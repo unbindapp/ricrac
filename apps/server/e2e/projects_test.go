@@ -294,3 +294,13 @@ func TestProgressOnlyCountsIssuesTheReaderSees(t *testing.T) {
 	eq(t, call(t, bob, "get_initiative", M{"id": "Grow"}).At("progress").Num(), 1)
 	eq(t, call(t, w.Ann, "get_initiative", M{"id": "Grow"}).At("progress").Num(), 0.5)
 }
+
+func TestDateResolutionsNeedADate(t *testing.T) {
+	w := world(t)
+	call(t, w.Ann, "save_project", M{"name": "Launch", "setTeams": []any{"ENG"}, "targetDate": "2030-03-31"})
+	cleared := call(t, w.Ann, "save_project", M{"id": "Launch", "targetDate": nil, "targetDateResolution": "quarter"})
+	check(t, cleared.At("targetDate").IsNull() && cleared.At("targetDateResolution").IsNull(), cleared.JSON())
+	call(t, w.Ann, "save_initiative", M{"name": "Grow", "targetDate": "2030-03-31"})
+	initiative := call(t, w.Ann, "save_initiative", M{"id": "Grow", "targetDate": nil, "targetDateResolution": "year"})
+	check(t, initiative.At("targetDateResolution").IsNull(), initiative.JSON())
+}

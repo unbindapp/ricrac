@@ -1223,7 +1223,7 @@ func projectDates(c *app.Ctx, tx pgx.Tx, id uuid.UUID, which string, date, resol
 	if err != nil {
 		return err
 	}
-	return app.Exec(c, tx, fmt.Sprintf("UPDATE projects SET %s_date_resolution = $2 WHERE id = $1", which), id, value)
+	return app.Exec(c, tx, fmt.Sprintf("UPDATE projects SET %[1]s_date_resolution = CASE WHEN %[1]s_date IS NULL THEN NULL ELSE $2 END WHERE id = $1", which), id, value)
 }
 
 func projectTeams(c *app.Ctx, tx pgx.Tx, id uuid.UUID, set, add, remove []string) error {

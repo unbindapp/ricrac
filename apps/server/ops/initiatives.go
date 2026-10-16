@@ -385,7 +385,7 @@ func applyInitiativeChanges(c *app.Ctx, tx pgx.Tx, id uuid.UUID, args SaveInitia
 		if err != nil {
 			return err
 		}
-		if err := app.Exec(c, tx, "UPDATE initiatives SET target_date_resolution = $2 WHERE id = $1", id, resolution); err != nil {
+		if err := app.Exec(c, tx, "UPDATE initiatives SET target_date_resolution = CASE WHEN target_date IS NULL THEN NULL ELSE $2 END WHERE id = $1", id, resolution); err != nil {
 			return err
 		}
 	}
