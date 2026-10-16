@@ -1,5 +1,6 @@
 import {
   BoxIcon,
+  BuildingIcon,
   CircleDotIcon,
   FileTextIcon,
   InboxIcon,
@@ -8,6 +9,7 @@ import {
   ListTodoIcon,
   PlusIcon,
   RefreshCwIcon,
+  RocketIcon,
   SearchIcon,
   SettingsIcon,
   SquarePenIcon,
@@ -121,6 +123,18 @@ export function Sidebar({ onNavigate }: TProps) {
               label="Documents"
               icon={FileTextIcon}
               link={{ to: "/$workspace/documents", params }}
+              onNavigate={onNavigate}
+            />
+            <SidebarNavItem
+              label="Customers"
+              icon={BuildingIcon}
+              link={{ to: "/$workspace/customers", params }}
+              onNavigate={onNavigate}
+            />
+            <SidebarNavItem
+              label="Releases"
+              icon={RocketIcon}
+              link={{ to: "/$workspace/releases", params }}
               onNavigate={onNavigate}
             />
             <SidebarNavItem

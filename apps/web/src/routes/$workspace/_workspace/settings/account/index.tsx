@@ -6,6 +6,7 @@ import { type ReactNode } from "react";
 import { z } from "zod";
 
 import type { WorkspaceUserDetail } from "@/api/ops.gen";
+import { GithubAccountSection } from "@/components/integrations/github-account-section";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { SettingsPage } from "@/components/layout/settings-page";
@@ -51,6 +52,7 @@ function AccountProfileSettingsPage() {
         <>
           <ProfileSection me={me} />
           <NotificationsSection me={me} />
+          <GithubAccountSection />
           <AppearanceSection />
         </>
       )}
