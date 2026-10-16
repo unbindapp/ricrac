@@ -16,17 +16,22 @@ import { Route as PrivacyIndexRouteImport } from './routes/privacy/index'
 import { Route as SignInIndexRouteImport } from './routes/sign-in/index'
 import { Route as TermsIndexRouteImport } from './routes/terms/index'
 import { Route as WorkspaceWorkspaceIndexRouteImport } from './routes/$workspace/_workspace/index'
+import { Route as WorkspaceWorkspaceCustomersRouteImport } from './routes/$workspace/_workspace/customers'
 import { Route as WorkspaceWorkspaceDocumentsRouteImport } from './routes/$workspace/_workspace/documents'
 import { Route as WorkspaceWorkspaceInboxRouteImport } from './routes/$workspace/_workspace/inbox'
 import { Route as WorkspaceWorkspaceInitiativesRouteImport } from './routes/$workspace/_workspace/initiatives'
 import { Route as WorkspaceWorkspaceIssuesRouteImport } from './routes/$workspace/_workspace/issues'
 import { Route as WorkspaceWorkspaceMyIssuesRouteImport } from './routes/$workspace/_workspace/my-issues'
 import { Route as WorkspaceWorkspaceProjectsRouteImport } from './routes/$workspace/_workspace/projects'
+import { Route as WorkspaceWorkspaceReleasesRouteImport } from './routes/$workspace/_workspace/releases'
 import { Route as WorkspaceWorkspaceViewsRouteImport } from './routes/$workspace/_workspace/views'
 import { Route as OauthAuthorizeIndexRouteImport } from './routes/oauth/authorize/index'
+import { Route as WorkspaceWorkspaceCustomerSlugRouteImport } from './routes/$workspace/_workspace/customer/$slug'
 import { Route as WorkspaceWorkspaceDocumentSlugRouteImport } from './routes/$workspace/_workspace/document/$slug'
 import { Route as WorkspaceWorkspaceInitiativeSlugRouteImport } from './routes/$workspace/_workspace/initiative/$slug'
 import { Route as WorkspaceWorkspaceIssueIdentifierRouteImport } from './routes/$workspace/_workspace/issue/$identifier'
+import { Route as WorkspaceWorkspaceReleaseNoteSlugRouteImport } from './routes/$workspace/_workspace/release-note/$slug'
+import { Route as WorkspaceWorkspaceReleaseSlugRouteImport } from './routes/$workspace/_workspace/release/$slug'
 import { Route as WorkspaceWorkspaceSettingsAdminRouteRouteImport } from './routes/$workspace/_workspace/settings/_admin/route'
 import { Route as WorkspaceWorkspaceSettingsAccountRouteRouteImport } from './routes/$workspace/_workspace/settings/account/route'
 import { Route as WorkspaceWorkspaceTeamKeyRouteRouteImport } from './routes/$workspace/_workspace/team/$key/route'
@@ -34,12 +39,15 @@ import { Route as WorkspaceWorkspaceViewView_idRouteImport } from './routes/$wor
 import { Route as WorkspaceWorkspaceProjectSlugIndexRouteImport } from './routes/$workspace/_workspace/project/$slug/index'
 import { Route as WorkspaceWorkspaceProjectSlugIssuesRouteImport } from './routes/$workspace/_workspace/project/$slug/issues'
 import { Route as WorkspaceWorkspaceSettingsAdminIndexRouteImport } from './routes/$workspace/_workspace/settings/_admin/index'
+import { Route as WorkspaceWorkspaceSettingsAdminCustomersRouteImport } from './routes/$workspace/_workspace/settings/_admin/customers'
 import { Route as WorkspaceWorkspaceSettingsAdminDangerRouteImport } from './routes/$workspace/_workspace/settings/_admin/danger'
 import { Route as WorkspaceWorkspaceSettingsAdminImportRouteImport } from './routes/$workspace/_workspace/settings/_admin/import'
+import { Route as WorkspaceWorkspaceSettingsAdminIntegrationsRouteImport } from './routes/$workspace/_workspace/settings/_admin/integrations'
 import { Route as WorkspaceWorkspaceSettingsAdminLabelsRouteImport } from './routes/$workspace/_workspace/settings/_admin/labels'
 import { Route as WorkspaceWorkspaceSettingsAdminMembersRouteImport } from './routes/$workspace/_workspace/settings/_admin/members'
 import { Route as WorkspaceWorkspaceSettingsAdminOauthAppsRouteImport } from './routes/$workspace/_workspace/settings/_admin/oauth-apps'
 import { Route as WorkspaceWorkspaceSettingsAdminProjectStatusesRouteImport } from './routes/$workspace/_workspace/settings/_admin/project-statuses'
+import { Route as WorkspaceWorkspaceSettingsAdminReleasesRouteImport } from './routes/$workspace/_workspace/settings/_admin/releases'
 import { Route as WorkspaceWorkspaceSettingsAdminTeamsRouteImport } from './routes/$workspace/_workspace/settings/_admin/teams'
 import { Route as WorkspaceWorkspaceSettingsAdminTemplatesRouteImport } from './routes/$workspace/_workspace/settings/_admin/templates'
 import { Route as WorkspaceWorkspaceSettingsAdminWebhooksRouteImport } from './routes/$workspace/_workspace/settings/_admin/webhooks'
@@ -59,6 +67,7 @@ import { Route as WorkspaceWorkspaceSettingsTeamKeyAutoArchiveRouteImport } from
 import { Route as WorkspaceWorkspaceSettingsTeamKeyCyclesRouteImport } from './routes/$workspace/_workspace/settings/team/$key/cycles'
 import { Route as WorkspaceWorkspaceSettingsTeamKeyDangerRouteImport } from './routes/$workspace/_workspace/settings/team/$key/danger'
 import { Route as WorkspaceWorkspaceSettingsTeamKeyEstimatesRouteImport } from './routes/$workspace/_workspace/settings/team/$key/estimates'
+import { Route as WorkspaceWorkspaceSettingsTeamKeyGithubRouteImport } from './routes/$workspace/_workspace/settings/team/$key/github'
 import { Route as WorkspaceWorkspaceSettingsTeamKeyLabelsRouteImport } from './routes/$workspace/_workspace/settings/team/$key/labels'
 import { Route as WorkspaceWorkspaceSettingsTeamKeyMembersRouteImport } from './routes/$workspace/_workspace/settings/team/$key/members'
 import { Route as WorkspaceWorkspaceSettingsTeamKeyTemplatesRouteImport } from './routes/$workspace/_workspace/settings/team/$key/templates'
@@ -101,6 +110,12 @@ const WorkspaceWorkspaceIndexRoute = WorkspaceWorkspaceIndexRouteImport.update({
   path: '/',
   getParentRoute: () => WorkspaceWorkspaceRouteRoute,
 } as any)
+const WorkspaceWorkspaceCustomersRoute =
+  WorkspaceWorkspaceCustomersRouteImport.update({
+    id: '/customers',
+    path: '/customers',
+    getParentRoute: () => WorkspaceWorkspaceRouteRoute,
+  } as any)
 const WorkspaceWorkspaceDocumentsRoute =
   WorkspaceWorkspaceDocumentsRouteImport.update({
     id: '/documents',
@@ -136,6 +151,12 @@ const WorkspaceWorkspaceProjectsRoute =
     path: '/projects',
     getParentRoute: () => WorkspaceWorkspaceRouteRoute,
   } as any)
+const WorkspaceWorkspaceReleasesRoute =
+  WorkspaceWorkspaceReleasesRouteImport.update({
+    id: '/releases',
+    path: '/releases',
+    getParentRoute: () => WorkspaceWorkspaceRouteRoute,
+  } as any)
 const WorkspaceWorkspaceViewsRoute = WorkspaceWorkspaceViewsRouteImport.update({
   id: '/views',
   path: '/views',
@@ -146,6 +167,12 @@ const OauthAuthorizeIndexRoute = OauthAuthorizeIndexRouteImport.update({
   path: '/oauth/authorize/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkspaceWorkspaceCustomerSlugRoute =
+  WorkspaceWorkspaceCustomerSlugRouteImport.update({
+    id: '/customer/$slug',
+    path: '/customer/$slug',
+    getParentRoute: () => WorkspaceWorkspaceRouteRoute,
+  } as any)
 const WorkspaceWorkspaceDocumentSlugRoute =
   WorkspaceWorkspaceDocumentSlugRouteImport.update({
     id: '/document/$slug',
@@ -162,6 +189,18 @@ const WorkspaceWorkspaceIssueIdentifierRoute =
   WorkspaceWorkspaceIssueIdentifierRouteImport.update({
     id: '/issue/$identifier',
     path: '/issue/$identifier',
+    getParentRoute: () => WorkspaceWorkspaceRouteRoute,
+  } as any)
+const WorkspaceWorkspaceReleaseNoteSlugRoute =
+  WorkspaceWorkspaceReleaseNoteSlugRouteImport.update({
+    id: '/release-note/$slug',
+    path: '/release-note/$slug',
+    getParentRoute: () => WorkspaceWorkspaceRouteRoute,
+  } as any)
+const WorkspaceWorkspaceReleaseSlugRoute =
+  WorkspaceWorkspaceReleaseSlugRouteImport.update({
+    id: '/release/$slug',
+    path: '/release/$slug',
     getParentRoute: () => WorkspaceWorkspaceRouteRoute,
   } as any)
 const WorkspaceWorkspaceSettingsAdminRouteRoute =
@@ -206,6 +245,12 @@ const WorkspaceWorkspaceSettingsAdminIndexRoute =
     path: '/',
     getParentRoute: () => WorkspaceWorkspaceSettingsAdminRouteRoute,
   } as any)
+const WorkspaceWorkspaceSettingsAdminCustomersRoute =
+  WorkspaceWorkspaceSettingsAdminCustomersRouteImport.update({
+    id: '/customers',
+    path: '/customers',
+    getParentRoute: () => WorkspaceWorkspaceSettingsAdminRouteRoute,
+  } as any)
 const WorkspaceWorkspaceSettingsAdminDangerRoute =
   WorkspaceWorkspaceSettingsAdminDangerRouteImport.update({
     id: '/danger',
@@ -216,6 +261,12 @@ const WorkspaceWorkspaceSettingsAdminImportRoute =
   WorkspaceWorkspaceSettingsAdminImportRouteImport.update({
     id: '/import',
     path: '/import',
+    getParentRoute: () => WorkspaceWorkspaceSettingsAdminRouteRoute,
+  } as any)
+const WorkspaceWorkspaceSettingsAdminIntegrationsRoute =
+  WorkspaceWorkspaceSettingsAdminIntegrationsRouteImport.update({
+    id: '/integrations',
+    path: '/integrations',
     getParentRoute: () => WorkspaceWorkspaceSettingsAdminRouteRoute,
   } as any)
 const WorkspaceWorkspaceSettingsAdminLabelsRoute =
@@ -240,6 +291,12 @@ const WorkspaceWorkspaceSettingsAdminProjectStatusesRoute =
   WorkspaceWorkspaceSettingsAdminProjectStatusesRouteImport.update({
     id: '/project-statuses',
     path: '/project-statuses',
+    getParentRoute: () => WorkspaceWorkspaceSettingsAdminRouteRoute,
+  } as any)
+const WorkspaceWorkspaceSettingsAdminReleasesRoute =
+  WorkspaceWorkspaceSettingsAdminReleasesRouteImport.update({
+    id: '/releases',
+    path: '/releases',
     getParentRoute: () => WorkspaceWorkspaceSettingsAdminRouteRoute,
   } as any)
 const WorkspaceWorkspaceSettingsAdminTeamsRoute =
@@ -356,6 +413,12 @@ const WorkspaceWorkspaceSettingsTeamKeyEstimatesRoute =
     path: '/estimates',
     getParentRoute: () => WorkspaceWorkspaceSettingsTeamKeyRouteRoute,
   } as any)
+const WorkspaceWorkspaceSettingsTeamKeyGithubRoute =
+  WorkspaceWorkspaceSettingsTeamKeyGithubRouteImport.update({
+    id: '/github',
+    path: '/github',
+    getParentRoute: () => WorkspaceWorkspaceSettingsTeamKeyRouteRoute,
+  } as any)
 const WorkspaceWorkspaceSettingsTeamKeyLabelsRoute =
   WorkspaceWorkspaceSettingsTeamKeyLabelsRouteImport.update({
     id: '/labels',
@@ -400,30 +463,38 @@ export interface FileRoutesByFullPath {
   '/privacy/': typeof PrivacyIndexRoute
   '/sign-in/': typeof SignInIndexRoute
   '/terms/': typeof TermsIndexRoute
+  '/$workspace/customers': typeof WorkspaceWorkspaceCustomersRoute
   '/$workspace/documents': typeof WorkspaceWorkspaceDocumentsRoute
   '/$workspace/inbox': typeof WorkspaceWorkspaceInboxRoute
   '/$workspace/initiatives': typeof WorkspaceWorkspaceInitiativesRoute
   '/$workspace/issues': typeof WorkspaceWorkspaceIssuesRoute
   '/$workspace/my-issues': typeof WorkspaceWorkspaceMyIssuesRoute
   '/$workspace/projects': typeof WorkspaceWorkspaceProjectsRoute
+  '/$workspace/releases': typeof WorkspaceWorkspaceReleasesRoute
   '/$workspace/views': typeof WorkspaceWorkspaceViewsRoute
   '/$workspace/': typeof WorkspaceWorkspaceIndexRoute
   '/oauth/authorize/': typeof OauthAuthorizeIndexRoute
   '/$workspace/settings': typeof WorkspaceWorkspaceSettingsAdminRouteRouteWithChildren
   '/$workspace/settings/account': typeof WorkspaceWorkspaceSettingsAccountRouteRouteWithChildren
   '/$workspace/team/$key': typeof WorkspaceWorkspaceTeamKeyRouteRouteWithChildren
+  '/$workspace/customer/$slug': typeof WorkspaceWorkspaceCustomerSlugRoute
   '/$workspace/document/$slug': typeof WorkspaceWorkspaceDocumentSlugRoute
   '/$workspace/initiative/$slug': typeof WorkspaceWorkspaceInitiativeSlugRoute
   '/$workspace/issue/$identifier': typeof WorkspaceWorkspaceIssueIdentifierRoute
+  '/$workspace/release-note/$slug': typeof WorkspaceWorkspaceReleaseNoteSlugRoute
+  '/$workspace/release/$slug': typeof WorkspaceWorkspaceReleaseSlugRoute
   '/$workspace/view/$view_id': typeof WorkspaceWorkspaceViewView_idRoute
   '/$workspace/settings/team/$key': typeof WorkspaceWorkspaceSettingsTeamKeyRouteRouteWithChildren
   '/$workspace/project/$slug/issues': typeof WorkspaceWorkspaceProjectSlugIssuesRoute
+  '/$workspace/settings/customers': typeof WorkspaceWorkspaceSettingsAdminCustomersRoute
   '/$workspace/settings/danger': typeof WorkspaceWorkspaceSettingsAdminDangerRoute
   '/$workspace/settings/import': typeof WorkspaceWorkspaceSettingsAdminImportRoute
+  '/$workspace/settings/integrations': typeof WorkspaceWorkspaceSettingsAdminIntegrationsRoute
   '/$workspace/settings/labels': typeof WorkspaceWorkspaceSettingsAdminLabelsRoute
   '/$workspace/settings/members': typeof WorkspaceWorkspaceSettingsAdminMembersRoute
   '/$workspace/settings/oauth-apps': typeof WorkspaceWorkspaceSettingsAdminOauthAppsRoute
   '/$workspace/settings/project-statuses': typeof WorkspaceWorkspaceSettingsAdminProjectStatusesRoute
+  '/$workspace/settings/releases': typeof WorkspaceWorkspaceSettingsAdminReleasesRoute
   '/$workspace/settings/teams': typeof WorkspaceWorkspaceSettingsAdminTeamsRoute
   '/$workspace/settings/templates': typeof WorkspaceWorkspaceSettingsAdminTemplatesRoute
   '/$workspace/settings/webhooks': typeof WorkspaceWorkspaceSettingsAdminWebhooksRoute
@@ -443,6 +514,7 @@ export interface FileRoutesByFullPath {
   '/$workspace/settings/team/$key/cycles': typeof WorkspaceWorkspaceSettingsTeamKeyCyclesRoute
   '/$workspace/settings/team/$key/danger': typeof WorkspaceWorkspaceSettingsTeamKeyDangerRoute
   '/$workspace/settings/team/$key/estimates': typeof WorkspaceWorkspaceSettingsTeamKeyEstimatesRoute
+  '/$workspace/settings/team/$key/github': typeof WorkspaceWorkspaceSettingsTeamKeyGithubRoute
   '/$workspace/settings/team/$key/labels': typeof WorkspaceWorkspaceSettingsTeamKeyLabelsRoute
   '/$workspace/settings/team/$key/members': typeof WorkspaceWorkspaceSettingsTeamKeyMembersRoute
   '/$workspace/settings/team/$key/templates': typeof WorkspaceWorkspaceSettingsTeamKeyTemplatesRoute
@@ -457,26 +529,34 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyIndexRoute
   '/sign-in': typeof SignInIndexRoute
   '/terms': typeof TermsIndexRoute
+  '/$workspace/customers': typeof WorkspaceWorkspaceCustomersRoute
   '/$workspace/documents': typeof WorkspaceWorkspaceDocumentsRoute
   '/$workspace/inbox': typeof WorkspaceWorkspaceInboxRoute
   '/$workspace/initiatives': typeof WorkspaceWorkspaceInitiativesRoute
   '/$workspace/issues': typeof WorkspaceWorkspaceIssuesRoute
   '/$workspace/my-issues': typeof WorkspaceWorkspaceMyIssuesRoute
   '/$workspace/projects': typeof WorkspaceWorkspaceProjectsRoute
+  '/$workspace/releases': typeof WorkspaceWorkspaceReleasesRoute
   '/$workspace/views': typeof WorkspaceWorkspaceViewsRoute
   '/$workspace': typeof WorkspaceWorkspaceIndexRoute
   '/oauth/authorize': typeof OauthAuthorizeIndexRoute
+  '/$workspace/customer/$slug': typeof WorkspaceWorkspaceCustomerSlugRoute
   '/$workspace/document/$slug': typeof WorkspaceWorkspaceDocumentSlugRoute
   '/$workspace/initiative/$slug': typeof WorkspaceWorkspaceInitiativeSlugRoute
   '/$workspace/issue/$identifier': typeof WorkspaceWorkspaceIssueIdentifierRoute
+  '/$workspace/release-note/$slug': typeof WorkspaceWorkspaceReleaseNoteSlugRoute
+  '/$workspace/release/$slug': typeof WorkspaceWorkspaceReleaseSlugRoute
   '/$workspace/view/$view_id': typeof WorkspaceWorkspaceViewView_idRoute
   '/$workspace/project/$slug/issues': typeof WorkspaceWorkspaceProjectSlugIssuesRoute
+  '/$workspace/settings/customers': typeof WorkspaceWorkspaceSettingsAdminCustomersRoute
   '/$workspace/settings/danger': typeof WorkspaceWorkspaceSettingsAdminDangerRoute
   '/$workspace/settings/import': typeof WorkspaceWorkspaceSettingsAdminImportRoute
+  '/$workspace/settings/integrations': typeof WorkspaceWorkspaceSettingsAdminIntegrationsRoute
   '/$workspace/settings/labels': typeof WorkspaceWorkspaceSettingsAdminLabelsRoute
   '/$workspace/settings/members': typeof WorkspaceWorkspaceSettingsAdminMembersRoute
   '/$workspace/settings/oauth-apps': typeof WorkspaceWorkspaceSettingsAdminOauthAppsRoute
   '/$workspace/settings/project-statuses': typeof WorkspaceWorkspaceSettingsAdminProjectStatusesRoute
+  '/$workspace/settings/releases': typeof WorkspaceWorkspaceSettingsAdminReleasesRoute
   '/$workspace/settings/teams': typeof WorkspaceWorkspaceSettingsAdminTeamsRoute
   '/$workspace/settings/templates': typeof WorkspaceWorkspaceSettingsAdminTemplatesRoute
   '/$workspace/settings/webhooks': typeof WorkspaceWorkspaceSettingsAdminWebhooksRoute
@@ -496,6 +576,7 @@ export interface FileRoutesByTo {
   '/$workspace/settings/team/$key/cycles': typeof WorkspaceWorkspaceSettingsTeamKeyCyclesRoute
   '/$workspace/settings/team/$key/danger': typeof WorkspaceWorkspaceSettingsTeamKeyDangerRoute
   '/$workspace/settings/team/$key/estimates': typeof WorkspaceWorkspaceSettingsTeamKeyEstimatesRoute
+  '/$workspace/settings/team/$key/github': typeof WorkspaceWorkspaceSettingsTeamKeyGithubRoute
   '/$workspace/settings/team/$key/labels': typeof WorkspaceWorkspaceSettingsTeamKeyLabelsRoute
   '/$workspace/settings/team/$key/members': typeof WorkspaceWorkspaceSettingsTeamKeyMembersRoute
   '/$workspace/settings/team/$key/templates': typeof WorkspaceWorkspaceSettingsTeamKeyTemplatesRoute
@@ -512,30 +593,38 @@ export interface FileRoutesById {
   '/privacy/': typeof PrivacyIndexRoute
   '/sign-in/': typeof SignInIndexRoute
   '/terms/': typeof TermsIndexRoute
+  '/$workspace/_workspace/customers': typeof WorkspaceWorkspaceCustomersRoute
   '/$workspace/_workspace/documents': typeof WorkspaceWorkspaceDocumentsRoute
   '/$workspace/_workspace/inbox': typeof WorkspaceWorkspaceInboxRoute
   '/$workspace/_workspace/initiatives': typeof WorkspaceWorkspaceInitiativesRoute
   '/$workspace/_workspace/issues': typeof WorkspaceWorkspaceIssuesRoute
   '/$workspace/_workspace/my-issues': typeof WorkspaceWorkspaceMyIssuesRoute
   '/$workspace/_workspace/projects': typeof WorkspaceWorkspaceProjectsRoute
+  '/$workspace/_workspace/releases': typeof WorkspaceWorkspaceReleasesRoute
   '/$workspace/_workspace/views': typeof WorkspaceWorkspaceViewsRoute
   '/$workspace/_workspace/': typeof WorkspaceWorkspaceIndexRoute
   '/oauth/authorize/': typeof OauthAuthorizeIndexRoute
   '/$workspace/_workspace/settings/_admin': typeof WorkspaceWorkspaceSettingsAdminRouteRouteWithChildren
   '/$workspace/_workspace/settings/account': typeof WorkspaceWorkspaceSettingsAccountRouteRouteWithChildren
   '/$workspace/_workspace/team/$key': typeof WorkspaceWorkspaceTeamKeyRouteRouteWithChildren
+  '/$workspace/_workspace/customer/$slug': typeof WorkspaceWorkspaceCustomerSlugRoute
   '/$workspace/_workspace/document/$slug': typeof WorkspaceWorkspaceDocumentSlugRoute
   '/$workspace/_workspace/initiative/$slug': typeof WorkspaceWorkspaceInitiativeSlugRoute
   '/$workspace/_workspace/issue/$identifier': typeof WorkspaceWorkspaceIssueIdentifierRoute
+  '/$workspace/_workspace/release-note/$slug': typeof WorkspaceWorkspaceReleaseNoteSlugRoute
+  '/$workspace/_workspace/release/$slug': typeof WorkspaceWorkspaceReleaseSlugRoute
   '/$workspace/_workspace/view/$view_id': typeof WorkspaceWorkspaceViewView_idRoute
   '/$workspace/_workspace/settings/team/$key': typeof WorkspaceWorkspaceSettingsTeamKeyRouteRouteWithChildren
   '/$workspace/_workspace/project/$slug/issues': typeof WorkspaceWorkspaceProjectSlugIssuesRoute
+  '/$workspace/_workspace/settings/_admin/customers': typeof WorkspaceWorkspaceSettingsAdminCustomersRoute
   '/$workspace/_workspace/settings/_admin/danger': typeof WorkspaceWorkspaceSettingsAdminDangerRoute
   '/$workspace/_workspace/settings/_admin/import': typeof WorkspaceWorkspaceSettingsAdminImportRoute
+  '/$workspace/_workspace/settings/_admin/integrations': typeof WorkspaceWorkspaceSettingsAdminIntegrationsRoute
   '/$workspace/_workspace/settings/_admin/labels': typeof WorkspaceWorkspaceSettingsAdminLabelsRoute
   '/$workspace/_workspace/settings/_admin/members': typeof WorkspaceWorkspaceSettingsAdminMembersRoute
   '/$workspace/_workspace/settings/_admin/oauth-apps': typeof WorkspaceWorkspaceSettingsAdminOauthAppsRoute
   '/$workspace/_workspace/settings/_admin/project-statuses': typeof WorkspaceWorkspaceSettingsAdminProjectStatusesRoute
+  '/$workspace/_workspace/settings/_admin/releases': typeof WorkspaceWorkspaceSettingsAdminReleasesRoute
   '/$workspace/_workspace/settings/_admin/teams': typeof WorkspaceWorkspaceSettingsAdminTeamsRoute
   '/$workspace/_workspace/settings/_admin/templates': typeof WorkspaceWorkspaceSettingsAdminTemplatesRoute
   '/$workspace/_workspace/settings/_admin/webhooks': typeof WorkspaceWorkspaceSettingsAdminWebhooksRoute
@@ -555,6 +644,7 @@ export interface FileRoutesById {
   '/$workspace/_workspace/settings/team/$key/cycles': typeof WorkspaceWorkspaceSettingsTeamKeyCyclesRoute
   '/$workspace/_workspace/settings/team/$key/danger': typeof WorkspaceWorkspaceSettingsTeamKeyDangerRoute
   '/$workspace/_workspace/settings/team/$key/estimates': typeof WorkspaceWorkspaceSettingsTeamKeyEstimatesRoute
+  '/$workspace/_workspace/settings/team/$key/github': typeof WorkspaceWorkspaceSettingsTeamKeyGithubRoute
   '/$workspace/_workspace/settings/team/$key/labels': typeof WorkspaceWorkspaceSettingsTeamKeyLabelsRoute
   '/$workspace/_workspace/settings/team/$key/members': typeof WorkspaceWorkspaceSettingsTeamKeyMembersRoute
   '/$workspace/_workspace/settings/team/$key/templates': typeof WorkspaceWorkspaceSettingsTeamKeyTemplatesRoute
@@ -572,30 +662,38 @@ export interface FileRouteTypes {
     | '/privacy/'
     | '/sign-in/'
     | '/terms/'
+    | '/$workspace/customers'
     | '/$workspace/documents'
     | '/$workspace/inbox'
     | '/$workspace/initiatives'
     | '/$workspace/issues'
     | '/$workspace/my-issues'
     | '/$workspace/projects'
+    | '/$workspace/releases'
     | '/$workspace/views'
     | '/$workspace/'
     | '/oauth/authorize/'
     | '/$workspace/settings'
     | '/$workspace/settings/account'
     | '/$workspace/team/$key'
+    | '/$workspace/customer/$slug'
     | '/$workspace/document/$slug'
     | '/$workspace/initiative/$slug'
     | '/$workspace/issue/$identifier'
+    | '/$workspace/release-note/$slug'
+    | '/$workspace/release/$slug'
     | '/$workspace/view/$view_id'
     | '/$workspace/settings/team/$key'
     | '/$workspace/project/$slug/issues'
+    | '/$workspace/settings/customers'
     | '/$workspace/settings/danger'
     | '/$workspace/settings/import'
+    | '/$workspace/settings/integrations'
     | '/$workspace/settings/labels'
     | '/$workspace/settings/members'
     | '/$workspace/settings/oauth-apps'
     | '/$workspace/settings/project-statuses'
+    | '/$workspace/settings/releases'
     | '/$workspace/settings/teams'
     | '/$workspace/settings/templates'
     | '/$workspace/settings/webhooks'
@@ -615,6 +713,7 @@ export interface FileRouteTypes {
     | '/$workspace/settings/team/$key/cycles'
     | '/$workspace/settings/team/$key/danger'
     | '/$workspace/settings/team/$key/estimates'
+    | '/$workspace/settings/team/$key/github'
     | '/$workspace/settings/team/$key/labels'
     | '/$workspace/settings/team/$key/members'
     | '/$workspace/settings/team/$key/templates'
@@ -629,26 +728,34 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sign-in'
     | '/terms'
+    | '/$workspace/customers'
     | '/$workspace/documents'
     | '/$workspace/inbox'
     | '/$workspace/initiatives'
     | '/$workspace/issues'
     | '/$workspace/my-issues'
     | '/$workspace/projects'
+    | '/$workspace/releases'
     | '/$workspace/views'
     | '/$workspace'
     | '/oauth/authorize'
+    | '/$workspace/customer/$slug'
     | '/$workspace/document/$slug'
     | '/$workspace/initiative/$slug'
     | '/$workspace/issue/$identifier'
+    | '/$workspace/release-note/$slug'
+    | '/$workspace/release/$slug'
     | '/$workspace/view/$view_id'
     | '/$workspace/project/$slug/issues'
+    | '/$workspace/settings/customers'
     | '/$workspace/settings/danger'
     | '/$workspace/settings/import'
+    | '/$workspace/settings/integrations'
     | '/$workspace/settings/labels'
     | '/$workspace/settings/members'
     | '/$workspace/settings/oauth-apps'
     | '/$workspace/settings/project-statuses'
+    | '/$workspace/settings/releases'
     | '/$workspace/settings/teams'
     | '/$workspace/settings/templates'
     | '/$workspace/settings/webhooks'
@@ -668,6 +775,7 @@ export interface FileRouteTypes {
     | '/$workspace/settings/team/$key/cycles'
     | '/$workspace/settings/team/$key/danger'
     | '/$workspace/settings/team/$key/estimates'
+    | '/$workspace/settings/team/$key/github'
     | '/$workspace/settings/team/$key/labels'
     | '/$workspace/settings/team/$key/members'
     | '/$workspace/settings/team/$key/templates'
@@ -683,30 +791,38 @@ export interface FileRouteTypes {
     | '/privacy/'
     | '/sign-in/'
     | '/terms/'
+    | '/$workspace/_workspace/customers'
     | '/$workspace/_workspace/documents'
     | '/$workspace/_workspace/inbox'
     | '/$workspace/_workspace/initiatives'
     | '/$workspace/_workspace/issues'
     | '/$workspace/_workspace/my-issues'
     | '/$workspace/_workspace/projects'
+    | '/$workspace/_workspace/releases'
     | '/$workspace/_workspace/views'
     | '/$workspace/_workspace/'
     | '/oauth/authorize/'
     | '/$workspace/_workspace/settings/_admin'
     | '/$workspace/_workspace/settings/account'
     | '/$workspace/_workspace/team/$key'
+    | '/$workspace/_workspace/customer/$slug'
     | '/$workspace/_workspace/document/$slug'
     | '/$workspace/_workspace/initiative/$slug'
     | '/$workspace/_workspace/issue/$identifier'
+    | '/$workspace/_workspace/release-note/$slug'
+    | '/$workspace/_workspace/release/$slug'
     | '/$workspace/_workspace/view/$view_id'
     | '/$workspace/_workspace/settings/team/$key'
     | '/$workspace/_workspace/project/$slug/issues'
+    | '/$workspace/_workspace/settings/_admin/customers'
     | '/$workspace/_workspace/settings/_admin/danger'
     | '/$workspace/_workspace/settings/_admin/import'
+    | '/$workspace/_workspace/settings/_admin/integrations'
     | '/$workspace/_workspace/settings/_admin/labels'
     | '/$workspace/_workspace/settings/_admin/members'
     | '/$workspace/_workspace/settings/_admin/oauth-apps'
     | '/$workspace/_workspace/settings/_admin/project-statuses'
+    | '/$workspace/_workspace/settings/_admin/releases'
     | '/$workspace/_workspace/settings/_admin/teams'
     | '/$workspace/_workspace/settings/_admin/templates'
     | '/$workspace/_workspace/settings/_admin/webhooks'
@@ -726,6 +842,7 @@ export interface FileRouteTypes {
     | '/$workspace/_workspace/settings/team/$key/cycles'
     | '/$workspace/_workspace/settings/team/$key/danger'
     | '/$workspace/_workspace/settings/team/$key/estimates'
+    | '/$workspace/_workspace/settings/team/$key/github'
     | '/$workspace/_workspace/settings/team/$key/labels'
     | '/$workspace/_workspace/settings/team/$key/members'
     | '/$workspace/_workspace/settings/team/$key/templates'
@@ -796,6 +913,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceWorkspaceIndexRouteImport
       parentRoute: typeof WorkspaceWorkspaceRouteRoute
     }
+    '/$workspace/_workspace/customers': {
+      id: '/$workspace/_workspace/customers'
+      path: '/customers'
+      fullPath: '/$workspace/customers'
+      preLoaderRoute: typeof WorkspaceWorkspaceCustomersRouteImport
+      parentRoute: typeof WorkspaceWorkspaceRouteRoute
+    }
     '/$workspace/_workspace/documents': {
       id: '/$workspace/_workspace/documents'
       path: '/documents'
@@ -838,6 +962,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceWorkspaceProjectsRouteImport
       parentRoute: typeof WorkspaceWorkspaceRouteRoute
     }
+    '/$workspace/_workspace/releases': {
+      id: '/$workspace/_workspace/releases'
+      path: '/releases'
+      fullPath: '/$workspace/releases'
+      preLoaderRoute: typeof WorkspaceWorkspaceReleasesRouteImport
+      parentRoute: typeof WorkspaceWorkspaceRouteRoute
+    }
     '/$workspace/_workspace/views': {
       id: '/$workspace/_workspace/views'
       path: '/views'
@@ -851,6 +982,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/oauth/authorize/'
       preLoaderRoute: typeof OauthAuthorizeIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/$workspace/_workspace/customer/$slug': {
+      id: '/$workspace/_workspace/customer/$slug'
+      path: '/customer/$slug'
+      fullPath: '/$workspace/customer/$slug'
+      preLoaderRoute: typeof WorkspaceWorkspaceCustomerSlugRouteImport
+      parentRoute: typeof WorkspaceWorkspaceRouteRoute
     }
     '/$workspace/_workspace/document/$slug': {
       id: '/$workspace/_workspace/document/$slug'
@@ -871,6 +1009,20 @@ declare module '@tanstack/react-router' {
       path: '/issue/$identifier'
       fullPath: '/$workspace/issue/$identifier'
       preLoaderRoute: typeof WorkspaceWorkspaceIssueIdentifierRouteImport
+      parentRoute: typeof WorkspaceWorkspaceRouteRoute
+    }
+    '/$workspace/_workspace/release-note/$slug': {
+      id: '/$workspace/_workspace/release-note/$slug'
+      path: '/release-note/$slug'
+      fullPath: '/$workspace/release-note/$slug'
+      preLoaderRoute: typeof WorkspaceWorkspaceReleaseNoteSlugRouteImport
+      parentRoute: typeof WorkspaceWorkspaceRouteRoute
+    }
+    '/$workspace/_workspace/release/$slug': {
+      id: '/$workspace/_workspace/release/$slug'
+      path: '/release/$slug'
+      fullPath: '/$workspace/release/$slug'
+      preLoaderRoute: typeof WorkspaceWorkspaceReleaseSlugRouteImport
       parentRoute: typeof WorkspaceWorkspaceRouteRoute
     }
     '/$workspace/_workspace/settings/_admin': {
@@ -922,6 +1074,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceWorkspaceSettingsAdminIndexRouteImport
       parentRoute: typeof WorkspaceWorkspaceSettingsAdminRouteRoute
     }
+    '/$workspace/_workspace/settings/_admin/customers': {
+      id: '/$workspace/_workspace/settings/_admin/customers'
+      path: '/customers'
+      fullPath: '/$workspace/settings/customers'
+      preLoaderRoute: typeof WorkspaceWorkspaceSettingsAdminCustomersRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSettingsAdminRouteRoute
+    }
     '/$workspace/_workspace/settings/_admin/danger': {
       id: '/$workspace/_workspace/settings/_admin/danger'
       path: '/danger'
@@ -934,6 +1093,13 @@ declare module '@tanstack/react-router' {
       path: '/import'
       fullPath: '/$workspace/settings/import'
       preLoaderRoute: typeof WorkspaceWorkspaceSettingsAdminImportRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSettingsAdminRouteRoute
+    }
+    '/$workspace/_workspace/settings/_admin/integrations': {
+      id: '/$workspace/_workspace/settings/_admin/integrations'
+      path: '/integrations'
+      fullPath: '/$workspace/settings/integrations'
+      preLoaderRoute: typeof WorkspaceWorkspaceSettingsAdminIntegrationsRouteImport
       parentRoute: typeof WorkspaceWorkspaceSettingsAdminRouteRoute
     }
     '/$workspace/_workspace/settings/_admin/labels': {
@@ -962,6 +1128,13 @@ declare module '@tanstack/react-router' {
       path: '/project-statuses'
       fullPath: '/$workspace/settings/project-statuses'
       preLoaderRoute: typeof WorkspaceWorkspaceSettingsAdminProjectStatusesRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSettingsAdminRouteRoute
+    }
+    '/$workspace/_workspace/settings/_admin/releases': {
+      id: '/$workspace/_workspace/settings/_admin/releases'
+      path: '/releases'
+      fullPath: '/$workspace/settings/releases'
+      preLoaderRoute: typeof WorkspaceWorkspaceSettingsAdminReleasesRouteImport
       parentRoute: typeof WorkspaceWorkspaceSettingsAdminRouteRoute
     }
     '/$workspace/_workspace/settings/_admin/teams': {
@@ -1097,6 +1270,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceWorkspaceSettingsTeamKeyEstimatesRouteImport
       parentRoute: typeof WorkspaceWorkspaceSettingsTeamKeyRouteRoute
     }
+    '/$workspace/_workspace/settings/team/$key/github': {
+      id: '/$workspace/_workspace/settings/team/$key/github'
+      path: '/github'
+      fullPath: '/$workspace/settings/team/$key/github'
+      preLoaderRoute: typeof WorkspaceWorkspaceSettingsTeamKeyGithubRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSettingsTeamKeyRouteRoute
+    }
     '/$workspace/_workspace/settings/team/$key/labels': {
       id: '/$workspace/_workspace/settings/team/$key/labels'
       path: '/labels'
@@ -1143,12 +1323,15 @@ declare module '@tanstack/react-router' {
 }
 
 interface WorkspaceWorkspaceSettingsAdminRouteRouteChildren {
+  WorkspaceWorkspaceSettingsAdminCustomersRoute: typeof WorkspaceWorkspaceSettingsAdminCustomersRoute
   WorkspaceWorkspaceSettingsAdminDangerRoute: typeof WorkspaceWorkspaceSettingsAdminDangerRoute
   WorkspaceWorkspaceSettingsAdminImportRoute: typeof WorkspaceWorkspaceSettingsAdminImportRoute
+  WorkspaceWorkspaceSettingsAdminIntegrationsRoute: typeof WorkspaceWorkspaceSettingsAdminIntegrationsRoute
   WorkspaceWorkspaceSettingsAdminLabelsRoute: typeof WorkspaceWorkspaceSettingsAdminLabelsRoute
   WorkspaceWorkspaceSettingsAdminMembersRoute: typeof WorkspaceWorkspaceSettingsAdminMembersRoute
   WorkspaceWorkspaceSettingsAdminOauthAppsRoute: typeof WorkspaceWorkspaceSettingsAdminOauthAppsRoute
   WorkspaceWorkspaceSettingsAdminProjectStatusesRoute: typeof WorkspaceWorkspaceSettingsAdminProjectStatusesRoute
+  WorkspaceWorkspaceSettingsAdminReleasesRoute: typeof WorkspaceWorkspaceSettingsAdminReleasesRoute
   WorkspaceWorkspaceSettingsAdminTeamsRoute: typeof WorkspaceWorkspaceSettingsAdminTeamsRoute
   WorkspaceWorkspaceSettingsAdminTemplatesRoute: typeof WorkspaceWorkspaceSettingsAdminTemplatesRoute
   WorkspaceWorkspaceSettingsAdminWebhooksRoute: typeof WorkspaceWorkspaceSettingsAdminWebhooksRoute
@@ -1157,10 +1340,14 @@ interface WorkspaceWorkspaceSettingsAdminRouteRouteChildren {
 
 const WorkspaceWorkspaceSettingsAdminRouteRouteChildren: WorkspaceWorkspaceSettingsAdminRouteRouteChildren =
   {
+    WorkspaceWorkspaceSettingsAdminCustomersRoute:
+      WorkspaceWorkspaceSettingsAdminCustomersRoute,
     WorkspaceWorkspaceSettingsAdminDangerRoute:
       WorkspaceWorkspaceSettingsAdminDangerRoute,
     WorkspaceWorkspaceSettingsAdminImportRoute:
       WorkspaceWorkspaceSettingsAdminImportRoute,
+    WorkspaceWorkspaceSettingsAdminIntegrationsRoute:
+      WorkspaceWorkspaceSettingsAdminIntegrationsRoute,
     WorkspaceWorkspaceSettingsAdminLabelsRoute:
       WorkspaceWorkspaceSettingsAdminLabelsRoute,
     WorkspaceWorkspaceSettingsAdminMembersRoute:
@@ -1169,6 +1356,8 @@ const WorkspaceWorkspaceSettingsAdminRouteRouteChildren: WorkspaceWorkspaceSetti
       WorkspaceWorkspaceSettingsAdminOauthAppsRoute,
     WorkspaceWorkspaceSettingsAdminProjectStatusesRoute:
       WorkspaceWorkspaceSettingsAdminProjectStatusesRoute,
+    WorkspaceWorkspaceSettingsAdminReleasesRoute:
+      WorkspaceWorkspaceSettingsAdminReleasesRoute,
     WorkspaceWorkspaceSettingsAdminTeamsRoute:
       WorkspaceWorkspaceSettingsAdminTeamsRoute,
     WorkspaceWorkspaceSettingsAdminTemplatesRoute:
@@ -1241,6 +1430,7 @@ interface WorkspaceWorkspaceSettingsTeamKeyRouteRouteChildren {
   WorkspaceWorkspaceSettingsTeamKeyCyclesRoute: typeof WorkspaceWorkspaceSettingsTeamKeyCyclesRoute
   WorkspaceWorkspaceSettingsTeamKeyDangerRoute: typeof WorkspaceWorkspaceSettingsTeamKeyDangerRoute
   WorkspaceWorkspaceSettingsTeamKeyEstimatesRoute: typeof WorkspaceWorkspaceSettingsTeamKeyEstimatesRoute
+  WorkspaceWorkspaceSettingsTeamKeyGithubRoute: typeof WorkspaceWorkspaceSettingsTeamKeyGithubRoute
   WorkspaceWorkspaceSettingsTeamKeyLabelsRoute: typeof WorkspaceWorkspaceSettingsTeamKeyLabelsRoute
   WorkspaceWorkspaceSettingsTeamKeyMembersRoute: typeof WorkspaceWorkspaceSettingsTeamKeyMembersRoute
   WorkspaceWorkspaceSettingsTeamKeyTemplatesRoute: typeof WorkspaceWorkspaceSettingsTeamKeyTemplatesRoute
@@ -1259,6 +1449,8 @@ const WorkspaceWorkspaceSettingsTeamKeyRouteRouteChildren: WorkspaceWorkspaceSet
       WorkspaceWorkspaceSettingsTeamKeyDangerRoute,
     WorkspaceWorkspaceSettingsTeamKeyEstimatesRoute:
       WorkspaceWorkspaceSettingsTeamKeyEstimatesRoute,
+    WorkspaceWorkspaceSettingsTeamKeyGithubRoute:
+      WorkspaceWorkspaceSettingsTeamKeyGithubRoute,
     WorkspaceWorkspaceSettingsTeamKeyLabelsRoute:
       WorkspaceWorkspaceSettingsTeamKeyLabelsRoute,
     WorkspaceWorkspaceSettingsTeamKeyMembersRoute:
@@ -1279,20 +1471,25 @@ const WorkspaceWorkspaceSettingsTeamKeyRouteRouteWithChildren =
   )
 
 interface WorkspaceWorkspaceRouteRouteChildren {
+  WorkspaceWorkspaceCustomersRoute: typeof WorkspaceWorkspaceCustomersRoute
   WorkspaceWorkspaceDocumentsRoute: typeof WorkspaceWorkspaceDocumentsRoute
   WorkspaceWorkspaceInboxRoute: typeof WorkspaceWorkspaceInboxRoute
   WorkspaceWorkspaceInitiativesRoute: typeof WorkspaceWorkspaceInitiativesRoute
   WorkspaceWorkspaceIssuesRoute: typeof WorkspaceWorkspaceIssuesRoute
   WorkspaceWorkspaceMyIssuesRoute: typeof WorkspaceWorkspaceMyIssuesRoute
   WorkspaceWorkspaceProjectsRoute: typeof WorkspaceWorkspaceProjectsRoute
+  WorkspaceWorkspaceReleasesRoute: typeof WorkspaceWorkspaceReleasesRoute
   WorkspaceWorkspaceViewsRoute: typeof WorkspaceWorkspaceViewsRoute
   WorkspaceWorkspaceIndexRoute: typeof WorkspaceWorkspaceIndexRoute
   WorkspaceWorkspaceSettingsAdminRouteRoute: typeof WorkspaceWorkspaceSettingsAdminRouteRouteWithChildren
   WorkspaceWorkspaceSettingsAccountRouteRoute: typeof WorkspaceWorkspaceSettingsAccountRouteRouteWithChildren
   WorkspaceWorkspaceTeamKeyRouteRoute: typeof WorkspaceWorkspaceTeamKeyRouteRouteWithChildren
+  WorkspaceWorkspaceCustomerSlugRoute: typeof WorkspaceWorkspaceCustomerSlugRoute
   WorkspaceWorkspaceDocumentSlugRoute: typeof WorkspaceWorkspaceDocumentSlugRoute
   WorkspaceWorkspaceInitiativeSlugRoute: typeof WorkspaceWorkspaceInitiativeSlugRoute
   WorkspaceWorkspaceIssueIdentifierRoute: typeof WorkspaceWorkspaceIssueIdentifierRoute
+  WorkspaceWorkspaceReleaseNoteSlugRoute: typeof WorkspaceWorkspaceReleaseNoteSlugRoute
+  WorkspaceWorkspaceReleaseSlugRoute: typeof WorkspaceWorkspaceReleaseSlugRoute
   WorkspaceWorkspaceViewView_idRoute: typeof WorkspaceWorkspaceViewView_idRoute
   WorkspaceWorkspaceSettingsTeamKeyRouteRoute: typeof WorkspaceWorkspaceSettingsTeamKeyRouteRouteWithChildren
   WorkspaceWorkspaceProjectSlugIssuesRoute: typeof WorkspaceWorkspaceProjectSlugIssuesRoute
@@ -1301,12 +1498,14 @@ interface WorkspaceWorkspaceRouteRouteChildren {
 
 const WorkspaceWorkspaceRouteRouteChildren: WorkspaceWorkspaceRouteRouteChildren =
   {
+    WorkspaceWorkspaceCustomersRoute: WorkspaceWorkspaceCustomersRoute,
     WorkspaceWorkspaceDocumentsRoute: WorkspaceWorkspaceDocumentsRoute,
     WorkspaceWorkspaceInboxRoute: WorkspaceWorkspaceInboxRoute,
     WorkspaceWorkspaceInitiativesRoute: WorkspaceWorkspaceInitiativesRoute,
     WorkspaceWorkspaceIssuesRoute: WorkspaceWorkspaceIssuesRoute,
     WorkspaceWorkspaceMyIssuesRoute: WorkspaceWorkspaceMyIssuesRoute,
     WorkspaceWorkspaceProjectsRoute: WorkspaceWorkspaceProjectsRoute,
+    WorkspaceWorkspaceReleasesRoute: WorkspaceWorkspaceReleasesRoute,
     WorkspaceWorkspaceViewsRoute: WorkspaceWorkspaceViewsRoute,
     WorkspaceWorkspaceIndexRoute: WorkspaceWorkspaceIndexRoute,
     WorkspaceWorkspaceSettingsAdminRouteRoute:
@@ -1315,11 +1514,15 @@ const WorkspaceWorkspaceRouteRouteChildren: WorkspaceWorkspaceRouteRouteChildren
       WorkspaceWorkspaceSettingsAccountRouteRouteWithChildren,
     WorkspaceWorkspaceTeamKeyRouteRoute:
       WorkspaceWorkspaceTeamKeyRouteRouteWithChildren,
+    WorkspaceWorkspaceCustomerSlugRoute: WorkspaceWorkspaceCustomerSlugRoute,
     WorkspaceWorkspaceDocumentSlugRoute: WorkspaceWorkspaceDocumentSlugRoute,
     WorkspaceWorkspaceInitiativeSlugRoute:
       WorkspaceWorkspaceInitiativeSlugRoute,
     WorkspaceWorkspaceIssueIdentifierRoute:
       WorkspaceWorkspaceIssueIdentifierRoute,
+    WorkspaceWorkspaceReleaseNoteSlugRoute:
+      WorkspaceWorkspaceReleaseNoteSlugRoute,
+    WorkspaceWorkspaceReleaseSlugRoute: WorkspaceWorkspaceReleaseSlugRoute,
     WorkspaceWorkspaceViewView_idRoute: WorkspaceWorkspaceViewView_idRoute,
     WorkspaceWorkspaceSettingsTeamKeyRouteRoute:
       WorkspaceWorkspaceSettingsTeamKeyRouteRouteWithChildren,
