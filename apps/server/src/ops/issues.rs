@@ -1044,18 +1044,19 @@ async fn update(ctx: &Ctx, tx: &mut PgConnection, id: Uuid, mut args: SaveIssueA
         }
     }
     if let Some(description) = new_content(&row.description, args.description.take(), args.patch.take().as_deref())?
-        && description != row.description {
-            sqlx::query("UPDATE issues SET description = $2 WHERE id = $1")
-                .bind(id)
-                .bind(&description)
-                .execute(&mut *tx)
-                .await?;
-            changes.insert("description".into(), json!({ "changed": true }));
-            let previous = events::mentions(ctx, &row.description).await?;
-            let mentioned: Vec<Uuid> =
-                events::mentions(ctx, &description).await?.into_iter().filter(|u| !previous.contains(u)).collect();
-            notify_mentions(ctx, tx, id, &mentioned).await?;
-        }
+        && description != row.description
+    {
+        sqlx::query("UPDATE issues SET description = $2 WHERE id = $1")
+            .bind(id)
+            .bind(&description)
+            .execute(&mut *tx)
+            .await?;
+        changes.insert("description".into(), json!({ "changed": true }));
+        let previous = events::mentions(ctx, &row.description).await?;
+        let mentioned: Vec<Uuid> =
+            events::mentions(ctx, &description).await?.into_iter().filter(|u| !previous.contains(u)).collect();
+        notify_mentions(ctx, tx, id, &mentioned).await?;
+    }
     if let Some(state) = args.state.take() {
         let state = resolve::state(ctx, row.team_id, &state).await?;
         if state != row.state_id {

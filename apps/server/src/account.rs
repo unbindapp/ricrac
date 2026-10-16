@@ -74,6 +74,8 @@ pub fn router() -> Router<AppState> {
         .route("/auth/callback/google", get(google::callback))
         .route("/auth/sign-out", post(google::sign_out))
         .route("/workspaces", post(create_workspace))
+        .route("/workspaces/{id}", delete(delete_workspace))
+        .route("/workspaces/{id}/leave", post(leave_workspace))
         .route("/invitations/{id}/accept", post(accept_invitation))
         .route("/invitations/{id}", delete(decline_invitation))
         .route("/api-keys", get(list_api_keys).post(create_api_key))
@@ -275,6 +277,76 @@ async fn create_workspace(
     seed::create_team(&mut tx, id, user, &team_name, &team_key).await?;
     tx.commit().await?;
     Ok(Json(WorkspaceSummary { id, name, url_key, role: "owner".into() }))
+}
+
+/// Deletes the workspace and everything in it. Owners only, confirmed by repeating its URL key.
+async fn delete_workspace(
+    State(state): State<AppState>,
+    SignedIn(user): SignedIn,
+    Path(id): Path<Uuid>,
+    Json(body): Json<DeleteWorkspace>,
+) -> ApiResult<Json<Value>> {
+    let ctx = Ctx::load(&state, user, id, vec![]).await?.ok_or_else(|| ApiError::not_found("No such workspace"))?;
+    if ctx.role != Role::Owner {
+        return Err(ApiError::forbidden("Only owners can delete a workspace"));
+    }
+    let deleted = sqlx::query("DELETE FROM workspaces WHERE id = $1 AND url_key = $2")
+        .bind(id)
+        .bind(body.confirm_url_key.trim().to_lowercase())
+        .execute(&state.db)
+        .await?;
+    crate::ensure!(deleted.rows_affected() == 1, "Type the workspace's URL key to confirm");
+    Ok(Json(json!({ "ok": true })))
+}
+
+#[derive(Deserialize, TS)]
+#[ts(export)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteWorkspace {
+    pub confirm_url_key: String,
+}
+
+/// Leaves the workspace. The last owner has to hand ownership over or delete it instead.
+async fn leave_workspace(
+    State(state): State<AppState>,
+    SignedIn(user): SignedIn,
+    Path(id): Path<Uuid>,
+) -> ApiResult<Json<Value>> {
+    let mut tx = state.db.begin().await?;
+    let owners: Vec<Uuid> = sqlx::query_scalar(
+        "SELECT user_id FROM workspace_members WHERE workspace_id = $1 AND role = 'owner' AND active FOR UPDATE",
+    )
+    .bind(id)
+    .fetch_all(&mut *tx)
+    .await?;
+    crate::ensure!(
+        owners != [user],
+        "You're the only owner: make someone else an owner first, or delete the workspace"
+    );
+    sqlx::query("UPDATE workspace_members SET active = false WHERE workspace_id = $1 AND user_id = $2")
+        .bind(id)
+        .bind(user)
+        .execute(&mut *tx)
+        .await?;
+    sqlx::query(
+        "DELETE FROM team_members m USING teams t WHERE t.id = m.team_id AND t.workspace_id = $1 AND m.user_id = $2",
+    )
+    .bind(id)
+    .bind(user)
+    .execute(&mut *tx)
+    .await?;
+    sqlx::query("DELETE FROM api_keys WHERE workspace_id = $1 AND user_id = $2")
+        .bind(id)
+        .bind(user)
+        .execute(&mut *tx)
+        .await?;
+    sqlx::query("DELETE FROM oauth_grants WHERE workspace_id = $1 AND user_id = $2")
+        .bind(id)
+        .bind(user)
+        .execute(&mut *tx)
+        .await?;
+    tx.commit().await?;
+    Ok(Json(json!({ "ok": true })))
 }
 
 async fn accept_invitation(

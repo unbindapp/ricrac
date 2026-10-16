@@ -23,7 +23,7 @@ schemars = { version = "1.2", features = ["chrono04", "uuid1"] }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
 sha2 = "0.10"
-sqlx = { version = "0.8.6", default-features = false, features = ["runtime-tokio", "postgres", "macros", "migrate", "chrono", "uuid", "json"] }
+sqlx = { version = "0.8.6", default-features = false, features = ["runtime-tokio", "tls-rustls-ring-webpki", "postgres", "macros", "migrate", "chrono", "uuid", "json"] }
 subtle = "2"
 tokio = { version = "1.53.1", features = ["full"] }
 tower-http = { version = "0.7.1", features = ["trace", "compression-gzip", "cors", "set-header"] }
