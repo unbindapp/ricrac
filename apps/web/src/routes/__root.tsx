@@ -1,52 +1,69 @@
-import type { QueryClient } from "@tanstack/react-query"
-import { Link, Outlet, createRootRouteWithContext } from "@tanstack/react-router"
+import type { QueryClient } from "@tanstack/react-query";
+import { createRootRouteWithContext, Outlet, redirect } from "@tanstack/react-router";
+import { TriangleAlertIcon } from "lucide-react";
 
-import { configQuery, meQuery } from "@/api/queries"
-import { CenterPanel } from "@/components/common"
-import { Button } from "@/components/ui/button"
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Toaster } from "@/components/ui/sonner"
-import { Spinner } from "@/components/ui/spinner"
+import NotFoundTemplate from "@/components/navigation/not-found-template";
+import Providers from "@/components/providers/providers";
+import { meQuery } from "@/lib/queries/me";
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  loader: ({ context }) =>
-    Promise.all([context.queryClient.ensureQueryData(meQuery), context.queryClient.ensureQueryData(configQuery)]),
-  pendingMs: 200,
-  pendingMinMs: 300,
-  pendingComponent: () => (
-    <div className="grid min-h-svh place-items-center text-muted-foreground" role="status" aria-label="Loading">
-      <Spinner className="size-5" />
-    </div>
+export type RouterContext = {
+  queryClient: QueryClient;
+};
+
+const PUBLIC_PATHS = new Set([
+  "/",
+  "/sign-in",
+  "/forgot-password",
+  "/reset-password",
+  "/welcome",
+  "/privacy",
+  "/terms",
+]);
+const PUBLIC_PREFIXES = ["/invite/"];
+
+function isPublicPath(pathname: string) {
+  const normalized = pathname.length > 1 ? pathname.replace(/\/$/, "") : pathname;
+  return PUBLIC_PATHS.has(normalized) || PUBLIC_PREFIXES.some((p) => pathname.startsWith(p));
+}
+
+export const Route = createRootRouteWithContext<RouterContext>()({
+  beforeLoad: async ({ context, location }) => {
+    if (isPublicPath(location.pathname)) return;
+    const me = await context.queryClient.ensureQueryData(meQuery);
+    if (!me) {
+      throw redirect({ to: "/sign-in", search: { redirect: location.href } });
+    }
+    return { me };
+  },
+  component: RootComponent,
+  notFoundComponent: () => (
+    <main className="flex min-h-svh flex-col">
+      <NotFoundTemplate
+        code={404}
+        description="Not found."
+        buttonText="Go home"
+        buttonTo="/"
+        Icon={TriangleAlertIcon}
+      />
+    </main>
   ),
   errorComponent: ({ error }) => (
-    <CenterPanel>
-      <Card>
-        <CardHeader>
-          <CardTitle>Ricrac couldn't load</CardTitle>
-          <CardDescription>{error instanceof Error ? error.message : "Unknown error"}</CardDescription>
-        </CardHeader>
-      </Card>
-    </CenterPanel>
+    <main className="flex min-h-svh flex-col">
+      <NotFoundTemplate
+        code={500}
+        description={error instanceof Error ? error.message : "Something went wrong."}
+        buttonText="Go home"
+        buttonTo="/"
+        Icon={TriangleAlertIcon}
+      />
+    </main>
   ),
-  component: () => (
-    <>
+});
+
+function RootComponent() {
+  return (
+    <Providers>
       <Outlet />
-      <Toaster position="bottom-right" />
-    </>
-  ),
-  notFoundComponent: () => (
-    <CenterPanel>
-      <Card>
-        <CardHeader>
-          <CardTitle>Page not found</CardTitle>
-          <CardDescription>There's nothing at this address.</CardDescription>
-        </CardHeader>
-        <div className="px-6">
-          <Button asChild variant="outline" className="w-full">
-            <Link to="/">Go to the dashboard</Link>
-          </Button>
-        </div>
-      </Card>
-    </CenterPanel>
-  ),
-})
+    </Providers>
+  );
+}
