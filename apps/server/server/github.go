@@ -79,7 +79,7 @@ func settingsURL(urlKey, failure string) string {
 func githubSetup(state *app.State) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := r.URL.Query()
-		workspace, user, ok := ops.ReadGitHubInstallState(state.Keys, params.Get("state"))
+		workspace, user, expired, ok := ops.ReadGitHubInstallState(state.Keys, params.Get("state"))
 		if !ok || state.GitHub == nil {
 			http.Redirect(w, r, "/?github_error=expired", http.StatusSeeOther)
 			return
@@ -87,6 +87,10 @@ func githubSetup(state *app.State) http.HandlerFunc {
 		urlKey, err := app.One[string](r.Context(), state.DB, "SELECT url_key FROM workspaces WHERE id = $1", workspace)
 		if err != nil {
 			http.Redirect(w, r, "/?github_error=expired", http.StatusSeeOther)
+			return
+		}
+		if expired {
+			http.Redirect(w, r, settingsURL(urlKey, "expired"), http.StatusSeeOther)
 			return
 		}
 		failure := connectInstallation(r, state, workspace, user, params)
