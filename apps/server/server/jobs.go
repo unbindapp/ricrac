@@ -57,7 +57,10 @@ func EveryMinute(ctx context.Context, state *app.State) error {
 	if err := ops.RunRecurringTemplates(ctx, state); err != nil {
 		return err
 	}
-	return Automations(ctx, state)
+	if err := Automations(ctx, state); err != nil {
+		return err
+	}
+	return ops.SendEmails(ctx, state)
 }
 
 // Automations runs auto-archive, auto-close, the trash, snoozes, due dates and expired uploads.
@@ -98,6 +101,7 @@ func Automations(ctx context.Context, state *app.State) error {
 			AND n.type = 'issueDue' AND n.created_at > now() - interval '1 day')`,
 		"DELETE FROM files WHERE data IS NULL AND upload_expires_at < now()",
 		"DELETE FROM webhook_deliveries WHERE created_at < now() - interval '14 days'",
+		"DELETE FROM emails WHERE created_at < now() - interval '30 days'",
 	} {
 		if err := app.Exec(ctx, state.DB, statement); err != nil {
 			return err

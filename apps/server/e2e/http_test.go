@@ -17,7 +17,6 @@ import (
 	"github.com/google/uuid"
 
 	"ricrac/app"
-	"ricrac/ops"
 	"ricrac/server"
 )
 
@@ -196,9 +195,6 @@ func TestMCPListsAndCallsTools(t *testing.T) {
 		"name": "save_issue", "arguments": M{"team": "NOPE", "title": "x"}}}))
 	eq(t, failed.At("result", "isError").V, any(true), failed.JSON())
 
-	if ops.Find("save_webhook") == nil {
-		t.Skip("needs save_webhook and list_webhooks ported")
-	}
 	_, everything := send(router, rpc("/mcp?tools=all", key, M{"jsonrpc": "2.0", "id": 7, "method": "tools/list"}))
 	check(t, slices.Contains(toolNames(everything), "save_webhook"))
 	_, found := send(router, rpc("/mcp", key, M{"jsonrpc": "2.0", "id": 5, "method": "tools/call", "params": M{
@@ -273,9 +269,6 @@ func TestTokensForSeveralWorkspacesNameOnePerCall(t *testing.T) {
 	status, _ = send(router, request("GET", "/v1/issues?workspace=acme", onlyBeta, nil))
 	eq(t, status, http.StatusBadRequest, "the key doesn't reach acme")
 
-	if ops.Find("list_workspaces") == nil {
-		t.Skip("needs list_workspaces ported")
-	}
 	_, workspaces := send(router, request("GET", "/v1/workspaces", all, nil))
 	eqList(t, workspaces.At("nodes").Strings("urlKey"), []string{"acme", "beta"})
 }
@@ -305,9 +298,6 @@ func TestMCPToolsTakeTheWorkspaceWhenTheTokenReachesSeveral(t *testing.T) {
 	check(t, schema.At("properties", "workspace").Len() > 0)
 	check(t, slices.Contains(schema.At("required").Strings(), "workspace"))
 
-	if ops.Find("list_workspaces") == nil {
-		t.Skip("needs list_workspaces ported")
-	}
 	check(t, slices.ContainsFunc(tools, func(tool J) bool { return tool.At("name").Str() == "list_workspaces" }))
 }
 

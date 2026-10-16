@@ -1,7 +1,16 @@
 package e2e
 
 import (
+	bytesPkg "bytes"
+	"context"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
+
+	"github.com/google/uuid"
+
+	"ricrac/server"
 )
 
 // Comments, reactions, notifications, attachments, uploads and search.
@@ -132,8 +141,9 @@ func TestCommentsNotifySubscribersParticipantsAndMentioned(t *testing.T) {
 	withSnoozed := call(t, w.Ann, "get_notifications", M{"includeSnoozed": true})
 	eq(t, withSnoozed.At("nodes").Len(), 2)
 	w.exec("UPDATE notifications SET snoozed_until = now() - interval '1 minute' WHERE id = $1::uuid", newest)
-	// needs jobs: what its automations do to snoozed notifications.
-	w.exec("UPDATE notifications SET snoozed_until = NULL, read_at = NULL WHERE snoozed_until <= now()")
+	if err := server.Automations(context.Background(), w.State); err != nil {
+		t.Fatal(err)
+	}
 	inbox = call(t, w.Ann, "get_notifications", M{})
 	eq(t, inbox.At("nodes", 0, "id").Str(), newest)
 	check(t, inbox.At("nodes", 0, "readAt").IsNull() && inbox.At("nodes", 0, "snoozedUntil").IsNull(), "woke up unread")
@@ -224,10 +234,55 @@ func TestFilesUploadOnceAndDownloadForMembers(t *testing.T) {
 	contains(t, prepared.At("curl").Str(), uploadURL)
 	eq(t, prepared.At("markdown").Str(), "![shot.png]("+assetURL+")")
 
-	// needs the router (files): the PUT upload, single-use upload URLs and downloads with keys and
-	// sessions. The upload is stored as the PUT stores it.
-	w.exec(`UPDATE files SET data = $2, size = $3, upload_hash = NULL, upload_expires_at = NULL WHERE id = $1::uuid`,
-		prepared.At("fileId").Str(), bytes, len(bytes))
+	router := server.Router(w.State)
+	uploadPath := strings.TrimPrefix(uploadURL, "http://localhost:3000")
+	filePath := strings.TrimPrefix(assetURL, "http://localhost:3000")
+	key := apiKey(w, "read", "write")
+	getFile := func(path, header, value string) (int, http.Header, []byte) {
+		req := httptest.NewRequest("GET", path, nil)
+		if header != "" {
+			req.Header.Set(header, value)
+		}
+		recorder := httptest.NewRecorder()
+		router.ServeHTTP(recorder, req)
+		return recorder.Code, recorder.Header(), recorder.Body.Bytes()
+	}
+	status, _, _ := getFile(filePath, "Authorization", "Bearer "+key)
+	eq(t, status, http.StatusNotFound, "nothing to download before the upload")
+
+	put := func() (int, J) {
+		req := httptest.NewRequest("PUT", uploadPath, bytesPkg.NewReader(bytes))
+		req.Header.Set("Content-Type", "image/png")
+		return send(router, req)
+	}
+	status, stored := put()
+	eq(t, status, http.StatusOK, stored.JSON())
+	eq(t, stored.At("fileId").Str(), prepared.At("fileId").Str())
+	eq(t, stored.At("size").Num(), float64(len(bytes)))
+	status, _ = put()
+	eq(t, status, http.StatusNotFound, "upload URLs are single use")
+
+	status, _, _ = getFile(filePath, "", "")
+	eq(t, status, http.StatusUnauthorized)
+	status, _, _ = getFile(filePath, "Authorization", "Bearer rr_key_nope")
+	eq(t, status, http.StatusUnauthorized)
+	status, headers, body := getFile(filePath, "Authorization", "Bearer "+key)
+	eq(t, status, http.StatusOK)
+	eq(t, string(body), string(bytes))
+	eq(t, headers.Get("Content-Type"), "image/png")
+	eq(t, headers.Get("X-Content-Type-Options"), "nosniff")
+	eq(t, headers.Get("Content-Security-Policy"), "sandbox")
+	check(t, strings.HasPrefix(headers.Get("Content-Disposition"), `inline; filename="shot.png"`), headers.Get("Content-Disposition"))
+
+	cookie := func(user uuid.UUID) string {
+		return w.State.Keys.SessionCookie + "=" + w.State.Keys.SessionToken(user)
+	}
+	status, _, body = getFile(filePath, "Cookie", cookie(w.Ann.User))
+	eq(t, status, http.StatusOK)
+	eq(t, string(body), string(bytes))
+	stranger := w.addUser("eve@elsewhere.test", "Eve Stranger")
+	status, _, _ = getFile(filePath, "Cookie", cookie(stranger))
+	eq(t, status, http.StatusNotFound)
 
 	attachment := call(t, w.Ann, "create_attachment_from_upload", M{"issue": "ENG-1", "fileId": prepared.At("fileId").V})
 	eq(t, attachment.At("url").Str(), assetURL)
@@ -235,8 +290,10 @@ func TestFilesUploadOnceAndDownloadForMembers(t *testing.T) {
 	eq(t, attachment.At("title").Str(), "shot.png")
 
 	inline := call(t, w.Ann, "upload_file", M{"name": "notes.html", "contentType": "text/html", "base64": "PGgxPmhpPC9oMT4="})
-	stored := scalar[[]byte](w, "SELECT data FROM files WHERE id = $1::uuid", inline.At("fileId").Str())
-	eq(t, string(stored), "<h1>hi</h1>")
+	status, headers, body = getFile(strings.TrimPrefix(inline.At("assetUrl").Str(), "http://localhost:3000"), "Authorization", "Bearer "+key)
+	eq(t, status, http.StatusOK)
+	eq(t, string(body), "<h1>hi</h1>")
+	check(t, strings.HasPrefix(headers.Get("Content-Disposition"), "attachment;"), "html is downloaded")
 
 	tooBig := fails(t, w.Ann, "prepare_file_upload", M{"name": "big.bin", "contentType": "application/octet-stream", "size": 2 << 20})
 	contains(t, tooBig, "at most")

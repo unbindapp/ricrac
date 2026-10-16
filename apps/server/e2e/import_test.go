@@ -62,7 +62,6 @@ func TestImportsIssuesWithTheirNumbersDatesPeopleAndComments(t *testing.T) {
 	eqList(t, gap.At("identifiers").Strings(), []string{"ENG-6"})
 	eq(t, gap.At("nextIdentifier").Str(), "ENG-10", "filling a gap doesn't move the counter back")
 
-	// needs get_notifications to read Bob's inbox; the table holds the same.
 	eq(t, scalar[int64](w, "SELECT count(*) FROM notifications"), 0, "imports notify nobody")
 }
 
