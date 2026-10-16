@@ -12,6 +12,7 @@ import {
   type TFilterField,
 } from "@/components/issues/filters";
 import { IssuesView } from "@/components/issues/issues-view";
+import { EmptyState } from "@/components/layout/empty-state";
 import { Tabs, TabsList, TabsTab } from "@/components/ui/tabs";
 import { meQuery } from "@/lib/queries/me";
 
@@ -44,6 +45,19 @@ function fixedFiltersFor(tab: TMyIssuesTab, userId: string): ListIssuesFilters {
   }
 }
 
+const emptyTitles: Record<TMyIssuesTab, string> = {
+  assigned: "No issues assigned to you yet",
+  created: "No issues created by you yet",
+  subscribed: "No subscribed issues yet",
+};
+
+const emptyDescriptions: Record<TMyIssuesTab, string> = {
+  assigned: "Issues assigned to you, across your teams, show up here.",
+  created: "Issues you create show up here.",
+  subscribed:
+    "Issues you follow (you created, were assigned or mentioned, or subscribed) show up here.",
+};
+
 const hiddenFieldsFor: Record<TMyIssuesTab, TFilterField[]> = {
   assigned: ["assignee"],
   created: ["creator"],
@@ -54,7 +68,8 @@ function MyIssuesPage() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
   const { data: me } = useQuery(meQuery);
-  const tab = search.tab ?? "assigned";
+  const { tab: selected, ...rest } = search;
+  const tab = selected ?? "assigned";
   if (!me) return null;
   return (
     <IssuesView
@@ -62,10 +77,17 @@ function MyIssuesPage() {
       title="My issues"
       icon={<UserCircleIcon />}
       storageKey={`my-issues:${tab}`}
-      fixedFilters={fixedFiltersFor(tab, me.user.id)}
+      fixedFilters={fixedFiltersFor(tab, me.id)}
       hiddenFilterFields={hiddenFieldsFor[tab]}
       defaultDisplay={{ group_by: "state" }}
-      filters={filtersFromSearch(search)}
+      filters={filtersFromSearch(rest)}
+      emptyState={
+        <EmptyState
+          icon={UserCircleIcon}
+          title={emptyTitles[tab]}
+          description={emptyDescriptions[tab]}
+        />
+      }
       onFiltersChange={(filters) =>
         void navigate({ search: (prev) => ({ ...prev, ...filtersToSearch(filters) }) })
       }

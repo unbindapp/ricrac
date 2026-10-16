@@ -1,21 +1,28 @@
 import { useNavigate } from "@tanstack/react-router";
 
-import { patchToOptimistic, type TIssuePatch } from "@/components/issues/issue-draft";
+import type { Issue, LabelRef } from "@/api/ops.gen";
 import {
-  issuePatchToUpdateInput,
-  type TIssue,
-  useIssueLifecycleMutation,
-  useUpdateIssueMutation,
-} from "@/lib/queries/issues";
+  patchToChanges,
+  patchToOptimistic,
+  type TIssuePatch,
+} from "@/components/issues/issue-draft";
 import { toast } from "@/components/ui/toast";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { useCopyToClipboard } from "@/lib/hooks/use-copy";
+import {
+  type TIssueLifecycleAction,
+  useIssueLifecycleMutation,
+  useUpdateIssueMutation,
+} from "@/lib/queries/issues";
 
+/** Changes properties of an issue, showing them at once. */
 export function useIssuePatch() {
-  const { mutate } = useUpdateIssueMutation();
-  return (issue: Pick<TIssue, "id">, patch: TIssuePatch) =>
+  const { workspace } = useWorkspace();
+  const { mutate } = useUpdateIssueMutation(workspace.id);
+  return (issue: { id: string; labels?: LabelRef[] }, patch: TIssuePatch) =>
     mutate({
-      input: issuePatchToUpdateInput(issue.id, patch),
+      id: issue.id,
+      changes: patchToChanges(patch, issue.labels),
       optimistic: patchToOptimistic(patch),
     });
 }
@@ -27,31 +34,26 @@ export function useCopyIssue() {
     toast.add({ type: "success", title, description: text });
   };
   return {
-    copyLink: (issue: Pick<TIssue, "url">) => copy(issue.url, "Link copied"),
-    copyBranch: (issue: Pick<TIssue, "git_branch_name">) =>
-      copy(issue.git_branch_name, "Branch name copied"),
+    copyLink: (issue: Pick<Issue, "url">) => copy(issue.url, "Link copied"),
+    copyIdentifier: (issue: Pick<Issue, "identifier">) => copy(issue.identifier, "ID copied"),
+    copyBranch: (issue: Pick<Issue, "branchName">) => copy(issue.branchName, "Branch name copied"),
   };
 }
 
-const lifecycleToasts = {
-  archive: "Issue archived",
-  unarchive: "Issue unarchived",
-  trash: "Issue moved to trash",
-  restore: "Issue restored",
-} as const;
+const lifecycleToasts: Record<TIssueLifecycleAction, [string, string]> = {
+  archive: ["Issue archived", "issues archived"],
+  unarchive: ["Issue unarchived", "issues unarchived"],
+  delete: ["Issue moved to the trash", "issues moved to the trash"],
+  restore: ["Issue restored", "issues restored"],
+};
 
 export function useIssueLifecycle() {
-  const { mutateAsync, isPending } = useIssueLifecycleMutation();
-  const run = async (issueIds: string[], action: keyof typeof lifecycleToasts) => {
-    await mutateAsync({ issueIds, action });
-    const count = issueIds.length;
-    toast.add({
-      type: "success",
-      title:
-        count === 1
-          ? lifecycleToasts[action]
-          : `${count} ${lifecycleToasts[action].replace("Issue", "issues")}`,
-    });
+  const { workspace } = useWorkspace();
+  const { mutateAsync, isPending } = useIssueLifecycleMutation(workspace.id);
+  const run = async (ids: string[], action: TIssueLifecycleAction) => {
+    await mutateAsync({ ids, action });
+    const [one, many] = lifecycleToasts[action];
+    toast.add({ type: "success", title: ids.length === 1 ? one : `${ids.length} ${many}` });
   };
   return { run, isPending };
 }
@@ -62,6 +64,6 @@ export function useOpenIssuePage() {
   return (identifier: string) =>
     navigate({
       to: "/$workspace/issue/$identifier",
-      params: { workspace: workspace.slug, identifier },
+      params: { workspace: workspace.urlKey, identifier },
     });
 }

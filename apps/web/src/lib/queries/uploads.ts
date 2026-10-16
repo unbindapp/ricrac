@@ -1,23 +1,41 @@
 import { useMutation } from "@tanstack/react-query";
 
-import { getGoClient } from "@/lib/server/client";
-import type { TGoClient, TResponseData } from "@/lib/server/types";
-
-export type TUpload = TResponseData<TGoClient["uploads"]["create"]>;
+import type { PreparedUpload } from "@/api/ops.gen";
+import { ApiError, call } from "@/lib/server/client";
 
 export const imageUploadAccept = "image/png,image/jpeg,image/gif,image/webp,image/svg+xml";
 
-export async function createUpload(input: { workspaceId: string; file: File }) {
-  const body = new FormData();
-  body.append("workspace_id", input.workspaceId);
-  body.append("file", input.file);
-  const res = await getGoClient().uploads.create(body);
-  return { data: res.data };
+/** Uploads a file: prepare_file_upload, then a PUT of its bytes to the one-time URL. */
+export async function uploadFile(workspaceId: string, file: File): Promise<PreparedUpload> {
+  const contentType = file.type || "application/octet-stream";
+  const prepared = await call(workspaceId, "prepare_file_upload", {
+    name: file.name,
+    contentType,
+    size: file.size,
+  });
+  const response = await fetch(new URL(prepared.uploadUrl).pathname, {
+    method: "PUT",
+    headers: { "content-type": contentType },
+    body: file,
+  }).catch(() => {
+    throw new ApiError(0, "Couldn't reach Ricrac. Try again in a moment.");
+  });
+  if (response.ok) return prepared;
+  const data = await response.json().catch(() => undefined);
+  throw new ApiError(
+    response.status,
+    typeof data?.error === "string" ? data.error : response.statusText,
+  );
 }
 
-export function useCreateUploadMutation() {
+export function useUploadFileMutation(workspaceId: string) {
   return useMutation({
-    mutationFn: createUpload,
+    mutationFn: (file: File) => uploadFile(workspaceId, file),
     meta: { errorTitle: "Upload failed" },
   });
+}
+
+/** For editors: uploads an image and gives the URL to embed. */
+export function useUploadImage(workspaceId: string) {
+  return async (file: File) => (await uploadFile(workspaceId, file)).assetUrl;
 }

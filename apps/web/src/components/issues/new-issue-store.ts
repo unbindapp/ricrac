@@ -3,12 +3,9 @@ import { create } from "zustand";
 
 import type { TIssueDraft } from "@/components/issues/issue-draft";
 
+/** What a new issue starts with: its team and any properties the page or group implies. */
 export type TNewIssueDefaults = {
   teamId?: string;
-  stateId?: string;
-  projectId?: string;
-  cycleId?: string;
-  parentId?: string;
   draft?: Partial<TIssueDraft>;
 };
 
@@ -36,11 +33,13 @@ export const useNewIssueStore = create<TNewIssueStore>((set, get) => ({
   setContext: (context) => set({ context }),
 }));
 
-export function useNewIssueContext(context: TNewIssueDefaults) {
+/** Lets the page's filters fill in new issues created from it (the C shortcut, the sidebar). */
+export function useNewIssueContext(context: TNewIssueDefaults, enabled = true) {
   const setContext = useNewIssueStore((state) => state.setContext);
   const serialized = JSON.stringify(context);
   useEffect(() => {
+    if (!enabled) return;
     setContext(JSON.parse(serialized) as TNewIssueDefaults);
     return () => setContext({});
-  }, [serialized, setContext]);
+  }, [serialized, setContext, enabled]);
 }

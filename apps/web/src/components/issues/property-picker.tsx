@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 
 export type TPickerOption = {
   value: string;
@@ -38,6 +39,10 @@ type TProps = {
   onSearchChange?: (query: string) => void;
   disabled?: boolean;
   align?: "start" | "center" | "end";
+  /** Above the search, like the relation kind of the relation picker. */
+  header?: ReactNode;
+  /** For long options, like issue titles. */
+  wide?: boolean;
   children?: ReactNode;
 };
 
@@ -56,6 +61,8 @@ export function PropertyPicker({
   onSearchChange,
   disabled,
   align = "start",
+  header,
+  wide,
   children,
 }: TProps) {
   const [internalOpen, setInternalOpen] = useState(false);
@@ -79,9 +86,11 @@ export function PropertyPicker({
     <span className="contents" onClick={(event) => event.stopPropagation()}>
       <Popover open={isOpen} onOpenChange={setOpen}>
         <PopoverTrigger disabled={disabled} render={trigger} />
-        <PopoverContent align={align} className="w-64 p-0">
+        <PopoverContent align={align} className={wide ? "w-96 p-0" : "w-64 p-0"}>
           {isOpen && (
             <Command wrapper="none" loop shouldFilter={!onSearchChange} label={label}>
+              <BlockPageHotkeys />
+              {header}
               <CommandInput
                 autoFocus
                 showSpinner={isPending}
@@ -106,6 +115,12 @@ export function PropertyPicker({
       </Popover>
     </span>
   );
+}
+
+/** While a picker is open, typing never reaches the page's shortcuts (C, S, P, ...). */
+export function BlockPageHotkeys() {
+  useHotkeyScope([], { modal: true });
+  return null;
 }
 
 function PickerGroups({

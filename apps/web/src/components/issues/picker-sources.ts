@@ -1,68 +1,110 @@
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 
-import { sortStates } from "@/components/issues/grouping";
-import type { TUserSummary } from "@/lib/queries/issues";
-import { useTeams } from "@/components/workspace/teams-provider";
+import type { IssueLabel, UserRef, WorkspaceUser } from "@/api/ops.gen";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { cyclesListQuery } from "@/lib/queries/cycles";
-import { labelTreeQuery } from "@/lib/queries/labels";
-import { projectsListQuery } from "@/lib/queries/projects";
+import {
+  issueLabelsQuery,
+  issueProjectsQuery,
+  projectMilestonesQuery,
+  teamCyclesQuery,
+} from "@/lib/queries/issue-options";
+import { teamQuery } from "@/lib/queries/teams";
 import { usersQuery } from "@/lib/queries/users";
 
-export function useTeam(teamId: string | undefined) {
-  const { teams } = useTeams();
-  return teams.find((team) => team.id === teamId);
+/** A team's settings, statuses and members (get_team). */
+export function useTeamDetail(teamId: string | undefined) {
+  const { workspace } = useWorkspace();
+  const { data } = useQuery({
+    ...teamQuery(workspace.id, teamId ?? ""),
+    enabled: Boolean(teamId),
+  });
+  return data;
 }
 
+/** The team's active statuses, in board order. */
 export function useTeamStates(teamId: string | undefined) {
-  const team = useTeam(teamId);
-  return team ? sortStates(team.states) : [];
+  return useTeamDetail(teamId)?.states ?? [];
 }
 
+/** Active members of the workspace. */
 export function useWorkspaceUsers() {
   const { workspace } = useWorkspace();
   const { data, isPending } = useQuery(usersQuery(workspace.id));
-  const users: TUserSummary[] = (data ?? []).map((user) => ({
-    id: user.id,
-    name: user.name,
-    display_name: user.displayName,
-    avatar_url: user.avatarUrl,
-  }));
+  const users = useMemo(() => (data ?? []).filter((user) => user.active), [data]);
   return { users, isPending };
 }
 
+/** The member's avatar, which refs in issues and comments don't carry. */
+export function useAvatarUrl(user: Pick<UserRef, "id"> | null | undefined) {
+  const { workspace } = useWorkspace();
+  const { data } = useQuery({
+    ...usersQuery(workspace.id),
+    select: (users: WorkspaceUser[]) => users.find((item) => item.id === user?.id)?.avatarUrl,
+    enabled: Boolean(user),
+  });
+  return data ?? null;
+}
+
+/** Labels an issue of the team can take (its own and the workspace's), groups left out. */
 export function useLabels(teamId: string | undefined) {
   const { workspace } = useWorkspace();
-  const { data, isPending } = useQuery(
-    labelTreeQuery({ workspaceId: workspace.id, teamId, allTeams: !teamId }),
+  const { data, isPending } = useQuery(issueLabelsQuery(workspace.id, teamId));
+  const labels = useMemo(
+    () => (data ?? []).filter((label: IssueLabel) => !label.isGroup && !label.retiredAt),
+    [data],
   );
-  return { labels: data?.labels ?? [], isPending };
+  const groups = useMemo(() => (data ?? []).filter((label) => label.isGroup), [data]);
+  return { labels, groups, isPending };
 }
 
-function useWorkspaceProjects() {
-  const { workspace } = useWorkspace();
-  return useQuery(projectsListQuery({ workspace_id: workspace.id }));
-}
-
+/** Open projects, the team's first. */
 export function useProjects(teamId: string | undefined) {
-  const { data, isPending } = useWorkspaceProjects();
-  const projects = (data?.projects ?? []).filter(
-    (project) =>
-      !teamId || project.teams.length === 0 || project.teams.some((team) => team.id === teamId),
-  );
+  const { workspace } = useWorkspace();
+  const { data, isPending } = useQuery(issueProjectsQuery(workspace.id));
+  const projects = useMemo(() => {
+    const open = (data ?? []).filter(
+      (project) =>
+        !project.archivedAt && !project.trashed && !project.completedAt && !project.canceledAt,
+    );
+    const isTeams = (project: (typeof open)[number]) =>
+      Boolean(teamId && project.teams.some((team) => team.id === teamId));
+    return [...open.filter(isTeams), ...open.filter((project) => !isTeams(project))];
+  }, [data, teamId]);
   return { projects, isPending };
 }
 
-export function useMilestones(projectId: string | undefined) {
-  const { data, isPending } = useWorkspaceProjects();
-  const project = data?.projects.find((item) => item.id === projectId);
-  return { milestones: project?.milestones ?? [], isPending: Boolean(projectId) && isPending };
+/** Every project by id, for icons and colors that project refs don't carry. */
+export function useProjectLookup() {
+  const { workspace } = useWorkspace();
+  const { data } = useQuery(issueProjectsQuery(workspace.id));
+  return useMemo(() => new Map((data ?? []).map((project) => [project.id, project])), [data]);
 }
 
+export function useMilestones(projectId: string | undefined) {
+  const { workspace } = useWorkspace();
+  const { data, isPending } = useQuery({
+    ...projectMilestonesQuery(workspace.id, projectId ?? ""),
+    enabled: Boolean(projectId),
+  });
+  return { milestones: data ?? [], isPending: Boolean(projectId) && isPending };
+}
+
+/** The team's current and upcoming cycles, when it uses cycles. */
 export function useCycles(teamId: string | undefined) {
-  const team = useTeam(teamId);
-  const enabled = Boolean(teamId && team?.cycles_enabled);
-  const { data, isPending } = useQuery({ ...cyclesListQuery(teamId ?? ""), enabled });
-  const cycles = (data?.cycles ?? []).filter((cycle) => !cycle.is_past);
+  const { workspace } = useWorkspace();
+  const team = useTeamDetail(teamId);
+  const enabled = Boolean(teamId && team?.cyclesEnabled);
+  const { data, isPending } = useQuery({
+    ...teamCyclesQuery(workspace.id, teamId ?? ""),
+    enabled,
+  });
+  const cycles = useMemo(
+    () =>
+      (data ?? [])
+        .filter((cycle) => !cycle.isPast && !cycle.archivedAt)
+        .sort((a, b) => a.startsAt.localeCompare(b.startsAt)),
+    [data],
+  );
   return { cycles, isPending: enabled && isPending, enabled };
 }

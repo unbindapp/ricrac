@@ -20,27 +20,32 @@ import {
 import { LayoutGridIcon, PlusIcon } from "lucide-react";
 import { type MouseEvent, type ReactNode, useState } from "react";
 
+import type { Issue } from "@/api/ops.gen";
 import type { DisplaySettings } from "@/components/issues/display";
 import type { ListIssuesFilters } from "@/components/issues/filters";
 import { GroupIcon } from "@/components/issues/group-icon";
 import type { TIssueGroup } from "@/components/issues/grouping";
-import { patchToOptimistic, type TIssuePatch } from "@/components/issues/issue-draft";
 import { IssueCard } from "@/components/issues/issue-card";
+import {
+  patchToChanges,
+  patchToOptimistic,
+  type TIssuePatch,
+} from "@/components/issues/issue-draft";
 import { useIsPeekable, useIssuePeek } from "@/components/issues/issue-peek";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
 import { sortOrderAtIndex } from "@/components/issues/sort-order";
-import { issuePatchToUpdateInput, type TIssue, useUpdateIssueMutation } from "@/lib/queries/issues";
+import { useOpenIssuePage } from "@/components/issues/use-issue-actions";
 import {
   newIssueDefaultsForGroup,
   useIssueCollection,
 } from "@/components/issues/use-issue-collection";
-import { useOpenIssuePage } from "@/components/issues/use-issue-actions";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { type TIssueChanges, useUpdateIssueMutation } from "@/lib/queries/issues";
 
 export type TIssueBoardProps = {
   workspaceId: string;
@@ -62,30 +67,38 @@ function columnId(groupKey: string) {
   return `column::${groupKey}`;
 }
 
-function groupPatch(group: TIssueGroup, issue: TIssue): TIssuePatch | "unsupported" {
+type TGroupMove = { patch: TIssuePatch; changes: TIssueChanges } | "unsupported";
+
+/** What dropping an issue into a column changes; another team's status column can't take it. */
+function groupMove(group: TIssueGroup, issue: Issue): TGroupMove {
   const meta = group.meta;
+  const plain = (patch: TIssuePatch) => ({ patch, changes: patchToChanges(patch, issue.labels) });
   switch (meta.kind) {
     case "state":
-      if (meta.state.team_id !== issue.team_id) return "unsupported";
-      return { state: meta.state };
+      if (meta.teamId && meta.teamId !== issue.team.id) return "unsupported";
+      return {
+        patch: { state: meta.state },
+        changes: { state: meta.teamId ? meta.state.id : meta.state.name },
+      };
     case "priority":
-      return { priority: meta.priority };
+      return plain({ priority: meta.priority });
     case "assignee":
-      return { assignee: meta.user };
+      return plain({ assignee: meta.user });
     case "project":
-      return { project: meta.project };
+      return plain({ project: meta.project });
     case "cycle":
-      if (issue.cycle?.id === meta.cycle?.id) return {};
-      return { cycle: meta.cycle };
+      if (issue.cycle?.id === meta.cycle?.id) return plain({});
+      return plain({ cycle: meta.cycle });
     case "none":
     case "label":
     case "parent":
+    case "team":
       return "unsupported";
   }
 }
 
 export function IssueBoard(props: TIssueBoardProps) {
-  const { query, issues, groups, display, fixedTeamId } = useIssueCollection({
+  const { query, issues, groups, display, fixedTeamId, isLoadingMore } = useIssueCollection({
     ...props,
     display: { group_by: "state", ...props.display },
   });
@@ -94,12 +107,12 @@ export function IssueBoard(props: TIssueBoardProps) {
   if (query.error) {
     return <ErrorCard message={query.error.message} onRetry={() => void query.refetch()} />;
   }
-  if (issues.length === 0 && groups.length === 0) {
+  if (issues.length === 0 && groups.length === 0 && !isLoadingMore) {
     return (
       props.emptyState ?? (
         <EmptyState
           icon={LayoutGridIcon}
-          title="No issues yet"
+          title="No matching issues"
           description="Issues that match these filters show up here."
         />
       )
@@ -126,8 +139,8 @@ function Board({
   isManualOrder: boolean;
   fixedTeamId: string | undefined;
 }) {
-  const { canEdit } = useWorkspace();
-  const { mutate: updateIssue } = useUpdateIssueMutation();
+  const { workspace, canEdit } = useWorkspace();
+  const { mutate: updateIssue } = useUpdateIssueMutation(workspace.id);
   const [activeCard, setActiveCard] = useState<TCardData | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: DRAG_ACTIVATION_DISTANCE } }),
@@ -168,10 +181,10 @@ function Board({
     const newIndex = reordered.findIndex((item) => item.id === issue.id);
     const neighbors = reordered
       .filter((item) => item.id !== issue.id)
-      .map((item) => item.sort_order);
+      .map((item) => item.sortOrder);
 
-    const patch = isSameColumn ? {} : groupPatch(targetGroup, issue);
-    if (patch === "unsupported") {
+    const move = isSameColumn ? { patch: {}, changes: {} } : groupMove(targetGroup, issue);
+    if (move === "unsupported") {
       toast.add({
         type: "warning",
         title: "Cannot move there",
@@ -184,15 +197,11 @@ function Board({
     }
     const sortOrder =
       isManualOrder || isSameColumn ? sortOrderAtIndex(neighbors, newIndex) : undefined;
+    const order = sortOrder !== undefined ? { sortOrder } : {};
     updateIssue({
-      input: {
-        ...issuePatchToUpdateInput(issue.id, patch),
-        ...(sortOrder !== undefined ? { sort_order: sortOrder } : {}),
-      },
-      optimistic: {
-        ...patchToOptimistic(patch),
-        ...(sortOrder !== undefined ? { sort_order: sortOrder } : {}),
-      },
+      id: issue.id,
+      changes: { ...move.changes, ...order },
+      optimistic: { ...patchToOptimistic(move.patch), ...order },
     });
   };
 
@@ -204,7 +213,7 @@ function Board({
       onDragCancel={() => setActiveCard(null)}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex w-full min-w-0 items-start gap-3 overflow-x-auto pb-2">
+      <div className="flex w-full min-w-0 flex-1 items-start gap-3 overflow-x-auto pb-2">
         {groups.map((group) => (
           <BoardColumn
             key={group.key}
@@ -244,7 +253,7 @@ function BoardColumn({
       data-over={isOver || undefined}
       className="bg-muted data-over:border-primary/5-10 flex w-72 shrink-0 flex-col rounded-lg border"
     >
-      <header className="flex h-10 items-center gap-2 px-3 text-sm">
+      <header className="flex h-10 items-center gap-2 pr-1 pl-3 text-sm">
         <GroupIcon meta={group.meta} />
         <span className="min-w-0 truncate font-medium">{group.label}</span>
         <span className="text-muted-foreground text-xs">{group.issues.length}</span>
@@ -265,7 +274,7 @@ function BoardColumn({
         )}
       </header>
       <SortableContext id={group.key} items={ids} strategy={verticalListSortingStrategy}>
-        <div ref={setNodeRef} role="list" className="flex min-h-16 flex-col gap-3 px-2 pb-2">
+        <div ref={setNodeRef} role="list" className="flex min-h-16 flex-col gap-2 px-2 pb-2">
           {group.issues.map((issue) => (
             <SortableIssueCard
               key={issue.id}
@@ -288,7 +297,7 @@ function SortableIssueCard({
   canEdit,
 }: {
   groupKey: string;
-  issue: TIssue;
+  issue: Issue;
   properties: DisplaySettings["properties"];
   canEdit: boolean;
 }) {

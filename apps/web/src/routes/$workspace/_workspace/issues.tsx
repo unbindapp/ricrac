@@ -18,6 +18,7 @@ function IssuesPage() {
       title="All issues"
       icon={<ListTodoIcon />}
       storageKey="all-issues"
+      fixedFilters={{ state_types: ["backlog", "unstarted", "started", "completed", "canceled"] }}
       filters={filtersFromSearch(search)}
       onFiltersChange={(filters) =>
         void navigate({ search: (prev) => ({ ...prev, ...filtersToSearch(filters) }) })

@@ -1,7 +1,8 @@
-import type { TGroupBy, TOrderBy } from "@/lib/queries/issues";
-
 export type TIssueLayout = "list" | "board";
 export type TShowCompleted = "all" | "past_week" | "none";
+export type TGroupBy =
+  "state" | "assignee" | "priority" | "project" | "cycle" | "label" | "parent" | "team" | "none";
+export type TOrderBy = "manual" | "priority" | "updated_at" | "created_at" | "due_date" | "title";
 export type TIssueProperty =
   | "priority"
   | "identifier"
@@ -47,6 +48,7 @@ export const GROUP_BY_OPTIONS: { value: TGroupBy; label: string }[] = [
   { value: "cycle", label: "Cycle" },
   { value: "label", label: "Label" },
   { value: "parent", label: "Parent issue" },
+  { value: "team", label: "Team" },
   { value: "none", label: "No grouping" },
 ];
 
@@ -75,6 +77,16 @@ export const DEFAULT_DISPLAY: TDisplaySettings = {
   properties: ["priority", "identifier", "state", "labels", "project", "due_date", "assignee"],
 };
 
+/** The order the server loads issues in, so a list cut at its limit keeps the first ones. */
+export const serverOrderBy: Record<TOrderBy, string> = {
+  manual: "manual",
+  priority: "priority",
+  updated_at: "updatedAt",
+  created_at: "createdAt",
+  due_date: "dueDate",
+  title: "updatedAt",
+};
+
 export function defaultOrderFor(orderBy: TOrderBy): "asc" | "desc" {
   switch (orderBy) {
     case "created_at":
@@ -85,8 +97,22 @@ export function defaultOrderFor(orderBy: TOrderBy): "asc" | "desc" {
   }
 }
 
+const isGroupBy = (value: unknown): value is TGroupBy =>
+  GROUP_BY_OPTIONS.some((option) => option.value === value);
+const isOrderBy = (value: unknown): value is TOrderBy =>
+  ORDER_BY_OPTIONS.some((option) => option.value === value);
+
+/** Layers display settings over the defaults, dropping values this version doesn't know. */
 export function resolveDisplay(
   ...layers: (Partial<TDisplaySettings> | undefined)[]
 ): TDisplaySettings {
-  return layers.reduce<TDisplaySettings>((acc, layer) => ({ ...acc, ...layer }), DEFAULT_DISPLAY);
+  const merged = layers.reduce<TDisplaySettings>(
+    (acc, layer) => ({ ...acc, ...layer }),
+    DEFAULT_DISPLAY,
+  );
+  return {
+    ...merged,
+    group_by: isGroupBy(merged.group_by) ? merged.group_by : DEFAULT_DISPLAY.group_by,
+    order_by: isOrderBy(merged.order_by) ? merged.order_by : DEFAULT_DISPLAY.order_by,
+  };
 }

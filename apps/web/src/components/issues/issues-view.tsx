@@ -1,6 +1,8 @@
 import { BookmarkPlusIcon, PlusIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
+import type { Issue } from "@/api/ops.gen";
+
 import { DisplayOptions, useDisplaySettings } from "@/components/issues/display-options";
 import type { DisplaySettings } from "@/components/issues/display";
 import { type ListIssuesFilters, mergeFilters } from "@/components/issues/filters";
@@ -11,6 +13,7 @@ import { IssuePeekHost } from "@/components/issues/issue-peek";
 import { useNewIssueContext, useNewIssueStore } from "@/components/issues/new-issue-store";
 import { useFilterDefaults } from "@/components/issues/use-filter-defaults";
 import type { TFilterField } from "@/components/issues/filters";
+import type { TStateType } from "@/components/shared/state-icon";
 import type { TBreadcrumbItem } from "@/components/layout/breadcrumb";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -28,11 +31,14 @@ type TProps = {
   onFiltersChange: (filters: ListIssuesFilters) => void;
   fixedFilters?: ListIssuesFilters;
   teamId?: string;
+  /** The kind of status issues created here get, unless the filters pin one. */
+  newIssueStateType?: TStateType;
   defaultDisplay?: Partial<DisplaySettings>;
   hiddenFilterFields?: TFilterField[];
   tabs?: ReactNode;
   header?: ReactNode;
   emptyState?: ReactNode;
+  rowActions?: (issue: Issue) => ReactNode;
 };
 
 export function IssuesView({
@@ -44,16 +50,18 @@ export function IssuesView({
   onFiltersChange,
   fixedFilters,
   teamId,
+  newIssueStateType,
   defaultDisplay,
   hiddenFilterFields,
   tabs,
   header,
   emptyState,
+  rowActions,
 }: TProps) {
   const { workspace, canEdit } = useWorkspace();
   const { display, setDisplay, reset, isDefault } = useDisplaySettings(storageKey, defaultDisplay);
   const effectiveFilters = mergeFilters(filters, fixedFilters);
-  const defaults = useFilterDefaults(effectiveFilters, teamId);
+  const defaults = useFilterDefaults(effectiveFilters, teamId, newIssueStateType);
   const { openSaveView, saveViewDialog } = useSaveViewDialog({
     filters: effectiveFilters,
     display,
@@ -69,6 +77,7 @@ export function IssuesView({
     display,
     emptyState,
   };
+  const teamDefaults = teamId ? { teamId } : undefined;
 
   const toolbar = (
     <PageToolbar
@@ -112,7 +121,7 @@ export function IssuesView({
             breadcrumb={breadcrumb}
             actions={
               canEdit && (
-                <Button onClick={() => openNewIssue()}>
+                <Button onClick={() => openNewIssue(teamDefaults)}>
                   <PlusIcon className="size-4" />
                   New issue
                 </Button>
@@ -126,7 +135,11 @@ export function IssuesView({
             }
           />
         )}
-        {display.layout === "board" ? <IssueBoard {...listProps} /> : <IssueList {...listProps} />}
+        {display.layout === "board" ? (
+          <IssueBoard {...listProps} />
+        ) : (
+          <IssueList {...listProps} rowActions={rowActions} />
+        )}
         {saveViewDialog}
       </PageContainer>
     </IssuePeekHost>

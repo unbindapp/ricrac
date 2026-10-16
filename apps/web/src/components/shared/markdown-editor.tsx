@@ -12,7 +12,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Avatar } from "@/components/shared/avatar";
 import { MarkdownMention } from "@/components/shared/markdown-mention";
-import type { TUserSummary } from "@/components/shared/user-chip";
 import { SuggestionMenu, type TSuggestionItem } from "@/components/ui/suggestion-menu";
 import { toast } from "@/components/ui/toast";
 import useDebouncedCallback from "@/lib/hooks/use-debounced-callback";
@@ -22,6 +21,14 @@ const AUTOSAVE_DELAY_MS = 800;
 const MAX_MENTION_RESULTS = 8;
 
 type TSaveStatus = "idle" | "saving" | "saved" | "error";
+
+/** Someone who can be @mentioned. */
+export type TMentionUser = {
+  id: string;
+  name: string;
+  displayName: string;
+  avatarUrl?: string | null;
+};
 
 type TMentionState = {
   items: TSuggestionItem[];
@@ -34,7 +41,7 @@ type TProps = {
   value: string;
   onChange?: (markdown: string) => void;
   placeholder?: string;
-  users?: TUserSummary[];
+  users?: TMentionUser[];
   onUploadImage?: (file: File) => Promise<string>;
   readOnly?: boolean;
   autosave?: {
@@ -290,20 +297,19 @@ function imageFiles(list: FileList | null | undefined) {
   return Array.from(list ?? []).filter((file) => file.type.startsWith("image/"));
 }
 
-function mentionItems(users: TUserSummary[], query: string): TSuggestionItem[] {
+function mentionItems(users: TMentionUser[], query: string): TSuggestionItem[] {
   const needle = query.toLowerCase();
   return users
     .filter(
       (user) =>
-        user.name.toLowerCase().includes(needle) ||
-        (user.display_name ?? "").toLowerCase().includes(needle),
+        user.name.toLowerCase().includes(needle) || user.displayName.toLowerCase().includes(needle),
     )
     .slice(0, MAX_MENTION_RESULTS)
     .map((user) => ({
       id: user.id,
-      label: user.display_name || user.name,
-      description: user.display_name ? user.name : undefined,
-      icon: <Avatar id={user.id} name={user.name} src={user.avatar_url} size="xs" />,
+      label: user.displayName,
+      description: user.name !== user.displayName ? user.name : undefined,
+      icon: <Avatar id={user.id} name={user.name} src={user.avatarUrl} size="xs" />,
     }));
 }
 

@@ -1,19 +1,21 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 import { resolveDisplay, type TDisplaySettings } from "@/components/issues/display";
 import {
-  buildListIssuesInput,
+  buildListIssuesArgs,
   isHiddenCompleted,
   type ListIssuesFilters,
+  mergeFilters,
 } from "@/components/issues/filters";
 import { groupIssues, type TIssueGroup } from "@/components/issues/grouping";
 import type { TNewIssueDefaults } from "@/components/issues/new-issue-store";
-import { useTeams } from "@/components/workspace/teams-provider";
+import { useTeamDetail } from "@/components/issues/picker-sources";
 import { useNow } from "@/components/providers/now-provider";
 import { issuesListQuery } from "@/lib/queries/issues";
 
 const HOUR_MS = 60 * 60 * 1000;
+const CLOSED = ["completed", "canceled"];
 
 export type TIssueCollectionProps = {
   workspaceId: string;
@@ -22,6 +24,10 @@ export type TIssueCollectionProps = {
   fixedFilters?: Partial<ListIssuesFilters>;
 };
 
+/**
+ * Loads every page of a list (up to LIST_MAX_ISSUES) and groups and sorts it here, since the
+ * server lists don't group or count.
+ */
 export function useIssueCollection({
   workspaceId,
   filters,
@@ -29,43 +35,57 @@ export function useIssueCollection({
   fixedFilters,
 }: TIssueCollectionProps) {
   const display = resolveDisplay(displayOverrides);
-  const input = buildListIssuesInput({ workspaceId, filters, fixedFilters, display });
-  const query = useInfiniteQuery(issuesListQuery(input));
-  const now = useNow();
-  const { teams } = useTeams();
+  const args = buildListIssuesArgs({ filters, fixedFilters, display });
+  const query = useInfiniteQuery(issuesListQuery(workspaceId, args));
+  const { hasNextPage, isFetchingNextPage, isError, fetchNextPage } = query;
+  useEffect(() => {
+    if (hasNextPage && !isFetchingNextPage && !isError) void fetchNextPage();
+  }, [hasNextPage, isFetchingNextPage, isError, fetchNextPage]);
+
+  const merged = mergeFilters(filters, fixedFilters);
+  const teamId = merged.team_ids?.length === 1 ? merged.team_ids[0] : undefined;
   const fixedTeamId = fixedFilters?.team_ids?.length === 1 ? fixedFilters.team_ids[0] : undefined;
-  const fixedTeam = teams.find((team) => team.id === fixedTeamId);
+  const team = useTeamDetail(teamId);
+  const now = useNow();
   const nowMs = Math.floor(now / HOUR_MS) * HOUR_MS;
 
+  const pages = query.data?.pages;
   const issues = useMemo(
     () =>
-      (query.data?.pages ?? [])
-        .flatMap((page) => page.data)
+      (pages ?? [])
+        .flatMap((page) => page.nodes)
         .filter((issue) => !isHiddenCompleted(issue, display.show_completed, nowMs)),
-    [query.data, display.show_completed, nowMs],
+    [pages, display.show_completed, nowMs],
   );
 
-  const fixedStateTypes = input.state_types;
+  const stateTypes = merged.state_types;
+  const showsClosed = display.show_completed !== "none";
   const groups = useMemo(() => {
-    const states = fixedTeam?.states.filter(
-      (state) => !fixedStateTypes || fixedStateTypes.includes(state.type),
+    const states = team?.states.filter(
+      (state) =>
+        (!stateTypes || stateTypes.includes(state.type)) &&
+        (showsClosed || !CLOSED.includes(state.type)),
     );
     return groupIssues({
       issues,
       groupBy: display.group_by,
       orderBy: display.order_by,
       order: display.order,
-      states,
+      team: team && states ? { id: team.id, states } : undefined,
     });
-  }, [issues, display.group_by, display.order_by, display.order, fixedTeam, fixedStateTypes]);
+  }, [issues, display.group_by, display.order_by, display.order, team, stateTypes, showsClosed]);
+
+  const lastPage = pages?.[pages.length - 1];
+  const isCapped = Boolean(lastPage?.pageInfo.hasNextPage) && !hasNextPage;
 
   return {
     query,
     issues,
     groups,
     display,
-    fixedTeamId,
-    total: query.data?.pages[0]?.total ?? 0,
+    fixedTeamId: fixedTeamId ?? teamId,
+    isLoadingMore: hasNextPage || isFetchingNextPage,
+    isCapped,
   };
 }
 
@@ -78,27 +98,21 @@ export function newIssueDefaultsForGroup(
     case "none":
       return base;
     case "state":
-      return {
-        ...base,
-        teamId: meta.state.team_id,
-        stateId: meta.state.id,
-        draft: { ...base.draft, state: meta.state },
-      };
+      if (!meta.teamId) return base;
+      return { ...base, teamId: meta.teamId, draft: { ...base.draft, state: meta.state } };
     case "priority":
       return { ...base, draft: { ...base.draft, priority: meta.priority } };
     case "assignee":
       return { ...base, draft: { ...base.draft, assignee: meta.user } };
     case "project":
-      return {
-        ...base,
-        projectId: meta.project?.id,
-        draft: { ...base.draft, project: meta.project },
-      };
+      return { ...base, draft: { ...base.draft, project: meta.project } };
     case "cycle":
-      return { ...base, cycleId: meta.cycle?.id, draft: { ...base.draft, cycle: meta.cycle } };
+      return { ...base, draft: { ...base.draft, cycle: meta.cycle } };
     case "label":
       return { ...base, draft: { ...base.draft, labels: meta.label ? [meta.label] : [] } };
     case "parent":
-      return { ...base, parentId: meta.parent?.id, draft: { ...base.draft, parent: meta.parent } };
+      return { ...base, draft: { ...base.draft, parent: meta.parent } };
+    case "team":
+      return { ...base, teamId: meta.team.id };
   }
 }

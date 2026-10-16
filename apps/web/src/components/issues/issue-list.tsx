@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 
+import type { Issue } from "@/api/ops.gen";
 import { BulkActionBar } from "@/components/issues/bulk-action-bar";
 import type { DisplaySettings } from "@/components/issues/display";
 import type { ListIssuesFilters } from "@/components/issues/filters";
@@ -19,12 +20,11 @@ import { useIsPeekable, useIssuePeek } from "@/components/issues/issue-peek";
 import { IssueRow } from "@/components/issues/issue-row";
 import { nestSubIssues } from "@/components/issues/nesting";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
-import type { TIssue } from "@/lib/queries/issues";
+import { useOpenIssuePage } from "@/components/issues/use-issue-actions";
 import {
   newIssueDefaultsForGroup,
   useIssueCollection,
 } from "@/components/issues/use-issue-collection";
-import { useOpenIssuePage } from "@/components/issues/use-issue-actions";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { List } from "@/components/layout/list";
@@ -32,6 +32,7 @@ import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
+import { LIST_MAX_ISSUES } from "@/lib/queries/issues";
 import { useIssueSelectionStore } from "@/lib/stores/issue-selection";
 
 export type TIssueListProps = {
@@ -40,15 +41,16 @@ export type TIssueListProps = {
   display?: Partial<DisplaySettings>;
   fixedFilters?: Partial<ListIssuesFilters>;
   emptyState?: ReactNode;
+  /** Quick actions shown on a hovered row, like triage's accept and decline. */
+  rowActions?: (issue: Issue) => ReactNode;
 };
 
 const ROW_HEIGHT = 36;
 const OVERSCAN = 12;
-const PREFETCH_ROWS = 20;
 
 type TListItem =
   | { kind: "header"; key: string; group: TIssueGroup }
-  | { kind: "row"; key: string; issue: TIssue; depth: number };
+  | { kind: "row"; key: string; issue: Issue; depth: number };
 
 function findScrollParent(element: HTMLElement | null): HTMLElement | null {
   let current = element?.parentElement ?? null;
@@ -61,7 +63,8 @@ function findScrollParent(element: HTMLElement | null): HTMLElement | null {
 }
 
 export function IssueList(props: TIssueListProps) {
-  const { query, issues, groups, display, fixedTeamId } = useIssueCollection(props);
+  const { query, issues, groups, display, fixedTeamId, isLoadingMore, isCapped } =
+    useIssueCollection(props);
   const { canEdit } = useWorkspace();
   const openNewIssue = useNewIssueStore((state) => state.open);
 
@@ -69,12 +72,12 @@ export function IssueList(props: TIssueListProps) {
   if (query.error) {
     return <ErrorCard message={query.error.message} onRetry={() => void query.refetch()} />;
   }
-  if (issues.length === 0) {
+  if (issues.length === 0 && !isLoadingMore) {
     return (
       props.emptyState ?? (
         <EmptyState
           icon={ListTodoIcon}
-          title="No issues yet"
+          title="No matching issues"
           description="Issues that match these filters show up here."
           action={
             canEdit && (
@@ -93,30 +96,34 @@ export function IssueList(props: TIssueListProps) {
     );
   }
   return (
-    <VirtualIssueList
-      groups={groups}
-      issues={issues}
-      showHeaders={display.group_by !== "none"}
-      nestSubIssues={display.nest_sub_issues}
-      properties={display.properties}
-      fixedTeamId={fixedTeamId}
-      hasNextPage={query.hasNextPage}
-      isFetchingNextPage={query.isFetchingNextPage}
-      fetchNextPage={() => void query.fetchNextPage()}
-    />
+    <div className="flex w-full flex-col gap-2">
+      <VirtualIssueList
+        groups={groups.filter((group) => group.issues.length > 0)}
+        issues={issues}
+        showHeaders={display.group_by !== "none"}
+        nestSubIssues={display.nest_sub_issues}
+        properties={display.properties}
+        fixedTeamId={fixedTeamId}
+        rowActions={props.rowActions}
+      />
+      {isLoadingMore && <p className="text-muted-foreground text-xs">Loading more issues…</p>}
+      {isCapped && (
+        <p className="text-muted-foreground text-xs">
+          Showing the first {LIST_MAX_ISSUES} issues. Narrow the filters to see the rest.
+        </p>
+      )}
+    </div>
   );
 }
 
 type TVirtualProps = {
   groups: TIssueGroup[];
-  issues: TIssue[];
+  issues: Issue[];
   showHeaders: boolean;
   nestSubIssues: boolean;
   properties: DisplaySettings["properties"];
   fixedTeamId: string | undefined;
-  hasNextPage: boolean;
-  isFetchingNextPage: boolean;
-  fetchNextPage: () => void;
+  rowActions?: (issue: Issue) => ReactNode;
 };
 
 function VirtualIssueList({
@@ -126,9 +133,7 @@ function VirtualIssueList({
   nestSubIssues: shouldNest,
   properties,
   fixedTeamId,
-  hasNextPage,
-  isFetchingNextPage,
-  fetchNextPage,
+  rowActions,
 }: TVirtualProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollElement, setScrollElement] = useState<HTMLElement | null>(null);
@@ -140,6 +145,7 @@ function VirtualIssueList({
   const isPeekable = useIsPeekable();
   const openPage = useOpenIssuePage();
   const selectedIds = useIssueSelectionStore((state) => state.selectedIds);
+  const focusedId = useIssueSelectionStore((state) => state.focusedId);
   const toggle = useIssueSelectionStore((state) => state.toggle);
   const selectRange = useIssueSelectionStore((state) => state.selectRange);
   const setFocused = useIssueSelectionStore((state) => state.setFocused);
@@ -189,7 +195,13 @@ function VirtualIssueList({
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => () => clear(), [clear]);
+  useEffect(
+    () => () => {
+      clear();
+      setFocused(null);
+    },
+    [clear, setFocused],
+  );
 
   const virtualizer = useVirtualizer({
     count: items.length,
@@ -200,26 +212,48 @@ function VirtualIssueList({
     getItemKey: (index) => items[index].key,
   });
   const virtualItems = virtualizer.getVirtualItems();
-  const lastIndex = virtualItems[virtualItems.length - 1]?.index ?? 0;
 
-  useEffect(() => {
-    if (!hasNextPage || isFetchingNextPage) return;
-    if (lastIndex < items.length - PREFETCH_ROWS) return;
-    fetchNextPage();
-  }, [lastIndex, items.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  const open = (issue: Issue) => {
+    if (peek && isPeekable) {
+      peek.openPeek(issue.identifier);
+      return;
+    }
+    void openPage(issue.identifier);
+  };
 
+  const moveFocus = (step: number) => {
+    if (orderedIds.length === 0) return;
+    const current = focusedId ? orderedIds.indexOf(focusedId) : -1;
+    const next = orderedIds[Math.max(0, Math.min(orderedIds.length - 1, current + step))];
+    setFocused(next);
+    const index = items.findIndex((item) => item.kind === "row" && item.issue.id === next);
+    virtualizer.scrollToIndex(index, { align: "auto" });
+    requestAnimationFrame(() =>
+      document.querySelector<HTMLElement>(`[data-issue-row="${next}"]`)?.focus(),
+    );
+  };
+
+  const focusedIssue = issues.find((issue) => issue.id === focusedId);
   useHotkeyScope([
+    { hotkey: "J", callback: () => moveFocus(1) },
+    { hotkey: "K", callback: () => moveFocus(-1) },
+    { hotkey: "ArrowDown", callback: () => moveFocus(1) },
+    { hotkey: "ArrowUp", callback: () => moveFocus(-1) },
+    {
+      hotkey: "O",
+      callback: () => focusedIssue && open(focusedIssue),
+      enabled: Boolean(focusedIssue),
+    },
     {
       hotkey: "X",
       callback: () => {
-        const focusedId = useIssueSelectionStore.getState().focusedId;
         if (focusedId && orderedIds.includes(focusedId)) toggle(focusedId);
       },
     },
     { hotkey: "Escape", callback: clear, enabled: selectedIds.length > 0, ignoreInputs: true },
   ]);
 
-  const handleClick = (event: MouseEvent, issue: TIssue) => {
+  const handleClick = (event: MouseEvent, issue: Issue) => {
     if (event.metaKey || event.ctrlKey) {
       void openPage(issue.identifier);
       return;
@@ -228,11 +262,11 @@ function VirtualIssueList({
       selectRange(orderedIds, issue.id);
       return;
     }
-    if (peek && isPeekable) {
-      peek.openPeek(issue.identifier);
+    if (selectedIds.length > 0) {
+      toggle(issue.id);
       return;
     }
-    void openPage(issue.identifier);
+    open(issue);
   };
 
   const selectedIssues = issues.filter((issue) => selectedIds.includes(issue.id));
@@ -275,7 +309,9 @@ function VirtualIssueList({
                       properties={properties}
                       isSelected={selectedIds.includes(item.issue.id)}
                       isActive={peek?.peek?.toUpperCase() === item.issue.identifier}
+                      isFocused={focusedId === item.issue.id}
                       canEdit={canEdit}
+                      actions={rowActions?.(item.issue)}
                       onClick={handleClick}
                       onFocus={(issue) => setFocused(issue.id)}
                     />

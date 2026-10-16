@@ -1,6 +1,8 @@
 import { type ReactNode, useState } from "react";
 
+import type { UserRef } from "@/api/ops.gen";
 import { applyPatch, type TIssueDraft, type TIssuePatch } from "@/components/issues/issue-draft";
+import { useCycles, useTeamDetail } from "@/components/issues/picker-sources";
 import {
   AssigneePicker,
   CyclePicker,
@@ -15,8 +17,6 @@ import {
   SubscribersPicker,
   type TPickerAppearance,
 } from "@/components/issues/pickers";
-import { useCycles, useTeam } from "@/components/issues/picker-sources";
-import type { TUserSummary } from "@/lib/queries/issues";
 import { PropertyRow } from "@/components/layout/property-row";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 
@@ -33,8 +33,8 @@ export type TPropertyKey =
   | "parent";
 
 type TSubscribers = {
-  users: TUserSummary[];
-  onChange: (added: TUserSummary[], removed: TUserSummary[]) => void;
+  users: UserRef[];
+  onChange: (added: UserRef[], removed: UserRef[]) => void;
 };
 
 type TProps = {
@@ -46,6 +46,9 @@ type TProps = {
   shortcutsEnabled?: boolean;
   subscribers?: TSubscribers;
   disabled?: boolean;
+  omit?: TPropertyKey[];
+  /** More rows at the end of the panel (sharing, SLA, snooze). */
+  children?: ReactNode;
 };
 
 const SHORTCUTS: { hotkey: string; property: TPropertyKey }[] = [
@@ -62,17 +65,19 @@ const SHORTCUTS: { hotkey: string; property: TPropertyKey }[] = [
 export function IssueProperties({
   teamId,
   issueId,
-  value,
+  value: draft,
   onChange,
   layout = "column",
   shortcutsEnabled = false,
   subscribers,
   disabled,
+  omit = [],
+  children,
 }: TProps) {
   const [openProperty, setOpenProperty] = useState<TPropertyKey | null>(null);
-  const team = useTeam(teamId);
+  const team = useTeamDetail(teamId);
   const { enabled: cyclesEnabled } = useCycles(teamId);
-  const estimatesEnabled = Boolean(team && team.estimate_type !== "none");
+  const estimatesEnabled = Boolean(team && team.estimateType !== "notUsed");
   useHotkeyScope(
     SHORTCUTS.map(({ hotkey, property }) => ({
       hotkey,
@@ -88,8 +93,6 @@ export function IssueProperties({
     open: openProperty === property,
     onOpenChange: (open: boolean) => setOpenProperty(open ? property : null),
   });
-  const change = (patch: TIssuePatch) => onChange(patch);
-  const draft = value;
 
   const fields: { property: TPropertyKey; label: string; node: ReactNode; hidden?: boolean }[] = [
     {
@@ -99,7 +102,7 @@ export function IssueProperties({
         <StatePicker
           teamId={teamId}
           state={draft.state}
-          onChange={(state) => change({ state })}
+          onChange={(state) => onChange({ state })}
           {...control("state")}
         />
       ),
@@ -110,7 +113,7 @@ export function IssueProperties({
       node: (
         <PriorityPicker
           priority={draft.priority}
-          onChange={(priority) => change({ priority })}
+          onChange={(priority) => onChange({ priority })}
           {...control("priority")}
         />
       ),
@@ -121,7 +124,7 @@ export function IssueProperties({
       node: (
         <AssigneePicker
           assignee={draft.assignee}
-          onChange={(assignee) => change({ assignee })}
+          onChange={(assignee) => onChange({ assignee })}
           {...control("assignee")}
         />
       ),
@@ -133,7 +136,7 @@ export function IssueProperties({
         <LabelsPicker
           teamId={teamId}
           labels={draft.labels}
-          onChange={(labels) => change({ labels })}
+          onChange={(labels) => onChange({ labels })}
           {...control("labels")}
         />
       ),
@@ -145,7 +148,7 @@ export function IssueProperties({
         <ProjectPicker
           teamId={teamId}
           project={draft.project}
-          onChange={(project) => change(applyPatchDiff(draft, { project }))}
+          onChange={(project) => onChange(withMilestone(draft, { project }))}
           {...control("project")}
         />
       ),
@@ -157,8 +160,8 @@ export function IssueProperties({
       node: (
         <MilestonePicker
           projectId={draft.project?.id}
-          milestone={draft.milestone}
-          onChange={(milestone) => change({ milestone })}
+          milestone={draft.projectMilestone}
+          onChange={(projectMilestone) => onChange({ projectMilestone })}
           {...control("milestone")}
         />
       ),
@@ -171,7 +174,7 @@ export function IssueProperties({
         <CyclePicker
           teamId={teamId}
           cycle={draft.cycle}
-          onChange={(cycle) => change({ cycle })}
+          onChange={(cycle) => onChange({ cycle })}
           {...control("cycle")}
         />
       ),
@@ -184,7 +187,7 @@ export function IssueProperties({
         <EstimatePicker
           teamId={teamId}
           estimate={draft.estimate}
-          onChange={(estimate) => change({ estimate })}
+          onChange={(estimate) => onChange({ estimate })}
           {...control("estimate")}
         />
       ),
@@ -194,8 +197,8 @@ export function IssueProperties({
       label: "Due date",
       node: (
         <DueDatePicker
-          dueDate={draft.due_date}
-          onChange={(due_date) => change({ due_date })}
+          dueDate={draft.dueDate}
+          onChange={(dueDate) => onChange({ dueDate })}
           {...control("due_date")}
         />
       ),
@@ -207,13 +210,13 @@ export function IssueProperties({
         <ParentPicker
           issueId={issueId}
           parent={draft.parent}
-          onChange={(parent) => change({ parent })}
+          onChange={(parent) => onChange({ parent })}
           {...control("parent")}
         />
       ),
     },
   ];
-  const visible = fields.filter((field) => !field.hidden);
+  const visible = fields.filter((field) => !field.hidden && !omit.includes(field.property));
 
   if (layout === "inline") {
     return (
@@ -228,7 +231,7 @@ export function IssueProperties({
   }
 
   return (
-    <div className="flex w-full flex-col">
+    <div className="flex w-full flex-col gap-0.5">
       {visible.map((field) => (
         <PropertyRow key={field.property} label={field.label}>
           {field.node}
@@ -244,12 +247,14 @@ export function IssueProperties({
           />
         </PropertyRow>
       )}
+      {children}
     </div>
   );
 }
 
-function applyPatchDiff(draft: TIssueDraft, patch: TIssuePatch): TIssuePatch {
+/** Changing the project drops a milestone of the old one. */
+function withMilestone(draft: TIssueDraft, patch: TIssuePatch): TIssuePatch {
   const next = applyPatch(draft, patch);
-  if (next.milestone === draft.milestone) return patch;
-  return { ...patch, milestone: next.milestone };
+  if (next.projectMilestone === draft.projectMilestone) return patch;
+  return { ...patch, projectMilestone: next.projectMilestone };
 }
