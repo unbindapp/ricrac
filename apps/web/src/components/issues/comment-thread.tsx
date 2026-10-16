@@ -1,3 +1,4 @@
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { useQuery } from "@tanstack/react-query";
 import {
   CheckCircle2Icon,
@@ -91,7 +92,7 @@ export function CommentComposer({
         >
           {parentId ? "Reply" : "Comment"}
           <Kbd className="bg-primary-foreground/2-10 text-primary-foreground border-transparent">
-            ⌘↵
+            {formatForDisplay("Mod+Enter")}
           </Kbd>
         </Button>
       </div>

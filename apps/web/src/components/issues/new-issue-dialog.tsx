@@ -1,3 +1,4 @@
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { useNavigate } from "@tanstack/react-router";
 import { ChevronDownIcon, CornerLeftUpIcon, XIcon } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
@@ -249,7 +250,7 @@ function NewIssueForm({ defaults, onClose }: { defaults: TNewIssueDefaults; onCl
         <Button type="submit" size="sm" isPending={isPending} disabled={!teamId || !title.trim()}>
           Create issue
           <Kbd className="bg-primary-foreground/2-10 text-primary-foreground border-transparent">
-            ⌘↵
+            {formatForDisplay("Mod+Enter")}
           </Kbd>
         </Button>
       </DialogFooter>
