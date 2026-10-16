@@ -20,3 +20,11 @@ func TestWebTypes(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestEveryOperationDeclaresItsResult(t *testing.T) {
+	for _, o := range All() {
+		if o.Result == nil {
+			t.Errorf("%s doesn't declare its result (returns)", o.Name)
+		}
+	}
+}
