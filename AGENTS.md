@@ -66,7 +66,13 @@ dnd-kit drags, cmdk is the command panel.
   apps/server; never edit them, regenerate them. Use the generated shapes (`Issue`,
   `IssueDetail`, ...) and `OpResult<"name">` instead of declaring your own.
 - `src/lib/queries/*` wrap operations in TanStack Query options and mutations, one module per
-  area; components never call the server directly.
+  area; components never call the server directly. Queries and mutation hooks take the
+  workspace id (`useWorkspace().workspace.id`), and their keys start with it
+  (`[workspaceId, "teams", ...]`) so one invalidation refreshes a workspace; `callAll` reads
+  every page of a small list. `teams.ts` and `workspaces.ts` show the shape.
+- `/$workspace` (`routes/$workspace/_workspace/route.tsx`) loads `get_workspace` and provides
+  `useWorkspace()` (workspace, role, `canEdit` for everyone but guests, `isAdmin` for owners and
+  admins) and `useTeams()` (`list_teams`); route params use `workspace.urlKey`.
 - Page structure comes only from `components/layout` (`PageContainer`, `PageHeader`,
   `PageToolbar`, `SettingsPage`, `SettingsSection`, `EmptyState`, `ErrorCard`, `ListSkeleton`,
   `SplitView`). Spacing: `gap-1.5` icon to label, `gap-2` controls in a row, `gap-3` cards,
