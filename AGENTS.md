@@ -134,6 +134,11 @@ The end-to-end tests live in `apps/server/e2e/`: each starts from `world(t)` (a 
 `tryCall`; `http_test.go` goes through the real router (REST, OAuth, MCP). Behaviour changes need
 a test there.
 
+Signing in needs Google; in development `go run . session ann@acme.test` (in apps/server, with the
+variables exported) prints a session cookie for that user instead, and
+`node scripts/seed.mjs "<cookie>"` (in apps/web) fills the server with a workspace "acme" to
+click through.
+
 For browser checks use headless Chromium through `playwright-core`, never the editor's preview tab.
 
 ## Commit Messages

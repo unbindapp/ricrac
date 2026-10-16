@@ -8,8 +8,11 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
+
+	"github.com/google/uuid"
 
 	"ricrac/app"
 	"ricrac/server"
@@ -20,6 +23,13 @@ func main() {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "configuration error: %v\n", err)
 		os.Exit(1)
+	}
+	if len(os.Args) == 3 && os.Args[1] == "session" {
+		if err := printSession(config, os.Args[2]); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
 	}
 	if !config.GoogleConfigured() {
 		slog.Warn("GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET aren't set: nobody can sign in")
@@ -53,4 +63,26 @@ func main() {
 		defer cancel()
 		_ = srv.Shutdown(shutdown)
 	}
+}
+
+// printSession prints a session cookie for the user with this email, creating them when there's
+// none, for signing in without Google during development: go run . session ann@example.com.
+func printSession(config app.Config, email string) error {
+	ctx := context.Background()
+	db, err := app.Connect(ctx, config.DatabaseURL)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	email = strings.ToLower(strings.TrimSpace(email))
+	local, _, _ := strings.Cut(email, "@")
+	user, err := app.One[uuid.UUID](ctx, db,
+		`INSERT INTO users (email, name, display_name) VALUES ($1, $2, $3)
+		 ON CONFLICT (email) DO UPDATE SET email = excluded.email RETURNING id`, email, local, app.DisplayName(local, email))
+	if err != nil {
+		return err
+	}
+	keys := app.NewKeys(config)
+	fmt.Printf("%s=%s\n", keys.SessionCookie, keys.SessionToken(user))
+	return nil
 }
