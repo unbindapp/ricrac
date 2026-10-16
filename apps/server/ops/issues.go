@@ -1571,7 +1571,7 @@ func applyIssueChanges(c *app.Ctx, tx pgx.Tx, id uuid.UUID, args SaveIssueArgs, 
 		}
 		if !samePtr(project, row.ProjectID) {
 			if err := app.Exec(c, tx,
-				"UPDATE issues SET project_id = $2, milestone_id = CASE WHEN $2 IS NULL OR $2 IS DISTINCT FROM project_id THEN NULL ELSE milestone_id END WHERE id = $1",
+				"UPDATE issues SET project_id = $2, milestone_id = CASE WHEN $2::uuid IS NULL OR $2::uuid IS DISTINCT FROM project_id THEN NULL ELSE milestone_id END WHERE id = $1",
 				id, project); err != nil {
 				return err
 			}
