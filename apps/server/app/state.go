@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"ricrac/mail"
 )
 
 type State struct {
@@ -16,9 +18,15 @@ type State struct {
 	Limiter *RateLimiter
 	// Wakes the webhook sender when deliveries are queued.
 	Deliveries chan struct{}
+	// Sends emails; nil when email is off.
+	Mailer mail.Sender
 }
 
 func NewState(db *pgxpool.Pool, config Config) *State {
+	var mailer mail.Sender
+	if config.Mail != nil {
+		mailer = mail.SMTP{Config: *config.Mail}
+	}
 	return &State{
 		DB:         db,
 		Config:     config,
@@ -26,6 +34,7 @@ func NewState(db *pgxpool.Pool, config Config) *State {
 		HTTP:       &http.Client{Timeout: 15 * time.Second},
 		Limiter:    NewRateLimiter(20, 15*time.Minute),
 		Deliveries: make(chan struct{}, 1),
+		Mailer:     mailer,
 	}
 }
 

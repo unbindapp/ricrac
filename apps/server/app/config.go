@@ -5,6 +5,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"ricrac/mail"
 )
 
 type Config struct {
@@ -21,6 +23,8 @@ type Config struct {
 	MaxUploadSize      int64
 	// Forces the Secure flag on cookies. When nil it is derived from X-Forwarded-Proto.
 	SecureCookies *bool
+	// Where emails go out; nil when email is off.
+	Mail *mail.Config
 }
 
 func ConfigFromEnv() (Config, error) {
@@ -58,6 +62,9 @@ func ConfigFromEnv() (Config, error) {
 		GoogleClientID:     env("GOOGLE_CLIENT_ID"),
 		GoogleClientSecret: env("GOOGLE_CLIENT_SECRET"),
 		MaxUploadSize:      int64(uploadMB) * 1024 * 1024,
+	}
+	if config.Mail, err = mail.ParseConfig(env("SMTP_URL"), env("EMAIL_FROM")); err != nil {
+		return Config{}, err
 	}
 	switch env("SECURE_COOKIES") {
 	case "true", "1":
