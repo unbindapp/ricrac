@@ -100,3 +100,25 @@ func TestFailedEmailsAreRetried(t *testing.T) {
 	eq(t, len(box.to("bob@acme.test")), 1)
 	eq(t, box.sent[0].Subject, "ENG-1 Fix login: Ann Smith assigned the issue to you")
 }
+
+func TestInvitationsAreEmailed(t *testing.T) {
+	w := world(t)
+	box := &outbox{}
+	w.State.Mailer = box
+	call(t, w.Ann, "invite_user", M{"email": "New@Example.com", "role": "admin"})
+	sendEmails(t, w)
+	sent := box.to("new@example.com")
+	eq(t, len(sent), 1)
+	eq(t, sent[0].Subject, "Ann Smith invited you to Acme on Ricrac")
+	contains(t, sent[0].Text, "as an admin", "Sign in with Google as new@example.com", "http://localhost:3000")
+}
+
+func TestPeopleTurnEmailNotificationsOff(t *testing.T) {
+	w := world(t)
+	bob := w.member("bob@acme.test", "Bob Jones", "member")
+	eq(t, call(t, bob, "get_user", M{"id": "me"}).At("emailNotifications").Bool(), true)
+	off := call(t, bob, "update_user", M{"id": "me", "emailNotifications": false})
+	eq(t, off.At("emailNotifications").Bool(), false)
+	check(t, call(t, w.Ann, "get_user", M{"id": "bob"}).At("emailNotifications").IsNull(), "only you see your setting")
+	contains(t, fails(t, w.Ann, "update_user", M{"id": "bob", "emailNotifications": true}), "your own")
+}

@@ -265,3 +265,28 @@ func sendQueued(ctx context.Context, state *app.State) error {
 	}
 	return nil
 }
+
+// queueInvitationEmail tells someone they were invited; they join by signing in with Google.
+func queueInvitationEmail(c *app.Ctx, tx pgx.Tx, to string, role app.Role) error {
+	type names struct{ Inviter, Workspace string }
+	n, _, err := app.Row[names](c, tx,
+		"SELECT (SELECT name FROM users WHERE id = $1), (SELECT name FROM workspaces WHERE id = $2)", c.User, c.Workspace)
+	if err != nil {
+		return err
+	}
+	article := "a"
+	if role == app.Admin {
+		article = "an"
+	}
+	return queueEmail(c, tx, to, mail.Content{
+		Subject: fmt.Sprintf("%s invited you to %s on Ricrac", n.Inviter, n.Workspace),
+		Heading: fmt.Sprintf("Join %s on Ricrac", n.Workspace),
+		Intro: []string{
+			fmt.Sprintf("%s invited you to the %s workspace as %s %s.", n.Inviter, n.Workspace, article, role),
+			fmt.Sprintf("Sign in with Google as %s to accept.", to),
+		},
+		Button: mail.Button{Label: "Accept invitation", URL: c.PublicURL()},
+		Note:   "This invitation expires in 14 days. If you weren't expecting it, you can ignore this email.",
+		Footer: mail.Footer{InstanceURL: c.PublicURL()},
+	})
+}

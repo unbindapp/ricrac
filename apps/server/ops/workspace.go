@@ -208,6 +208,7 @@ const userJSON = `jsonb_build_object(
 	'role', m.role,
 	'active', m.active,
 	'isMe', u.id = $3,
+	'emailNotifications', CASE WHEN u.id = $3 THEN u.email_notifications END,
 	'joinedAt', m.joined_at,
 	'teams', (SELECT coalesce(jsonb_agg(team_ref(t.id) ORDER BY t.name), '[]')
 		FROM team_members tm JOIN teams t ON t.id = tm.team_id
@@ -297,11 +298,12 @@ func getUser(c *app.Ctx, args IDArgs) (any, error) {
 }
 
 type UpdateUserArgs struct {
-	ID          string           `json:"id" doc:"The member: id, name, email or \"me\"."`
-	Role        *string          `json:"role" doc:"owner, admin, member or guest. Needs an admin; owner changes need an owner."`
-	Name        *string          `json:"name" doc:"Your full name."`
-	DisplayName *string          `json:"displayName" doc:"Your short handle, used for @mentions."`
-	Timezone    Nullable[string] `json:"timezone" doc:"Your IANA timezone, like Europe/Berlin; null clears it."`
+	ID                 string           `json:"id" doc:"The member: id, name, email or \"me\"."`
+	Role               *string          `json:"role" doc:"owner, admin, member or guest. Needs an admin; owner changes need an owner."`
+	Name               *string          `json:"name" doc:"Your full name."`
+	DisplayName        *string          `json:"displayName" doc:"Your short handle, used for @mentions."`
+	Timezone           Nullable[string] `json:"timezone" doc:"Your IANA timezone, like Europe/Berlin; null clears it."`
+	EmailNotifications *bool            `json:"emailNotifications" doc:"Whether you get unread notifications by email."`
 }
 
 func activeOwners(c *app.Ctx, q app.Querier) (int64, error) {
@@ -327,9 +329,9 @@ func updateUser(c *app.Ctx, args UpdateUserArgs) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	profileChange := args.Name != nil || args.DisplayName != nil || args.Timezone.Set
+	profileChange := args.Name != nil || args.DisplayName != nil || args.Timezone.Set || args.EmailNotifications != nil
 	if profileChange && user != c.User {
-		return nil, app.Forbidden("You can only change your own name, display name and timezone")
+		return nil, app.Forbidden("You can only change your own name, display name, timezone and email notifications")
 	}
 	var value M
 	err = inTx(c, func(tx pgx.Tx) error {
@@ -367,6 +369,11 @@ func updateUser(c *app.Ctx, args UpdateUserArgs) (any, error) {
 				}
 			}
 			if err := app.Exec(c, tx, "UPDATE users SET timezone = $2 WHERE id = $1", user, timezone); err != nil {
+				return err
+			}
+		}
+		if args.EmailNotifications != nil {
+			if err := app.Exec(c, tx, "UPDATE users SET email_notifications = $2 WHERE id = $1", user, *args.EmailNotifications); err != nil {
 				return err
 			}
 		}
@@ -572,6 +579,9 @@ func inviteUser(c *app.Ctx, args InviteUserArgs) (any, error) {
 			return err
 		}
 		if err := audit(c, tx, "invitation.created", M{"email": email, "role": role.String()}); err != nil {
+			return err
+		}
+		if err := queueInvitationEmail(c, tx, email, role); err != nil {
 			return err
 		}
 		value, err = app.One[M](c, tx, fmt.Sprintf("SELECT %s FROM invitations i WHERE i.id = $1", invitationJSON), id)
