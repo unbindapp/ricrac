@@ -31,8 +31,8 @@ links agents share.
   progress history.
 - **Documents** attached to projects, initiatives, teams, issues, cycles or releases, with
   version history.
-- **Custom views**, **favorites**, **templates** (issue templates with sub-issues, project
-  templates with milestones and issues, document templates), an **inbox** of notifications
+- **Custom views**, **favorites**, **templates** (issue templates with sub-issues, recurring
+  issues on a schedule, project templates with milestones and issues, document templates), an **inbox** of notifications
   (read, archive, snooze), **customers** and customer requests, **releases** with pipelines,
   stages and release notes, and **webhooks** signed with HMAC-SHA256.
 
@@ -40,7 +40,9 @@ links agents share.
 
 - **MCP** (streamable HTTP): `https://<host>/mcp`. Clients sign in with OAuth 2.1, using dynamic
   client registration or client ID metadata documents (Claude, ChatGPT, Claude Code, Codex,
-  Cursor), and pick the workspace to use on the consent screen.
+  Cursor), and pick the workspace to use on the consent screen. The everyday operations are listed
+  as tools; the rest are found with `find_operations` and run with `call_operation`
+  (`/mcp?tools=all` lists every operation as a tool instead).
 - **REST**: `https://<host>/v1`, with `Authorization: Bearer <token>`. The token is an OAuth
   access token or an API key (`rr_key_...`) made in the dashboard. The OpenAPI document is at
   `/v1/openapi.json` and an overview for agents at `/llms.txt`. Every operation is also

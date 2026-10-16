@@ -79,7 +79,8 @@ function ConnectPage() {
             <CardTitle>MCP server</CardTitle>
             <CardDescription>
               Add this URL to your agent. It signs in with OAuth and asks which workspace to use, so each connection
-              works in one workspace.
+              works in one workspace. Everyday operations are listed as tools and the rest are reached through
+              find_operations; add <code className="font-mono">?tools=all</code> to the URL to list every operation.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">

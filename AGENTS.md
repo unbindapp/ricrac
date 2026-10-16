@@ -16,7 +16,9 @@ Dockerfile) and a `postgres` database service.
 
 - `ops/` holds every operation of the tracker, defined once with `op(name, access, routes,
   description, handler)`. `ops::all()` feeds the MCP tools (`mcp.rs`), the REST routes, the generic
-  `POST /v1/ops/{name}` and the OpenAPI document (`rest.rs`). A handler is
+  `POST /v1/ops/{name}` and the OpenAPI document (`rest.rs`). MCP lists the everyday operations
+  (`mcp::CORE`) as tools and reaches the rest through `find_operations` and `call_operation`, so a
+  session doesn't start with every definition; `/mcp?tools=all` lists them all. A handler is
   `async fn(ctx: Ctx, args: Args) -> ApiResult<Value>`; `Args` derives `Deserialize` and
   `JsonSchema` with `#[serde(rename_all = "camelCase", deny_unknown_fields)]`, and its doc
   comments are what agents read.
@@ -39,7 +41,7 @@ Dockerfile) and a `postgres` database service.
   (workspaces, invitations, API keys, OAuth apps, connected apps, OAuth consent). Its types are
   exported to TypeScript with ts-rs.
 - `jobs.rs` runs the automations every minute (auto-archive, auto-close, trash, snoozes, due
-  dates, cycles) and delivers webhooks. `seed.rs` is what new workspaces and teams start with.
+  dates, cycles, recurring issues from templates) and delivers webhooks. `seed.rs` is what new workspaces and teams start with.
 - `files.rs` serves uploads; `spa.rs` serves `apps/web/dist`.
 
 ### apps/web (Vite, React, TanStack Router + Query, Tailwind, shadcn)
