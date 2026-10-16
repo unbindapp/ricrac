@@ -21,32 +21,32 @@ func teamOps() []*Op {
 		op("list_teams", app.Read, []string{"GET /teams"},
 			"List the teams you can see (private teams only if you're in them) with key, name, whether you're a member, "+
 				"member and open issue counts and whether cycles and triage are on. Narrow with query (name or key) or mine.",
-			listTeams),
+			listTeams).returns(ResultOf[PageOf[Team]]()),
 		op("get_team", app.Read, []string{"GET /teams/{id}"},
 			"Read a team by key, name or id: all its settings (estimates, cycles, triage, auto-archive and auto-close), "+
 				"its statuses in order, members (with owners), sub-teams, current cycle, default status and who is on triage.",
-			getTeam),
+			getTeam).returns(ResultOf[TeamDetail]()),
 		op("save_team", app.Write, []string{"POST /teams", "PATCH /teams/{id}"},
 			"Create a team (omit id; name is required, key defaults to its initials) or change one (id = key, name or "+
 				"id). Omitted fields stay as they are; null clears a nullable field. People are id, name, email or \"me\"; "+
 				"statuses are name, type or id. Changing the key renames every issue (ENG-1 becomes NEW-1); old "+
 				"identifiers keep working. Workspace admins, team owners and members of the team (or anyone, for a public "+
 				"team) may change it; guests can't.",
-			saveTeam),
+			saveTeam).returns(ResultOf[TeamDetail]()),
 		op("delete_team", app.Write, []string{"DELETE /teams/{id}"},
 			"Archive a team (workspace admins and team owners). It disappears from lists and its key becomes free; its "+
 				"issues stay readable.",
-			deleteTeam),
+			deleteTeam).returns(ResultOf[DeletedTeam]()),
 		op("join_team", app.Write, []string{"POST /teams/{id}/join"},
 			"Join a team yourself. Private teams can only be joined by workspace admins; others need a member to add them "+
 				"(save_team addMembers).",
-			joinTeam),
+			joinTeam).returns(ResultOf[TeamDetail]()),
 		op("leave_team", app.Write, []string{"POST /teams/{id}/leave"},
-			"Leave a team. The last member of a private team can't leave it.", leaveTeam),
+			"Leave a team. The last member of a private team can't leave it.", leaveTeam).returns(ResultOf[LeftTeam]()),
 		op("get_triage_responsibility", app.Read, []string{"GET /teams/{id}/triage"},
 			"Who handles the team's triage: the action (none, notify or assign), who is responsible now and, with a "+
 				"rotation, the upcoming shifts (filter them with user).",
-			getTriageResponsibility),
+			getTriageResponsibility).returns(ResultOf[TriageResponsibility]()),
 	}
 }
 
@@ -1059,4 +1059,110 @@ func getTriageResponsibility(c *app.Ctx, args TriageArgs) (any, error) {
 		"rotation":       rotation,
 		"upcomingShifts": upcoming,
 	}, nil
+}
+
+/* Shapes */
+
+type Team struct {
+	ID            string   `json:"id"`
+	Key           string   `json:"key"`
+	Name          string   `json:"name"`
+	Description   *string  `json:"description"`
+	Icon          *string  `json:"icon"`
+	Color         *string  `json:"color"`
+	Private       bool     `json:"private"`
+	Parent        *TeamRef `json:"parent"`
+	URL           string   `json:"url"`
+	IsMember      bool     `json:"isMember"`
+	MemberCount   int      `json:"memberCount"`
+	IssueCount    int      `json:"issueCount" doc:"Open issues: not completed, canceled, archived or trashed."`
+	CyclesEnabled bool     `json:"cyclesEnabled"`
+	TriageEnabled bool     `json:"triageEnabled"`
+	Timezone      string   `json:"timezone"`
+	ArchivedAt    *string  `json:"archivedAt"`
+	CreatedAt     string   `json:"createdAt"`
+	UpdatedAt     string   `json:"updatedAt"`
+}
+
+type TeamDetail struct {
+	Team
+	EstimateType                 string       `json:"estimateType" enum:"notUsed,exponential,fibonacci,linear,tShirt"`
+	EstimateAllowZero            bool         `json:"estimateAllowZero"`
+	EstimateExtended             bool         `json:"estimateExtended"`
+	DefaultEstimate              *float64     `json:"defaultEstimate"`
+	AllowedEstimates             []float64    `json:"allowedEstimates"`
+	CycleDurationWeeks           int          `json:"cycleDurationWeeks"`
+	CycleCooldownWeeks           int          `json:"cycleCooldownWeeks"`
+	CycleStartDay                int          `json:"cycleStartDay" doc:"0 Sunday, 1 Monday ... 6 Saturday."`
+	UpcomingCycleCount           int          `json:"upcomingCycleCount"`
+	CycleAutoAddStarted          bool         `json:"cycleAutoAddStarted"`
+	CycleAutoAddCompleted        bool         `json:"cycleAutoAddCompleted"`
+	CycleRollover                bool         `json:"cycleRollover"`
+	CurrentCycle                 *CycleRef    `json:"currentCycle"`
+	TriageAction                 string       `json:"triageAction" enum:"none,notify,assign"`
+	TriageResponsible            []UserRef    `json:"triageResponsible" doc:"Everyone responsible for triage, in rotation order."`
+	TriageRotationWeeks          *int         `json:"triageRotationWeeks"`
+	TriageRotationStart          *string      `json:"triageRotationStart"`
+	RequirePriorityToLeaveTriage bool         `json:"requirePriorityToLeaveTriage"`
+	Triage                       TeamTriage   `json:"triage"`
+	AutoArchiveMonths            *int         `json:"autoArchiveMonths"`
+	AutoCloseMonths              *int         `json:"autoCloseMonths"`
+	AutoCloseState               *StateRef    `json:"autoCloseState"`
+	AutoCloseParentIssues        bool         `json:"autoCloseParentIssues"`
+	AutoCloseChildIssues         bool         `json:"autoCloseChildIssues"`
+	DefaultIssueState            *StateRef    `json:"defaultIssueState"`
+	States                       []TeamStatus `json:"states" doc:"Its active statuses in board order."`
+	Members                      []TeamMember `json:"members"`
+	LabelCount                   int          `json:"labelCount"`
+	SubTeams                     []TeamRef    `json:"subTeams"`
+}
+
+type TeamTriage struct {
+	Enabled     bool      `json:"enabled"`
+	Action      string    `json:"action" enum:"none,notify,assign"`
+	Responsible []UserRef `json:"responsible" doc:"Who is responsible now: with a rotation, the person on duty."`
+}
+
+type TeamStatus struct {
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	Type        string  `json:"type" enum:"triage,backlog,unstarted,started,completed,canceled"`
+	Color       string  `json:"color"`
+	Description *string `json:"description"`
+	Position    float64 `json:"position"`
+}
+
+type TeamMember struct {
+	UserRef
+	Owner bool `json:"owner"`
+}
+
+type DeletedTeam struct {
+	Deleted string `json:"deleted"`
+	Key     string `json:"key"`
+}
+
+type LeftTeam struct {
+	Left TeamRef `json:"left"`
+}
+
+type TriageResponsibility struct {
+	Team           TeamRef         `json:"team"`
+	TriageEnabled  bool            `json:"triageEnabled"`
+	Action         string          `json:"action" enum:"none,notify,assign"`
+	Responsible    []UserRef       `json:"responsible" doc:"Who is responsible now: with a rotation, the person on duty."`
+	Everyone       []UserRef       `json:"everyone" doc:"Everyone responsible for triage, in rotation order."`
+	Rotation       *TriageRotation `json:"rotation"`
+	UpcomingShifts []TriageShift   `json:"upcomingShifts"`
+}
+
+type TriageRotation struct {
+	Weeks int     `json:"weeks"`
+	Start *string `json:"start"`
+}
+
+type TriageShift struct {
+	User     UserRef `json:"user"`
+	StartsAt string  `json:"startsAt"`
+	EndsAt   string  `json:"endsAt"`
 }

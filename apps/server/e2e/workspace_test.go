@@ -19,6 +19,10 @@ func TestReadsAndUpdatesTheWorkspace(t *testing.T) {
 	eq(t, workspace.At("teams").JSON(), J{teams}.JSON())
 	eq(t, workspace.At("memberCount").Num(), 2)
 	eq(t, workspace.At("issueCount").Num(), 1)
+	reachable := call(t, bob, "list_workspaces", M{})
+	eq(t, reachable.At("nodes").Len(), 1)
+	eq(t, reachable.At("nodes", 0, "urlKey").Str(), "acme")
+	eq(t, reachable.At("nodes", 0, "role").Str(), "member")
 
 	contains(t, fails(t, bob, "update_workspace", M{"name": "Bobco"}), "admins")
 	w.exec("INSERT INTO workspaces (name, url_key) VALUES ('Other', 'other')")

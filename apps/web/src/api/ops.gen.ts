@@ -14,6 +14,15 @@ export type Attachment = {
   url: string
 }
 
+export type AuditEntry = {
+  actor: UserRef | null
+  createdAt: string
+  id: number
+  metadata: Record<string, unknown>
+  /** Like member.roleChanged, member.removed, invitation.created, team.archived or workspace.updated. */
+  type: string
+}
+
 export type Comment = {
   body: string
   createdAt: string
@@ -85,6 +94,37 @@ export type DeletedComment = {
   deletedReplies: number
 }
 
+export type DeletedIssueLabel = {
+  deleted: string
+  removedFromIssues: number
+}
+
+export type DeletedIssueStatus = {
+  archivedAt: string | null
+  color: string
+  createdAt: string
+  description: string | null
+  id: string
+  /** Auto-closed issues go to it. */
+  isAutoCloseState: boolean
+  /** New issues start in it. */
+  isDefault: boolean
+  issueCount: number
+  movedIssues: number
+  movedTo: StateRef | null
+  name: string
+  /** Order within its type on the board. */
+  position: number
+  team: TeamRef
+  type: "triage" | "backlog" | "unstarted" | "started" | "completed" | "canceled"
+  updatedAt: string
+}
+
+export type DeletedTeam = {
+  deleted: string
+  key: string
+}
+
 export type DocumentRef = {
   id: string
   slugId: string
@@ -103,6 +143,17 @@ export type InitiativeRef = {
   id: string
   name: string
   slugId: string
+}
+
+export type Invitation = {
+  createdAt: string
+  email: string
+  expiresAt: string
+  id: string
+  inviter: UserRef | null
+  role: "admin" | "member" | "guest"
+  /** The teams they join. */
+  teams: TeamRef[]
 }
 
 export type Issue = {
@@ -233,6 +284,32 @@ export type IssueHistory = {
   identifier: string
 }
 
+export type IssueLabel = {
+  /** For groups: the labels in it. */
+  children: LabelRef[] | null
+  color: string
+  createdAt: string
+  creator: UserRef | null
+  description: string | null
+  /** For groups. */
+  groupType: "singleSelect" | "multiSelect" | null
+  id: string
+  isGroup: boolean
+  issueCount: number
+  name: string
+  /** The group it is in. */
+  parent: IssueLabelParent | null
+  retiredAt: string | null
+  /** Null for a workspace label. */
+  team: TeamRef | null
+  updatedAt: string
+}
+
+export type IssueLabelParent = {
+  id: string
+  name: string
+}
+
 export type IssueReaction = {
   emoji: string
   user: UserRef | null
@@ -258,6 +335,25 @@ export type IssueShare = {
   with: string
 }
 
+export type IssueStatus = {
+  archivedAt: string | null
+  color: string
+  createdAt: string
+  description: string | null
+  id: string
+  /** Auto-closed issues go to it. */
+  isAutoCloseState: boolean
+  /** New issues start in it. */
+  isDefault: boolean
+  issueCount: number
+  name: string
+  /** Order within its type on the board. */
+  position: number
+  team: TeamRef
+  type: "triage" | "backlog" | "unstarted" | "started" | "completed" | "canceled"
+  updatedAt: string
+}
+
 export type IssueUnshare = {
   unshared: string
   with: string
@@ -269,6 +365,10 @@ export type LabelRef = {
   name: string
   /** The name of its group. */
   parent: string | null
+}
+
+export type LeftTeam = {
+  left: TeamRef
 }
 
 export type MilestoneRef = {
@@ -298,6 +398,14 @@ export type ProjectRef = {
   slugId: string
 }
 
+export type ReachableWorkspace = {
+  id: string
+  name: string
+  role: "owner" | "admin" | "member" | "guest"
+  url: string
+  urlKey: string
+}
+
 export type Reaction = {
   comment: Ref | null
   createdAt: string
@@ -323,6 +431,10 @@ export type RemovedReaction = {
   removed: string
 }
 
+export type RemovedUser = {
+  removed: string
+}
+
 export type StateRef = {
   color: string
   id: string
@@ -330,10 +442,133 @@ export type StateRef = {
   type: "triage" | "backlog" | "unstarted" | "started" | "completed" | "canceled"
 }
 
+export type Team = {
+  archivedAt: string | null
+  color: string | null
+  createdAt: string
+  cyclesEnabled: boolean
+  description: string | null
+  icon: string | null
+  id: string
+  isMember: boolean
+  /** Open issues: not completed, canceled, archived or trashed. */
+  issueCount: number
+  key: string
+  memberCount: number
+  name: string
+  parent: TeamRef | null
+  private: boolean
+  timezone: string
+  triageEnabled: boolean
+  updatedAt: string
+  url: string
+}
+
+export type TeamDetail = {
+  allowedEstimates: number[]
+  archivedAt: string | null
+  autoArchiveMonths: number | null
+  autoCloseChildIssues: boolean
+  autoCloseMonths: number | null
+  autoCloseParentIssues: boolean
+  autoCloseState: StateRef | null
+  color: string | null
+  createdAt: string
+  currentCycle: CycleRef | null
+  cycleAutoAddCompleted: boolean
+  cycleAutoAddStarted: boolean
+  cycleCooldownWeeks: number
+  cycleDurationWeeks: number
+  cycleRollover: boolean
+  /** 0 Sunday, 1 Monday ... 6 Saturday. */
+  cycleStartDay: number
+  cyclesEnabled: boolean
+  defaultEstimate: number | null
+  defaultIssueState: StateRef | null
+  description: string | null
+  estimateAllowZero: boolean
+  estimateExtended: boolean
+  estimateType: "notUsed" | "exponential" | "fibonacci" | "linear" | "tShirt"
+  icon: string | null
+  id: string
+  isMember: boolean
+  /** Open issues: not completed, canceled, archived or trashed. */
+  issueCount: number
+  key: string
+  labelCount: number
+  memberCount: number
+  members: TeamMember[]
+  name: string
+  parent: TeamRef | null
+  private: boolean
+  requirePriorityToLeaveTriage: boolean
+  /** Its active statuses in board order. */
+  states: TeamStatus[]
+  subTeams: TeamRef[]
+  timezone: string
+  triage: TeamTriage
+  triageAction: "none" | "notify" | "assign"
+  triageEnabled: boolean
+  /** Everyone responsible for triage, in rotation order. */
+  triageResponsible: UserRef[]
+  triageRotationStart: string | null
+  triageRotationWeeks: number | null
+  upcomingCycleCount: number
+  updatedAt: string
+  url: string
+}
+
+export type TeamMember = {
+  displayName: string
+  email: string
+  id: string
+  name: string
+  owner: boolean
+}
+
 export type TeamRef = {
   id: string
   key: string
   name: string
+}
+
+export type TeamStatus = {
+  color: string
+  description: string | null
+  id: string
+  name: string
+  position: number
+  type: "triage" | "backlog" | "unstarted" | "started" | "completed" | "canceled"
+}
+
+export type TeamTriage = {
+  action: "none" | "notify" | "assign"
+  enabled: boolean
+  /** Who is responsible now: with a rotation, the person on duty. */
+  responsible: UserRef[]
+}
+
+export type TriageResponsibility = {
+  action: "none" | "notify" | "assign"
+  /** Everyone responsible for triage, in rotation order. */
+  everyone: UserRef[]
+  /** Who is responsible now: with a rotation, the person on duty. */
+  responsible: UserRef[]
+  rotation: TriageRotation | null
+  team: TeamRef
+  triageEnabled: boolean
+  upcomingShifts: TriageShift[]
+}
+
+export type TriageRotation = {
+  start: string | null
+  weeks: number
+}
+
+export type TriageShift = {
+  endsAt: string
+  startsAt: string
+  user: UserRef
 }
 
 export type UpdatedIssues = {
@@ -355,6 +590,71 @@ export type UserRef = {
   email: string
   id: string
   name: string
+}
+
+export type Workspace = {
+  createdAt: string
+  id: string
+  /** Issues of the teams you can see, trashed ones left out. */
+  issueCount: number
+  logoUrl: string | null
+  memberCount: number
+  name: string
+  /** Your role. */
+  role: "owner" | "admin" | "member" | "guest"
+  /** The teams you can see. */
+  teams: WorkspaceTeam[]
+  url: string
+  urlKey: string
+}
+
+export type WorkspaceList = {
+  nodes: ReachableWorkspace[]
+}
+
+export type WorkspaceTeam = {
+  id: string
+  key: string
+  name: string
+  private: boolean
+}
+
+export type WorkspaceUser = {
+  /** False once removed from the workspace. */
+  active: boolean
+  avatarUrl: string | null
+  displayName: string
+  email: string
+  /** Only shown for yourself. */
+  emailNotifications: boolean | null
+  id: string
+  isMe: boolean
+  joinedAt: string
+  name: string
+  role: "owner" | "admin" | "member" | "guest"
+  /** Their teams that you can see. */
+  teams: TeamRef[]
+  timezone: string | null
+}
+
+export type WorkspaceUserDetail = {
+  /** False once removed from the workspace. */
+  active: boolean
+  avatarUrl: string | null
+  displayName: string
+  email: string
+  /** Only shown for yourself. */
+  emailNotifications: boolean | null
+  id: string
+  isMe: boolean
+  joinedAt: string
+  name: string
+  /** Open issues assigned to them. */
+  openIssueCount: number
+  role: "owner" | "admin" | "member" | "guest"
+  /** Their teams that you can see. */
+  teams: TeamRef[]
+  timezone: string | null
 }
 
 export type ListWorkspacesArgs = Record<string, never>
@@ -2106,34 +2406,52 @@ export type ListWebhookDeliveriesArgs = {
 }
 
 export interface Ops {
-  list_workspaces: { args: ListWorkspacesArgs; result: unknown }
-  get_workspace: { args: GetWorkspaceArgs; result: unknown }
-  update_workspace: { args: UpdateWorkspaceArgs; result: unknown }
-  list_users: { args: ListUsersArgs; result: unknown }
-  get_user: { args: GetUserArgs; result: unknown }
-  update_user: { args: UpdateUserArgs; result: unknown }
-  remove_user: { args: RemoveUserArgs; result: unknown }
-  list_invitations: { args: ListInvitationsArgs; result: unknown }
-  invite_user: { args: InviteUserArgs; result: unknown }
-  delete_invitation: { args: DeleteInvitationArgs; result: unknown }
-  get_audit_log: { args: GetAuditLogArgs; result: unknown }
-  list_teams: { args: ListTeamsArgs; result: unknown }
-  get_team: { args: GetTeamArgs; result: unknown }
-  save_team: { args: SaveTeamArgs; result: unknown }
-  delete_team: { args: DeleteTeamArgs; result: unknown }
-  join_team: { args: JoinTeamArgs; result: unknown }
-  leave_team: { args: LeaveTeamArgs; result: unknown }
-  get_triage_responsibility: { args: GetTriageResponsibilityArgs; result: unknown }
-  list_issue_statuses: { args: ListIssueStatusesArgs; result: unknown }
-  get_issue_status: { args: GetIssueStatusArgs; result: unknown }
-  save_issue_status: { args: SaveIssueStatusArgs; result: unknown }
-  delete_issue_status: { args: DeleteIssueStatusArgs; result: unknown }
-  list_issue_labels: { args: ListIssueLabelsArgs; result: unknown }
-  get_issue_label: { args: GetIssueLabelArgs; result: unknown }
-  save_issue_label: { args: SaveIssueLabelArgs; result: unknown }
-  retire_issue_label: { args: RetireIssueLabelArgs; result: unknown }
-  restore_issue_label: { args: RestoreIssueLabelArgs; result: unknown }
-  delete_issue_label: { args: DeleteIssueLabelArgs; result: unknown }
+  list_workspaces: { args: ListWorkspacesArgs; result: WorkspaceList }
+  get_workspace: { args: GetWorkspaceArgs; result: Workspace }
+  update_workspace: { args: UpdateWorkspaceArgs; result: Workspace }
+  list_users: { args: ListUsersArgs; result: {
+  nodes: WorkspaceUser[]
+  pageInfo: PageInfo
+} }
+  get_user: { args: GetUserArgs; result: WorkspaceUserDetail }
+  update_user: { args: UpdateUserArgs; result: WorkspaceUserDetail }
+  remove_user: { args: RemoveUserArgs; result: RemovedUser }
+  list_invitations: { args: ListInvitationsArgs; result: {
+  nodes: Invitation[]
+  pageInfo: PageInfo
+} }
+  invite_user: { args: InviteUserArgs; result: Invitation }
+  delete_invitation: { args: DeleteInvitationArgs; result: Deleted }
+  get_audit_log: { args: GetAuditLogArgs; result: {
+  nodes: AuditEntry[]
+  pageInfo: PageInfo
+} }
+  list_teams: { args: ListTeamsArgs; result: {
+  nodes: Team[]
+  pageInfo: PageInfo
+} }
+  get_team: { args: GetTeamArgs; result: TeamDetail }
+  save_team: { args: SaveTeamArgs; result: TeamDetail }
+  delete_team: { args: DeleteTeamArgs; result: DeletedTeam }
+  join_team: { args: JoinTeamArgs; result: TeamDetail }
+  leave_team: { args: LeaveTeamArgs; result: LeftTeam }
+  get_triage_responsibility: { args: GetTriageResponsibilityArgs; result: TriageResponsibility }
+  list_issue_statuses: { args: ListIssueStatusesArgs; result: {
+  nodes: IssueStatus[]
+  pageInfo: PageInfo
+} }
+  get_issue_status: { args: GetIssueStatusArgs; result: IssueStatus }
+  save_issue_status: { args: SaveIssueStatusArgs; result: IssueStatus }
+  delete_issue_status: { args: DeleteIssueStatusArgs; result: DeletedIssueStatus }
+  list_issue_labels: { args: ListIssueLabelsArgs; result: {
+  nodes: IssueLabel[]
+  pageInfo: PageInfo
+} }
+  get_issue_label: { args: GetIssueLabelArgs; result: IssueLabel }
+  save_issue_label: { args: SaveIssueLabelArgs; result: IssueLabel }
+  retire_issue_label: { args: RetireIssueLabelArgs; result: IssueLabel }
+  restore_issue_label: { args: RestoreIssueLabelArgs; result: IssueLabel }
+  delete_issue_label: { args: DeleteIssueLabelArgs; result: DeletedIssueLabel }
   list_issues: { args: ListIssuesArgs; result: {
   nodes: Issue[]
   pageInfo: PageInfo

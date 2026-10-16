@@ -20,47 +20,47 @@ func workspaceOps() []*Op {
 		accountOp("list_workspaces", app.Read, []string{"GET /workspaces"},
 			"List the workspaces this token reaches: name, URL key, link and your role. When there are several, pass "+
 				"the URL key as `workspace` to the other operations.",
-			listWorkspaces),
+			listWorkspaces).returns(ResultOf[WorkspaceList]()),
 		op("get_workspace", app.Read, []string{"GET /workspace"},
 			"The workspace: its name, URL key and link, your role, the teams you can see (key, name, private) and "+
 				"how many members and issues it has.",
-			getWorkspace),
+			getWorkspace).returns(ResultOf[Workspace]()),
 		op("update_workspace", app.AdminAccess, []string{"PATCH /workspace"},
 			"Rename the workspace, change its URL key (2 to 32 lowercase letters, digits and dashes; links with the old "+
 				"key stop working) or its logo. Admins only. Omitted fields stay as they are; null clears the logo.",
-			updateWorkspace),
+			updateWorkspace).returns(ResultOf[Workspace]()),
 		op("list_users", app.Read, []string{"GET /users"},
 			"List the workspace's members with their role, teams and whether they are you. Narrow with query (name, "+
 				"display name or email) or team; removed members are left out unless includeInactive is set.",
-			listUsers),
+			listUsers).returns(ResultOf[PageOf[WorkspaceUser]]()),
 		op("get_user", app.Read, []string{"GET /users/{id}"},
 			"Read a member by id, name, display name, email or \"me\": role, teams, timezone and how many open issues "+
 				"are assigned to them. Removed members can be read by id.",
-			getUser),
+			getUser).returns(ResultOf[WorkspaceUserDetail]()),
 		op("update_user", app.Write, []string{"PATCH /users/{id}"},
 			"Change a member. Anyone may change their own name, displayName and timezone. Changing a role (owner, admin, "+
 				"member, guest) needs an admin; only owners grant or take away owner, and the last owner stays one. Omitted "+
 				"fields stay as they are; null clears the timezone.",
-			updateUser),
+			updateUser).returns(ResultOf[WorkspaceUserDetail]()),
 		op("remove_user", app.AdminAccess, []string{"DELETE /users/{id}"},
 			"Remove a member from the workspace (admins only): they lose access and leave all teams; their issues, "+
 				"comments and history stay. The last owner can't be removed. Invite them again to bring them back.",
-			removeUser),
+			removeUser).returns(ResultOf[RemovedUser]()),
 		op("list_invitations", app.Read, []string{"GET /invitations"},
 			"List pending invitations to the workspace: email, role, teams, who invited and when they expire.",
-			listInvitations),
+			listInvitations).returns(ResultOf[PageOf[Invitation]]()),
 		op("invite_user", app.Write, []string{"POST /invitations"},
 			"Invite someone by email. role is member (default), admin (only admins invite admins) or guest; teams "+
 				"(keys, names or ids) are the teams they join, required for guests, who only see those teams. The "+
 				"invitation expires in 14 days; inviting the same email again renews it. They accept it in the dashboard.",
-			inviteUser),
+			inviteUser).returns(ResultOf[Invitation]()),
 		op("delete_invitation", app.Write, []string{"DELETE /invitations/{id}"},
 			"Withdraw a pending invitation by id. Admins can withdraw any; members the ones they sent.",
-			deleteInvitation),
+			deleteInvitation).returns(ResultOf[Deleted]()),
 		op("get_audit_log", app.AdminAccess, []string{"GET /audit-log"},
 			"The workspace's audit log, newest first (admins only): role changes, removed members, invitations, "+
 				"archived teams and workspace changes, with who did it. Filter with type, e.g. member.roleChanged.",
-			getAuditLog),
+			getAuditLog).returns(ResultOf[PageOf[AuditEntry]]()),
 	}
 }
 
@@ -639,4 +639,80 @@ func getAuditLog(c *app.Ctx, args AuditLogArgs) (any, error) {
 		return nil, err
 	}
 	return args.wrap(nodes)
+}
+
+/* Shapes */
+
+type WorkspaceList struct {
+	Nodes []ReachableWorkspace `json:"nodes"`
+}
+
+type ReachableWorkspace struct {
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	URLKey string `json:"urlKey"`
+	URL    string `json:"url"`
+	Role   string `json:"role" enum:"owner,admin,member,guest"`
+}
+
+type Workspace struct {
+	ID          string          `json:"id"`
+	Name        string          `json:"name"`
+	URLKey      string          `json:"urlKey"`
+	LogoURL     *string         `json:"logoUrl"`
+	URL         string          `json:"url"`
+	CreatedAt   string          `json:"createdAt"`
+	Role        string          `json:"role" enum:"owner,admin,member,guest" doc:"Your role."`
+	Teams       []WorkspaceTeam `json:"teams" doc:"The teams you can see."`
+	MemberCount int             `json:"memberCount"`
+	IssueCount  int             `json:"issueCount" doc:"Issues of the teams you can see, trashed ones left out."`
+}
+
+type WorkspaceTeam struct {
+	ID      string `json:"id"`
+	Key     string `json:"key"`
+	Name    string `json:"name"`
+	Private bool   `json:"private"`
+}
+
+type WorkspaceUser struct {
+	ID                 string    `json:"id"`
+	Name               string    `json:"name"`
+	DisplayName        string    `json:"displayName"`
+	Email              string    `json:"email"`
+	AvatarURL          *string   `json:"avatarUrl"`
+	Timezone           *string   `json:"timezone"`
+	Role               string    `json:"role" enum:"owner,admin,member,guest"`
+	Active             bool      `json:"active" doc:"False once removed from the workspace."`
+	IsMe               bool      `json:"isMe"`
+	EmailNotifications *bool     `json:"emailNotifications" doc:"Only shown for yourself."`
+	JoinedAt           string    `json:"joinedAt"`
+	Teams              []TeamRef `json:"teams" doc:"Their teams that you can see."`
+}
+
+type WorkspaceUserDetail struct {
+	WorkspaceUser
+	OpenIssueCount int `json:"openIssueCount" doc:"Open issues assigned to them."`
+}
+
+type RemovedUser struct {
+	Removed string `json:"removed"`
+}
+
+type Invitation struct {
+	ID        string    `json:"id"`
+	Email     string    `json:"email"`
+	Role      string    `json:"role" enum:"admin,member,guest"`
+	Teams     []TeamRef `json:"teams" doc:"The teams they join."`
+	Inviter   *UserRef  `json:"inviter"`
+	CreatedAt string    `json:"createdAt"`
+	ExpiresAt string    `json:"expiresAt"`
+}
+
+type AuditEntry struct {
+	ID        int      `json:"id"`
+	Type      string   `json:"type" doc:"Like member.roleChanged, member.removed, invitation.created, team.archived or workspace.updated."`
+	Actor     *UserRef `json:"actor"`
+	Metadata  M        `json:"metadata"`
+	CreatedAt string   `json:"createdAt"`
 }
