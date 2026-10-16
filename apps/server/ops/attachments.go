@@ -142,7 +142,7 @@ func saveAttachment(c *app.Ctx, tx pgx.Tx, issue uuid.UUID, url, title string, s
 	}
 	row, _, err := app.Row[saved](c, tx,
 		`INSERT INTO attachments (workspace_id, issue_id, url, title, subtitle, metadata, icon_url, source_type, creator_id)
-		 VALUES ($1, $2, $3, $4, $5, coalesce($6, '{}'), $7, $8, $9)
+		 VALUES ($1, $2, $3, $4, $5, coalesce($6::jsonb, '{}'), $7, $8, $9)
 		 ON CONFLICT (issue_id, url) DO UPDATE SET title = EXCLUDED.title,
 			subtitle = coalesce($5, attachments.subtitle), metadata = coalesce($6, attachments.metadata),
 			icon_url = coalesce($7, attachments.icon_url), updated_at = now()
