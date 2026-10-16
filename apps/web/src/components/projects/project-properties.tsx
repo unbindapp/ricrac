@@ -1,108 +1,141 @@
-import { LabelsPicker, PriorityPicker } from "@/components/issues/pickers";
+import type { OpArgs } from "@/lib/server/client";
+import type { ProjectDetail } from "@/api/ops.gen";
 import { PropertyRow } from "@/components/layout/property-row";
 import { HealthBadge } from "@/components/projects/health-badge";
-import { ProjectLinks } from "@/components/projects/project-links";
+import { PeoplePicker, PersonPicker } from "@/components/projects/people";
+import { fromResolution, toResolution } from "@/components/projects/project-dates";
+import { ProjectDependencies } from "@/components/projects/project-dependencies";
+import { EntityLinks } from "@/components/projects/project-links";
 import {
-  LeadPicker,
-  MembersPicker,
-  ProjectDatePicker,
+  InitiativesPicker,
+  PlannedDatePicker,
+  ProjectLabelsPicker,
+  ProjectPriorityPicker,
   ProjectStatusPicker,
   TeamsPicker,
 } from "@/components/projects/project-pickers";
-import { ProgressBar } from "@/components/projects/progress-bar";
+import { Separator } from "@/components/ui/separator";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import {
-  type TProject,
-  type TUpdateProjectInput,
-  useUpdateProjectMutation,
-} from "@/lib/queries/projects";
+import { useSaveProjectMutation } from "@/lib/queries/projects";
 
-const NIL_UUID = "00000000-0000-0000-0000-000000000000";
+function hasRelations(project: ProjectDetail) {
+  return Object.values(project.relations).some((related) => related.length > 0);
+}
 
-export function ProjectProperties({ project }: { project: TProject }) {
-  const { canEdit } = useWorkspace();
-  const { mutate: updateProject } = useUpdateProjectMutation();
-  const update = (input: Omit<TUpdateProjectInput, "project_id">) =>
-    updateProject({ project_id: project.id, ...input });
+export function ProjectProperties({ project }: { project: ProjectDetail }) {
+  const { workspace, canEdit } = useWorkspace();
+  const { mutate: saveProject, mutateAsync: saveProjectAsync } = useSaveProjectMutation(
+    workspace.id,
+  );
+  const update = (args: Omit<OpArgs<"save_project">, "id">) =>
+    saveProject({ id: project.id, ...args });
   const disabled = !canEdit;
 
   return (
-    <div className="flex flex-col gap-1">
-      <PropertyRow label="Status">
-        <ProjectStatusPicker
-          status={project.status}
-          disabled={disabled}
-          onChange={(status) => update({ status_id: status.id })}
-        />
-      </PropertyRow>
-      <PropertyRow label="Health">
-        <HealthBadge health={project.health} />
-      </PropertyRow>
-      <PropertyRow label="Priority">
-        <PriorityPicker
-          priority={project.priority}
-          disabled={disabled}
-          onChange={(priority) => update({ priority })}
-        />
-      </PropertyRow>
-      <PropertyRow label="Lead">
-        <LeadPicker
-          lead={project.lead}
-          disabled={disabled}
-          onChange={(user) => update({ lead_id: user?.id ?? NIL_UUID })}
-        />
-      </PropertyRow>
-      <PropertyRow label="Members">
-        <MembersPicker
-          members={project.members}
-          disabled={disabled}
-          onChange={(ids) => update({ member_ids: ids })}
-        />
-      </PropertyRow>
-      <PropertyRow label="Teams">
-        <TeamsPicker
-          teams={project.teams}
-          disabled={disabled}
-          onChange={(ids) => update({ team_ids: ids })}
-        />
-      </PropertyRow>
-      <PropertyRow label="Start date">
-        <ProjectDatePicker
-          label="Start date"
-          date={project.start_date}
-          resolution={project.start_date_resolution}
-          disabled={disabled}
-          onChange={({ date, resolution }) =>
-            update({ start_date: date ?? "", start_date_resolution: resolution })
-          }
-        />
-      </PropertyRow>
-      <PropertyRow label="Target date">
-        <ProjectDatePicker
-          label="Target date"
-          date={project.target_date}
-          resolution={project.target_date_resolution}
-          disabled={disabled}
-          onChange={({ date, resolution }) =>
-            update({ target_date: date ?? "", target_date_resolution: resolution })
-          }
-        />
-      </PropertyRow>
-      <PropertyRow label="Labels">
-        <LabelsPicker
-          teamId={undefined}
-          labels={project.labels}
-          disabled={disabled}
-          onChange={(labels) => update({ label_ids: labels.map((label) => label.id) })}
-        />
-      </PropertyRow>
-      <PropertyRow label="Progress">
-        <ProgressBar percent={project.progress.percent} label="Project progress" />
-      </PropertyRow>
-      <div className="flex flex-col gap-1.5 pt-2">
-        <span className="text-muted-foreground text-sm">Links</span>
-        <ProjectLinks project={project} canEdit={canEdit} />
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-0.5">
+        <PropertyRow label="Status">
+          <ProjectStatusPicker
+            status={project.status}
+            disabled={disabled}
+            onChange={(state) => update({ state })}
+          />
+        </PropertyRow>
+        {project.health && (
+          <PropertyRow label="Health">
+            <span className="px-2">
+              <HealthBadge health={project.health} />
+            </span>
+          </PropertyRow>
+        )}
+        <PropertyRow label="Priority">
+          <ProjectPriorityPicker
+            priority={project.priority}
+            disabled={disabled}
+            onChange={(priority) => update({ priority })}
+          />
+        </PropertyRow>
+        <PropertyRow label="Lead">
+          <PersonPicker
+            role="Lead"
+            user={project.lead}
+            disabled={disabled}
+            onChange={(lead) => update({ lead })}
+          />
+        </PropertyRow>
+        <PropertyRow label="Members">
+          <PeoplePicker
+            people={project.members}
+            disabled={disabled}
+            onChange={(ids) => {
+              const current = project.members.map((member) => member.id);
+              update({
+                addMembers: ids.filter((id) => !current.includes(id)),
+                removeMembers: current.filter((id) => !ids.includes(id)),
+              });
+            }}
+          />
+        </PropertyRow>
+        <PropertyRow label="Teams">
+          <TeamsPicker
+            teams={project.teams}
+            disabled={disabled}
+            onChange={(setTeams) => update({ setTeams })}
+          />
+        </PropertyRow>
+        <PropertyRow label="Start">
+          <PlannedDatePicker
+            label="Start date"
+            edge="start"
+            date={project.startDate}
+            resolution={toResolution(project.startDateResolution)}
+            disabled={disabled}
+            onChange={({ date, resolution }) =>
+              update({
+                startDate: date,
+                startDateResolution: date ? fromResolution(resolution) : null,
+              })
+            }
+          />
+        </PropertyRow>
+        <PropertyRow label="Target">
+          <PlannedDatePicker
+            label="Target date"
+            edge="end"
+            date={project.targetDate}
+            resolution={toResolution(project.targetDateResolution)}
+            disabled={disabled}
+            onChange={({ date, resolution }) =>
+              update({
+                targetDate: date,
+                targetDateResolution: date ? fromResolution(resolution) : null,
+              })
+            }
+          />
+        </PropertyRow>
+        <PropertyRow label="Labels">
+          <ProjectLabelsPicker
+            labels={project.labels}
+            disabled={disabled}
+            onChange={(labels) => update({ labels })}
+          />
+        </PropertyRow>
+        <PropertyRow label="Initiatives">
+          <InitiativesPicker
+            initiatives={project.initiatives}
+            disabled={disabled}
+            onChange={(setInitiatives) => update({ setInitiatives })}
+          />
+        </PropertyRow>
       </div>
+      {(canEdit || project.links.length > 0 || hasRelations(project)) && <Separator />}
+      <ProjectDependencies project={project} />
+      <EntityLinks
+        links={project.links}
+        canEdit={canEdit}
+        onAdd={(link) => saveProjectAsync({ id: project.id, links: [link] })}
+        onRemove={(url) => update({ removeLinks: [url] })}
+      />
     </div>
   );
 }

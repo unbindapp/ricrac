@@ -1,110 +1,86 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { LIST_REFETCH_INTERVAL_MS } from "@/lib/queries/issues";
-import { getGoClient } from "@/lib/server/client";
-import type { TGoClient, TInput, TListItem, TResponseData } from "@/lib/server/types";
+import { slugIdFromParam } from "@/lib/helpers/entity-slug";
+import { call, callAll, type OpArgs } from "@/lib/server/client";
 
-export type TDocument = TResponseData<TGoClient["documents"]["get"]>;
-export type TDocumentListItem = TListItem<TGoClient["documents"]["list"]>;
-export type TListDocumentsInput = TInput<TGoClient["documents"]["list"]>;
-export type TCreateDocumentInput = TInput<TGoClient["documents"]["create"]>;
-export type TUpdateDocumentInput = TInput<TGoClient["documents"]["update"]>;
+export type TDocumentListArgs = Omit<OpArgs<"list_documents">, "cursor" | "limit">;
 
 export const DOCUMENT_TITLE_MAX_LENGTH = 255;
 export const UNTITLED_DOCUMENT = "Untitled";
 
 export const queryKeyDocuments = {
-  all: () => ["documents"] as const,
-  lists: () => ["documents", "list"] as const,
-  list: (input: TListDocumentsInput) => ["documents", "list", input] as const,
-  detail: (workspaceId: string, slug: string) =>
-    ["documents", "detail", workspaceId, slug] as const,
+  all: (workspaceId: string) => [workspaceId, "documents"] as const,
+  list: (workspaceId: string, args: TDocumentListArgs) =>
+    [workspaceId, "documents", "list", args] as const,
+  detail: (workspaceId: string, slugId: string) =>
+    [workspaceId, "documents", "detail", slugId] as const,
+  versions: (workspaceId: string, documentId: string) =>
+    [workspaceId, "documents", "versions", documentId] as const,
+  version: (workspaceId: string, versionId: number) =>
+    [workspaceId, "documents", "version", versionId] as const,
 };
 
-export const documentsListQuery = (input: TListDocumentsInput) =>
+export const documentsQuery = (workspaceId: string, args: TDocumentListArgs = {}) =>
   queryOptions({
-    queryKey: queryKeyDocuments.list(input),
-    queryFn: async () => {
-      const res = await getGoClient().documents.list(input);
-      return { documents: res.data ?? [] };
-    },
-    refetchInterval: LIST_REFETCH_INTERVAL_MS,
+    queryKey: queryKeyDocuments.list(workspaceId, args),
+    queryFn: () => callAll(workspaceId, "list_documents", args),
   });
 
-export const documentBySlugQuery = (workspaceId: string, slug: string) =>
+/** A document by its link slug, slug id or id; cached by slug id. */
+export const documentQuery = (workspaceId: string, document: string) => {
+  const slugId = slugIdFromParam(document);
+  return queryOptions({
+    queryKey: queryKeyDocuments.detail(workspaceId, slugId),
+    queryFn: () => call(workspaceId, "get_document", { id: slugId }),
+  });
+};
+
+/** Newest first. */
+export const documentVersionsQuery = (workspaceId: string, documentId: string) =>
   queryOptions({
-    queryKey: queryKeyDocuments.detail(workspaceId, slug),
-    queryFn: async () => {
-      const res = await getGoClient().documents.get({ workspace_id: workspaceId, slug });
-      return { document: res.data };
-    },
+    queryKey: queryKeyDocuments.versions(workspaceId, documentId),
+    queryFn: () => call(workspaceId, "list_document_versions", { id: documentId }),
   });
 
-export async function createDocument(input: TCreateDocumentInput) {
-  const res = await getGoClient().documents.create(input);
-  return { data: res.data };
-}
+export const documentVersionQuery = (workspaceId: string, versionId: number) =>
+  queryOptions({
+    queryKey: queryKeyDocuments.version(workspaceId, versionId),
+    queryFn: () => call(workspaceId, "get_document_version", { id: String(versionId) }),
+    staleTime: Infinity,
+  });
 
-export async function updateDocument(input: TUpdateDocumentInput) {
-  const res = await getGoClient().documents.update(input);
-  return { data: res.data };
-}
-
-export type TDocumentLifecycleAction = "archive" | "unarchive" | "trash" | "restore" | "delete";
-
-export async function changeDocumentLifecycle(input: {
-  documentId: string;
-  action: TDocumentLifecycleAction;
-}) {
-  const documents = getGoClient().documents;
-  const params = { document_id: input.documentId };
-  switch (input.action) {
-    case "archive":
-      return { data: (await documents.archive(params)).data };
-    case "unarchive":
-      return { data: (await documents.unarchive(params)).data };
-    case "trash":
-      return { data: (await documents.trash(params)).data };
-    case "restore":
-      return { data: (await documents.restore(params)).data };
-    case "delete":
-      await documents.delete(params);
-      return { data: null };
-  }
-}
-
-function useInvalidateDocuments() {
+/** Documents are listed on projects and initiatives too, so their pages refresh. */
+function useInvalidateDocuments(workspaceId: string) {
   const queryClient = useQueryClient();
-  return () => queryClient.invalidateQueries({ queryKey: queryKeyDocuments.all() });
+  return () =>
+    Promise.all(
+      ["documents", "projects", "initiatives"].map((area) =>
+        queryClient.invalidateQueries({ queryKey: [workspaceId, area] }),
+      ),
+    );
 }
 
-export function useCreateDocumentMutation() {
-  const invalidate = useInvalidateDocuments();
+export function useSaveDocumentMutation(workspaceId: string) {
+  const queryClient = useQueryClient();
+  const invalidate = useInvalidateDocuments(workspaceId);
   return useMutation({
-    mutationFn: createDocument,
-    meta: { errorTitle: "Could not create document" },
-    onSuccess: invalidate,
-  });
-}
-
-export function useUpdateDocumentMutation() {
-  const invalidate = useInvalidateDocuments();
-  return useMutation({
-    mutationFn: updateDocument,
+    mutationFn: (args: OpArgs<"save_document">) => call(workspaceId, "save_document", args),
     meta: { errorTitle: "Could not save document" },
-    onSuccess: invalidate,
+    onSuccess: (document) => {
+      queryClient.setQueryData(queryKeyDocuments.detail(workspaceId, document.slugId), document);
+      return invalidate();
+    },
   });
 }
 
-export function useDocumentLifecycleMutation() {
-  const queryClient = useQueryClient();
+export type TDocumentLifecycleAction = "trash" | "restore";
+
+export function useDocumentLifecycleMutation(workspaceId: string) {
+  const invalidate = useInvalidateDocuments(workspaceId);
   return useMutation({
-    mutationFn: changeDocumentLifecycle,
+    mutationFn: ({ id, action }: { id: string; action: TDocumentLifecycleAction }) =>
+      call(workspaceId, action === "trash" ? "delete_document" : "restore_document", { id }),
     meta: { errorTitle: "Could not change the document" },
-    onSuccess: (_data, variables) =>
-      queryClient.invalidateQueries({
-        queryKey:
-          variables.action === "delete" ? queryKeyDocuments.lists() : queryKeyDocuments.all(),
-      }),
+    onSuccess: invalidate,
   });
 }

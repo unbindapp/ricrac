@@ -1,6 +1,7 @@
 import { type ReactElement, useState } from "react";
 import { z } from "zod";
 
+import type { Milestone } from "@/api/ops.gen";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,22 +12,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
-import {
-  type TMilestone,
-  useCreateMilestoneMutation,
-  useUpdateMilestoneMutation,
-} from "@/lib/queries/projects";
+import { useSaveMilestoneMutation } from "@/lib/queries/projects";
 
 const milestoneSchema = z.object({
   name: z.string().trim().min(1, "Name is required.").max(80, "Keep the name under 80 characters."),
   description: z.string().trim().max(5000, "Keep the description under 5000 characters."),
-  target_date: z.string().regex(/^(\d{4}-\d{2}-\d{2})?$/, "Pick a date."),
+  targetDate: z.string().regex(/^(\d{4}-\d{2}-\d{2})?$/, "Pick a date."),
 });
 
 type TProps = { trigger: ReactElement } & (
-  | { mode: "create"; projectId: string; milestone?: never }
-  | { mode: "edit"; milestone: TMilestone; projectId?: never }
+  { projectId: string; milestone?: never } | { milestone: Milestone; projectId?: never }
 );
 
 export function MilestoneDialog(props: TProps) {
@@ -36,7 +33,7 @@ export function MilestoneDialog(props: TProps) {
       <DialogTrigger render={props.trigger} />
       <DialogContent className="w-md max-w-full">
         <DialogHeader>
-          <DialogTitle>{props.mode === "create" ? "Add milestone" : "Edit milestone"}</DialogTitle>
+          <DialogTitle>{props.milestone ? "Edit milestone" : "Add milestone"}</DialogTitle>
         </DialogHeader>
         {isOpen && <MilestoneForm {...props} onDone={() => setIsOpen(false)} />}
       </DialogContent>
@@ -45,44 +42,48 @@ export function MilestoneDialog(props: TProps) {
 }
 
 function MilestoneForm(props: TProps & { onDone: () => void }) {
-  const { mutateAsync: createMilestone } = useCreateMilestoneMutation();
-  const { mutateAsync: updateMilestone } = useUpdateMilestoneMutation();
+  const { workspace } = useWorkspace();
+  const { mutateAsync: saveMilestone } = useSaveMilestoneMutation(workspace.id);
+  const { milestone } = props;
   const form = useAppForm({
-    defaultValues:
-      props.mode === "edit"
-        ? {
-            name: props.milestone.name,
-            description: props.milestone.description,
-            target_date: props.milestone.target_date ?? "",
-          }
-        : { name: "", description: "", target_date: "" },
+    defaultValues: {
+      name: milestone?.name ?? "",
+      description: milestone?.description ?? "",
+      targetDate: milestone?.targetDate ?? "",
+    },
     validators: { onSubmit: milestoneSchema },
     onSubmit: async ({ value }) => {
       const parsed = milestoneSchema.parse(value);
-      if (props.mode === "edit") {
-        await updateMilestone({ milestone_id: props.milestone.id, ...parsed });
-        props.onDone();
-        return;
-      }
-      await createMilestone({
-        project_id: props.projectId,
+      const fields = {
         name: parsed.name,
-        description: parsed.description || undefined,
-        target_date: parsed.target_date || undefined,
-      });
+        description: parsed.description || null,
+        targetDate: parsed.targetDate || null,
+      };
+      await saveMilestone(
+        milestone ? { id: milestone.id, ...fields } : { project: props.projectId, ...fields },
+      );
       props.onDone();
     },
   });
   return (
     <form className="flex flex-col gap-4" onSubmit={submitHandler(form)} noValidate>
-      <form.AppField name="name" children={(field) => <field.TextField label="Name" autoFocus />} />
       <form.AppField
-        name="description"
-        children={(field) => <field.TextareaField label="Description" rows={2} />}
+        name="name"
+        children={(field) => <field.TextField label="Name" placeholder="Beta" autoFocus />}
       />
       <form.AppField
-        name="target_date"
+        name="targetDate"
         children={(field) => <field.TextField label="Target date" type="date" />}
+      />
+      <form.AppField
+        name="description"
+        children={(field) => (
+          <field.TextareaField
+            label="Description"
+            placeholder="What is done when this milestone is reached?"
+            rows={3}
+          />
+        )}
       />
       <DialogFooter>
         <DialogClose
@@ -93,9 +94,7 @@ function MilestoneForm(props: TProps & { onDone: () => void }) {
           }
         />
         <form.AppForm>
-          <form.SubmitButton size="sm">
-            {props.mode === "edit" ? "Save" : "Add milestone"}
-          </form.SubmitButton>
+          <form.SubmitButton size="sm">{milestone ? "Save" : "Add milestone"}</form.SubmitButton>
         </form.AppForm>
       </DialogFooter>
     </form>

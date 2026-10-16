@@ -39,6 +39,7 @@ import { Route as WorkspaceWorkspaceSettingsAdminImportRouteImport } from './rou
 import { Route as WorkspaceWorkspaceSettingsAdminLabelsRouteImport } from './routes/$workspace/_workspace/settings/_admin/labels'
 import { Route as WorkspaceWorkspaceSettingsAdminMembersRouteImport } from './routes/$workspace/_workspace/settings/_admin/members'
 import { Route as WorkspaceWorkspaceSettingsAdminOauthAppsRouteImport } from './routes/$workspace/_workspace/settings/_admin/oauth-apps'
+import { Route as WorkspaceWorkspaceSettingsAdminProjectLabelsRouteImport } from './routes/$workspace/_workspace/settings/_admin/project-labels'
 import { Route as WorkspaceWorkspaceSettingsAdminProjectStatusesRouteImport } from './routes/$workspace/_workspace/settings/_admin/project-statuses'
 import { Route as WorkspaceWorkspaceSettingsAdminTeamsRouteImport } from './routes/$workspace/_workspace/settings/_admin/teams'
 import { Route as WorkspaceWorkspaceSettingsAdminTemplatesRouteImport } from './routes/$workspace/_workspace/settings/_admin/templates'
@@ -236,6 +237,12 @@ const WorkspaceWorkspaceSettingsAdminOauthAppsRoute =
     path: '/oauth-apps',
     getParentRoute: () => WorkspaceWorkspaceSettingsAdminRouteRoute,
   } as any)
+const WorkspaceWorkspaceSettingsAdminProjectLabelsRoute =
+  WorkspaceWorkspaceSettingsAdminProjectLabelsRouteImport.update({
+    id: '/project-labels',
+    path: '/project-labels',
+    getParentRoute: () => WorkspaceWorkspaceSettingsAdminRouteRoute,
+  } as any)
 const WorkspaceWorkspaceSettingsAdminProjectStatusesRoute =
   WorkspaceWorkspaceSettingsAdminProjectStatusesRouteImport.update({
     id: '/project-statuses',
@@ -423,6 +430,7 @@ export interface FileRoutesByFullPath {
   '/$workspace/settings/labels': typeof WorkspaceWorkspaceSettingsAdminLabelsRoute
   '/$workspace/settings/members': typeof WorkspaceWorkspaceSettingsAdminMembersRoute
   '/$workspace/settings/oauth-apps': typeof WorkspaceWorkspaceSettingsAdminOauthAppsRoute
+  '/$workspace/settings/project-labels': typeof WorkspaceWorkspaceSettingsAdminProjectLabelsRoute
   '/$workspace/settings/project-statuses': typeof WorkspaceWorkspaceSettingsAdminProjectStatusesRoute
   '/$workspace/settings/teams': typeof WorkspaceWorkspaceSettingsAdminTeamsRoute
   '/$workspace/settings/templates': typeof WorkspaceWorkspaceSettingsAdminTemplatesRoute
@@ -476,6 +484,7 @@ export interface FileRoutesByTo {
   '/$workspace/settings/labels': typeof WorkspaceWorkspaceSettingsAdminLabelsRoute
   '/$workspace/settings/members': typeof WorkspaceWorkspaceSettingsAdminMembersRoute
   '/$workspace/settings/oauth-apps': typeof WorkspaceWorkspaceSettingsAdminOauthAppsRoute
+  '/$workspace/settings/project-labels': typeof WorkspaceWorkspaceSettingsAdminProjectLabelsRoute
   '/$workspace/settings/project-statuses': typeof WorkspaceWorkspaceSettingsAdminProjectStatusesRoute
   '/$workspace/settings/teams': typeof WorkspaceWorkspaceSettingsAdminTeamsRoute
   '/$workspace/settings/templates': typeof WorkspaceWorkspaceSettingsAdminTemplatesRoute
@@ -535,6 +544,7 @@ export interface FileRoutesById {
   '/$workspace/_workspace/settings/_admin/labels': typeof WorkspaceWorkspaceSettingsAdminLabelsRoute
   '/$workspace/_workspace/settings/_admin/members': typeof WorkspaceWorkspaceSettingsAdminMembersRoute
   '/$workspace/_workspace/settings/_admin/oauth-apps': typeof WorkspaceWorkspaceSettingsAdminOauthAppsRoute
+  '/$workspace/_workspace/settings/_admin/project-labels': typeof WorkspaceWorkspaceSettingsAdminProjectLabelsRoute
   '/$workspace/_workspace/settings/_admin/project-statuses': typeof WorkspaceWorkspaceSettingsAdminProjectStatusesRoute
   '/$workspace/_workspace/settings/_admin/teams': typeof WorkspaceWorkspaceSettingsAdminTeamsRoute
   '/$workspace/_workspace/settings/_admin/templates': typeof WorkspaceWorkspaceSettingsAdminTemplatesRoute
@@ -595,6 +605,7 @@ export interface FileRouteTypes {
     | '/$workspace/settings/labels'
     | '/$workspace/settings/members'
     | '/$workspace/settings/oauth-apps'
+    | '/$workspace/settings/project-labels'
     | '/$workspace/settings/project-statuses'
     | '/$workspace/settings/teams'
     | '/$workspace/settings/templates'
@@ -648,6 +659,7 @@ export interface FileRouteTypes {
     | '/$workspace/settings/labels'
     | '/$workspace/settings/members'
     | '/$workspace/settings/oauth-apps'
+    | '/$workspace/settings/project-labels'
     | '/$workspace/settings/project-statuses'
     | '/$workspace/settings/teams'
     | '/$workspace/settings/templates'
@@ -706,6 +718,7 @@ export interface FileRouteTypes {
     | '/$workspace/_workspace/settings/_admin/labels'
     | '/$workspace/_workspace/settings/_admin/members'
     | '/$workspace/_workspace/settings/_admin/oauth-apps'
+    | '/$workspace/_workspace/settings/_admin/project-labels'
     | '/$workspace/_workspace/settings/_admin/project-statuses'
     | '/$workspace/_workspace/settings/_admin/teams'
     | '/$workspace/_workspace/settings/_admin/templates'
@@ -957,6 +970,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceWorkspaceSettingsAdminOauthAppsRouteImport
       parentRoute: typeof WorkspaceWorkspaceSettingsAdminRouteRoute
     }
+    '/$workspace/_workspace/settings/_admin/project-labels': {
+      id: '/$workspace/_workspace/settings/_admin/project-labels'
+      path: '/project-labels'
+      fullPath: '/$workspace/settings/project-labels'
+      preLoaderRoute: typeof WorkspaceWorkspaceSettingsAdminProjectLabelsRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSettingsAdminRouteRoute
+    }
     '/$workspace/_workspace/settings/_admin/project-statuses': {
       id: '/$workspace/_workspace/settings/_admin/project-statuses'
       path: '/project-statuses'
@@ -1148,6 +1168,7 @@ interface WorkspaceWorkspaceSettingsAdminRouteRouteChildren {
   WorkspaceWorkspaceSettingsAdminLabelsRoute: typeof WorkspaceWorkspaceSettingsAdminLabelsRoute
   WorkspaceWorkspaceSettingsAdminMembersRoute: typeof WorkspaceWorkspaceSettingsAdminMembersRoute
   WorkspaceWorkspaceSettingsAdminOauthAppsRoute: typeof WorkspaceWorkspaceSettingsAdminOauthAppsRoute
+  WorkspaceWorkspaceSettingsAdminProjectLabelsRoute: typeof WorkspaceWorkspaceSettingsAdminProjectLabelsRoute
   WorkspaceWorkspaceSettingsAdminProjectStatusesRoute: typeof WorkspaceWorkspaceSettingsAdminProjectStatusesRoute
   WorkspaceWorkspaceSettingsAdminTeamsRoute: typeof WorkspaceWorkspaceSettingsAdminTeamsRoute
   WorkspaceWorkspaceSettingsAdminTemplatesRoute: typeof WorkspaceWorkspaceSettingsAdminTemplatesRoute
@@ -1167,6 +1188,8 @@ const WorkspaceWorkspaceSettingsAdminRouteRouteChildren: WorkspaceWorkspaceSetti
       WorkspaceWorkspaceSettingsAdminMembersRoute,
     WorkspaceWorkspaceSettingsAdminOauthAppsRoute:
       WorkspaceWorkspaceSettingsAdminOauthAppsRoute,
+    WorkspaceWorkspaceSettingsAdminProjectLabelsRoute:
+      WorkspaceWorkspaceSettingsAdminProjectLabelsRoute,
     WorkspaceWorkspaceSettingsAdminProjectStatusesRoute:
       WorkspaceWorkspaceSettingsAdminProjectStatusesRoute,
     WorkspaceWorkspaceSettingsAdminTeamsRoute:

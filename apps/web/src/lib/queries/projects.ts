@@ -1,338 +1,264 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 
-import { LIST_REFETCH_INTERVAL_MS } from "@/lib/queries/issues";
-import { getGoClient } from "@/lib/server/client";
-import type { TGoClient, TInput, TListItem, TResponseData } from "@/lib/server/types";
+import type { ProjectDetail, ProjectStatus, StatusUpdate } from "@/api/ops.gen";
+import { slugIdFromParam } from "@/lib/helpers/entity-slug";
+import { call, callAll, type OpArgs } from "@/lib/server/client";
 
-export type TProject = TResponseData<TGoClient["projects"]["get"]>;
-export type TProjectListItem = TListItem<TGoClient["projects"]["list"]>;
-export type TProjectStatus = TListItem<TGoClient["projects"]["statuses"]["list"]>;
-export type TProjectStatusType = TProjectStatus["type"];
-export type TMilestone = TListItem<TGoClient["projects"]["milestones"]["list"]>;
-export type TProjectUpdate = TListItem<TGoClient["projects"]["updates"]["list"]>;
-export type THealth = TProjectUpdate["health"];
-export type TProjectLink = TProject["links"][number];
-export type TDateResolution = TProject["start_date_resolution"];
-export type TListProjectsInput = TInput<TGoClient["projects"]["list"]>;
-export type TCreateProjectInput = TInput<TGoClient["projects"]["create"]>;
-export type TUpdateProjectInput = TInput<TGoClient["projects"]["update"]>;
-export type TCreateProjectStatusInput = TInput<TGoClient["projects"]["statuses"]["create"]>;
-export type TUpdateProjectStatusInput = TInput<TGoClient["projects"]["statuses"]["update"]>;
-export type TCreateMilestoneInput = TInput<TGoClient["projects"]["milestones"]["create"]>;
-export type TUpdateMilestoneInput = TInput<TGoClient["projects"]["milestones"]["update"]>;
-export type TCreateProjectUpdateInput = TInput<TGoClient["projects"]["updates"]["create"]>;
-export type TEditProjectUpdateInput = TInput<TGoClient["projects"]["updates"]["update"]>;
-export type TCreateProjectLinkInput = TInput<TGoClient["projects"]["links"]["create"]>;
-export type TUpdateProjectLinkInput = TInput<TGoClient["projects"]["links"]["update"]>;
+export type TProjectStatusType = ProjectStatus["type"];
+export type THealth = StatusUpdate["health"];
+export type TDateResolution = ProjectDetail["targetDateResolution"];
+export type TProjectListArgs = Omit<OpArgs<"list_projects">, "cursor" | "limit">;
 
 export const queryKeyProjects = {
-  all: () => ["projects"] as const,
-  lists: () => ["projects", "list"] as const,
-  list: (input: TListProjectsInput) => ["projects", "list", input] as const,
-  detail: (workspaceId: string, slug: string) => ["projects", "detail", workspaceId, slug] as const,
-  statuses: (workspaceId: string) => ["projects", "statuses", workspaceId] as const,
-  updates: (projectId: string) => ["projects", "updates", projectId] as const,
+  all: (workspaceId: string) => [workspaceId, "projects"] as const,
+  list: (workspaceId: string, args: TProjectListArgs) =>
+    [workspaceId, "projects", "list", args] as const,
+  detail: (workspaceId: string, project: string) =>
+    [workspaceId, "projects", "detail", project] as const,
+  statuses: (workspaceId: string) => [workspaceId, "projects", "statuses"] as const,
+  labels: (workspaceId: string) => [workspaceId, "projects", "labels"] as const,
+  milestone: (workspaceId: string, id: string) =>
+    [workspaceId, "projects", "milestone", id] as const,
 };
 
-export const projectsListQuery = (input: TListProjectsInput) =>
+export const queryKeyStatusUpdates = {
+  all: (workspaceId: string) => [workspaceId, "status-updates"] as const,
+  list: (workspaceId: string, parent: TStatusUpdateParent) =>
+    [workspaceId, "status-updates", "list", parent] as const,
+  comments: (workspaceId: string, updateId: string) =>
+    [workspaceId, "status-updates", "comments", updateId] as const,
+};
+
+/** Projects of the workspace, every page, in the order the server gives (manual by default here). */
+export const projectsQuery = (workspaceId: string, args: TProjectListArgs = {}) =>
   queryOptions({
-    queryKey: queryKeyProjects.list(input),
-    queryFn: async () => {
-      const res = await getGoClient().projects.list(input);
-      return { projects: res.data ?? [] };
-    },
-    refetchInterval: LIST_REFETCH_INTERVAL_MS,
+    queryKey: queryKeyProjects.list(workspaceId, args),
+    queryFn: () => callAll(workspaceId, "list_projects", { orderBy: "manual", ...args }),
   });
 
-export const projectBySlugQuery = (workspaceId: string, slug: string) =>
-  queryOptions({
-    queryKey: queryKeyProjects.detail(workspaceId, slug),
-    queryFn: async () => {
-      const res = await getGoClient().projects.get({ workspace_id: workspaceId, slug });
-      return { project: res.data };
-    },
+/** A project by its link slug (`launch-v2-0a1b2c3d4e5f`), slug id or id; cached by slug id. */
+export const projectQuery = (workspaceId: string, project: string) => {
+  const slugId = slugIdFromParam(project);
+  return queryOptions({
+    queryKey: queryKeyProjects.detail(workspaceId, slugId),
+    queryFn: () => call(workspaceId, "get_project", { id: slugId }),
   });
+};
 
 export const projectStatusesQuery = (workspaceId: string) =>
   queryOptions({
     queryKey: queryKeyProjects.statuses(workspaceId),
-    queryFn: async () => {
-      const res = await getGoClient().projects.statuses.list({ workspace_id: workspaceId });
-      return { statuses: res.data ?? [] };
-    },
+    queryFn: async () =>
+      (await callAll(workspaceId, "list_project_statuses", {})).sort(
+        (a, b) => a.position - b.position,
+      ),
   });
 
-export const projectUpdatesQuery = (projectId: string) =>
+export const projectLabelsQuery = (workspaceId: string) =>
   queryOptions({
-    queryKey: queryKeyProjects.updates(projectId),
-    queryFn: async () => {
-      const res = await getGoClient().projects.updates.list({ project_id: projectId });
-      return { updates: res.data ?? [] };
-    },
-    refetchInterval: LIST_REFETCH_INTERVAL_MS,
+    queryKey: queryKeyProjects.labels(workspaceId),
+    queryFn: () => callAll(workspaceId, "list_project_labels", { includeRetired: true }),
   });
 
-export async function createProject(input: TCreateProjectInput) {
-  const res = await getGoClient().projects.create(input);
-  return { data: res.data };
-}
-
-export async function updateProject(input: TUpdateProjectInput) {
-  const res = await getGoClient().projects.update(input);
-  return { data: res.data };
-}
-
-export type TProjectLifecycleAction = "archive" | "unarchive" | "trash" | "restore" | "delete";
-
-export async function changeProjectLifecycle(input: {
-  projectId: string;
-  action: TProjectLifecycleAction;
-}) {
-  const projects = getGoClient().projects;
-  const params = { project_id: input.projectId };
-  switch (input.action) {
-    case "archive":
-      return { data: (await projects.archive(params)).data };
-    case "unarchive":
-      return { data: (await projects.unarchive(params)).data };
-    case "trash":
-      return { data: (await projects.trash(params)).data };
-    case "restore":
-      return { data: (await projects.restore(params)).data };
-    case "delete":
-      await projects.delete(params);
-      return { data: null };
-  }
-}
-
-export async function createProjectStatus(input: TCreateProjectStatusInput) {
-  const res = await getGoClient().projects.statuses.create(input);
-  return { data: res.data };
-}
-
-export async function updateProjectStatus(input: TUpdateProjectStatusInput) {
-  const res = await getGoClient().projects.statuses.update(input);
-  return { data: res.data };
-}
-
-export async function deleteProjectStatus(input: { statusId: string; moveToStatusId: string }) {
-  const res = await getGoClient().projects.statuses.delete({
-    status_id: input.statusId,
-    move_to_status_id: input.moveToStatusId,
+export const milestoneQuery = (workspaceId: string, id: string) =>
+  queryOptions({
+    queryKey: queryKeyProjects.milestone(workspaceId, id),
+    queryFn: () => call(workspaceId, "get_milestone", { id }),
   });
-  return { data: res.data };
-}
 
-export async function createMilestone(input: TCreateMilestoneInput) {
-  const res = await getGoClient().projects.milestones.create(input);
-  return { data: res.data };
-}
+/** A project's issues; keyed under the workspace's issues so issue changes refresh them. */
+export const projectIssuesQuery = (workspaceId: string, projectId: string) =>
+  queryOptions({
+    queryKey: [workspaceId, "issues", "project", projectId] as const,
+    queryFn: () => callAll(workspaceId, "list_issues", { project: projectId, orderBy: "manual" }),
+  });
 
-export async function updateMilestone(input: TUpdateMilestoneInput) {
-  const res = await getGoClient().projects.milestones.update(input);
-  return { data: res.data };
-}
+export type TStatusUpdateParent = { project: string } | { initiative: string };
 
-export async function deleteMilestone(input: { milestoneId: string }) {
-  const res = await getGoClient().projects.milestones.delete({ milestone_id: input.milestoneId });
-  return { data: res.data };
-}
+export const statusUpdatesQuery = (workspaceId: string, parent: TStatusUpdateParent) =>
+  queryOptions({
+    queryKey: queryKeyStatusUpdates.list(workspaceId, parent),
+    queryFn: () => callAll(workspaceId, "get_status_updates", parent),
+  });
 
-export async function createProjectUpdate(input: TCreateProjectUpdateInput) {
-  const res = await getGoClient().projects.updates.create(input);
-  return { data: res.data };
-}
+export const statusUpdateCommentsQuery = (workspaceId: string, updateId: string) =>
+  queryOptions({
+    queryKey: queryKeyStatusUpdates.comments(workspaceId, updateId),
+    queryFn: () => callAll(workspaceId, "list_comments", { statusUpdateId: updateId }),
+  });
 
-export async function editProjectUpdate(input: TEditProjectUpdateInput) {
-  const res = await getGoClient().projects.updates.update(input);
-  return { data: res.data };
-}
-
-export async function deleteProjectUpdate(input: { updateId: string }) {
-  const res = await getGoClient().projects.updates.delete({ update_id: input.updateId });
-  return { data: res.data };
-}
-
-export async function createProjectLink(input: TCreateProjectLinkInput) {
-  const res = await getGoClient().projects.links.create(input);
-  return { data: res.data };
-}
-
-export async function updateProjectLink(input: TUpdateProjectLinkInput) {
-  const res = await getGoClient().projects.links.update(input);
-  return { data: res.data };
-}
-
-export async function deleteProjectLink(input: { linkId: string }) {
-  const res = await getGoClient().projects.links.delete({ link_id: input.linkId });
-  return { data: res.data };
-}
-
-export async function toggleProjectUpdateReaction(input: {
-  updateId: string;
-  emoji: string;
-  reacted: boolean;
-}) {
-  const reactions = getGoClient().issues.reactions;
-  const call = input.reacted ? reactions.remove : reactions.add;
-  const res = await call({ emoji: input.emoji, project_update_id: input.updateId });
-  return { data: res.data };
-}
-
-function useInvalidateProjects() {
+/** Projects show up in initiatives, documents and issues too, so those refresh with them. */
+function useInvalidateProjects(workspaceId: string) {
   const queryClient = useQueryClient();
-  return async () => {
-    await queryClient.invalidateQueries({ queryKey: queryKeyProjects.all() });
-    await queryClient.invalidateQueries({ queryKey: ["initiatives"] });
-  };
+  return () =>
+    Promise.all(
+      ["projects", "initiatives", "status-updates"].map((area) =>
+        queryClient.invalidateQueries({ queryKey: [workspaceId, area] }),
+      ),
+    );
 }
 
-export function useCreateProjectMutation() {
-  const invalidate = useInvalidateProjects();
+export function useSaveProjectMutation(workspaceId: string) {
+  const queryClient = useQueryClient();
+  const invalidate = useInvalidateProjects(workspaceId);
   return useMutation({
-    mutationFn: createProject,
-    meta: { errorTitle: "Could not create project" },
-    onSuccess: invalidate,
+    mutationFn: (args: OpArgs<"save_project">) => call(workspaceId, "save_project", args),
+    meta: { errorTitle: "Could not save project" },
+    onSuccess: (project) => {
+      queryClient.setQueryData(queryKeyProjects.detail(workspaceId, project.slugId), project);
+      return invalidate();
+    },
   });
 }
 
-export function useUpdateProjectMutation() {
-  const invalidate = useInvalidateProjects();
-  return useMutation({
-    mutationFn: updateProject,
-    meta: { errorTitle: "Could not update project" },
-    onSuccess: invalidate,
-  });
-}
+export type TProjectLifecycleAction = "archive" | "unarchive" | "trash" | "restore";
 
-export function useProjectLifecycleMutation() {
-  const invalidate = useInvalidateProjects();
+const projectLifecycleOps = {
+  archive: "archive_project",
+  unarchive: "unarchive_project",
+  trash: "delete_project",
+  restore: "restore_project",
+} as const;
+
+export function useProjectLifecycleMutation(workspaceId: string) {
+  const invalidate = useInvalidateProjects(workspaceId);
   return useMutation({
-    mutationFn: changeProjectLifecycle,
+    mutationFn: ({ id, action }: { id: string; action: TProjectLifecycleAction }) =>
+      call(workspaceId, projectLifecycleOps[action], { id }),
     meta: { errorTitle: "Could not change the project" },
     onSuccess: invalidate,
   });
 }
 
-export function useCreateProjectStatusMutation() {
-  const invalidate = useInvalidateProjects();
+export function useSaveProjectStatusMutation(workspaceId: string) {
+  const invalidate = useInvalidateProjects(workspaceId);
   return useMutation({
-    mutationFn: createProjectStatus,
-    meta: { errorTitle: "Could not add status" },
+    mutationFn: (args: OpArgs<"save_project_status">) =>
+      call(workspaceId, "save_project_status", args),
+    meta: { errorTitle: "Could not save status" },
     onSuccess: invalidate,
   });
 }
 
-export function useUpdateProjectStatusMutation() {
-  const invalidate = useInvalidateProjects();
+export function useDeleteProjectStatusMutation(workspaceId: string) {
+  const invalidate = useInvalidateProjects(workspaceId);
   return useMutation({
-    mutationFn: updateProjectStatus,
-    meta: { errorTitle: "Could not update status" },
-    onSuccess: invalidate,
-  });
-}
-
-export function useDeleteProjectStatusMutation() {
-  const invalidate = useInvalidateProjects();
-  return useMutation({
-    mutationFn: deleteProjectStatus,
+    mutationFn: (args: OpArgs<"delete_project_status">) =>
+      call(workspaceId, "delete_project_status", args),
     meta: { errorTitle: "Could not delete status" },
     onSuccess: invalidate,
   });
 }
 
-export function useCreateMilestoneMutation() {
-  const invalidate = useInvalidateProjects();
+export function useSaveProjectLabelMutation(workspaceId: string) {
+  const invalidate = useInvalidateProjects(workspaceId);
   return useMutation({
-    mutationFn: createMilestone,
-    meta: { errorTitle: "Could not add milestone" },
+    mutationFn: (args: OpArgs<"save_project_label">) =>
+      call(workspaceId, "save_project_label", args),
+    meta: { errorTitle: "Could not save label" },
     onSuccess: invalidate,
   });
 }
 
-export function useUpdateMilestoneMutation() {
-  const invalidate = useInvalidateProjects();
+export type TProjectLabelAction = "retire" | "restore" | "delete";
+
+const projectLabelOps = {
+  retire: "retire_project_label",
+  restore: "restore_project_label",
+  delete: "delete_project_label",
+} as const;
+
+export function useProjectLabelActionMutation(workspaceId: string) {
+  const invalidate = useInvalidateProjects(workspaceId);
   return useMutation({
-    mutationFn: updateMilestone,
-    meta: { errorTitle: "Could not update milestone" },
+    mutationFn: ({ id, action }: { id: string; action: TProjectLabelAction }) =>
+      call(workspaceId, projectLabelOps[action], { id }),
+    meta: { errorTitle: "Could not change the label" },
     onSuccess: invalidate,
   });
 }
 
-export function useDeleteMilestoneMutation() {
+/** Milestones also show on issues, so issues refresh with them. */
+function useInvalidateMilestones(workspaceId: string) {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: deleteMilestone,
-    meta: { errorTitle: "Could not delete milestone" },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeyProjects.all() });
-      await queryClient.invalidateQueries({ queryKey: ["issues"] });
-    },
-  });
+  const invalidate = useInvalidateProjects(workspaceId);
+  return () =>
+    Promise.all([
+      invalidate(),
+      queryClient.invalidateQueries({ queryKey: [workspaceId, "issues"] }),
+    ]);
 }
 
-export function useCreateProjectUpdateMutation() {
-  const invalidate = useInvalidateProjects();
+export function useSaveMilestoneMutation(workspaceId: string) {
+  const invalidate = useInvalidateMilestones(workspaceId);
   return useMutation({
-    mutationFn: createProjectUpdate,
-    meta: { errorTitle: "Could not post update" },
+    mutationFn: (args: OpArgs<"save_milestone">) => call(workspaceId, "save_milestone", args),
+    meta: { errorTitle: "Could not save milestone" },
     onSuccess: invalidate,
   });
 }
 
-export function useEditProjectUpdateMutation() {
-  const invalidate = useInvalidateProjects();
+export function useDeleteMilestoneMutation(workspaceId: string) {
+  const invalidate = useInvalidateMilestones(workspaceId);
   return useMutation({
-    mutationFn: editProjectUpdate,
+    mutationFn: (id: string) => call(workspaceId, "delete_milestone", { id }),
+    meta: { errorTitle: "Could not delete milestone" },
+    onSuccess: invalidate,
+  });
+}
+
+/** Status updates set the health of their project or initiative, so both refresh. */
+export function useSaveStatusUpdateMutation(workspaceId: string) {
+  const invalidate = useInvalidateProjects(workspaceId);
+  return useMutation({
+    mutationFn: (args: OpArgs<"save_status_update">) =>
+      call(workspaceId, "save_status_update", args),
     meta: { errorTitle: "Could not save update" },
     onSuccess: invalidate,
   });
 }
 
-export function useDeleteProjectUpdateMutation() {
-  const invalidate = useInvalidateProjects();
+export function useDeleteStatusUpdateMutation(workspaceId: string) {
+  const invalidate = useInvalidateProjects(workspaceId);
   return useMutation({
-    mutationFn: deleteProjectUpdate,
+    mutationFn: (id: string) => call(workspaceId, "delete_status_update", { id }),
     meta: { errorTitle: "Could not delete update" },
     onSuccess: invalidate,
   });
 }
 
-export function useProjectUpdateReactionMutation(projectId: string) {
+export function useStatusUpdateReactionMutation(workspaceId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: toggleProjectUpdateReaction,
+    mutationFn: async (input: { updateId: string; emoji: string; reacted: boolean }) => {
+      const target = { statusUpdateId: input.updateId, emoji: input.emoji };
+      if (input.reacted) await call(workspaceId, "remove_reaction", target);
+      else await call(workspaceId, "add_reaction", target);
+    },
     meta: { errorTitle: "Could not react" },
     onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: queryKeyProjects.updates(projectId) }),
+      queryClient.invalidateQueries({ queryKey: queryKeyStatusUpdates.all(workspaceId) }),
   });
 }
 
-export function useCreateProjectLinkMutation() {
-  const invalidate = useInvalidateProjects();
+export function useSaveStatusUpdateCommentMutation(workspaceId: string) {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: createProjectLink,
-    meta: { errorTitle: "Could not add link" },
-    onSuccess: invalidate,
+    mutationFn: (args: OpArgs<"save_comment">) => call(workspaceId, "save_comment", args),
+    meta: { errorTitle: "Could not save comment" },
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeyStatusUpdates.all(workspaceId) }),
   });
 }
 
-export function useUpdateProjectLinkMutation() {
-  const invalidate = useInvalidateProjects();
+export function useDeleteStatusUpdateCommentMutation(workspaceId: string) {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: updateProjectLink,
-    meta: { errorTitle: "Could not update link" },
-    onSuccess: invalidate,
-  });
-}
-
-export function useDeleteProjectLinkMutation() {
-  const invalidate = useInvalidateProjects();
-  return useMutation({
-    mutationFn: deleteProjectLink,
-    meta: { errorTitle: "Could not delete link" },
-    onSuccess: invalidate,
+    mutationFn: (id: string) => call(workspaceId, "delete_comment", { id }),
+    meta: { errorTitle: "Could not delete comment" },
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeyStatusUpdates.all(workspaceId) }),
   });
 }
 

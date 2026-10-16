@@ -16,7 +16,8 @@ function TeamKeyProjectsPage() {
       title="Projects"
       breadcrumb={[teamCrumb(team, workspace), { label: "Projects" }]}
       storageKey={`team:${team.id}`}
-      filters={{ team_id: team.id }}
+      filters={{ team: team.id }}
+      teamId={team.id}
     />
   );
 }

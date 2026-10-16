@@ -6,7 +6,7 @@ import { useTeams } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { cyclesListQuery } from "@/lib/queries/cycles";
 import { labelTreeQuery } from "@/lib/queries/labels";
-import { projectsListQuery } from "@/lib/queries/projects";
+import { projectsQuery } from "@/lib/queries/projects";
 import { usersQuery } from "@/lib/queries/users";
 
 export function useTeam(teamId: string | undefined) {
@@ -41,7 +41,8 @@ export function useLabels(teamId: string | undefined) {
 
 function useWorkspaceProjects() {
   const { workspace } = useWorkspace();
-  return useQuery(projectsListQuery({ workspace_id: workspace.id }));
+  const { data, isPending } = useQuery(projectsQuery(workspace.id));
+  return { data: { projects: data ?? [] }, isPending };
 }
 
 export function useProjects(teamId: string | undefined) {

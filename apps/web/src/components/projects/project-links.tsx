@@ -1,7 +1,8 @@
-import { ExternalLinkIcon, LinkIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { LinkIcon, PlusIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 
+import type { EntityLink } from "@/api/ops.gen";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,11 +14,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
-import {
-  type TProject,
-  useCreateProjectLinkMutation,
-  useDeleteProjectLinkMutation,
-} from "@/lib/queries/projects";
 
 const linkSchema = z.object({
   url: z
@@ -25,58 +21,74 @@ const linkSchema = z.object({
     .trim()
     .url("Enter a full URL such as https://example.com.")
     .refine((value) => /^https?:\/\//i.test(value), "Use an http or https URL."),
-  label: z
-    .string()
-    .trim()
-    .min(1, "Label is required.")
-    .max(120, "Keep the label under 120 characters."),
+  title: z.string().trim().max(120, "Keep the title under 120 characters."),
 });
 
-export function ProjectLinks({ project, canEdit }: { project: TProject; canEdit: boolean }) {
-  const { mutate: deleteLink } = useDeleteProjectLinkMutation();
+type TProps = {
+  links: EntityLink[];
+  canEdit: boolean;
+  onAdd: (link: { url: string; title: string }) => Promise<unknown>;
+  onRemove: (url: string) => void;
+};
+
+function hostOf(url: string) {
+  try {
+    return new URL(url).host.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+}
+
+/** Links of a project or initiative: specs, designs, dashboards. */
+export function EntityLinks({ links, canEdit, onAdd, onRemove }: TProps) {
+  if (!canEdit && links.length === 0) return null;
   return (
-    <div className="flex w-full min-w-0 flex-col gap-1.5">
-      {project.links.map((link) => (
-        <div key={link.id} className="group/link flex min-h-8 min-w-0 items-center gap-1.5 text-sm">
-          <LinkIcon className="text-muted-foreground size-4 shrink-0" />
+    <div className="flex w-full min-w-0 flex-col gap-1">
+      <div className="flex h-8 items-center gap-2">
+        <span className="text-muted-foreground flex-1 text-sm">Links</span>
+        {canEdit && <AddLinkDialog onAdd={onAdd} />}
+      </div>
+      {links.map((link) => (
+        <div
+          key={link.id}
+          className="group/link has-hover:hover:bg-accent flex h-8 min-w-0 items-center gap-2 rounded-md px-2 text-sm"
+        >
+          <LinkIcon className="text-muted-foreground size-3.5 shrink-0" />
           <a
             href={link.url}
             target="_blank"
             rel="noreferrer"
-            className="min-w-0 flex-1 truncate hover:underline"
+            title={link.url}
+            className="min-w-0 flex-1 truncate"
           >
-            {link.label}
+            {link.label || hostOf(link.url)}
           </a>
-          <ExternalLinkIcon className="text-muted-foreground size-3.5 shrink-0" />
           {canEdit && (
             <Button
               variant="ghost"
               size="icon"
-              aria-label={`Remove link ${link.label}`}
-              onClick={() => deleteLink({ linkId: link.id })}
+              forceMinSize={false}
+              aria-label={`Remove link ${link.label || link.url}`}
+              className="size-6 opacity-0 group-hover/link:opacity-100 focus-visible:opacity-100"
+              onClick={() => onRemove(link.url)}
             >
-              <Trash2Icon className="size-4" />
+              <XIcon className="size-3.5" />
             </Button>
           )}
         </div>
       ))}
-      {project.links.length === 0 && (
-        <span className="text-muted-foreground text-sm">No links</span>
-      )}
-      {canEdit && <AddLinkDialog projectId={project.id} />}
     </div>
   );
 }
 
-function AddLinkDialog({ projectId }: { projectId: string }) {
+function AddLinkDialog({ onAdd }: { onAdd: TProps["onAdd"] }) {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger
         render={
-          <Button variant="ghost" size="sm" className="self-start">
+          <Button variant="ghost" size="icon" aria-label="Add link">
             <PlusIcon className="size-4" />
-            Add link
           </Button>
         }
       />
@@ -84,20 +96,19 @@ function AddLinkDialog({ projectId }: { projectId: string }) {
         <DialogHeader>
           <DialogTitle>Add link</DialogTitle>
         </DialogHeader>
-        {isOpen && <AddLinkForm projectId={projectId} onDone={() => setIsOpen(false)} />}
+        {isOpen && <AddLinkForm onAdd={onAdd} onDone={() => setIsOpen(false)} />}
       </DialogContent>
     </Dialog>
   );
 }
 
-function AddLinkForm({ projectId, onDone }: { projectId: string; onDone: () => void }) {
-  const { mutateAsync: createLink } = useCreateProjectLinkMutation();
+function AddLinkForm({ onAdd, onDone }: { onAdd: TProps["onAdd"]; onDone: () => void }) {
   const form = useAppForm({
-    defaultValues: { url: "", label: "" },
+    defaultValues: { url: "", title: "" },
     validators: { onSubmit: linkSchema },
     onSubmit: async ({ value }) => {
       const parsed = linkSchema.parse(value);
-      await createLink({ project_id: projectId, ...parsed });
+      await onAdd({ url: parsed.url, title: parsed.title || hostOf(parsed.url) });
       onDone();
     },
   });
@@ -107,7 +118,10 @@ function AddLinkForm({ projectId, onDone }: { projectId: string; onDone: () => v
         name="url"
         children={(field) => <field.TextField label="URL" placeholder="https://" autoFocus />}
       />
-      <form.AppField name="label" children={(field) => <field.TextField label="Label" />} />
+      <form.AppField
+        name="title"
+        children={(field) => <field.TextField label="Title" placeholder="Optional" />}
+      />
       <DialogFooter>
         <DialogClose
           render={

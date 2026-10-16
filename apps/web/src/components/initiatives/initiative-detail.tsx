@@ -1,34 +1,56 @@
 import { useQuery } from "@tanstack/react-query";
 import { TargetIcon } from "lucide-react";
 
-import { AutosaveMarkdown } from "@/components/shared/autosave-markdown";
-import { InlineText } from "@/components/shared/inline-text";
+import type { InitiativeDetail as TInitiativeDetail } from "@/api/ops.gen";
+import { FavoriteButton } from "@/components/favorites/favorite-button";
+import { ParentDocuments } from "@/components/documents/document-list";
 import { LifecycleBanner } from "@/components/documents/lifecycle-banner";
-import { ProjectDocuments } from "@/components/documents/project-documents";
-import {
-  InitiativeActions,
-  useInitiativeLifecycle,
-} from "@/components/initiatives/initiative-actions";
-import { InitiativeProjects } from "@/components/initiatives/initiative-projects";
+import { MarkdownBody } from "@/components/documents/markdown-body";
+import { InitiativeProjects, SubInitiatives } from "@/components/initiatives/initiative-projects";
 import { InitiativeProperties } from "@/components/initiatives/initiative-properties";
-import { InitiativeUpdates } from "@/components/initiatives/initiative-updates";
-import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { InitiativeIcon } from "@/components/initiatives/initiative-status";
+import { Breadcrumb, type TBreadcrumbItem } from "@/components/layout/breadcrumb";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
-import { IconPicker } from "@/components/shared/icon-picker";
-import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { isApiError } from "@/lib/server/errors";
-import {
-  initiativeBySlugQuery,
-  initiativeNameMaxLength,
-  type TInitiative,
-  useUpdateInitiativeMutation,
-} from "@/lib/queries/initiatives";
 import { EntityNotFound } from "@/components/navigation/not-found-template";
+import { EntityMenu } from "@/components/projects/entity-menu";
+import { ProgressBar } from "@/components/projects/progress-bar";
+import { StatusUpdatesSection } from "@/components/projects/status-updates";
+import { CopyLinkAction, HeaderActions } from "@/components/shared/detail-actions";
+import { IconPicker } from "@/components/shared/icon-picker";
+import { InlineText } from "@/components/shared/inline-text";
+import { toast } from "@/components/ui/toast";
+import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { entitySlug } from "@/lib/helpers/entity-slug";
+import {
+  initiativeNameMaxLength,
+  initiativeQuery,
+  type TInitiativeLifecycleAction,
+  useInitiativeLifecycleMutation,
+  useSaveInitiativeMutation,
+} from "@/lib/queries/initiatives";
+import { isApiError } from "@/lib/server/errors";
+
+const lifecycleToasts: Record<TInitiativeLifecycleAction, string> = {
+  archive: "Initiative archived",
+  unarchive: "Initiative unarchived",
+  trash: "Initiative moved to trash",
+  restore: "Initiative restored",
+};
+
+function useInitiativeLifecycle(id: string) {
+  const { workspace } = useWorkspace();
+  const { mutateAsync, isPending } = useInitiativeLifecycleMutation(workspace.id);
+  const run = (action: TInitiativeLifecycleAction) =>
+    void mutateAsync({ id, action })
+      .then(() => toast.add({ type: "success", title: lifecycleToasts[action] }))
+      .catch(() => undefined);
+  return { run, isPending };
+}
 
 export function InitiativeDetail({ slug }: { slug: string }) {
   const { workspace } = useWorkspace();
-  const { data, isPending, error, refetch } = useQuery(initiativeBySlugQuery(workspace.id, slug));
+  const { data, isPending, error, refetch } = useQuery(initiativeQuery(workspace.id, slug));
   if (isPending) return <ListSkeleton rows={4} />;
   if (error) {
     if (isApiError(error, 404)) {
@@ -41,74 +63,140 @@ export function InitiativeDetail({ slug }: { slug: string }) {
     }
     return <ErrorCard message={error.message} onRetry={() => void refetch()} />;
   }
-  return <InitiativeDetailContent key={data.initiative.id} initiative={data.initiative} />;
+  return <InitiativeDetailContent key={data.id} initiative={data} />;
 }
 
-function InitiativeDetailContent({ initiative }: { initiative: TInitiative }) {
+function initiativeBreadcrumb(
+  workspaceUrlKey: string,
+  initiative: TInitiativeDetail,
+): TBreadcrumbItem[] {
+  const items: TBreadcrumbItem[] = [
+    {
+      label: "Initiatives",
+      link: { to: "/$workspace/initiatives", params: { workspace: workspaceUrlKey } },
+    },
+  ];
+  if (initiative.parent) {
+    items.push({
+      label: initiative.parent.name,
+      link: {
+        to: "/$workspace/initiative/$slug",
+        params: { workspace: workspaceUrlKey, slug: entitySlug(initiative.parent) },
+      },
+    });
+  }
+  items.push({
+    label: initiative.name,
+    icon: <InitiativeIcon initiative={initiative} size="sm" />,
+  });
+  return items;
+}
+
+function InitiativeDetailContent({ initiative }: { initiative: TInitiativeDetail }) {
   const { workspace, canEdit } = useWorkspace();
-  const { mutate: update, mutateAsync: updateAsync } = useUpdateInitiativeMutation();
-  const lifecycle = useInitiativeLifecycle();
+  const { mutate: save, mutateAsync: saveAsync } = useSaveInitiativeMutation(workspace.id);
+  const lifecycle = useInitiativeLifecycle(initiative.id);
+  const lifecycleState = initiative.trashed ? "trashed" : initiative.archivedAt ? "archived" : null;
 
   return (
     <div className="flex w-full flex-col gap-6">
       <div className="flex w-full min-w-0 items-center gap-2">
         <div className="min-w-0 flex-1">
-          <Breadcrumb
-            items={[
-              {
-                label: "Initiatives",
-                link: { to: "/$workspace/initiatives", params: { workspace: workspace.slug } },
-              },
-              { label: initiative.name },
-            ]}
-          />
+          <Breadcrumb items={initiativeBreadcrumb(workspace.urlKey, initiative)} />
         </div>
-        <InitiativeActions initiative={initiative} />
+        <HeaderActions>
+          <FavoriteButton kind="initiative" entityId={initiative.id} />
+          <CopyLinkAction url={initiative.url} />
+          {canEdit && (
+            <EntityMenu
+              noun="initiative"
+              isArchived={Boolean(initiative.archivedAt)}
+              isTrashed={initiative.trashed}
+              onArchive={(archive) => lifecycle.run(archive ? "archive" : "unarchive")}
+              onTrash={(trash) => lifecycle.run(trash ? "trash" : "restore")}
+            />
+          )}
+        </HeaderActions>
       </div>
-      <div className="flex w-full flex-col gap-6 lg:flex-row">
-        <div className="flex min-w-0 flex-1 flex-col gap-6">
+      <div className="flex w-full flex-col gap-6 lg:flex-row lg:items-start">
+        <div className="mx-auto flex w-full max-w-3xl min-w-0 flex-1 flex-col gap-6">
           <LifecycleBanner
             entity="initiative"
-            state={initiative.archived_at ? "archived" : null}
+            state={lifecycleState}
             isPending={lifecycle.isPending}
             onRestore={
               canEdit
-                ? () => void lifecycle.run(initiative.id, "unarchive").catch(() => undefined)
+                ? () => lifecycle.run(lifecycleState === "trashed" ? "restore" : "unarchive")
                 : undefined
             }
           />
           <div className="flex flex-col gap-2">
             <div className="flex min-w-0 items-center gap-2">
               <IconPicker
-                value={initiative.icon || null}
-                color={initiative.color || null}
+                value={initiative.icon}
+                color={initiative.color}
                 disabled={!canEdit}
                 label="Initiative icon"
-                onChange={(icon) => update({ initiative_id: initiative.id, icon: icon ?? "" })}
+                onChange={(icon) => save({ id: initiative.id, icon })}
               />
               <InlineText
                 value={initiative.name}
                 label="Initiative name"
                 maxLength={initiativeNameMaxLength}
                 readOnly={!canEdit}
-                onSave={(name) => update({ initiative_id: initiative.id, name })}
+                onSave={(name) => save({ id: initiative.id, name })}
               />
             </div>
-            <AutosaveMarkdown
-              key={initiative.id}
-              label="Description"
-              placeholder="Add a description…"
-              initialValue={initiative.description}
-              readOnly={!canEdit}
-              onSave={(description) => updateAsync({ initiative_id: initiative.id, description })}
-            />
+            {(canEdit || initiative.summary) && (
+              <InlineText
+                label="Initiative summary"
+                variant="summary"
+                value={initiative.summary ?? ""}
+                maxLength={255}
+                allowEmpty
+                readOnly={!canEdit}
+                placeholder="Add a one-line summary…"
+                onSave={(summary) => save({ id: initiative.id, summary: summary || null })}
+              />
+            )}
           </div>
+          {initiative.projectCount > 0 && (
+            <div className="bg-card flex flex-col gap-2 rounded-lg border p-4">
+              <div className="flex items-baseline gap-2">
+                <span className="text-base font-semibold tabular-nums">
+                  {Math.round(initiative.progress * 100)}%
+                </span>
+                <span className="text-muted-foreground text-sm">
+                  average progress of {initiative.projectCount} project
+                  {initiative.projectCount === 1 ? "" : "s"}
+                </span>
+              </div>
+              <ProgressBar
+                value={initiative.progress}
+                label="Initiative progress"
+                showValue={false}
+              />
+            </div>
+          )}
+          <MarkdownBody
+            key={initiative.id}
+            label="Description"
+            placeholder="Why it matters and how you'll know it's done…"
+            initialValue={initiative.description ?? ""}
+            readOnly={!canEdit}
+            onSave={(description) => saveAsync({ id: initiative.id, description })}
+          />
           <InitiativeProjects initiative={initiative} />
-          <InitiativeUpdates initiative={initiative} />
-          <ProjectDocuments workspaceId={workspace.id} initiativeId={initiative.id} />
+          <SubInitiatives initiative={initiative} />
+          <StatusUpdatesSection
+            parent={{ initiative: initiative.id }}
+            noun="initiative"
+            health={initiative.health}
+          />
+          <ParentDocuments parent={{ initiative: initiative.id }} />
         </div>
-        <aside aria-label="Properties" className="w-full shrink-0 lg:w-72">
-          <div className="rounded-lg border p-4 lg:sticky lg:top-0">
+        <aside aria-label="Properties" className="w-full shrink-0 lg:sticky lg:top-0 lg:w-80">
+          <div className="bg-card rounded-lg border p-4">
             <InitiativeProperties initiative={initiative} />
           </div>
         </aside>

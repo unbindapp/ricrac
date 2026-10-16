@@ -1,90 +1,60 @@
 import { useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
 
-import { Breadcrumb } from "@/components/layout/breadcrumb";
+import type { ProjectDetail } from "@/api/ops.gen";
 import { FavoriteButton } from "@/components/favorites/favorite-button";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
-import {
-  ArchiveAction,
-  CopyLinkAction,
-  DeleteMenuAction,
-  HeaderActions,
-  TrashAction,
-} from "@/components/shared/detail-actions";
+import { Breadcrumb, type TBreadcrumbItem } from "@/components/layout/breadcrumb";
+import { EntityMenu } from "@/components/projects/entity-menu";
+import { CopyLinkAction, HeaderActions } from "@/components/shared/detail-actions";
+import { ProjectIcon } from "@/components/shared/project-icon";
 import { Tabs, TabsList, TabsTab } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/toast";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import {
-  type TProject,
-  type TProjectLifecycleAction,
-  useProjectLifecycleMutation,
-} from "@/lib/queries/projects";
+import { entitySlug } from "@/lib/helpers/entity-slug";
+import { type TProjectLifecycleAction, useProjectLifecycleMutation } from "@/lib/queries/projects";
 
 export type TProjectTab = "overview" | "issues";
 
-const lifecycleToasts: Record<Exclude<TProjectLifecycleAction, "delete">, string> = {
+const lifecycleToasts: Record<TProjectLifecycleAction, string> = {
   archive: "Project archived",
   unarchive: "Project unarchived",
   trash: "Project moved to trash",
   restore: "Project restored",
 };
 
-export function ProjectActions({ project }: { project: TProject }) {
-  const { workspace, canEdit, isAdmin } = useWorkspace();
-  const navigate = useNavigate();
-  const { mutateAsync: change, isPending } = useProjectLifecycleMutation();
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+export function useProjectLifecycle(projectId: string) {
+  const { workspace } = useWorkspace();
+  const { mutateAsync, isPending } = useProjectLifecycleMutation(workspace.id);
+  const run = (action: TProjectLifecycleAction) =>
+    void mutateAsync({ id: projectId, action })
+      .then(() => toast.add({ type: "success", title: lifecycleToasts[action] }))
+      .catch(() => undefined);
+  return { run, isPending };
+}
 
-  const run = async (action: Exclude<TProjectLifecycleAction, "delete">) => {
-    await change({ projectId: project.id, action });
-    toast.add({ type: "success", title: lifecycleToasts[action] });
-  };
-
+function ProjectActions({ project }: { project: ProjectDetail }) {
+  const { canEdit } = useWorkspace();
+  const lifecycle = useProjectLifecycle(project.id);
   return (
     <HeaderActions>
       <FavoriteButton kind="project" entityId={project.id} />
-      <CopyLinkAction url={window.location.href.replace(/\/issues$/, "")} />
+      <CopyLinkAction url={project.url} />
       {canEdit && (
-        <ArchiveAction
-          isOn={Boolean(project.archived_at)}
-          isPending={isPending}
-          onToggle={() =>
-            void run(project.archived_at ? "unarchive" : "archive").catch(() => undefined)
-          }
+        <EntityMenu
+          noun="project"
+          isArchived={Boolean(project.archivedAt)}
+          isTrashed={project.trashed}
+          onArchive={(archive) => lifecycle.run(archive ? "archive" : "unarchive")}
+          onTrash={(trash) => lifecycle.run(trash ? "trash" : "restore")}
         />
-      )}
-      {canEdit && (
-        <TrashAction
-          isOn={Boolean(project.trashed_at)}
-          isPending={isPending}
-          onToggle={() => void run(project.trashed_at ? "restore" : "trash").catch(() => undefined)}
-        />
-      )}
-      {isAdmin && (
-        <>
-          <DeleteMenuAction label="Delete project" onSelect={() => setIsDeleteOpen(true)} />
-          <ConfirmDialog
-            open={isDeleteOpen}
-            onOpenChange={setIsDeleteOpen}
-            title={`Delete ${project.name}`}
-            description="Milestones, updates, links and documents of this project are deleted. Its issues stay and lose the project."
-            confirmLabel="Delete project"
-            onConfirm={async () => {
-              await change({ projectId: project.id, action: "delete" });
-              toast.add({ type: "success", title: "Project deleted" });
-              await navigate({ to: "/$workspace/projects", params: { workspace: workspace.slug } });
-            }}
-          />
-        </>
       )}
     </HeaderActions>
   );
 }
 
-export function ProjectTabs({ project, tab }: { project: TProject; tab: TProjectTab }) {
+function ProjectTabs({ project, tab }: { project: ProjectDetail; tab: TProjectTab }) {
   const { workspace } = useWorkspace();
   const navigate = useNavigate();
-  const params = { workspace: workspace.slug, slug: project.slug };
+  const params = { workspace: workspace.urlKey, slug: entitySlug(project) };
   return (
     <Tabs
       value={tab}
@@ -100,36 +70,44 @@ export function ProjectTabs({ project, tab }: { project: TProject; tab: TProject
         <TabsTab value="overview">Overview</TabsTab>
         <TabsTab value="issues">
           Issues
-          <span className="text-muted-foreground text-xs font-normal">
-            {project.issue_counts.total}
-          </span>
+          {project.issueCount > 0 && (
+            <span className="text-muted-foreground text-xs font-normal tabular-nums">
+              {project.issueCount}
+            </span>
+          )}
         </TabsTab>
       </TabsList>
     </Tabs>
   );
 }
 
-export function ProjectHeaderBar({ project, tab }: { project: TProject; tab: TProjectTab }) {
+export function projectBreadcrumb(
+  workspaceUrlKey: string,
+  project: Pick<ProjectDetail, "name" | "icon" | "color">,
+): TBreadcrumbItem[] {
+  return [
+    {
+      label: "Projects",
+      link: { to: "/$workspace/projects", params: { workspace: workspaceUrlKey } },
+    },
+    {
+      label: project.name,
+      icon: <ProjectIcon icon={project.icon} color={project.color} size="sm" />,
+    },
+  ];
+}
+
+export function ProjectHeaderBar({ project, tab }: { project: ProjectDetail; tab: TProjectTab }) {
   const { workspace } = useWorkspace();
   return (
     <div className="flex w-full flex-col gap-2">
       <div className="flex w-full min-w-0 items-center gap-2">
         <div className="min-w-0 flex-1">
-          <Breadcrumb items={projectBreadcrumb(workspace.slug, project)} />
+          <Breadcrumb items={projectBreadcrumb(workspace.urlKey, project)} />
         </div>
         <ProjectActions project={project} />
       </div>
       <ProjectTabs project={project} tab={tab} />
     </div>
   );
-}
-
-export function projectBreadcrumb(workspaceSlug: string, project: TProject) {
-  return [
-    {
-      label: "Projects",
-      link: { to: "/$workspace/projects" as const, params: { workspace: workspaceSlug } },
-    },
-    { label: project.name },
-  ];
 }

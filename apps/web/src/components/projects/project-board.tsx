@@ -18,62 +18,60 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Link } from "@tanstack/react-router";
-import { BoxIcon, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { type CSSProperties, type HTMLAttributes, type ReactNode, type Ref, useState } from "react";
 
+import type { Project } from "@/api/ops.gen";
 import { sortOrderAtIndex } from "@/components/issues/sort-order";
-import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { HealthBadge } from "@/components/projects/health-badge";
 import { useNewProjectStore } from "@/components/projects/new-project-store";
-import { formatProjectDate } from "@/components/projects/project-dates";
-import { type TProjectGroup } from "@/components/projects/project-groups";
-import { type TProjectListFilters, useProjectList } from "@/components/projects/project-list";
+import { PersonAvatar } from "@/components/projects/people";
 import { ProgressBar } from "@/components/projects/progress-bar";
+import { type TProjectGroup } from "@/components/projects/project-groups";
+import { useProjectList } from "@/components/projects/project-list";
+import { TargetDate } from "@/components/projects/project-row";
 import { ProjectStatusIcon } from "@/components/projects/project-status-icon";
-import { Avatar } from "@/components/shared/avatar";
 import { PriorityIcon } from "@/components/shared/priority-icon";
 import { ProjectIcon } from "@/components/shared/project-icon";
 import { Button } from "@/components/ui/button";
+import { SimpleTooltip } from "@/components/ui/tooltip";
 import { cn } from "@/components/ui/utils";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { type TProjectListItem, useUpdateProjectMutation } from "@/lib/queries/projects";
+import { entitySlug } from "@/lib/helpers/entity-slug";
+import { type TProjectListArgs, useSaveProjectMutation } from "@/lib/queries/projects";
 
 const DRAG_ACTIVATION_DISTANCE = 6;
 
 type TCardData = { statusId: string; projectId: string };
 
 type TProps = {
-  workspaceId: string;
-  filters: TProjectListFilters;
-  emptyState?: ReactNode;
+  filters: TProjectListArgs;
+  query?: string;
+  empty: ReactNode;
+  noMatches?: ReactNode;
+  createDefaults?: { teamId?: string; initiativeId?: string };
 };
 
-export function ProjectBoard({ workspaceId, filters, emptyState }: TProps) {
-  const { groups, projects, isPending, error, refetch } = useProjectList(workspaceId, {
-    ...filters,
-    order_by: "sort_order",
-  });
+export function ProjectBoard({ filters, query, empty, noMatches = null, createDefaults }: TProps) {
+  const { groups, projects, total, isPending, error, refetch } = useProjectList(filters, query);
   if (isPending) return <ListSkeleton rows={8} />;
   if (error) return <ErrorCard message={error.message} onRetry={refetch} />;
-  if (projects.length === 0) {
-    return (
-      emptyState ?? (
-        <EmptyState
-          icon={BoxIcon}
-          title="No projects yet"
-          description="Projects group issues toward a goal."
-        />
-      )
-    );
-  }
-  return <Board groups={groups} filters={filters} />;
+  if (total === 0) return empty;
+  if (projects.length === 0) return noMatches;
+  return <Board groups={groups} createDefaults={createDefaults} />;
 }
 
-function Board({ groups, filters }: { groups: TProjectGroup[]; filters: TProjectListFilters }) {
-  const { canEdit } = useWorkspace();
-  const { mutate: updateProject } = useUpdateProjectMutation();
+function Board({
+  groups,
+  createDefaults,
+}: {
+  groups: TProjectGroup[];
+  createDefaults?: TProps["createDefaults"];
+}) {
+  const { workspace, canEdit } = useWorkspace();
+  const { mutate: saveProject } = useSaveProjectMutation(workspace.id);
   const [active, setActive] = useState<TCardData | null>(null);
   const [pending, setPending] = useState<{ projectId: string; statusId: string } | null>(null);
   const sensors = useSensors(
@@ -103,33 +101,26 @@ function Board({ groups, filters }: { groups: TProjectGroup[]; filters: TProject
     const overIndex = overCard?.projectId
       ? targetGroup.projects.findIndex((item) => item.id === overCard.projectId)
       : targetGroup.projects.length;
+    const fromIndex = targetGroup.projects.findIndex((item) => item.id === project.id);
     const reordered = isSameColumn
-      ? arrayMove(
-          targetGroup.projects,
-          targetGroup.projects.findIndex((item) => item.id === project.id),
-          overIndex,
-        )
+      ? arrayMove(targetGroup.projects, fromIndex, overIndex)
       : [
           ...targetGroup.projects.slice(0, overIndex),
           project,
           ...targetGroup.projects.slice(overIndex),
         ];
     const newIndex = reordered.findIndex((item) => item.id === project.id);
-    if (
-      isSameColumn &&
-      newIndex === sourceGroup.projects.findIndex((item) => item.id === project.id)
-    )
-      return;
+    if (isSameColumn && newIndex === fromIndex) return;
     const neighbors = reordered
       .filter((item) => item.id !== project.id)
-      .map((item) => item.sort_order);
+      .map((item) => item.sortOrder);
 
     setPending({ projectId: project.id, statusId: targetGroup.status.id });
-    updateProject(
+    saveProject(
       {
-        project_id: project.id,
-        sort_order: sortOrderAtIndex(neighbors, newIndex),
-        ...(isSameColumn ? {} : { status_id: targetGroup.status.id }),
+        id: project.id,
+        sortOrder: sortOrderAtIndex(neighbors, newIndex),
+        ...(isSameColumn ? {} : { state: targetGroup.status.id }),
       },
       { onSettled: () => setPending(null) },
     );
@@ -143,9 +134,14 @@ function Board({ groups, filters }: { groups: TProjectGroup[]; filters: TProject
       onDragCancel={() => setActive(null)}
       onDragEnd={onDragEnd}
     >
-      <div className="flex w-full min-w-0 items-start gap-3 overflow-x-auto pb-2">
+      <div className="flex min-h-0 w-full min-w-0 flex-1 items-start gap-3 overflow-x-auto pb-2">
         {shown.map((group) => (
-          <BoardColumn key={group.status.id} group={group} canEdit={canEdit} filters={filters} />
+          <BoardColumn
+            key={group.status.id}
+            group={group}
+            canEdit={canEdit}
+            createDefaults={createDefaults}
+          />
         ))}
       </div>
       <DragOverlay>
@@ -167,11 +163,11 @@ function moveProject(groups: TProjectGroup[], projectId: string, statusId: strin
 function BoardColumn({
   group,
   canEdit,
-  filters,
+  createDefaults,
 }: {
   group: TProjectGroup;
   canEdit: boolean;
-  filters: TProjectListFilters;
+  createDefaults?: TProps["createDefaults"];
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: `column::${group.status.id}` });
   const openNewProject = useNewProjectStore((state) => state.open);
@@ -179,28 +175,24 @@ function BoardColumn({
     <section
       aria-label={group.status.name}
       data-over={isOver || undefined}
-      className="bg-muted data-over:border-primary/5-10 flex w-72 shrink-0 flex-col rounded-lg border"
+      className="bg-muted data-over:border-primary/5-10 flex max-h-full w-72 shrink-0 flex-col rounded-lg border"
     >
-      <header className="flex h-10 items-center gap-2 px-3 text-sm">
+      <header className="flex h-10 shrink-0 items-center gap-2 pr-1.5 pl-3 text-sm">
         <ProjectStatusIcon type={group.status.type} color={group.status.color} />
         <span className="min-w-0 truncate font-medium">{group.status.name}</span>
-        <span className="text-muted-foreground text-xs">{group.projects.length}</span>
+        <span className="text-muted-foreground text-xs tabular-nums">{group.projects.length}</span>
         <span className="flex-1" />
         {canEdit && (
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label={`New project in ${group.status.name}`}
-            onClick={() =>
-              openNewProject({
-                statusId: group.status.id,
-                teamId: filters.team_id,
-                initiativeId: filters.initiative_id,
-              })
-            }
-          >
-            <PlusIcon className="size-4" />
-          </Button>
+          <SimpleTooltip content={`New project in ${group.status.name}`}>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={`New project in ${group.status.name}`}
+              onClick={() => openNewProject({ ...createDefaults, statusId: group.status.id })}
+            >
+              <PlusIcon className="size-4" />
+            </Button>
+          </SimpleTooltip>
         )}
       </header>
       <SortableContext
@@ -208,7 +200,11 @@ function BoardColumn({
         items={group.projects.map((project) => project.id)}
         strategy={verticalListSortingStrategy}
       >
-        <div ref={setNodeRef} role="list" className="flex min-h-16 flex-col gap-3 px-2 pb-2">
+        <div
+          ref={setNodeRef}
+          role="list"
+          className="flex min-h-16 flex-col gap-2 overflow-y-auto px-2 pb-2"
+        >
           {group.projects.map((project) => (
             <SortableProjectCard
               key={project.id}
@@ -229,7 +225,7 @@ function SortableProjectCard({
   canEdit,
 }: {
   statusId: string;
-  project: TProjectListItem;
+  project: Project;
   canEdit: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -259,7 +255,7 @@ function ProjectCard({
   style,
   dragProps,
 }: {
-  project: TProjectListItem;
+  project: Project;
   isDragging?: boolean;
   isOverlay?: boolean;
   ref?: Ref<HTMLDivElement>;
@@ -267,7 +263,7 @@ function ProjectCard({
   dragProps?: HTMLAttributes<HTMLDivElement>;
 }) {
   const { workspace } = useWorkspace();
-  const lead = project.lead;
+  const hasFooter = Boolean(project.health || project.targetDate || project.lead);
   return (
     <div
       ref={ref}
@@ -277,41 +273,36 @@ function ProjectCard({
       aria-label={project.name}
       data-dragging={isDragging || undefined}
       className={cn(
-        "bg-card has-hover:hover:border-primary/4-10 focus-visible:ring-primary/8-10 flex w-full cursor-default flex-col gap-2 rounded-lg border p-4 text-sm outline-hidden focus-visible:ring-1 data-dragging:opacity-40",
+        "bg-card has-hover:hover:border-primary/4-10 focus-visible:ring-primary/8-10 relative flex w-full cursor-default flex-col gap-3 rounded-lg border p-3 text-sm outline-hidden focus-visible:ring-1 data-dragging:opacity-40",
         isOverlay && "shadow-lg",
       )}
     >
-      <div className="flex min-w-0 items-center gap-1.5">
+      <div className="flex min-w-0 items-center gap-2">
         <ProjectIcon icon={project.icon} color={project.color} />
         <Link
           to="/$workspace/project/$slug"
-          params={{ workspace: workspace.slug, slug: project.slug }}
-          className="min-w-0 flex-1 truncate font-medium"
+          params={{ workspace: workspace.urlKey, slug: entitySlug(project) }}
+          className="min-w-0 flex-1 truncate font-medium after:absolute after:inset-0"
         >
           {project.name}
         </Link>
-        <PriorityIcon priority={project.priority} />
+        {project.priority > 0 && <PriorityIcon priority={project.priority} />}
       </div>
       {project.summary && (
         <p className="text-muted-foreground line-clamp-2 text-xs">{project.summary}</p>
       )}
-      <ProgressBar percent={project.progress.percent} label={`${project.name} progress`} />
-      <div className="flex items-center gap-2">
-        {project.health && <HealthBadge health={project.health} />}
-        <span className="text-muted-foreground min-w-0 flex-1 truncate text-xs">
-          {project.target_date
-            ? formatProjectDate(project.target_date, project.target_date_resolution)
-            : ""}
-        </span>
-        {lead && (
-          <Avatar
-            id={lead.id}
-            name={lead.name || lead.display_name}
-            src={lead.avatar_url}
-            size="sm"
-          />
-        )}
-      </div>
+      {project.issueCount > 0 && (
+        <ProgressBar value={project.progress} label={`${project.name} progress`} />
+      )}
+      {hasFooter && (
+        <div className="flex min-w-0 items-center gap-2">
+          <HealthBadge health={project.health} />
+          <span className="min-w-0 flex-1 truncate">
+            <TargetDate project={project} />
+          </span>
+          {project.lead && <PersonAvatar user={project.lead} size="xs" />}
+        </div>
+      )}
     </div>
   );
 }

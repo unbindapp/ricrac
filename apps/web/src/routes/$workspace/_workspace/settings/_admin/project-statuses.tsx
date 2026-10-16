@@ -35,11 +35,11 @@ import {
 } from "@/components/projects/project-status-icon";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import type { ProjectStatus } from "@/api/ops.gen";
 import {
   projectStatusesQuery,
-  type TProjectStatus,
   type TProjectStatusType,
-  useUpdateProjectStatusMutation,
+  useSaveProjectStatusMutation,
 } from "@/lib/queries/projects";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/_admin/project-statuses")({
@@ -49,20 +49,20 @@ export const Route = createFileRoute("/$workspace/_workspace/settings/_admin/pro
 const typeDescriptions: Record<TProjectStatusType, string> = {
   backlog: "Ideas nobody has planned yet.",
   planned: "Projects scheduled to start.",
-  started: "Projects in progress.",
+  started: "Projects being worked on.",
   paused: "Projects on hold.",
   completed: "Finished projects.",
   canceled: "Projects that will not be done.",
 };
 
-function byPosition(a: TProjectStatus, b: TProjectStatus) {
+function byPosition(a: ProjectStatus, b: ProjectStatus) {
   return a.position - b.position;
 }
 
 function ProjectStatusesSettingsPage() {
   const { workspace } = useWorkspace();
   const { data, isPending, error, refetch } = useQuery(projectStatusesQuery(workspace.id));
-  const statuses = data?.statuses ?? [];
+  const statuses = (data ?? []).filter((status) => !status.archivedAt);
 
   return (
     <SettingsPage
@@ -80,7 +80,6 @@ function ProjectStatusesSettingsPage() {
         PROJECT_STATUS_TYPES.map((type) => (
           <StatusGroup
             key={type}
-            workspaceId={workspace.id}
             type={type}
             statuses={statuses.filter((status) => status.type === type).sort(byPosition)}
             allStatuses={statuses}
@@ -91,18 +90,17 @@ function ProjectStatusesSettingsPage() {
 }
 
 function StatusGroup({
-  workspaceId,
   type,
   statuses,
   allStatuses,
 }: {
-  workspaceId: string;
   type: TProjectStatusType;
-  statuses: TProjectStatus[];
-  allStatuses: TProjectStatus[];
+  statuses: ProjectStatus[];
+  allStatuses: ProjectStatus[];
 }) {
   const [dragOrder, setDragOrder] = useState<string[] | null>(null);
-  const { mutate: updateStatus } = useUpdateProjectStatusMutation();
+  const { workspace } = useWorkspace();
+  const { mutate: saveStatus } = useSaveProjectStatusMutation(workspace.id);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -110,9 +108,8 @@ function StatusGroup({
   const ordered = dragOrder
     ? dragOrder
         .map((id) => statuses.find((status) => status.id === id))
-        .filter((status): status is TProjectStatus => !!status)
+        .filter((status): status is ProjectStatus => !!status)
     : statuses;
-  const lastPosition = statuses.at(-1)?.position ?? 0;
 
   const onDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -123,9 +120,9 @@ function StatusGroup({
     const before = ordered.find((status) => status.id === next[index - 1]);
     const after = ordered.find((status) => status.id === next[index + 1]);
     setDragOrder(next);
-    updateStatus(
+    saveStatus(
       {
-        status_id: String(active.id),
+        id: String(active.id),
         position: sortOrderBetween(before?.position, after?.position),
       },
       { onSettled: () => setDragOrder(null) },
@@ -138,10 +135,7 @@ function StatusGroup({
       description={typeDescriptions[type]}
       actions={
         <ProjectStatusDialog
-          mode="create"
-          workspaceId={workspaceId}
           type={type}
-          position={lastPosition + 1}
           trigger={
             <Button
               variant="ghost"
@@ -155,7 +149,7 @@ function StatusGroup({
       }
     >
       {ordered.length === 0 ? (
-        <p className="text-muted-foreground text-sm">No statuses of this type.</p>
+        <p className="text-muted-foreground text-sm">None yet. Projects skip this stage.</p>
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
           <SortableContext
@@ -178,8 +172,8 @@ function SortableStatusRow({
   status,
   allStatuses,
 }: {
-  status: TProjectStatus;
-  allStatuses: TProjectStatus[];
+  status: ProjectStatus;
+  allStatuses: ProjectStatus[];
 }) {
   const {
     attributes,
@@ -219,9 +213,13 @@ function SortableStatusRow({
           {status.description}
         </span>
       )}
+      {status.projectCount > 0 && (
+        <span className="text-muted-foreground shrink-0 text-xs tabular-nums">
+          {status.projectCount} project{status.projectCount === 1 ? "" : "s"}
+        </span>
+      )}
       <div className="ml-auto flex shrink-0 items-center gap-2">
         <ProjectStatusDialog
-          mode="edit"
           status={status}
           trigger={
             <Button variant="ghost" size="icon" aria-label={`Edit ${status.name}`}>

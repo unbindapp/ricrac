@@ -1,16 +1,17 @@
-import { useStore } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
-import { CircleUserIcon } from "lucide-react";
 import { type ReactElement, useState } from "react";
 
-import { userName } from "@/components/initiatives/initiative-pickers";
+import { InitiativeParentPicker } from "@/components/initiatives/initiative-parent-picker";
+import { InitiativeStatusPicker } from "@/components/initiatives/initiative-status";
 import {
-  INITIATIVE_STATUSES,
-  InitiativeStatusIcon,
-  initiativeStatusLabels,
-} from "@/components/initiatives/initiative-status";
-import { useWorkspaceUsers } from "@/components/issues/picker-sources";
-import { Avatar } from "@/components/shared/avatar";
+  PersonPicker,
+  toUserRef,
+  useMentionUsers,
+  useWorkspaceUserList,
+} from "@/components/projects/people";
+import { fromResolution, type TResolution } from "@/components/projects/project-dates";
+import { PlannedDatePicker } from "@/components/projects/project-pickers";
+import { MarkdownField } from "@/components/shared/markdown-editor";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,122 +23,106 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { submitHandler, type TSelectFieldItem, useAppForm } from "@/lib/hooks/use-app-form";
+import { entitySlug } from "@/lib/helpers/entity-slug";
+import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
 import {
   InitiativeFormSchema,
   type TInitiativeStatus,
-  useCreateInitiativeMutation,
+  useSaveInitiativeMutation,
 } from "@/lib/queries/initiatives";
-import { MarkdownField } from "@/components/shared/markdown-editor";
 
-const NO_OWNER = "__none__";
+type TProps = {
+  trigger: ReactElement;
+  /** Creates a sub-initiative of this one. */
+  parentId?: string;
+};
 
-const statusItems: TSelectFieldItem[] = INITIATIVE_STATUSES.map((status) => ({
-  value: status,
-  label: initiativeStatusLabels[status],
-  icon: <InitiativeStatusIcon status={status} />,
-}));
-
-export function NewInitiativeDialog({ trigger }: { trigger: ReactElement }) {
+export function NewInitiativeDialog({ trigger, parentId }: TProps) {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger render={trigger} />
-      <DialogContent className="w-lg max-w-full">
+      <DialogContent className="w-2xl max-w-full">
         <DialogHeader>
-          <DialogTitle>New initiative</DialogTitle>
+          <DialogTitle>{parentId ? "New sub-initiative" : "New initiative"}</DialogTitle>
         </DialogHeader>
-        {isOpen && <NewInitiativeForm onDone={() => setIsOpen(false)} />}
+        {isOpen && <NewInitiativeForm parentId={parentId} onDone={() => setIsOpen(false)} />}
       </DialogContent>
     </Dialog>
   );
 }
 
-function NewInitiativeForm({ onDone }: { onDone: () => void }) {
+function NewInitiativeForm({ parentId, onDone }: { parentId?: string; onDone: () => void }) {
   const { workspace } = useWorkspace();
   const navigate = useNavigate();
-  const { users } = useWorkspaceUsers();
-  const { mutateAsync: createInitiative } = useCreateInitiativeMutation();
-  const ownerItems: TSelectFieldItem[] = [
-    {
-      value: NO_OWNER,
-      label: "No owner",
-      icon: <CircleUserIcon className="text-muted-foreground size-4" />,
-    },
-    ...users.map((user) => ({
-      value: user.id,
-      label: userName(user),
-      icon: <Avatar id={user.id} name={userName(user)} src={user.avatar_url} size="xs" />,
-    })),
-  ];
+  const { users } = useWorkspaceUserList();
+  const mentionUsers = useMentionUsers();
+  const { mutateAsync: saveInitiative } = useSaveInitiativeMutation(workspace.id);
+  const [description, setDescription] = useState("");
+  const [status, setStatus] = useState<TInitiativeStatus>("planned");
+  const [ownerId, setOwnerId] = useState<string | null>(null);
+  const [parent, setParent] = useState<string | null>(parentId ?? null);
+  const [target, setTarget] = useState<{ date: string | null; resolution: TResolution }>({
+    date: null,
+    resolution: "day",
+  });
+  const owner = users.find((user) => user.id === ownerId);
 
   const form = useAppForm({
-    defaultValues: {
-      name: "",
-      description: "",
-      status: "planned" as TInitiativeStatus,
-      owner_id: NO_OWNER,
-      target_date: "",
-      icon: "",
-      color: "",
-    },
+    defaultValues: { name: "", summary: "" },
     validators: { onSubmit: InitiativeFormSchema },
     onSubmit: async ({ value }) => {
       const parsed = InitiativeFormSchema.parse(value);
-      const res = await createInitiative({
-        workspace_id: workspace.id,
+      const initiative = await saveInitiative({
         name: parsed.name,
-        description: parsed.description || undefined,
-        status: parsed.status,
-        owner_id: parsed.owner_id === NO_OWNER ? undefined : parsed.owner_id,
-        target_date: parsed.target_date || undefined,
-        icon: parsed.icon || undefined,
-        color: parsed.color || undefined,
+        summary: parsed.summary || undefined,
+        description: description.trim() || undefined,
+        status,
+        owner: ownerId ?? undefined,
+        parent: parent ?? undefined,
+        targetDate: target.date ?? undefined,
+        targetDateResolution: target.date ? fromResolution(target.resolution) : undefined,
       });
       onDone();
       await navigate({
         to: "/$workspace/initiative/$slug",
-        params: { workspace: workspace.slug, slug: res.data.slug },
+        params: { workspace: workspace.urlKey, slug: entitySlug(initiative) },
       });
     },
   });
-  const color = useStore(form.store, (state) => state.values.color);
 
   return (
     <form className="flex flex-col gap-4" onSubmit={submitHandler(form)} noValidate>
-      <div className="flex items-start gap-4">
-        <form.AppField
-          name="icon"
-          children={(field) => <field.IconField label="Icon" color={color || undefined} />}
-        />
-        <form.AppField name="color" children={(field) => <field.ColorField label="Color" />} />
-      </div>
       <form.AppField name="name" children={(field) => <field.TextField label="Name" autoFocus />} />
-      <form.Field
-        name="description"
-        children={(field) => (
-          <MarkdownField
-            label="Description"
-            value={field.state.value}
-            onChange={field.handleChange}
-            placeholder="Add a description…"
-          />
-        )}
-      />
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <form.AppField
-          name="status"
-          children={(field) => <field.SelectField label="Status" items={statusItems} />}
-        />
-        <form.AppField
-          name="owner_id"
-          children={(field) => <field.SelectField label="Owner" items={ownerItems} />}
-        />
-      </div>
       <form.AppField
-        name="target_date"
-        children={(field) => <field.TextField label="Target date" type="date" />}
+        name="summary"
+        children={(field) => <field.TextField label="Summary" placeholder="The goal in one line" />}
       />
+      <MarkdownField
+        label="Description"
+        value={description}
+        onChange={setDescription}
+        users={mentionUsers}
+        placeholder="Why it matters and how you'll know it's done…"
+      />
+      <div className="flex flex-wrap items-center gap-2">
+        <InitiativeStatusPicker appearance="compact" status={status} onChange={setStatus} />
+        <PersonPicker
+          role="Owner"
+          appearance="compact"
+          user={owner ? toUserRef(owner) : null}
+          onChange={setOwnerId}
+        />
+        <PlannedDatePicker
+          appearance="compact"
+          label="Target date"
+          edge="end"
+          date={target.date}
+          resolution={target.resolution}
+          onChange={setTarget}
+        />
+        <InitiativeParentPicker appearance="compact" parentId={parent} onChange={setParent} />
+      </div>
       <DialogFooter>
         <DialogClose
           render={

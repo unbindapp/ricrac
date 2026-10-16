@@ -1,40 +1,37 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
+import { z } from "zod";
 
-import { filtersFromSearch, filtersToSearch, issueSearchSchema } from "@/components/issues/filters";
-import { IssuesView } from "@/components/issues/issues-view";
+import { PageContainer } from "@/components/layout/page-container";
 import { ProjectHeaderBar } from "@/components/projects/project-header";
+import { ProjectIssues } from "@/components/projects/project-issues";
 import { ProjectLoader } from "@/components/projects/project-page";
-import { ProjectIcon } from "@/components/shared/project-icon";
-import type { TProject } from "@/lib/queries/projects";
+
+const searchSchema = z.object({ milestone: z.string().optional() });
 
 export const Route = createFileRoute("/$workspace/_workspace/project/$slug/issues")({
-  validateSearch: zodValidator(issueSearchSchema),
+  validateSearch: zodValidator(searchSchema),
   component: ProjectSlugIssuesPage,
 });
 
 function ProjectSlugIssuesPage() {
   const { slug } = Route.useParams();
-  return (
-    <ProjectLoader slug={slug}>{(project) => <ProjectIssues project={project} />}</ProjectLoader>
-  );
-}
-
-function ProjectIssues({ project }: { project: TProject }) {
-  const search = Route.useSearch();
+  const { milestone } = Route.useSearch();
   const navigate = Route.useNavigate();
   return (
-    <IssuesView
-      title={project.name}
-      icon={<ProjectIcon icon={project.icon} color={project.color} size="lg" />}
-      header={<ProjectHeaderBar project={project} tab="issues" />}
-      storageKey={`project:${project.id}`}
-      filters={filtersFromSearch(search)}
-      onFiltersChange={(filters) =>
-        void navigate({ search: (prev) => ({ ...prev, ...filtersToSearch(filters) }) })
-      }
-      fixedFilters={{ project_ids: [project.id] }}
-      hiddenFilterFields={["project"]}
-    />
+    <ProjectLoader slug={slug}>
+      {(project) => (
+        <PageContainer>
+          <div className="flex w-full flex-col gap-4">
+            <ProjectHeaderBar project={project} tab="issues" />
+            <ProjectIssues
+              project={project}
+              milestone={milestone}
+              onMilestoneChange={(next) => void navigate({ search: { milestone: next } })}
+            />
+          </div>
+        </PageContainer>
+      )}
+    </ProjectLoader>
   );
 }

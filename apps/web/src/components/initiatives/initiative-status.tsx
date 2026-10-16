@@ -1,8 +1,12 @@
+import { TargetIcon } from "lucide-react";
+
+import { PickerTrigger, type TPickerAppearance } from "@/components/issues/pickers";
+import { PropertyPicker, type TPickerOption } from "@/components/issues/property-picker";
+import { EntityIcon } from "@/components/shared/entity-icon";
 import { StateIcon, type TStateType } from "@/components/shared/state-icon";
-import { Badge } from "@/components/ui/badge";
 import type { TInitiativeStatus } from "@/lib/queries/initiatives";
 
-export const INITIATIVE_STATUSES: TInitiativeStatus[] = ["planned", "active", "completed"];
+export const INITIATIVE_STATUSES: TInitiativeStatus[] = ["active", "planned", "completed"];
 
 export const initiativeStatusLabels: Record<TInitiativeStatus, string> = {
   planned: "Planned",
@@ -21,16 +25,57 @@ export function InitiativeStatusIcon({ status }: { status: TInitiativeStatus }) 
     <StateIcon
       type={iconTypes[status]}
       name={initiativeStatusLabels[status]}
-      className={status === "planned" ? undefined : "text-primary"}
+      className={status === "planned" ? undefined : "text-foreground"}
     />
   );
 }
 
-export function InitiativeStatusBadge({ status }: { status: TInitiativeStatus }) {
+export function InitiativeIcon({
+  initiative,
+  size,
+}: {
+  initiative: { icon?: string | null; color?: string | null };
+  size?: "sm" | "md" | "lg";
+}) {
   return (
-    <Badge variant="outline">
-      <InitiativeStatusIcon status={status} />
-      {initiativeStatusLabels[status]}
-    </Badge>
+    <EntityIcon icon={initiative.icon} color={initiative.color} fallback={TargetIcon} size={size} />
+  );
+}
+
+export function InitiativeStatusPicker({
+  status,
+  onChange,
+  appearance = "row",
+  disabled,
+}: {
+  status: TInitiativeStatus;
+  onChange: (status: TInitiativeStatus) => void;
+  appearance?: TPickerAppearance;
+  disabled?: boolean;
+}) {
+  const options: TPickerOption[] = INITIATIVE_STATUSES.map((option) => ({
+    value: option,
+    label: initiativeStatusLabels[option],
+    icon: <InitiativeStatusIcon status={option} />,
+  }));
+  return (
+    <PropertyPicker
+      label="Change status"
+      options={options}
+      value={[status]}
+      disabled={disabled}
+      onChange={([next]) => {
+        const picked = INITIATIVE_STATUSES.find((option) => option === next);
+        if (picked && picked !== status) onChange(picked);
+      }}
+      trigger={
+        <PickerTrigger
+          appearance={appearance}
+          label={`Status: ${initiativeStatusLabels[status]}`}
+          icon={<InitiativeStatusIcon status={status} />}
+          text={initiativeStatusLabels[status]}
+        />
+      }
+    />
   );
 }

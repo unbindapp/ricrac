@@ -1,8 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { CalendarIcon, CircleUserIcon, UsersIcon, XIcon } from "lucide-react";
-import { useState } from "react";
+import {
+  CalendarIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CircleDashedIcon,
+  TagIcon,
+  TargetIcon,
+  UsersIcon,
+  XIcon,
+} from "lucide-react";
+import { type ReactElement, useState } from "react";
 
-import { useWorkspaceUsers } from "@/components/issues/picker-sources";
+import type { InitiativeRef, ProjectLabelRef, ProjectStatusRef, TeamRef } from "@/api/ops.gen";
+import { PickerTrigger, type TPickerAppearance } from "@/components/issues/pickers";
 import { PropertyPicker, type TPickerOption } from "@/components/issues/property-picker";
 import {
   formatProjectDate,
@@ -12,55 +22,25 @@ import {
   type TResolution,
 } from "@/components/projects/project-dates";
 import { ProjectStatusIcon } from "@/components/projects/project-status-icon";
-import { Avatar } from "@/components/shared/avatar";
+import { EntityIcon } from "@/components/shared/entity-icon";
+import { LabelChip } from "@/components/shared/label-chip";
+import { PRIORITIES, PriorityIcon, priorityLabel } from "@/components/shared/priority-icon";
+import { ProjectIcon } from "@/components/shared/project-icon";
 import { TeamIcon } from "@/components/shared/team-icon";
-import { type TUserSummary } from "@/components/shared/user-chip";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useTeams } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { type TProject, type TProjectStatus, projectStatusesQuery } from "@/lib/queries/projects";
-import { PickerTrigger } from "@/components/issues/pickers";
+import { initiativesQuery } from "@/lib/queries/initiatives";
+import { projectLabelsQuery, projectsQuery, projectStatusesQuery } from "@/lib/queries/projects";
 
-export type TProjectPickerAppearance = "row" | "compact";
-
-const NONE = "__none__";
-
-function UserIcon({ user }: { user: TUserSummary }) {
-  return (
-    <Avatar
-      id={user.id}
-      name={user.name || user.display_name || "?"}
-      src={user.avatar_url}
-      size="xs"
-    />
-  );
-}
-
-function userOption(user: TUserSummary): TPickerOption {
-  return {
-    value: user.id,
-    label: user.name || user.display_name || "?",
-    description: user.display_name ? `@${user.display_name}` : undefined,
-    keywords: user.display_name ? [user.display_name] : undefined,
-    icon: <UserIcon user={user} />,
-  };
-}
-
-type TControl = { appearance?: TProjectPickerAppearance; disabled?: boolean };
+type TControl = { appearance?: TPickerAppearance; disabled?: boolean };
 
 export function useProjectStatuses() {
   const { workspace } = useWorkspace();
   const { data, isPending } = useQuery(projectStatusesQuery(workspace.id));
-  return { statuses: data?.statuses ?? [], isPending };
+  return { statuses: data ?? [], isPending };
 }
 
 export function ProjectStatusPicker({
@@ -68,13 +48,15 @@ export function ProjectStatusPicker({
   onChange,
   appearance = "row",
   disabled,
-}: TControl & { status: TProjectStatus | undefined; onChange: (status: TProjectStatus) => void }) {
+}: TControl & { status: ProjectStatusRef | undefined; onChange: (statusId: string) => void }) {
   const { statuses, isPending } = useProjectStatuses();
-  const options: TPickerOption[] = statuses.map((option) => ({
-    value: option.id,
-    label: option.name,
-    icon: <ProjectStatusIcon type={option.type} color={option.color} />,
-  }));
+  const options: TPickerOption[] = statuses
+    .filter((option) => !option.archivedAt)
+    .map((option) => ({
+      value: option.id,
+      label: option.name,
+      icon: <ProjectStatusIcon type={option.type} color={option.color} />,
+    }));
   return (
     <PropertyPicker
       label="Change status"
@@ -83,8 +65,7 @@ export function ProjectStatusPicker({
       isPending={isPending}
       disabled={disabled}
       onChange={([id]) => {
-        const next = statuses.find((option) => option.id === id);
-        if (next && next.id !== status?.id) onChange(next);
+        if (id && id !== status?.id) onChange(id);
       }}
       trigger={
         <PickerTrigger
@@ -94,7 +75,7 @@ export function ProjectStatusPicker({
             status ? (
               <ProjectStatusIcon type={status.type} color={status.color} />
             ) : (
-              <CalendarIcon />
+              <CircleDashedIcon className="text-muted-foreground size-4" />
             )
           }
           text={status?.name ?? "Status"}
@@ -105,92 +86,38 @@ export function ProjectStatusPicker({
   );
 }
 
-export function LeadPicker({
-  lead,
+export function ProjectPriorityPicker({
+  priority,
   onChange,
   appearance = "row",
   disabled,
-}: TControl & {
-  lead: TUserSummary | null | undefined;
-  onChange: (user: TUserSummary | null) => void;
-}) {
-  const { users, isPending } = useWorkspaceUsers();
-  const options: TPickerOption[] = [
-    {
-      value: NONE,
-      label: "No lead",
-      icon: <CircleUserIcon className="text-muted-foreground size-4" />,
-    },
-    ...users.map(userOption),
-  ];
-  const name = lead ? lead.name || lead.display_name : null;
+}: TControl & { priority: number; onChange: (priority: number) => void }) {
+  const options: TPickerOption[] = [0, 1, 2, 3, 4].map((value) => ({
+    value: String(value),
+    label: priorityLabel(value),
+    icon: <PriorityIcon priority={value} />,
+    shortcut: String(value),
+  }));
+  const isSet = priority !== PRIORITIES[0];
   return (
     <PropertyPicker
-      label="Set lead"
+      label="Change priority"
       options={options}
-      value={[lead?.id ?? NONE]}
-      isPending={isPending}
+      value={[String(priority)]}
       disabled={disabled}
-      onChange={([id]) => {
-        if (id === (lead?.id ?? NONE)) return;
-        onChange(users.find((user) => user.id === id) ?? null);
+      onChange={([value]) => {
+        if (Number(value) !== priority) onChange(Number(value));
       }}
       trigger={
         <PickerTrigger
           appearance={appearance}
-          label={name ? `Lead: ${name}` : "Set lead"}
-          icon={lead ? <UserIcon user={lead} /> : <CircleUserIcon className="size-4" />}
-          text={name ?? "Lead"}
-          muted={!lead}
+          label={`Priority: ${priorityLabel(priority)}`}
+          icon={<PriorityIcon priority={priority} />}
+          text={isSet || appearance === "row" ? priorityLabel(priority) : "Priority"}
+          muted={!isSet}
         />
       }
     />
-  );
-}
-
-export function MembersPicker({
-  members,
-  onChange,
-  appearance = "row",
-  disabled,
-}: TControl & { members: TUserSummary[]; onChange: (ids: string[]) => void }) {
-  const { users, isPending } = useWorkspaceUsers();
-  return (
-    <PropertyPicker
-      label="Change members"
-      multiple
-      options={users.map(userOption)}
-      value={members.map((member) => member.id)}
-      isPending={isPending}
-      disabled={disabled}
-      onChange={onChange}
-      trigger={
-        <PickerTrigger
-          appearance={appearance}
-          label="Change members"
-          icon={
-            members.length > 0 ? <AvatarStack users={members} /> : <UsersIcon className="size-4" />
-          }
-          text={
-            members.length === 0
-              ? "Members"
-              : `${members.length} member${members.length === 1 ? "" : "s"}`
-          }
-          muted={members.length === 0}
-        />
-      }
-    />
-  );
-}
-
-export function AvatarStack({ users, max = 3 }: { users: TUserSummary[]; max?: number }) {
-  const shown = users.slice(0, max);
-  return (
-    <span className="flex shrink-0 items-center -space-x-1">
-      {shown.map((user) => (
-        <UserIcon key={user.id} user={user} />
-      ))}
-    </span>
   );
 }
 
@@ -199,7 +126,7 @@ export function TeamsPicker({
   onChange,
   appearance = "row",
   disabled,
-}: TControl & { teams: TProject["teams"]; onChange: (ids: string[]) => void }) {
+}: TControl & { teams: TeamRef[]; onChange: (keys: string[]) => void }) {
   const { teams: available, isPending } = useTeams();
   const options: TPickerOption[] = available.map((team) => ({
     value: team.id,
@@ -208,6 +135,7 @@ export function TeamsPicker({
     keywords: [team.key],
     icon: <TeamIcon teamKey={team.key} icon={team.icon} color={team.color} size="sm" />,
   }));
+  const first = available.find((team) => team.id === teams[0]?.id);
   return (
     <PropertyPicker
       label="Change teams"
@@ -217,8 +145,7 @@ export function TeamsPicker({
       isPending={isPending}
       disabled={disabled}
       onChange={(ids) => {
-        if (ids.length === 0) return;
-        onChange(ids);
+        if (ids.length > 0) onChange(ids);
       }}
       trigger={
         <PickerTrigger
@@ -226,14 +153,9 @@ export function TeamsPicker({
           label="Change teams"
           icon={
             teams[0] ? (
-              <TeamIcon
-                teamKey={teams[0].key}
-                icon={teams[0].icon}
-                color={teams[0].color}
-                size="sm"
-              />
+              <TeamIcon teamKey={teams[0].key} icon={first?.icon} color={first?.color} size="sm" />
             ) : (
-              <UsersIcon className="size-4" />
+              <UsersIcon className="text-muted-foreground size-4" />
             )
           }
           text={teams.length === 0 ? "Teams" : teams.map((team) => team.name).join(", ")}
@@ -244,10 +166,257 @@ export function TeamsPicker({
   );
 }
 
-const resolutionItems = RESOLUTIONS.map((value) => ({ value, label: resolutionLabels[value] }));
+export function ProjectLabelsPicker({
+  labels,
+  onChange,
+  appearance = "row",
+  disabled,
+}: TControl & { labels: ProjectLabelRef[]; onChange: (ids: string[]) => void }) {
+  const { workspace } = useWorkspace();
+  const { data, isPending } = useQuery(projectLabelsQuery(workspace.id));
+  const options: TPickerOption[] = (data ?? [])
+    .filter((label) => !label.isGroup && !label.retiredAt)
+    .map((label) => ({
+      value: label.id,
+      label: label.name,
+      group: label.parent?.name,
+      icon: (
+        <span
+          aria-hidden
+          className="size-2 shrink-0 rounded-full"
+          style={{ backgroundColor: label.color }}
+        />
+      ),
+    }));
+  const trigger =
+    appearance === "row" && labels.length > 0 ? (
+      <Button
+        variant="ghost"
+        size="sm"
+        forceMinSize={false}
+        aria-label="Change labels"
+        className="h-auto min-h-8 w-full flex-wrap justify-start gap-1 py-1"
+      >
+        {labels.map((label) => (
+          <LabelChip key={label.id} name={label.name} color={label.color} />
+        ))}
+      </Button>
+    ) : (
+      <PickerTrigger
+        appearance={appearance}
+        label="Change labels"
+        icon={<TagIcon className="text-muted-foreground size-4" />}
+        text={
+          labels.length === 0
+            ? appearance === "row"
+              ? "No labels"
+              : "Labels"
+            : `${labels.length} labels`
+        }
+        muted={labels.length === 0}
+      />
+    );
+  return (
+    <PropertyPicker
+      label="Change labels"
+      multiple
+      options={options}
+      value={labels.map((label) => label.id)}
+      isPending={isPending}
+      disabled={disabled}
+      emptyText="No project labels yet"
+      onChange={onChange}
+      trigger={trigger}
+    />
+  );
+}
 
-export function ProjectDatePicker({
+/** Picks projects of the workspace: dependencies, an initiative's projects. */
+export function ProjectsPicker({
   label,
+  value,
+  exclude = [],
+  onChange,
+  trigger,
+}: {
+  label: string;
+  value: string[];
+  exclude?: string[];
+  onChange: (ids: string[]) => void;
+  trigger: ReactElement;
+}) {
+  const { workspace } = useWorkspace();
+  const { data, isPending } = useQuery(projectsQuery(workspace.id));
+  const options: TPickerOption[] = (data ?? [])
+    .filter((project) => !exclude.includes(project.id))
+    .map((project) => ({
+      value: project.id,
+      label: project.name,
+      icon: <ProjectIcon icon={project.icon} color={project.color} />,
+      description: project.status.name,
+    }));
+  return (
+    <PropertyPicker
+      label={label}
+      multiple
+      align="end"
+      options={options}
+      value={value}
+      isPending={isPending}
+      emptyText="No projects"
+      onChange={onChange}
+      trigger={trigger}
+    />
+  );
+}
+
+export function InitiativesPicker({
+  initiatives,
+  onChange,
+  appearance = "row",
+  disabled,
+}: TControl & { initiatives: InitiativeRef[]; onChange: (ids: string[]) => void }) {
+  const { workspace } = useWorkspace();
+  const { data, isPending } = useQuery(initiativesQuery(workspace.id));
+  const options: TPickerOption[] = (data ?? []).map((initiative) => ({
+    value: initiative.id,
+    label: initiative.name,
+    icon: <EntityIcon icon={initiative.icon} color={initiative.color} fallback={TargetIcon} />,
+  }));
+  const count = initiatives.length;
+  return (
+    <PropertyPicker
+      label="Change initiatives"
+      multiple
+      options={options}
+      value={initiatives.map((initiative) => initiative.id)}
+      isPending={isPending}
+      disabled={disabled}
+      emptyText="No initiatives yet"
+      onChange={onChange}
+      trigger={
+        <PickerTrigger
+          appearance={appearance}
+          label="Change initiatives"
+          icon={<TargetIcon className="text-muted-foreground size-4" />}
+          text={
+            count === 0
+              ? appearance === "row"
+                ? "No initiatives"
+                : "Initiatives"
+              : initiatives.map((initiative) => initiative.name).join(", ")
+          }
+          muted={count === 0}
+        />
+      }
+    />
+  );
+}
+
+const MONTH_NAMES = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+/** The periods of a year to pick from (months, quarters, halves), or a run of years. */
+function periodsOf(resolution: Exclude<TResolution, "day">, year: number) {
+  const month = (index: number) => `${year}-${String(index + 1).padStart(2, "0")}-01`;
+  switch (resolution) {
+    case "month":
+      return MONTH_NAMES.map((name, index) => ({ label: name, date: month(index) }));
+    case "quarter":
+      return [1, 2, 3, 4].map((quarter) => ({
+        label: `Q${quarter}`,
+        date: month((quarter - 1) * 3),
+      }));
+    case "halfYear":
+      return [1, 2].map((half) => ({ label: `H${half}`, date: month((half - 1) * 6) }));
+    case "year":
+      return [0, 1, 2, 3, 4, 5].map((offset) => ({
+        label: String(year + offset),
+        date: `${year + offset}-01-01`,
+      }));
+  }
+}
+
+function PeriodGrid({
+  resolution,
+  date,
+  onPick,
+}: {
+  resolution: Exclude<TResolution, "day">;
+  date: string | null;
+  onPick: (date: string) => void;
+}) {
+  const thisYear = new Date().getFullYear();
+  const [year, setYear] = useState(() =>
+    date ? Number(date.slice(0, 4)) - (resolution === "year" ? 1 : 0) : thisYear,
+  );
+  const step = resolution === "year" ? 6 : 1;
+  const current = date ? formatProjectDate(date, resolution) : null;
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Earlier"
+          onClick={() => setYear((value) => value - step)}
+        >
+          <ChevronLeftIcon className="size-4" />
+        </Button>
+        <span className="flex-1 text-center text-sm font-medium tabular-nums">
+          {resolution === "year" ? `${year} – ${year + 5}` : year}
+        </span>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Later"
+          onClick={() => setYear((value) => value + step)}
+        >
+          <ChevronRightIcon className="size-4" />
+        </Button>
+      </div>
+      <div
+        data-columns={resolution === "halfYear" ? 2 : resolution === "quarter" ? 4 : 3}
+        className="grid grid-cols-3 gap-1 data-[columns=2]:grid-cols-2 data-[columns=4]:grid-cols-4"
+      >
+        {periodsOf(resolution, year).map((period) => {
+          const isCurrent = formatProjectDate(period.date, resolution) === current;
+          return (
+            <Button
+              key={period.date}
+              variant={isCurrent ? "secondary" : "ghost"}
+              size="sm"
+              forceMinSize={false}
+              aria-pressed={isCurrent}
+              onClick={() => onPick(period.date)}
+            >
+              {period.label}
+            </Button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+const resolutionOptions = RESOLUTIONS.map((value) => ({ value, label: resolutionLabels[value] }));
+
+/** A planned date at a precision: an exact day, or a month, quarter, half or year. */
+export function PlannedDatePicker({
+  label,
+  edge,
   date,
   resolution,
   onChange,
@@ -255,19 +424,27 @@ export function ProjectDatePicker({
   disabled,
 }: TControl & {
   label: string;
+  /** Start dates snap to the start of their period, target dates to its end. */
+  edge: "start" | "end";
   date: string | null;
   resolution: TResolution;
   onChange: (value: { date: string | null; resolution: TResolution }) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [draftResolution, setDraftResolution] = useState<TResolution>(resolution);
-  const text = date ? formatProjectDate(date, resolution) : label;
+  const [draft, setDraft] = useState<TResolution>(resolution);
+  const text = date
+    ? formatProjectDate(date, resolution)
+    : appearance === "row"
+      ? `No ${label.toLowerCase()}`
+      : label;
+  const pick = (value: string, nextResolution: TResolution) =>
+    onChange({ date: snapToResolution(value, nextResolution, edge), resolution: nextResolution });
   return (
     <Popover
       open={isOpen}
       onOpenChange={(open) => {
         setIsOpen(open);
-        if (open) setDraftResolution(resolution);
+        if (open) setDraft(resolution);
       }}
     >
       <PopoverTrigger
@@ -276,49 +453,58 @@ export function ProjectDatePicker({
           <PickerTrigger
             appearance={appearance}
             label={date ? `${label}: ${text}` : `Set ${label.toLowerCase()}`}
-            icon={<CalendarIcon className="size-4" />}
+            icon={<CalendarIcon className="text-muted-foreground size-4" />}
             text={text}
             muted={!date}
           />
         }
       />
-      <PopoverContent align="start" className="flex w-64 flex-col gap-2 p-3">
-        <Select
-          items={resolutionItems}
-          value={draftResolution}
-          onValueChange={(value) => {
-            if (!value) return;
-            const next = value as TResolution;
-            setDraftResolution(next);
-            if (date) onChange({ date: snapToResolution(date, next), resolution: next });
-          }}
-        >
-          <SelectTrigger size="sm" aria-label={`${label} precision`}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {resolutionItems.map((item) => (
-              <SelectItem key={item.value} value={item.value}>
-                {item.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Input
-          type="date"
-          aria-label={label}
-          defaultValue={date ?? ""}
-          onChange={(event) => {
-            if (!event.target.value) return;
-            onChange({
-              date: snapToResolution(event.target.value, draftResolution),
-              resolution: draftResolution,
-            });
-          }}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") setIsOpen(false);
-          }}
-        />
+      <PopoverContent align="start" className="flex w-80 flex-col gap-3 p-3">
+        <div role="radiogroup" aria-label={`${label} precision`} className="flex flex-wrap gap-1">
+          {resolutionOptions.map((option) => (
+            <Button
+              key={option.value}
+              role="radio"
+              aria-checked={draft === option.value}
+              variant={draft === option.value ? "secondary" : "ghost"}
+              size="sm"
+              forceMinSize={false}
+              onClick={() => {
+                setDraft(option.value);
+                if (date) pick(date, option.value);
+              }}
+            >
+              {option.label}
+            </Button>
+          ))}
+        </div>
+        {draft === "day" ? (
+          <Input
+            type="date"
+            aria-label={label}
+            defaultValue={date ?? ""}
+            onChange={(event) => {
+              if (event.target.value) pick(event.target.value, "day");
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") setIsOpen(false);
+            }}
+          />
+        ) : (
+          <PeriodGrid
+            resolution={draft}
+            date={date}
+            onPick={(value) => {
+              pick(value, draft);
+              setIsOpen(false);
+            }}
+          />
+        )}
+        {date && resolution !== "day" && (
+          <p className="text-muted-foreground text-xs">
+            {edge === "end" ? "By" : "From"} {formatProjectDate(date)}
+          </p>
+        )}
         {date && (
           <Button
             variant="ghost"

@@ -7,6 +7,7 @@ import {
   LockIcon,
   SettingsIcon,
   TagIcon,
+  TagsIcon,
   TriangleAlertIcon,
   UsersIcon,
   UsersRoundIcon,
@@ -50,6 +51,11 @@ function WorkspaceSettingsLayout() {
       label: "Project statuses",
       icon: BoxesIcon,
       link: { to: "/$workspace/settings/project-statuses", params },
+    },
+    {
+      label: "Project labels",
+      icon: TagsIcon,
+      link: { to: "/$workspace/settings/project-labels", params },
     },
     {
       label: "Templates",

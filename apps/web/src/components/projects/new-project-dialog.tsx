@@ -1,24 +1,29 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
-import { useWorkspaceUsers } from "@/components/issues/picker-sources";
-import { PriorityPicker } from "@/components/issues/pickers";
+import type { TeamRef } from "@/api/ops.gen";
 import {
   type TNewProjectDefaults,
   useNewProjectStore,
 } from "@/components/projects/new-project-store";
-import { type TResolution } from "@/components/projects/project-dates";
 import {
-  LeadPicker,
-  MembersPicker,
-  ProjectDatePicker,
+  PeoplePicker,
+  PersonPicker,
+  toUserRef,
+  useMentionUsers,
+  useWorkspaceUserList,
+} from "@/components/projects/people";
+import { fromResolution, type TResolution } from "@/components/projects/project-dates";
+import {
+  PlannedDatePicker,
+  ProjectLabelsPicker,
+  ProjectPriorityPicker,
   ProjectStatusPicker,
   TeamsPicker,
   useProjectStatuses,
 } from "@/components/projects/project-pickers";
 import { MarkdownField } from "@/components/shared/markdown-editor";
 import { NoTeamsNotice } from "@/components/shared/no-teams-notice";
-import { type TUserSummary } from "@/components/shared/user-chip";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -31,12 +36,10 @@ import {
 import { useTeams } from "@/components/workspace/teams-provider";
 import { useTeamFromRoute } from "@/components/workspace/use-team-from-route";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { entitySlug } from "@/lib/helpers/entity-slug";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
-import {
-  ProjectFormSchema,
-  type TProjectStatus,
-  useCreateProjectMutation,
-} from "@/lib/queries/projects";
+import { useProjectLabelsById } from "@/components/projects/project-labels";
+import { ProjectFormSchema, useSaveProjectMutation } from "@/lib/queries/projects";
 
 export function NewProjectDialog() {
   const isOpen = useNewProjectStore((state) => state.isOpen);
@@ -54,17 +57,17 @@ export function NewProjectDialog() {
   );
 }
 
-type TTeamRef = { id: string; key: string; name: string; icon: string; color: string };
-
-function useInitialTeams(defaults: TNewProjectDefaults): TTeamRef[] {
+function useInitialTeams(defaults: TNewProjectDefaults): TeamRef[] {
   const { teams, myTeams } = useTeams();
   const routeTeam = useTeamFromRoute();
   const id = [defaults.teamId, routeTeam?.id, myTeams[0]?.id, teams[0]?.id].find(Boolean);
   const team = teams.find((candidate) => candidate.id === id);
-  return team
-    ? [{ id: team.id, key: team.key, name: team.name, icon: team.icon, color: team.color }]
-    : [];
+  return team ? [{ id: team.id, key: team.key, name: team.name }] : [];
 }
+
+type TPlannedDate = { date: string | null; resolution: TResolution };
+
+const noDate: TPlannedDate = { date: null, resolution: "day" };
 
 function NewProjectForm({
   defaults,
@@ -77,49 +80,57 @@ function NewProjectForm({
   const navigate = useNavigate();
   const { teams: allTeams, isPending: isTeamsPending } = useTeams();
   const { statuses } = useProjectStatuses();
+  const { users } = useWorkspaceUserList();
+  const mentionUsers = useMentionUsers();
+  const labelsById = useProjectLabelsById();
   const initialTeams = useInitialTeams(defaults);
-  const [pickedTeams, setTeams] = useState<TTeamRef[] | null>(null);
-  const teams = pickedTeams ?? initialTeams;
+  const [pickedTeamIds, setTeamIds] = useState<string[] | null>(null);
+  const teams = pickedTeamIds
+    ? allTeams
+        .filter((team) => pickedTeamIds.includes(team.id))
+        .map((team) => ({ id: team.id, key: team.key, name: team.name }))
+    : initialTeams;
   const hasNoTeams = !isTeamsPending && allTeams.length === 0;
   const [statusId, setStatusId] = useState<string | undefined>(defaults.statusId);
-  const [lead, setLead] = useState<TUserSummary | null>(null);
+  const [leadId, setLeadId] = useState<string | null>(null);
   const [memberIds, setMemberIds] = useState<string[]>([]);
-  const { users } = useWorkspaceUsers();
-  const members = users.filter((user) => memberIds.includes(user.id));
+  const [labelIds, setLabelIds] = useState<string[]>([]);
   const [priority, setPriority] = useState(0);
-  const [target, setTarget] = useState<{ date: string | null; resolution: TResolution }>({
-    date: null,
-    resolution: "day",
-  });
+  const [start, setStart] = useState<TPlannedDate>(noDate);
+  const [target, setTarget] = useState<TPlannedDate>(noDate);
   const [description, setDescription] = useState("");
-  const { mutateAsync: createProject } = useCreateProjectMutation();
-  const status: TProjectStatus | undefined =
+  const { mutateAsync: saveProject } = useSaveProjectMutation(workspace.id);
+  const status =
     statuses.find((candidate) => candidate.id === statusId) ??
-    statuses.find((candidate) => candidate.type === "backlog");
+    statuses.find((candidate) => candidate.type === "backlog" && !candidate.archivedAt);
+  const lead = users.find((user) => user.id === leadId);
+  const members = users.filter((user) => memberIds.includes(user.id)).map(toUserRef);
 
   const form = useAppForm({
     defaultValues: { name: "", summary: "" },
     validators: { onSubmit: ProjectFormSchema },
     onSubmit: async ({ value }) => {
       const parsed = ProjectFormSchema.parse(value);
-      const res = await createProject({
-        workspace_id: workspace.id,
+      const project = await saveProject({
         name: parsed.name,
         summary: parsed.summary || undefined,
-        description: description || undefined,
-        team_ids: teams.map((team) => team.id),
-        status_id: status?.id,
-        lead_id: lead?.id,
-        member_ids: memberIds.length > 0 ? memberIds : undefined,
+        description: description.trim() || undefined,
+        setTeams: teams.map((team) => team.id),
+        state: status?.id,
+        lead: leadId ?? undefined,
+        addMembers: memberIds.length > 0 ? memberIds : undefined,
+        labels: labelIds.length > 0 ? labelIds : undefined,
         priority,
-        target_date: target.date ?? undefined,
-        target_date_resolution: target.date ? target.resolution : undefined,
-        initiative_ids: defaults.initiativeId ? [defaults.initiativeId] : undefined,
+        startDate: start.date ?? undefined,
+        startDateResolution: start.date ? fromResolution(start.resolution) : undefined,
+        targetDate: target.date ?? undefined,
+        targetDateResolution: target.date ? fromResolution(target.resolution) : undefined,
+        addInitiatives: defaults.initiativeId ? [defaults.initiativeId] : undefined,
       });
       onClose();
       await navigate({
         to: "/$workspace/project/$slug",
-        params: { workspace: workspace.slug, slug: res.data.slug },
+        params: { workspace: workspace.urlKey, slug: entitySlug(project) },
       });
     },
   });
@@ -137,41 +148,41 @@ function NewProjectForm({
       <MarkdownField
         value={description}
         onChange={setDescription}
-        placeholder="Add a description…"
+        users={mentionUsers}
+        placeholder="What is this project about? Write a plan, goals, links…"
         label="Description"
       />
       <div className="flex flex-wrap items-center gap-2">
-        <ProjectStatusPicker
+        <ProjectStatusPicker appearance="compact" status={status} onChange={setStatusId} />
+        <TeamsPicker appearance="compact" teams={teams} onChange={setTeamIds} />
+        <PersonPicker
+          role="Lead"
           appearance="compact"
-          status={status}
-          onChange={(next) => setStatusId(next.id)}
+          user={lead ? toUserRef(lead) : null}
+          onChange={setLeadId}
         />
-        <TeamsPicker
+        <PeoplePicker appearance="compact" people={members} onChange={setMemberIds} />
+        <ProjectPriorityPicker appearance="compact" priority={priority} onChange={setPriority} />
+        <PlannedDatePicker
           appearance="compact"
-          teams={teams}
-          onChange={(ids) =>
-            setTeams(
-              allTeams
-                .filter((team) => ids.includes(team.id))
-                .map((team) => ({
-                  id: team.id,
-                  key: team.key,
-                  name: team.name,
-                  icon: team.icon,
-                  color: team.color,
-                })),
-            )
-          }
+          label="Start date"
+          edge="start"
+          date={start.date}
+          resolution={start.resolution}
+          onChange={setStart}
         />
-        <LeadPicker appearance="compact" lead={lead} onChange={setLead} />
-        <MembersPicker appearance="compact" members={members} onChange={setMemberIds} />
-        <PriorityPicker appearance="compact" priority={priority} onChange={setPriority} />
-        <ProjectDatePicker
+        <PlannedDatePicker
           appearance="compact"
           label="Target date"
+          edge="end"
           date={target.date}
           resolution={target.resolution}
           onChange={setTarget}
+        />
+        <ProjectLabelsPicker
+          appearance="compact"
+          labels={labelIds.flatMap((id) => labelsById.get(id) ?? [])}
+          onChange={setLabelIds}
         />
       </div>
       <DialogFooter className="items-center">
