@@ -9,13 +9,21 @@ use uuid::Uuid;
 use super::events;
 use super::resolve::{self, as_uuid};
 use super::util::{Page, non_empty, nullable};
-use super::{IdArgs, NoArgs, Op, op};
+use super::{IdArgs, NoArgs, Op, account_op, op};
 use crate::account::check_url_key;
-use crate::ctx::{Access, Ctx, Role};
+use crate::ctx::{Access, Caller, Ctx, Role};
 use crate::error::{ApiError, ApiResult};
 
 pub fn ops() -> Vec<Op> {
     vec![
+        account_op(
+            "list_workspaces",
+            Access::Read,
+            &[("GET", "/workspaces")],
+            "List the workspaces this token reaches: name, URL key, link and your role. When there are several, pass \
+             the URL key as `workspace` to the other operations.",
+            list_workspaces,
+        ),
         op(
             "get_workspace",
             Access::Read,
@@ -102,6 +110,19 @@ pub fn ops() -> Vec<Op> {
 /* ------------------------------------------------------------------ */
 /*                              Workspace                             */
 /* ------------------------------------------------------------------ */
+
+async fn list_workspaces(caller: Caller, _: NoArgs) -> ApiResult<Value> {
+    let base = &caller.state.config.public_url;
+    let nodes: Vec<Value> = caller
+        .reachable()
+        .await?
+        .into_iter()
+        .map(|w| {
+            json!({ "id": w.id, "name": w.name, "urlKey": w.url_key, "url": format!("{base}/{}", w.url_key), "role": w.role })
+        })
+        .collect();
+    Ok(json!({ "nodes": nodes }))
+}
 
 async fn workspace_value(ctx: &Ctx, db: &mut PgConnection) -> ApiResult<Value> {
     let teams = ctx.team_ids().await?.to_vec();

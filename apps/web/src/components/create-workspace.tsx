@@ -14,7 +14,13 @@ import { teamKeyFrom, urlKeyFrom } from "@/lib/slug"
 import { selectWorkspace } from "@/lib/workspace"
 
 /** Name, URL key and first team. Keys follow the names until they're edited. */
-export function CreateWorkspaceForm({ onCreated, onCancel }: { onCreated?: () => void; onCancel?: () => void }) {
+export function CreateWorkspaceForm({
+  onCreated,
+  onCancel,
+}: {
+  onCreated?: (workspace: WorkspaceSummary) => void
+  onCancel?: () => void
+}) {
   const queryClient = useQueryClient()
   const [name, setName] = useState("")
   const [urlKey, setUrlKey] = useState<string | null>(null)
@@ -29,7 +35,7 @@ export function CreateWorkspaceForm({ onCreated, onCancel }: { onCreated?: () =>
       selectWorkspace(workspace.id)
       await queryClient.invalidateQueries({ queryKey: meQuery.queryKey })
       toast.success(`Created ${workspace.name}`)
-      onCreated?.()
+      onCreated?.(workspace)
     },
     onError: (error) => toast.error(error.message),
   })

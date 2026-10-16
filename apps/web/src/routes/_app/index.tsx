@@ -23,7 +23,7 @@ function ConnectPage() {
         <Steps>
           <li>In claude.ai or Claude Desktop, open Settings → Connectors.</li>
           <li>Choose “Add custom connector”, name it Ricrac and paste the MCP URL.</li>
-          <li>Connect, sign in with Google and pick the workspace.</li>
+          <li>Connect, sign in with Google and allow it (all your workspaces, or the ones you pick).</li>
         </Steps>
       ),
     },
@@ -44,7 +44,7 @@ function ConnectPage() {
         <Steps>
           <li>Open Settings → Apps & Connectors → Advanced and turn on Developer mode.</li>
           <li>Create a connector with the MCP URL and OAuth authentication.</li>
-          <li>Sign in with Google when asked and pick the workspace.</li>
+          <li>Sign in with Google when asked and allow it.</li>
         </Steps>
       ),
     },
@@ -78,8 +78,8 @@ function ConnectPage() {
           <CardHeader>
             <CardTitle>MCP server</CardTitle>
             <CardDescription>
-              Add this URL to your agent. It signs in with OAuth and asks which workspace to use, so each connection
-              works in one workspace. Everyday operations are listed as tools and the rest are reached through
+              Add this URL to your agent. It signs in with OAuth and asks which workspaces it may use: all of them,
+              including ones you join later, or only the ones you pick. Everyday operations are listed as tools and the rest are reached through
               find_operations; add <code className="font-mono">?tools=all</code> to the URL to list every operation.
             </CardDescription>
           </CardHeader>

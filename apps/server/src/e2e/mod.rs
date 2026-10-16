@@ -90,6 +90,27 @@ impl World {
             .unwrap();
         ctx(&self.state, user, self.workspace).await
     }
+
+    /// Another workspace owned by Ann, with one team.
+    pub async fn second_workspace(&self, name: &str, url_key: &str, team_key: &str) -> Uuid {
+        let mut tx = self.state.db.begin().await.unwrap();
+        let workspace: Uuid = sqlx::query_scalar("INSERT INTO workspaces (name, url_key) VALUES ($1, $2) RETURNING id")
+            .bind(name)
+            .bind(url_key)
+            .fetch_one(&mut *tx)
+            .await
+            .unwrap();
+        sqlx::query("INSERT INTO workspace_members (workspace_id, user_id, role) VALUES ($1, $2, 'owner')")
+            .bind(workspace)
+            .bind(self.ann.user)
+            .execute(&mut *tx)
+            .await
+            .unwrap();
+        seed::workspace_defaults(&mut tx, workspace).await.unwrap();
+        seed::create_team(&mut tx, workspace, self.ann.user, name, team_key).await.unwrap();
+        tx.commit().await.unwrap();
+        workspace
+    }
 }
 
 /// Calls an operation and returns its result, failing the test on an error.

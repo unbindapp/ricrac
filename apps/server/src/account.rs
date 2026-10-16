@@ -12,6 +12,7 @@ use axum::{Json, Router};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
+use sqlx::PgConnection;
 use ts_rs::TS;
 use uuid::Uuid;
 
@@ -19,7 +20,6 @@ use crate::ctx::{ALL_SCOPES, Ctx, Role};
 use crate::error::{ApiError, ApiResult};
 use crate::keys::{random_secret, secret_hash};
 use crate::oauth::{self, API_KEY_PREFIX, OAuthClientInfo, OAuthRequest};
-use crate::rest::session_workspace;
 use crate::state::AppState;
 use crate::{google, seed};
 
@@ -55,6 +55,25 @@ impl FromRequestParts<AppState> for Member {
         let ctx =
             Ctx::load(state, user, workspace, scopes).await?.ok_or_else(|| ApiError::forbidden("Not a member"))?;
         Ok(Self(ctx))
+    }
+}
+
+/// The workspace named in `x-ricrac-workspace` (id or URL key), or the user's only one.
+async fn session_workspace(state: &AppState, user: Uuid, headers: &HeaderMap) -> ApiResult<Uuid> {
+    let named =
+        headers.get("x-ricrac-workspace").and_then(|v| v.to_str().ok()).map(str::trim).filter(|v| !v.is_empty());
+    let ids: Vec<Uuid> = sqlx::query_scalar(
+        "SELECT w.id FROM workspaces w JOIN workspace_members m ON m.workspace_id = w.id
+         WHERE m.user_id = $1 AND m.active AND ($2::text IS NULL OR w.id::text = $2 OR w.url_key = lower($2))",
+    )
+    .bind(user)
+    .bind(named)
+    .fetch_all(&state.db)
+    .await?;
+    match ids.as_slice() {
+        [one] => Ok(*one),
+        [] => Err(ApiError::forbidden("No such workspace")),
+        _ => Err(ApiError::bad_request("Name the workspace in the x-ricrac-workspace header")),
     }
 }
 
@@ -292,12 +311,15 @@ async fn delete_workspace(
     if ctx.role != Role::Owner {
         return Err(ApiError::forbidden("Only owners can delete a workspace"));
     }
+    let mut tx = state.db.begin().await?;
     let deleted = sqlx::query("DELETE FROM workspaces WHERE id = $1 AND url_key = $2")
         .bind(id)
         .bind(body.confirm_url_key.trim().to_lowercase())
-        .execute(&state.db)
+        .execute(&mut *tx)
         .await?;
     crate::ensure!(deleted.rows_affected() == 1, "Type the workspace's URL key to confirm");
+    drop_workspace_access(&mut tx, id, None).await?;
+    tx.commit().await?;
     Ok(Json(json!({ "ok": true })))
 }
 
@@ -337,18 +359,40 @@ async fn leave_workspace(
     .bind(user)
     .execute(&mut *tx)
     .await?;
-    sqlx::query("DELETE FROM api_keys WHERE workspace_id = $1 AND user_id = $2")
-        .bind(id)
-        .bind(user)
-        .execute(&mut *tx)
-        .await?;
-    sqlx::query("DELETE FROM oauth_grants WHERE workspace_id = $1 AND user_id = $2")
-        .bind(id)
-        .bind(user)
-        .execute(&mut *tx)
-        .await?;
+    drop_workspace_access(&mut tx, id, Some(user)).await?;
     tx.commit().await?;
     Ok(Json(json!({ "ok": true })))
+}
+
+/// Takes the workspace out of the keys and OAuth grants that list it (of one user, or everyone's),
+/// deleting those left without a workspace. Those for all workspaces stop reaching it on their own.
+async fn drop_workspace_access(tx: &mut PgConnection, workspace: Uuid, user: Option<Uuid>) -> ApiResult<()> {
+    for table in ["api_keys", "oauth_grants", "oauth_codes"] {
+        sqlx::query(&format!(
+            "DELETE FROM {table} WHERE workspace_ids = ARRAY[$1]::uuid[] AND ($2::uuid IS NULL OR user_id = $2)"
+        ))
+        .bind(workspace)
+        .bind(user)
+        .execute(&mut *tx)
+        .await?;
+        sqlx::query(&format!(
+            "UPDATE {table} SET workspace_ids = array_remove(workspace_ids, $1)
+             WHERE $1 = ANY(workspace_ids) AND ($2::uuid IS NULL OR user_id = $2)"
+        ))
+        .bind(workspace)
+        .bind(user)
+        .execute(&mut *tx)
+        .await?;
+    }
+    Ok(())
+}
+
+/// The columns saying which workspaces the rows of `alias` (keys or grants) reach.
+fn access_columns(alias: &str) -> String {
+    format!(
+        "{alias}.workspace_ids IS NULL AS all_workspaces,
+         ARRAY(SELECT w.name FROM workspaces w WHERE w.id = ANY({alias}.workspace_ids) ORDER BY lower(w.name)) AS workspaces"
+    )
 }
 
 async fn accept_invitation(
@@ -419,17 +463,24 @@ pub struct ApiKey {
     pub label: String,
     pub key_hint: String,
     pub scopes: Vec<String>,
+    /// Every workspace of its owner, including ones they join later.
+    pub all_workspaces: bool,
+    /// The names of the workspaces it reaches, when not all.
+    pub workspaces: Vec<String>,
     pub created_at: DateTime<Utc>,
     pub last_used_at: Option<DateTime<Utc>>,
 }
 
-async fn list_api_keys(State(state): State<AppState>, Member(ctx): Member) -> ApiResult<Json<Vec<ApiKey>>> {
-    let keys = sqlx::query_as(
-        "SELECT id, label, key_hint, scopes, created_at, last_used_at FROM api_keys
-         WHERE user_id = $1 AND workspace_id = $2 ORDER BY created_at DESC",
-    )
-    .bind(ctx.user)
-    .bind(ctx.workspace)
+fn key_columns() -> String {
+    format!("k.id, k.label, k.key_hint, k.scopes, {}, k.created_at, k.last_used_at", access_columns("k"))
+}
+
+async fn list_api_keys(State(state): State<AppState>, SignedIn(user): SignedIn) -> ApiResult<Json<Vec<ApiKey>>> {
+    let keys = sqlx::query_as(&format!(
+        "SELECT {} FROM api_keys k WHERE k.user_id = $1 ORDER BY k.created_at DESC",
+        key_columns()
+    ))
+    .bind(user)
     .fetch_all(&state.db)
     .await?;
     Ok(Json(keys))
@@ -437,11 +488,16 @@ async fn list_api_keys(State(state): State<AppState>, Member(ctx): Member) -> Ap
 
 #[derive(Deserialize, TS)]
 #[ts(export)]
+#[serde(rename_all = "camelCase")]
 pub struct CreateApiKey {
     pub label: String,
     /// read, write and/or admin; all of them when left out.
     #[ts(optional)]
     pub scopes: Option<Vec<String>>,
+    /// The workspaces it reaches; every workspace of yours, including ones you join later, when
+    /// left out.
+    #[ts(optional)]
+    pub workspace_ids: Option<Vec<Uuid>>,
 }
 
 #[derive(Serialize, TS)]
@@ -468,23 +524,33 @@ fn check_scopes(scopes: Option<Vec<String>>) -> ApiResult<Vec<String>> {
 
 async fn create_api_key(
     State(state): State<AppState>,
-    Member(ctx): Member,
+    SignedIn(user): SignedIn,
     Json(body): Json<CreateApiKey>,
 ) -> ApiResult<Json<CreatedApiKey>> {
     let label = body.label.trim().to_string();
     crate::ensure!(!label.is_empty() && label.len() <= 80, "The label is 1 to 80 characters");
     let scopes = check_scopes(body.scopes)?;
+    oauth::check_workspaces(&state, user, body.workspace_ids.as_deref()).await?;
     if scopes.iter().any(|s| s == "admin") {
-        crate::ensure!(ctx.role >= Role::Admin, "Only workspace admins can make keys with the admin scope");
+        let admin: bool = sqlx::query_scalar(
+            "SELECT EXISTS (SELECT 1 FROM workspace_members WHERE user_id = $1 AND active AND role IN ('owner', 'admin')
+             AND ($2::uuid[] IS NULL OR workspace_id = ANY($2)))",
+        )
+        .bind(user)
+        .bind(&body.workspace_ids)
+        .fetch_one(&state.db)
+        .await?;
+        crate::ensure!(admin, "Only workspace admins can make keys with the admin scope");
     }
     let secret = random_secret(API_KEY_PREFIX);
     let hint = format!("{}…{}", &secret[..API_KEY_PREFIX.len() + 4], &secret[secret.len() - 4..]);
-    let key = sqlx::query_as(
-        "INSERT INTO api_keys (workspace_id, user_id, label, key_hash, key_hint, scopes) VALUES ($1, $2, $3, $4, $5, $6)
-         RETURNING id, label, key_hint, scopes, created_at, last_used_at",
-    )
-    .bind(ctx.workspace)
-    .bind(ctx.user)
+    let key = sqlx::query_as(&format!(
+        "WITH k AS (INSERT INTO api_keys (workspace_ids, user_id, label, key_hash, key_hint, scopes)
+         VALUES ($1, $2, $3, $4, $5, $6) RETURNING *) SELECT {} FROM k",
+        key_columns()
+    ))
+    .bind(&body.workspace_ids)
+    .bind(user)
     .bind(&label)
     .bind(secret_hash(&secret))
     .bind(&hint)
@@ -680,19 +746,23 @@ async fn delete_oauth_app(
 pub struct ConnectedApp {
     pub id: Uuid,
     pub name: String,
-    pub workspace_name: String,
     pub scopes: Vec<String>,
+    /// Every workspace of yours, including ones you join later.
+    pub all_workspaces: bool,
+    /// The names of the workspaces it reaches, when not all.
+    pub workspaces: Vec<String>,
     pub created_at: DateTime<Utc>,
     pub last_used_at: DateTime<Utc>,
 }
 
 async fn connected_apps(State(state): State<AppState>, SignedIn(user): SignedIn) -> ApiResult<Json<Vec<ConnectedApp>>> {
-    let apps = sqlx::query_as(
-        "SELECT g.id, c.name, w.name AS workspace_name, g.scopes, g.created_at, g.last_used_at FROM oauth_grants g
-         JOIN oauth_clients c ON c.id = g.client_id JOIN workspaces w ON w.id = g.workspace_id
+    let apps = sqlx::query_as(&format!(
+        "SELECT g.id, c.name, g.scopes, {}, g.created_at, g.last_used_at FROM oauth_grants g
+         JOIN oauth_clients c ON c.id = g.client_id
          WHERE g.user_id = $1 AND EXISTS (SELECT 1 FROM oauth_tokens t WHERE t.grant_id = g.id AND t.expires_at > now())
          ORDER BY g.last_used_at DESC",
-    )
+        access_columns("g")
+    ))
     .bind(user)
     .fetch_all(&state.db)
     .await?;
@@ -728,8 +798,9 @@ async fn oauth_client(
 #[serde(rename_all = "camelCase")]
 pub struct OAuthDecision {
     pub request: OAuthRequest,
+    /// The workspaces to grant; all of the user's, including ones they join later, when left out.
     #[ts(optional)]
-    pub workspace_id: Option<Uuid>,
+    pub workspace_ids: Option<Vec<Uuid>>,
     pub allow: bool,
 }
 
@@ -744,7 +815,7 @@ async fn oauth_decide(
     SignedIn(user): SignedIn,
     Json(body): Json<OAuthDecision>,
 ) -> ApiResult<Json<OAuthRedirect>> {
-    let redirect = oauth::decide(&state, user, body.workspace_id, &body.request, body.allow)
+    let redirect = oauth::decide(&state, user, body.workspace_ids, &body.request, body.allow)
         .await
         .map_err(ApiError::bad_request)?;
     Ok(Json(OAuthRedirect { redirect }))

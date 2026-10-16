@@ -40,9 +40,11 @@ links agents share.
 
 - **MCP** (streamable HTTP): `https://<host>/mcp`. Clients sign in with OAuth 2.1, using dynamic
   client registration or client ID metadata documents (Claude, ChatGPT, Claude Code, Codex,
-  Cursor), and pick the workspace to use on the consent screen. The everyday operations are listed
-  as tools; the rest are found with `find_operations` and run with `call_operation`
-  (`/mcp?tools=all` lists every operation as a tool instead).
+  Cursor). The consent screen grants all your workspaces (including ones you join later) or the
+  ones you pick; when a connection reaches several, every tool takes a `workspace` argument and
+  `list_workspaces` lists them. The everyday operations are listed as tools; the rest are found
+  with `find_operations` and run with `call_operation` (`/mcp?tools=all` lists every operation as
+  a tool instead).
 - **REST**: `https://<host>/v1`, with `Authorization: Bearer <token>`. The token is an OAuth
   access token or an API key (`rr_key_...`) made in the dashboard. The OpenAPI document is at
   `/v1/openapi.json` and an overview for agents at `/llms.txt`. Every operation is also

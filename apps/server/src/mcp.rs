@@ -1,5 +1,5 @@
-//! The MCP server at `/mcp`: one tool per operation, acting as the user and workspace of the
-//! request's token.
+//! The MCP server at `/mcp`: one tool per operation, acting as the user of the request's token
+//! in one of the workspaces it reaches.
 
 use std::sync::Arc;
 
@@ -11,7 +11,7 @@ use rmcp::service::RequestContext;
 use rmcp::{ErrorData as McpError, RoleServer, ServerHandler};
 use serde_json::Value;
 
-use crate::ctx::{Access, Ctx, Role};
+use crate::ctx::{Access, Caller, Role};
 use crate::error::{ApiError, ApiResult};
 use crate::ops;
 
@@ -19,6 +19,7 @@ use crate::ops;
 /// call_operation, so a session doesn't start with ~140 tool definitions; `/mcp?tools=all` lists
 /// them all instead.
 const CORE: &[&str] = &[
+    "list_workspaces",
     "get_workspace",
     "list_users",
     "get_user",
@@ -106,6 +107,10 @@ Writing: descriptions, comments, documents and updates are Markdown; write liter
 Mention people with @displayName or @email: they are notified and subscribed. To change part of a long description or \
 document, pass `patch` edits instead of resending it all.
 
+Workspaces: a connection may reach several workspaces; list_workspaces lists them. When it reaches more than one, \
+every tool takes a `workspace` argument (the URL key, like \"acme\") naming the one to act in. Identifiers like ENG-123 \
+and names are only unique within a workspace; Ricrac links already name theirs.
+
 Saving: save_* tools create when you omit `id` and update when you pass it; omitted fields stay as they are and null \
 clears a field. List tools page with `limit` and `cursor` (pass pageInfo.endCursor). Start with get_workspace or \
 list_teams to learn the teams and their keys, and list_issue_statuses for a team's workflow.
@@ -117,12 +122,34 @@ find_operations and run with call_operation.";
 #[derive(Clone, Default)]
 pub struct Mcp;
 
-fn caller(ctx: &RequestContext<RoleServer>) -> Result<Ctx, McpError> {
+fn caller(ctx: &RequestContext<RoleServer>) -> Result<Caller, McpError> {
     let parts = ctx
         .extensions
         .get::<axum::http::request::Parts>()
         .ok_or_else(|| McpError::internal_error("missing request", None))?;
-    parts.extensions.get::<Ctx>().cloned().ok_or_else(|| McpError::invalid_request("not authenticated", None))
+    parts.extensions.get::<Caller>().cloned().ok_or_else(|| McpError::invalid_request("not authenticated", None))
+}
+
+/// What the caller's token reaches, which decides the tools they see and their arguments.
+struct Reach {
+    scopes: Vec<Access>,
+    /// Admin in at least one of the workspaces.
+    admin: bool,
+    /// More than one workspace, so every tool needs `workspace`.
+    several: bool,
+}
+
+impl Reach {
+    async fn of(caller: &Caller) -> Result<Self, McpError> {
+        let reachable = caller.reachable().await.map_err(|e| McpError::internal_error(e.message, None))?;
+        let admin = reachable.iter().any(|w| Role::parse(&w.role).is_some_and(|r| r >= Role::Admin));
+        Ok(Self { scopes: caller.scopes.clone(), admin, several: reachable.len() > 1 })
+    }
+
+    /// Write tools need the write scope, admin tools an admin.
+    fn sees(&self, op: &ops::Op) -> bool {
+        self.scopes.contains(&op.access) && (op.access != Access::Admin || self.admin)
+    }
 }
 
 fn lists_all_tools(context: &RequestContext<RoleServer>) -> bool {
@@ -134,8 +161,8 @@ fn summary(description: &str) -> &str {
     description.split_once(". ").map_or(description, |(first, _)| first)
 }
 
-fn find_operations(ctx: &Ctx, args: FindOperationsArgs) -> Value {
-    let candidates = ops::all().iter().filter(|op| visible(op, ctx));
+fn find_operations(reach: &Reach, args: FindOperationsArgs) -> Value {
+    let candidates = ops::all().iter().filter(|op| reach.sees(op));
     let Some(query) = args.query.map(|q| q.to_lowercase()).filter(|q| !q.trim().is_empty()) else {
         let names: Vec<Value> =
             candidates.map(|op| serde_json::json!({ "name": op.name, "summary": summary(op.description) })).collect();
@@ -166,26 +193,29 @@ fn find_operations(ctx: &Ctx, args: FindOperationsArgs) -> Value {
     let found: Vec<Value> = scored
         .into_iter()
         .take(8)
-        .map(|(_, op)| serde_json::json!({ "name": op.name, "description": op.description, "arguments": op.schema }))
+        .map(|(_, op)| {
+            let arguments = arguments(op, reach.several);
+            serde_json::json!({ "name": op.name, "description": op.description, "arguments": arguments })
+        })
         .collect();
     serde_json::json!({ "operations": found })
 }
 
-async fn call_operation(ctx: Ctx, args: CallOperationArgs) -> ApiResult<Value> {
+async fn call_operation(caller: &Caller, args: CallOperationArgs) -> ApiResult<Value> {
     let Some(op) = ops::find(args.name.trim()) else {
         return Err(ApiError::bad_request(format!("No operation \"{}\"; use find_operations", args.name)));
     };
-    op.call(ctx, args.arguments).await
+    op.call_as(caller, args.arguments, None).await
 }
 
-/// Tools the caller may use: write tools need the write scope, admin tools an admin.
-fn visible(op: &ops::Op, ctx: &Ctx) -> bool {
-    ctx.allows(op.access) && (op.access != Access::Admin || ctx.role >= Role::Admin)
+/// An operation's arguments, with `workspace` when the token reaches several workspaces.
+fn arguments(op: &ops::Op, several: bool) -> Value {
+    if several { op.schema_with_workspace(true) } else { op.schema.clone() }
 }
 
-fn tool(op: &ops::Op) -> Tool {
-    let schema = match &op.schema {
-        Value::Object(map) => map.clone(),
+fn tool(op: &ops::Op, several: bool) -> Tool {
+    let schema = match arguments(op, several) {
+        Value::Object(map) => map,
         _ => Default::default(),
     };
     let annotations = ToolAnnotations::from_raw(
@@ -228,10 +258,13 @@ impl ServerHandler for Mcp {
         _request: Option<PaginatedRequestParams>,
         context: RequestContext<RoleServer>,
     ) -> Result<ListToolsResult, McpError> {
-        let ctx = caller(&context)?;
+        let reach = Reach::of(&caller(&context)?).await?;
         let all = lists_all_tools(&context);
-        let mut tools: Vec<Tool> =
-            ops::all().iter().filter(|op| visible(op, &ctx) && (all || CORE.contains(&op.name))).map(tool).collect();
+        let mut tools: Vec<Tool> = ops::all()
+            .iter()
+            .filter(|op| reach.sees(op) && (all || CORE.contains(&op.name)))
+            .map(|op| tool(op, reach.several))
+            .collect();
         if !all {
             tools.extend(meta_tools());
         }
@@ -243,18 +276,21 @@ impl ServerHandler for Mcp {
         request: CallToolRequestParams,
         context: RequestContext<RoleServer>,
     ) -> Result<CallToolResponse, McpError> {
-        let ctx = caller(&context)?;
+        let caller = caller(&context)?;
         let args = request.arguments.map(Value::Object).unwrap_or(Value::Null);
         let outcome = match request.name.as_ref() {
-            "find_operations" => serde_json::from_value::<FindOperationsArgs>(args)
-                .map(|a| find_operations(&ctx, a))
-                .map_err(|e| ApiError::bad_request(format!("Invalid arguments: {e}"))),
+            "find_operations" => {
+                let reach = Reach::of(&caller).await?;
+                serde_json::from_value::<FindOperationsArgs>(args)
+                    .map(|a| find_operations(&reach, a))
+                    .map_err(|e| ApiError::bad_request(format!("Invalid arguments: {e}")))
+            }
             "call_operation" => match serde_json::from_value::<CallOperationArgs>(args) {
-                Ok(a) => call_operation(ctx, a).await,
+                Ok(a) => call_operation(&caller, a).await,
                 Err(e) => Err(ApiError::bad_request(format!("Invalid arguments: {e}"))),
             },
             name => match ops::find(name) {
-                Some(op) => op.call(ctx, args).await,
+                Some(op) => op.call_as(&caller, args, None).await,
                 None => return Err(McpError::invalid_params(format!("Unknown tool {name}"), None)),
             },
         };
@@ -268,7 +304,7 @@ impl ServerHandler for Mcp {
     }
 
     fn get_tool(&self, name: &str) -> Option<Tool> {
-        ops::find(name).map(tool).or_else(|| meta_tools().into_iter().find(|t| t.name == name))
+        ops::find(name).map(|op| tool(op, false)).or_else(|| meta_tools().into_iter().find(|t| t.name == name))
     }
 }
 
