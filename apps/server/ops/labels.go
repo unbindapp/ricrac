@@ -18,26 +18,26 @@ func labelOps() []*Op {
 			"List issue labels. With team: that team's labels and the workspace labels (the ones its issues can use); "+
 				"without: workspace labels and the labels of every team you can see. Groups (isGroup) hold child labels; an "+
 				"issue takes one child of a singleSelect group. Retired labels are left out unless includeRetired is set.",
-			listLabels),
+			listLabels).returns(ResultOf[PageOf[IssueLabel]]()),
 		op("get_issue_label", app.Read, []string{"GET /labels/{id}"},
 			"Read an issue label by id or name (Group/Label for a label in a group; pass team to pick a team's label).",
-			getLabel),
+			getLabel).returns(ResultOf[IssueLabel]()),
 		op("save_issue_label", app.Write, []string{"POST /labels", "PATCH /labels/{id}"},
 			"Create an issue label (omit id; name is required; with team it's that team's label, without it a workspace "+
 				"label) or change one (id = id or name). Set isGroup to make a group that holds labels, and parent to put a "+
 				"label in a group (null takes it out). Names are unique within their team (or the workspace) and group. "+
 				"Omitted fields stay as they are; null clears a field.",
-			saveLabel),
+			saveLabel).returns(ResultOf[IssueLabel]()),
 		op("retire_issue_label", app.Write, []string{"POST /labels/{id}/retire"},
 			"Retire a label (and the labels of a group): it stays on the issues that have it but can't be added anymore. "+
 				"restore_issue_label brings it back.",
-			retireLabel),
+			retireLabel).returns(ResultOf[IssueLabel]()),
 		op("restore_issue_label", app.Write, []string{"POST /labels/{id}/restore"},
-			"Bring back a retired label (and the labels of a group).", restoreLabel),
+			"Bring back a retired label (and the labels of a group).", restoreLabel).returns(ResultOf[IssueLabel]()),
 		op("delete_issue_label", app.Write, []string{"DELETE /labels/{id}"},
 			"Delete a label for good and take it off every issue; deleting a group deletes its labels too. Prefer "+
 				"retire_issue_label to keep it on existing issues.",
-			deleteLabel),
+			deleteLabel).returns(ResultOf[DeletedIssueLabel]()),
 	}
 }
 
@@ -526,4 +526,33 @@ func deleteLabel(c *app.Ctx, args LabelArgs) (any, error) {
 		return nil, err
 	}
 	return M{"deleted": label, "removedFromIssues": issues}, nil
+}
+
+/* Shapes */
+
+type IssueLabel struct {
+	ID          string            `json:"id"`
+	Name        string            `json:"name"`
+	Color       string            `json:"color"`
+	Description *string           `json:"description"`
+	IsGroup     bool              `json:"isGroup"`
+	GroupType   *string           `json:"groupType" enum:"singleSelect,multiSelect" doc:"For groups."`
+	Parent      *IssueLabelParent `json:"parent" doc:"The group it is in."`
+	Team        *TeamRef          `json:"team" doc:"Null for a workspace label."`
+	Children    *[]LabelRef       `json:"children" doc:"For groups: the labels in it."`
+	IssueCount  int               `json:"issueCount"`
+	Creator     *UserRef          `json:"creator"`
+	RetiredAt   *string           `json:"retiredAt"`
+	CreatedAt   string            `json:"createdAt"`
+	UpdatedAt   string            `json:"updatedAt"`
+}
+
+type IssueLabelParent struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type DeletedIssueLabel struct {
+	Deleted           string `json:"deleted"`
+	RemovedFromIssues int    `json:"removedFromIssues"`
 }

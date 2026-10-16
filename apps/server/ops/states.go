@@ -18,21 +18,21 @@ func stateOps() []*Op {
 		op("list_issue_statuses", app.Read, []string{"GET /teams/{team}/statuses"},
 			"List a team's workflow statuses in board order (triage, backlog, unstarted, started, completed, canceled, "+
 				"then position): name, type, color, how many issues are in each and which is the default for new issues.",
-			listStates),
+			listStates).returns(ResultOf[PageOf[IssueStatus]]()),
 		op("get_issue_status", app.Read, []string{"GET /statuses/{id}"},
-			"Read a workflow status by id, or by name or type together with its team.", getState),
+			"Read a workflow status by id, or by name or type together with its team.", getState).returns(ResultOf[IssueStatus]()),
 		op("save_issue_status", app.Write, []string{"POST /statuses", "PATCH /statuses/{id}"},
 			"Create a workflow status (omit id; team, name and type are required) or change one (id, or name with team). "+
 				"Types: triage, backlog, unstarted, started, completed, canceled. Names are unique within the team. The type "+
 				"can only change while no issues are in the status. Omitted fields stay as they are; null clears the "+
 				"description.",
-			saveState),
+			saveState).returns(ResultOf[IssueStatus]()),
 		op("delete_issue_status", app.Write, []string{"DELETE /statuses/{id}"},
 			"Archive a workflow status. If issues are in it, pass moveIssuesTo (a status of the same team) and they move "+
 				"there. If it is the team's default or auto-close status, that setting moves to moveIssuesTo too (which then "+
 				"must be backlog/unstarted, or canceled). A team keeps at least one open, one completed and one canceled "+
 				"status; turn triage off with save_team rather than deleting the Triage status.",
-			deleteState),
+			deleteState).returns(ResultOf[DeletedIssueStatus]()),
 	}
 }
 
@@ -516,4 +516,28 @@ func deleteState(c *app.Ctx, args DeleteStateArgs) (any, error) {
 		return nil, err
 	}
 	return value, nil
+}
+
+/* Shapes */
+
+type IssueStatus struct {
+	ID               string  `json:"id"`
+	Name             string  `json:"name"`
+	Type             string  `json:"type" enum:"triage,backlog,unstarted,started,completed,canceled"`
+	Color            string  `json:"color"`
+	Description      *string `json:"description"`
+	Position         float64 `json:"position" doc:"Order within its type on the board."`
+	Team             TeamRef `json:"team"`
+	IssueCount       int     `json:"issueCount"`
+	IsDefault        bool    `json:"isDefault" doc:"New issues start in it."`
+	IsAutoCloseState bool    `json:"isAutoCloseState" doc:"Auto-closed issues go to it."`
+	ArchivedAt       *string `json:"archivedAt"`
+	CreatedAt        string  `json:"createdAt"`
+	UpdatedAt        string  `json:"updatedAt"`
+}
+
+type DeletedIssueStatus struct {
+	IssueStatus
+	MovedIssues int       `json:"movedIssues"`
+	MovedTo     *StateRef `json:"movedTo"`
 }
