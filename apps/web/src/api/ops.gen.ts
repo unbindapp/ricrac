@@ -85,10 +85,40 @@ export type DeletedComment = {
   deletedReplies: number
 }
 
+export type DeletedMilestone = {
+  deleted: boolean
+  id: string
+  name: string
+}
+
+export type DeletedProjectLabel = {
+  deleted: boolean
+  id: string
+}
+
+export type DeletedProjectStatus = {
+  deleted: boolean
+  id: string
+  movedProjects: number
+}
+
+export type DeletedStatusUpdate = {
+  deleted: boolean
+  id: string
+}
+
 export type DocumentRef = {
   id: string
   slugId: string
   title: string
+}
+
+export type EntityLink = {
+  createdAt: string
+  creator: UserRef | null
+  id: string
+  label: string
+  url: string
 }
 
 export type HistoryEntry = {
@@ -97,6 +127,82 @@ export type HistoryEntry = {
   /** Changed fields, each {from, to}. */
   changes: Record<string, unknown>
   createdAt: string
+}
+
+export type Initiative = {
+  archivedAt: string | null
+  color: string | null
+  completedAt: string | null
+  createdAt: string
+  creator: UserRef | null
+  /** Markdown; in lists only with includeDescription. */
+  description?: string
+  health: "onTrack" | "atRisk" | "offTrack" | null
+  icon: string | null
+  id: string
+  name: string
+  owner: UserRef | null
+  parent: InitiativeRef | null
+  /** The average progress of its projects, from 0 to 1. */
+  progress: number
+  projectCount: number
+  slugId: string
+  sortOrder: number
+  startedAt: string | null
+  status: "planned" | "active" | "completed"
+  summary: string | null
+  targetDate: string | null
+  targetDateResolution: "month" | "quarter" | "halfYear" | "year" | null
+  trashed: boolean
+  trashedAt: string | null
+  updatedAt: string
+  url: string
+}
+
+export type InitiativeDetail = {
+  archivedAt: string | null
+  color: string | null
+  completedAt: string | null
+  createdAt: string
+  creator: UserRef | null
+  /** Markdown; in lists only with includeDescription. */
+  description?: string
+  documents: DocumentRef[]
+  health: "onTrack" | "atRisk" | "offTrack" | null
+  icon: string | null
+  id: string
+  latestUpdate: StatusUpdate | null
+  links: EntityLink[]
+  name: string
+  owner: UserRef | null
+  parent: InitiativeRef | null
+  /** The average progress of its projects, from 0 to 1. */
+  progress: number
+  projectCount: number
+  projects: InitiativeProject[]
+  slugId: string
+  sortOrder: number
+  startedAt: string | null
+  status: "planned" | "active" | "completed"
+  subInitiatives: SubInitiative[]
+  summary: string | null
+  targetDate: string | null
+  targetDateResolution: "month" | "quarter" | "halfYear" | "year" | null
+  trashed: boolean
+  trashedAt: string | null
+  updatedAt: string
+  url: string
+}
+
+export type InitiativeProject = {
+  health: "onTrack" | "atRisk" | "offTrack" | null
+  id: string
+  lead: UserRef | null
+  name: string
+  progress: number
+  slugId: string
+  status: ProjectStatusRef
+  targetDate: string | null
 }
 
 export type InitiativeRef = {
@@ -271,6 +377,39 @@ export type LabelRef = {
   parent: string | null
 }
 
+export type Milestone = {
+  canceledIssueCount: number
+  completedIssueCount: number
+  createdAt: string
+  description: string | null
+  id: string
+  issueCount: number
+  name: string
+  /** Completed issues / (all - canceled), from 0 to 1. */
+  progress: number
+  project: ProjectRef
+  sortOrder: number
+  targetDate: string | null
+  updatedAt: string
+}
+
+export type MilestoneDetail = {
+  canceledIssueCount: number
+  completedIssueCount: number
+  createdAt: string
+  description: string | null
+  id: string
+  issueCount: number
+  issues: IssueChild[]
+  name: string
+  /** Completed issues / (all - canceled), from 0 to 1. */
+  progress: number
+  project: ProjectRef
+  sortOrder: number
+  targetDate: string | null
+  updatedAt: string
+}
+
 export type MilestoneRef = {
   id: string
   name: string
@@ -292,10 +431,159 @@ export type PreparedUpload = {
   uploadUrl: string
 }
 
+export type Project = {
+  archivedAt: string | null
+  canceledAt: string | null
+  canceledIssueCount: number
+  color: string | null
+  completedAt: string | null
+  completedIssueCount: number
+  createdAt: string
+  /** Markdown; in lists only with includeDescription. */
+  description?: string
+  health: "onTrack" | "atRisk" | "offTrack" | null
+  icon: string | null
+  id: string
+  initiatives: InitiativeRef[]
+  issueCount: number
+  labels: ProjectLabelRef[]
+  lead: UserRef | null
+  leadTeam: TeamRef | null
+  name: string
+  /** 0 none, 1 urgent, 2 high, 3 medium, 4 low. */
+  priority: number
+  priorityLabel: string
+  /** Completed issues / (all - canceled), from 0 to 1. */
+  progress: number
+  slugId: string
+  sortOrder: number
+  startDate: string | null
+  startDateResolution: "month" | "quarter" | "halfYear" | "year" | null
+  startedAt: string | null
+  status: ProjectStatusRef
+  summary: string | null
+  targetDate: string | null
+  targetDateResolution: "month" | "quarter" | "halfYear" | "year" | null
+  teams: TeamRef[]
+  trashed: boolean
+  trashedAt: string | null
+  updatedAt: string
+  url: string
+}
+
+export type ProjectDetail = {
+  archivedAt: string | null
+  canceledAt: string | null
+  canceledIssueCount: number
+  color: string | null
+  completedAt: string | null
+  completedIssueCount: number
+  createdAt: string
+  creator: UserRef | null
+  /** Markdown; in lists only with includeDescription. */
+  description?: string
+  documents: DocumentRef[]
+  estimate: ProjectEstimate
+  health: "onTrack" | "atRisk" | "offTrack" | null
+  icon: string | null
+  id: string
+  initiatives: InitiativeRef[]
+  issueCount: number
+  /** Issue counts by status type; types without issues are left out. */
+  issueCountByStateType: Record<string, number>
+  labels: ProjectLabelRef[]
+  latestUpdate: StatusUpdate | null
+  lead: UserRef | null
+  leadTeam: TeamRef | null
+  links: EntityLink[]
+  members: UserRef[]
+  milestones: Milestone[]
+  name: string
+  /** 0 none, 1 urgent, 2 high, 3 medium, 4 low. */
+  priority: number
+  priorityLabel: string
+  /** Completed issues / (all - canceled), from 0 to 1. */
+  progress: number
+  relations: ProjectRelations
+  slugId: string
+  sortOrder: number
+  startDate: string | null
+  startDateResolution: "month" | "quarter" | "halfYear" | "year" | null
+  startedAt: string | null
+  status: ProjectStatusRef
+  subscribers: UserRef[]
+  summary: string | null
+  targetDate: string | null
+  targetDateResolution: "month" | "quarter" | "halfYear" | "year" | null
+  teams: TeamRef[]
+  trashed: boolean
+  trashedAt: string | null
+  updatedAt: string
+  url: string
+}
+
+export type ProjectEstimate = {
+  completed: number
+  /** The sum of the estimates of the project's issues, canceled ones left out. */
+  total: number
+}
+
+export type ProjectLabel = {
+  color: string
+  createdAt: string
+  creator: UserRef | null
+  description: string | null
+  id: string
+  isGroup: boolean
+  name: string
+  parent: ProjectLabelGroup | null
+  projectCount: number
+  retiredAt: string | null
+  updatedAt: string
+}
+
+export type ProjectLabelGroup = {
+  id: string
+  name: string
+}
+
+export type ProjectLabelRef = {
+  color: string
+  id: string
+  name: string
+  parent: string | null
+}
+
 export type ProjectRef = {
   id: string
   name: string
   slugId: string
+}
+
+export type ProjectRelations = {
+  blockedBy: ProjectRef[]
+  blocks: ProjectRef[]
+  related: ProjectRef[]
+}
+
+export type ProjectStatus = {
+  archivedAt: string | null
+  color: string
+  createdAt: string
+  description: string | null
+  id: string
+  name: string
+  position: number
+  projectCount: number
+  type: "backlog" | "planned" | "started" | "paused" | "completed" | "canceled"
+  updatedAt: string
+}
+
+export type ProjectStatusRef = {
+  color: string
+  id: string
+  name: string
+  type: "backlog" | "planned" | "started" | "paused" | "completed" | "canceled"
 }
 
 export type Reaction = {
@@ -328,6 +616,36 @@ export type StateRef = {
   id: string
   name: string
   type: "triage" | "backlog" | "unstarted" | "started" | "completed" | "canceled"
+}
+
+export type StatusUpdate = {
+  body: string
+  commentCount: number
+  createdAt: string
+  editedAt: string | null
+  health: "onTrack" | "atRisk" | "offTrack"
+  id: string
+  initiative: InitiativeRef | null
+  project: ProjectRef | null
+  reactions: StatusUpdateReaction[]
+  type: "project" | "initiative"
+  updatedAt: string
+  user: UserRef | null
+}
+
+export type StatusUpdateReaction = {
+  emoji: string
+  user: UserRef | null
+}
+
+export type SubInitiative = {
+  health: "onTrack" | "atRisk" | "offTrack" | null
+  id: string
+  name: string
+  owner: UserRef | null
+  progress: number
+  slugId: string
+  status: "planned" | "active" | "completed"
 }
 
 export type TeamRef = {
@@ -2169,35 +2487,53 @@ export interface Ops {
   prepare_file_upload: { args: PrepareFileUploadArgs; result: PreparedUpload }
   upload_file: { args: UploadFileArgs; result: UploadedFile }
   create_attachment_from_upload: { args: CreateAttachmentFromUploadArgs; result: Attachment }
-  list_projects: { args: ListProjectsArgs; result: unknown }
-  get_project: { args: GetProjectArgs; result: unknown }
-  save_project: { args: SaveProjectArgs; result: unknown }
-  delete_project: { args: DeleteProjectArgs; result: unknown }
-  restore_project: { args: RestoreProjectArgs; result: unknown }
-  archive_project: { args: ArchiveProjectArgs; result: unknown }
-  unarchive_project: { args: UnarchiveProjectArgs; result: unknown }
-  list_project_statuses: { args: ListProjectStatusesArgs; result: unknown }
-  save_project_status: { args: SaveProjectStatusArgs; result: unknown }
-  delete_project_status: { args: DeleteProjectStatusArgs; result: unknown }
-  list_project_labels: { args: ListProjectLabelsArgs; result: unknown }
-  save_project_label: { args: SaveProjectLabelArgs; result: unknown }
-  retire_project_label: { args: RetireProjectLabelArgs; result: unknown }
-  restore_project_label: { args: RestoreProjectLabelArgs; result: unknown }
-  delete_project_label: { args: DeleteProjectLabelArgs; result: unknown }
-  list_milestones: { args: ListMilestonesArgs; result: unknown }
-  get_milestone: { args: GetMilestoneArgs; result: unknown }
-  save_milestone: { args: SaveMilestoneArgs; result: unknown }
-  delete_milestone: { args: DeleteMilestoneArgs; result: unknown }
-  get_status_updates: { args: GetStatusUpdatesArgs; result: unknown }
-  save_status_update: { args: SaveStatusUpdateArgs; result: unknown }
-  delete_status_update: { args: DeleteStatusUpdateArgs; result: unknown }
-  list_initiatives: { args: ListInitiativesArgs; result: unknown }
-  get_initiative: { args: GetInitiativeArgs; result: unknown }
-  save_initiative: { args: SaveInitiativeArgs; result: unknown }
-  delete_initiative: { args: DeleteInitiativeArgs; result: unknown }
-  restore_initiative: { args: RestoreInitiativeArgs; result: unknown }
-  archive_initiative: { args: ArchiveInitiativeArgs; result: unknown }
-  unarchive_initiative: { args: UnarchiveInitiativeArgs; result: unknown }
+  list_projects: { args: ListProjectsArgs; result: {
+  nodes: Project[]
+  pageInfo: PageInfo
+} }
+  get_project: { args: GetProjectArgs; result: ProjectDetail }
+  save_project: { args: SaveProjectArgs; result: ProjectDetail }
+  delete_project: { args: DeleteProjectArgs; result: Project }
+  restore_project: { args: RestoreProjectArgs; result: Project }
+  archive_project: { args: ArchiveProjectArgs; result: Project }
+  unarchive_project: { args: UnarchiveProjectArgs; result: Project }
+  list_project_statuses: { args: ListProjectStatusesArgs; result: {
+  nodes: ProjectStatus[]
+  pageInfo: PageInfo
+} }
+  save_project_status: { args: SaveProjectStatusArgs; result: ProjectStatus }
+  delete_project_status: { args: DeleteProjectStatusArgs; result: DeletedProjectStatus }
+  list_project_labels: { args: ListProjectLabelsArgs; result: {
+  nodes: ProjectLabel[]
+  pageInfo: PageInfo
+} }
+  save_project_label: { args: SaveProjectLabelArgs; result: ProjectLabel }
+  retire_project_label: { args: RetireProjectLabelArgs; result: ProjectLabel }
+  restore_project_label: { args: RestoreProjectLabelArgs; result: ProjectLabel }
+  delete_project_label: { args: DeleteProjectLabelArgs; result: DeletedProjectLabel }
+  list_milestones: { args: ListMilestonesArgs; result: {
+  nodes: Milestone[]
+  pageInfo: PageInfo
+} }
+  get_milestone: { args: GetMilestoneArgs; result: MilestoneDetail }
+  save_milestone: { args: SaveMilestoneArgs; result: Milestone }
+  delete_milestone: { args: DeleteMilestoneArgs; result: DeletedMilestone }
+  get_status_updates: { args: GetStatusUpdatesArgs; result: {
+  nodes: StatusUpdate[]
+  pageInfo: PageInfo
+} }
+  save_status_update: { args: SaveStatusUpdateArgs; result: StatusUpdate }
+  delete_status_update: { args: DeleteStatusUpdateArgs; result: DeletedStatusUpdate }
+  list_initiatives: { args: ListInitiativesArgs; result: {
+  nodes: Initiative[]
+  pageInfo: PageInfo
+} }
+  get_initiative: { args: GetInitiativeArgs; result: InitiativeDetail }
+  save_initiative: { args: SaveInitiativeArgs; result: Initiative }
+  delete_initiative: { args: DeleteInitiativeArgs; result: Initiative }
+  restore_initiative: { args: RestoreInitiativeArgs; result: Initiative }
+  archive_initiative: { args: ArchiveInitiativeArgs; result: Initiative }
+  unarchive_initiative: { args: UnarchiveInitiativeArgs; result: Initiative }
   list_cycles: { args: ListCyclesArgs; result: unknown }
   get_cycle: { args: GetCycleArgs; result: unknown }
   save_cycle: { args: SaveCycleArgs; result: unknown }

@@ -19,17 +19,17 @@ func statusUpdateOps() []*Op {
 		op("get_status_updates", app.Read, []string{"GET /status-updates"},
 			"Status updates, newest first: of one project or initiative, or, without either, the recent updates across "+
 				"the projects you can see and the initiatives. Pass id to read one update.",
-			listStatusUpdates),
+			listStatusUpdates).returns(ResultOf[PageOf[StatusUpdate]]()),
 		op("save_status_update", app.Write, []string{"POST /status-updates", "PATCH /status-updates/{id}"},
 			"Post a status update on a project or initiative (omit id; body is required) with its health: onTrack, "+
 				"atRisk or offTrack (by default the previous update's, else onTrack). The newest update's health becomes "+
 				"the project's or initiative's. Members and subscribers of the project (or the initiative's owner) are "+
 				"notified, and so are people @mentioned. Pass id to edit your own update.",
-			saveStatusUpdate),
+			saveStatusUpdate).returns(ResultOf[StatusUpdate]()),
 		op("delete_status_update", app.Write, []string{"DELETE /status-updates/{id}"},
 			"Delete a status update (yours, or any as a workspace admin). The health goes back to the newest remaining "+
 				"update's.",
-			deleteStatusUpdate),
+			deleteStatusUpdate).returns(ResultOf[DeletedStatusUpdate]()),
 	}
 }
 
@@ -418,4 +418,31 @@ func deleteStatusUpdate(c *app.Ctx, args IDArgs) (any, error) {
 		return nil, err
 	}
 	return M{"deleted": true, "id": id}, nil
+}
+
+/* Result shapes */
+
+type StatusUpdate struct {
+	ID           string                 `json:"id"`
+	Type         string                 `json:"type" enum:"project,initiative"`
+	Project      *ProjectRef            `json:"project"`
+	Initiative   *InitiativeRef         `json:"initiative"`
+	Body         string                 `json:"body"`
+	Health       string                 `json:"health" enum:"onTrack,atRisk,offTrack"`
+	User         *UserRef               `json:"user"`
+	Reactions    []StatusUpdateReaction `json:"reactions"`
+	CommentCount int                    `json:"commentCount"`
+	CreatedAt    string                 `json:"createdAt"`
+	UpdatedAt    string                 `json:"updatedAt"`
+	EditedAt     *string                `json:"editedAt"`
+}
+
+type StatusUpdateReaction struct {
+	Emoji string   `json:"emoji"`
+	User  *UserRef `json:"user"`
+}
+
+type DeletedStatusUpdate struct {
+	Deleted bool   `json:"deleted"`
+	ID      string `json:"id"`
 }

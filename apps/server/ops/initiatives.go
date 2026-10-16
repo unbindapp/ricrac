@@ -20,26 +20,26 @@ func initiativeOps() []*Op {
 			"List initiatives, most recently updated first, each with its project count and progress (the average of "+
 				"its projects'). Narrow with status (planned, active, completed), owner, parent or query. Archived ones are "+
 				"left out unless includeArchived is set.",
-			listInitiatives),
+			listInitiatives).returns(ResultOf[PageOf[Initiative]]()),
 		op("get_initiative", app.Read, []string{"GET /initiatives/{id}"},
 			"Read an initiative by id, slug, link or name: its fields and description, projects (with status, "+
 				"progress, health and lead), sub-initiatives, latest status update, links and documents.",
-			getInitiative),
+			getInitiative).returns(ResultOf[InitiativeDetail]()),
 		op("save_initiative", app.Write, []string{"POST /initiatives", "PATCH /initiatives/{id}"},
 			"Create an initiative (omit id; name is required) or update one (pass id). Omitted fields stay as they are; "+
 				"null clears a field. Add projects with addProjects or setProjects; nest it under another initiative with "+
 				"parent.",
-			saveInitiative),
+			saveInitiative).returns(ResultOf[Initiative]()),
 		op("delete_initiative", app.Write, []string{"DELETE /initiatives/{id}"},
 			"Move an initiative to the trash; its projects stay. It is deleted for good after 30 days; "+
 				"restore_initiative brings it back before then.",
-			trashInitiative),
+			trashInitiative).returns(ResultOf[Initiative]()),
 		op("restore_initiative", app.Write, []string{"POST /initiatives/{id}/restore"},
-			"Bring an initiative back from the trash.", restoreInitiative),
+			"Bring an initiative back from the trash.", restoreInitiative).returns(ResultOf[Initiative]()),
 		op("archive_initiative", app.Write, []string{"POST /initiatives/{id}/archive"},
-			"Archive an initiative. It stays readable but is left out of lists unless includeArchived is set.", archiveInitiative),
+			"Archive an initiative. It stays readable but is left out of lists unless includeArchived is set.", archiveInitiative).returns(ResultOf[Initiative]()),
 		op("unarchive_initiative", app.Write, []string{"POST /initiatives/{id}/unarchive"},
-			"Bring an archived initiative back.", unarchiveInitiative),
+			"Bring an archived initiative back.", unarchiveInitiative).returns(ResultOf[Initiative]()),
 	}
 }
 
@@ -528,4 +528,60 @@ func unarchiveInitiative(c *app.Ctx, args IDArgs) (any, error) {
 		return nil, err
 	}
 	return markInitiative(c, id, "UPDATE initiatives SET archived_at = NULL, updated_at = now() WHERE id = $1", "update")
+}
+
+/* Result shapes */
+
+type Initiative struct {
+	ID                   string         `json:"id"`
+	SlugID               string         `json:"slugId"`
+	Name                 string         `json:"name"`
+	Summary              *string        `json:"summary"`
+	Description          string         `json:"description,omitempty" doc:"Markdown; in lists only with includeDescription."`
+	URL                  string         `json:"url"`
+	Icon                 *string        `json:"icon"`
+	Color                *string        `json:"color"`
+	Status               string         `json:"status" enum:"planned,active,completed"`
+	Health               *string        `json:"health" enum:"onTrack,atRisk,offTrack"`
+	Owner                *UserRef       `json:"owner"`
+	Creator              *UserRef       `json:"creator"`
+	TargetDate           *string        `json:"targetDate"`
+	TargetDateResolution *string        `json:"targetDateResolution" enum:"month,quarter,halfYear,year"`
+	Parent               *InitiativeRef `json:"parent"`
+	ProjectCount         int            `json:"projectCount"`
+	Progress             float64        `json:"progress" doc:"The average progress of its projects, from 0 to 1."`
+	SortOrder            float64        `json:"sortOrder"`
+	StartedAt            *string        `json:"startedAt"`
+	CompletedAt          *string        `json:"completedAt"`
+	ArchivedAt           *string        `json:"archivedAt"`
+	Trashed              bool           `json:"trashed"`
+	TrashedAt            *string        `json:"trashedAt"`
+	CreatedAt            string         `json:"createdAt"`
+	UpdatedAt            string         `json:"updatedAt"`
+}
+
+type InitiativeDetail struct {
+	Initiative
+	Projects       []InitiativeProject `json:"projects"`
+	SubInitiatives []SubInitiative     `json:"subInitiatives"`
+	Links          []EntityLink        `json:"links"`
+	Documents      []DocumentRef       `json:"documents"`
+	LatestUpdate   *StatusUpdate       `json:"latestUpdate"`
+}
+
+type InitiativeProject struct {
+	ProjectRef
+	Status     ProjectStatusRef `json:"status"`
+	Health     *string          `json:"health" enum:"onTrack,atRisk,offTrack"`
+	Lead       *UserRef         `json:"lead"`
+	TargetDate *string          `json:"targetDate"`
+	Progress   float64          `json:"progress"`
+}
+
+type SubInitiative struct {
+	InitiativeRef
+	Status   string   `json:"status" enum:"planned,active,completed"`
+	Health   *string  `json:"health" enum:"onTrack,atRisk,offTrack"`
+	Owner    *UserRef `json:"owner"`
+	Progress float64  `json:"progress"`
 }
