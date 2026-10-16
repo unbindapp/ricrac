@@ -5,7 +5,7 @@ import type { UserRef, WorkspaceUser } from "@/api/ops.gen";
 import { PickerTrigger, type TPickerAppearance } from "@/components/projects/picker-trigger";
 import { PropertyPicker, type TPickerOption } from "@/components/issues/property-picker";
 import { Avatar } from "@/components/shared/avatar";
-import type { TUserSummary } from "@/components/shared/user-chip";
+import type { TMentionUser } from "@/components/shared/markdown-editor";
 import type { TAvatarSize } from "@/components/ui/avatar";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { usersQuery } from "@/lib/queries/users";
@@ -24,13 +24,13 @@ export function toUserRef(user: WorkspaceUser): UserRef {
 }
 
 /** The people the Markdown editor offers after @. */
-export function useMentionUsers(): TUserSummary[] {
+export function useMentionUsers(): TMentionUser[] {
   const { users } = useWorkspaceUserList();
   return users.map((user) => ({
     id: user.id,
     name: user.name,
-    display_name: user.displayName,
-    avatar_url: user.avatarUrl,
+    displayName: user.displayName,
+    avatarUrl: user.avatarUrl,
   }));
 }
 

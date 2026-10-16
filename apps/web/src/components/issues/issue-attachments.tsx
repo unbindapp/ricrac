@@ -1,73 +1,130 @@
-import { FileIcon, LinkIcon, UploadIcon, XIcon } from "lucide-react";
+import {
+  BugIcon,
+  FileIcon,
+  GitBranchIcon,
+  GitCommitHorizontalIcon,
+  GitMergeIcon,
+  HashIcon,
+  ImageIcon,
+  LinkIcon,
+  type LucideIcon,
+  NotebookTextIcon,
+  PaperclipIcon,
+  PenToolIcon,
+  UploadIcon,
+  VideoIcon,
+  XIcon,
+} from "lucide-react";
 import { type FormEvent, useState } from "react";
 
-import {
-  type TAttachment,
-  type TIssueDetail,
-  useCreateAttachmentMutation,
-  useDeleteAttachmentMutation,
-} from "@/lib/queries/issues";
+import type { IssueAttachment, IssueDetail } from "@/api/ops.gen";
 import { GithubIcon } from "@/components/icons/github";
-import {
-  githubLinkOf,
-  type TGithubLink,
-  type TPullRequestState,
-} from "@/components/issues/github-link";
+import { githubLinkOf, type TPullRequestState } from "@/components/issues/github-link";
 import { List, ListRow, ListRowText } from "@/components/layout/list";
-import { SectionTitle } from "@/components/layout/section-title";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FileTrigger } from "@/components/ui/file-trigger";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { toast } from "@/components/ui/toast";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { useCreateUploadMutation } from "@/lib/queries/uploads";
+import {
+  useAttachUploadMutation,
+  useCreateAttachmentMutation,
+  useDeleteAttachmentMutation,
+} from "@/lib/queries/issues";
+import { uploadFile } from "@/lib/queries/uploads";
+import { errorText } from "@/lib/server/errors";
 
-export function IssueAttachments({ issue }: { issue: TIssueDetail }) {
-  const { workspace, canEdit } = useWorkspace();
-  const attachments = issue.attachments ?? [];
-  const { mutateAsync: upload, isPending: isUploading } = useCreateUploadMutation();
-  const { mutateAsync: createAttachment } = useCreateAttachmentMutation();
+type TSource = { label: string; icon: LucideIcon | typeof GithubIcon; rank: number };
+
+/** How each attachment source reads, in the order the sections show. */
+const SOURCES: Record<string, TSource> = {
+  github: { label: "GitHub", icon: GithubIcon, rank: 0 },
+  github_branch: { label: "GitHub", icon: GithubIcon, rank: 0 },
+  github_commit: { label: "GitHub", icon: GithubIcon, rank: 0 },
+  gitlab: { label: "GitLab", icon: GitMergeIcon, rank: 1 },
+  figma: { label: "Figma", icon: PenToolIcon, rank: 2 },
+  sentry: { label: "Sentry", icon: BugIcon, rank: 3 },
+  slack: { label: "Slack", icon: HashIcon, rank: 4 },
+  notion: { label: "Notion", icon: NotebookTextIcon, rank: 5 },
+  loom: { label: "Loom", icon: VideoIcon, rank: 6 },
+  upload: { label: "Files", icon: FileIcon, rank: 7 },
+  link: { label: "Links", icon: LinkIcon, rank: 8 },
+};
+
+const sourceOf = (attachment: IssueAttachment) => SOURCES[attachment.sourceType] ?? SOURCES.link;
+
+const IMAGE_PATTERN = /\.(png|jpe?g|gif|webp|svg)$/i;
+
+function AttachmentIcon({ attachment }: { attachment: IssueAttachment }) {
+  const github = githubLinkOf(attachment);
+  if (github?.kind === "branch") return <GitBranchIcon className="text-muted-foreground size-4" />;
+  if (github?.kind === "commit") {
+    return <GitCommitHorizontalIcon className="text-muted-foreground size-4" />;
+  }
+  if (attachment.sourceType === "upload" && IMAGE_PATTERN.test(attachment.title)) {
+    return <ImageIcon className="text-muted-foreground size-4 shrink-0" />;
+  }
+  const Icon = sourceOf(attachment).icon;
+  return <Icon className="text-muted-foreground size-4 shrink-0" />;
+}
+
+/** Upload files or add a link, from one popover. */
+export function AttachMenu({ issue, label = "Attach" }: { issue: IssueDetail; label?: string }) {
+  const { workspace } = useWorkspace();
+  const [isOpen, setIsOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const { mutateAsync: attachUpload } = useAttachUploadMutation(workspace.id);
 
   const uploadFiles = async (files: File[]) => {
-    for (const file of files) {
-      const res = await upload({ workspaceId: workspace.id, file });
-      await createAttachment({ issueId: issue.id, title: file.name, uploadId: res.data.id });
+    setIsUploading(true);
+    try {
+      for (const file of files) {
+        const prepared = await uploadFile(workspace.id, file);
+        await attachUpload({ fileId: prepared.fileId, issue: issue.id, title: file.name });
+      }
+    } catch (error) {
+      toast.add({ type: "error", title: "Upload failed", description: errorText(error) });
+    } finally {
+      setIsUploading(false);
     }
   };
 
   return (
-    <section aria-label="Attachments" className="flex w-full flex-col gap-2">
-      <SectionTitle
-        title="Attachments"
-        actions={
-          canEdit && (
-            <>
-              <FileTrigger
-                multiple
-                onSelect={(files) => void uploadFiles(files).catch(() => undefined)}
-              >
-                {(open) => (
-                  <Button variant="ghost" size="sm" isPending={isUploading} onClick={open}>
-                    <UploadIcon className="size-4" />
-                    Upload
-                  </Button>
-                )}
-              </FileTrigger>
-              <AddLinkPopover issueId={issue.id} />
-            </>
-          )
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger
+        render={
+          <Button
+            variant="ghost"
+            size="sm"
+            isPending={isUploading}
+            className="text-muted-foreground font-normal"
+          >
+            <PaperclipIcon className="size-4" />
+            {label}
+          </Button>
         }
       />
-      {attachments.length > 0 && (
-        <List>
-          {attachments.map((attachment) => (
-            <AttachmentRow key={attachment.id} attachment={attachment} canEdit={canEdit} />
-          ))}
-        </List>
-      )}
-    </section>
+      <PopoverContent align="start" className="flex w-80 flex-col gap-4">
+        <FileTrigger
+          multiple
+          onSelect={(files) => {
+            setIsOpen(false);
+            void uploadFiles(files);
+          }}
+        >
+          {(pickFiles) => (
+            <Button variant="outline" size="sm" onClick={pickFiles}>
+              <UploadIcon className="size-4" />
+              Upload files
+            </Button>
+          )}
+        </FileTrigger>
+        <AddLinkForm issueId={issue.id} onDone={() => setIsOpen(false)} />
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -81,23 +138,57 @@ const pullRequestStates: Record<
   closed: { label: "Closed", variant: "destructive" },
 };
 
-function AttachmentIcon({
-  attachment,
-  github,
-}: {
-  attachment: TAttachment;
-  github: TGithubLink | null;
-}) {
-  if (github) return <GithubIcon className="text-muted-foreground" />;
-  const Icon = attachment.upload_id ? FileIcon : LinkIcon;
-  return <Icon className="text-muted-foreground size-4 shrink-0" />;
+/** Attachments grouped by where they come from (GitHub, Figma, files, links, ...). */
+export function IssueAttachments({ issue }: { issue: IssueDetail }) {
+  const { canEdit } = useWorkspace();
+  if (issue.attachments.length === 0) return null;
+  const sections = new Map<string, IssueAttachment[]>();
+  const sorted = [...issue.attachments].sort((a, b) => sourceOf(a).rank - sourceOf(b).rank);
+  for (const attachment of sorted) {
+    const label = sourceOf(attachment).label;
+    sections.set(label, [...(sections.get(label) ?? []), attachment]);
+  }
+  return (
+    <section aria-label="Attachments" className="flex w-full flex-col gap-2">
+      <div className="flex min-h-7 items-center gap-2">
+        <h2 className="text-sm font-semibold">Attachments</h2>
+        <span className="text-muted-foreground text-xs">{issue.attachments.length}</span>
+        <span className="flex-1" />
+        {canEdit && <AttachMenu issue={issue} label="Add" />}
+      </div>
+      <List>
+        {[...sections.entries()].map(([label, attachments]) => (
+          <div key={label} role="group" aria-label={label} className="flex flex-col">
+            {sections.size > 1 && (
+              <p className="bg-muted text-muted-foreground border-b px-3 py-1 text-xs font-medium">
+                {label}
+              </p>
+            )}
+            {attachments.map((attachment) => (
+              <AttachmentRow key={attachment.id} attachment={attachment} canEdit={canEdit} />
+            ))}
+          </div>
+        ))}
+      </List>
+    </section>
+  );
 }
 
-function AttachmentRow({ attachment, canEdit }: { attachment: TAttachment; canEdit: boolean }) {
-  const { mutate: remove, isPending } = useDeleteAttachmentMutation();
+function AttachmentRow({ attachment, canEdit }: { attachment: IssueAttachment; canEdit: boolean }) {
+  const { workspace } = useWorkspace();
+  const { mutate: remove, isPending } = useDeleteAttachmentMutation(workspace.id);
   const github = githubLinkOf(attachment);
   const pullRequestState =
     github?.kind === "pull_request" && github.state ? pullRequestStates[github.state] : null;
+  const title =
+    github?.kind === "commit" ? (
+      <>
+        <span className="text-muted-foreground font-mono text-xs">{github.sha}</span>{" "}
+        {github.subject}
+      </>
+    ) : (
+      attachment.title
+    );
   return (
     <ListRow
       actions={
@@ -106,23 +197,25 @@ function AttachmentRow({ attachment, canEdit }: { attachment: TAttachment; canEd
             <Badge variant={pullRequestState.variant}>{pullRequestState.label}</Badge>
           )}
           <span className="text-muted-foreground text-xs">
-            <RelativeTime value={attachment.created_at} />
+            <RelativeTime value={attachment.createdAt} />
           </span>
           {canEdit && (
             <Button
               variant="ghost"
               size="icon"
+              forceMinSize={false}
+              className="size-6"
               aria-label={`Remove ${attachment.title}`}
               isPending={isPending}
-              onClick={() => remove({ attachmentId: attachment.id })}
+              onClick={() => remove(attachment.id)}
             >
-              <XIcon className="size-4" />
+              <XIcon className="size-3.5" />
             </Button>
           )}
         </>
       }
     >
-      <AttachmentIcon attachment={attachment} github={github} />
+      <AttachmentIcon attachment={attachment} />
       <a
         href={attachment.url}
         target="_blank"
@@ -130,7 +223,7 @@ function AttachmentRow({ attachment, canEdit }: { attachment: TAttachment; canEd
         className="flex min-w-0 flex-1 outline-hidden focus-visible:underline has-hover:hover:underline"
       >
         <ListRowText
-          primary={github?.kind === "commit" ? <CommitTitle commit={github} /> : attachment.title}
+          primary={title}
           secondary={github?.reference || attachment.subtitle || undefined}
         />
       </a>
@@ -138,70 +231,50 @@ function AttachmentRow({ attachment, canEdit }: { attachment: TAttachment; canEd
   );
 }
 
-function CommitTitle({ commit }: { commit: Extract<TGithubLink, { kind: "commit" }> }) {
-  return (
-    <>
-      <span className="text-muted-foreground font-mono text-xs">{commit.sha}</span> {commit.subject}
-    </>
-  );
-}
-
-function AddLinkPopover({ issueId }: { issueId: string }) {
-  const [isOpen, setIsOpen] = useState(false);
+function AddLinkForm({ issueId, onDone }: { issueId: string; onDone: () => void }) {
+  const { workspace } = useWorkspace();
   const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
-  const { mutateAsync: createAttachment, isPending } = useCreateAttachmentMutation();
+  const { mutateAsync: createAttachment, isPending } = useCreateAttachmentMutation(workspace.id);
   const isValid = /^https?:\/\/\S+$/i.test(url.trim());
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (!isValid) return;
     const trimmed = url.trim();
-    await createAttachment({ issueId, url: trimmed, title: title.trim() || trimmed });
+    await createAttachment({ issue: issueId, url: trimmed, title: title.trim() || trimmed });
     setUrl("");
     setTitle("");
-    setIsOpen(false);
+    onDone();
   };
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger
-        render={
-          <Button variant="ghost" size="sm">
-            <LinkIcon className="size-4" />
-            Link
-          </Button>
-        }
+    <form
+      className="flex flex-col gap-2 border-t pt-4"
+      onSubmit={(event) => void submit(event).catch(() => undefined)}
+    >
+      <p className="text-muted-foreground text-xs">Or link a pull request, design, doc, …</p>
+      <Input
+        aria-label="URL"
+        placeholder="https://"
+        value={url}
+        onChange={(event) => setUrl(event.target.value)}
       />
-      <PopoverContent align="end" className="w-80">
-        <form
-          className="flex flex-col gap-4"
-          onSubmit={(event) => void submit(event).catch(() => undefined)}
-        >
-          <Input
-            aria-label="URL"
-            placeholder="https://"
-            autoFocus
-            value={url}
-            onChange={(event) => setUrl(event.target.value)}
-          />
-          <Input
-            aria-label="Title"
-            placeholder="Title (optional)"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-          />
-          <Button
-            type="submit"
-            size="sm"
-            isPending={isPending}
-            disabled={!isValid}
-            className="self-end"
-          >
-            Add link
-          </Button>
-        </form>
-      </PopoverContent>
-    </Popover>
+      <Input
+        aria-label="Title"
+        placeholder="Title (optional)"
+        value={title}
+        onChange={(event) => setTitle(event.target.value)}
+      />
+      <Button
+        type="submit"
+        size="sm"
+        isPending={isPending}
+        disabled={!isValid}
+        className="self-end"
+      >
+        Add link
+      </Button>
+    </form>
   );
 }

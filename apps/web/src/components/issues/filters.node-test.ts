@@ -4,15 +4,18 @@ import { test } from "node:test";
 import { DEFAULT_DISPLAY } from "./display.ts";
 import {
   activeFilterFields,
-  buildListIssuesInput,
+  buildListIssuesArgs,
   clearFilterField,
   filtersFromSearch,
   isHiddenCompleted,
+  issueFilterOf,
   issueSearchSchema,
   mergeFilters,
 } from "./filters.ts";
 
-test("search params parse into list-issues filters and drop bad values", () => {
+const showAll = { ...DEFAULT_DISPLAY, show_completed: "all" as const };
+
+test("search params parse into filters and drop bad values", () => {
   const search = issueSearchSchema.parse({
     assignee_ids: ["u1", "null"],
     priorities: [1, 9],
@@ -32,25 +35,42 @@ test("fixed filters narrow user filters instead of replacing them", () => {
   assert.deepEqual(merged.assignee_ids, ["u1"]);
 });
 
-test("hiding completed issues removes completed and canceled state types", () => {
-  const input = buildListIssuesInput({
-    workspaceId: "w",
+test("filters become Ricrac's filter language", () => {
+  assert.deepEqual(issueFilterOf({ label_ids: ["l1"], priorities: [1, 2] }), {
+    and: [{ labels: { some: { id: { in: ["l1"] } } } }, { priority: { in: [1, 2] } }],
+  });
+  assert.deepEqual(issueFilterOf({ assignee_ids: ["null", "u1"] }), {
+    or: [{ assignee: { null: true } }, { assignee: { id: { in: ["u1"] } } }],
+  });
+  assert.equal(issueFilterOf({ assignee_ids: [] }), undefined);
+});
+
+test("one team goes as the team argument, several in the filter", () => {
+  assert.deepEqual(
+    buildListIssuesArgs({ filters: {}, fixedFilters: { team_ids: ["t1"] }, display: showAll }),
+    { team: "t1", orderBy: "manual" },
+  );
+  assert.deepEqual(
+    buildListIssuesArgs({ filters: { team_ids: ["t1", "t2"] }, display: showAll }).filter,
+    { team: { id: { in: ["t1", "t2"] } } },
+  );
+});
+
+test("hiding completed issues leaves out completed and canceled statuses", () => {
+  const args = buildListIssuesArgs({
     filters: {},
     display: { ...DEFAULT_DISPLAY, show_completed: "none" },
   });
-  assert.deepEqual(input.state_types, ["triage", "backlog", "unstarted", "started"]);
+  assert.deepEqual(args.filter, {
+    state: { type: { in: ["triage", "backlog", "unstarted", "started"] } },
+  });
 });
 
-test("flat sub-issue rows still list sub-issues", () => {
-  const input = buildListIssuesInput({
-    workspaceId: "w",
-    filters: { assignee_ids: [] },
-    display: { ...DEFAULT_DISPLAY, nest_sub_issues: false },
-  });
-  assert.equal(input.has_parent, undefined);
-  assert.equal(input.assignee_ids, undefined);
-  assert.equal(input.workspace_id, "w");
-  assert.equal(input.order_by, "manual");
+test("the past week of completed issues is asked of the server", () => {
+  const args = buildListIssuesArgs({ filters: { priorities: [1] }, display: DEFAULT_DISPLAY });
+  const filter = args.filter as { and: unknown[] };
+  assert.equal(filter.and.length, 2);
+  assert.deepEqual(filter.and[0], { priority: { in: [1] } });
 });
 
 test("active fields and clearing a field round trip", () => {
@@ -63,8 +83,8 @@ test("past week keeps recently completed issues only", () => {
   const now = new Date("2026-03-10T00:00:00Z").getTime();
   const done = (completedAt: string) => ({
     state: { type: "completed" as const },
-    completed_at: completedAt,
-    canceled_at: null,
+    completedAt,
+    canceledAt: null,
   });
   assert.equal(isHiddenCompleted(done("2026-03-08T00:00:00Z"), "past_week", now), false);
   assert.equal(isHiddenCompleted(done("2026-02-01T00:00:00Z"), "past_week", now), true);

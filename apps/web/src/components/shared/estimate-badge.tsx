@@ -8,7 +8,7 @@ type TProps = {
 };
 
 export function EstimateBadge({ value, type }: TProps) {
-  if (value === null || value === undefined || type === "none") return null;
+  if (value === null || value === undefined || type === "notUsed") return null;
   const text = formatEstimate(value, type);
   return (
     <span

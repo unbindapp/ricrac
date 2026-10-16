@@ -7,372 +7,316 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-import type { TIssuePatch as TIssueDraftPatch } from "@/components/issues/issue-draft";
-import { getGoClient } from "@/lib/server/client";
-import type { TGoClient, TInput, TListItem, TResponseData } from "@/lib/server/types";
-
-type TIssuesApi = TGoClient["issues"];
-
-export type TIssue = TListItem<TIssuesApi["list"]>;
-export type TIssueDetail = TResponseData<TIssuesApi["get"]>;
-export type TIssuePage = Awaited<ReturnType<TIssuesApi["list"]>>;
-export type TListIssuesInput = TInput<TIssuesApi["list"]>;
-export type TCreateIssueInput = TInput<TIssuesApi["create"]>;
-export type TUpdateIssueInput = TInput<TIssuesApi["update"]>;
-export type TBulkUpdateIssuesInput = TInput<TIssuesApi["bulkUpdate"]>;
-export type TComment = TListItem<TIssuesApi["comments"]["list"]>;
-export type TCommentReply = TComment["replies"][number];
-export type THistoryEntry = TListItem<TIssuesApi["history"]["list"]>;
-export type TFieldChange = THistoryEntry["changes"][number];
-export type TAttachment = TIssueDetail["attachments"][number];
-export type TReactionGroup = TIssueDetail["reactions"][number];
-export type TRelatedIssue = TIssueDetail["relations"]["blocks"][number];
-export type TUserSummary = NonNullable<TIssue["assignee"]>;
-export type TWorkflowStateSummary = TIssue["state"];
-export type TLabelSummary = TIssue["labels"][number];
-export type TOrderBy = NonNullable<TListIssuesInput["order_by"]>;
-export type TGroupBy = NonNullable<TListIssuesInput["group_by"]>;
+import type { Issue, IssueDetail, ListIssuesArgs, PageInfo, SaveIssueArgs } from "@/api/ops.gen";
+import { ApiError, call, type OpArgs } from "@/lib/server/client";
 
 export const ISSUE_TITLE_MAX_LENGTH = 255;
-export const CLEAR_UUID = "00000000-0000-0000-0000-000000000000";
-export const CLEAR_DATE = "";
-export const CLEAR_ESTIMATE = -1;
-
-const LIST_PAGE_SIZE = 100;
-const SEARCH_LIMIT = 8;
-const HISTORY_PAGE_SIZE = 100;
 export const LIST_REFETCH_INTERVAL_MS = 15 * 1000;
 
-function issuesApi() {
-  return getGoClient().issues;
-}
+const LIST_PAGE_SIZE = 250;
+/** Lists stop loading pages here; grouping and counts are of what is loaded. */
+export const LIST_MAX_ISSUES = 2000;
+const SEARCH_LIMIT = 8;
+
+export type TIssueChanges = Omit<SaveIssueArgs, "id" | "template">;
+type TIssuePage = { nodes: Issue[]; pageInfo: PageInfo };
 
 export const queryKeyIssues = {
-  all: () => ["issues"] as const,
-  lists: () => ["issues", "list"] as const,
-  list: (input: TListIssuesInput) => ["issues", "list", input] as const,
-  details: () => ["issues", "detail"] as const,
+  all: (workspaceId: string) => [workspaceId, "issues"] as const,
+  lists: (workspaceId: string) => [workspaceId, "issues", "list"] as const,
+  list: (workspaceId: string, args: ListIssuesArgs) =>
+    [workspaceId, "issues", "list", args] as const,
+  details: (workspaceId: string) => [workspaceId, "issues", "detail"] as const,
   detail: (workspaceId: string, identifier: string) =>
-    ["issues", "detail", workspaceId, identifier.toUpperCase()] as const,
-  history: (issueId: string) => ["issues", "history", issueId] as const,
-  search: (workspaceId: string, query: string) => ["issues", "search", workspaceId, query] as const,
+    [workspaceId, "issues", "detail", identifier.toUpperCase()] as const,
+  history: (workspaceId: string, issueId: string) =>
+    [workspaceId, "issues", "history", issueId] as const,
+  search: (workspaceId: string, query: string) => [workspaceId, "issues", "search", query] as const,
 };
 
-const queryKeyNotificationCounts = () => ["notifications", "counts"] as const;
-const queryKeyProjects = () => ["projects"] as const;
-const queryKeyCycles = () => ["cycles"] as const;
-
-export const issuesListQuery = (input: TListIssuesInput) =>
+/** Every page of a list, loaded one after the other up to LIST_MAX_ISSUES. */
+export const issuesListQuery = (workspaceId: string, args: ListIssuesArgs) =>
   infiniteQueryOptions({
-    queryKey: queryKeyIssues.list(input),
-    queryFn: async ({ pageParam }) => {
-      const res = await issuesApi().list({ ...input, limit: LIST_PAGE_SIZE, cursor: pageParam });
-      return { data: res.data ?? [], next_cursor: res.next_cursor ?? null, total: res.total ?? 0 };
+    queryKey: queryKeyIssues.list(workspaceId, args),
+    queryFn: ({ pageParam }) =>
+      call(workspaceId, "list_issues", { ...args, limit: LIST_PAGE_SIZE, cursor: pageParam }),
+    initialPageParam: null as string | null,
+    getNextPageParam: (last, pages) => {
+      if (!last.pageInfo.hasNextPage) return undefined;
+      if (pages.length * LIST_PAGE_SIZE >= LIST_MAX_ISSUES) return undefined;
+      return last.pageInfo.endCursor ?? undefined;
     },
-    initialPageParam: undefined as string | undefined,
-    getNextPageParam: (last: TIssuePage) => last.next_cursor ?? undefined,
     refetchInterval: LIST_REFETCH_INTERVAL_MS,
   });
 
+/** An issue by identifier (ENG-123) or id. */
 export const issueQuery = (workspaceId: string, identifier: string) =>
   queryOptions({
     queryKey: queryKeyIssues.detail(workspaceId, identifier),
-    queryFn: async () => {
-      const res = await issuesApi().get({
-        workspace_id: workspaceId,
-        identifier: identifier.toUpperCase(),
-      });
-      return { issue: res.data };
-    },
+    queryFn: () => call(workspaceId, "get_issue", { id: identifier }),
   });
 
-export const issueHistoryQuery = (issueId: string) =>
-  infiniteQueryOptions({
-    queryKey: queryKeyIssues.history(issueId),
-    queryFn: async ({ pageParam }) => {
-      const res = await issuesApi().history.list({
-        issue_id: issueId,
-        limit: HISTORY_PAGE_SIZE,
-        cursor: pageParam,
-      });
-      return { data: res.data ?? [], next_cursor: res.next_cursor ?? null };
-    },
-    initialPageParam: undefined as string | undefined,
-    getNextPageParam: (last) => last.next_cursor ?? undefined,
+export const issueHistoryQuery = (workspaceId: string, issueId: string) =>
+  queryOptions({
+    queryKey: queryKeyIssues.history(workspaceId, issueId),
+    queryFn: () => call(workspaceId, "get_issue_history", { id: issueId }),
   });
 
+/** Issues matching words or an identifier, for pickers. */
 export const searchIssuesQuery = (workspaceId: string, query: string) =>
   queryOptions({
-    queryKey: queryKeyIssues.search(workspaceId, query),
+    queryKey: queryKeyIssues.search(workspaceId, query.trim()),
     queryFn: async () => {
-      const res = await issuesApi().search({
-        workspace_id: workspaceId,
-        query,
+      const page = await call(workspaceId, "list_issues", {
+        query: query.trim(),
         limit: SEARCH_LIMIT,
       });
-      return { issues: res.data ?? [] };
+      return page.nodes;
     },
     enabled: query.trim().length > 0,
   });
 
-export async function createIssue(input: TCreateIssueInput) {
-  const res = await issuesApi().create(input);
-  return { data: res.data };
-}
-
-export function issuePatchToUpdateInput(
-  issueId: string,
-  patch: TIssueDraftPatch,
-): TUpdateIssueInput {
-  const input: TUpdateIssueInput = { issue_id: issueId };
-  if (patch.state) input.state_id = patch.state.id;
-  if (patch.priority !== undefined) input.priority = patch.priority;
-  if (patch.assignee !== undefined) input.assignee_id = patch.assignee?.id ?? CLEAR_UUID;
-  if (patch.labels) input.label_ids = patch.labels.map((label) => label.id);
-  if (patch.project !== undefined) input.project_id = patch.project?.id ?? CLEAR_UUID;
-  if (patch.milestone !== undefined) input.milestone_id = patch.milestone?.id ?? CLEAR_UUID;
-  if (patch.cycle !== undefined) input.cycle_id = patch.cycle?.id ?? CLEAR_UUID;
-  if (patch.estimate !== undefined) input.estimate = patch.estimate ?? CLEAR_ESTIMATE;
-  if (patch.due_date !== undefined) input.due_date = patch.due_date ?? CLEAR_DATE;
-  if (patch.parent !== undefined) input.parent_id = patch.parent?.id ?? CLEAR_UUID;
-  return input;
-}
-
-export async function updateIssue(input: TUpdateIssueInput) {
-  const res = await issuesApi().update(input);
-  return { data: res.data };
-}
-
-export async function bulkUpdateIssues(input: TBulkUpdateIssuesInput) {
-  const res = await issuesApi().bulkUpdate(input);
-  return { data: res.data };
-}
-
-export async function deleteIssue(input: { issueId: string }) {
-  const res = await issuesApi().delete({ issue_id: input.issueId });
-  return { data: res.data };
-}
-
-type TIssueLifecycleAction = "archive" | "unarchive" | "trash" | "restore";
-
-export async function changeIssueLifecycle(input: {
-  issueIds: string[];
-  action: TIssueLifecycleAction;
-}) {
-  const api = issuesApi();
-  const results = await Promise.all(
-    input.issueIds.map((issueId) => api[input.action]({ issue_id: issueId })),
-  );
-  return { data: results.map((res) => res.data) };
-}
-
-export async function setIssueSubscription(input: {
-  issueId: string;
-  subscribed: boolean;
-  userId?: string;
-}) {
-  const api = issuesApi();
-  const call = input.subscribed ? api.subscribe : api.unsubscribe;
-  const res = await call({ issue_id: input.issueId, user_id: input.userId });
-  return { data: res.data };
-}
-
-export type TReactionTarget = { issueId: string } | { commentId: string };
-
-export async function toggleReaction(input: {
-  emoji: string;
-  target: TReactionTarget;
-  reacted: boolean;
-}) {
-  const api = issuesApi();
-  const call = input.reacted ? api.reactions.remove : api.reactions.add;
-  const target =
-    "issueId" in input.target
-      ? { issue_id: input.target.issueId }
-      : { comment_id: input.target.commentId };
-  const res = await call({ emoji: input.emoji, ...target });
-  return { data: res.data };
-}
-
-export async function createAttachment(input: {
-  issueId: string;
-  title: string;
-  url?: string;
-  uploadId?: string;
-}) {
-  const res = await issuesApi().attachments.create({
-    issue_id: input.issueId,
-    title: input.title,
-    url: input.url,
-    upload_id: input.uploadId,
+/** Whether you have open issues assigned, which decides where a workspace opens. */
+export const hasAssignedWorkQuery = (workspaceId: string) =>
+  queryOptions({
+    queryKey: [workspaceId, "issues", "has-assigned-work"] as const,
+    queryFn: async () => {
+      const page = await call(workspaceId, "list_issues", {
+        assignee: "me",
+        filter: { state: { type: { in: ["unstarted", "started"] } } },
+        limit: 1,
+      });
+      return page.nodes.length > 0;
+    },
   });
-  return { data: res.data };
-}
 
-export async function deleteAttachment(input: { attachmentId: string }) {
-  const res = await issuesApi().attachments.delete({ attachment_id: input.attachmentId });
-  return { data: res.data };
-}
-
-export function invalidateIssues(queryClient: QueryClient) {
+/** Issues change projects' and cycles' progress and statuses' counts too. */
+export function invalidateIssues(queryClient: QueryClient, workspaceId: string) {
   return Promise.all([
-    queryClient.invalidateQueries({ queryKey: queryKeyIssues.all() }),
-    queryClient.invalidateQueries({ queryKey: queryKeyNotificationCounts() }),
-    queryClient.invalidateQueries({ queryKey: queryKeyProjects() }),
-    queryClient.invalidateQueries({ queryKey: queryKeyCycles() }),
+    queryClient.invalidateQueries({ queryKey: queryKeyIssues.all(workspaceId) }),
+    queryClient.invalidateQueries({ queryKey: [workspaceId, "teams", "statuses"] }),
+    queryClient.invalidateQueries({ queryKey: [workspaceId, "projects"] }),
+    queryClient.invalidateQueries({ queryKey: [workspaceId, "cycles"] }),
   ]);
 }
 
-function useInvalidateIssues() {
+function useInvalidateIssues(workspaceId: string) {
   const queryClient = useQueryClient();
-  return () => invalidateIssues(queryClient);
+  return () => invalidateIssues(queryClient, workspaceId);
 }
 
-type TIssuePatch = { id: string; patch: Partial<TIssue> };
+type TIssueCachePatch = { id: string; patch: Partial<Issue> };
+type TCacheSnapshot = [readonly unknown[], unknown][];
 
-function patchIssueCaches(queryClient: QueryClient, patches: TIssuePatch[]) {
+function patchIssueCaches(
+  queryClient: QueryClient,
+  workspaceId: string,
+  patches: TIssueCachePatch[],
+) {
   const byId = new Map(patches.map((item) => [item.id, item.patch]));
-  const apply = <T extends TIssue>(issue: T): T => {
+  const apply = <T extends { id: string }>(issue: T): T => {
     const patch = byId.get(issue.id);
     return patch ? { ...issue, ...patch } : issue;
   };
   queryClient.setQueriesData<InfiniteData<TIssuePage>>(
-    { queryKey: queryKeyIssues.lists() },
+    { queryKey: queryKeyIssues.lists(workspaceId) },
     (data) =>
       data && {
         ...data,
-        pages: data.pages.map((page) => ({ ...page, data: page.data.map(apply) })),
+        pages: data.pages.map((page) => ({ ...page, nodes: page.nodes.map(apply) })),
       },
   );
-  queryClient.setQueriesData<{ issue: TIssueDetail }>(
-    { queryKey: queryKeyIssues.details() },
-    (data) =>
-      data && { issue: { ...apply(data.issue), children: data.issue.children?.map(apply) } },
+  queryClient.setQueriesData<IssueDetail>(
+    { queryKey: queryKeyIssues.details(workspaceId) },
+    (data) => data && { ...apply(data), children: data.children.map(apply) },
   );
 }
-
-type TIssueCacheSnapshot = [readonly unknown[], unknown][];
 
 async function optimisticallyPatch(
   queryClient: QueryClient,
-  patches: TIssuePatch[],
-): Promise<TIssueCacheSnapshot> {
+  workspaceId: string,
+  patches: TIssueCachePatch[],
+): Promise<TCacheSnapshot> {
   if (patches.length === 0) return [];
-  await queryClient.cancelQueries({ queryKey: queryKeyIssues.all() });
-  const snapshot: TIssueCacheSnapshot = [
-    ...queryClient.getQueriesData({ queryKey: queryKeyIssues.lists() }),
-    ...queryClient.getQueriesData({ queryKey: queryKeyIssues.details() }),
+  await queryClient.cancelQueries({ queryKey: queryKeyIssues.all(workspaceId) });
+  const snapshot: TCacheSnapshot = [
+    ...queryClient.getQueriesData({ queryKey: queryKeyIssues.lists(workspaceId) }),
+    ...queryClient.getQueriesData({ queryKey: queryKeyIssues.details(workspaceId) }),
   ];
-  patchIssueCaches(queryClient, patches);
+  patchIssueCaches(queryClient, workspaceId, patches);
   return snapshot;
 }
 
-function restoreIssueCaches(queryClient: QueryClient, snapshot: TIssueCacheSnapshot | undefined) {
+function restoreIssueCaches(queryClient: QueryClient, snapshot: TCacheSnapshot | undefined) {
   snapshot?.forEach(([queryKey, data]) => queryClient.setQueryData(queryKey, data));
 }
 
-export type TUpdateIssueVariables = { input: TUpdateIssueInput; optimistic?: Partial<TIssue> };
-
-export function useCreateIssueMutation() {
-  const invalidate = useInvalidateIssues();
+export function useCreateIssueMutation(workspaceId: string) {
+  const invalidate = useInvalidateIssues(workspaceId);
   return useMutation({
-    mutationFn: createIssue,
+    mutationFn: (args: TIssueChanges) => call(workspaceId, "save_issue", args),
     meta: { errorTitle: "Could not create issue" },
     onSuccess: invalidate,
   });
 }
 
-export function useUpdateIssueMutation() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (variables: TUpdateIssueVariables) => updateIssue(variables.input),
-    meta: { errorTitle: "Could not update issue" },
-    onMutate: (variables) =>
-      optimisticallyPatch(
-        queryClient,
-        variables.optimistic ? [{ id: variables.input.issue_id, patch: variables.optimistic }] : [],
-      ),
-    onError: (_error, _variables, snapshot) => restoreIssueCaches(queryClient, snapshot),
-    onSettled: () => invalidateIssues(queryClient),
-  });
-}
-
-export type TBulkUpdateIssuesVariables = {
-  input: TBulkUpdateIssuesInput;
-  optimistic?: Partial<TIssue>;
+export type TUpdateIssueVariables = {
+  id: string;
+  changes: TIssueChanges;
+  optimistic?: Partial<Issue>;
 };
 
-export function useBulkUpdateIssuesMutation() {
+export function useUpdateIssueMutation(workspaceId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (variables: TBulkUpdateIssuesVariables) => bulkUpdateIssues(variables.input),
-    meta: { errorTitle: "Could not update issues" },
-    onMutate: (variables) => {
-      const patch = variables.optimistic;
-      return optimisticallyPatch(
-        queryClient,
-        patch ? (variables.input.issue_ids ?? []).map((id) => ({ id, patch })) : [],
-      );
-    },
+    mutationFn: ({ id, changes }: TUpdateIssueVariables) =>
+      call(workspaceId, "save_issue", { ...changes, id }),
+    meta: { errorTitle: "Could not update issue" },
+    onMutate: ({ id, optimistic }) =>
+      optimisticallyPatch(queryClient, workspaceId, optimistic ? [{ id, patch: optimistic }] : []),
     onError: (_error, _variables, snapshot) => restoreIssueCaches(queryClient, snapshot),
-    onSettled: () => invalidateIssues(queryClient),
+    onSettled: () => invalidateIssues(queryClient, workspaceId),
   });
 }
 
-export function useDeleteIssueMutation() {
-  const invalidate = useInvalidateIssues();
+/**
+ * Saves a description edit as a patch, so edits others made elsewhere in it meanwhile stay;
+ * when the patch no longer applies, the whole text is saved instead.
+ */
+export function useSaveDescriptionMutation(workspaceId: string) {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deleteIssue,
-    meta: { errorTitle: "Could not delete issue" },
-    onSuccess: invalidate,
+    mutationFn: async ({ id, change, description }: TSaveDescriptionVariables) => {
+      if (!change.patch) return call(workspaceId, "save_issue", { id, description });
+      try {
+        return await call(workspaceId, "save_issue", { id, patch: change.patch });
+      } catch (error) {
+        if (!(error instanceof ApiError) || error.status !== 400) throw error;
+        return call(workspaceId, "save_issue", { id, description });
+      }
+    },
+    meta: { errorTitle: "Could not save the description" },
+    onSettled: () => invalidateIssues(queryClient, workspaceId),
   });
 }
 
-export function useIssueLifecycleMutation() {
-  const invalidate = useInvalidateIssues();
+type TSaveDescriptionVariables = {
+  id: string;
+  change: Pick<SaveIssueArgs, "patch">;
+  description: string;
+};
+
+export type TUpdateIssuesVariables = {
+  ids: string[];
+  changes: TIssueChanges;
+  optimistic?: Partial<Issue>;
+};
+
+export function useUpdateIssuesMutation(workspaceId: string) {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: changeIssueLifecycle,
+    mutationFn: ({ ids, changes }: TUpdateIssuesVariables) =>
+      call(workspaceId, "update_issues", { ids, changes }),
+    meta: { errorTitle: "Could not update issues" },
+    onMutate: ({ ids, optimistic }) =>
+      optimisticallyPatch(
+        queryClient,
+        workspaceId,
+        optimistic ? ids.map((id) => ({ id, patch: optimistic })) : [],
+      ),
+    onError: (_error, _variables, snapshot) => restoreIssueCaches(queryClient, snapshot),
+    onSettled: () => invalidateIssues(queryClient, workspaceId),
+  });
+}
+
+export type TIssueLifecycleAction = "archive" | "unarchive" | "delete" | "restore";
+
+const lifecycleOps = {
+  archive: "archive_issue",
+  unarchive: "unarchive_issue",
+  delete: "delete_issue",
+  restore: "restore_issue",
+} as const;
+
+export function useIssueLifecycleMutation(workspaceId: string) {
+  const invalidate = useInvalidateIssues(workspaceId);
+  return useMutation({
+    mutationFn: ({ ids, action }: { ids: string[]; action: TIssueLifecycleAction }) =>
+      Promise.all(ids.map((id) => call(workspaceId, lifecycleOps[action], { id }))),
     meta: { errorTitle: "Could not update issue" },
     onSuccess: invalidate,
   });
 }
 
-export function useIssueSubscriptionMutation() {
-  const invalidate = useInvalidateIssues();
+export function useIssueSubscriptionMutation(workspaceId: string) {
+  const invalidate = useInvalidateIssues(workspaceId);
   return useMutation({
-    mutationFn: setIssueSubscription,
-    meta: { errorTitle: "Could not change subscription" },
+    mutationFn: ({ id, users, subscribed }: { id: string; users: string[]; subscribed: boolean }) =>
+      call(
+        workspaceId,
+        "save_issue",
+        subscribed ? { id, addSubscribers: users } : { id, removeSubscribers: users },
+      ),
+    meta: { errorTitle: "Could not change subscribers" },
     onSuccess: invalidate,
   });
 }
 
-export function useToggleReactionMutation() {
+export function useShareIssueMutation(workspaceId: string) {
+  const invalidate = useInvalidateIssues(workspaceId);
+  return useMutation({
+    mutationFn: ({ id, user, shared }: { id: string; user: string; shared: boolean }) =>
+      call(workspaceId, shared ? "share_issue" : "unshare_issue", { id, user }),
+    meta: { errorTitle: "Could not change sharing" },
+    onSuccess: invalidate,
+  });
+}
+
+export function useIssueReactionMutation(workspaceId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: toggleReaction,
+    mutationFn: async ({
+      issueId,
+      emoji,
+      reacted,
+    }: {
+      issueId: string;
+      emoji: string;
+      reacted: boolean;
+    }) => {
+      if (reacted) await call(workspaceId, "remove_reaction", { issueId, emoji });
+      else await call(workspaceId, "add_reaction", { issueId, emoji });
+    },
     meta: { errorTitle: "Could not update reaction" },
     onSuccess: () =>
-      Promise.all([
-        queryClient.invalidateQueries({ queryKey: queryKeyIssues.details() }),
-        queryClient.invalidateQueries({ queryKey: queryKeyNotificationCounts() }),
-      ]),
+      queryClient.invalidateQueries({ queryKey: queryKeyIssues.details(workspaceId) }),
   });
 }
 
-export function useCreateAttachmentMutation() {
-  const invalidate = useInvalidateIssues();
+export function useCreateAttachmentMutation(workspaceId: string) {
+  const invalidate = useInvalidateIssues(workspaceId);
   return useMutation({
-    mutationFn: createAttachment,
-    meta: { errorTitle: "Could not add attachment" },
+    mutationFn: (args: OpArgs<"create_attachment">) => call(workspaceId, "create_attachment", args),
+    meta: { errorTitle: "Could not add the link" },
     onSuccess: invalidate,
   });
 }
 
-export function useDeleteAttachmentMutation() {
-  const invalidate = useInvalidateIssues();
+export function useAttachUploadMutation(workspaceId: string) {
+  const invalidate = useInvalidateIssues(workspaceId);
   return useMutation({
-    mutationFn: deleteAttachment,
-    meta: { errorTitle: "Could not remove attachment" },
+    mutationFn: (args: OpArgs<"create_attachment_from_upload">) =>
+      call(workspaceId, "create_attachment_from_upload", args),
+    meta: { errorTitle: "Could not attach the file" },
+    onSuccess: invalidate,
+  });
+}
+
+export function useDeleteAttachmentMutation(workspaceId: string) {
+  const invalidate = useInvalidateIssues(workspaceId);
+  return useMutation({
+    mutationFn: (id: string) => call(workspaceId, "delete_attachment", { id }),
+    meta: { errorTitle: "Could not remove the attachment" },
     onSuccess: invalidate,
   });
 }

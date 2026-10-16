@@ -43,7 +43,8 @@ export function ProjectIssues({ project, milestone, onMilestoneChange }: TProps)
   const openNewIssue = useNewIssueStore((state) => state.open);
   const [toggled, setToggled] = useState<string[]>([]);
   const teamId = project.teams[0]?.id;
-  useNewIssueContext({ projectId: project.id, teamId });
+  const projectRef = { id: project.id, name: project.name, slugId: project.slugId };
+  useNewIssueContext({ teamId, draft: { project: projectRef } });
 
   const issues = (data ?? []).filter((issue) => {
     if (!milestone) return true;
@@ -55,7 +56,7 @@ export function ProjectIssues({ project, milestone, onMilestoneChange }: TProps)
     <Button
       size="sm"
       variant="outline"
-      onClick={() => openNewIssue({ projectId: project.id, teamId })}
+      onClick={() => openNewIssue({ teamId, draft: { project: projectRef } })}
     >
       <PlusIcon className="size-4" />
       New issue

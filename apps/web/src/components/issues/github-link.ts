@@ -6,7 +6,7 @@ export type TGithubLink =
   | { kind: "branch"; reference: string }
   | { kind: "commit"; reference: string; sha: string; subject: string };
 
-type TLinkedAttachment = { source_type: string; title: string; metadata: Record<string, unknown> };
+type TLinkedAttachment = { sourceType: string; title: string; metadata: Record<string, unknown> };
 
 const SHORT_SHA_LENGTH = 7;
 
@@ -16,13 +16,14 @@ function text(value: unknown) {
 
 export function githubLinkOf(attachment: TLinkedAttachment): TGithubLink | null {
   const repo = text(attachment.metadata.repo);
-  switch (attachment.source_type) {
+  switch (attachment.sourceType) {
     case "github": {
       const number = attachment.metadata.number;
+      if (typeof number !== "number") return null;
       const state = PULL_REQUEST_STATES.find((value) => value === attachment.metadata.state);
       return {
         kind: "pull_request",
-        reference: typeof number === "number" ? `${repo}#${number}` : repo,
+        reference: `${repo}#${number}`,
         state: state ?? null,
       };
     }

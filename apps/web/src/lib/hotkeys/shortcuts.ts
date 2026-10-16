@@ -39,6 +39,28 @@ export const shortcutGroups: TShortcutGroup[] = [
     ],
   },
   {
+    title: "Issue lists",
+    shortcuts: [
+      { label: "Next / previous", keys: ["J", "K"] },
+      { label: "Open", keys: ["O"] },
+      { label: "Select", keys: ["X"] },
+      { label: "Clear the selection", keys: ["Escape"] },
+    ],
+  },
+  {
+    title: "Issue",
+    shortcuts: [
+      { label: "Status", keys: ["S"] },
+      { label: "Priority", keys: ["P"] },
+      { label: "Assignee", keys: ["A"] },
+      { label: "Labels", keys: ["L"] },
+      { label: "Project", keys: ["Shift+P"] },
+      { label: "Cycle", keys: ["Shift+C"] },
+      { label: "Estimate", keys: ["E"] },
+      { label: "Due date", keys: ["D"] },
+    ],
+  },
+  {
     title: "Inbox",
     shortcuts: [
       { label: "Next / previous", keys: ["J", "K"] },

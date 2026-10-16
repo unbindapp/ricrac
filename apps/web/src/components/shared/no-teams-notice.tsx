@@ -16,7 +16,7 @@ export function NoTeamsNotice({ entity, onNavigate }: TProps) {
       <p className="min-w-0 flex-1 text-sm">{entity} belong to a team. Create a team first.</p>
       <LinkButton
         to="/$workspace/settings/teams"
-        params={{ workspace: workspace.slug }}
+        params={{ workspace: workspace.urlKey }}
         variant="outline"
         size="sm"
         onClick={onNavigate}

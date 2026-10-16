@@ -1,115 +1,86 @@
 import { infiniteQueryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { invalidateIssues, toggleReaction } from "@/lib/queries/issues";
-import { getGoClient } from "@/lib/server/client";
-
-function commentsApi() {
-  return getGoClient().issues.comments;
-}
+import { queryKeyIssues } from "@/lib/queries/issues";
+import { call, type OpArgs } from "@/lib/server/client";
 
 const COMMENTS_PAGE_SIZE = 100;
 
 export const queryKeyComments = {
-  all: () => ["comments"] as const,
-  list: (issueId: string) => ["comments", "list", issueId] as const,
+  all: (workspaceId: string) => [workspaceId, "comments"] as const,
+  issue: (workspaceId: string, issueId: string) =>
+    [workspaceId, "comments", "issue", issueId] as const,
 };
 
-export const commentsQuery = (issueId: string) =>
+/** An issue's comment threads, oldest first, each with its replies. */
+export const issueCommentsQuery = (workspaceId: string, issueId: string) =>
   infiniteQueryOptions({
-    queryKey: queryKeyComments.list(issueId),
-    queryFn: async ({ pageParam }) => {
-      const res = await commentsApi().list({
-        issue_id: issueId,
+    queryKey: queryKeyComments.issue(workspaceId, issueId),
+    queryFn: ({ pageParam }) =>
+      call(workspaceId, "list_comments", {
+        issueId,
         limit: COMMENTS_PAGE_SIZE,
         cursor: pageParam,
-      });
-      return { data: res.data ?? [], next_cursor: res.next_cursor ?? null };
-    },
-    initialPageParam: undefined as string | undefined,
-    getNextPageParam: (last) => last.next_cursor ?? undefined,
+      }),
+    initialPageParam: null as string | null,
+    getNextPageParam: (last) =>
+      last.pageInfo.hasNextPage ? (last.pageInfo.endCursor ?? undefined) : undefined,
   });
 
-export async function createComment(input: { issueId: string; body: string; parentId?: string }) {
-  const res = await commentsApi().create({
-    issue_id: input.issueId,
-    body: input.body,
-    parent_id: input.parentId,
-  });
-  return { data: res.data };
-}
-
-export async function updateComment(input: { commentId: string; body: string }) {
-  const res = await commentsApi().update({ comment_id: input.commentId, body: input.body });
-  return { data: res.data };
-}
-
-export async function deleteComment(input: { commentId: string }) {
-  const res = await commentsApi().delete({ comment_id: input.commentId });
-  return { data: res.data };
-}
-
-export async function setCommentResolved(input: { commentId: string; resolved: boolean }) {
-  const api = commentsApi();
-  const call = input.resolved ? api.resolve : api.unresolve;
-  const res = await call({ comment_id: input.commentId });
-  return { data: res.data };
-}
-
-function useInvalidateComments() {
+/** Comments change the issue's comment count and subscribers too. */
+function useInvalidateComments(workspaceId: string) {
   const queryClient = useQueryClient();
   return () =>
     Promise.all([
-      queryClient.invalidateQueries({ queryKey: queryKeyComments.all() }),
-      invalidateIssues(queryClient),
+      queryClient.invalidateQueries({ queryKey: queryKeyComments.all(workspaceId) }),
+      queryClient.invalidateQueries({ queryKey: queryKeyIssues.details(workspaceId) }),
     ]);
 }
 
-export function useCreateCommentMutation() {
-  const invalidate = useInvalidateComments();
+/** Posts a comment (without id) or edits one of yours (with it). */
+export function useSaveCommentMutation(workspaceId: string) {
+  const invalidate = useInvalidateComments(workspaceId);
   return useMutation({
-    mutationFn: createComment,
-    meta: { errorTitle: "Could not post comment" },
+    mutationFn: (args: OpArgs<"save_comment">) => call(workspaceId, "save_comment", args),
+    meta: { errorTitle: "Could not save comment" },
     onSuccess: invalidate,
   });
 }
 
-export function useUpdateCommentMutation() {
-  const invalidate = useInvalidateComments();
+export function useDeleteCommentMutation(workspaceId: string) {
+  const invalidate = useInvalidateComments(workspaceId);
   return useMutation({
-    mutationFn: updateComment,
-    meta: { errorTitle: "Could not edit comment" },
-    onSuccess: invalidate,
-  });
-}
-
-export function useDeleteCommentMutation() {
-  const invalidate = useInvalidateComments();
-  return useMutation({
-    mutationFn: deleteComment,
+    mutationFn: (id: string) => call(workspaceId, "delete_comment", { id }),
     meta: { errorTitle: "Could not delete comment" },
     onSuccess: invalidate,
   });
 }
 
-export function useResolveCommentMutation() {
-  const invalidate = useInvalidateComments();
+export function useResolveCommentMutation(workspaceId: string) {
+  const invalidate = useInvalidateComments(workspaceId);
   return useMutation({
-    mutationFn: setCommentResolved,
-    meta: { errorTitle: "Could not update comment" },
+    mutationFn: async ({ id, resolved }: { id: string; resolved: boolean }) =>
+      call(workspaceId, resolved ? "resolve_comment" : "unresolve_comment", { id }),
+    meta: { errorTitle: "Could not update the thread" },
     onSuccess: invalidate,
   });
 }
 
-export function useToggleCommentReactionMutation() {
+export function useCommentReactionMutation(workspaceId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: { commentId: string; emoji: string; reacted: boolean }) =>
-      toggleReaction({
-        emoji: input.emoji,
-        reacted: input.reacted,
-        target: { commentId: input.commentId },
-      }),
+    mutationFn: async ({
+      commentId,
+      emoji,
+      reacted,
+    }: {
+      commentId: string;
+      emoji: string;
+      reacted: boolean;
+    }) => {
+      if (reacted) await call(workspaceId, "remove_reaction", { commentId, emoji });
+      else await call(workspaceId, "add_reaction", { commentId, emoji });
+    },
     meta: { errorTitle: "Could not update reaction" },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeyComments.all() }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeyComments.all(workspaceId) }),
   });
 }

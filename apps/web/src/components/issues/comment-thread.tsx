@@ -1,3 +1,4 @@
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { useQuery } from "@tanstack/react-query";
 import {
   CheckCircle2Icon,
@@ -10,10 +11,11 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-import { UserAvatar } from "@/components/issues/pickers";
+import type { Comment, CommentThread as TCommentThread } from "@/api/ops.gen";
+import { userName } from "@/components/issues/grouping";
 import { useWorkspaceUsers } from "@/components/issues/picker-sources";
-import { ReactionBar } from "@/components/issues/reaction-bar";
-import type { TComment, TCommentReply } from "@/lib/queries/issues";
+import { UserAvatar } from "@/components/issues/pickers";
+import { AddReactionButton, groupReactions, ReactionBar } from "@/components/issues/reaction-bar";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { MarkdownEditor } from "@/components/shared/markdown-editor";
 import { MarkdownView } from "@/components/shared/markdown-view";
@@ -25,25 +27,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Kbd } from "@/components/ui/kbd";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import {
-  useCreateCommentMutation,
+  useCommentReactionMutation,
   useDeleteCommentMutation,
   useResolveCommentMutation,
-  useToggleCommentReactionMutation,
-  useUpdateCommentMutation,
+  useSaveCommentMutation,
 } from "@/lib/queries/comments";
 import { meQuery } from "@/lib/queries/me";
-import { useCreateUploadMutation } from "@/lib/queries/uploads";
-
-export function useUploadImage() {
-  const { workspace } = useWorkspace();
-  const { mutateAsync } = useCreateUploadMutation();
-  return async (file: File) => {
-    const res = await mutateAsync({ workspaceId: workspace.id, file });
-    return res.data.url;
-  };
-}
+import { useUploadImage } from "@/lib/queries/uploads";
 
 export function CommentComposer({
   issueId,
@@ -58,19 +51,24 @@ export function CommentComposer({
   autoFocus?: boolean;
   onDone?: () => void;
 }) {
+  const { workspace } = useWorkspace();
   const [body, setBody] = useState("");
+  const [formKey, setFormKey] = useState(0);
   const { users } = useWorkspaceUsers();
-  const uploadImage = useUploadImage();
-  const { mutateAsync: createComment, isPending } = useCreateCommentMutation();
+  const uploadImage = useUploadImage(workspace.id);
+  const { mutateAsync: saveComment, isPending } = useSaveCommentMutation(workspace.id);
   const submit = async () => {
     if (!body.trim() || isPending) return;
-    await createComment({ issueId, body, parentId }).catch(() => undefined);
+    const saved = await saveComment({ issueId, body, parentId }).catch(() => null);
+    if (!saved) return;
     setBody("");
+    setFormKey((key) => key + 1);
     onDone?.();
   };
   return (
-    <div className="bg-card flex w-full flex-col gap-2 rounded-lg border p-4">
+    <div className="bg-card flex w-full flex-col gap-2 rounded-lg border p-3">
       <MarkdownEditor
+        key={formKey}
         label={parentId ? "Reply" : "Comment"}
         value={body}
         onChange={setBody}
@@ -82,7 +80,7 @@ export function CommentComposer({
       />
       <div className="flex items-center justify-end gap-2">
         {onDone && (
-          <Button variant="outline" size="sm" onClick={onDone}>
+          <Button variant="ghost" size="sm" onClick={onDone}>
             Cancel
           </Button>
         )}
@@ -93,32 +91,36 @@ export function CommentComposer({
           onClick={() => void submit()}
         >
           {parentId ? "Reply" : "Comment"}
+          <Kbd className="bg-primary-foreground/2-10 text-primary-foreground border-transparent">
+            {formatForDisplay("Mod+Enter")}
+          </Kbd>
         </Button>
       </div>
     </div>
   );
 }
 
-export function CommentThread({ comment, issueId }: { comment: TComment; issueId: string }) {
+export function CommentThread({ thread, issueId }: { thread: TCommentThread; issueId: string }) {
   const [isReplying, setIsReplying] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const { canEdit } = useWorkspace();
-  const isResolved = Boolean(comment.resolved_at);
+  const isResolved = Boolean(thread.resolvedAt);
+  const author = thread.user ? userName(thread.user) : "a deleted user";
 
   if (isResolved && !isExpanded) {
     return (
       <Button
         variant="ghost"
         size="sm"
-        className="text-muted-foreground self-start"
+        className="text-muted-foreground self-start font-normal"
         aria-expanded={false}
         onClick={() => setIsExpanded(true)}
       >
         <ChevronRightIcon className="size-3.5" />
         <CheckCircle2Icon className="size-4" />
-        Resolved thread from {comment.author?.name ?? "a deleted user"}
-        {comment.replies.length > 0 &&
-          ` and ${comment.replies.length} repl${comment.replies.length === 1 ? "y" : "ies"}`}
+        Resolved thread from {author}
+        {thread.replies.length > 0 &&
+          ` and ${thread.replies.length} repl${thread.replies.length === 1 ? "y" : "ies"}`}
       </Button>
     );
   }
@@ -126,32 +128,47 @@ export function CommentThread({ comment, issueId }: { comment: TComment; issueId
   return (
     <div className="bg-card flex w-full flex-col rounded-lg border">
       <CommentItem
-        comment={comment}
-        isThreadRoot
+        comment={thread}
+        thread={thread}
         onReply={canEdit ? () => setIsReplying(true) : undefined}
       />
-      {comment.replies.map((reply) => (
+      {thread.replies.map((reply) => (
         <div key={reply.id} className="border-t">
           <CommentItem comment={reply} />
         </div>
       ))}
-      {isReplying && (
+      {isReplying ? (
         <div className="border-t p-2">
           <CommentComposer
             issueId={issueId}
-            parentId={comment.id}
+            parentId={thread.id}
             placeholder="Leave a reply…"
             autoFocus
             onDone={() => setIsReplying(false)}
           />
         </div>
+      ) : (
+        canEdit &&
+        thread.replies.length > 0 && (
+          <div className="border-t px-2 py-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground font-normal"
+              onClick={() => setIsReplying(true)}
+            >
+              <ReplyIcon className="size-4" />
+              Reply
+            </Button>
+          </div>
+        )
       )}
       {isResolved && (
-        <div className="border-t px-4 py-2">
+        <div className="border-t px-2 py-1">
           <Button
             variant="ghost"
             size="sm"
-            className="text-muted-foreground"
+            className="text-muted-foreground font-normal"
             onClick={() => setIsExpanded(false)}
           >
             Collapse resolved thread
@@ -164,82 +181,98 @@ export function CommentThread({ comment, issueId }: { comment: TComment; issueId
 
 function CommentItem({
   comment,
-  isThreadRoot,
+  thread,
   onReply,
 }: {
-  comment: TComment | TCommentReply;
-  isThreadRoot?: boolean;
+  comment: Comment;
+  /** Set on the thread's first comment, which resolves the thread. */
+  thread?: TCommentThread;
   onReply?: () => void;
 }) {
+  const { workspace, canEdit, isAdmin } = useWorkspace();
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [draft, setDraft] = useState(comment.body);
-  const { canEdit, isAdmin } = useWorkspace();
   const { data: me } = useQuery(meQuery);
   const { users } = useWorkspaceUsers();
-  const uploadImage = useUploadImage();
-  const { mutateAsync: updateComment, isPending: isSaving } = useUpdateCommentMutation();
-  const { mutateAsync: deleteComment } = useDeleteCommentMutation();
-  const { mutate: setResolved } = useResolveCommentMutation();
-  const { mutate: toggleReaction } = useToggleCommentReactionMutation();
-  const isAuthor = Boolean(me && comment.author?.id === me.user.id);
-  const canModify = isAuthor || isAdmin;
-  const authorName = comment.author
-    ? comment.author.name || comment.author.display_name
-    : "Deleted user";
+  const uploadImage = useUploadImage(workspace.id);
+  const { mutateAsync: saveComment, isPending: isSaving } = useSaveCommentMutation(workspace.id);
+  const { mutateAsync: deleteComment } = useDeleteCommentMutation(workspace.id);
+  const { mutate: setResolved } = useResolveCommentMutation(workspace.id);
+  const { mutate: toggleReaction } = useCommentReactionMutation(workspace.id);
+  const isAuthor = Boolean(me && comment.user?.id === me.id);
+  const authorName = comment.user ? userName(comment.user) : "Deleted user";
+  const reactions = groupReactions(comment.reactions, me?.id);
+  const react = (emoji: string, reacted: boolean) =>
+    toggleReaction({ commentId: comment.id, emoji, reacted });
 
   const save = async () => {
     if (!draft.trim()) return;
-    await updateComment({ commentId: comment.id, body: draft });
+    await saveComment({ id: comment.id, body: draft });
     setIsEditing(false);
   };
 
   return (
-    <article aria-label={`Comment from ${authorName}`} className="flex flex-col gap-2 p-4">
-      <header className="flex items-center gap-2">
-        {comment.author && <UserAvatar user={comment.author} size="sm" />}
+    <article
+      aria-label={`Comment from ${authorName}`}
+      className="group/comment group/reactable flex flex-col gap-2 p-3"
+    >
+      <header className="flex min-h-7 items-center gap-2">
+        {comment.user && <UserAvatar user={comment.user} size="sm" />}
         <span className="truncate text-sm font-medium">{authorName}</span>
         <span className="text-muted-foreground text-xs">
-          <RelativeTime value={comment.created_at} />
+          <RelativeTime value={comment.createdAt} />
         </span>
-        {comment.edited_at && <span className="text-muted-foreground text-xs">(edited)</span>}
-        {comment.resolved_at && (
+        {comment.editedAt && <span className="text-muted-foreground text-xs">(edited)</span>}
+        {comment.resolvedAt && (
           <span className="text-muted-foreground inline-flex items-center gap-1.5 text-xs">
             <CheckCircle2Icon className="size-3.5" />
             Resolved
           </span>
         )}
         <span className="flex-1" />
+        {canEdit && reactions.length === 0 && (
+          <AddReactionButton reactions={reactions} onToggle={react} revealOnHover />
+        )}
         {onReply && (
-          <Button variant="ghost" size="icon" aria-label="Reply" onClick={onReply}>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Reply"
+            className="size-7 opacity-0 group-hover/comment:opacity-100 focus-visible:opacity-100"
+            onClick={onReply}
+          >
             <ReplyIcon className="size-4" />
           </Button>
         )}
-        {(canModify || (canEdit && isThreadRoot)) && (
+        {(isAuthor || isAdmin || (canEdit && thread)) && (
           <DropdownMenu>
             <DropdownMenuTrigger
               render={
-                <Button variant="ghost" size="icon" aria-label="Comment actions">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Comment actions"
+                  className="size-7 opacity-0 group-hover/comment:opacity-100 focus-visible:opacity-100 data-popup-open:opacity-100"
+                >
                   <EllipsisIcon className="size-4" />
                 </Button>
               }
             />
             <DropdownMenuContent align="end" className="w-48">
-              {isThreadRoot && canEdit && (
+              {thread && canEdit && (
                 <DropdownMenuItem
-                  onClick={() =>
-                    setResolved({ commentId: comment.id, resolved: !comment.resolved_at })
-                  }
+                  onClick={() => setResolved({ id: thread.id, resolved: !thread.resolvedAt })}
                 >
-                  {comment.resolved_at ? (
+                  {thread.resolvedAt ? (
                     <UndoIcon className="size-4" />
                   ) : (
                     <CheckCircle2Icon className="size-4" />
                   )}
-                  {comment.resolved_at ? "Unresolve thread" : "Resolve thread"}
+                  {thread.resolvedAt ? "Reopen thread" : "Resolve thread"}
                 </DropdownMenuItem>
               )}
-              {canModify && (
+              {isAuthor && (
                 <DropdownMenuItem
                   onClick={() => {
                     setDraft(comment.body);
@@ -250,7 +283,7 @@ function CommentItem({
                   Edit
                 </DropdownMenuItem>
               )}
-              {canModify && (
+              {(isAuthor || isAdmin) && (
                 <DropdownMenuItem className="text-destructive" onClick={() => setIsDeleting(true)}>
                   <Trash2Icon className="size-4" />
                   Delete
@@ -260,6 +293,11 @@ function CommentItem({
           </DropdownMenu>
         )}
       </header>
+      {comment.quotedText && (
+        <blockquote className="text-muted-foreground border-l-2 pl-3 text-sm">
+          {comment.quotedText}
+        </blockquote>
+      )}
       {isEditing ? (
         <div className="flex flex-col gap-2">
           <MarkdownEditor
@@ -270,15 +308,16 @@ function CommentItem({
             users={users}
             onUploadImage={uploadImage}
             autoFocus
+            framed
           />
           <div className="flex items-center justify-end gap-2">
-            <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>
+            <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)}>
               Cancel
             </Button>
             <Button
               size="sm"
               isPending={isSaving}
-              disabled={!draft.trim()}
+              disabled={!draft.trim() || draft === comment.body}
               onClick={() => void save().catch(() => undefined)}
             >
               Save
@@ -288,22 +327,20 @@ function CommentItem({
       ) : (
         <MarkdownView markdown={comment.body} />
       )}
-      <ReactionBar
-        reactions={comment.reactions}
-        disabled={!canEdit}
-        onToggle={(emoji, reacted) => toggleReaction({ commentId: comment.id, emoji, reacted })}
-      />
+      {reactions.length > 0 && (
+        <ReactionBar reactions={reactions} disabled={!canEdit} onToggle={react} />
+      )}
       <ConfirmDialog
         open={isDeleting}
         onOpenChange={setIsDeleting}
         title="Delete comment"
         description={
-          "replies" in comment && comment.replies.length > 0
+          thread && thread.replies.length > 0
             ? "The comment and its replies are deleted for everyone."
             : "The comment is deleted for everyone."
         }
         confirmLabel="Delete comment"
-        onConfirm={() => deleteComment({ commentId: comment.id })}
+        onConfirm={() => deleteComment(comment.id)}
       />
     </article>
   );

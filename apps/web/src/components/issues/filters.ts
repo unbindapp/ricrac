@@ -1,11 +1,13 @@
 import { z } from "zod";
 
+import type { ListIssuesArgs } from "@/api/ops.gen";
+import { serverOrderBy, type TDisplaySettings } from "./display.ts";
 import type { TStateType } from "@/components/shared/state-icon";
-import type { TListIssuesInput } from "@/lib/queries/issues";
-import type { TDisplaySettings } from "@/components/issues/display";
 
+/** Stands for "no assignee" or "no project" among the ids. */
 export const UNASSIGNED = "null";
 
+/** What a list shows, as the filter bar edits it; `issueFilterOf` turns it into Ricrac's filter language. */
 export type ListIssuesFilters = {
   team_ids?: string[];
   state_ids?: string[];
@@ -22,6 +24,8 @@ export type ListIssuesFilters = {
   due_after?: string;
   subscriber_id?: string;
   query?: string;
+  /** Leave out snoozed issues, as triage does, or show only them. */
+  snoozed?: "hide" | "only";
 };
 
 export type TFilterField =
@@ -59,7 +63,7 @@ export const listParamOfField: Partial<Record<TFilterField, TListParam>> = {
   cycle: "cycle_ids",
 };
 
-const STATE_TYPE_VALUES = [
+export const STATE_TYPE_VALUES = [
   "triage",
   "backlog",
   "unstarted",
@@ -68,7 +72,7 @@ const STATE_TYPE_VALUES = [
   "canceled",
 ] as const satisfies readonly TStateType[];
 
-const COMPLETED_TYPES: TStateType[] = ["completed", "canceled"];
+const CLOSED_TYPES: TStateType[] = ["completed", "canceled"];
 
 const stringList = z.array(z.string()).optional().catch(undefined);
 const optionalString = z.string().optional().catch(undefined);
@@ -92,32 +96,21 @@ export const issueSearchSchema = z.object({
 
 export type TIssueSearch = z.infer<typeof issueSearchSchema>;
 
-export function filtersFromSearch(search: TIssueSearch): ListIssuesFilters {
-  const filters: ListIssuesFilters = {
-    state_ids: search.state_ids,
-    state_types: search.state_types,
-    assignee_ids: search.assignee_ids,
-    creator_ids: search.creator_ids,
-    label_ids: search.label_ids,
-    project_ids: search.project_ids,
-    cycle_ids: search.cycle_ids,
-    priorities: search.priorities,
-    due_before: search.due_before,
-    due_after: search.due_after,
-    subscriber_id: search.subscriber_id,
-  };
-  return compactFilters(filters);
-}
-
 export function compactFilters<T extends object>(filters: T): T {
   const entries = Object.entries(filters).filter(([, value]) => {
-    if (value === undefined || value === null || value === "") return false;
+    if (value === undefined || value === null || value === "" || value === false) return false;
     if (Array.isArray(value)) return value.length > 0;
     return true;
   });
   return Object.fromEntries(entries) as T;
 }
 
+export function filtersFromSearch(search: TIssueSearch): ListIssuesFilters {
+  const filters: TIssueSearch = { ...search, peek: undefined };
+  return compactFilters(filters);
+}
+
+/** Search params for the filters: every filter key is set so removed filters leave the URL. */
 export function filtersToSearch(filters: ListIssuesFilters): Partial<TIssueSearch> {
   const clean = compactFilters(filters);
   return {
@@ -186,6 +179,7 @@ function intersect<T>(a: T[] | undefined, b: T[] | undefined): T[] | undefined {
   return a.filter((value) => b.includes(value));
 }
 
+/** A page's own filters narrow what the person picked; they never widen it. */
 export function mergeFilters(
   filters: ListIssuesFilters,
   fixed: ListIssuesFilters | undefined,
@@ -204,11 +198,52 @@ export function mergeFilters(
     "cycle_ids",
   ] as const;
   for (const key of listKeys) {
-    const value = intersect<string>(filters[key], fixed[key]);
-    (merged as Record<string, unknown>)[key] = value;
+    (merged as Record<string, unknown>)[key] = intersect<string>(filters[key], fixed[key]);
   }
   merged.priorities = intersect(filters.priorities, fixed.priorities);
-  return merged;
+  return compactFilters(merged);
+}
+
+type TCondition = Record<string, unknown>;
+
+const anyOf = (values: string[]) => ({ in: values });
+
+/** The ids, with "null" standing for "not set" (no assignee, no project). */
+function nullableIds(field: string, values: string[]): TCondition {
+  const ids = values.filter((value) => value !== UNASSIGNED);
+  const conditions: TCondition[] = [];
+  if (values.includes(UNASSIGNED)) conditions.push({ [field]: { null: true } });
+  if (ids.length > 0) conditions.push({ [field]: { id: anyOf(ids) } });
+  return conditions.length === 1 ? conditions[0] : { or: conditions };
+}
+
+/** The filters in Ricrac's issue filter language (what list_issues and custom views take). */
+export function issueFilterOf(filters: ListIssuesFilters): TCondition | undefined {
+  const clean = compactFilters(filters);
+  const parts: TCondition[] = [];
+  if (clean.team_ids) parts.push({ team: { id: anyOf(clean.team_ids) } });
+  if (clean.state_ids) parts.push({ state: { id: anyOf(clean.state_ids) } });
+  if (clean.state_types) parts.push({ state: { type: anyOf(clean.state_types) } });
+  if (clean.assignee_ids) parts.push(nullableIds("assignee", clean.assignee_ids));
+  if (clean.creator_ids) parts.push({ creator: { id: anyOf(clean.creator_ids) } });
+  if (clean.label_ids) parts.push({ labels: { some: { id: anyOf(clean.label_ids) } } });
+  if (clean.project_ids) parts.push(nullableIds("project", clean.project_ids));
+  if (clean.milestone_ids) parts.push({ projectMilestone: { id: anyOf(clean.milestone_ids) } });
+  if (clean.cycle_ids) parts.push(nullableIds("cycle", clean.cycle_ids));
+  if (clean.parent_id) parts.push({ parent: { id: { eq: clean.parent_id } } });
+  if (clean.priorities) parts.push({ priority: { in: clean.priorities } });
+  if (clean.due_before) parts.push({ dueDate: { lte: clean.due_before } });
+  if (clean.due_after) parts.push({ dueDate: { gte: clean.due_after } });
+  if (clean.subscriber_id) {
+    parts.push({ subscribers: { some: { id: { eq: clean.subscriber_id } } } });
+  }
+  if (clean.query) parts.push({ searchableContent: { contains: clean.query } });
+  if (clean.snoozed === "hide") {
+    parts.push({ or: [{ snoozedUntil: { null: true } }, { snoozedUntil: { lt: "PT1S" } }] });
+  }
+  if (clean.snoozed === "only") parts.push({ snoozedUntil: { gt: "PT1S" } });
+  if (parts.length === 0) return undefined;
+  return parts.length === 1 ? parts[0] : { and: parts };
 }
 
 function stateTypesForDisplay(
@@ -217,47 +252,59 @@ function stateTypesForDisplay(
 ): TStateType[] | undefined {
   if (showCompleted !== "none") return current;
   const base = current ?? [...STATE_TYPE_VALUES];
-  return base.filter((type) => !COMPLETED_TYPES.includes(type));
+  return base.filter((type) => !CLOSED_TYPES.includes(type));
 }
 
-export function buildListIssuesInput({
-  workspaceId,
+export function buildListIssuesArgs({
   filters,
   fixedFilters,
   display,
 }: {
-  workspaceId: string;
   filters: ListIssuesFilters;
   fixedFilters?: ListIssuesFilters;
-  display: TDisplaySettings;
-}): TListIssuesInput {
+  display: Pick<TDisplaySettings, "order_by" | "show_completed">;
+}): ListIssuesArgs {
   const merged = mergeFilters(filters, fixedFilters);
-  const input: TListIssuesInput = {
-    ...merged,
-    workspace_id: workspaceId,
-    state_types: stateTypesForDisplay(merged.state_types, display.show_completed),
-    order_by: display.order_by,
-    order: display.order,
-    group_by: display.group_by,
-  };
-  return compactFilters(input);
+  const { team_ids: teams, ...rest } = merged;
+  const conditions = [
+    issueFilterOf({
+      ...rest,
+      team_ids: teams && teams.length > 1 ? teams : undefined,
+      state_types: stateTypesForDisplay(merged.state_types, display.show_completed),
+    }),
+    display.show_completed === "past_week" ? closedThisWeek : undefined,
+  ].filter((condition) => condition !== undefined);
+  return compactFilters({
+    team: teams?.length === 1 ? teams[0] : undefined,
+    orderBy: serverOrderBy[display.order_by],
+    filter: conditions.length > 1 ? { and: conditions } : conditions[0],
+  });
 }
+
+const closedThisWeek: TCondition = {
+  or: [
+    { state: { type: { nin: CLOSED_TYPES } } },
+    { completedAt: { gte: "-P7D" } },
+    { canceledAt: { gte: "-P7D" } },
+  ],
+};
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
+/** Closed issues past the "completed issues" window are hidden even though they are loaded. */
 export function isHiddenCompleted(
-  issue: { state: { type: TStateType }; completed_at: string | null; canceled_at: string | null },
+  issue: { state: { type: TStateType }; completedAt: string | null; canceledAt: string | null },
   showCompleted: TDisplaySettings["show_completed"],
   now: number,
 ) {
-  if (!COMPLETED_TYPES.includes(issue.state.type)) return false;
+  if (!CLOSED_TYPES.includes(issue.state.type)) return false;
   switch (showCompleted) {
     case "all":
       return false;
     case "none":
       return true;
     case "past_week": {
-      const closedAt = issue.completed_at ?? issue.canceled_at;
+      const closedAt = issue.completedAt ?? issue.canceledAt;
       if (!closedAt) return false;
       return now - new Date(closedAt).getTime() > WEEK_MS;
     }
