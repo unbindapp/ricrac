@@ -6,6 +6,7 @@ import { useState } from "react"
 import { configQuery } from "@/api/queries"
 import { CenterPanel } from "@/components/common"
 import { GoogleIcon } from "@/components/google-icon"
+import { PublicFooter } from "@/components/public-page"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -91,6 +92,7 @@ export function SignedOut({ title = "Sign in", description }: { title?: string; 
           <GoogleButton />
         </CardContent>
       </Card>
+      <PublicFooter />
     </CenterPanel>
   )
 }

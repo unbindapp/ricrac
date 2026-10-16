@@ -228,8 +228,10 @@ pub fn check_url_key(key: &str) -> ApiResult<String> {
             && !key.ends_with('-'),
         "The URL key is 2 to 32 lowercase letters, digits and dashes"
     );
-    const RESERVED: [&str; 12] =
-        ["api", "v1", "mcp", "oauth", "assets", "files", "settings", "login", "admin", "docs", "llms.txt", "uploads"];
+    const RESERVED: [&str; 14] = [
+        "api", "v1", "mcp", "oauth", "assets", "files", "settings", "login", "admin", "docs", "llms.txt", "uploads",
+        "privacy", "terms",
+    ];
     crate::ensure!(!RESERVED.contains(&key.as_str()), "\"{key}\" is reserved");
     Ok(key)
 }

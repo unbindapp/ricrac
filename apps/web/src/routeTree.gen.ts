@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as OauthAuthorizeRouteImport } from './routes/oauth/authorize'
 import { Route as WorkspaceDocumentSlugRouteImport } from './routes/$workspace/document/$slug'
@@ -26,6 +28,16 @@ import { Route as AppSettingsWorkspaceRouteImport } from './routes/_app/settings
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -98,6 +110,8 @@ const AppSettingsWorkspaceRoute = AppSettingsWorkspaceRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/oauth/authorize': typeof OauthAuthorizeRoute
   '/$workspace/document/$slug': typeof WorkspaceDocumentSlugRoute
   '/$workspace/initiative/$slug': typeof WorkspaceInitiativeSlugRoute
@@ -112,6 +126,8 @@ export interface FileRoutesByFullPath {
   '/settings/workspace': typeof AppSettingsWorkspaceRoute
 }
 export interface FileRoutesByTo {
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/oauth/authorize': typeof OauthAuthorizeRoute
   '/': typeof AppIndexRoute
   '/$workspace/document/$slug': typeof WorkspaceDocumentSlugRoute
@@ -129,6 +145,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/oauth/authorize': typeof OauthAuthorizeRoute
   '/_app/': typeof AppIndexRoute
   '/$workspace/document/$slug': typeof WorkspaceDocumentSlugRoute
@@ -147,6 +165,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/privacy'
+    | '/terms'
     | '/oauth/authorize'
     | '/$workspace/document/$slug'
     | '/$workspace/initiative/$slug'
@@ -161,6 +181,8 @@ export interface FileRouteTypes {
     | '/settings/workspace'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/privacy'
+    | '/terms'
     | '/oauth/authorize'
     | '/'
     | '/$workspace/document/$slug'
@@ -177,6 +199,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_app'
+    | '/privacy'
+    | '/terms'
     | '/oauth/authorize'
     | '/_app/'
     | '/$workspace/document/$slug'
@@ -194,6 +218,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
+  PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
   OauthAuthorizeRoute: typeof OauthAuthorizeRoute
   WorkspaceDocumentSlugRoute: typeof WorkspaceDocumentSlugRoute
   WorkspaceInitiativeSlugRoute: typeof WorkspaceInitiativeSlugRoute
@@ -209,6 +235,20 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/': {
@@ -329,6 +369,8 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
+  PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
   OauthAuthorizeRoute: OauthAuthorizeRoute,
   WorkspaceDocumentSlugRoute: WorkspaceDocumentSlugRoute,
   WorkspaceInitiativeSlugRoute: WorkspaceInitiativeSlugRoute,
