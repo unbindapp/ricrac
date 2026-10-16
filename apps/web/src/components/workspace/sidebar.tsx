@@ -1,10 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
 import {
   BoxIcon,
   CircleDotIcon,
-  CircleHelpIcon,
   FileTextIcon,
   InboxIcon,
+  KeyboardIcon,
   LayersIcon,
   ListTodoIcon,
   PlusIcon,
@@ -19,14 +18,13 @@ import {
 
 import type { Team } from "@/api/ops.gen";
 import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
+import { ShortcutKeys } from "@/components/command-panel/shortcut-keys";
 import { SidebarFavorites } from "@/components/favorites/sidebar-favorites";
+import { InboxUnreadBadge } from "@/components/inbox/inbox-unread-badge";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
 import { useCreateTeamStore } from "@/components/settings/create-team-store";
 import { TeamIcon } from "@/components/shared/team-icon";
-import { Badge } from "@/components/ui/badge";
 import { Button, LinkButton } from "@/components/ui/button";
-import { Kbd } from "@/components/ui/kbd";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -37,7 +35,6 @@ import {
 import { useTeams } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
-import { notificationCountsQuery } from "@/lib/queries/notifications";
 
 type TProps = {
   onNavigate?: () => void;
@@ -81,7 +78,7 @@ export function Sidebar({ onNavigate }: TProps) {
         >
           <SearchIcon className="size-4" />
           <span className="flex-1 text-left">Search</span>
-          <Kbd>⌘K</Kbd>
+          <ShortcutKeys keys={["Mod+K"]} />
         </Button>
       </div>
       <ScrollArea className="min-h-0" classNameViewport="px-2 pb-2">
@@ -159,18 +156,6 @@ export function Sidebar({ onNavigate }: TProps) {
       </ScrollArea>
       <SidebarFooter onNavigate={onNavigate} />
     </div>
-  );
-}
-
-function InboxUnreadBadge() {
-  const { workspace } = useWorkspace();
-  const { data } = useQuery(notificationCountsQuery(workspace.id));
-  const unread = data?.unread ?? 0;
-  if (unread === 0) return null;
-  return (
-    <Badge variant="muted" aria-label={`${unread} unread`}>
-      {unread > 99 ? "99+" : unread}
-    </Badge>
   );
 }
 
@@ -273,6 +258,7 @@ function TeamNav({ team, onNavigate }: { team: Team } & TProps) {
 
 function SidebarFooter({ onNavigate }: TProps) {
   const { workspace, isAdmin } = useWorkspace();
+  const openShortcuts = useCommandPanelStore((state) => state.setShortcutsOpen);
   const params = { workspace: workspace.urlKey };
   return (
     <div className="flex items-center gap-2 border-t p-2">
@@ -286,29 +272,17 @@ function SidebarFooter({ onNavigate }: TProps) {
       >
         <SettingsIcon className="size-4" />
       </LinkButton>
-      <Popover>
-        <PopoverTrigger
-          render={
-            <Button variant="ghost" size="icon" aria-label="Help">
-              <CircleHelpIcon className="size-4" />
-            </Button>
-          }
-        />
-        <PopoverContent side="top" align="start" className="flex w-64 flex-col gap-2 p-3">
-          <p className="text-sm font-medium">Keyboard shortcuts</p>
-          <ShortcutRow label="Open command panel" keys="⌘K" />
-          <ShortcutRow label="New issue" keys="C" />
-        </PopoverContent>
-      </Popover>
-    </div>
-  );
-}
-
-function ShortcutRow({ label, keys }: { label: string; keys: string }) {
-  return (
-    <div className="flex items-center gap-2 text-sm">
-      <span className="text-muted-foreground flex-1">{label}</span>
-      <Kbd>{keys}</Kbd>
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label="Keyboard shortcuts"
+        onClick={() => {
+          onNavigate?.();
+          openShortcuts(true);
+        }}
+      >
+        <KeyboardIcon className="size-4" />
+      </Button>
     </div>
   );
 }

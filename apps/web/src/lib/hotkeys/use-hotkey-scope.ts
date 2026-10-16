@@ -10,7 +10,7 @@ type TStore = {
   deactivate: (id: string) => void;
 };
 
-const useHotkeyScopeStore = create<TStore>((set) => ({
+export const useHotkeyScopeStore = create<TStore>((set) => ({
   scopes: [],
   activate: (scope) =>
     set((state) => ({ scopes: [...state.scopes.filter((item) => item.id !== scope.id), scope] })),
