@@ -44,7 +44,7 @@ pub fn ops() -> Vec<Op> {
              one (pass id). Omitted fields stay as they are; null clears a field. People are given as id, name, email or \
              \"me\"; states as name, type or id; labels, projects, cycles and milestones as name or id. Use patch to edit \
              part of the description without resending it. Moving an issue to another team gives it a new identifier; \
-             the old one keeps working.",
+             the old one keeps working. Returns the issue as get_issue does, with relations and sub-issues.",
             save,
         ),
         op(
@@ -591,7 +591,7 @@ pub struct SaveIssueArgs {
     pub patch: Option<Vec<TextEdit>>,
     /// Status name, type (backlog, unstarted, started, completed, canceled, triage) or id.
     pub state: Option<String>,
-    /// 0 none, 1 urgent, 2 high, 3 medium, 4 low.
+    /// 1 urgent, 2 high, 3 medium, 4 low; 0 means no priority (not the highest).
     pub priority: Option<i32>,
     /// Estimate points on the team's scale; null clears it. T-shirt sizes are XS=1, S=2, M=3, L=5, XL=8, XXL=13, XXXL=21.
     #[serde(default, deserialize_with = "nullable")]
@@ -709,9 +709,8 @@ async fn save(ctx: Ctx, args: SaveIssueArgs) -> ApiResult<Value> {
         }
         None => create(&ctx, &mut tx, args).await?,
     };
-    let value = issue_value(&ctx, &mut tx, id).await?;
     tx.commit().await?;
-    Ok(value)
+    get(ctx.fresh(), GetIssueArgs { id: id.to_string(), include_comments: false, include_history: false }).await
 }
 
 #[derive(Deserialize, JsonSchema)]
