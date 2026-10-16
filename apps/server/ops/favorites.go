@@ -17,14 +17,14 @@ func favoriteOps() []*Op {
 		op("list_favorites", app.Read, []string{"GET /favorites"},
 			"List the caller's favorites by folder and order, each with what it points at. Favorites of things that "+
 				"were deleted or can no longer be seen are left out.",
-			listFavorites),
+			listFavorites).returns(ResultOf[PageOf[Favorite]]()),
 		op("add_favorite", app.Write, []string{"POST /favorites"},
 			"Add something to the caller's favorites: an issue, project, initiative, cycle, customView, document, "+
 				"label, team, user or release. Adding a favorite again only updates its folder or order.",
-			addFavorite),
+			addFavorite).returns(ResultOf[Favorite]()),
 		op("remove_favorite", app.Write, []string{"DELETE /favorites/{id}"},
 			"Remove one of the caller's favorites, by the favorite's id, or by type and target.",
-			removeFavorite),
+			removeFavorite).returns(ResultOf[RemovedFavorite]()),
 	}
 }
 
@@ -240,4 +240,42 @@ func removeFavorite(c *app.Ctx, args RemoveFavoriteArgs) (any, error) {
 		return nil, app.NotFound("That isn't one of your favorites")
 	}
 	return M{"removed": true, "id": removed}, nil
+}
+
+/* Shapes */
+
+type Favorite struct {
+	ID        string         `json:"id"`
+	Type      string         `json:"type" enum:"issue,project,initiative,cycle,customView,document,label,team,user,release"`
+	Folder    *string        `json:"folder"`
+	SortOrder float64        `json:"sortOrder"`
+	CreatedAt string         `json:"createdAt"`
+	Target    FavoriteTarget `json:"target" doc:"What it points at, in the short form of its type."`
+}
+
+// FavoriteTarget is the short form of whatever a favorite points at.
+type FavoriteTarget struct{}
+
+func (FavoriteTarget) JSONSchema() M {
+	return M{"anyOf": []any{
+		ResultOf[IssueRef](), ResultOf[ProjectRef](), ResultOf[InitiativeRef](), ResultOf[FavoriteCycle](),
+		ResultOf[FavoriteCustomView](), ResultOf[DocumentRef](), ResultOf[LabelRef](), ResultOf[TeamRef](),
+		ResultOf[UserRef](), ResultOf[ReleaseRef](),
+	}}
+}
+
+type FavoriteCycle struct {
+	CycleRef
+	Team TeamRef `json:"team"`
+}
+
+type FavoriteCustomView struct {
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	SlugID string `json:"slugId"`
+}
+
+type RemovedFavorite struct {
+	Removed bool   `json:"removed"`
+	ID      string `json:"id"`
 }

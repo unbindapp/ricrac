@@ -17,14 +17,14 @@ func notificationOps() []*Op {
 		op("get_notifications", app.Read, []string{"GET /notifications"},
 			"Your inbox, newest first: assignments, mentions, comments, replies, status changes and more, with how many "+
 				"are unread. Archived notifications and snoozed ones (until they wake) are left out unless asked for.",
-			getNotifications),
+			getNotifications).returns(ResultOf[Inbox]()),
 		op("mark_notification", app.Write, []string{"POST /notifications/mark"},
 			"Mark one or more of your notifications read or unread, archive or unarchive them, or snooze them until a "+
 				"time (it comes back unread then) or unsnooze them.",
-			markNotification),
+			markNotification).returns(ResultOf[MarkedNotifications]()),
 		op("mark_all_notifications_read", app.Write, []string{"POST /notifications/read-all"},
 			"Mark all your unread notifications read, optionally only those before a time or about one issue.",
-			markAllNotificationsRead),
+			markAllNotificationsRead).returns(ResultOf[MarkedAllRead]()),
 	}
 }
 
@@ -192,4 +192,41 @@ func markAllNotificationsRead(c *app.Ctx, args MarkAllNotificationsReadArgs) (an
 		return nil, err
 	}
 	return M{"marked": tag.RowsAffected()}, nil
+}
+
+/* Shapes */
+
+type Notification struct {
+	ID           string               `json:"id"`
+	Type         string               `json:"type" doc:"What happened, e.g. issueAssignedToYou, issueMention, issueNewComment."`
+	Summary      string               `json:"summary"`
+	Actor        *UserRef             `json:"actor"`
+	Issue        *IssueRef            `json:"issue"`
+	Comment      *NotificationComment `json:"comment"`
+	Project      *ProjectRef          `json:"project"`
+	Initiative   *InitiativeRef       `json:"initiative"`
+	Document     *DocumentRef         `json:"document"`
+	StatusUpdate *Ref                 `json:"statusUpdate"`
+	ReadAt       *string              `json:"readAt"`
+	SnoozedUntil *string              `json:"snoozedUntil"`
+	ArchivedAt   *string              `json:"archivedAt"`
+	CreatedAt    string               `json:"createdAt"`
+}
+
+type NotificationComment struct {
+	ID   string `json:"id"`
+	Body string `json:"body" doc:"Its first 200 characters."`
+}
+
+type Inbox struct {
+	PageOf[Notification]
+	UnreadCount int `json:"unreadCount"`
+}
+
+type MarkedNotifications struct {
+	Nodes []Notification `json:"nodes"`
+}
+
+type MarkedAllRead struct {
+	Marked int `json:"marked" doc:"How many were marked read."`
 }

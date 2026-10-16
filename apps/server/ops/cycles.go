@@ -21,20 +21,20 @@ func cycleOps() []*Op {
 			"List a team's cycles with their progress (issue counts by state type, estimate sums, daily history). "+
 				"type narrows to the current, previous or next cycle, the upcoming ones or the completed ones. Newest "+
 				"first, except upcoming (soonest first). Archived cycles are left out unless includeArchived is set.",
-			listCycles),
+			listCycles).returns(ResultOf[PageOf[Cycle]]()),
 		op("get_cycle", app.Read, []string{"GET /cycles/{id}"},
 			"Read a cycle by id, or by number, name or \"current\" / \"next\" / \"previous\" together with team: its "+
 				"dates, progress, daily history and issues (unless includeIssues is false).",
-			getCycle),
+			getCycle).returns(ResultOf[CycleDetail]()),
 		op("save_cycle", app.Write, []string{"POST /cycles", "PATCH /cycles/{id}"},
 			"Create a cycle (omit id; team, startsAt and endsAt are required and the team must have cycles enabled) "+
 				"or update one's name, description or dates (pass id). Cycles of a team can't overlap, and completed "+
 				"cycles can't be moved. Teams with cycles enabled get their cycles created automatically; only create "+
 				"one by hand when the user asks.",
-			saveCycle),
+			saveCycle).returns(ResultOf[Cycle]()),
 		op("archive_cycle", app.Write, []string{"POST /cycles/{id}/archive"},
 			"Archive an upcoming or completed cycle (not the current one). Issues of an archived upcoming cycle leave it.",
-			archiveCycle),
+			archiveCycle).returns(ResultOf[Cycle]()),
 	}
 }
 
@@ -571,4 +571,62 @@ func completeEnded(ctx context.Context, tx pgx.Tx, team cycleSettings, today str
 		}
 	}
 	return nil
+}
+
+/* Shapes */
+
+type Cycle struct {
+	ID          string          `json:"id"`
+	Number      int             `json:"number"`
+	Name        *string         `json:"name"`
+	Description *string         `json:"description"`
+	URL         string          `json:"url"`
+	StartsAt    string          `json:"startsAt"`
+	EndsAt      string          `json:"endsAt"`
+	CompletedAt *string         `json:"completedAt"`
+	ArchivedAt  *string         `json:"archivedAt"`
+	IsActive    bool            `json:"isActive"`
+	IsFuture    bool            `json:"isFuture"`
+	IsPast      bool            `json:"isPast"`
+	Team        TeamRef         `json:"team"`
+	Progress    float64         `json:"progress" doc:"The share of its issues completed, 0 to 1."`
+	Scope       CycleScope      `json:"scope"`
+	History     []CycleSnapshot `json:"history" doc:"The counts of each day the cycle ran."`
+	CreatedAt   string          `json:"createdAt"`
+	UpdatedAt   string          `json:"updatedAt"`
+}
+
+type CycleScope struct {
+	Issues            int     `json:"issues"`
+	Completed         int     `json:"completed"`
+	Started           int     `json:"started"`
+	Unstarted         int     `json:"unstarted"`
+	Canceled          int     `json:"canceled"`
+	Estimate          float64 `json:"estimate"`
+	CompletedEstimate float64 `json:"completedEstimate"`
+	StartedEstimate   float64 `json:"startedEstimate"`
+}
+
+type CycleSnapshot struct {
+	Date              string  `json:"date"`
+	Scope             int     `json:"scope"`
+	Completed         int     `json:"completed"`
+	Started           int     `json:"started"`
+	ScopeEstimate     float64 `json:"scopeEstimate"`
+	CompletedEstimate float64 `json:"completedEstimate"`
+}
+
+type CycleDetail struct {
+	Cycle
+	Issues []CycleIssue `json:"issues,omitempty" doc:"Unless includeIssues is false."`
+}
+
+type CycleIssue struct {
+	ID         string   `json:"id"`
+	Identifier string   `json:"identifier"`
+	Title      string   `json:"title"`
+	State      StateRef `json:"state"`
+	Assignee   *UserRef `json:"assignee"`
+	Estimate   *float64 `json:"estimate"`
+	Priority   int      `json:"priority"`
 }
