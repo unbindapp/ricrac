@@ -945,7 +945,10 @@ func leaveTeam(c *app.Ctx, args IDArgs) (any, error) {
 			return err
 		}
 		if err := checkTeam(c, tx, team); err != nil {
-			return app.BadRequest("You're the last member of this private team; add someone else or delete the team")
+			if app.AsError(err).Message == "A private team needs at least one member" {
+				return app.BadRequest("You're the last member of this private team; add someone else or delete the team")
+			}
+			return err
 		}
 		ref, err = app.One[any](c, tx, "SELECT team_ref($1)", team)
 		return err
