@@ -257,17 +257,14 @@ async fn templates_fill_in_issues_and_documents(db: PgPool) {
     let read = call(&w.ann, "get_template", json!({ "id": "bug report" })).await;
     assert_eq!(read["data"]["subIssues"].as_array().unwrap().len(), 2);
 
-    // save_issue can't apply sub-issues yet: it resolves the new parent outside its transaction.
-    call(
-        &w.ann,
-        "save_template",
-        json!({ "id": template["id"], "data": { "description": "## Steps", "priority": 2, "labels": ["Bug"] } }),
-    )
-    .await;
     let issue = call(&w.ann, "save_issue", json!({ "template": "Bug report", "title": "Bug: crash" })).await;
     assert_eq!((issue["priority"].as_i64(), issue["labels"][0]["name"].as_str()), (Some(2), Some("Bug")));
     assert_eq!(issue["description"], "## Steps");
     assert_eq!(issue["team"]["key"], "ENG");
+    let parent = call(&w.ann, "get_issue", json!({ "id": issue["identifier"] })).await;
+    let children: Vec<&str> =
+        parent["children"].as_array().unwrap().iter().map(|c| c["title"].as_str().unwrap()).collect();
+    assert_eq!(children, vec!["Reproduce", "Fix"]);
 
     call(
         &w.ann,

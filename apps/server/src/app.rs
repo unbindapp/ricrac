@@ -28,7 +28,10 @@ pub fn router(state: AppState) -> Router {
         .allow_methods(Any)
         .allow_headers(Any)
         .expose_headers([axum::http::header::WWW_AUTHENTICATE, axum::http::HeaderName::from_static("mcp-session-id")]);
-    let mut mcp_config = StreamableHttpServerConfig::default().with_legacy_session_mode(false).with_json_response(true);
+    let mut mcp_config = StreamableHttpServerConfig::default()
+        .with_legacy_session_mode(false)
+        .with_json_response(true)
+        .with_max_request_body_bytes(8 * 1024 * 1024);
     if let Some(host) = state.config.public_url.split("://").nth(1) {
         mcp_config = mcp_config.with_allowed_hosts([host.to_string(), "localhost".into(), "127.0.0.1".into()]);
     }

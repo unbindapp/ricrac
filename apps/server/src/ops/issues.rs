@@ -953,9 +953,16 @@ async fn create(ctx: &Ctx, tx: &mut PgConnection, mut args: SaveIssueArgs) -> Ap
             .map_err(|e| ApiError::bad_request(format!("The template's sub-issue {} is invalid: {e}", n + 1)))?;
         sub_args.id = None;
         sub_args.template = None;
-        sub_args.parent_id = Some(Some(id.to_string()));
+        // The parent isn't committed yet, so resolving it by reference would miss it.
+        sub_args.parent_id = None;
         sub_args.team = sub_args.team.or(Some(team.to_string()));
-        Box::pin(create(ctx, tx, sub_args)).await?;
+        let child = Box::pin(create(ctx, tx, sub_args)).await?;
+        sqlx::query("UPDATE issues SET parent_id = $2, sub_issue_sort_order = $3 WHERE id = $1")
+            .bind(child)
+            .bind(id)
+            .bind((n as f64 + 1.0) * 1000.0)
+            .execute(&mut *tx)
+            .await?;
     }
     let value = issue_value(ctx, tx, id).await?;
     events::emit(tx, ctx, "Issue", "create", &value, None, Some(team)).await?;
