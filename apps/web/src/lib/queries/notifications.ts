@@ -1,145 +1,157 @@
 import {
+  type InfiniteData,
   infiniteQueryOptions,
   queryOptions,
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
 
-import { getGoClient } from "@/lib/server/client";
-import type { TGoClient, TInput, TListItem } from "@/lib/server/types";
+import type { GetNotificationsArgs, Inbox, Notification } from "@/api/ops.gen";
+import { call } from "@/lib/server/client";
 
-export type TNotification = TListItem<TGoClient["notifications"]["list"]>;
-export type TNotificationFilter = NonNullable<TInput<TGoClient["notifications"]["list"]>["filter"]>;
+export type TInboxFilter = "inbox" | "unread" | "snoozed" | "archived";
+export type TNotificationAction =
+  "read" | "unread" | "archive" | "unarchive" | "snooze" | "unsnooze";
 
-const LIST_PAGE_SIZE = 50;
-const LIST_REFETCH_INTERVAL_MS = 15 * 1000;
-const COUNTS_REFETCH_INTERVAL_MS = 30 * 1000;
+const PAGE_SIZE = 100;
+const POLL_MS = 30 * 1000;
+/** mark_notification takes at most this many ids at once. */
+const MARK_BATCH = 250;
 
 export const queryKeyNotifications = {
-  all: () => ["notifications"] as const,
-  lists: () => ["notifications", "list"] as const,
-  list: (workspaceId: string, filter: TNotificationFilter) =>
-    ["notifications", "list", workspaceId, filter] as const,
-  counts: (workspaceId: string) => ["notifications", "counts", workspaceId] as const,
+  all: (workspaceId: string) => [workspaceId, "notifications"] as const,
+  lists: (workspaceId: string) => [workspaceId, "notifications", "list"] as const,
+  list: (workspaceId: string, filter: TInboxFilter) =>
+    [workspaceId, "notifications", "list", filter] as const,
+  unreadCount: (workspaceId: string) => [workspaceId, "notifications", "unread-count"] as const,
 };
 
-export const notificationsListQuery = (workspaceId: string, filter: TNotificationFilter) =>
+/** What each filter asks the server for; the inbox narrows snoozed and archived ones further. */
+const filterArgs: Record<TInboxFilter, GetNotificationsArgs> = {
+  inbox: {},
+  unread: { unreadOnly: true },
+  snoozed: { includeSnoozed: true },
+  archived: { includeArchived: true },
+};
+
+export const notificationsQuery = (workspaceId: string, filter: TInboxFilter) =>
   infiniteQueryOptions({
     queryKey: queryKeyNotifications.list(workspaceId, filter),
-    queryFn: async ({ pageParam }) => {
-      const res = await getGoClient().notifications.list({
-        workspace_id: workspaceId,
-        filter,
-        limit: LIST_PAGE_SIZE,
+    queryFn: ({ pageParam }) =>
+      call(workspaceId, "get_notifications", {
+        ...filterArgs[filter],
+        limit: PAGE_SIZE,
         cursor: pageParam,
-      });
-      return { notifications: res.data ?? [], nextCursor: res.next_cursor ?? null };
-    },
-    initialPageParam: undefined as string | undefined,
-    getNextPageParam: (last) => last.nextCursor ?? undefined,
-    refetchInterval: LIST_REFETCH_INTERVAL_MS,
+      }),
+    initialPageParam: null as string | null,
+    getNextPageParam: (page) => (page.pageInfo.hasNextPage ? page.pageInfo.endCursor : undefined),
+    refetchInterval: POLL_MS,
   });
 
-export const notificationCountsQuery = (workspaceId: string) =>
+/** How many unread notifications wait in the inbox, for the sidebar badge. */
+export const unreadCountQuery = (workspaceId: string) =>
   queryOptions({
-    queryKey: queryKeyNotifications.counts(workspaceId),
-    queryFn: async () => {
-      const res = await getGoClient().notifications.counts({ workspace_id: workspaceId });
-      return { unread: res.data.unread };
-    },
-    refetchInterval: COUNTS_REFETCH_INTERVAL_MS,
+    queryKey: queryKeyNotifications.unreadCount(workspaceId),
+    queryFn: async () =>
+      (await call(workspaceId, "get_notifications", { unreadOnly: true, limit: 1 })).unreadCount,
+    refetchInterval: POLL_MS,
   });
 
-type TIdsInput = { notificationIds: string[] };
+type TMarkInput = { ids: string[]; action: TNotificationAction; until?: string };
 
-export async function markNotificationsRead({ notificationIds }: TIdsInput) {
-  const res = await getGoClient().notifications.read({ notification_ids: notificationIds });
-  return { data: res.data };
+function applyAction(notification: Notification, { action, until }: TMarkInput): Notification {
+  const now = new Date().toISOString();
+  switch (action) {
+    case "read":
+      return { ...notification, readAt: notification.readAt ?? now };
+    case "unread":
+      return { ...notification, readAt: null };
+    case "archive":
+      return { ...notification, archivedAt: notification.archivedAt ?? now };
+    case "unarchive":
+      return { ...notification, archivedAt: null };
+    case "snooze":
+      return { ...notification, snoozedUntil: until ?? null };
+    case "unsnooze":
+      return { ...notification, snoozedUntil: null };
+  }
 }
 
-export async function markNotificationsUnread({ notificationIds }: TIdsInput) {
-  const res = await getGoClient().notifications.unread({ notification_ids: notificationIds });
-  return { data: res.data };
+/** Whether the server counts it in unreadCount. */
+function countsAsUnread(notification: Notification) {
+  const isSnoozed =
+    notification.snoozedUntil !== null &&
+    new Date(notification.snoozedUntil).getTime() > Date.now();
+  return notification.readAt === null && notification.archivedAt === null && !isSnoozed;
 }
 
-export async function archiveNotifications({ notificationIds }: TIdsInput) {
-  const res = await getGoClient().notifications.archive({ notification_ids: notificationIds });
-  return { data: res.data };
-}
-
-export async function unarchiveNotifications({ notificationIds }: TIdsInput) {
-  const res = await getGoClient().notifications.unarchive({ notification_ids: notificationIds });
-  return { data: res.data };
-}
-
-export async function snoozeNotifications(input: TIdsInput & { until: Date }) {
-  const res = await getGoClient().notifications.snooze({
-    notification_ids: input.notificationIds,
-    until: input.until.toISOString(),
-  });
-  return { data: res.data };
-}
-
-export async function markAllNotificationsRead({ workspaceId }: { workspaceId: string }) {
-  const res = await getGoClient().notifications.readAll({ workspace_id: workspaceId });
-  return { data: res.data };
-}
-
-function useInvalidateNotifications() {
+/**
+ * Marks notifications at once in every loaded list, so moving through the inbox doesn't wait on
+ * the server, and puts them back if the server refuses.
+ */
+export function useMarkNotificationsMutation(workspaceId: string) {
   const queryClient = useQueryClient();
-  return () => queryClient.invalidateQueries({ queryKey: queryKeyNotifications.all() });
-}
-
-export function useMarkNotificationsReadMutation() {
-  const invalidate = useInvalidateNotifications();
+  const lists = queryKeyNotifications.lists(workspaceId);
   return useMutation({
-    mutationFn: markNotificationsRead,
-    meta: { errorTitle: "Could not mark as read" },
-    onSuccess: invalidate,
+    mutationFn: async ({ ids, action, until }: TMarkInput) => {
+      for (let start = 0; start < ids.length; start += MARK_BATCH) {
+        const batch = ids.slice(start, start + MARK_BATCH);
+        await call(workspaceId, "mark_notification", { ids: batch, action, until: until ?? null });
+      }
+    },
+    meta: { errorTitle: "Could not update the notification" },
+    onMutate: async (input) => {
+      const countKey = queryKeyNotifications.unreadCount(workspaceId);
+      await queryClient.cancelQueries({ queryKey: queryKeyNotifications.all(workspaceId) });
+      const previous = queryClient.getQueriesData<InfiniteData<Inbox>>({ queryKey: lists });
+      const previousCount = queryClient.getQueryData<number>(countKey);
+      const ids = new Set(input.ids);
+      const marked = new Map<string, Notification>();
+      for (const [, data] of previous) {
+        for (const node of data?.pages.flatMap((page) => page.nodes) ?? []) {
+          if (ids.has(node.id)) marked.set(node.id, node);
+        }
+      }
+      const delta = [...marked.values()].reduce(
+        (sum, node) =>
+          sum + Number(countsAsUnread(applyAction(node, input))) - Number(countsAsUnread(node)),
+        0,
+      );
+      if (previousCount !== undefined)
+        queryClient.setQueryData(countKey, Math.max(0, previousCount + delta));
+      queryClient.setQueriesData<InfiniteData<Inbox>>({ queryKey: lists }, (data) =>
+        data
+          ? {
+              ...data,
+              pages: data.pages.map((page) => ({
+                ...page,
+                nodes: page.nodes.map((node) =>
+                  ids.has(node.id) ? applyAction(node, input) : node,
+                ),
+              })),
+            }
+          : data,
+      );
+      return { previous, previousCount };
+    },
+    onError: (_error, _input, context) => {
+      for (const [key, data] of context?.previous ?? []) queryClient.setQueryData(key, data);
+      queryClient.setQueryData(
+        queryKeyNotifications.unreadCount(workspaceId),
+        context?.previousCount,
+      );
+    },
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeyNotifications.all(workspaceId) }),
   });
 }
 
-export function useMarkNotificationsUnreadMutation() {
-  const invalidate = useInvalidateNotifications();
+export function useMarkAllNotificationsReadMutation(workspaceId: string) {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: markNotificationsUnread,
-    meta: { errorTitle: "Could not mark as unread" },
-    onSuccess: invalidate,
-  });
-}
-
-export function useArchiveNotificationsMutation() {
-  const invalidate = useInvalidateNotifications();
-  return useMutation({
-    mutationFn: archiveNotifications,
-    meta: { errorTitle: "Could not archive" },
-    onSuccess: invalidate,
-  });
-}
-
-export function useUnarchiveNotificationsMutation() {
-  const invalidate = useInvalidateNotifications();
-  return useMutation({
-    mutationFn: unarchiveNotifications,
-    meta: { errorTitle: "Could not move back to inbox" },
-    onSuccess: invalidate,
-  });
-}
-
-export function useSnoozeNotificationsMutation() {
-  const invalidate = useInvalidateNotifications();
-  return useMutation({
-    mutationFn: snoozeNotifications,
-    meta: { errorTitle: "Could not snooze" },
-    onSuccess: invalidate,
-  });
-}
-
-export function useMarkAllNotificationsReadMutation() {
-  const invalidate = useInvalidateNotifications();
-  return useMutation({
-    mutationFn: markAllNotificationsRead,
+    mutationFn: () => call(workspaceId, "mark_all_notifications_read", {}),
     meta: { errorTitle: "Could not mark all as read" },
-    onSuccess: invalidate,
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeyNotifications.all(workspaceId) }),
   });
 }

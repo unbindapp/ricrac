@@ -5,7 +5,7 @@ import type { Issue } from "@/api/ops.gen";
 
 import { DisplayOptions, useDisplaySettings } from "@/components/issues/display-options";
 import type { DisplaySettings } from "@/components/issues/display";
-import { type ListIssuesFilters, mergeFilters } from "@/components/issues/filters";
+import { issueFilterOf, type ListIssuesFilters, mergeFilters } from "@/components/issues/filters";
 import { IssueBoard } from "@/components/issues/issue-board";
 import { IssueFilters } from "@/components/issues/issue-filters";
 import { IssueList } from "@/components/issues/issue-list";
@@ -63,9 +63,13 @@ export function IssuesView({
   const effectiveFilters = mergeFilters(filters, fixedFilters);
   const defaults = useFilterDefaults(effectiveFilters, teamId, newIssueStateType);
   const { openSaveView, saveViewDialog } = useSaveViewDialog({
-    filters: effectiveFilters,
+    filter:
+      issueFilterOf({
+        ...effectiveFilters,
+        team_ids: teamId ? undefined : effectiveFilters.team_ids,
+      }) ?? {},
     display,
-    teamId,
+    team: teamId ?? null,
   });
   const openNewIssue = useNewIssueStore((state) => state.open);
   useNewIssueContext(defaults);

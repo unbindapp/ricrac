@@ -1,5 +1,5 @@
-import { useNavigate } from "@tanstack/react-router";
-import { EllipsisIcon, PencilIcon, Trash2Icon } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { BracesIcon, EllipsisIcon, LinkIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -11,23 +11,33 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { toast } from "@/components/ui/toast";
 import { ViewDialog } from "@/components/views/view-dialog";
+import { ViewFilterJsonDialog } from "@/components/views/view-filter-json-dialog";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { meQuery } from "@/lib/queries/me";
 import { type TView, useDeleteViewMutation } from "@/lib/queries/views";
 
+/** Owners change their views; admins also change shared ones. */
 export function useCanEditView(view: TView) {
-  const { canEdit, isAdmin } = useWorkspace();
-  return view.is_owner ? canEdit : isAdmin && view.shared;
+  const { isAdmin, canEdit } = useWorkspace();
+  const { data: me } = useQuery(meQuery);
+  if (!canEdit) return false;
+  return view.owner?.id === me?.id || (view.shared && isAdmin);
 }
 
-export function ViewMenu({ view, leaveOnDelete }: { view: TView; leaveOnDelete?: boolean }) {
+type TProps = {
+  view: TView;
+  onDeleted?: () => void;
+};
+
+export function ViewMenu({ view, onDeleted }: TProps) {
   const { workspace } = useWorkspace();
-  const navigate = useNavigate();
-  const [dialog, setDialog] = useState<"edit" | "delete" | null>(null);
-  const { mutateAsync: deleteView } = useDeleteViewMutation();
-  const close = (open: boolean) => {
-    if (!open) setDialog(null);
-  };
+  const canEdit = useCanEditView(view);
+  const [dialog, setDialog] = useState<"edit" | "json" | "delete" | null>(null);
+  const { mutateAsync: deleteView } = useDeleteViewMutation(workspace.id);
+  const close = () => setDialog(null);
+
   return (
     <>
       <DropdownMenu>
@@ -38,34 +48,55 @@ export function ViewMenu({ view, leaveOnDelete }: { view: TView; leaveOnDelete?:
             </Button>
           }
         />
-        <DropdownMenuContent align="end" className="w-40">
-          <DropdownMenuItem onClick={() => setDialog("edit")}>
-            <PencilIcon className="size-4" />
-            Edit view
+        <DropdownMenuContent align="end" className="w-52">
+          {canEdit && (
+            <DropdownMenuItem onClick={() => setDialog("edit")}>
+              <PencilIcon className="size-4" />
+              Edit view
+            </DropdownMenuItem>
+          )}
+          {canEdit && (
+            <DropdownMenuItem onClick={() => setDialog("json")}>
+              <BracesIcon className="size-4" />
+              Edit filter as JSON
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuItem
+            onClick={() =>
+              void navigator.clipboard
+                .writeText(view.url)
+                .then(() => toast.add({ type: "success", title: "Link copied" }))
+            }
+          >
+            <LinkIcon className="size-4" />
+            Copy link
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-destructive" onClick={() => setDialog("delete")}>
-            <Trash2Icon className="size-4" />
-            Delete view
-          </DropdownMenuItem>
+          {canEdit && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-destructive" onClick={() => setDialog("delete")}>
+                <Trash2Icon className="size-4" />
+                Delete view
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
-      <ViewDialog mode="edit" view={view} open={dialog === "edit"} onOpenChange={close} />
+      <ViewDialog target={dialog === "edit" ? { mode: "edit", view } : null} onClose={close} />
+      <ViewFilterJsonDialog view={dialog === "json" ? view : null} onClose={close} />
       <ConfirmDialog
         open={dialog === "delete"}
-        onOpenChange={close}
+        onOpenChange={(open) => !open && close()}
         title={`Delete ${view.name}`}
         description={
           view.shared
-            ? "The view is deleted for everyone in the workspace. Issues are not touched."
-            : "The view is deleted. Issues are not touched."
+            ? "The view is deleted for everyone in the workspace. The issues stay as they are."
+            : "The view is deleted. The issues stay as they are."
         }
         confirmLabel="Delete view"
         onConfirm={async () => {
-          await deleteView({ viewId: view.id });
-          if (leaveOnDelete) {
-            void navigate({ to: "/$workspace/views", params: { workspace: workspace.slug } });
-          }
+          await deleteView(view.id);
+          onDeleted?.();
         }}
       />
     </>

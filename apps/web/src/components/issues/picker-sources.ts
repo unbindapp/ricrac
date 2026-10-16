@@ -3,12 +3,9 @@ import { useMemo } from "react";
 
 import type { IssueLabel, UserRef, WorkspaceUser } from "@/api/ops.gen";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import {
-  issueLabelsQuery,
-  issueProjectsQuery,
-  projectMilestonesQuery,
-  teamCyclesQuery,
-} from "@/lib/queries/issue-options";
+import { cyclesQuery } from "@/lib/queries/cycles";
+import { issueProjectsQuery, projectMilestonesQuery } from "@/lib/queries/issue-options";
+import { labelsQuery } from "@/lib/queries/labels";
 import { teamQuery } from "@/lib/queries/teams";
 import { usersQuery } from "@/lib/queries/users";
 
@@ -49,7 +46,7 @@ export function useAvatarUrl(user: Pick<UserRef, "id"> | null | undefined) {
 /** Labels an issue of the team can take (its own and the workspace's), groups left out. */
 export function useLabels(teamId: string | undefined) {
   const { workspace } = useWorkspace();
-  const { data, isPending } = useQuery(issueLabelsQuery(workspace.id, teamId));
+  const { data, isPending } = useQuery(labelsQuery(workspace.id, { team: teamId }));
   const labels = useMemo(
     () => (data ?? []).filter((label: IssueLabel) => !label.isGroup && !label.retiredAt),
     [data],
@@ -96,7 +93,7 @@ export function useCycles(teamId: string | undefined) {
   const team = useTeamDetail(teamId);
   const enabled = Boolean(teamId && team?.cyclesEnabled);
   const { data, isPending } = useQuery({
-    ...teamCyclesQuery(workspace.id, teamId ?? ""),
+    ...cyclesQuery(workspace.id, teamId ?? ""),
     enabled,
   });
   const cycles = useMemo(

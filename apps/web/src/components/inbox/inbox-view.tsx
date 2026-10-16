@@ -1,193 +1,236 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { ArchiveIcon, CheckCheckIcon, InboxIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import {
+  AlarmClockIcon,
+  ArchiveIcon,
+  CheckCheckIcon,
+  EllipsisIcon,
+  InboxIcon,
+  MailIcon,
+} from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { NotificationPane } from "@/components/inbox/notification-pane";
 import { NotificationRow } from "@/components/inbox/notification-row";
-import { List } from "@/components/layout/list";
+import {
+  groupNotifications,
+  notificationLink,
+  type TNotificationGroup,
+} from "@/components/inbox/notifications";
 import { ListStates } from "@/components/layout/list-states";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
 import { SplitView } from "@/components/layout/split-view";
 import { useDeviceSize } from "@/components/providers/device-size-provider";
+import { useNow } from "@/components/providers/now-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTab } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/toast";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import {
-  notificationCountsQuery,
-  notificationsListQuery,
-  type TNotification,
-  useArchiveNotificationsMutation,
-  useMarkAllNotificationsReadMutation,
-  useMarkNotificationsReadMutation,
-  useMarkNotificationsUnreadMutation,
-  useSnoozeNotificationsMutation,
-  useUnarchiveNotificationsMutation,
-} from "@/lib/queries/notifications";
 import { formatDateTime } from "@/lib/helpers/dates";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
+import {
+  notificationsQuery,
+  type TInboxFilter,
+  type TNotificationAction,
+  unreadCountQuery,
+  useMarkAllNotificationsReadMutation,
+  useMarkNotificationsMutation,
+} from "@/lib/queries/notifications";
 
-export const INBOX_TABS = ["inbox", "read", "archived", "snoozed"] as const;
-export type TInboxTab = (typeof INBOX_TABS)[number];
+export const INBOX_FILTERS = ["inbox", "unread", "snoozed", "archived"] as const;
 
-const tabLabels: Record<TInboxTab, string> = {
-  inbox: "Inbox",
-  read: "Read",
-  archived: "Archived",
+const filterLabels: Record<TInboxFilter, string> = {
+  inbox: "All",
+  unread: "Unread",
   snoozed: "Snoozed",
+  archived: "Archived",
 };
 
-const emptyStates: Record<TInboxTab, { title: string; description: string }> = {
+const emptyStates = {
   inbox: {
-    title: "No notifications yet",
-    description: "Assignments, mentions and comments on issues you follow show up here.",
+    icon: InboxIcon,
+    title: "You're all caught up",
+    description: "Assignments, mentions and comments on what you follow show up here.",
   },
-  read: { title: "No read notifications yet", description: "Notifications you opened stay here." },
+  unread: {
+    icon: MailIcon,
+    title: "No unread notifications yet",
+    description: "Everything in your inbox has been read.",
+  },
+  snoozed: {
+    icon: AlarmClockIcon,
+    title: "No snoozed notifications yet",
+    description: "Snooze one with H and it comes back unread when the time comes.",
+  },
   archived: {
+    icon: ArchiveIcon,
     title: "No archived notifications yet",
-    description: "Archive a notification with E.",
+    description: "Archive one with E once you're done with it.",
   },
-  snoozed: { title: "No snoozed notifications yet", description: "Snooze a notification with H." },
-};
+} satisfies Record<TInboxFilter, unknown>;
+
+/** Enter on a focused button or link presses it instead of opening the row. */
+function isOnControl(target: EventTarget | null) {
+  return target instanceof Element && target.closest("button, a, [role=menuitem]") !== null;
+}
 
 type TProps = {
-  tab: TInboxTab;
-  selectedId: string | undefined;
-  onTabChange: (tab: TInboxTab) => void;
-  onSelect: (id: string | undefined) => void;
+  filter: TInboxFilter;
+  selectedKey: string | undefined;
+  onFilterChange: (filter: TInboxFilter) => void;
+  onSelect: (key: string | undefined) => void;
 };
 
-export function InboxView({ tab, selectedId, onTabChange, onSelect }: TProps) {
+export function InboxView({ filter, selectedKey, onFilterChange, onSelect }: TProps) {
   const { workspace } = useWorkspace();
   const navigate = useNavigate();
+  const now = useNow();
   const { size } = useDeviceSize();
   const hasPane = size === "lg" || size === "xl";
   const [isSnoozeOpen, setIsSnoozeOpen] = useState(false);
 
-  const list = useInfiniteQuery(notificationsListQuery(workspace.id, tab));
-  const { data: counts } = useQuery(notificationCountsQuery(workspace.id));
-  const notifications = list.data?.pages.flatMap((page) => page.notifications) ?? [];
-  const selectedIndex = notifications.findIndex((item) => item.id === selectedId);
-  const selected = selectedIndex >= 0 ? notifications[selectedIndex] : undefined;
-  const isArchivedTab = tab === "archived";
-  const unread = counts?.unread ?? 0;
+  const list = useInfiniteQuery(notificationsQuery(workspace.id, filter));
+  const { data: unread = 0 } = useQuery(unreadCountQuery(workspace.id));
+  const groups = useMemo(
+    () =>
+      groupNotifications(
+        list.data?.pages.flatMap((page) => page.nodes) ?? [],
+        filter,
+        now,
+        selectedKey,
+      ),
+    [list.data, filter, now, selectedKey],
+  );
+  const selectedIndex = groups.findIndex((group) => group.key === selectedKey);
+  const selected = selectedIndex >= 0 ? groups[selectedIndex] : undefined;
+  const isArchivedFilter = filter === "archived";
 
-  const { mutate: markRead } = useMarkNotificationsReadMutation();
-  const { mutate: markUnread } = useMarkNotificationsUnreadMutation();
-  const { mutate: archive } = useArchiveNotificationsMutation();
-  const { mutate: unarchive } = useUnarchiveNotificationsMutation();
-  const { mutate: snooze } = useSnoozeNotificationsMutation();
-  const { mutate: markAllRead, isPending: isMarkingAll } = useMarkAllNotificationsReadMutation();
+  const { mutate: mark } = useMarkNotificationsMutation(workspace.id);
+  const { mutate: markAllRead, isPending: isMarkingAll } = useMarkAllNotificationsReadMutation(
+    workspace.id,
+  );
+  const markGroup = (group: TNotificationGroup, action: TNotificationAction, until?: string) =>
+    mark({ ids: group.notifications.map((n) => n.id), action, until });
 
   const readOnOpen = useRef<string | null>(null);
   useEffect(() => {
-    if (!selected || selected.read_at || readOnOpen.current === selected.id) return;
-    readOnOpen.current = selected.id;
-    markRead({ notificationIds: [selected.id] });
-  }, [selected, markRead]);
+    if (!hasPane || !selected || readOnOpen.current === selected.key) return;
+    readOnOpen.current = selected.key;
+    if (selected.unreadIds.length > 0) mark({ ids: selected.unreadIds, action: "read" });
+  }, [hasPane, selected, mark]);
 
-  const neighbourOf = (notification: TNotification) => {
-    const index = notifications.findIndex((item) => item.id === notification.id);
-    return notifications[index + 1] ?? notifications[index - 1];
+  const selectNeighbourOf = (group: TNotificationGroup) => {
+    if (group.key !== selectedKey) return;
+    const index = groups.findIndex((item) => item.key === group.key);
+    onSelect((groups[index + 1] ?? groups[index - 1])?.key);
   };
 
-  const open = (notification: TNotification) => {
+  const openTarget = (group: TNotificationGroup) => {
+    const link = notificationLink(group.latest, workspace.urlKey);
+    if (group.unreadIds.length > 0) mark({ ids: group.unreadIds, action: "read" });
+    if (link) void navigate(link);
+  };
+
+  const select = (group: TNotificationGroup) => {
     if (hasPane) {
-      onSelect(notification.id);
+      onSelect(group.key);
       return;
     }
-    if (!notification.read_at) markRead({ notificationIds: [notification.id] });
-    if (notification.issue) {
-      void navigate({
-        to: "/$workspace/issue/$identifier",
-        params: { workspace: workspace.slug, identifier: notification.issue.identifier },
-      });
-      return;
-    }
-    if (notification.project) {
-      void navigate({
-        to: "/$workspace/project/$slug",
-        params: { workspace: workspace.slug, slug: notification.project.slug },
-      });
-    }
+    openTarget(group);
   };
 
-  const leave = (notification: TNotification) => {
-    if (notification.id !== selectedId) return;
-    onSelect(neighbourOf(notification)?.id);
-  };
-
-  const toggleArchive = (notification: TNotification) => {
-    leave(notification);
-    const input = { notificationIds: [notification.id] };
-    if (isArchivedTab) {
-      unarchive(input, {
-        onSuccess: () => toast.add({ type: "success", title: "Moved to inbox" }),
-      });
+  const toggleRead = (group: TNotificationGroup) => {
+    if (group.unreadIds.length > 0) {
+      mark({ ids: group.unreadIds, action: "read" });
       return;
     }
-    archive(input, {
-      onSuccess: () =>
-        toast.add({
-          type: "success",
-          title: "Archived",
-          data: {
-            action: (
-              <Button variant="outline" size="sm" onClick={() => unarchive(input)}>
-                Undo
-              </Button>
-            ),
-          },
-        }),
+    readOnOpen.current = group.key;
+    mark({ ids: [group.latest.id], action: "unread" });
+  };
+
+  const toggleArchive = (group: TNotificationGroup) => {
+    selectNeighbourOf(group);
+    if (isArchivedFilter) {
+      markGroup(group, "unarchive");
+      return;
+    }
+    markGroup(group, "archive");
+    toast.add({
+      type: "success",
+      title: "Archived",
+      data: {
+        action: (
+          <Button variant="outline" size="sm" onClick={() => markGroup(group, "unarchive")}>
+            Undo
+          </Button>
+        ),
+      },
     });
   };
 
-  const snoozeUntil = (notification: TNotification, until: Date) => {
-    leave(notification);
-    snooze(
-      { notificationIds: [notification.id], until },
-      {
-        onSuccess: () =>
-          toast.add({
-            type: "success",
-            title: "Snoozed",
-            description: `Until ${formatDateTime(until)}`,
-          }),
-      },
-    );
+  const snooze = (group: TNotificationGroup, until: Date) => {
+    selectNeighbourOf(group);
+    markGroup(group, "snooze", until.toISOString());
+    toast.add({ type: "success", title: "Snoozed", description: `Until ${formatDateTime(until)}` });
+  };
+
+  const unsnooze = (group: TNotificationGroup) => {
+    if (filter === "snoozed") selectNeighbourOf(group);
+    markGroup(group, "unsnooze");
+  };
+
+  const archiveRead = () => {
+    const read = groups.filter((group) => group.unreadIds.length === 0);
+    if (read.length === 0) return;
+    if (selected && read.includes(selected)) onSelect(undefined);
+    mark({ ids: read.flatMap((group) => group.notifications.map((n) => n.id)), action: "archive" });
+    toast.add({ type: "success", title: `Archived ${read.length} read` });
   };
 
   const move = (step: number) => {
-    if (notifications.length === 0) return;
-    const next = selectedIndex < 0 ? 0 : selectedIndex + step;
-    const target = notifications[Math.min(Math.max(next, 0), notifications.length - 1)];
-    onSelect(target.id);
-    if (next >= notifications.length - 1 && list.hasNextPage && !list.isFetchingNextPage) {
+    if (groups.length === 0) return;
+    const next = Math.min(
+      Math.max(selectedIndex < 0 ? 0 : selectedIndex + step, 0),
+      groups.length - 1,
+    );
+    onSelect(groups[next].key);
+    if (next >= groups.length - 3 && list.hasNextPage && !list.isFetchingNextPage) {
       void list.fetchNextPage();
     }
   };
 
-  const shortcutsEnabled = !isSnoozeOpen;
   useHotkeyScope(
     [
       { hotkey: "J", callback: () => move(1) },
       { hotkey: "K", callback: () => move(-1) },
+      { hotkey: "ArrowDown", callback: () => move(1) },
+      { hotkey: "ArrowUp", callback: () => move(-1) },
       {
         hotkey: "E",
         callback: () => selected && toggleArchive(selected),
         enabled: Boolean(selected),
       },
-      {
-        hotkey: "U",
-        callback: () => selected && markUnread({ notificationIds: [selected.id] }),
-        enabled: Boolean(selected?.read_at),
-      },
+      { hotkey: "U", callback: () => selected && toggleRead(selected), enabled: Boolean(selected) },
       { hotkey: "H", callback: () => setIsSnoozeOpen(true), enabled: Boolean(selected) },
+      {
+        hotkey: "Enter",
+        callback: (event) => {
+          if (!selected || isOnControl(event.target)) return;
+          openTarget(selected);
+        },
+        enabled: Boolean(selected),
+      },
+      { hotkey: "Escape", callback: () => onSelect(undefined), enabled: Boolean(selected) },
     ],
-    { enabled: shortcutsEnabled },
+    { enabled: !isSnoozeOpen },
   );
 
   const main = (
@@ -196,23 +239,41 @@ export function InboxView({ tab, selectedId, onTabChange, onSelect }: TProps) {
         title="Inbox"
         icon={<InboxIcon />}
         actions={
-          <Button
-            variant="outline"
-            disabled={unread === 0}
-            isPending={isMarkingAll}
-            onClick={() => markAllRead({ workspaceId: workspace.id })}
-          >
-            <CheckCheckIcon className="size-4" />
-            Mark all read
-          </Button>
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={unread === 0}
+              isPending={isMarkingAll}
+              onClick={() => markAllRead()}
+            >
+              <CheckCheckIcon className="size-4" />
+              Mark all read
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button variant="ghost" size="icon" aria-label="More inbox actions">
+                    <EllipsisIcon className="size-4" />
+                  </Button>
+                }
+              />
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem disabled={isArchivedFilter} onClick={archiveRead}>
+                  <ArchiveIcon className="size-4" />
+                  Archive all read
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>
         }
         toolbar={
-          <Tabs value={tab} onValueChange={(value) => onTabChange(value as TInboxTab)}>
+          <Tabs value={filter} onValueChange={(value) => onFilterChange(value as TInboxFilter)}>
             <TabsList>
-              {INBOX_TABS.map((value) => (
+              {INBOX_FILTERS.map((value) => (
                 <TabsTab key={value} value={value}>
-                  {tabLabels[value]}
-                  {value === "inbox" && unread > 0 && (
+                  {filterLabels[value]}
+                  {value === "unread" && unread > 0 && (
                     <Badge variant="muted">{unread > 99 ? "99+" : unread}</Badge>
                   )}
                 </TabsTab>
@@ -225,22 +286,26 @@ export function InboxView({ tab, selectedId, onTabChange, onSelect }: TProps) {
         isPending={list.isPending}
         error={list.error}
         onRetry={() => void list.refetch()}
-        isEmpty={notifications.length === 0}
-        empty={{ icon: tab === "archived" ? ArchiveIcon : InboxIcon, ...emptyStates[tab] }}
+        isEmpty={groups.length === 0 && !list.hasNextPage}
+        empty={emptyStates[filter]}
       >
         <div className="flex w-full flex-col gap-2">
-          <List>
-            {notifications.map((notification) => (
+          <div
+            role="listbox"
+            aria-label="Notifications"
+            className="bg-card flex w-full flex-col overflow-hidden rounded-lg border"
+          >
+            {groups.map((group) => (
               <NotificationRow
-                key={notification.id}
-                notification={notification}
-                isActive={notification.id === selectedId}
-                isArchived={isArchivedTab}
-                onOpen={open}
+                key={group.key}
+                group={group}
+                isSelected={group.key === selectedKey}
+                isArchived={isArchivedFilter}
+                onSelect={select}
                 onToggleArchive={toggleArchive}
               />
             ))}
-          </List>
+          </div>
           {list.hasNextPage && (
             <Button
               variant="ghost"
@@ -249,7 +314,7 @@ export function InboxView({ tab, selectedId, onTabChange, onSelect }: TProps) {
               isPending={list.isFetchingNextPage}
               onClick={() => void list.fetchNextPage()}
             >
-              Load more
+              Load older
             </Button>
           )}
         </div>
@@ -260,19 +325,18 @@ export function InboxView({ tab, selectedId, onTabChange, onSelect }: TProps) {
   return (
     <SplitView
       storageKey="inbox-pane-width"
+      defaultAsideWidth={640}
       main={main}
       aside={
         hasPane ? (
           <NotificationPane
-            notification={selected}
-            isArchived={isArchivedTab}
+            group={selected}
+            isArchived={isArchivedFilter}
             isSnoozeOpen={isSnoozeOpen}
             onSnoozeOpenChange={setIsSnoozeOpen}
-            onSnooze={snoozeUntil}
-            onMarkUnread={(notification) => {
-              readOnOpen.current = notification.id;
-              markUnread({ notificationIds: [notification.id] });
-            }}
+            onSnooze={snooze}
+            onUnsnooze={unsnooze}
+            onToggleRead={toggleRead}
             onToggleArchive={toggleArchive}
           />
         ) : undefined

@@ -258,6 +258,8 @@ func TestConnectingGitHubChecksTheInstallerCanReachTheInstallation(t *testing.T)
 	eq(t, setup(g.Ann.User, "99", state), "/acme/settings/integrations?github_error=not_your_installation")
 	eq(t, setup(bob.User, "77", state), "/acme/settings/integrations?github_error=signed_out")
 	eq(t, setup(g.Ann.User, "77", state+"x"), "/?github_error=expired")
+	old := g.State.Keys.Sign(fmt.Sprintf("github-install:%d:%s:%s", time.Now().Add(-time.Minute).Unix(), g.Workspace, g.Ann.User))
+	eq(t, setup(g.Ann.User, "77", old), "/acme/settings/integrations?github_error=expired", "an old link still finds its workspace")
 	eq(t, g.browse(t, g.Ann.User, "/api/github/callback?setup_action=request&state="+url.QueryEscape(state)),
 		"/acme/settings/integrations?github_error=requested")
 	eq(t, setup(g.Ann.User, "77", state), "/acme/settings/integrations")

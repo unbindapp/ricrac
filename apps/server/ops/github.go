@@ -222,23 +222,23 @@ func connectGitHub(c *app.Ctx, _ NoArgs) (any, error) {
 }
 
 // ReadGitHubInstallState is the workspace and user connect_github signed the state for, false
-// when it is forged or expired.
-func ReadGitHubInstallState(keys app.Keys, state string) (workspace, user uuid.UUID, ok bool) {
+// when it is forged; expired says it is too old to use (the workspace is still known).
+func ReadGitHubInstallState(keys app.Keys, state string) (workspace, user uuid.UUID, expired, ok bool) {
 	payload, ok := keys.Verify(state)
 	if !ok {
-		return uuid.Nil, uuid.Nil, false
+		return uuid.Nil, uuid.Nil, false, false
 	}
 	parts := strings.Split(payload, ":")
 	if len(parts) != 4 || parts[0] != "github-install" {
-		return uuid.Nil, uuid.Nil, false
+		return uuid.Nil, uuid.Nil, false, false
 	}
 	expires, err := strconv.ParseInt(parts[1], 10, 64)
-	if err != nil || expires < time.Now().Unix() {
-		return uuid.Nil, uuid.Nil, false
-	}
 	workspace, errW := uuid.Parse(parts[2])
 	user, errU := uuid.Parse(parts[3])
-	return workspace, user, errW == nil && errU == nil
+	if err != nil || errW != nil || errU != nil {
+		return uuid.Nil, uuid.Nil, false, false
+	}
+	return workspace, user, expires < time.Now().Unix(), true
 }
 
 type DisconnectGitHubArgs struct {

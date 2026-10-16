@@ -1,242 +1,174 @@
-import { closestCenter, DndContext, type DragEndEvent } from "@dnd-kit/core";
-import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronRightIcon, FolderIcon, GripVerticalIcon, PlusIcon, TagIcon } from "lucide-react";
+import { ChevronRightIcon, FolderPlusIcon, PlusIcon, SearchIcon, TagIcon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
-import { LabelDialog } from "@/components/labels/label-dialog";
+import { LabelDialog, type TLabelDialogTarget } from "@/components/labels/label-dialog";
 import { LabelRowMenu } from "@/components/labels/label-row-menu";
-import { reorderedPosition, sortableStyle, useSortSensors } from "@/components/labels/sortable";
+import { EmptyState } from "@/components/layout/empty-state";
 import { List } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { SettingsSection } from "@/components/layout/settings-section";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Switch } from "@/components/ui/switch";
-import {
-  labelTreeQuery,
-  type TLabel,
-  type TLabelTree,
-  useUpdateLabelMutation,
-} from "@/lib/queries/labels";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/components/ui/utils";
+import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { labelsQuery, labelTree, type TLabel, type TLabelNode } from "@/lib/queries/labels";
+
+const SEARCH_THRESHOLD = 12;
 
 type TProps = {
-  workspaceId: string;
-  teamId?: string;
+  /** The team whose labels to manage; null for the workspace labels. */
+  team: { id: string; name: string } | null;
   canEdit: boolean;
   title: string;
-  description: string;
+  description?: ReactNode;
 };
 
-export function LabelManager({ workspaceId, teamId, canEdit, title, description }: TProps) {
-  const [showArchived, setShowArchived] = useState(false);
-  const [creating, setCreating] = useState<"label" | "group" | null>(null);
-  const { data, isPending, error, refetch } = useQuery(
-    labelTreeQuery({ workspaceId, teamId, includeArchived: showArchived }),
-  );
-  const labels = (data?.labels ?? []).filter(
-    (label) => (label.team_id ?? null) === (teamId ?? null),
-  );
-  const groups = labels.filter((label) => label.is_group && !label.archived_at);
+const inScope = (label: TLabel, teamId: string | null) => (label.team?.id ?? null) === teamId;
 
-  const createMenu = canEdit && (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <Button size="sm">
-            <PlusIcon className="size-4" />
-            New
-          </Button>
-        }
-      />
-      <DropdownMenuContent align="end" className="w-40">
-        <DropdownMenuItem onClick={() => setCreating("label")}>
-          <TagIcon className="size-4" />
-          New label
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setCreating("group")}>
-          <FolderIcon className="size-4" />
-          New group
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+/** The labels of the scope as groups with their labels; a team's labels also show in workspace groups. */
+function scopedTree(labels: TLabel[], teamId: string | null, showRetired: boolean, query: string) {
+  const visible = (label: TLabel) =>
+    (showRetired || !label.retiredAt) && label.name.toLowerCase().includes(query);
+  return labelTree(labels).flatMap((node): TLabelNode[] => {
+    const own = inScope(node, teamId);
+    if (!node.isGroup) return own && visible(node) ? [node] : [];
+    const children = node.labels.filter((child) => inScope(child, teamId) && visible(child));
+    const groupMatches = own && (showRetired || !node.retiredAt);
+    if (!groupMatches && children.length === 0) return [];
+    if (query && !node.name.toLowerCase().includes(query) && children.length === 0) return [];
+    return [{ ...node, labels: children }];
+  });
+}
+
+export function LabelManager({ team, canEdit, title, description }: TProps) {
+  const { workspace } = useWorkspace();
+  const teamId = team?.id ?? null;
+  const { data, isPending, error, refetch } = useQuery(
+    labelsQuery(workspace.id, { team: teamId, includeRetired: true }),
+  );
+  const [showRetired, setShowRetired] = useState(false);
+  const [query, setQuery] = useState("");
+  const [dialog, setDialog] = useState<TLabelDialogTarget | null>(null);
+
+  const labels = data ?? [];
+  const own = labels.filter((label) => inScope(label, teamId));
+  const retiredCount = own.filter((label) => label.retiredAt).length;
+  const tree = scopedTree(labels, teamId, showRetired, query.trim().toLowerCase());
+  const groups = labels.filter(
+    (label) => label.isGroup && !label.retiredAt && (inScope(label, teamId) || !label.team),
+  );
+  const open = (target: TLabelDialogTarget) => setDialog(target);
+
+  const createButtons = canEdit && (
+    <>
+      <Button variant="outline" size="sm" onClick={() => open({ mode: "create", isGroup: true })}>
+        <FolderPlusIcon className="size-4" />
+        New group
+      </Button>
+      <Button size="sm" onClick={() => open({ mode: "create", isGroup: false })}>
+        <PlusIcon className="size-4" />
+        New label
+      </Button>
+    </>
+  );
+  const actions = own.length > 0 && (
+    <>
+      {retiredCount > 0 && (
+        <Button
+          variant="ghost"
+          size="sm"
+          aria-pressed={showRetired}
+          onClick={() => setShowRetired((shown) => !shown)}
+          className="text-muted-foreground"
+        >
+          {showRetired ? "Hide retired" : `${retiredCount} retired`}
+        </Button>
+      )}
+      {createButtons}
+    </>
   );
 
   return (
-    <SettingsSection
-      title={title}
-      description={description}
-      actions={
-        <>
-          <ArchivedToggle checked={showArchived} onChange={setShowArchived} />
-          {createMenu}
-        </>
-      }
-    >
+    <SettingsSection title={title} description={description} actions={actions}>
       <ListStates
         isPending={isPending}
         error={error}
         onRetry={() => void refetch()}
-        isEmpty={labels.length === 0}
+        isEmpty={own.length === 0}
         empty={{
           icon: TagIcon,
           title: "No labels yet",
           description: canEdit
-            ? "Labels sort issues by type, area or anything else. Groups hold related labels."
-            : "An admin can add labels here.",
+            ? "Labels sort issues by type, area or anything else. Groups gather related labels, like Type: Bug, Feature."
+            : "Members of the workspace add labels here.",
+          action: createButtons,
         }}
       >
-        <SortableLabels items={labels} groups={groups} canEdit={canEdit} />
+        {own.length > SEARCH_THRESHOLD && (
+          <div className="relative max-w-xs">
+            <SearchIcon className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+            <Input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Filter labels"
+              aria-label="Filter labels"
+              className="pl-9"
+            />
+          </div>
+        )}
+        {tree.length === 0 ? (
+          <EmptyState icon={SearchIcon} title="No matching labels" />
+        ) : (
+          <List>
+            {tree.map((node) =>
+              node.isGroup ? (
+                <GroupRows
+                  key={node.id}
+                  group={node}
+                  teamId={teamId}
+                  canEdit={canEdit}
+                  onOpen={open}
+                />
+              ) : (
+                <LabelRow key={node.id} label={node} canEdit={canEdit} onOpen={open} />
+              ),
+            )}
+          </List>
+        )}
       </ListStates>
-      {canEdit && (
-        <LabelDialog
-          mode="create"
-          workspaceId={workspaceId}
-          teamId={teamId}
-          isGroup={creating === "group"}
-          groups={groups}
-          open={creating !== null}
-          onOpenChange={(open) => {
-            if (!open) setCreating(null);
-          }}
-        />
-      )}
+      <LabelDialog target={dialog} onClose={() => setDialog(null)} team={team} groups={groups} />
     </SettingsSection>
   );
 }
 
-function ArchivedToggle({
-  checked,
-  onChange,
-}: {
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-}) {
-  return (
-    <label className="text-muted-foreground flex items-center gap-2 text-xs">
-      <Switch checked={checked} onCheckedChange={onChange} aria-label="Show archived labels" />
-      Archived
-    </label>
-  );
-}
-
-function SortableLabels({
-  items,
-  groups,
-  canEdit,
-}: {
-  items: TLabelTree[];
-  groups: TLabelTree[];
+type TRowProps = {
   canEdit: boolean;
-}) {
-  return (
-    <SortableList items={items}>
-      {(ordered) => (
-        <List>
-          {ordered.map((label, index) =>
-            label.is_group ? (
-              <GroupBlock
-                key={label.id}
-                group={label}
-                groups={groups}
-                canEdit={canEdit}
-                isLast={index === ordered.length - 1}
-              />
-            ) : (
-              <SortableLabelRow
-                key={label.id}
-                label={label}
-                groups={groups}
-                canEdit={canEdit}
-                divided={index < ordered.length - 1}
-              />
-            ),
-          )}
-        </List>
-      )}
-    </SortableList>
-  );
-}
+  onOpen: (target: TLabelDialogTarget) => void;
+};
 
-function SortableList<T extends TLabel>({
-  items,
-  children,
-}: {
-  items: T[];
-  children: (ordered: T[]) => ReactNode;
-}) {
-  const [dragOrder, setDragOrder] = useState<string[] | null>(null);
-  const { mutate: updateLabel } = useUpdateLabelMutation();
-  const sensors = useSortSensors();
-  const ordered = dragOrder
-    ? dragOrder
-        .map((id) => items.find((item) => item.id === id))
-        .filter((item): item is T => !!item)
-    : items;
-
-  const onDragEnd = (event: DragEndEvent) => {
-    const moved = reorderedPosition(ordered, event);
-    if (!moved) return;
-    setDragOrder(moved.order);
-    updateLabel(
-      { label_id: moved.id, sort_order: moved.sortOrder },
-      { onSettled: () => setDragOrder(null) },
-    );
-  };
-
-  return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-      <SortableContext
-        items={ordered.map((item) => item.id)}
-        strategy={verticalListSortingStrategy}
-      >
-        {children(ordered)}
-      </SortableContext>
-    </DndContext>
-  );
-}
-
-function GroupBlock({
+function GroupRows({
   group,
-  groups,
-  canEdit,
-  isLast,
-}: {
-  group: TLabelTree;
-  groups: TLabelTree[];
-  canEdit: boolean;
-  isLast: boolean;
-}) {
+  teamId,
+  ...props
+}: { group: TLabelNode; teamId: string | null } & TRowProps) {
   const [isOpen, setIsOpen] = useState(true);
-  const isExpanded = isOpen && group.children.length > 0;
-  const sortable = useSortable({ id: group.id, disabled: !canEdit });
+  const isOwn = inScope(group, teamId);
+  const count = group.labels.length;
   return (
-    <div
-      ref={sortable.setNodeRef}
-      role="listitem"
-      data-dragging={sortable.isDragging || undefined}
-      style={sortableStyle(sortable.transform, sortable.transition)}
-      className="bg-card data-dragging:bg-accent relative flex w-full flex-col data-dragging:z-10"
-    >
-      <LabelRowBody
+    <>
+      <Row
         label={group}
-        divided={isExpanded || !isLast}
-        groups={groups}
-        canEdit={canEdit}
-        handle={sortable}
         leading={
           <Button
             variant="ghost"
             size="icon"
+            forceMinSize={false}
             aria-expanded={isOpen}
             aria-label={isOpen ? `Collapse ${group.name}` : `Expand ${group.name}`}
             onClick={() => setIsOpen((open) => !open)}
+            className="text-muted-foreground -ml-1 size-6"
           >
             <ChevronRightIcon
               data-open={isOpen || undefined}
@@ -246,124 +178,79 @@ function GroupBlock({
         }
         meta={
           <>
-            <span className="text-muted-foreground text-xs">
-              {group.children.length} {group.children.length === 1 ? "label" : "labels"}
-            </span>
-            {group.group_single_select && <Badge variant="muted">Single select</Badge>}
+            <Badge variant="muted">
+              {group.groupType === "multiSelect" ? "Multi select" : "Single select"}
+            </Badge>
+            {!isOwn && <span className="text-muted-foreground text-xs">Workspace group</span>}
           </>
         }
+        trailing={`${count} ${count === 1 ? "label" : "labels"}`}
+        menu={props.canEdit && isOwn && <LabelRowMenu label={group} onOpen={props.onOpen} />}
       />
-      {isExpanded && (
-        <SortableList items={group.children}>
-          {(ordered) => (
-            <div role="list" className="flex flex-col">
-              {ordered.map((child, index) => (
-                <SortableLabelRow
-                  key={child.id}
-                  label={child}
-                  groups={groups}
-                  canEdit={canEdit}
-                  divided={!isLast || index < ordered.length - 1}
-                  nested
-                />
-              ))}
-            </div>
-          )}
-        </SortableList>
-      )}
-    </div>
+      {isOpen &&
+        group.labels.map((child) => <LabelRow key={child.id} label={child} nested {...props} />)}
+    </>
   );
 }
 
-function SortableLabelRow({
+function LabelRow({
   label,
-  groups,
-  canEdit,
-  divided,
   nested,
-}: {
-  label: TLabel;
-  groups: TLabelTree[];
-  canEdit: boolean;
-  divided: boolean;
-  nested?: boolean;
-}) {
-  const sortable = useSortable({ id: label.id, disabled: !canEdit });
+  canEdit,
+  onOpen,
+}: { label: TLabel; nested?: boolean } & TRowProps) {
   return (
-    <div
-      ref={sortable.setNodeRef}
-      role="listitem"
-      data-dragging={sortable.isDragging || undefined}
-      style={sortableStyle(sortable.transform, sortable.transition)}
-      className="bg-card data-dragging:bg-accent relative flex w-full data-dragging:z-10"
-    >
-      <LabelRowBody
-        label={label}
-        divided={divided}
-        groups={groups}
-        canEdit={canEdit}
-        handle={sortable}
-        leading={nested ? <span aria-hidden className="size-8 shrink-0" /> : undefined}
-      />
-    </div>
+    <Row
+      label={label}
+      nested={nested}
+      trailing={
+        label.issueCount > 0 && `${label.issueCount} ${label.issueCount === 1 ? "issue" : "issues"}`
+      }
+      menu={canEdit && <LabelRowMenu label={label} onOpen={onOpen} />}
+    />
   );
 }
 
-function LabelRowBody({
+function Row({
   label,
-  groups,
-  canEdit,
-  handle,
+  nested,
   leading,
   meta,
-  divided,
+  trailing,
+  menu,
 }: {
   label: TLabel;
-  groups: TLabelTree[];
-  canEdit: boolean;
-  handle: ReturnType<typeof useSortable>;
+  nested?: boolean;
   leading?: ReactNode;
   meta?: ReactNode;
-  divided: boolean;
+  trailing?: ReactNode;
+  menu?: ReactNode;
 }) {
   return (
     <div
-      data-archived={label.archived_at ? true : undefined}
-      data-divided={divided || undefined}
-      className="data-archived:text-muted-foreground flex h-9 w-full items-center gap-2 px-2 text-sm data-divided:border-b"
+      role="listitem"
+      data-retired={label.retiredAt ? true : undefined}
+      data-nested={nested || undefined}
+      className="data-retired:text-muted-foreground flex h-9 w-full items-center gap-2 border-b px-3 text-sm last:border-b-0 data-nested:pl-10"
     >
-      {canEdit && (
-        <Button
-          ref={handle.setActivatorNodeRef}
-          variant="ghost"
-          size="icon"
-          aria-label={`Reorder ${label.name}`}
-          className="text-muted-foreground cursor-grab"
-          {...handle.attributes}
-          {...handle.listeners}
-        >
-          <GripVerticalIcon className="size-4" />
-        </Button>
-      )}
-      {leading}
+      {leading ?? <span aria-hidden className="-ml-1 size-6 shrink-0" />}
       <span
         aria-hidden
-        className="size-2.5 shrink-0 rounded-full"
+        className={cn("size-2.5 shrink-0 rounded-full", label.retiredAt && "opacity-50")}
         style={{ backgroundColor: label.color }}
       />
-      <span className="truncate">{label.name}</span>
+      <span className={cn("shrink-0 truncate", !label.retiredAt && "font-medium")}>
+        {label.name}
+      </span>
+      {meta}
+      {label.retiredAt && <Badge variant="muted">Retired</Badge>}
       {label.description && (
-        <span className="text-muted-foreground hidden truncate text-xs sm:inline">
+        <span className="text-muted-foreground hidden min-w-0 truncate sm:inline">
           {label.description}
         </span>
       )}
-      {meta}
-      {label.archived_at && <Badge variant="muted">Archived</Badge>}
-      {canEdit && (
-        <div className="ml-auto flex shrink-0 items-center gap-2">
-          <LabelRowMenu label={label} groups={groups} />
-        </div>
-      )}
+      <span className="text-muted-foreground ml-auto shrink-0 text-xs">{trailing}</span>
+      {menu}
     </div>
   );
 }

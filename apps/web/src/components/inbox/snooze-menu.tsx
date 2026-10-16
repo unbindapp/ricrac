@@ -1,4 +1,4 @@
-import { AlarmClockIcon } from "lucide-react";
+import { AlarmClockIcon, BellRingIcon } from "lucide-react";
 
 import { snoozeOptions } from "@/components/inbox/snooze";
 import { useNow } from "@/components/providers/now-provider";
@@ -9,6 +9,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Kbd } from "@/components/ui/kbd";
@@ -18,17 +19,18 @@ type TProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSnooze: (until: Date) => void;
-  disabled?: boolean;
+  /** Offered when it is snoozed already. */
+  onUnsnooze?: () => void;
 };
 
-export function SnoozeMenu({ open, onOpenChange, onSnooze, disabled }: TProps) {
+export function SnoozeMenu({ open, onOpenChange, onSnooze, onUnsnooze }: TProps) {
   const now = useNow();
   const options = snoozeOptions(new Date(now));
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger
         render={
-          <Button variant="ghost" size="icon" aria-label="Snooze" disabled={disabled}>
+          <Button variant="ghost" size="icon" aria-label="Snooze">
             <AlarmClockIcon className="size-4" />
           </Button>
         }
@@ -46,6 +48,15 @@ export function SnoozeMenu({ open, onOpenChange, onSnooze, disabled }: TProps) {
             </DropdownMenuItem>
           ))}
         </DropdownMenuGroup>
+        {onUnsnooze && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={onUnsnooze}>
+              <BellRingIcon className="size-4" />
+              Unsnooze now
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

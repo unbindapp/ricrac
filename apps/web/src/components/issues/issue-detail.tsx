@@ -4,6 +4,7 @@ import {
   ArchiveIcon,
   CheckIcon,
   CircleDotIcon,
+  HandshakeIcon,
   MoonIcon,
   Trash2Icon,
   TriangleIcon,
@@ -13,6 +14,8 @@ import {
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
 import type { IssueDetail as TIssueDetail } from "@/api/ops.gen";
+import { CustomerNeedDialog } from "@/components/customers/customer-need-dialog";
+import { CustomerNeedsSection } from "@/components/customers/customer-needs-section";
 import { descriptionChange } from "@/components/issues/description-patch";
 import { IssueActivity } from "@/components/issues/issue-activity";
 import { AttachMenu, IssueAttachments } from "@/components/issues/issue-attachments";
@@ -52,6 +55,7 @@ import {
   useShareIssueMutation,
   useUpdateIssueMutation,
 } from "@/lib/queries/issues";
+import { customerNeedsQuery } from "@/lib/queries/customers";
 import { meQuery } from "@/lib/queries/me";
 import { isApiError } from "@/lib/server/errors";
 
@@ -123,6 +127,10 @@ function IssueDetailContent({
   const savedDescription = useRef(issue.description ?? "");
 
   const isPeek = variant === "peek";
+  const { data: customerNeeds } = useQuery(
+    customerNeedsQuery(workspace.id, { issue: issue.identifier }),
+  );
+  const hasCustomerNeeds = (customerNeeds?.length ?? 0) > 0;
   const reactions = groupReactions(issue.reactions, me?.id);
   const react = (emoji: string, reacted: boolean) =>
     toggleReaction({ issueId: issue.id, emoji, reacted });
@@ -187,8 +195,22 @@ function IssueDetailContent({
       <SubIssues issue={issue} />
       <IssueRelations issue={issue} />
       <IssueAttachments issue={issue} />
+      {hasCustomerNeeds && <CustomerNeedsSection issue={issue.identifier} />}
       <EmptyExtras
         issue={issue}
+        customerNeed={
+          !hasCustomerNeeds && (
+            <CustomerNeedDialog
+              scope={{ issue: issue.identifier }}
+              trigger={
+                <Button variant="ghost" size="sm" className="text-muted-foreground font-normal">
+                  <HandshakeIcon className="size-4" />
+                  Add customer request
+                </Button>
+              }
+            />
+          )
+        }
         reaction={
           reactions.length === 0 && <AddReactionButton reactions={reactions} onToggle={react} />
         }
@@ -226,17 +248,26 @@ function IssueDetailContent({
 }
 
 /** One small row of "add" actions for the sections an issue doesn't have yet. */
-function EmptyExtras({ issue, reaction }: { issue: TIssueDetail; reaction: ReactNode }) {
+function EmptyExtras({
+  issue,
+  customerNeed,
+  reaction,
+}: {
+  issue: TIssueDetail;
+  customerNeed: ReactNode;
+  reaction: ReactNode;
+}) {
   const { canEdit } = useWorkspace();
   if (!canEdit) return null;
   const actions: ReactNode[] = [];
   if (issue.children.length === 0) actions.push(<AddSubIssueMenu key="sub" issue={issue} />);
   if (!hasRelations(issue)) actions.push(<AddRelationPicker key="relation" issue={issue} />);
   if (issue.attachments.length === 0) actions.push(<AttachMenu key="attach" issue={issue} />);
-  if (actions.length === 0 && !reaction) return null;
+  if (actions.length === 0 && !customerNeed && !reaction) return null;
   return (
     <div className="-ml-2.5 flex flex-wrap items-center gap-1">
       {actions}
+      {customerNeed}
       {reaction}
     </div>
   );

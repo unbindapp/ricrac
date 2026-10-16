@@ -6,21 +6,18 @@ import { useRequiredTeamFromRoute } from "@/components/workspace/use-team-from-r
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/team/$key/labels")({
-  component: LabelsSettingsPage,
+  component: TeamLabelsSettingsPage,
 });
 
-function LabelsSettingsPage() {
-  const { workspace, isAdmin } = useWorkspace();
+function TeamLabelsSettingsPage() {
+  const { canEdit } = useWorkspace();
   const team = useRequiredTeamFromRoute();
   return (
-    <SettingsPage title="Labels" description="Labels that only this team uses.">
-      <LabelManager
-        workspaceId={workspace.id}
-        teamId={team.id}
-        canEdit={isAdmin}
-        title={`${team.name} labels`}
-        description="Drag to reorder. Workspace labels are managed in workspace settings."
-      />
+    <SettingsPage
+      title="Labels"
+      description={`Labels only ${team.name} uses, next to the workspace labels every team shares.`}
+    >
+      <LabelManager team={team} canEdit={canEdit} title={`${team.name} labels`} />
     </SettingsPage>
   );
 }

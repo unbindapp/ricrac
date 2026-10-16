@@ -11,16 +11,23 @@ type TProps = {
   main: ReactNode;
   aside?: ReactNode;
   storageKey?: string;
+  /** The aside's width until the reader resizes it. */
+  defaultAsideWidth?: number;
 };
 
 const DEFAULT_ASIDE_WIDTH = 480;
 const MIN_ASIDE_WIDTH = 360;
 const MAX_ASIDE_WIDTH = 900;
 
-export function SplitView({ main, aside, storageKey }: TProps) {
+export function SplitView({
+  main,
+  aside,
+  storageKey,
+  defaultAsideWidth = DEFAULT_ASIDE_WIDTH,
+}: TProps) {
   return (
     <ResizableGroup
-      defaultSize={DEFAULT_ASIDE_WIDTH}
+      defaultSize={defaultAsideWidth}
       minSize={MIN_ASIDE_WIDTH}
       maxSize={MAX_ASIDE_WIDTH}
       storageKey={storageKey}
