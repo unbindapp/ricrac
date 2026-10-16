@@ -1,5 +1,6 @@
 //! Templates: what new issues, projects and documents start from, for the workspace or one team.
 
+use chrono::{DateTime, Duration, Months, Utc};
 use schemars::JsonSchema;
 use serde::Deserialize;
 use serde_json::{Value, json};
@@ -9,10 +10,11 @@ use uuid::Uuid;
 use super::events;
 use super::issues::SaveIssueArgs;
 use super::resolve::{self, as_uuid};
-use super::util::{Page, non_empty, nullable};
+use super::util::{Page, non_empty, nullable, parse_datetime};
 use super::{Op, op};
 use crate::ctx::{Access, Ctx};
 use crate::error::{ApiError, ApiResult};
+use crate::state::AppState;
 
 pub fn ops() -> Vec<Op> {
     vec![
@@ -39,7 +41,8 @@ pub fn ops() -> Vec<Op> {
              it fills in, by type. issue: title, description, team, state, priority, estimate, assignee, labels, \
              project, cycle, dueDate and subIssues (a list of objects with save_issue's fields). project: name, \
              summary, description, state, priority, lead, labels, teams, milestones ([{name, description, \
-             targetDate}]) and issues (save_issue objects). document: title, content.",
+             targetDate}]) and issues (save_issue objects). document: title, content. An issue template with a \
+             recurrence creates an issue from itself on that schedule (recurring issues), as its creator.",
             save,
         ),
         op(
@@ -59,6 +62,8 @@ const TEMPLATE_JSON: &str = "jsonb_build_object(
     'type', tp.type,
     'team', team_ref(tp.team_id),
     'creator', user_ref(tp.creator_id),
+    'recurrence', tp.recurrence,
+    'nextRunAt', tp.next_run_at,
     'createdAt', tp.created_at,
     'updatedAt', tp.updated_at
 )";
@@ -250,6 +255,74 @@ pub struct SaveTemplateArgs {
     team: Option<Option<String>>,
     /// What the template fills in; the keys depend on the type (see the description).
     data: Option<Value>,
+    /// Issue templates only: create an issue from the template on a schedule, e.g. {"every": 1, "unit": "week",
+    /// "startsAt": "2026-11-02T09:00:00Z"}. unit is day, week or month; startsAt (ISO 8601, default now) is the
+    /// first one. null stops it.
+    #[serde(default, deserialize_with = "nullable")]
+    #[schemars(with = "Option<Recurrence>")]
+    recurrence: Option<Option<Recurrence>>,
+}
+
+#[derive(Deserialize, JsonSchema, Clone)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Recurrence {
+    every: u32,
+    unit: String,
+    starts_at: Option<String>,
+}
+
+fn next_run(at: DateTime<Utc>, every: u32, unit: &str) -> Option<DateTime<Utc>> {
+    match unit {
+        "day" => at.checked_add_signed(Duration::days(every as i64)),
+        "week" => at.checked_add_signed(Duration::weeks(every as i64)),
+        "month" => at.checked_add_months(Months::new(every)),
+        _ => None,
+    }
+}
+
+/// Creates the issues of recurring templates that are due. Each template is claimed and moved to
+/// its next time first, so a slow or failing run never creates the same issue twice.
+pub async fn run_recurring(state: &AppState) -> ApiResult<()> {
+    let mut tx = state.db.begin().await?;
+    let due: Vec<(Uuid, Uuid, Option<Uuid>, String, Value, DateTime<Utc>)> = sqlx::query_as(
+        "SELECT id, workspace_id, creator_id, name, recurrence, next_run_at FROM templates
+         WHERE next_run_at <= now() AND type = 'issue' ORDER BY next_run_at LIMIT 20 FOR UPDATE SKIP LOCKED",
+    )
+    .fetch_all(&mut *tx)
+    .await?;
+    let mut runs = Vec::new();
+    for (id, workspace, creator, name, recurrence, at) in due {
+        let recurrence: Option<Recurrence> = serde_json::from_value(recurrence).ok();
+        let mut next = recurrence.as_ref().and_then(|r| next_run(at, r.every, &r.unit));
+        while let (Some(n), Some(r)) = (next, recurrence.as_ref())
+            && n <= Utc::now()
+        {
+            next = next_run(n, r.every, &r.unit);
+        }
+        sqlx::query("UPDATE templates SET next_run_at = $2 WHERE id = $1")
+            .bind(id)
+            .bind(next)
+            .execute(&mut *tx)
+            .await?;
+        runs.push((id, workspace, creator, name));
+    }
+    tx.commit().await?;
+    for (id, workspace, creator, name) in runs {
+        let Some(creator) = creator else { continue };
+        let scopes = vec![Access::Read, Access::Write];
+        let Some(ctx) = Ctx::load(state, creator, workspace, scopes).await? else { continue };
+        let Some(op) = super::find("save_issue") else { continue };
+        let data: Value =
+            sqlx::query_scalar("SELECT data FROM templates WHERE id = $1").bind(id).fetch_one(&state.db).await?;
+        let mut args = serde_json::json!({ "template": id.to_string() });
+        if data.get("title").is_none() {
+            args["title"] = Value::String(name.clone());
+        }
+        if let Err(e) = op.call(ctx, args).await {
+            tracing::warn!("recurring issue from template {name} failed: {}", e.message);
+        }
+    }
+    Ok(())
 }
 
 async fn save(ctx: Ctx, args: SaveTemplateArgs) -> ApiResult<Value> {
@@ -303,9 +376,40 @@ async fn save(ctx: Ctx, args: SaveTemplateArgs) -> ApiResult<Value> {
     if let Some(team) = team {
         sqlx::query("UPDATE templates SET team_id = $2 WHERE id = $1").bind(id).bind(team).execute(&mut *tx).await?;
     }
+    if let Some(recurrence) = &args.recurrence {
+        let (value, next) = match recurrence {
+            None => (None, None),
+            Some(r) => {
+                if kind != "issue" {
+                    return Err(ApiError::bad_request("Only issue templates recur"));
+                }
+                if !(1..=365).contains(&r.every) || !matches!(r.unit.as_str(), "day" | "week" | "month") {
+                    return Err(ApiError::bad_request("recurrence is {every: 1-365, unit: day|week|month, startsAt?}"));
+                }
+                let starts = r.starts_at.as_deref().map(parse_datetime).transpose()?.unwrap_or_else(Utc::now);
+                let value = serde_json::json!({ "every": r.every, "unit": r.unit, "startsAt": starts });
+                (Some(value), Some(starts))
+            }
+        };
+        sqlx::query("UPDATE templates SET recurrence = $2, next_run_at = $3 WHERE id = $1")
+            .bind(id)
+            .bind(value)
+            .bind(next)
+            .execute(&mut *tx)
+            .await?;
+    }
     if let Some(data) = &args.data {
         check_data(&kind, data)?;
         sqlx::query("UPDATE templates SET data = $2 WHERE id = $1").bind(id).bind(data).execute(&mut *tx).await?;
+    }
+    let teamless: bool = sqlx::query_scalar(
+        "SELECT recurrence IS NOT NULL AND team_id IS NULL AND NOT data ? 'team' FROM templates WHERE id = $1",
+    )
+    .bind(id)
+    .fetch_one(&mut *tx)
+    .await?;
+    if teamless {
+        return Err(ApiError::bad_request("A recurring template needs a team (team, or data.team)"));
     }
     sqlx::query("UPDATE templates SET updated_at = now() WHERE id = $1").bind(id).execute(&mut *tx).await?;
     let value = template_value(&mut tx, id).await?;

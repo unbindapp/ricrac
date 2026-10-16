@@ -35,6 +35,7 @@ pub async fn every_minute(state: &AppState) -> ApiResult<()> {
     state.limiter.prune();
     crate::oauth::cleanup(state).await?;
     ops::cycles::run_automations(state).await?;
+    ops::templates::run_recurring(state).await?;
     automations(state).await
 }
 

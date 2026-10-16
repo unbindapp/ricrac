@@ -277,3 +277,32 @@ async fn templates_fill_in_issues_and_documents(db: PgPool) {
     call(&w.ann, "delete_template", json!({ "id": template["id"] })).await;
     fails(&w.ann, "get_template", json!({ "id": "Bug report" })).await;
 }
+
+#[sqlx::test]
+async fn recurring_templates_create_issues_on_schedule(db: PgPool) {
+    let w = world(db).await;
+    let template = call(
+        &w.ann,
+        "save_template",
+        json!({ "name": "Weekly triage", "type": "issue", "team": "ENG", "data": { "priority": 3 },
+                "recurrence": { "every": 1, "unit": "week", "startsAt": "-PT1M" } }),
+    )
+    .await;
+    assert_eq!(template["recurrence"]["unit"], "week");
+    crate::ops::templates::run_recurring(&w.state).await.unwrap();
+    crate::ops::templates::run_recurring(&w.state).await.unwrap();
+    let issues = call(&w.ann, "list_issues", json!({})).await;
+    assert_eq!(identifiers(&issues), vec!["ENG-1"], "one issue per due run");
+    assert_eq!(issues["nodes"][0]["title"], "Weekly triage");
+    let next = call(&w.ann, "get_template", json!({ "id": "Weekly triage" })).await;
+    assert!(next["nextRunAt"].as_str().unwrap() > chrono::Utc::now().to_rfc3339().as_str());
+    let teamless = fails(
+        &w.ann,
+        "save_template",
+        json!({ "name": "x", "type": "issue", "data": {}, "recurrence": { "every": 1, "unit": "day" } }),
+    )
+    .await;
+    assert!(teamless.contains("team"), "{teamless}");
+    let stopped = call(&w.ann, "save_template", json!({ "id": template["id"], "recurrence": null })).await;
+    assert!(stopped["nextRunAt"].is_null());
+}
