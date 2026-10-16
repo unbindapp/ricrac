@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { TargetIcon } from "lucide-react";
 
 import type { InitiativeDetail as TInitiativeDetail } from "@/api/ops.gen";
 import { FavoriteButton } from "@/components/favorites/favorite-button";
 import { ParentDocuments } from "@/components/documents/document-list";
-import { LifecycleBanner } from "@/components/documents/lifecycle-banner";
 import { MarkdownBody } from "@/components/documents/markdown-body";
 import { InitiativeProjects, SubInitiatives } from "@/components/initiatives/initiative-projects";
 import { InitiativeProperties } from "@/components/initiatives/initiative-properties";
@@ -13,7 +13,8 @@ import { Breadcrumb, type TBreadcrumbItem } from "@/components/layout/breadcrumb
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { EntityNotFound } from "@/components/navigation/not-found-template";
-import { EntityMenu } from "@/components/projects/entity-menu";
+import { ArchivedBanner } from "@/components/projects/archived-banner";
+import { EntityMenu, toastTrashed } from "@/components/projects/entity-menu";
 import { ProgressBar } from "@/components/projects/progress-bar";
 import { StatusUpdatesSection } from "@/components/projects/status-updates";
 import { CopyLinkAction, HeaderActions } from "@/components/shared/detail-actions";
@@ -29,7 +30,7 @@ import {
   useInitiativeLifecycleMutation,
   useSaveInitiativeMutation,
 } from "@/lib/queries/initiatives";
-import { isApiError } from "@/lib/server/errors";
+import { isMissing } from "@/lib/queries/projects";
 
 const lifecycleToasts: Record<TInitiativeLifecycleAction, string> = {
   archive: "Initiative archived",
@@ -40,12 +41,20 @@ const lifecycleToasts: Record<TInitiativeLifecycleAction, string> = {
 
 function useInitiativeLifecycle(id: string) {
   const { workspace } = useWorkspace();
+  const navigate = useNavigate();
   const { mutateAsync, isPending } = useInitiativeLifecycleMutation(workspace.id);
   const run = (action: TInitiativeLifecycleAction) =>
     void mutateAsync({ id, action })
       .then(() => toast.add({ type: "success", title: lifecycleToasts[action] }))
       .catch(() => undefined);
-  return { run, isPending };
+  const trash = () =>
+    void mutateAsync({ id, action: "trash" })
+      .then(async () => {
+        await navigate({ to: "/$workspace/initiatives", params: { workspace: workspace.urlKey } });
+        toastTrashed("Initiative moved to trash", () => run("restore"));
+      })
+      .catch(() => undefined);
+  return { run, trash, isPending };
 }
 
 export function InitiativeDetail({ slug }: { slug: string }) {
@@ -53,7 +62,7 @@ export function InitiativeDetail({ slug }: { slug: string }) {
   const { data, isPending, error, refetch } = useQuery(initiativeQuery(workspace.id, slug));
   if (isPending) return <ListSkeleton rows={4} />;
   if (error) {
-    if (isApiError(error, 404)) {
+    if (isMissing(error)) {
       return (
         <EntityNotFound
           Icon={TargetIcon}
@@ -96,7 +105,6 @@ function InitiativeDetailContent({ initiative }: { initiative: TInitiativeDetail
   const { workspace, canEdit } = useWorkspace();
   const { mutate: save, mutateAsync: saveAsync } = useSaveInitiativeMutation(workspace.id);
   const lifecycle = useInitiativeLifecycle(initiative.id);
-  const lifecycleState = initiative.trashed ? "trashed" : initiative.archivedAt ? "archived" : null;
 
   return (
     <div className="flex w-full flex-col gap-6">
@@ -111,25 +119,21 @@ function InitiativeDetailContent({ initiative }: { initiative: TInitiativeDetail
             <EntityMenu
               noun="initiative"
               isArchived={Boolean(initiative.archivedAt)}
-              isTrashed={initiative.trashed}
               onArchive={(archive) => lifecycle.run(archive ? "archive" : "unarchive")}
-              onTrash={(trash) => lifecycle.run(trash ? "trash" : "restore")}
+              onTrash={lifecycle.trash}
             />
           )}
         </HeaderActions>
       </div>
       <div className="flex w-full flex-col gap-6 lg:flex-row lg:items-start">
         <div className="mx-auto flex w-full max-w-3xl min-w-0 flex-1 flex-col gap-6">
-          <LifecycleBanner
-            entity="initiative"
-            state={lifecycleState}
-            isPending={lifecycle.isPending}
-            onRestore={
-              canEdit
-                ? () => lifecycle.run(lifecycleState === "trashed" ? "restore" : "unarchive")
-                : undefined
-            }
-          />
+          {initiative.archivedAt && (
+            <ArchivedBanner
+              noun="initiative"
+              isPending={lifecycle.isPending}
+              onUnarchive={canEdit ? () => lifecycle.run("unarchive") : undefined}
+            />
+          )}
           <div className="flex flex-col gap-2">
             <div className="flex min-w-0 items-center gap-2">
               <IconPicker

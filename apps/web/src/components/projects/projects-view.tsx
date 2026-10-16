@@ -9,7 +9,9 @@ import { PageHeader } from "@/components/layout/page-header";
 import { PageToolbar } from "@/components/layout/page-toolbar";
 import { useNewProjectStore } from "@/components/projects/new-project-store";
 import { ProjectBoard } from "@/components/projects/project-board";
+import type { TProjectScope } from "@/components/projects/project-groups";
 import { ProjectList } from "@/components/projects/project-list";
+import { ScopeEmpty, ScopeTabs } from "@/components/projects/scope-tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SimpleTooltip } from "@/components/ui/tooltip";
@@ -32,22 +34,26 @@ export function ProjectsView({ title, breadcrumb, storageKey, filters, teamId }:
   const openNewProject = useNewProjectStore((state) => state.open);
   const [layout, setLayout] = useLocalStorage<TLayout>(`projects-layout:${storageKey}`, "list");
   const [query, setQuery] = useState("");
+  const [scope, setScope] = useState<TProjectScope>("active");
   const create = () => openNewProject({ teamId });
-  const empty = (
-    <EmptyState
-      icon={BoxIcon}
-      title="No projects yet"
-      description="Projects group issues from one or more teams toward a goal, with milestones and status updates."
-      action={
-        canEdit && (
-          <Button size="sm" variant="outline" onClick={create}>
-            <PlusIcon className="size-4" />
-            New project
-          </Button>
-        )
-      }
-    />
-  );
+  const empty =
+    scope !== "active" ? (
+      <ScopeEmpty scope={scope} noun="project" />
+    ) : (
+      <EmptyState
+        icon={BoxIcon}
+        title="No projects yet"
+        description="Projects group issues from one or more teams toward a goal, with milestones and status updates."
+        action={
+          canEdit && (
+            <Button size="sm" variant="outline" onClick={create}>
+              <PlusIcon className="size-4" />
+              New project
+            </Button>
+          )
+        }
+      />
+    );
   const noMatches = (
     <EmptyState
       icon={SearchIcon}
@@ -55,7 +61,8 @@ export function ProjectsView({ title, breadcrumb, storageKey, filters, teamId }:
       description={`Nothing matches “${query.trim()}”.`}
     />
   );
-  const listProps = { filters, query, empty, noMatches, createDefaults: { teamId } };
+  const listProps = { filters, query, scope, empty, noMatches, createDefaults: { teamId } };
+  const isBoard = layout === "board" && scope === "active";
 
   return (
     <PageContainer>
@@ -74,32 +81,37 @@ export function ProjectsView({ title, breadcrumb, storageKey, filters, teamId }:
         toolbar={
           <PageToolbar
             actions={
-              <div role="radiogroup" aria-label="Layout" className="flex items-center gap-1">
-                <SimpleTooltip content="List">
-                  <Button
-                    variant={layout === "list" ? "secondary" : "ghost"}
-                    size="icon"
-                    role="radio"
-                    aria-checked={layout === "list"}
-                    aria-label="List layout"
-                    onClick={() => setLayout("list")}
-                  >
-                    <ListIcon className="size-4" />
-                  </Button>
-                </SimpleTooltip>
-                <SimpleTooltip content="Board">
-                  <Button
-                    variant={layout === "board" ? "secondary" : "ghost"}
-                    size="icon"
-                    role="radio"
-                    aria-checked={layout === "board"}
-                    aria-label="Board layout"
-                    onClick={() => setLayout("board")}
-                  >
-                    <LayoutGridIcon className="size-4" />
-                  </Button>
-                </SimpleTooltip>
-              </div>
+              <>
+                <ScopeTabs scope={scope} onChange={setScope} />
+                {scope === "active" && (
+                  <div role="radiogroup" aria-label="Layout" className="flex items-center gap-1">
+                    <SimpleTooltip content="List">
+                      <Button
+                        variant={layout === "list" ? "secondary" : "ghost"}
+                        size="icon"
+                        role="radio"
+                        aria-checked={layout === "list"}
+                        aria-label="List layout"
+                        onClick={() => setLayout("list")}
+                      >
+                        <ListIcon className="size-4" />
+                      </Button>
+                    </SimpleTooltip>
+                    <SimpleTooltip content="Board">
+                      <Button
+                        variant={layout === "board" ? "secondary" : "ghost"}
+                        size="icon"
+                        role="radio"
+                        aria-checked={layout === "board"}
+                        aria-label="Board layout"
+                        onClick={() => setLayout("board")}
+                      >
+                        <LayoutGridIcon className="size-4" />
+                      </Button>
+                    </SimpleTooltip>
+                  </div>
+                )}
+              </>
             }
           >
             <div className="relative w-full max-w-xs">
@@ -118,7 +130,7 @@ export function ProjectsView({ title, breadcrumb, storageKey, filters, teamId }:
           </PageToolbar>
         }
       />
-      {layout === "board" ? <ProjectBoard {...listProps} /> : <ProjectList {...listProps} />}
+      {isBoard ? <ProjectBoard {...listProps} /> : <ProjectList {...listProps} />}
     </PageContainer>
   );
 }

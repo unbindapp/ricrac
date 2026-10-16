@@ -4,6 +4,7 @@ import { z } from "zod";
 import type { ProjectDetail, ProjectStatus, StatusUpdate } from "@/api/ops.gen";
 import { slugIdFromParam } from "@/lib/helpers/entity-slug";
 import { call, callAll, type OpArgs } from "@/lib/server/client";
+import { isApiError } from "@/lib/server/errors";
 
 export type TProjectStatusType = ProjectStatus["type"];
 export type THealth = StatusUpdate["health"];
@@ -18,8 +19,6 @@ export const queryKeyProjects = {
     [workspaceId, "projects", "detail", project] as const,
   statuses: (workspaceId: string) => [workspaceId, "projects", "statuses"] as const,
   labels: (workspaceId: string) => [workspaceId, "projects", "labels"] as const,
-  milestone: (workspaceId: string, id: string) =>
-    [workspaceId, "projects", "milestone", id] as const,
 };
 
 export const queryKeyStatusUpdates = {
@@ -59,12 +58,6 @@ export const projectLabelsQuery = (workspaceId: string) =>
   queryOptions({
     queryKey: queryKeyProjects.labels(workspaceId),
     queryFn: () => callAll(workspaceId, "list_project_labels", { includeRetired: true }),
-  });
-
-export const milestoneQuery = (workspaceId: string, id: string) =>
-  queryOptions({
-    queryKey: queryKeyProjects.milestone(workspaceId, id),
-    queryFn: () => call(workspaceId, "get_milestone", { id }),
   });
 
 /** A project's issues; keyed under the workspace's issues so issue changes refresh them. */
@@ -260,6 +253,11 @@ export function useDeleteStatusUpdateCommentMutation(workspaceId: string) {
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: queryKeyStatusUpdates.all(workspaceId) }),
   });
+}
+
+/** A link to something deleted or never there: the server can't resolve it (400) or find it (404). */
+export function isMissing(error: unknown) {
+  return isApiError(error, 404) || isApiError(error, 400);
 }
 
 export const projectNameMaxLength = 80;

@@ -2960,6 +2960,8 @@ export type SaveDocumentArgs = {
   project?: string | null
   /** Parent release: name, slug or id. */
   release?: string | null
+  /** An earlier version (its id from list_document_versions) to bring back on update: its title and content replace the current ones, which are kept as a version. */
+  restoreVersion?: number | null
   /** Parent team: key, name or id (or the team of the cycle, with cycle). */
   team?: string | null
   /** Document template name or id, applied on create: it gives the title and content the arguments don't. */

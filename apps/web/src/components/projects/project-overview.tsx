@@ -1,7 +1,7 @@
 import type { ProjectDetail } from "@/api/ops.gen";
 import { ParentDocuments } from "@/components/documents/document-list";
-import { LifecycleBanner } from "@/components/documents/lifecycle-banner";
 import { MarkdownBody } from "@/components/documents/markdown-body";
+import { ArchivedBanner } from "@/components/projects/archived-banner";
 import { MilestonesSection } from "@/components/projects/milestones-section";
 import { ProjectHeaderBar, useProjectLifecycle } from "@/components/projects/project-header";
 import { ProjectProgress } from "@/components/projects/project-progress";
@@ -18,23 +18,19 @@ export function ProjectOverview({ project }: { project: ProjectDetail }) {
     workspace.id,
   );
   const lifecycle = useProjectLifecycle(project.id);
-  const lifecycleState = project.trashed ? "trashed" : project.archivedAt ? "archived" : null;
 
   return (
     <div className="flex w-full flex-col gap-6">
       <ProjectHeaderBar project={project} tab="overview" />
       <div className="flex w-full flex-col gap-6 lg:flex-row lg:items-start">
         <div className="mx-auto flex w-full max-w-3xl min-w-0 flex-1 flex-col gap-6">
-          <LifecycleBanner
-            entity="project"
-            state={lifecycleState}
-            isPending={lifecycle.isPending}
-            onRestore={
-              canEdit
-                ? () => lifecycle.run(lifecycleState === "trashed" ? "restore" : "unarchive")
-                : undefined
-            }
-          />
+          {project.archivedAt && (
+            <ArchivedBanner
+              noun="project"
+              isPending={lifecycle.isPending}
+              onUnarchive={canEdit ? () => lifecycle.run("unarchive") : undefined}
+            />
+          )}
           <div className="flex flex-col gap-2">
             <div className="flex min-w-0 items-center gap-2">
               <IconPicker

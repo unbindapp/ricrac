@@ -45,7 +45,7 @@ export function VersionHistoryDialog({ document, open, onOpenChange, onRestored 
           <DialogTitle>Version history</DialogTitle>
           <DialogDescription>
             A version is kept before each round of edits. Restoring one keeps the current text as a
-            version too.
+            version, so it can be undone.
           </DialogDescription>
         </DialogHeader>
         {open && (
@@ -89,29 +89,31 @@ function VersionBrowser({
   }
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4 md:flex-row">
-      <ScrollArea className="max-h-48 shrink-0 rounded-lg border md:max-h-none md:w-64">
-        <div role="listbox" aria-label="Versions" className="flex flex-col p-1">
-          {versions.data.map((version) => (
-            <Button
-              key={version.id}
-              role="option"
-              aria-selected={version.id === selected}
-              variant={version.id === selected ? "secondary" : "ghost"}
-              size="sm"
-              forceMinSize={false}
-              className="h-auto flex-col items-start gap-0.5 py-2 text-left"
-              onClick={() => setSelectedId(version.id)}
-            >
-              <span className="text-sm" title={formatDateTime(version.createdAt)}>
-                {formatRelative(version.createdAt)}
-              </span>
-              <span className="text-muted-foreground text-xs font-normal">
-                {version.author?.name ?? "Someone"}
-              </span>
-            </Button>
-          ))}
-        </div>
-      </ScrollArea>
+      <div className="flex max-h-48 shrink-0 flex-col rounded-lg border md:max-h-none md:w-56">
+        <ScrollArea className="min-h-0 flex-1">
+          <div role="listbox" aria-label="Versions" className="flex flex-col p-1">
+            {versions.data.map((version) => (
+              <Button
+                key={version.id}
+                role="option"
+                aria-selected={version.id === selected}
+                variant={version.id === selected ? "secondary" : "ghost"}
+                size="sm"
+                forceMinSize={false}
+                className="h-auto flex-col items-start gap-0.5 py-2 text-left"
+                onClick={() => setSelectedId(version.id)}
+              >
+                <span className="text-sm" title={formatDateTime(version.createdAt)}>
+                  {formatRelative(version.createdAt)}
+                </span>
+                <span className="text-muted-foreground text-xs font-normal">
+                  {version.author?.name ?? "Someone"}
+                </span>
+              </Button>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
       {selected !== null && (
         <VersionPreview
           documentId={document.id}
@@ -155,7 +157,7 @@ function VersionPreview({
                 size="sm"
                 isPending={isRestoring}
                 onClick={() =>
-                  void saveDocument({ id: documentId, title: data.title, content: data.content })
+                  void saveDocument({ id: documentId, restoreVersion: data.id })
                     .then(() => {
                       toast.add({ type: "success", title: "Version restored" });
                       onRestored();

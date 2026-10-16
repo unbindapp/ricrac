@@ -259,19 +259,20 @@ func getDocument(c *app.Ctx, args IDArgs) (any, error) {
 /* Save */
 
 type SaveDocumentArgs struct {
-	ID         *string          `json:"id" doc:"Only to update a document: its id, slug, link or title. Omit to create one."`
-	Title      *string          `json:"title"`
-	Content    *string          `json:"content" doc:"Markdown. Mention people with @displayName or @email; they are notified."`
-	Patch      []TextEdit       `json:"patch" doc:"Edits to the current content instead of the whole text, applied in order, all or none."`
-	Icon       Nullable[string] `json:"icon" doc:"An emoji or icon name; null clears it."`
-	Color      Nullable[string] `json:"color" doc:"Hex color like #5e6ad2; null clears it."`
-	Project    *string          `json:"project" doc:"Parent project: name, slug or id."`
-	Initiative *string          `json:"initiative" doc:"Parent initiative: name, slug or id."`
-	Team       *string          `json:"team" doc:"Parent team: key, name or id (or the team of the cycle, with cycle)."`
-	Issue      *string          `json:"issue" doc:"Parent issue: identifier (ENG-123) or id."`
-	Cycle      *string          `json:"cycle" doc:"Parent cycle: id, or number, name or \"current\" with team."`
-	Release    *string          `json:"release" doc:"Parent release: name, slug or id."`
-	Template   *string          `json:"template" doc:"Document template name or id, applied on create: it gives the title and content the arguments don't."`
+	ID             *string          `json:"id" doc:"Only to update a document: its id, slug, link or title. Omit to create one."`
+	Title          *string          `json:"title"`
+	Content        *string          `json:"content" doc:"Markdown. Mention people with @displayName or @email; they are notified."`
+	Patch          []TextEdit       `json:"patch" doc:"Edits to the current content instead of the whole text, applied in order, all or none."`
+	Icon           Nullable[string] `json:"icon" doc:"An emoji or icon name; null clears it."`
+	Color          Nullable[string] `json:"color" doc:"Hex color like #5e6ad2; null clears it."`
+	Project        *string          `json:"project" doc:"Parent project: name, slug or id."`
+	Initiative     *string          `json:"initiative" doc:"Parent initiative: name, slug or id."`
+	Team           *string          `json:"team" doc:"Parent team: key, name or id (or the team of the cycle, with cycle)."`
+	Issue          *string          `json:"issue" doc:"Parent issue: identifier (ENG-123) or id."`
+	Cycle          *string          `json:"cycle" doc:"Parent cycle: id, or number, name or \"current\" with team."`
+	Release        *string          `json:"release" doc:"Parent release: name, slug or id."`
+	Template       *string          `json:"template" doc:"Document template name or id, applied on create: it gives the title and content the arguments don't."`
+	RestoreVersion *int64           `json:"restoreVersion" doc:"An earlier version (its id from list_document_versions) to bring back on update: its title and content replace the current ones, which are kept as a version."`
 }
 
 type documentParents struct {
@@ -389,6 +390,9 @@ func createDocument(c *app.Ctx, tx pgx.Tx, args SaveDocumentArgs) (uuid.UUID, er
 	if args.Patch != nil {
 		return uuid.Nil, app.BadRequest("patch only applies when updating; pass content")
 	}
+	if args.RestoreVersion != nil {
+		return uuid.Nil, app.BadRequest("restoreVersion only applies when updating")
+	}
 	title, content := args.Title, args.Content
 	if args.Template != nil {
 		template, err := resolveTemplate(c, "document", *args.Template)
@@ -460,8 +464,14 @@ func updateDocument(c *app.Ctx, tx pgx.Tx, id uuid.UUID, args SaveDocumentArgs) 
 	if replaced != nil {
 		content = *replaced
 	}
+	restoring := args.RestoreVersion != nil
+	if restoring {
+		if title, content, err = versionText(c, tx, id, *args.RestoreVersion, args); err != nil {
+			return err
+		}
+	}
 	if title != row.Title || content != row.Content {
-		if err := keepVersion(c, tx, id, row.Title, row.Content, row.UpdatedBy); err != nil {
+		if err := keepVersion(c, tx, id, row.Title, row.Content, row.UpdatedBy, restoring); err != nil {
 			return err
 		}
 		if err := app.Exec(c, tx, "UPDATE documents SET title = $2, content = $3 WHERE id = $1", id, title, content); err != nil {
@@ -500,15 +510,33 @@ func updateDocument(c *app.Ctx, tx pgx.Tx, id uuid.UUID, args SaveDocumentArgs) 
 	return app.Exec(c, tx, "UPDATE documents SET updated_at = now(), updated_by_id = $2 WHERE id = $1", id, c.User)
 }
 
+// versionText is the title and content of an earlier version of the document, to restore.
+func versionText(c *app.Ctx, tx pgx.Tx, id uuid.UUID, version int64, args SaveDocumentArgs) (string, string, error) {
+	if args.Title != nil || args.Content != nil || args.Patch != nil {
+		return "", "", app.BadRequest("restoreVersion brings back a version's title and content; don't pass title, content or patch with it")
+	}
+	type text struct{ Title, Content string }
+	found, ok, err := app.Row[text](c, tx,
+		"SELECT title, content FROM document_versions WHERE id = $1 AND document_id = $2", version, id)
+	if err != nil {
+		return "", "", err
+	}
+	if !ok {
+		return "", "", app.NotFound("No version %d of this document; list_document_versions lists them", version)
+	}
+	return found.Title, found.Content, nil
+}
+
 // keepVersion keeps the current title and content as a version, unless the caller wrote them and
 // the last version is less than 10 minutes old: a burst of edits by one person makes one version.
-func keepVersion(c *app.Ctx, tx pgx.Tx, id uuid.UUID, title, content string, updatedBy *uuid.UUID) error {
+// A restore always keeps one, so it can be undone.
+func keepVersion(c *app.Ctx, tx pgx.Tx, id uuid.UUID, title, content string, updatedBy *uuid.UUID, always bool) error {
 	recent, err := app.One[bool](c, tx,
 		"SELECT EXISTS (SELECT 1 FROM document_versions WHERE document_id = $1 AND created_at > now() - interval '10 minutes')", id)
 	if err != nil {
 		return err
 	}
-	if recent && updatedBy != nil && *updatedBy == c.User {
+	if !always && recent && updatedBy != nil && *updatedBy == c.User {
 		return nil
 	}
 	return app.Exec(c, tx, "INSERT INTO document_versions (document_id, title, content, author_id) VALUES ($1, $2, $3, $4)",

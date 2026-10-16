@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import type { ProjectDetail } from "@/api/ops.gen";
 import { FavoriteButton } from "@/components/favorites/favorite-button";
 import { Breadcrumb, type TBreadcrumbItem } from "@/components/layout/breadcrumb";
-import { EntityMenu } from "@/components/projects/entity-menu";
+import { EntityMenu, toastTrashed } from "@/components/projects/entity-menu";
 import { CopyLinkAction, HeaderActions } from "@/components/shared/detail-actions";
 import { ProjectIcon } from "@/components/shared/project-icon";
 import { Tabs, TabsList, TabsTab } from "@/components/ui/tabs";
@@ -23,12 +23,20 @@ const lifecycleToasts: Record<TProjectLifecycleAction, string> = {
 
 export function useProjectLifecycle(projectId: string) {
   const { workspace } = useWorkspace();
+  const navigate = useNavigate();
   const { mutateAsync, isPending } = useProjectLifecycleMutation(workspace.id);
   const run = (action: TProjectLifecycleAction) =>
     void mutateAsync({ id: projectId, action })
       .then(() => toast.add({ type: "success", title: lifecycleToasts[action] }))
       .catch(() => undefined);
-  return { run, isPending };
+  const trash = () =>
+    void mutateAsync({ id: projectId, action: "trash" })
+      .then(async () => {
+        await navigate({ to: "/$workspace/projects", params: { workspace: workspace.urlKey } });
+        toastTrashed("Project moved to trash", () => run("restore"));
+      })
+      .catch(() => undefined);
+  return { run, trash, isPending };
 }
 
 function ProjectActions({ project }: { project: ProjectDetail }) {
@@ -42,9 +50,8 @@ function ProjectActions({ project }: { project: ProjectDetail }) {
         <EntityMenu
           noun="project"
           isArchived={Boolean(project.archivedAt)}
-          isTrashed={project.trashed}
           onArchive={(archive) => lifecycle.run(archive ? "archive" : "unarchive")}
-          onTrash={(trash) => lifecycle.run(trash ? "trash" : "restore")}
+          onTrash={lifecycle.trash}
         />
       )}
     </HeaderActions>

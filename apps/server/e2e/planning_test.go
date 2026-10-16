@@ -130,6 +130,16 @@ func TestDocumentsKeepVersionsAndFollowVisibility(t *testing.T) {
 	version := call(t, w.Ann, "get_document_version", M{"id": versionID})
 	eq(t, version.At("content").Str(), "Third")
 
+	back := call(t, w.Ann, "save_document", M{"id": slug, "restoreVersion": versions.At(0, "id").Num()})
+	eq(t, back.At("content").Str(), "Third")
+	eq(t, back.At("versionCount").Num(), 3)
+	first := call(t, w.Ann, "save_document", M{"id": slug, "restoreVersion": versions.At(1, "id").Num()})
+	eq(t, first.At("content").Str(), "Hello @bob")
+	eq(t, first.At("versionCount").Num(), 4, "a restore keeps the text it replaces, even right after an edit")
+	contains(t, fails(t, w.Ann, "save_document", M{"id": slug, "restoreVersion": 1, "content": "x"}), "don't pass")
+	fails(t, w.Ann, "save_document", M{"id": slug, "restoreVersion": 999999})
+	fails(t, w.Ann, "save_document", M{"title": "New", "team": "ENG", "restoreVersion": 1})
+
 	teamDocs := call(t, w.Ann, "list_documents", M{"team": "ENG"})
 	eqList(t, titles(teamDocs), []string{"Design Notes!"})
 	_, hasContent := teamDocs.At("nodes", 0).V.(map[string]any)["content"]

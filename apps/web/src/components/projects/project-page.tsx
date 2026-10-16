@@ -8,8 +8,7 @@ import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { EntityNotFound } from "@/components/navigation/not-found-template";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { projectQuery } from "@/lib/queries/projects";
-import { isApiError } from "@/lib/server/errors";
+import { isMissing, projectQuery } from "@/lib/queries/projects";
 
 export function ProjectLoader({
   slug,
@@ -27,7 +26,7 @@ export function ProjectLoader({
       </PageContainer>
     );
   }
-  if (error && isApiError(error, 404)) {
+  if (error && isMissing(error)) {
     return (
       <PageContainer>
         <EntityNotFound

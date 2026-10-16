@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { FileTextIcon, FolderInputIcon } from "lucide-react";
 import { useState } from "react";
 
@@ -6,14 +7,13 @@ import type { DocumentDetail as TDocumentDetail } from "@/api/ops.gen";
 import { FavoriteButton } from "@/components/favorites/favorite-button";
 import { useDocumentParent } from "@/components/documents/document-parent";
 import { DocumentParentPicker } from "@/components/documents/document-parent-picker";
-import { LifecycleBanner } from "@/components/documents/lifecycle-banner";
 import { MarkdownBody } from "@/components/documents/markdown-body";
 import { VersionHistoryDialog } from "@/components/documents/version-history";
 import { Breadcrumb, type TBreadcrumbItem } from "@/components/layout/breadcrumb";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { EntityNotFound } from "@/components/navigation/not-found-template";
-import { EntityMenu } from "@/components/projects/entity-menu";
+import { EntityMenu, toastTrashed } from "@/components/projects/entity-menu";
 import { CopyLinkAction, HeaderActions } from "@/components/shared/detail-actions";
 import { IconPicker } from "@/components/shared/icon-picker";
 import { InlineText } from "@/components/shared/inline-text";
@@ -24,18 +24,17 @@ import { useWorkspace } from "@/components/workspace/workspace-provider";
 import {
   DOCUMENT_TITLE_MAX_LENGTH,
   documentQuery,
-  type TDocumentLifecycleAction,
   useDocumentLifecycleMutation,
   useSaveDocumentMutation,
 } from "@/lib/queries/documents";
-import { isApiError } from "@/lib/server/errors";
+import { isMissing } from "@/lib/queries/projects";
 
 export function DocumentDetail({ slug }: { slug: string }) {
   const { workspace } = useWorkspace();
   const { data, isPending, error, refetch } = useQuery(documentQuery(workspace.id, slug));
   if (isPending) return <ListSkeleton rows={4} />;
   if (error) {
-    if (isApiError(error, 404)) {
+    if (isMissing(error)) {
       return (
         <EntityNotFound
           Icon={FileTextIcon}
@@ -48,26 +47,30 @@ export function DocumentDetail({ slug }: { slug: string }) {
   return <DocumentDetailContent key={data.id} document={data} />;
 }
 
-const lifecycleToasts: Record<TDocumentLifecycleAction, string> = {
-  trash: "Document moved to trash",
-  restore: "Document restored",
-};
-
 function DocumentDetailContent({ document }: { document: TDocumentDetail }) {
   const { workspace, canEdit } = useWorkspace();
   const { mutate: save, mutateAsync: saveAsync } = useSaveDocumentMutation(workspace.id);
-  const { mutateAsync: changeLifecycle, isPending: isChanging } = useDocumentLifecycleMutation(
-    workspace.id,
-  );
+  const { mutateAsync: changeLifecycle } = useDocumentLifecycleMutation(workspace.id);
+  const navigate = useNavigate();
   const parent = useDocumentParent(document, workspace.urlKey);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [revision, setRevision] = useState(0);
   const editor = document.updatedBy ?? document.creator;
-  const isEditable = canEdit && !document.trashed;
 
-  const runLifecycle = (action: TDocumentLifecycleAction) =>
-    void changeLifecycle({ id: document.id, action })
-      .then(() => toast.add({ type: "success", title: lifecycleToasts[action] }))
+  const trash = () =>
+    void changeLifecycle({ id: document.id, action: "trash" })
+      .then(async () => {
+        await navigate(
+          parent?.link ?? { to: "/$workspace/documents", params: { workspace: workspace.urlKey } },
+        );
+        toastTrashed(
+          "Document moved to trash",
+          () =>
+            void changeLifecycle({ id: document.id, action: "restore" })
+              .then(() => toast.add({ type: "success", title: "Document restored" }))
+              .catch(() => undefined),
+        );
+      })
       .catch(() => undefined);
 
   const breadcrumb: TBreadcrumbItem[] = [
@@ -92,25 +95,18 @@ function DocumentDetailContent({ document }: { document: TDocumentDetail }) {
           {canEdit && (
             <EntityMenu
               noun="document"
-              isTrashed={document.trashed}
-              onTrash={(trash) => runLifecycle(trash ? "trash" : "restore")}
+              onTrash={trash}
               onShowHistory={() => setIsHistoryOpen(true)}
             />
           )}
         </HeaderActions>
       </div>
-      <LifecycleBanner
-        entity="document"
-        state={document.trashed ? "trashed" : null}
-        isPending={isChanging}
-        onRestore={canEdit ? () => runLifecycle("restore") : undefined}
-      />
       <div className="flex flex-col gap-2">
         <div className="flex min-w-0 items-center gap-2">
           <IconPicker
             value={document.icon}
             color={document.color}
-            disabled={!isEditable}
+            disabled={!canEdit}
             label="Document icon"
             onChange={(icon) => save({ id: document.id, icon })}
           />
@@ -118,7 +114,7 @@ function DocumentDetailContent({ document }: { document: TDocumentDetail }) {
             value={document.title}
             label="Document title"
             maxLength={DOCUMENT_TITLE_MAX_LENGTH}
-            readOnly={!isEditable}
+            readOnly={!canEdit}
             onSave={(title) => save({ id: document.id, title })}
           />
         </div>
@@ -139,7 +135,7 @@ function DocumentDetailContent({ document }: { document: TDocumentDetail }) {
               {document.versionCount} earlier version{document.versionCount === 1 ? "" : "s"}
             </Button>
           )}
-          {isEditable && (
+          {canEdit && (
             <DocumentParentPicker
               label="Move document"
               value={currentParent(document)}
@@ -168,7 +164,7 @@ function DocumentDetailContent({ document }: { document: TDocumentDetail }) {
         label="Document content"
         placeholder="Start writing…"
         initialValue={document.content ?? ""}
-        readOnly={!isEditable}
+        readOnly={!canEdit}
         onSave={(content) => saveAsync({ id: document.id, content })}
       />
       <VersionHistoryDialog

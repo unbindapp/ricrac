@@ -27,3 +27,21 @@ export function matchesQuery(project: Project, query: string) {
     text.toLowerCase().includes(needle),
   );
 }
+
+/** Which projects a list shows: the ones in use, the archived ones or the trash. */
+export type TProjectScope = "active" | "archived" | "trash";
+
+export function scopeArgs(scope: TProjectScope) {
+  if (scope === "archived") return { includeArchived: true };
+  if (scope === "trash") return { includeArchived: true, includeTrashed: true };
+  return {};
+}
+
+export function inScope(
+  item: { archivedAt: string | null; trashed: boolean },
+  scope: TProjectScope,
+) {
+  if (scope === "trash") return item.trashed;
+  if (item.trashed) return false;
+  return scope === "archived" ? Boolean(item.archivedAt) : !item.archivedAt;
+}

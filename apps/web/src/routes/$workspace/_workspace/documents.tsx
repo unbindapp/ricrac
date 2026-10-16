@@ -5,6 +5,7 @@ import { FileTextIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { z } from "zod";
 
+import type { Document } from "@/api/ops.gen";
 import { DocumentRow } from "@/components/documents/document-row";
 import { NewDocumentDialog } from "@/components/documents/new-document-dialog";
 import { EmptyState } from "@/components/layout/empty-state";
@@ -14,11 +15,14 @@ import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageToolbar } from "@/components/layout/page-toolbar";
+import { TrashedRow } from "@/components/projects/entity-menu";
+import { EntityIcon } from "@/components/shared/entity-icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTab } from "@/components/ui/tabs";
+import { toast } from "@/components/ui/toast";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { documentsQuery } from "@/lib/queries/documents";
+import { documentsQuery, useDocumentLifecycleMutation } from "@/lib/queries/documents";
 
 const searchSchema = z.object({ view: z.enum(["all", "trash"]).optional() });
 
@@ -107,12 +111,38 @@ function DocumentsPage() {
       )}
       {documents.length > 0 && (
         <List>
-          {documents.map((document) => (
-            <DocumentRow key={document.id} document={document} />
-          ))}
+          {documents.map((document) =>
+            isTrash ? (
+              <TrashedDocumentRow key={document.id} document={document} />
+            ) : (
+              <DocumentRow key={document.id} document={document} />
+            ),
+          )}
         </List>
       )}
     </PageContainer>
+  );
+}
+
+function TrashedDocumentRow({ document }: { document: Document }) {
+  const { workspace, canEdit } = useWorkspace();
+  const { mutate: change, isPending } = useDocumentLifecycleMutation(workspace.id);
+  return (
+    <TrashedRow
+      icon={<EntityIcon icon={document.icon} color={document.color} fallback={FileTextIcon} />}
+      name={document.title}
+      trashedAt={document.trashedAt}
+      isPending={isPending}
+      onRestore={
+        canEdit
+          ? () =>
+              change(
+                { id: document.id, action: "restore" },
+                { onSuccess: () => toast.add({ type: "success", title: "Document restored" }) },
+              )
+          : undefined
+      }
+    />
   );
 }
 

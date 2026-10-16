@@ -171,6 +171,23 @@ function BoardColumn({
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: `column::${group.status.id}` });
   const openNewProject = useNewProjectStore((state) => state.open);
+  if (group.projects.length === 0 && !isOver) {
+    return (
+      <section
+        ref={setNodeRef}
+        aria-label={`${group.status.name}, no projects`}
+        className="bg-muted flex w-10 shrink-0 flex-col items-center gap-2 rounded-lg border py-3"
+      >
+        <ProjectStatusIcon type={group.status.type} color={group.status.color} />
+        <span
+          className="text-muted-foreground text-sm font-medium whitespace-nowrap"
+          style={{ writingMode: "vertical-rl" }}
+        >
+          {group.status.name}
+        </span>
+      </section>
+    );
+  }
   return (
     <section
       aria-label={group.status.name}
