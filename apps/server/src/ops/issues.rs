@@ -1432,6 +1432,13 @@ async fn apply_changes(
                 .bind(project)
                 .execute(&mut *tx)
                 .await?;
+            if let Some(project) = project {
+                sqlx::query("INSERT INTO project_teams (project_id, team_id) VALUES ($1, $2) ON CONFLICT DO NOTHING")
+                    .bind(project)
+                    .bind(row.team_id)
+                    .execute(&mut *tx)
+                    .await?;
+            }
             let refs: (Option<Value>, Option<Value>) = sqlx::query_as("SELECT project_ref($1), project_ref($2)")
                 .bind(row.project_id)
                 .bind(project)

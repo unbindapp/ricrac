@@ -103,7 +103,10 @@ pub async fn call(ctx: &Ctx, name: &str, args: Value) -> Value {
 
 pub async fn try_call(ctx: &Ctx, name: &str, args: Value) -> Result<Value, ApiError> {
     let op = ops::find(name).unwrap_or_else(|| panic!("no operation {name}"));
-    op.call(ctx.clone(), args).await
+    let ctx = Ctx::load(&ctx.state, ctx.user, ctx.workspace, ctx.scopes.clone())
+        .await?
+        .ok_or_else(|| ApiError::forbidden("Not a member of this workspace"))?;
+    op.call(ctx, args).await
 }
 
 /// Calls an operation that must fail, returning the error message.

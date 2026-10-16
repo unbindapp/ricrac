@@ -161,7 +161,8 @@ pub async fn issue(ctx: &Ctx, value: &str) -> ApiResult<Uuid> {
     } else if let Some((key, number)) = parse_identifier(candidate) {
         let current: Option<Uuid> = sqlx::query_scalar(
             "SELECT i.id FROM issues i JOIN teams t ON t.id = i.team_id
-             WHERE i.workspace_id = $1 AND upper(t.key) = $2 AND i.number = $3",
+             WHERE i.workspace_id = $1 AND upper(t.key) = $2 AND i.number = $3
+             ORDER BY t.archived_at IS NOT NULL LIMIT 1",
         )
         .bind(ctx.workspace)
         .bind(&key)

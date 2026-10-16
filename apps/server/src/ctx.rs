@@ -95,6 +95,11 @@ impl Ctx {
         Ok(Some(Self { state: state.clone(), user, workspace, role, scopes, teams: Arc::default() }))
     }
 
+    /// The same caller with nothing cached, as a new request would see it.
+    pub fn fresh(&self) -> Self {
+        Self { teams: Arc::default(), ..self.clone() }
+    }
+
     pub fn db(&self) -> &PgPool {
         &self.state.db
     }
