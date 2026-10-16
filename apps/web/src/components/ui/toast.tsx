@@ -29,7 +29,7 @@ function ToastViewport({ className, ...props }: ToastPrimitive.Viewport.Props) {
     <ToastPrimitive.Viewport
       data-slot="toast-viewport"
       className={cn(
-        "pointer-events-none fixed inset-x-4 bottom-4 z-2000 w-auto font-sans outline-none sm:top-4 sm:right-4 sm:bottom-auto sm:left-auto sm:w-full sm:max-w-sm",
+        "pointer-events-none fixed inset-x-4 bottom-4 z-2000 w-auto font-sans outline-none sm:right-4 sm:left-auto sm:w-full sm:max-w-sm",
         className,
       )}
       {...props}
@@ -42,11 +42,11 @@ function Toast({ className, ...props }: ToastPrimitive.Root.Props) {
     <ToastPrimitive.Root
       data-slot="toast"
       className={cn(
-        "group/toast border-border bg-background text-foreground shadow-shadow-color/shadow-opacity pointer-events-auto absolute right-0 bottom-0 z-[calc(1000-var(--toast-index))] w-full origin-bottom rounded-lg border shadow-lg will-change-transform outline-none select-none sm:top-0 sm:bottom-auto sm:origin-top",
-        "[--dir:-1] sm:[--dir:1]",
+        "group/toast border-border bg-background text-foreground shadow-shadow-color/shadow-opacity pointer-events-auto absolute right-0 bottom-0 z-[calc(1000-var(--toast-index))] w-full origin-bottom rounded-lg border shadow-lg will-change-transform outline-none select-none",
+        "[--dir:-1]",
         "[--gap:0.75rem] [--height:var(--toast-frontmost-height,var(--toast-height))] [--offset-y:calc(var(--dir)*(var(--toast-offset-y)+var(--toast-index)*var(--gap))+var(--toast-swipe-movement-y))] [--peek:0.75rem] [--scale:calc(max(0,1-(var(--toast-index)*0.1)))] [--shrink:calc(1-var(--scale))]",
         "h-(--height) [transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+var(--dir)*(var(--toast-index)*var(--peek)+var(--shrink)*var(--height))))_scale(var(--scale))] [transition:transform_500ms_cubic-bezier(0.22,1,0.36,1),opacity_500ms,height_150ms]",
-        "after:absolute after:top-full after:left-0 after:h-[calc(var(--gap)+1px)] after:w-full after:content-[''] sm:after:top-auto sm:after:bottom-full",
+        "after:absolute after:top-full after:left-0 after:h-[calc(var(--gap)+1px)] after:w-full after:content-['']",
         "data-expanded:h-(--toast-height) data-expanded:[transform:translateX(var(--toast-swipe-movement-x))_translateY(var(--offset-y))]",
         "data-limited:opacity-0 data-starting-style:[transform:translateY(calc(var(--dir)*-150%))]",
         "[&[data-ending-style]:not([data-limited]):not([data-swipe-direction])]:[transform:translateY(calc(var(--dir)*-150%))]",
@@ -143,7 +143,7 @@ function ToastIcon({ icon, type }: { icon: React.ReactNode; type: string | undef
 }
 
 const swipeDirectionMobile: ToastPrimitive.Root.Props["swipeDirection"] = ["down"];
-const swipeDirectionDesktop: ToastPrimitive.Root.Props["swipeDirection"] = ["up", "right"];
+const swipeDirectionDesktop: ToastPrimitive.Root.Props["swipeDirection"] = ["down", "right"];
 
 function ToastList() {
   const { toasts } = ToastPrimitive.useToastManager<TToastData>();

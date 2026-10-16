@@ -1,116 +1,68 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { LIST_REFETCH_INTERVAL_MS } from "@/lib/queries/issues";
-import { getGoClient } from "@/lib/server/client";
+import type { Cycle, CycleDetail, CycleRef } from "@/api/ops.gen";
+import { queryKeyFavorites } from "@/lib/queries/favorites";
+import { queryKeyTeams } from "@/lib/queries/teams";
+import { call, callAll, type OpArgs } from "@/lib/server/client";
 import { isApiError } from "@/lib/server/errors";
-import type { TGoClient, TInput, TListItem, TResponseData } from "@/lib/server/types";
 
-export type TCycle = TListItem<TGoClient["cycles"]["list"]>;
-export type TCycleDetail = TResponseData<TGoClient["cycles"]["get"]>;
-export type TCycleScopePoint = NonNullable<TCycleDetail["scope_history"]>[number];
-export type TCreateCycleInput = TInput<TGoClient["cycles"]["create"]>;
-export type TUpdateCycleInput = TInput<TGoClient["cycles"]["update"]>;
+export type TCycle = Cycle;
+export type TCycleDetail = CycleDetail;
 
 export const queryKeyCycles = {
-  all: () => ["cycles"] as const,
-  list: (teamId: string) => ["cycles", "list", teamId] as const,
-  detail: (teamId: string, number: number) => ["cycles", "detail", teamId, number] as const,
+  all: (workspaceId: string) => [workspaceId, "cycles"] as const,
+  list: (workspaceId: string, team: string, includeArchived: boolean) =>
+    [workspaceId, "cycles", "list", team, includeArchived] as const,
+  detail: (workspaceId: string, team: string, number: number) =>
+    [workspaceId, "cycles", "detail", team, number] as const,
 };
 
-export const cyclesListQuery = (teamId: string) =>
+/** A team's cycles, newest first. */
+export const cyclesQuery = (workspaceId: string, team: string, includeArchived = false) =>
   queryOptions({
-    queryKey: queryKeyCycles.list(teamId),
+    queryKey: queryKeyCycles.list(workspaceId, team, includeArchived),
     queryFn: async () => {
-      const res = await getGoClient().cycles.list({ team_id: teamId });
-      return { cycles: res.data ?? [] };
+      const cycles = await callAll(workspaceId, "list_cycles", { team, includeArchived });
+      return cycles.sort((a, b) => b.startsAt.localeCompare(a.startsAt));
     },
-    refetchInterval: LIST_REFETCH_INTERVAL_MS,
   });
 
-export const cycleByNumberQuery = (teamId: string, number: number) =>
+/** A cycle by its number in the team, with its issues and daily history. */
+export const cycleQuery = (workspaceId: string, team: string, number: number) =>
   queryOptions({
-    queryKey: queryKeyCycles.detail(teamId, number),
-    queryFn: async () => {
-      const res = await getGoClient().cycles.get({ team_id: teamId, number });
-      return { cycle: res.data };
-    },
-    retry: retryUnlessNotFound,
-    refetchInterval: LIST_REFETCH_INTERVAL_MS,
+    queryKey: queryKeyCycles.detail(workspaceId, team, number),
+    queryFn: () => call(workspaceId, "get_cycle", { id: String(number), team }),
+    retry: (failureCount, error) => !isApiError(error, 404) && failureCount < 3,
   });
 
-export async function createCycle(input: TCreateCycleInput) {
-  const res = await getGoClient().cycles.create(input);
-  return { data: res.data };
-}
-
-export async function updateCycle(input: TUpdateCycleInput) {
-  const res = await getGoClient().cycles.update(input);
-  return { data: res.data };
-}
-
-export async function archiveCycle(input: { cycleId: string }) {
-  const res = await getGoClient().cycles.archive({ cycle_id: input.cycleId });
-  return { data: res.data };
-}
-
-export async function deleteCycle(input: { cycleId: string }) {
-  const res = await getGoClient().cycles.delete({ cycle_id: input.cycleId });
-  return { data: res.data };
-}
-
-function useInvalidateCycles() {
+function useInvalidateCycles(workspaceId: string) {
   const queryClient = useQueryClient();
-  return async () => {
-    await queryClient.invalidateQueries({ queryKey: queryKeyCycles.all() });
-    await queryClient.invalidateQueries({ queryKey: ["teams"] });
-    await queryClient.invalidateQueries({ queryKey: ["favorites"] });
-  };
+  return () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: queryKeyCycles.all(workspaceId) }),
+      queryClient.invalidateQueries({ queryKey: queryKeyTeams.all(workspaceId) }),
+      queryClient.invalidateQueries({ queryKey: queryKeyFavorites.all(workspaceId) }),
+    ]);
 }
 
-export function useCreateCycleMutation() {
-  const invalidate = useInvalidateCycles();
+export function useSaveCycleMutation(workspaceId: string) {
+  const invalidate = useInvalidateCycles(workspaceId);
   return useMutation({
-    mutationFn: createCycle,
-    meta: { errorTitle: "Could not create cycle" },
+    mutationFn: (args: OpArgs<"save_cycle">) => call(workspaceId, "save_cycle", args),
+    meta: { errorTitle: "Could not save cycle" },
     onSuccess: invalidate,
   });
 }
 
-export function useUpdateCycleMutation() {
-  const invalidate = useInvalidateCycles();
+export function useArchiveCycleMutation(workspaceId: string) {
+  const invalidate = useInvalidateCycles(workspaceId);
   return useMutation({
-    mutationFn: updateCycle,
-    meta: { errorTitle: "Could not update cycle" },
-    onSuccess: invalidate,
-  });
-}
-
-export function useArchiveCycleMutation() {
-  const invalidate = useInvalidateCycles();
-  return useMutation({
-    mutationFn: archiveCycle,
+    mutationFn: (id: string) => call(workspaceId, "archive_cycle", { id }),
     meta: { errorTitle: "Could not archive cycle" },
     onSuccess: invalidate,
   });
 }
 
-export function useDeleteCycleMutation() {
-  const invalidate = useInvalidateCycles();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: deleteCycle,
-    meta: { errorTitle: "Could not delete cycle" },
-    onSuccess: async () => {
-      await invalidate();
-      await queryClient.invalidateQueries({ queryKey: ["issues"] });
-    },
-  });
-}
-
-export function cycleName(cycle: { name: string; number: number }) {
+export function cycleName(cycle: Pick<CycleRef, "name" | "number">) {
   return cycle.name || `Cycle ${cycle.number}`;
-}
-
-function retryUnlessNotFound(failureCount: number, error: Error) {
-  return !isApiError(error, 404) && failureCount < 3;
 }

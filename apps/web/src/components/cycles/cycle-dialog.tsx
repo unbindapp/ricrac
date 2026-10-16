@@ -1,137 +1,137 @@
-import { format } from "date-fns";
-import { ReactElement, useState } from "react";
+import { addDays, format } from "date-fns";
 import { z } from "zod";
 
+import type { Cycle } from "@/api/ops.gen";
+import { cycleLastDay } from "@/components/cycles/cycle-status";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
+import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
-import { type TCycle, useCreateCycleMutation, useUpdateCycleMutation } from "@/lib/queries/cycles";
-import type { TTeam } from "@/lib/queries/teams";
+import { cycleName, useSaveCycleMutation } from "@/lib/queries/cycles";
 
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 
-const formSchema = z
+const cycleFormSchema = z
   .object({
-    name: z.string().trim().max(64, "Keep the name under 64 characters."),
+    name: z.string().trim().max(80, "Keep the name under 80 characters."),
     description: z.string().trim().max(2000, "Keep the description under 2000 characters."),
     startsOn: z.string().regex(datePattern, "Pick a start date."),
-    endsOn: z.string().regex(datePattern, "Pick an end date."),
+    lastDay: z.string().regex(datePattern, "Pick the last day."),
   })
-  .refine((value) => value.endsOn >= value.startsOn, {
-    message: "The cycle must end on or after its start.",
-    path: ["endsOn"],
+  .refine((value) => value.lastDay >= value.startsOn, {
+    message: "The cycle ends on or after its first day.",
+    path: ["lastDay"],
   });
 
-function toDay(value: string | Date) {
-  return format(new Date(value), "yyyy-MM-dd");
-}
+const day = (date: Date) => format(date, "yyyy-MM-dd");
 
-function startOfDay(day: string) {
-  return new Date(`${day}T00:00:00`).toISOString();
-}
-
-function endOfDay(day: string) {
-  const next = new Date(`${day}T00:00:00`);
-  next.setDate(next.getDate() + 1);
-  return next.toISOString();
-}
+export type TCycleDialogTarget =
+  { mode: "create"; startsOn: Date; weeks: number } | { mode: "edit"; cycle: Cycle };
 
 type TProps = {
-  trigger?: ReactElement;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-} & ({ mode: "create"; team: TTeam; after?: TCycle } | { mode: "edit"; cycle: TCycle });
+  team: { id: string; name: string };
+  target: TCycleDialogTarget | null;
+  onClose: () => void;
+};
 
-export function CycleDialog(props: TProps) {
-  const [internalOpen, setInternalOpen] = useState(false);
-  const isOpen = props.open ?? internalOpen;
-  const setOpen = (next: boolean) => {
-    setInternalOpen(next);
-    props.onOpenChange?.(next);
-  };
+export function CycleDialog({ team, target, onClose }: TProps) {
   return (
-    <Dialog open={isOpen} onOpenChange={setOpen}>
-      {props.trigger && <DialogTrigger render={props.trigger} />}
+    <Dialog open={target !== null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="w-md max-w-full">
         <DialogHeader>
-          <DialogTitle>{props.mode === "edit" ? "Edit cycle" : "New cycle"}</DialogTitle>
+          <DialogTitle>
+            {target?.mode === "edit" ? `Edit ${cycleName(target.cycle)}` : "New cycle"}
+          </DialogTitle>
+          {target?.mode === "create" && (
+            <DialogDescription>
+              {team.name} plans cycles on its own; add one for a break from the schedule.
+            </DialogDescription>
+          )}
         </DialogHeader>
-        {isOpen && <CycleForm {...props} onDone={() => setOpen(false)} />}
+        {target && <CycleForm team={team} target={target} onDone={onClose} />}
       </DialogContent>
     </Dialog>
   );
 }
 
-function defaultRange(team: TTeam, after?: TCycle) {
-  const start = after ? new Date(after.ends_at) : new Date();
-  const end = new Date(start);
-  end.setDate(end.getDate() + 7 * team.cycle_duration_weeks - 1);
-  return { startsOn: toDay(start), endsOn: toDay(end) };
-}
-
-function CycleForm(props: TProps & { onDone: () => void }) {
-  const { mutateAsync: createCycle } = useCreateCycleMutation();
-  const { mutateAsync: updateCycle } = useUpdateCycleMutation();
+function CycleForm({
+  team,
+  target,
+  onDone,
+}: {
+  team: TProps["team"];
+  target: TCycleDialogTarget;
+  onDone: () => void;
+}) {
+  const { workspace } = useWorkspace();
+  const { mutateAsync: saveCycle } = useSaveCycleMutation(workspace.id);
+  const cycle = target.mode === "edit" ? target.cycle : null;
   const form = useAppForm({
     defaultValues:
-      props.mode === "edit"
+      target.mode === "edit"
         ? {
-            name: props.cycle.name,
-            description: props.cycle.description,
-            startsOn: toDay(props.cycle.starts_at),
-            endsOn: toDay(new Date(new Date(props.cycle.ends_at).getTime() - 1)),
+            name: target.cycle.name ?? "",
+            description: target.cycle.description ?? "",
+            startsOn: day(new Date(target.cycle.startsAt)),
+            lastDay: day(cycleLastDay(target.cycle)),
           }
-        : { name: "", description: "", ...defaultRange(props.team, props.after) },
-    validators: { onSubmit: formSchema },
+        : {
+            name: "",
+            description: "",
+            startsOn: day(target.startsOn),
+            lastDay: day(addDays(target.startsOn, 7 * target.weeks - 1)),
+          },
+    validators: { onSubmit: cycleFormSchema },
     onSubmit: async ({ value }) => {
-      const parsed = formSchema.parse(value);
-      const dates = { starts_at: startOfDay(parsed.startsOn), ends_at: endOfDay(parsed.endsOn) };
-      if (props.mode === "edit") {
-        await updateCycle({
-          cycle_id: props.cycle.id,
-          name: parsed.name,
-          description: parsed.description,
-          ...dates,
-        });
-        props.onDone();
-        return;
-      }
-      await createCycle({
-        team_id: props.team.id,
-        name: parsed.name || undefined,
-        description: parsed.description || undefined,
-        ...dates,
-      });
-      props.onDone();
+      const parsed = cycleFormSchema.parse(value);
+      const fields = {
+        name: parsed.name || null,
+        description: parsed.description || null,
+        startsAt: parsed.startsOn,
+        endsAt: day(addDays(new Date(`${parsed.lastDay}T00:00:00`), 1)),
+      };
+      if (cycle) await saveCycle({ id: cycle.id, ...fields });
+      else await saveCycle({ team: team.id, ...fields });
+      onDone();
     },
   });
+
   return (
     <form className="flex flex-col gap-4" onSubmit={submitHandler(form)} noValidate>
       <form.AppField
         name="name"
-        children={(field) => <field.TextField label="Name" placeholder="Optional" autoFocus />}
+        children={(field) => (
+          <field.TextField
+            label="Name"
+            placeholder={cycle ? `Cycle ${cycle.number}` : "Optional"}
+            autoFocus
+            autoComplete="off"
+          />
+        )}
       />
       <div className="grid grid-cols-2 gap-4">
         <form.AppField
           name="startsOn"
-          children={(field) => <field.TextField label="Starts" type="date" />}
+          children={(field) => <field.TextField label="First day" type="date" />}
         />
         <form.AppField
-          name="endsOn"
-          children={(field) => <field.TextField label="Ends" type="date" />}
+          name="lastDay"
+          children={(field) => <field.TextField label="Last day" type="date" />}
         />
       </div>
       <form.AppField
         name="description"
-        children={(field) => <field.TextareaField label="Description" rows={3} />}
+        children={(field) => (
+          <field.TextareaField label="Goal" rows={3} placeholder="What this cycle is for" />
+        )}
       />
       <DialogFooter>
         <DialogClose
@@ -142,9 +142,7 @@ function CycleForm(props: TProps & { onDone: () => void }) {
           }
         />
         <form.AppForm>
-          <form.SubmitButton size="sm">
-            {props.mode === "edit" ? "Save" : "Create cycle"}
-          </form.SubmitButton>
+          <form.SubmitButton size="sm">{cycle ? "Save" : "Create cycle"}</form.SubmitButton>
         </form.AppForm>
       </DialogFooter>
     </form>

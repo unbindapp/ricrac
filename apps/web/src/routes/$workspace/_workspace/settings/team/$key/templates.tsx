@@ -6,21 +6,18 @@ import { useRequiredTeamFromRoute } from "@/components/workspace/use-team-from-r
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/team/$key/templates")({
-  component: TemplatesSettingsPage,
+  component: TeamTemplatesSettingsPage,
 });
 
-function TemplatesSettingsPage() {
-  const { workspace, isAdmin } = useWorkspace();
+function TeamTemplatesSettingsPage() {
+  const { canEdit } = useWorkspace();
   const team = useRequiredTeamFromRoute();
   return (
-    <SettingsPage title="Templates" description="Templates for this team.">
-      <TemplateManager
-        workspaceId={workspace.id}
-        teamId={team.id}
-        canEdit={isAdmin}
-        title={`${team.name} issue templates`}
-        description="Team templates can also preset the status of new issues."
-      />
+    <SettingsPage
+      title="Templates"
+      description={`Templates only ${team.name} uses. Templates for every team are in workspace settings.`}
+    >
+      <TemplateManager team={team} canEdit={canEdit} />
     </SettingsPage>
   );
 }

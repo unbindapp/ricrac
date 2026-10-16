@@ -1,4 +1,5 @@
 import type { ProjectDetail } from "@/api/ops.gen";
+import { CustomerNeedsSection } from "@/components/customers/customer-needs-section";
 import { ParentDocuments } from "@/components/documents/document-list";
 import { MarkdownBody } from "@/components/documents/markdown-body";
 import { ArchivedBanner } from "@/components/projects/archived-banner";
@@ -77,6 +78,7 @@ export function ProjectOverview({ project }: { project: ProjectDetail }) {
             health={project.health}
           />
           <ParentDocuments parent={{ project: project.id }} />
+          <CustomerNeedsSection project={project.id} />
         </div>
         <aside aria-label="Properties" className="w-full shrink-0 lg:sticky lg:top-0 lg:w-80">
           <div className="bg-card rounded-lg border p-4">

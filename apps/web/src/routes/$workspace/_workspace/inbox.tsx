@@ -2,11 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
 
-import { INBOX_TABS, InboxView } from "@/components/inbox/inbox-view";
+import { INBOX_FILTERS, InboxView } from "@/components/inbox/inbox-view";
 
 const searchSchema = z.object({
-  tab: z.enum(INBOX_TABS).optional(),
-  id: z.string().optional(),
+  filter: z.enum(INBOX_FILTERS).optional(),
+  /** The open row: issue:<id>, project:<id>, ... */
+  open: z.string().optional(),
 });
 
 export const Route = createFileRoute("/$workspace/_workspace/inbox")({
@@ -15,17 +16,17 @@ export const Route = createFileRoute("/$workspace/_workspace/inbox")({
 });
 
 function InboxPage() {
-  const { tab, id } = Route.useSearch();
+  const { filter, open } = Route.useSearch();
   const navigate = Route.useNavigate();
   return (
     <InboxView
-      tab={tab ?? "inbox"}
-      selectedId={id}
-      onTabChange={(next) =>
-        void navigate({ search: { tab: next === "inbox" ? undefined : next }, replace: true })
+      filter={filter ?? "inbox"}
+      selectedKey={open}
+      onFilterChange={(next) =>
+        void navigate({ search: { filter: next === "inbox" ? undefined : next }, replace: true })
       }
       onSelect={(next) =>
-        void navigate({ search: (prev) => ({ ...prev, id: next }), replace: true })
+        void navigate({ search: (prev) => ({ ...prev, open: next }), replace: true })
       }
     />
   );

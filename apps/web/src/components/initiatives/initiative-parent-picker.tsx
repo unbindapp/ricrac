@@ -3,7 +3,7 @@ import { CornerLeftUpIcon } from "lucide-react";
 
 import { InitiativeIcon } from "@/components/initiatives/initiative-status";
 import { descendantIds } from "@/components/initiatives/initiative-tree";
-import { PickerTrigger, type TPickerAppearance } from "@/components/issues/pickers";
+import { PickerTrigger, type TPickerAppearance } from "@/components/projects/picker-trigger";
 import { PropertyPicker, type TPickerOption } from "@/components/issues/property-picker";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { initiativesQuery } from "@/lib/queries/initiatives";

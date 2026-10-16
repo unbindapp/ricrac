@@ -1,19 +1,20 @@
 import { useNavigate } from "@tanstack/react-router";
 import { type ReactNode, useState } from "react";
 
-import type { DisplaySettings } from "@/components/issues/display";
-import type { ListIssuesFilters } from "@/components/issues/filters";
 import { ViewDialog } from "@/components/views/view-dialog";
-import { viewDisplayFrom, viewFiltersFrom } from "@/components/views/view-display";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { type TFilter, viewParam } from "@/lib/queries/views";
 
 type TSaveViewArgs = {
-  filters: ListIssuesFilters;
-  display?: Partial<DisplaySettings>;
-  teamId?: string;
+  /** The list's filter, in the filter language of list_issues. */
+  filter: TFilter;
+  display?: Record<string, unknown>;
+  /** The team (id or key) the list is of, if any. */
+  team?: string | null;
 };
 
-export function useSaveViewDialog({ filters, display, teamId }: TSaveViewArgs): {
+/** Saves what an issue list shows as a view, then opens it. */
+export function useSaveViewDialog({ filter, display, team }: TSaveViewArgs): {
   openSaveView: () => void;
   saveViewDialog: ReactNode;
 } {
@@ -22,19 +23,12 @@ export function useSaveViewDialog({ filters, display, teamId }: TSaveViewArgs): 
   const [isOpen, setIsOpen] = useState(false);
   const saveViewDialog = (
     <ViewDialog
-      mode="create"
-      open={isOpen}
-      onOpenChange={setIsOpen}
-      draft={{
-        workspaceId: workspace.id,
-        teamId,
-        filters: viewFiltersFrom(filters),
-        display: viewDisplayFrom(display),
-      }}
+      target={isOpen ? { mode: "create", draft: { model: "issue", filter, display, team } } : null}
+      onClose={() => setIsOpen(false)}
       onSaved={(view) =>
         void navigate({
           to: "/$workspace/view/$view_id",
-          params: { workspace: workspace.slug, view_id: view.id },
+          params: { workspace: workspace.urlKey, view_id: viewParam(view) },
         })
       }
     />

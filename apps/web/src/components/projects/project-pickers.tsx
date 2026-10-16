@@ -12,7 +12,7 @@ import {
 import { type ReactElement, useState } from "react";
 
 import type { InitiativeRef, ProjectLabelRef, ProjectStatusRef, TeamRef } from "@/api/ops.gen";
-import { PickerTrigger, type TPickerAppearance } from "@/components/issues/pickers";
+import { PickerTrigger, type TPickerAppearance } from "@/components/projects/picker-trigger";
 import { PropertyPicker, type TPickerOption } from "@/components/issues/property-picker";
 import {
   formatProjectDate,

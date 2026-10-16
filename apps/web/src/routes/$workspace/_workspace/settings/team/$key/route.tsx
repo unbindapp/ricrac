@@ -2,6 +2,7 @@ import { createFileRoute, Outlet } from "@tanstack/react-router";
 import {
   ArchiveIcon,
   FileStackIcon,
+  GitPullRequestIcon,
   LockIcon,
   RefreshCwIcon,
   SettingsIcon,
@@ -110,6 +111,11 @@ function TeamSettingsLayout() {
       label: "Templates",
       icon: FileStackIcon,
       link: { to: "/$workspace/settings/team/$key/templates", params },
+    },
+    {
+      label: "GitHub",
+      icon: GitPullRequestIcon,
+      link: { to: "/$workspace/settings/team/$key/github", params },
     },
     {
       label: "Auto close & archive",

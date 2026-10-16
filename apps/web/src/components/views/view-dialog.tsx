@@ -1,4 +1,5 @@
-import { ReactElement, useState } from "react";
+import { useState } from "react";
+import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -9,109 +10,189 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
+import { Tabs, TabsList, TabsTab } from "@/components/ui/tabs";
 import {
-  type TView,
-  type TViewDisplay,
-  useCreateViewMutation,
-  useUpdateViewMutation,
-  ViewFormSchema,
-} from "@/lib/queries/views";
+  conditionsToFilter,
+  type TCondition,
+  type TFilterModel,
+} from "@/components/views/view-filter";
+import { ViewFilterBar } from "@/components/views/view-filter-bar";
+import { useTeams } from "@/components/workspace/teams-provider";
+import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
+import { type TFilter, type TView, useSaveViewMutation } from "@/lib/queries/views";
 
-export type TNewView = {
-  workspaceId: string;
-  teamId?: string;
-  filters: Record<string, unknown>;
-  display: TViewDisplay;
+const ALL_TEAMS = "all";
+
+const viewFormSchema = z.object({
+  name: z.string().trim().min(1, "Name is required.").max(80, "Keep the name under 80 characters."),
+  description: z.string().trim().max(500, "Keep the description under 500 characters."),
+  icon: z.string(),
+  color: z.string(),
+  team: z.string(),
+  shared: z.boolean(),
+});
+
+/** A new view: what it lists and, when saved from a list, the filter it starts from. */
+export type TViewDraft = {
+  model: TFilterModel;
+  team?: string | null;
+  filter?: TFilter;
+  display?: Record<string, unknown>;
 };
 
-type TProps = {
-  trigger?: ReactElement;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  onSaved?: (view: TView) => void;
-} & (
-  { mode: "create"; draft: TNewView; view?: never } | { mode: "edit"; view: TView; draft?: never }
-);
+export type TViewDialogTarget =
+  { mode: "create"; draft: TViewDraft } | { mode: "edit"; view: TView };
 
-export function ViewDialog(props: TProps) {
-  const [internalOpen, setInternalOpen] = useState(false);
-  const isOpen = props.open ?? internalOpen;
-  const setOpen = (next: boolean) => {
-    setInternalOpen(next);
-    props.onOpenChange?.(next);
-  };
+type TProps = {
+  target: TViewDialogTarget | null;
+  onClose: () => void;
+  onSaved?: (view: TView) => void;
+};
+
+export function ViewDialog({ target, onClose, onSaved }: TProps) {
   return (
-    <Dialog open={isOpen} onOpenChange={setOpen}>
-      {props.trigger && <DialogTrigger render={props.trigger} />}
-      <DialogContent className="w-md max-w-full">
+    <Dialog open={target !== null} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="w-lg max-w-full">
         <DialogHeader>
-          <DialogTitle>{props.mode === "edit" ? "Edit view" : "Save view"}</DialogTitle>
-          {props.mode === "create" && (
-            <DialogDescription>Saves the current filters and display options.</DialogDescription>
+          <DialogTitle>{target?.mode === "edit" ? "Edit view" : "New view"}</DialogTitle>
+          {target?.mode === "create" && (
+            <DialogDescription>
+              A saved filter that stays up to date. Only you see it unless you share it.
+            </DialogDescription>
           )}
         </DialogHeader>
-        {isOpen && <ViewForm {...props} onDone={() => setOpen(false)} />}
+        {target && (
+          <ViewForm
+            target={target}
+            onDone={(view) => {
+              onClose();
+              onSaved?.(view);
+            }}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );
 }
 
-function ViewForm(props: TProps & { onDone: () => void }) {
-  const { mutateAsync: createView } = useCreateViewMutation();
-  const { mutateAsync: updateView } = useUpdateViewMutation();
+function ViewForm({
+  target,
+  onDone,
+}: {
+  target: TViewDialogTarget;
+  onDone: (view: TView) => void;
+}) {
+  const { workspace } = useWorkspace();
+  const { teams } = useTeams();
+  const { mutateAsync: saveView } = useSaveViewMutation(workspace.id);
+  const view = target.mode === "edit" ? target.view : null;
+  const draft = target.mode === "create" ? target.draft : null;
+  const [model, setModel] = useState<TFilterModel>(
+    view?.model === "project" ? "project" : (draft?.model ?? "issue"),
+  );
+  const [conditions, setConditions] = useState<TCondition[]>([]);
+  const teamItems = [
+    { value: ALL_TEAMS, label: "All teams" },
+    ...teams.map((team) => ({ value: team.id, label: team.name })),
+  ];
+
   const form = useAppForm({
-    defaultValues:
-      props.mode === "edit"
-        ? {
-            name: props.view.name,
-            description: props.view.description,
-            icon: props.view.icon,
-            color: props.view.color,
-            shared: props.view.shared,
-          }
-        : { name: "", description: "", icon: "", color: "", shared: false },
-    validators: { onSubmit: ViewFormSchema },
+    defaultValues: {
+      name: view?.name ?? "",
+      description: view?.description ?? "",
+      icon: view?.icon ?? "",
+      color: view?.color ?? "",
+      team: view?.team?.id ?? draft?.team ?? ALL_TEAMS,
+      shared: view?.shared ?? false,
+    },
+    validators: { onSubmit: viewFormSchema },
     onSubmit: async ({ value }) => {
-      const parsed = ViewFormSchema.parse(value);
-      const result =
-        props.mode === "edit"
-          ? await updateView({ view_id: props.view.id, ...parsed })
-          : await createView({
-              workspace_id: props.draft.workspaceId,
-              team_id: props.draft.teamId,
-              kind: "issue",
-              filters: props.draft.filters,
-              display: props.draft.display,
-              name: parsed.name,
-              description: parsed.description || undefined,
-              icon: parsed.icon || undefined,
-              color: parsed.color || undefined,
-              shared: parsed.shared,
-            });
-      props.onSaved?.(result.data);
-      props.onDone();
+      const parsed = viewFormSchema.parse(value);
+      const fields = {
+        name: parsed.name,
+        description: parsed.description || null,
+        icon: parsed.icon || null,
+        color: parsed.color || null,
+        team: parsed.team === ALL_TEAMS ? null : parsed.team,
+        shared: parsed.shared,
+      };
+      if (view) {
+        onDone(await saveView({ id: view.id, ...fields }));
+        return;
+      }
+      const filter = draft?.filter ?? conditionsToFilter(conditions);
+      onDone(await saveView({ ...fields, model, filter, display: draft?.display }));
     },
   });
+
   return (
     <form className="flex flex-col gap-4" onSubmit={submitHandler(form)} noValidate>
-      <div className="flex items-start gap-2">
+      {!view && !draft?.filter && (
+        <Tabs
+          value={model}
+          onValueChange={(value) => {
+            setModel(value as TFilterModel);
+            setConditions([]);
+          }}
+        >
+          <TabsList>
+            <TabsTab value="issue">Issues</TabsTab>
+            <TabsTab value="project">Projects</TabsTab>
+          </TabsList>
+        </Tabs>
+      )}
+      <form.AppField
+        name="name"
+        children={(field) => (
+          <field.TextField
+            label="Name"
+            autoFocus
+            autoComplete="off"
+            placeholder={model === "project" ? "Projects at risk" : "Urgent bugs"}
+          />
+        )}
+      />
+      <form.AppField
+        name="description"
+        children={(field) => (
+          <field.TextareaField label="Description" rows={2} placeholder="Optional" />
+        )}
+      />
+      <div className="grid grid-cols-2 gap-4">
         <form.AppField name="icon" children={(field) => <field.IconField label="Icon" />} />
         <form.AppField name="color" children={(field) => <field.ColorField label="Color" />} />
       </div>
-      <form.AppField name="name" children={(field) => <field.TextField label="Name" autoFocus />} />
       <form.AppField
-        name="description"
-        children={(field) => <field.TextareaField label="Description" rows={2} />}
+        name="team"
+        children={(field) => (
+          <field.SelectField
+            label="Teams"
+            description={
+              model === "issue"
+                ? "All teams lets the filter span teams; a team keeps the view to its issues."
+                : "A team keeps the view to its projects."
+            }
+            items={teamItems}
+          />
+        )}
       />
+      {!view && !draft?.filter && (
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-medium">Filters</span>
+          <div className="flex min-h-9 items-center rounded-md border px-2 py-1">
+            <ViewFilterBar model={model} conditions={conditions} onChange={setConditions} />
+          </div>
+          <p className="text-muted-foreground text-xs">You can change them later on the view.</p>
+        </div>
+      )}
       <form.AppField
         name="shared"
         children={(field) => (
           <field.SwitchField
-            label="Share with workspace"
-            description="Everyone in the workspace can open shared views."
+            label="Share with the workspace"
+            description="Everyone sees shared views; admins can change them too."
           />
         )}
       />
@@ -124,9 +205,7 @@ function ViewForm(props: TProps & { onDone: () => void }) {
           }
         />
         <form.AppForm>
-          <form.SubmitButton size="sm">
-            {props.mode === "edit" ? "Save" : "Save view"}
-          </form.SubmitButton>
+          <form.SubmitButton size="sm">{view ? "Save" : "Create view"}</form.SubmitButton>
         </form.AppForm>
       </DialogFooter>
     </form>

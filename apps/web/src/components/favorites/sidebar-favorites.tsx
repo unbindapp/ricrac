@@ -1,74 +1,80 @@
 import { closestCenter, DndContext, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useQuery } from "@tanstack/react-query";
-import { type MouseEvent, useRef, useState } from "react";
+import { FolderIcon, XIcon } from "lucide-react";
+import { type MouseEvent, useRef } from "react";
 
-import { favoriteKindIcons, favoriteLink } from "@/components/favorites/favorite-link";
-import { reorderedPosition, sortableStyle, useSortSensors } from "@/components/labels/sortable";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { SidebarNavItem } from "@/components/workspace/sidebar-nav";
+import { favoriteTarget } from "@/components/favorites/favorite-target";
+import { reorderedPosition, sortableStyle, useSortSensors } from "@/components/favorites/sortable";
+import { Button, LinkButton } from "@/components/ui/button";
+import { SidebarCollapsible, SidebarSection } from "@/components/workspace/sidebar-nav";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import {
-  favoritesListQuery,
+  favoritesQuery,
   type TFavorite,
-  useReorderFavoritesMutation,
+  useMoveFavoriteMutation,
+  useRemoveFavoriteMutation,
 } from "@/lib/queries/favorites";
 
 type TProps = {
   onNavigate?: () => void;
 };
 
+/** The Favorites section of the sidebar; left out while there are none. */
 export function SidebarFavorites({ onNavigate }: TProps) {
   const { workspace } = useWorkspace();
-  const { data, isPending, error, refetch } = useQuery(favoritesListQuery(workspace.id));
-  const [dragOrder, setDragOrder] = useState<string[] | null>(null);
-  const { mutate: reorder } = useReorderFavoritesMutation();
-  const sensors = useSortSensors();
-  const justDragged = useRef(false);
-
-  if (isPending) {
-    return (
-      <div className="flex flex-col gap-2 px-2.5 py-1">
-        <Skeleton className="h-3 w-2/3" />
-      </div>
-    );
-  }
+  const { data, error, refetch } = useQuery(favoritesQuery(workspace.id));
   if (error) {
     return (
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => void refetch()}
-        className="text-destructive justify-start"
-      >
-        Could not load favorites. Retry
-      </Button>
+      <SidebarSection title="Favorites">
+        <Button
+          variant="ghost"
+          size="sm"
+          forceMinSize={false}
+          onClick={() => void refetch()}
+          className="text-muted-foreground justify-start font-normal"
+        >
+          Couldn't load favorites. Retry
+        </Button>
+      </SidebarSection>
     );
   }
-  const favorites = data.favorites;
-  if (favorites.length === 0) {
-    return (
-      <p className="text-muted-foreground px-2.5 text-xs">
-        Star issues, projects, cycles and views to keep them here.
-      </p>
-    );
-  }
-  const ordered = dragOrder
-    ? dragOrder
-        .map((id) => favorites.find((favorite) => favorite.id === id))
-        .filter((favorite): favorite is TFavorite => !!favorite)
-    : favorites;
+  const shown = (data ?? []).filter((favorite) => favoriteTarget(workspace.urlKey, favorite));
+  if (shown.length === 0) return null;
+
+  const folders = [...new Set(shown.flatMap((favorite) => favorite.folder ?? []))];
+  return (
+    <SidebarSection title="Favorites">
+      <FavoriteList favorites={shown.filter((f) => !f.folder)} onNavigate={onNavigate} />
+      {folders.map((folder) => (
+        <SidebarCollapsible
+          key={folder}
+          label={folder}
+          icon={<FolderIcon className="text-muted-foreground size-4" />}
+        >
+          <FavoriteList
+            favorites={shown.filter((favorite) => favorite.folder === folder)}
+            onNavigate={onNavigate}
+          />
+        </SidebarCollapsible>
+      ))}
+    </SidebarSection>
+  );
+}
+
+function FavoriteList({ favorites, onNavigate }: { favorites: TFavorite[] } & TProps) {
+  const { workspace } = useWorkspace();
+  const { mutate: move } = useMoveFavoriteMutation(workspace.id);
+  const sensors = useSortSensors();
+  const justDragged = useRef(false);
+  if (favorites.length === 0) return null;
 
   const onDragEnd = (event: DragEndEvent) => {
     justDragged.current = true;
-    const moved = reorderedPosition(ordered, event);
-    if (!moved) return;
-    setDragOrder(moved.order);
-    reorder(
-      { workspaceId: workspace.id, favoriteIds: moved.order },
-      { onSettled: () => setDragOrder(null) },
-    );
+    const moved = reorderedPosition(favorites, event);
+    const favorite = favorites.find((item) => item.id === moved?.id);
+    if (!moved || !favorite) return;
+    move({ favorite, sortOrder: moved.sortOrder });
   };
   const swallowClickAfterDrag = (event: MouseEvent) => {
     if (!justDragged.current) return;
@@ -85,7 +91,7 @@ export function SidebarFavorites({ onNavigate }: TProps) {
       onDragEnd={onDragEnd}
     >
       <SortableContext
-        items={ordered.map((favorite) => favorite.id)}
+        items={favorites.map((favorite) => favorite.id)}
         strategy={verticalListSortingStrategy}
       >
         <div
@@ -94,7 +100,7 @@ export function SidebarFavorites({ onNavigate }: TProps) {
           className="flex flex-col gap-0.5"
           onClickCapture={swallowClickAfterDrag}
         >
-          {ordered.map((favorite) => (
+          {favorites.map((favorite) => (
             <FavoriteItem key={favorite.id} favorite={favorite} onNavigate={onNavigate} />
           ))}
         </div>
@@ -105,9 +111,10 @@ export function SidebarFavorites({ onNavigate }: TProps) {
 
 function FavoriteItem({ favorite, onNavigate }: { favorite: TFavorite } & TProps) {
   const { workspace } = useWorkspace();
+  const { mutate: remove, isPending } = useRemoveFavoriteMutation(workspace.id);
   const sortable = useSortable({ id: favorite.id });
-  const link = favoriteLink(workspace.slug, favorite);
-  if (!link) return null;
+  const target = favoriteTarget(workspace.urlKey, favorite);
+  if (!target) return null;
   return (
     <div
       ref={sortable.setNodeRef}
@@ -116,14 +123,33 @@ function FavoriteItem({ favorite, onNavigate }: { favorite: TFavorite } & TProps
       role="listitem"
       style={sortableStyle(sortable.transform, sortable.transition)}
       data-dragging={sortable.isDragging || undefined}
-      className="data-dragging:z-10 data-dragging:opacity-80"
+      className="group/favorite relative data-dragging:z-10 data-dragging:opacity-80"
     >
-      <SidebarNavItem
-        label={favorite.name}
-        icon={favoriteKindIcons[favorite.kind]}
-        link={link}
-        onNavigate={onNavigate}
-      />
+      <LinkButton
+        {...target.link}
+        activeOptions={{ exact: true, includeSearch: false }}
+        variant="ghost"
+        size="sm"
+        forceMinSize={false}
+        onClick={onNavigate}
+        className="text-muted-foreground data-[status=active]:bg-accent data-[status=active]:text-foreground w-full justify-start pr-8 font-normal"
+      >
+        <span className="text-muted-foreground flex size-4 shrink-0 items-center justify-center">
+          {target.icon}
+        </span>
+        <span className="min-w-0 flex-1 truncate text-left">{target.label}</span>
+      </LinkButton>
+      <Button
+        variant="ghost"
+        size="icon"
+        forceMinSize={false}
+        aria-label={`Remove ${target.label} from favorites`}
+        disabled={isPending}
+        onClick={() => remove(favorite.id)}
+        className="text-muted-foreground absolute top-1/2 right-1 size-6 -translate-y-1/2 opacity-0 group-focus-within/favorite:opacity-100 group-hover/favorite:opacity-100"
+      >
+        <XIcon className="size-3.5" />
+      </Button>
     </div>
   );
 }

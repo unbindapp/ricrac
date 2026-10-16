@@ -1,6 +1,6 @@
 import { TargetIcon } from "lucide-react";
 
-import { PickerTrigger, type TPickerAppearance } from "@/components/issues/pickers";
+import { PickerTrigger, type TPickerAppearance } from "@/components/projects/picker-trigger";
 import { PropertyPicker, type TPickerOption } from "@/components/issues/property-picker";
 import { EntityIcon } from "@/components/shared/entity-icon";
 import { StateIcon, type TStateType } from "@/components/shared/state-icon";

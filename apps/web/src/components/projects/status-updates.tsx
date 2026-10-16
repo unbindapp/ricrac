@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { MessageSquareIcon, PencilIcon, PenLineIcon, Trash2Icon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocation } from "@tanstack/react-router";
 
 import type { Comment, StatusUpdate } from "@/api/ops.gen";
 import { ErrorCard } from "@/components/layout/error-card";
@@ -52,7 +53,13 @@ export function StatusUpdatesSection({ parent, noun, health }: TProps) {
   const [isWriting, setIsWriting] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const updates = [...(data ?? [])].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  const shown = showAll ? updates : updates.slice(0, SHOWN_UPDATES);
+  const linkedId = useLinkedUpdateId();
+  const isLinkedHidden = updates.findIndex((update) => update.id === linkedId) >= SHOWN_UPDATES;
+  const shown = showAll || isLinkedHidden ? updates : updates.slice(0, SHOWN_UPDATES);
+  useEffect(() => {
+    if (!linkedId || !data) return;
+    document.getElementById(`update-${linkedId}`)?.scrollIntoView({ block: "center" });
+  }, [linkedId, data]);
   const hidden = updates.length - shown.length;
 
   if (!canEdit && !isPending && !error && updates.length === 0) return null;
@@ -89,7 +96,7 @@ export function StatusUpdatesSection({ parent, noun, health }: TProps) {
         </p>
       )}
       {shown.map((update) => (
-        <StatusUpdateCard key={update.id} update={update} />
+        <StatusUpdateCard key={update.id} update={update} isLinked={update.id === linkedId} />
       ))}
       {hidden > 0 && (
         <Button variant="ghost" size="sm" className="self-start" onClick={() => setShowAll(true)}>
@@ -100,7 +107,13 @@ export function StatusUpdatesSection({ parent, noun, health }: TProps) {
   );
 }
 
-function StatusUpdateCard({ update }: { update: StatusUpdate }) {
+/** The update a link points at, as #update-<id> (the inbox links them so). */
+function useLinkedUpdateId() {
+  const hash = useLocation({ select: (location) => location.hash });
+  return hash.startsWith("update-") ? hash.slice("update-".length) : null;
+}
+
+function StatusUpdateCard({ update, isLinked }: { update: StatusUpdate; isLinked: boolean }) {
   const { workspace, canEdit, isAdmin } = useWorkspace();
   const meId = useMeId();
   const [isEditing, setIsEditing] = useState(false);
@@ -126,7 +139,11 @@ function StatusUpdateCard({ update }: { update: StatusUpdate }) {
   }
 
   return (
-    <Card className="flex flex-col gap-3 p-4">
+    <Card
+      id={`update-${update.id}`}
+      data-linked={isLinked || undefined}
+      className="data-linked:ring-primary/5-10 flex scroll-mt-4 flex-col gap-3 p-4 data-linked:ring-2"
+    >
       <div className="flex min-w-0 items-center gap-2 text-sm">
         {update.user && <PersonAvatar user={update.user} />}
         <span className="truncate font-medium">{update.user?.name ?? "Someone"}</span>

@@ -1,45 +1,29 @@
-import { useNavigate } from "@tanstack/react-router";
-import { ArchiveIcon, EllipsisIcon, PencilIcon, Trash2Icon } from "lucide-react";
+import { ArchiveIcon, EllipsisIcon, PencilIcon } from "lucide-react";
 import { useState } from "react";
 
-import { CycleDialog } from "@/components/cycles/cycle-dialog";
+import type { Cycle } from "@/api/ops.gen";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/components/ui/toast";
-import {
-  cycleName,
-  type TCycle,
-  useArchiveCycleMutation,
-  useDeleteCycleMutation,
-} from "@/lib/queries/cycles";
+import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { cycleName, useArchiveCycleMutation } from "@/lib/queries/cycles";
 
 type TProps = {
-  cycle: TCycle;
-  workspaceSlug: string;
-  teamKey: string;
+  cycle: Cycle;
+  onEdit: () => void;
 };
 
-export function CycleMenu({ cycle, workspaceSlug, teamKey }: TProps) {
-  const [dialog, setDialog] = useState<"edit" | "delete" | null>(null);
-  const navigate = useNavigate();
-  const { mutate: archive } = useArchiveCycleMutation();
-  const { mutateAsync: deleteCycle } = useDeleteCycleMutation();
+export function CycleMenu({ cycle, onEdit }: TProps) {
+  const { workspace } = useWorkspace();
+  const [isArchiving, setIsArchiving] = useState(false);
+  const { mutateAsync: archive } = useArchiveCycleMutation(workspace.id);
   const name = cycleName(cycle);
-  const close = (open: boolean) => {
-    if (!open) setDialog(null);
-  };
-  const backToList = () =>
-    void navigate({
-      to: "/$workspace/team/$key/cycles",
-      params: { workspace: workspaceSlug, key: teamKey },
-    });
 
   return (
     <>
@@ -52,45 +36,28 @@ export function CycleMenu({ cycle, workspaceSlug, teamKey }: TProps) {
           }
         />
         <DropdownMenuContent align="end" className="w-44">
-          <DropdownMenuItem onClick={() => setDialog("edit")}>
+          <DropdownMenuItem onClick={onEdit}>
             <PencilIcon className="size-4" />
             Edit cycle
           </DropdownMenuItem>
-          {!cycle.archived_at && (
-            <DropdownMenuItem
-              onClick={() =>
-                archive(
-                  { cycleId: cycle.id },
-                  {
-                    onSuccess: () => {
-                      toast.add({ type: "success", title: `Archived ${name}` });
-                      backToList();
-                    },
-                  },
-                )
-              }
-            >
+          {!cycle.archivedAt && (
+            <DropdownMenuItem onClick={() => setIsArchiving(true)}>
               <ArchiveIcon className="size-4" />
-              Archive
+              Archive cycle
             </DropdownMenuItem>
           )}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-destructive" onClick={() => setDialog("delete")}>
-            <Trash2Icon className="size-4" />
-            Delete cycle
-          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <CycleDialog mode="edit" cycle={cycle} open={dialog === "edit"} onOpenChange={close} />
       <ConfirmDialog
-        open={dialog === "delete"}
-        onOpenChange={close}
-        title={`Delete ${name}`}
-        description="The cycle is deleted. Its issues stay and leave the cycle."
-        confirmLabel="Delete cycle"
+        open={isArchiving}
+        onOpenChange={setIsArchiving}
+        title={`Archive ${name}`}
+        description="It leaves the cycle list (shown again with Show archived). Its issues stay where they are."
+        confirmLabel="Archive cycle"
+        variant="default"
         onConfirm={async () => {
-          await deleteCycle({ cycleId: cycle.id });
-          backToList();
+          await archive(cycle.id);
+          toast.add({ type: "success", title: `Archived ${name}` });
         }}
       />
     </>
