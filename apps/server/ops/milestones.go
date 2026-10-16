@@ -16,16 +16,16 @@ func milestoneOps() []*Op {
 		op("list_milestones", app.Read, []string{"GET /projects/{project}/milestones"},
 			"List a project's milestones in order, each with its issue counts and progress (completed issues / (all - "+
 				"canceled)).",
-			listMilestones),
+			listMilestones).returns(ResultOf[PageOf[Milestone]]()),
 		op("get_milestone", app.Read, []string{"GET /milestones/{id}"},
-			"Read a milestone by id (or by name with its project), with its progress and its issues.", getMilestone),
+			"Read a milestone by id (or by name with its project), with its progress and its issues.", getMilestone).returns(ResultOf[MilestoneDetail]()),
 		op("save_milestone", app.Write, []string{"POST /milestones", "PATCH /milestones/{id}"},
 			"Create a milestone in a project (omit id; project and name are required) or change one (pass its id, or "+
 				"its name with the project). Names are unique within a project. Put issues in it with save_issue "+
 				"(milestone).",
-			saveMilestone),
+			saveMilestone).returns(ResultOf[Milestone]()),
 		op("delete_milestone", app.Write, []string{"DELETE /milestones/{id}"},
-			"Delete a milestone. Its issues stay in the project, without a milestone.", deleteMilestone),
+			"Delete a milestone. Its issues stay in the project, without a milestone.", deleteMilestone).returns(ResultOf[DeletedMilestone]()),
 	}
 }
 
@@ -257,4 +257,29 @@ func deleteMilestone(c *app.Ctx, args MilestoneArgs) (any, error) {
 		return nil, err
 	}
 	return M{"deleted": true, "id": id, "name": value["name"]}, nil
+}
+
+/* Result shapes */
+
+type Milestone struct {
+	ID          string     `json:"id"`
+	Name        string     `json:"name"`
+	Description *string    `json:"description"`
+	TargetDate  *string    `json:"targetDate"`
+	SortOrder   float64    `json:"sortOrder"`
+	Project     ProjectRef `json:"project"`
+	CreatedAt   string     `json:"createdAt"`
+	UpdatedAt   string     `json:"updatedAt"`
+	ProjectIssueStats
+}
+
+type MilestoneDetail struct {
+	Milestone
+	Issues []IssueChild `json:"issues"`
+}
+
+type DeletedMilestone struct {
+	Deleted bool   `json:"deleted"`
+	ID      string `json:"id"`
+	Name    string `json:"name"`
 }

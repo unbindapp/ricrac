@@ -25,53 +25,53 @@ func projectOps() []*Op {
 				"priority, query, or a saved project view (customView). Archived and trashed projects are left out unless "+
 				"asked for; descriptions unless includeDescription is set. Each project has its progress: completed issues "+
 				"/ (all - canceled).",
-			listProjects),
+			listProjects).returns(ResultOf[PageOf[Project]]()),
 		op("get_project", app.Read, []string{"GET /projects/{id}"},
 			"Read a project by id, slug, link or name: its fields and description, members, milestones with their "+
 				"progress, latest status update, links, dependencies (blocks, blocked by, related), documents, issue counts "+
 				"by status type and estimate sums.",
-			getProject),
+			getProject).returns(ResultOf[ProjectDetail]()),
 		op("save_project", app.Write, []string{"POST /projects", "PATCH /projects/{id}"},
 			"Create a project (omit id; name and at least one team via setTeams or addTeams are required) or update one "+
 				"(pass id). Omitted fields stay as they are; null clears a field. People are given as id, name, email or "+
 				"\"me\"; the status (state) as name, type or id. Use patch to edit part of the description. A project template "+
 				"(create only) adds its milestones and issues. A new lead is notified; so are people @mentioned in the "+
 				"description.",
-			saveProject),
+			saveProject).returns(ResultOf[ProjectDetail]()),
 		op("delete_project", app.Write, []string{"DELETE /projects/{id}"},
 			"Move a project to the trash. Its issues keep their project. It is deleted for good after 30 days; "+
 				"restore_project brings it back before then.",
-			trashProject),
-		op("restore_project", app.Write, []string{"POST /projects/{id}/restore"}, "Bring a project back from the trash.", restoreProject),
+			trashProject).returns(ResultOf[Project]()),
+		op("restore_project", app.Write, []string{"POST /projects/{id}/restore"}, "Bring a project back from the trash.", restoreProject).returns(ResultOf[Project]()),
 		op("archive_project", app.Write, []string{"POST /projects/{id}/archive"},
-			"Archive a project. It stays readable but is left out of lists unless includeArchived is set.", archiveProject),
-		op("unarchive_project", app.Write, []string{"POST /projects/{id}/unarchive"}, "Bring an archived project back.", unarchiveProject),
+			"Archive a project. It stays readable but is left out of lists unless includeArchived is set.", archiveProject).returns(ResultOf[Project]()),
+		op("unarchive_project", app.Write, []string{"POST /projects/{id}/unarchive"}, "Bring an archived project back.", unarchiveProject).returns(ResultOf[Project]()),
 		op("list_project_statuses", app.Read, []string{"GET /project-statuses"},
 			"The workspace's project statuses in order, each with its type (backlog, planned, started, paused, "+
 				"completed, canceled) and how many projects are in it.",
-			listProjectStatuses),
+			listProjectStatuses).returns(ResultOf[PageOf[ProjectStatus]]()),
 		op("save_project_status", app.Write, []string{"POST /project-statuses", "PATCH /project-statuses/{id}"},
 			"Create a project status (omit id; name and type are required) or change one (pass its id or name). "+
 				"Workspace admins only.",
-			saveProjectStatus),
+			saveProjectStatus).returns(ResultOf[ProjectStatus]()),
 		op("delete_project_status", app.Write, []string{"DELETE /project-statuses/{id}"},
 			"Delete a project status. Projects in it move to moveProjectsTo, which is required when there are any. "+
 				"The workspace keeps at least one status. Workspace admins only.",
-			deleteProjectStatus),
+			deleteProjectStatus).returns(ResultOf[DeletedProjectStatus]()),
 		op("list_project_labels", app.Read, []string{"GET /project-labels"},
 			"The workspace's project labels and label groups, with how many projects use each. Retired labels are "+
 				"left out unless includeRetired is set.",
-			listProjectLabels),
+			listProjectLabels).returns(ResultOf[PageOf[ProjectLabel]]()),
 		op("save_project_label", app.Write, []string{"POST /project-labels", "PATCH /project-labels/{id}"},
 			"Create a project label (omit id; name is required) or change one (pass its id or name). A label can sit in "+
 				"a group (parent, a label with isGroup); groups don't nest.",
-			saveProjectLabel),
+			saveProjectLabel).returns(ResultOf[ProjectLabel]()),
 		op("retire_project_label", app.Write, []string{"POST /project-labels/{id}/retire"},
-			"Retire a project label (and a group's labels): projects keep it, but it can't be added anymore.", retireProjectLabel),
+			"Retire a project label (and a group's labels): projects keep it, but it can't be added anymore.", retireProjectLabel).returns(ResultOf[ProjectLabel]()),
 		op("restore_project_label", app.Write, []string{"POST /project-labels/{id}/restore"},
-			"Bring a retired project label back.", restoreProjectLabel),
+			"Bring a retired project label back.", restoreProjectLabel).returns(ResultOf[ProjectLabel]()),
 		op("delete_project_label", app.Write, []string{"DELETE /project-labels/{id}"},
-			"Delete a project label for good, removing it from every project.", deleteProjectLabel),
+			"Delete a project label for good, removing it from every project.", deleteProjectLabel).returns(ResultOf[DeletedProjectLabel]()),
 	}
 }
 
@@ -2035,4 +2035,125 @@ func deleteProjectLabel(c *app.Ctx, args IDArgs) (any, error) {
 		return nil, err
 	}
 	return M{"deleted": true, "id": id}, nil
+}
+
+/* Result shapes */
+
+// ProjectIssueStats is what project_issue_stats adds to projects and milestones.
+type ProjectIssueStats struct {
+	IssueCount          int     `json:"issueCount"`
+	CompletedIssueCount int     `json:"completedIssueCount"`
+	CanceledIssueCount  int     `json:"canceledIssueCount"`
+	Progress            float64 `json:"progress" doc:"Completed issues / (all - canceled), from 0 to 1."`
+}
+
+type Project struct {
+	ID                   string            `json:"id"`
+	SlugID               string            `json:"slugId"`
+	Name                 string            `json:"name"`
+	Summary              *string           `json:"summary"`
+	Description          string            `json:"description,omitempty" doc:"Markdown; in lists only with includeDescription."`
+	URL                  string            `json:"url"`
+	Icon                 *string           `json:"icon"`
+	Color                *string           `json:"color"`
+	Status               ProjectStatusRef  `json:"status"`
+	Priority             int               `json:"priority" doc:"0 none, 1 urgent, 2 high, 3 medium, 4 low."`
+	PriorityLabel        string            `json:"priorityLabel"`
+	Health               *string           `json:"health" enum:"onTrack,atRisk,offTrack"`
+	Lead                 *UserRef          `json:"lead"`
+	LeadTeam             *TeamRef          `json:"leadTeam"`
+	Teams                []TeamRef         `json:"teams"`
+	Labels               []ProjectLabelRef `json:"labels"`
+	Initiatives          []InitiativeRef   `json:"initiatives"`
+	StartDate            *string           `json:"startDate"`
+	StartDateResolution  *string           `json:"startDateResolution" enum:"month,quarter,halfYear,year"`
+	TargetDate           *string           `json:"targetDate"`
+	TargetDateResolution *string           `json:"targetDateResolution" enum:"month,quarter,halfYear,year"`
+	SortOrder            float64           `json:"sortOrder"`
+	StartedAt            *string           `json:"startedAt"`
+	CompletedAt          *string           `json:"completedAt"`
+	CanceledAt           *string           `json:"canceledAt"`
+	ArchivedAt           *string           `json:"archivedAt"`
+	Trashed              bool              `json:"trashed"`
+	TrashedAt            *string           `json:"trashedAt"`
+	CreatedAt            string            `json:"createdAt"`
+	UpdatedAt            string            `json:"updatedAt"`
+	ProjectIssueStats
+}
+
+type ProjectDetail struct {
+	Project
+	Creator               *UserRef         `json:"creator"`
+	Members               []UserRef        `json:"members"`
+	Subscribers           []UserRef        `json:"subscribers"`
+	Links                 []EntityLink     `json:"links"`
+	Relations             ProjectRelations `json:"relations"`
+	Documents             []DocumentRef    `json:"documents"`
+	IssueCountByStateType map[string]int   `json:"issueCountByStateType" doc:"Issue counts by status type; types without issues are left out."`
+	Estimate              ProjectEstimate  `json:"estimate"`
+	Milestones            []Milestone      `json:"milestones"`
+	LatestUpdate          *StatusUpdate    `json:"latestUpdate"`
+}
+
+// EntityLink is a link (resource) on a project or initiative.
+type EntityLink struct {
+	ID        string   `json:"id"`
+	URL       string   `json:"url"`
+	Label     string   `json:"label"`
+	Creator   *UserRef `json:"creator"`
+	CreatedAt string   `json:"createdAt"`
+}
+
+type ProjectRelations struct {
+	Blocks    []ProjectRef `json:"blocks"`
+	BlockedBy []ProjectRef `json:"blockedBy"`
+	Related   []ProjectRef `json:"related"`
+}
+
+type ProjectEstimate struct {
+	Total     float64 `json:"total" doc:"The sum of the estimates of the project's issues, canceled ones left out."`
+	Completed float64 `json:"completed"`
+}
+
+type ProjectStatus struct {
+	ID           string  `json:"id"`
+	Name         string  `json:"name"`
+	Type         string  `json:"type" enum:"backlog,planned,started,paused,completed,canceled"`
+	Color        string  `json:"color"`
+	Description  *string `json:"description"`
+	Position     float64 `json:"position"`
+	ProjectCount int     `json:"projectCount"`
+	ArchivedAt   *string `json:"archivedAt"`
+	CreatedAt    string  `json:"createdAt"`
+	UpdatedAt    string  `json:"updatedAt"`
+}
+
+type DeletedProjectStatus struct {
+	Deleted       bool   `json:"deleted"`
+	ID            string `json:"id"`
+	MovedProjects int    `json:"movedProjects"`
+}
+
+type ProjectLabel struct {
+	ID           string             `json:"id"`
+	Name         string             `json:"name"`
+	Color        string             `json:"color"`
+	Description  *string            `json:"description"`
+	IsGroup      bool               `json:"isGroup"`
+	Parent       *ProjectLabelGroup `json:"parent"`
+	ProjectCount int                `json:"projectCount"`
+	Creator      *UserRef           `json:"creator"`
+	RetiredAt    *string            `json:"retiredAt"`
+	CreatedAt    string             `json:"createdAt"`
+	UpdatedAt    string             `json:"updatedAt"`
+}
+
+type ProjectLabelGroup struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type DeletedProjectLabel struct {
+	Deleted bool   `json:"deleted"`
+	ID      string `json:"id"`
 }

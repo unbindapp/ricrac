@@ -174,6 +174,12 @@ func TestInitiativesGroupProjectsWithProgress(t *testing.T) {
 	eqList(t, names(call(t, w.Ann, "list_initiatives", M{})), []string{"Grow 2030"})
 	call(t, w.Ann, "restore_initiative", M{"id": "Grow EU"})
 	eq(t, len(names(call(t, w.Ann, "list_initiatives", M{}))), 2)
+	archived := call(t, w.Ann, "archive_initiative", M{"id": "Grow EU"})
+	check(t, archived.At("archivedAt").IsString())
+	eqList(t, names(call(t, w.Ann, "list_initiatives", M{})), []string{"Grow 2030"})
+	eq(t, len(names(call(t, w.Ann, "list_initiatives", M{"includeArchived": true}))), 2)
+	unarchived := call(t, w.Ann, "unarchive_initiative", M{"id": "Grow EU"})
+	check(t, unarchived.At("archivedAt").IsNull())
 }
 
 func TestProjectTemplatesCreateMilestonesAndIssues(t *testing.T) {
@@ -261,6 +267,9 @@ func TestProjectStatusesAndLabels(t *testing.T) {
 	call(t, bob, "retire_project_label", M{"id": "Area"})
 	eq(t, len(names(call(t, bob, "list_project_labels", M{}))), 0)
 	eq(t, len(names(call(t, bob, "list_project_labels", M{"includeRetired": true}))), 2)
+	restored := call(t, bob, "restore_project_label", M{"id": "Area"})
+	check(t, restored.At("retiredAt").IsNull())
+	eq(t, len(names(call(t, bob, "list_project_labels", M{}))), 2, "the group's labels come back with it")
 	call(t, bob, "delete_project_label", M{"id": "Mobile"})
 	eq(t, call(t, bob, "get_project", M{"id": "P"}).At("labels").Len(), 0)
 }
