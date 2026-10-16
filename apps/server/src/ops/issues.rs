@@ -719,22 +719,26 @@ async fn save(ctx: Ctx, args: SaveIssueArgs) -> ApiResult<Value> {
 pub struct UpdateManyArgs {
     /// Identifiers (ENG-123) or ids of the issues to change, at most 100.
     ids: Vec<String>,
-    /// The change, with the fields of save_issue (except id and template).
-    changes: SaveIssueArgs,
+    /// The change: an object with save_issue's fields (except id and template), e.g.
+    /// {"state": "Done"}, {"assignee": "me", "addLabels": ["Bug"]} or {"cycle": "current"}.
+    #[schemars(with = "serde_json::Map<String, Value>")]
+    changes: Value,
 }
 
 async fn update_many(ctx: Ctx, args: UpdateManyArgs) -> ApiResult<Value> {
     if args.ids.is_empty() || args.ids.len() > 100 {
         return Err(ApiError::bad_request("Pass 1 to 100 issue ids"));
     }
-    if args.changes.id.is_some() || args.changes.template.is_some() {
+    let changes: SaveIssueArgs =
+        serde_json::from_value(args.changes).map_err(|e| ApiError::bad_request(format!("Invalid changes: {e}")))?;
+    if changes.id.is_some() || changes.template.is_some() {
         return Err(ApiError::bad_request("changes can't have an id or a template"));
     }
     let mut updated = Vec::new();
     for reference in &args.ids {
         let id = resolve::issue(&ctx, reference).await?;
         let mut tx = ctx.db().begin().await?;
-        update(&ctx, &mut tx, id, args.changes.clone()).await?;
+        update(&ctx, &mut tx, id, changes.clone()).await?;
         let identifier = identifier(&mut tx, id).await?;
         tx.commit().await?;
         updated.push(identifier);

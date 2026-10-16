@@ -183,8 +183,8 @@ async fn mcp_lists_and_calls_tools(db: PgPool) {
     let key = api_key(&w, &["read", "write", "admin"]).await;
     let (status, _) = send(&router, Request::post("/mcp").body(Body::empty()).unwrap()).await;
     assert_eq!(status, StatusCode::UNAUTHORIZED);
-    let rpc = |body: Value| {
-        Request::post("/mcp")
+    let rpc_at = |uri: &'static str, body: Value| {
+        Request::post(uri)
             .header("authorization", format!("Bearer {key}"))
             .header("content-type", "application/json")
             .header("accept", "application/json, text/event-stream")
@@ -193,6 +193,10 @@ async fn mcp_lists_and_calls_tools(db: PgPool) {
             .body(Body::from(body.to_string()))
             .unwrap()
     };
+    let rpc = |body: Value| rpc_at("/mcp", body);
+    let (_, everything) =
+        send(&router, rpc_at("/mcp?tools=all", json!({ "jsonrpc": "2.0", "id": 7, "method": "tools/list" }))).await;
+    assert!(everything["result"]["tools"].as_array().unwrap().iter().any(|t| t["name"] == "save_webhook"));
     let (status, init) = send(
         &router,
         rpc(json!({ "jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {
@@ -204,7 +208,23 @@ async fn mcp_lists_and_calls_tools(db: PgPool) {
     let (_, tools) = send(&router, rpc(json!({ "jsonrpc": "2.0", "id": 2, "method": "tools/list" }))).await;
     let names: Vec<&str> =
         tools["result"]["tools"].as_array().unwrap().iter().map(|t| t["name"].as_str().unwrap()).collect();
-    assert!(names.contains(&"save_issue") && names.contains(&"list_issues"), "{names:?}");
+    assert!(names.contains(&"save_issue") && names.contains(&"find_operations"), "{names:?}");
+    assert!(!names.contains(&"save_webhook"), "rarer operations are found through find_operations");
+    let (_, found) = send(
+        &router,
+        rpc(json!({ "jsonrpc": "2.0", "id": 5, "method": "tools/call", "params": {
+        "name": "find_operations", "arguments": { "query": "webhook" } } })),
+    )
+    .await;
+    let text = found["result"]["content"][0]["text"].as_str().unwrap();
+    assert!(text.contains("save_webhook") && text.contains("resourceTypes"), "{text}");
+    let (_, called) = send(
+        &router,
+        rpc(json!({ "jsonrpc": "2.0", "id": 6, "method": "tools/call", "params": {
+        "name": "call_operation", "arguments": { "name": "list_webhooks", "arguments": {} } } })),
+    )
+    .await;
+    assert_eq!(called["result"]["isError"], false, "{called}");
     let (_, result) = send(
         &router,
         rpc(json!({ "jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": {
