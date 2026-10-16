@@ -1,6 +1,7 @@
 package ops
 
 import (
+	"encoding"
 	"encoding/json"
 	"reflect"
 	"strings"
@@ -50,6 +51,8 @@ var (
 	nullableType = reflect.TypeFor[nullable]()
 	schemaerType = reflect.TypeFor[schemaer]()
 	rawType      = reflect.TypeFor[json.RawMessage]()
+
+	textMarshalerType = reflect.TypeFor[encoding.TextMarshaler]()
 )
 
 var schemaCache sync.Map
@@ -103,6 +106,9 @@ func (s schemas) of(t reflect.Type) M {
 	}
 	if t == rawType {
 		return M{}
+	}
+	if t.Kind() != reflect.Pointer && t.Implements(textMarshalerType) {
+		return M{"type": "string"}
 	}
 	switch t.Kind() {
 	case reflect.Pointer:
