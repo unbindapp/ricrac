@@ -51,6 +51,11 @@ Dockerfile) and a `postgres` database service.
 - `server/files.go` serves uploads; `server/spa.go` serves the web build copied into
   `server/dist` (the committed `index.html` is a placeholder).
 - `mail/` renders emails (`mail/templates`) and sends them over SMTP.
+- `github/` is the GitHub App client (app JWT, installation tokens, payloads, finding ENG-123 in
+  branches and messages); `ops/github*.go` connect installations, link pull requests, branches and
+  commits to issues, sync issues of chosen repositories both ways (`github_push.go` sends queued
+  changes back) and `server/github.go` has the webhook and the install / account-link callbacks.
+  `docs/github-app.md` is how to create the app.
 
 ### apps/web (Vite, React, TanStack Router + Query + Form, Tailwind v4, shadcn on base-ui)
 
