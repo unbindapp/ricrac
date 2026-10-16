@@ -38,6 +38,11 @@ links agents share.
   issues on a schedule, project templates with milestones and issues, document templates), an **inbox** of notifications
   (read, archive, snooze), **customers** and customer requests, **releases** with pipelines,
   stages and release notes, and **webhooks** signed with HMAC-SHA256.
+- **GitHub**, as a GitHub App admins install on their repositories: pull requests, branches and
+  commits that mention ENG-123 are attached to the issue and move it (opened, then done when a
+  pull request that fixes it merges or a fixing commit lands on the default branch), and
+  repositories synced with a team keep their issues and comments in step both ways. See
+  [docs/github-app.md](docs/github-app.md).
 
 ## Connecting agents
 
@@ -67,6 +72,8 @@ links agents share.
 | `SECRET_KEY` | At least 32 characters; signs session cookies. |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Sign-in with Google. The OAuth client's redirect URI is `<PUBLIC_URL>/api/auth/callback/google`. |
 | `SMTP_URL`, `EMAIL_FROM` | Email for invitations and notification digests, e.g. `smtps://resend:<API key>@smtp.resend.com:465` and `Ricrac <notifications@example.com>`. Without them no emails are sent. |
+| `GITHUB_APP_ID`, `GITHUB_APP_SLUG`, `GITHUB_APP_PRIVATE_KEY`, `GITHUB_WEBHOOK_SECRET`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | The GitHub App (see [docs/github-app.md](docs/github-app.md)): its id, its URL name (`github.com/apps/<slug>`), its private key (PEM; `\n` for line breaks works), the webhook secret, and its OAuth client id and secret. All or none; without them GitHub is off. |
+| `GITHUB_API_URL`, `GITHUB_WEB_URL` | GitHub's API and web addresses, `https://api.github.com` and `https://github.com` by default (for GitHub Enterprise or tests). |
 | `MAX_UPLOAD_MB` | Largest uploaded file, 25 by default. |
 | `PORT` | 3000 by default. |
 

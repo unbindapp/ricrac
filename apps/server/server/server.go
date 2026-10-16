@@ -29,6 +29,7 @@ func Router(state *app.State) http.Handler {
 	mux.HandleFunc("GET /files/{id}", download(state))
 	mux.HandleFunc("PUT /uploads/{token}", upload(state))
 	mux.Handle("/mcp", requireBearer(state, mcpHandler(state)))
+	githubRoutes(mux, state)
 	accountRoutes(mux, state)
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) { _, _ = w.Write([]byte("ok")) })
 	mux.HandleFunc("/", serveSPA)

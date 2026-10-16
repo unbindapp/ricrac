@@ -53,6 +53,7 @@ export type Me = {
   avatarUrl: string | null
   displayName: string
   email: string
+  githubLogin: string | null
   id: string
   invitations: PendingInvitation[]
   name: string

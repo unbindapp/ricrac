@@ -336,77 +336,85 @@ func saveComment(c *app.Ctx, args SaveCommentArgs) (any, error) {
 	}
 	var value M
 	err = inTx(c, func(tx pgx.Tx) error {
-		id, err := app.One[uuid.UUID](c, tx, fmt.Sprintf(
-			`INSERT INTO comments (workspace_id, %s, parent_id, user_id, body, quoted_text)
-			 VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`, target.column), c.Workspace, target.id, root, c.User, body, quoted)
-		if err != nil {
-			return err
-		}
-		about, err := commentAbout(c, tx, *target)
-		if err != nil {
-			return err
-		}
-		mentioned, err := mentions(c, body)
-		if err != nil {
-			return err
-		}
-		var participants []uuid.UUID
-		if root != nil {
-			if participants, err = app.All[uuid.UUID](c, tx,
-				"SELECT DISTINCT user_id FROM comments WHERE (id = $1 OR parent_id = $1) AND user_id IS NOT NULL", *root); err != nil {
-				return err
-			}
-		}
-		var audience []uuid.UUID
-		switch target.column {
-		case "issue_id":
-			if err := subscribe(c, tx, target.id, []uuid.UUID{c.User}); err != nil {
-				return err
-			}
-			if err := subscribe(c, tx, target.id, mentioned); err != nil {
-				return err
-			}
-			if err := app.Exec(c, tx, "UPDATE issues SET updated_at = now() WHERE id = $1", target.id); err != nil {
-				return err
-			}
-			if audience, err = issueSubscribers(c, tx, target.id); err != nil {
-				return err
-			}
-		case "status_update_id":
-			if audience, err = app.All[uuid.UUID](c, tx,
-				"SELECT user_id FROM status_updates WHERE id = $1 AND user_id IS NOT NULL", target.id); err != nil {
-				return err
-			}
-		}
-		name, err := actorName(c)
-		if err != nil {
-			return err
-		}
-		replied := slices.DeleteFunc(participants, func(u uuid.UUID) bool { return slices.Contains(mentioned, u) })
-		others := slices.DeleteFunc(audience, func(u uuid.UUID) bool {
-			return slices.Contains(mentioned, u) || slices.Contains(replied, u)
-		})
-		for _, n := range []struct {
-			users   []uuid.UUID
-			kind    string
-			summary string
-		}{
-			{mentioned, about.kinds[2], fmt.Sprintf("%s mentioned you in a comment on %s", name, about.label)},
-			{replied, about.kinds[1], fmt.Sprintf("%s replied to a thread on %s", name, about.label)},
-			{others, about.kinds[0], fmt.Sprintf("%s commented on %s", name, about.label)},
-		} {
-			notice := about.notice
-			notice.Kind, notice.Summary, notice.Comment = n.kind, n.summary, &id
-			if err := notify(c, tx, n.users, notice); err != nil {
-				return err
-			}
-		}
-		if value, err = commentValue(c, tx, id); err != nil {
-			return err
-		}
-		return emit(c, tx, "Comment", "create", value, nil, about.team)
+		_, value, err = createComment(c, tx, *target, root, body, quoted)
+		return err
 	})
 	return value, err
+}
+
+// createComment adds a comment (a reply when root is set) by the caller, notifying and
+// subscribing the people it concerns.
+func createComment(c *app.Ctx, tx pgx.Tx, target commentTarget, root *uuid.UUID, body string, quoted *string) (uuid.UUID, M, error) {
+	id, err := app.One[uuid.UUID](c, tx, fmt.Sprintf(
+		`INSERT INTO comments (workspace_id, %s, parent_id, user_id, body, quoted_text)
+		 VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`, target.column), c.Workspace, target.id, root, c.Actor(), body, quoted)
+	if err != nil {
+		return uuid.Nil, nil, err
+	}
+	about, err := commentAbout(c, tx, target)
+	if err != nil {
+		return uuid.Nil, nil, err
+	}
+	mentioned, err := mentions(c, body)
+	if err != nil {
+		return uuid.Nil, nil, err
+	}
+	var participants []uuid.UUID
+	if root != nil {
+		if participants, err = app.All[uuid.UUID](c, tx,
+			"SELECT DISTINCT user_id FROM comments WHERE (id = $1 OR parent_id = $1) AND user_id IS NOT NULL", *root); err != nil {
+			return uuid.Nil, nil, err
+		}
+	}
+	var audience []uuid.UUID
+	switch target.column {
+	case "issue_id":
+		if err := subscribe(c, tx, target.id, append([]uuid.UUID{c.User}, mentioned...)); err != nil {
+			return uuid.Nil, nil, err
+		}
+		if err := app.Exec(c, tx, "UPDATE issues SET updated_at = now() WHERE id = $1", target.id); err != nil {
+			return uuid.Nil, nil, err
+		}
+		if audience, err = issueSubscribers(c, tx, target.id); err != nil {
+			return uuid.Nil, nil, err
+		}
+		if err := queueCommentForGitHub(c, tx, target.id, id, "comment_created"); err != nil {
+			return uuid.Nil, nil, err
+		}
+	case "status_update_id":
+		if audience, err = app.All[uuid.UUID](c, tx,
+			"SELECT user_id FROM status_updates WHERE id = $1 AND user_id IS NOT NULL", target.id); err != nil {
+			return uuid.Nil, nil, err
+		}
+	}
+	name, err := actorName(c)
+	if err != nil {
+		return uuid.Nil, nil, err
+	}
+	replied := slices.DeleteFunc(participants, func(u uuid.UUID) bool { return slices.Contains(mentioned, u) })
+	others := slices.DeleteFunc(audience, func(u uuid.UUID) bool {
+		return slices.Contains(mentioned, u) || slices.Contains(replied, u)
+	})
+	for _, n := range []struct {
+		users   []uuid.UUID
+		kind    string
+		summary string
+	}{
+		{mentioned, about.kinds[2], fmt.Sprintf("%s mentioned you in a comment on %s", name, about.label)},
+		{replied, about.kinds[1], fmt.Sprintf("%s replied to a thread on %s", name, about.label)},
+		{others, about.kinds[0], fmt.Sprintf("%s commented on %s", name, about.label)},
+	} {
+		notice := about.notice
+		notice.Kind, notice.Summary, notice.Comment = n.kind, n.summary, &id
+		if err := notify(c, tx, n.users, notice); err != nil {
+			return uuid.Nil, nil, err
+		}
+	}
+	value, err := commentValue(c, tx, id)
+	if err != nil {
+		return uuid.Nil, nil, err
+	}
+	return id, value, emit(c, tx, "Comment", "create", value, nil, about.team)
 }
 
 func editComment(c *app.Ctx, reference, body string) (any, error) {
@@ -419,53 +427,63 @@ func editComment(c *app.Ctx, reference, body string) (any, error) {
 	}
 	var value M
 	err = inTx(c, func(tx pgx.Tx) error {
-		before, err := commentValue(c, tx, row.ID)
-		if err != nil {
-			return err
-		}
-		if err := app.Exec(c, tx, "UPDATE comments SET body = $2, edited_at = now(), updated_at = now() WHERE id = $1", row.ID, body); err != nil {
-			return err
-		}
-		previous, err := mentions(c, row.Body)
-		if err != nil {
-			return err
-		}
-		current, err := mentions(c, body)
-		if err != nil {
-			return err
-		}
-		mentioned := slices.DeleteFunc(current, func(u uuid.UUID) bool { return slices.Contains(previous, u) })
-		target, err := row.target()
-		if err != nil {
-			return err
-		}
-		about, err := commentAbout(c, tx, target)
-		if err != nil {
-			return err
-		}
-		if target.column == "issue_id" {
-			if err := subscribe(c, tx, target.id, mentioned); err != nil {
-				return err
-			}
-		}
-		name, err := actorName(c)
-		if err != nil {
-			return err
-		}
-		notice := about.notice
-		notice.Kind = about.kinds[2]
-		notice.Summary = fmt.Sprintf("%s mentioned you in a comment on %s", name, about.label)
-		notice.Comment = &row.ID
-		if err := notify(c, tx, mentioned, notice); err != nil {
-			return err
-		}
-		if value, err = commentValue(c, tx, row.ID); err != nil {
-			return err
-		}
-		updatedFrom := M{"body": before["body"], "editedAt": before["editedAt"]}
-		return emit(c, tx, "Comment", "update", value, updatedFrom, about.team)
+		value, err = changeComment(c, tx, row, body)
+		return err
 	})
 	return value, err
+}
+
+// changeComment rewrites a comment's body, notifying people newly mentioned.
+func changeComment(c *app.Ctx, tx pgx.Tx, row commentRow, body string) (M, error) {
+	before, err := commentValue(c, tx, row.ID)
+	if err != nil {
+		return nil, err
+	}
+	if err := app.Exec(c, tx, "UPDATE comments SET body = $2, edited_at = now(), updated_at = now() WHERE id = $1", row.ID, body); err != nil {
+		return nil, err
+	}
+	previous, err := mentions(c, row.Body)
+	if err != nil {
+		return nil, err
+	}
+	current, err := mentions(c, body)
+	if err != nil {
+		return nil, err
+	}
+	mentioned := slices.DeleteFunc(current, func(u uuid.UUID) bool { return slices.Contains(previous, u) })
+	target, err := row.target()
+	if err != nil {
+		return nil, err
+	}
+	about, err := commentAbout(c, tx, target)
+	if err != nil {
+		return nil, err
+	}
+	if target.column == "issue_id" {
+		if err := subscribe(c, tx, target.id, mentioned); err != nil {
+			return nil, err
+		}
+		if err := queueCommentForGitHub(c, tx, target.id, row.ID, "comment_edited"); err != nil {
+			return nil, err
+		}
+	}
+	name, err := actorName(c)
+	if err != nil {
+		return nil, err
+	}
+	notice := about.notice
+	notice.Kind = about.kinds[2]
+	notice.Summary = fmt.Sprintf("%s mentioned you in a comment on %s", name, about.label)
+	notice.Comment = &row.ID
+	if err := notify(c, tx, mentioned, notice); err != nil {
+		return nil, err
+	}
+	value, err := commentValue(c, tx, row.ID)
+	if err != nil {
+		return nil, err
+	}
+	updatedFrom := M{"body": before["body"], "editedAt": before["editedAt"]}
+	return value, emit(c, tx, "Comment", "update", value, updatedFrom, about.team)
 }
 
 // about is how notifications about comments on a target read and what they point at.
@@ -520,6 +538,9 @@ func commentAbout(c *app.Ctx, tx pgx.Tx, target commentTarget) (about, error) {
 }
 
 func actorName(c *app.Ctx) (string, error) {
+	if c.User == uuid.Nil {
+		return "Someone on GitHub", nil
+	}
 	return app.One[string](c, c.DB(), "SELECT name FROM users WHERE id = $1", c.User)
 }
 
@@ -546,30 +567,42 @@ func deleteComment(c *app.Ctx, args IDArgs) (any, error) {
 	}
 	var replies int64
 	err = inTx(c, func(tx pgx.Tx) error {
-		value, err := commentValue(c, tx, row.ID)
-		if err != nil {
-			return err
-		}
-		if replies, err = app.One[int64](c, tx, "SELECT count(*) FROM comments WHERE parent_id = $1", row.ID); err != nil {
-			return err
-		}
-		if err := app.Exec(c, tx, "DELETE FROM comments WHERE id = $1", row.ID); err != nil {
-			return err
-		}
-		target, err := row.target()
-		if err != nil {
-			return err
-		}
-		team, err := teamOfTarget(c, tx, target)
-		if err != nil {
-			return err
-		}
-		return emit(c, tx, "Comment", "remove", value, nil, team)
+		replies, err = removeComment(c, tx, row)
+		return err
 	})
 	if err != nil {
 		return nil, err
 	}
 	return M{"deleted": row.ID, "deletedReplies": replies}, nil
+}
+
+// removeComment deletes a comment and its replies, answering how many replies went with it.
+func removeComment(c *app.Ctx, tx pgx.Tx, row commentRow) (int64, error) {
+	value, err := commentValue(c, tx, row.ID)
+	if err != nil {
+		return 0, err
+	}
+	replies, err := app.One[int64](c, tx, "SELECT count(*) FROM comments WHERE parent_id = $1", row.ID)
+	if err != nil {
+		return 0, err
+	}
+	target, err := row.target()
+	if err != nil {
+		return 0, err
+	}
+	if target.column == "issue_id" {
+		if err := queueCommentForGitHub(c, tx, target.id, row.ID, "comment_deleted"); err != nil {
+			return 0, err
+		}
+	}
+	if err := app.Exec(c, tx, "DELETE FROM comments WHERE id = $1", row.ID); err != nil {
+		return 0, err
+	}
+	team, err := teamOfTarget(c, tx, target)
+	if err != nil {
+		return 0, err
+	}
+	return replies, emit(c, tx, "Comment", "remove", value, nil, team)
 }
 
 func setResolved(c *app.Ctx, reference string, resolved bool) (any, error) {

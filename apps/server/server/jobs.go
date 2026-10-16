@@ -10,7 +10,7 @@ import (
 )
 
 // StartJobs runs the work that happens on its own until ctx ends: workspace automations every
-// minute and webhook deliveries as soon as they are queued.
+// minute, webhook deliveries as soon as they are queued, and the GitHub sync.
 func StartJobs(ctx context.Context, state *app.State) {
 	go func() {
 		ticker := time.NewTicker(time.Minute)
@@ -44,6 +44,37 @@ func StartJobs(ctx context.Context, state *app.State) {
 			time.Sleep(200 * time.Millisecond)
 		}
 	}()
+	if state.GitHub != nil {
+		go func() {
+			for ctx.Err() == nil {
+				busy, err := GitHubJobs(ctx, state)
+				if err != nil && ctx.Err() == nil {
+					slog.Warn("GitHub sync failed", "err", app.AsError(err).Message)
+				}
+				if busy && err == nil {
+					continue
+				}
+				select {
+				case <-ctx.Done():
+					return
+				case <-state.GitHubWork:
+				case <-time.After(30 * time.Second):
+				}
+				time.Sleep(200 * time.Millisecond)
+			}
+		}()
+	}
+}
+
+// GitHubJobs sends the changes queued for GitHub and imports a page of each repository's existing
+// issues, saying whether there's more to do right away.
+func GitHubJobs(ctx context.Context, state *app.State) (bool, error) {
+	pushed, err := ops.PushGitHubChanges(ctx, state)
+	if err != nil {
+		return false, err
+	}
+	more, err := ops.RunGitHubBackfills(ctx, state)
+	return more || pushed > 0, err
 }
 
 func EveryMinute(ctx context.Context, state *app.State) error {

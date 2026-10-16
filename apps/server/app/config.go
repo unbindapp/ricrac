@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"ricrac/github"
 	"ricrac/mail"
 )
 
@@ -25,6 +26,8 @@ type Config struct {
 	SecureCookies *bool
 	// Where emails go out; nil when email is off.
 	Mail *mail.Config
+	// The GitHub App; nil when the GitHub integration is off.
+	GitHub *github.Config
 }
 
 func ConfigFromEnv() (Config, error) {
@@ -64,6 +67,11 @@ func ConfigFromEnv() (Config, error) {
 		MaxUploadSize:      int64(uploadMB) * 1024 * 1024,
 	}
 	if config.Mail, err = mail.ParseConfig(env("SMTP_URL"), env("EMAIL_FROM")); err != nil {
+		return Config{}, err
+	}
+	config.GitHub, err = github.ParseConfig(env("GITHUB_APP_ID"), env("GITHUB_APP_SLUG"), env("GITHUB_APP_PRIVATE_KEY"),
+		env("GITHUB_WEBHOOK_SECRET"), env("GITHUB_CLIENT_ID"), env("GITHUB_CLIENT_SECRET"), env("GITHUB_API_URL"), env("GITHUB_WEB_URL"))
+	if err != nil {
 		return Config{}, err
 	}
 	switch env("SECURE_COOKIES") {

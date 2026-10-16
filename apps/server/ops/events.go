@@ -1,6 +1,7 @@
 package ops
 
 import (
+	"maps"
 	"slices"
 	"strings"
 	"time"
@@ -34,7 +35,7 @@ func emit(c *app.Ctx, tx app.Querier, kind, action string, data any, updatedFrom
 			"type":        kind,
 			"data":        data,
 			"url":         url,
-			"actor":       M{"id": c.User},
+			"actor":       M{"id": c.Actor()},
 			"createdAt":   time.Now().UTC(),
 			"workspaceId": c.Workspace,
 			"webhookId":   hook,
@@ -50,15 +51,25 @@ func emit(c *app.Ctx, tx app.Querier, kind, action string, data any, updatedFrom
 	return nil
 }
 
-// history adds an entry to an issue's history. changes maps fields to {from, to}.
-func history(c *app.Ctx, tx app.Querier, issue uuid.UUID, action string, changes any) error {
-	return app.Exec(c, tx, "INSERT INTO issue_history (issue_id, actor_id, action, changes) VALUES ($1, $2, $3, $4)",
-		issue, c.User, action, changes)
+// history adds an entry to an issue's history. changes maps fields to {from, to}; a change from
+// GitHub also has github: {label, url}. Changes to issues linked to GitHub issues are queued for
+// GitHub.
+func history(c *app.Ctx, tx app.Querier, issue uuid.UUID, action string, changes M) error {
+	if c.Origin != nil {
+		changes = maps.Clone(changes)
+		changes["github"] = M{"label": c.Origin.Label, "url": c.Origin.URL}
+	}
+	err := app.Exec(c, tx, "INSERT INTO issue_history (issue_id, actor_id, action, changes) VALUES ($1, $2, $3, $4)",
+		issue, c.Actor(), action, changes)
+	if err != nil {
+		return err
+	}
+	return queueIssueForGitHub(c, tx, issue, changes)
 }
 
 func audit(c *app.Ctx, tx app.Querier, kind string, metadata any) error {
 	return app.Exec(c, tx, "INSERT INTO audit_entries (workspace_id, actor_id, type, metadata) VALUES ($1, $2, $3, $4)",
-		c.Workspace, c.User, kind, metadata)
+		c.Workspace, c.Actor(), kind, metadata)
 }
 
 // Notice is what an inbox notification is about. Unset targets stay empty.
@@ -90,7 +101,7 @@ func notify(c *app.Ctx, tx app.Querier, users []uuid.UUID, notice Notice) error 
 				initiative_id, document_id, status_update_id, summary)
 			 SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
 			 WHERE EXISTS (SELECT 1 FROM workspace_members WHERE workspace_id = $1 AND user_id = $2 AND active)`,
-			c.Workspace, user, c.User, notice.Kind, notice.Issue, notice.Comment, notice.Project, notice.Initiative,
+			c.Workspace, user, c.Actor(), notice.Kind, notice.Issue, notice.Comment, notice.Project, notice.Initiative,
 			notice.Document, notice.StatusUpdate, notice.Summary)
 		if err != nil {
 			return err
@@ -104,6 +115,7 @@ func issueSubscribers(c *app.Ctx, tx app.Querier, issue uuid.UUID) ([]uuid.UUID,
 }
 
 func subscribe(c *app.Ctx, tx app.Querier, issue uuid.UUID, users []uuid.UUID) error {
+	users = slices.DeleteFunc(slices.Clone(users), func(u uuid.UUID) bool { return u == uuid.Nil })
 	return app.Exec(c, tx,
 		"INSERT INTO issue_subscribers (issue_id, user_id) SELECT $1, unnest($2::uuid[]) ON CONFLICT DO NOTHING",
 		issue, users)
