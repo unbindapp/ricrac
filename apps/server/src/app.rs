@@ -56,7 +56,7 @@ pub fn router(state: AppState) -> Router {
         .nest("/api", account::router())
         .route("/healthz", get(|| async { "ok" }))
         .fallback(spa::serve)
-        .layer(DefaultBodyLimit::max(4 * 1024 * 1024))
+        .layer(DefaultBodyLimit::max(8 * 1024 * 1024))
         .layer(header(X_CONTENT_TYPE_OPTIONS, "nosniff"))
         .layer(header(X_FRAME_OPTIONS, "DENY"))
         .layer(header(REFERRER_POLICY, "strict-origin-when-cross-origin"))
