@@ -1,6 +1,7 @@
 //! OAuth 2.1 authorization server: discovery, dynamic client registration, client ID metadata
 //! documents, apps registered in the dashboard, authorization code + PKCE, rotating refresh
-//! tokens and revocation. Every grant is for one workspace, chosen on the consent screen.
+//! tokens and revocation. Every grant is for the workspaces chosen on the consent screen, or all
+//! of the user's.
 //! Also the bearer check shared by `/v1` and `/mcp`, which takes these tokens and API keys.
 
 use std::collections::HashMap;
@@ -21,7 +22,8 @@ use sha2::{Digest, Sha256};
 use ts_rs::TS;
 use uuid::Uuid;
 
-use crate::ctx::{ALL_SCOPES, Access, Ctx};
+use crate::ctx::{ALL_SCOPES, Access, Caller};
+use crate::error::ApiResult;
 use crate::keys::{client_ip, random_secret, secret_hash};
 use crate::state::AppState;
 
@@ -419,11 +421,12 @@ fn with_params(uri: &str, params: &[(&str, &str)]) -> String {
     format!("{uri}{sep}{}", query.join("&"))
 }
 
-/// Records the user's decision and returns where to send the browser.
+/// Records the user's decision and returns where to send the browser. `workspaces` None grants
+/// every workspace of the user, including ones they join later.
 pub async fn decide(
     state: &AppState,
     user: Uuid,
-    workspace: Option<Uuid>,
+    workspaces: Option<Vec<Uuid>>,
     req: &OAuthRequest,
     allow: bool,
 ) -> Result<String, String> {
@@ -438,19 +441,16 @@ pub async fn decide(
         params.push(("error", "access_denied"));
         return Ok(with_params(&req.redirect_uri, &params));
     }
-    let workspace = workspace.ok_or("Pick a workspace.")?;
-    if Ctx::load(state, user, workspace, vec![]).await.map_err(|e| e.message)?.is_none() {
-        return Err("You aren't a member of that workspace.".into());
-    }
+    check_workspaces(state, user, workspaces.as_deref()).await.map_err(|e| e.message)?;
     let code = random_secret("rr_ac_");
     sqlx::query(
-        "INSERT INTO oauth_codes (code_hash, client_id, user_id, workspace_id, scopes, redirect_uri, code_challenge, resource, expires_at)
+        "INSERT INTO oauth_codes (code_hash, client_id, user_id, workspace_ids, scopes, redirect_uri, code_challenge, resource, expires_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now() + make_interval(secs => $9))",
     )
     .bind(secret_hash(&code))
     .bind(&req.client_id)
     .bind(user)
-    .bind(workspace)
+    .bind(&workspaces)
     .bind(&info.scopes)
     .bind(&req.redirect_uri)
     .bind(&req.code_challenge)
@@ -464,6 +464,22 @@ pub async fn decide(
     })?;
     params.insert(0, ("code", &code));
     Ok(with_params(&req.redirect_uri, &params))
+}
+
+/// A list of workspaces to grant must be non-empty and only hold the user's.
+pub async fn check_workspaces(state: &AppState, user: Uuid, workspaces: Option<&[Uuid]>) -> ApiResult<()> {
+    let Some(workspaces) = workspaces else { return Ok(()) };
+    crate::ensure!(!workspaces.is_empty(), "Pick at least one workspace.");
+    let members: bool = sqlx::query_scalar(
+        "SELECT NOT EXISTS (SELECT unnest($2::uuid[])
+         EXCEPT SELECT workspace_id FROM workspace_members WHERE user_id = $1 AND active)",
+    )
+    .bind(user)
+    .bind(workspaces)
+    .fetch_one(&state.db)
+    .await?;
+    crate::ensure!(members, "You aren't a member of one of those workspaces.");
+    Ok(())
 }
 
 /* ------------------------------------------------------------------ */
@@ -560,7 +576,7 @@ pub async fn token(
     })
 }
 
-type CodeRow = (String, Uuid, Uuid, Vec<String>, String, Option<String>, Option<String>, DateTime<Utc>);
+type CodeRow = (String, Uuid, Option<Vec<Uuid>>, Vec<String>, String, Option<String>, Option<String>, DateTime<Utc>);
 
 async fn exchange_code(
     state: &AppState,
@@ -573,12 +589,12 @@ async fn exchange_code(
     // Single use: the code is deleted whether or not the exchange succeeds.
     let row: Option<CodeRow> = sqlx::query_as(
         "DELETE FROM oauth_codes WHERE code_hash = $1
-         RETURNING client_id, user_id, workspace_id, scopes, redirect_uri, code_challenge, resource, expires_at",
+         RETURNING client_id, user_id, workspace_ids, scopes, redirect_uri, code_challenge, resource, expires_at",
     )
     .bind(secret_hash(code))
     .fetch_optional(&state.db)
     .await?;
-    let Some((code_client, user, workspace, scopes, redirect_uri, challenge, resource, expires_at)) = row else {
+    let Some((code_client, user, workspaces, scopes, redirect_uri, challenge, resource, expires_at)) = row else {
         return invalid("Unknown or used code");
     };
     if expires_at < Utc::now() || code_client != client_id {
@@ -601,11 +617,11 @@ async fn exchange_code(
         return Ok(oauth_error(StatusCode::BAD_REQUEST, "invalid_target", "Tokens are only issued for this server"));
     }
     let grant: Uuid = sqlx::query_scalar(
-        "INSERT INTO oauth_grants (client_id, user_id, workspace_id, scopes) VALUES ($1, $2, $3, $4) RETURNING id",
+        "INSERT INTO oauth_grants (client_id, user_id, workspace_ids, scopes) VALUES ($1, $2, $3, $4) RETURNING id",
     )
     .bind(client_id)
     .bind(user)
-    .bind(workspace)
+    .bind(&workspaces)
     .bind(&scopes)
     .fetch_one(&state.db)
     .await?;
@@ -674,11 +690,17 @@ fn bearer(headers: &HeaderMap) -> Option<&str> {
 }
 
 /// The caller of a request with an OAuth access token or an API key.
-pub async fn bearer_ctx(state: &AppState, headers: &HeaderMap) -> Option<Ctx> {
+pub async fn bearer_caller(state: &AppState, headers: &HeaderMap) -> Option<Caller> {
     let token = bearer(headers)?;
+    let caller = |user, workspaces, scopes: Vec<String>| Caller {
+        state: state.clone(),
+        user,
+        scopes: Access::parse_scopes(&scopes),
+        workspaces,
+    };
     if token.starts_with(API_KEY_PREFIX) {
-        let (id, user, workspace, scopes): (Uuid, Uuid, Uuid, Vec<String>) =
-            sqlx::query_as("SELECT id, user_id, workspace_id, scopes FROM api_keys WHERE key_hash = $1")
+        let (id, user, workspaces, scopes): (Uuid, Uuid, Option<Vec<Uuid>>, Vec<String>) =
+            sqlx::query_as("SELECT id, user_id, workspace_ids, scopes FROM api_keys WHERE key_hash = $1")
                 .bind(secret_hash(token))
                 .fetch_optional(&state.db)
                 .await
@@ -687,10 +709,11 @@ pub async fn bearer_ctx(state: &AppState, headers: &HeaderMap) -> Option<Ctx> {
             .bind(id)
             .execute(&state.db)
             .await;
-        return Ctx::load(state, user, workspace, Access::parse_scopes(&scopes)).await.ok()?;
+        return Some(caller(user, workspaces, scopes));
     }
-    let (grant, user, workspace, scopes, expires_at): (Uuid, Uuid, Uuid, Vec<String>, DateTime<Utc>) = sqlx::query_as(
-        "SELECT g.id, g.user_id, g.workspace_id, g.scopes, t.expires_at FROM oauth_tokens t
+    type GrantRow = (Uuid, Uuid, Option<Vec<Uuid>>, Vec<String>, DateTime<Utc>);
+    let (grant, user, workspaces, scopes, expires_at): GrantRow = sqlx::query_as(
+        "SELECT g.id, g.user_id, g.workspace_ids, g.scopes, t.expires_at FROM oauth_tokens t
          JOIN oauth_grants g ON g.id = t.grant_id WHERE t.token_hash = $1 AND t.kind = 'access'",
     )
     .bind(secret_hash(token))
@@ -706,15 +729,15 @@ pub async fn bearer_ctx(state: &AppState, headers: &HeaderMap) -> Option<Ctx> {
     .bind(grant)
     .execute(&state.db)
     .await;
-    Ctx::load(state, user, workspace, Access::parse_scopes(&scopes)).await.ok()?
+    Some(caller(user, workspaces, scopes))
 }
 
 /// Rejects `/mcp` requests without a valid token, pointing clients at the OAuth metadata.
 pub async fn require_bearer(State(state): State<AppState>, mut req: Request, next: Next) -> Response {
-    let Some(ctx) = bearer_ctx(&state, req.headers()).await else {
+    let Some(caller) = bearer_caller(&state, req.headers()).await else {
         return unauthorized(&state, req.headers());
     };
-    req.extensions_mut().insert(ctx);
+    req.extensions_mut().insert(caller);
     next.run(req).await
 }
 

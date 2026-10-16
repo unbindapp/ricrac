@@ -251,7 +251,7 @@ async fn send(router: &axum::Router, request: Request<Body>) -> (StatusCode, axu
 
 async fn api_key(w: &World) -> String {
     let key = random_secret(crate::oauth::API_KEY_PREFIX);
-    sqlx::query("INSERT INTO api_keys (workspace_id, user_id, label, key_hash, key_hint, scopes) VALUES ($1, $2, 'test', $3, 'x', $4)")
+    sqlx::query("INSERT INTO api_keys (workspace_ids, user_id, label, key_hash, key_hint, scopes) VALUES (ARRAY[$1]::uuid[], $2, 'test', $3, 'x', $4)")
         .bind(w.workspace)
         .bind(w.ann.user)
         .bind(secret_hash(&key))

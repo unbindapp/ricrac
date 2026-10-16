@@ -37,13 +37,12 @@ export const connectedAppsQuery = queryOptions({
   queryFn: () => api<ConnectedApp[]>("GET", "/connected-apps"),
 })
 
-// Everything below belongs to one workspace, whose id is the second part of the key.
+export const apiKeysQuery = queryOptions({
+  queryKey: ["api-keys"],
+  queryFn: () => api<ApiKey[]>("GET", "/api-keys"),
+})
 
-export const apiKeysQuery = (workspace: string) =>
-  queryOptions({
-    queryKey: ["api-keys", workspace],
-    queryFn: () => api<ApiKey[]>("GET", "/api-keys", { workspace }),
-  })
+// Everything below belongs to one workspace, whose id is the second part of the key.
 
 export const oauthAppsQuery = (workspace: string) =>
   queryOptions({

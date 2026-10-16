@@ -13,7 +13,7 @@ use percent_encoding::{NON_ALPHANUMERIC, utf8_percent_encode};
 use serde_json::json;
 use uuid::Uuid;
 
-use crate::ctx::Access;
+use crate::ctx::{Access, Caller};
 use crate::error::{ApiError, ApiResult};
 use crate::keys::secret_hash;
 use crate::state::AppState;
@@ -70,21 +70,15 @@ pub async fn download(State(state): State<AppState>, Path(id): Path<String>, hea
     }
 }
 
-/// Who asks: a token for one workspace, or a dashboard user who may belong to several.
-enum Caller {
-    Token(Uuid),
-    Session(Uuid),
-}
-
+/// A token or a dashboard session.
 async fn caller(state: &AppState, headers: &HeaderMap) -> ApiResult<Caller> {
     if headers.contains_key(AUTHORIZATION) {
-        let ctx = crate::oauth::bearer_ctx(state, headers).await.ok_or_else(ApiError::unauthorized)?;
-        if !ctx.allows(Access::Read) {
-            return Err(ApiError::forbidden("This token lacks the \"read\" scope"));
-        }
-        return Ok(Caller::Token(ctx.workspace));
+        let caller = crate::oauth::bearer_caller(state, headers).await.ok_or_else(ApiError::unauthorized)?;
+        caller.require(Access::Read)?;
+        return Ok(caller);
     }
-    state.keys.session_user(headers).map(Caller::Session).ok_or_else(ApiError::unauthorized)
+    let user = state.keys.session_user(headers).ok_or_else(ApiError::unauthorized)?;
+    Ok(Caller::session(state, user))
 }
 
 async fn serve(state: &AppState, id: &str, headers: &HeaderMap) -> ApiResult<Response> {
@@ -97,18 +91,7 @@ async fn serve(state: &AppState, id: &str, headers: &HeaderMap) -> ApiResult<Res
             .fetch_optional(&state.db)
             .await?
             .ok_or_else(not_found)?;
-    let allowed =
-        match caller {
-            Caller::Token(token_workspace) => token_workspace == workspace,
-            Caller::Session(user) => sqlx::query_scalar(
-                "SELECT EXISTS (SELECT 1 FROM workspace_members WHERE workspace_id = $1 AND user_id = $2 AND active)",
-            )
-            .bind(workspace)
-            .bind(user)
-            .fetch_one(&state.db)
-            .await?,
-        };
-    if !allowed {
+    if !caller.reachable().await?.iter().any(|w| w.id == workspace) {
         return Err(not_found());
     }
     let headers = [

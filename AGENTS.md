@@ -28,15 +28,19 @@ Dockerfile) and a `postgres` database service.
   and custom views. `ops/events.rs` writes issue history, notifications, webhook deliveries and
   the audit log inside the change's transaction. `ops/util.rs` has the nullable-argument helper,
   dates and durations, paging, slugs and Markdown patches.
-- `ctx.rs` is the caller: user, workspace, role (owner, admin, member, guest), token scopes and
-  the teams they can see (private teams only for their members; guests only their teams).
+- `ctx.rs` is the caller: `Caller` is the user, token scopes and the workspaces the token reaches
+  (one, several or all); `Caller::ctx` picks the one a call acts in (the `workspace` argument,
+  links among the arguments, or the only one) and gives a `Ctx`: user, workspace, role (owner,
+  admin, member, guest), scopes and the teams they can see (private teams only for their members;
+  guests only their teams). Operations defined with `account_op` run with the `Caller` instead.
 - `migrations/0002_refs.sql` defines `user_ref`, `team_ref`, `state_ref`, `issue_ref`,
   `project_ref`, ... SQL functions: every response shows a referenced thing in the same short JSON
   form. Responses are built in SQL with `jsonb_build_object` (at most 100 arguments per call;
   join two with `||`).
 - `oauth.rs` is the OAuth 2.1 server (discovery, dynamic registration, client ID metadata
   documents, dashboard apps, PKCE, rotating refresh tokens, revocation) and the bearer check for
-  `/v1` and `/mcp`, which also takes API keys (`rr_key_...`). Every grant is for one workspace.
+  `/v1` and `/mcp`, which also takes API keys (`rr_key_...`). Grants and keys reach the
+  workspaces chosen when they were made, or all of the user's (`workspace_ids` NULL).
 - `google.rs` is sign-in with Google; `account.rs` the dashboard's JSON API under `/api`
   (workspaces, invitations, API keys, OAuth apps, connected apps, OAuth consent). Its types are
   exported to TypeScript with ts-rs.

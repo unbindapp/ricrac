@@ -10,6 +10,7 @@ import { Confirm } from "@/components/confirm"
 import { Button } from "@/components/ui/button"
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { WorkspaceAccess } from "@/components/workspace-access"
 
 export const Route = createFileRoute("/_app/settings/connected-apps")({ component: ConnectedAppsPage })
 
@@ -53,7 +54,7 @@ function ConnectedAppsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead className="pl-4">App</TableHead>
-                <TableHead>Workspace</TableHead>
+                <TableHead>Workspaces</TableHead>
                 <TableHead>Scopes</TableHead>
                 <TableHead>Authorized</TableHead>
                 <TableHead>Last used</TableHead>
@@ -66,7 +67,7 @@ function ConnectedAppsPage() {
               {apps.data.map((app) => (
                 <TableRow key={app.id}>
                   <TableCell className="pl-4 font-medium">{app.name}</TableCell>
-                  <TableCell>{app.workspaceName}</TableCell>
+                  <TableCell><WorkspaceAccess all={app.allWorkspaces} workspaces={app.workspaces} /></TableCell>
                   <TableCell>
                     <Scopes scopes={app.scopes} />
                   </TableCell>
@@ -84,7 +85,7 @@ function ConnectedAppsPage() {
                         </Button>
                       }
                       title={`Disconnect ${app.name}?`}
-                      description={`It loses access to ${app.workspaceName} right away. You can connect it again later.`}
+                      description={`It loses access to ${app.allWorkspaces ? "your workspaces" : app.workspaces.join(", ")} right away. You can connect it again later.`}
                       action="Revoke access"
                       onConfirm={() => revoke.mutateAsync(app.id)}
                     />

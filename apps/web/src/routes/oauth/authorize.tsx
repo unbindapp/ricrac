@@ -17,18 +17,17 @@ import { SignedOut } from "@/components/sign-in"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Field, FieldLabel } from "@/components/ui/field"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
+import { WorkspaceAccessField, type WorkspaceChoice } from "@/components/workspace-access"
 import { useSelectedWorkspace } from "@/lib/workspace"
 
 /** The OAuth consent screen that MCP clients and OAuth apps send people to. */
 export const Route = createFileRoute("/oauth/authorize")({ component: AuthorizePage })
 
 const scopeWords: Record<string, string> = {
-  read: "Read everything you can see in the workspace",
+  read: "Read everything you can see",
   write: "Create and change issues, projects, comments and more",
-  admin: "Workspace administration: members, teams and settings",
+  admin: "Administer the workspaces where you're an admin: members, teams and settings",
 }
 
 function oauthRequest(search: string): OAuthRequest {
@@ -57,7 +56,7 @@ function AuthorizePage() {
   })
 
   if (!me) {
-    return <SignedOut title="Sign in to connect" description="An app wants to connect to your Ricrac workspace." />
+    return <SignedOut title="Sign in to connect" description="An app wants to connect to your Ricrac workspaces." />
   }
   if (info.isPending) {
     return (
@@ -82,13 +81,12 @@ function AuthorizePage() {
 
 function Consent({ me, info, request }: { me: Me; info: OAuthClientInfo; request: OAuthRequest }) {
   const selected = useSelectedWorkspace(me)
-  const [picked, setWorkspaceId] = useState<string | null>(null)
-  const workspaceId = picked ?? selected?.id ?? ""
+  const [workspaceIds, setWorkspaceIds] = useState<WorkspaceChoice>(null)
   const [creating, setCreating] = useState(false)
   const decide = useMutation({
     mutationFn: (allow: boolean) =>
       api<OAuthRedirect>("POST", "/oauth/decide", {
-        body: { request, workspaceId: workspaceId || undefined, allow } satisfies OAuthDecision,
+        body: { request, workspaceIds: workspaceIds ?? undefined, allow } satisfies OAuthDecision,
       }),
     // Stays busy while the browser goes on to the app.
     onSuccess: ({ redirect }) => {
@@ -102,14 +100,17 @@ function Consent({ me, info, request }: { me: Me; info: OAuthClientInfo; request
       <CenterPanel wide>
         <Card>
           <CardHeader>
-            <CardTitle>Create a workspace first</CardTitle>
+            <CardTitle>{me.workspaces.length === 0 ? "Create a workspace first" : "Create a workspace"}</CardTitle>
             <CardDescription>
-              {info.client_name} connects to one workspace. Create yours, then come back to allow it.
+              {info.client_name} works in your workspaces. Create one, then come back to allow it.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <CreateWorkspaceForm
-              onCreated={() => setCreating(false)}
+              onCreated={(workspace) => {
+                setCreating(false)
+                setWorkspaceIds((current) => current && [...current, workspace.id])
+              }}
               onCancel={me.workspaces.length > 0 ? () => setCreating(false) : undefined}
             />
           </CardContent>
@@ -124,7 +125,7 @@ function Consent({ me, info, request }: { me: Me; info: OAuthClientInfo; request
       <Card>
         <CardHeader>
           <CardTitle className="text-xl leading-snug break-words">
-            {info.client_name} wants to access your Ricrac workspace
+            {info.client_name} wants to access your Ricrac workspaces
           </CardTitle>
           <CardDescription>
             After you decide, you'll go back to{" "}
@@ -154,25 +155,20 @@ function Consent({ me, info, request }: { me: Me; info: OAuthClientInfo; request
             </ul>
             <p className="text-xs text-muted-foreground">It acts as you, with your permissions.</p>
           </div>
-          <Field>
-            <FieldLabel htmlFor="consent-workspace">Workspace</FieldLabel>
-            <Select
-              value={workspaceId}
-              onValueChange={(value) => (value === "__new" ? setCreating(true) : setWorkspaceId(value))}
-            >
-              <SelectTrigger id="consent-workspace" className="w-full">
-                <SelectValue placeholder="Pick a workspace" />
-              </SelectTrigger>
-              <SelectContent>
-                {me.workspaces.map((workspace) => (
-                  <SelectItem key={workspace.id} value={workspace.id}>
-                    {workspace.name}
-                  </SelectItem>
-                ))}
-                <SelectItem value="__new">Create a workspace…</SelectItem>
-              </SelectContent>
-            </Select>
-          </Field>
+          <div className="space-y-3">
+            <WorkspaceAccessField
+              id="consent-workspaces"
+              workspaces={me.workspaces}
+              value={workspaceIds}
+              preferred={selected?.id}
+              onChange={setWorkspaceIds}
+            />
+            {workspaceIds !== null && (
+              <Button variant="link" size="sm" className="h-auto px-0 pl-7" onClick={() => setCreating(true)}>
+                Create a workspace…
+              </Button>
+            )}
+          </div>
           {decide.isError && (
             <Alert variant="destructive">
               <TriangleAlertIcon />
@@ -184,7 +180,7 @@ function Consent({ me, info, request }: { me: Me; info: OAuthClientInfo; request
           <Button variant="outline" disabled={busy} onClick={() => decide.mutate(false)}>
             Deny
           </Button>
-          <Button disabled={busy || !workspaceId} onClick={() => decide.mutate(true)}>
+          <Button disabled={busy || workspaceIds?.length === 0} onClick={() => decide.mutate(true)}>
             {busy && <Spinner />}
             Allow
           </Button>

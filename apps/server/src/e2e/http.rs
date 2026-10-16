@@ -22,9 +22,14 @@ async fn send(router: &axum::Router, request: Request<Body>) -> (StatusCode, Val
 }
 
 async fn api_key(w: &World, scopes: &[&str]) -> String {
+    key_reaching(w, scopes, Some(&[w.workspace])).await
+}
+
+/// A key of Ann's for these workspaces, or all of hers.
+async fn key_reaching(w: &World, scopes: &[&str], workspaces: Option<&[Uuid]>) -> String {
     let key = random_secret(crate::oauth::API_KEY_PREFIX);
-    sqlx::query("INSERT INTO api_keys (workspace_id, user_id, label, key_hash, key_hint, scopes) VALUES ($1, $2, 'test', $3, 'x', $4)")
-        .bind(w.workspace)
+    sqlx::query("INSERT INTO api_keys (workspace_ids, user_id, label, key_hash, key_hint, scopes) VALUES ($1, $2, 'test', $3, 'x', $4)")
+        .bind(workspaces)
         .bind(w.ann.user)
         .bind(secret_hash(&key))
         .bind(scopes.iter().map(|s| s.to_string()).collect::<Vec<_>>())
@@ -109,7 +114,16 @@ async fn oauth_flow_gives_a_token_for_the_chosen_workspace(db: PgPool) {
         scope: None,
         resource: Some("http://localhost:3000/mcp".into()),
     };
-    let redirect = crate::oauth::decide(&w.state, w.ann.user, Some(w.workspace), &req, true).await.unwrap();
+    let stranger = w.second_workspace("Beta", "beta", "OPS").await;
+    sqlx::query("UPDATE workspace_members SET active = false WHERE workspace_id = $1")
+        .bind(stranger)
+        .execute(&w.state.db)
+        .await
+        .unwrap();
+    for workspaces in [vec![], vec![w.workspace, stranger]] {
+        assert!(crate::oauth::decide(&w.state, w.ann.user, Some(workspaces), &req, true).await.is_err());
+    }
+    let redirect = crate::oauth::decide(&w.state, w.ann.user, Some(vec![w.workspace]), &req, true).await.unwrap();
     assert!(redirect.starts_with("http://localhost:4567/callback?code=") && redirect.contains("state=xyz"));
     let code = redirect.split("code=").nth(1).unwrap().split('&').next().unwrap();
     let code = percent_encoding::percent_decode_str(code).decode_utf8().unwrap().to_string();
@@ -240,4 +254,130 @@ async fn mcp_lists_and_calls_tools(db: PgPool) {
     )
     .await;
     assert_eq!(error["result"]["isError"], true, "{error}");
+}
+
+fn with_header(mut request: Request<Body>, name: &'static str, value: &str) -> Request<Body> {
+    request.headers_mut().insert(name, value.parse().unwrap());
+    request
+}
+
+#[sqlx::test]
+async fn tokens_for_several_workspaces_name_one_per_call(db: PgPool) {
+    let w = world(db).await;
+    let beta = w.second_workspace("Beta", "beta", "OPS").await;
+    let router = crate::app::router(w.state.clone());
+    let all = key_reaching(&w, &["read", "write"], None).await;
+    let (_, listed) = send(&router, request("GET", "/v1/workspaces", &all, None)).await;
+    let keys: Vec<&str> = listed["nodes"].as_array().unwrap().iter().map(|n| n["urlKey"].as_str().unwrap()).collect();
+    assert_eq!(keys, ["acme", "beta"]);
+
+    let issue = json!({ "team": "ENG", "title": "In Acme" });
+    let (status, error) = send(&router, request("POST", "/v1/issues", &all, Some(issue.clone()))).await;
+    assert_eq!(status, StatusCode::BAD_REQUEST);
+    let message = error["error"].as_str().unwrap();
+    assert!(message.contains("\"acme\" (Acme)") && message.contains("\"beta\" (Beta)"), "{message}");
+    let (_, created) = send(
+        &router,
+        request("POST", "/v1/issues", &all, Some(json!({ "workspace": "acme", "team": "ENG", "title": "In Acme" }))),
+    )
+    .await;
+    assert_eq!(created["identifier"], "ENG-1", "{created}");
+    let in_beta = request("POST", "/v1/issues", &all, Some(json!({ "team": "OPS", "title": "In Beta" })));
+    let (_, created) = send(&router, with_header(in_beta, "x-ricrac-workspace", "beta")).await;
+    assert_eq!(created["identifier"], "OPS-1", "{created}");
+    let (_, read) = send(&router, request("GET", "/v1/issues/ENG-1?workspace=acme", &all, None)).await;
+    assert_eq!(read["title"], "In Acme");
+    let link = json!({ "id": "http://localhost:3000/beta/issue/OPS-1" });
+    let (_, read) = send(&router, request("POST", "/v1/ops/get_issue", &all, Some(link))).await;
+    assert_eq!(read["title"], "In Beta", "links name their workspace");
+    let (status, _) =
+        send(&router, request("POST", "/v1/ops/get_issue", &all, Some(json!({ "workspace": "nope", "id": "ENG-1" }))))
+            .await;
+    assert_eq!(status, StatusCode::BAD_REQUEST);
+
+    let only_beta = key_reaching(&w, &["read"], Some(&[beta])).await;
+    let (_, listed) = send(&router, request("GET", "/v1/issues", &only_beta, None)).await;
+    assert_eq!(identifiers(&listed), ["OPS-1"]);
+    let (status, _) = send(&router, request("GET", "/v1/issues?workspace=acme", &only_beta, None)).await;
+    assert_eq!(status, StatusCode::BAD_REQUEST, "the key doesn't reach acme");
+}
+
+#[sqlx::test]
+async fn mcp_tools_take_the_workspace_when_the_token_reaches_several(db: PgPool) {
+    let w = world(db).await;
+    let router = crate::app::router(w.state.clone());
+    let all = key_reaching(&w, &["read", "write"], None).await;
+    let save_issue_schema = |key: String| {
+        let router = router.clone();
+        async move {
+            let rpc = Request::post("/mcp")
+                .header("authorization", format!("Bearer {key}"))
+                .header("content-type", "application/json")
+                .header("accept", "application/json, text/event-stream")
+                .header("host", "localhost:3000")
+                .header("mcp-protocol-version", "2025-06-18")
+                .body(Body::from(json!({ "jsonrpc": "2.0", "id": 1, "method": "tools/list" }).to_string()))
+                .unwrap();
+            let (_, tools) = send(&router, rpc).await;
+            let tools = tools["result"]["tools"].as_array().unwrap().clone();
+            assert!(tools.iter().any(|t| t["name"] == "list_workspaces"));
+            tools.into_iter().find(|t| t["name"] == "save_issue").unwrap()["inputSchema"].clone()
+        }
+    };
+    let schema = save_issue_schema(all.clone()).await;
+    assert!(schema["properties"].get("workspace").is_none(), "one workspace needs no argument");
+    w.second_workspace("Beta", "beta", "OPS").await;
+    let schema = save_issue_schema(all).await;
+    assert!(schema["properties"]["workspace"].is_object());
+    assert!(schema["required"].as_array().unwrap().contains(&json!("workspace")));
+}
+
+#[sqlx::test]
+async fn leaving_a_workspace_takes_it_out_of_keys(db: PgPool) {
+    let w = world(db).await;
+    let beta = w.second_workspace("Beta", "beta", "OPS").await;
+    let bob = w.member("bob@acme.test", "Bob", "member").await.user;
+    sqlx::query("INSERT INTO workspace_members (workspace_id, user_id, role) VALUES ($1, $2, 'member')")
+        .bind(beta)
+        .bind(bob)
+        .execute(&w.state.db)
+        .await
+        .unwrap();
+    let router = crate::app::router(w.state.clone());
+    let cookie = format!("{}={}", w.state.keys.session_cookie, w.state.keys.session_token(bob));
+    let dashboard = |method: &str, uri: &str, body: Value| {
+        Request::builder()
+            .method(method)
+            .uri(uri)
+            .header("cookie", &cookie)
+            .header("x-ricrac", "1")
+            .header("content-type", "application/json")
+            .body(Body::from(body.to_string()))
+            .unwrap()
+    };
+    let mut keys = vec![];
+    for workspaces in [json!([beta]), json!([w.workspace, beta]), Value::Null] {
+        let body = json!({ "label": "agent", "scopes": ["read"], "workspaceIds": workspaces });
+        let (status, created) = send(&router, dashboard("POST", "/api/api-keys", body)).await;
+        assert_eq!(status, StatusCode::OK, "{created}");
+        keys.push(created["key"]["id"].as_str().unwrap().to_string());
+    }
+    let admin_key = json!({ "label": "admin", "scopes": ["admin"], "workspaceIds": [beta] });
+    let (status, _) = send(&router, dashboard("POST", "/api/api-keys", admin_key)).await;
+    assert_eq!(status, StatusCode::BAD_REQUEST, "Bob isn't an admin in beta");
+
+    let (status, _) = send(&router, dashboard("POST", &format!("/api/workspaces/{beta}/leave"), json!({}))).await;
+    assert_eq!(status, StatusCode::OK);
+    let (_, listed) = send(&router, dashboard("GET", "/api/api-keys", Value::Null)).await;
+    let reach: Vec<(String, bool, Value)> = listed
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|k| {
+            (k["id"].as_str().unwrap().to_string(), k["allWorkspaces"].as_bool().unwrap(), k["workspaces"].clone())
+        })
+        .collect();
+    assert!(!reach.iter().any(|(id, ..)| *id == keys[0]), "the key for beta alone is gone");
+    assert!(reach.contains(&(keys[1].clone(), false, json!(["Acme"]))));
+    assert!(reach.contains(&(keys[2].clone(), true, json!([]))));
 }

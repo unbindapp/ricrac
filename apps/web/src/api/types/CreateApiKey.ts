@@ -4,4 +4,9 @@ export type CreateApiKey = { label: string,
 /**
  * read, write and/or admin; all of them when left out.
  */
-scopes?: Array<string>, };
+scopes?: Array<string>, 
+/**
+ * The workspaces it reaches; every workspace of yours, including ones you join later, when
+ * left out.
+ */
+workspaceIds?: Array<string>, };

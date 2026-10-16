@@ -5,9 +5,10 @@ import { useState, type FormEvent } from "react"
 import { toast } from "sonner"
 
 import { api } from "@/api/client"
-import { apiKeysQuery } from "@/api/queries"
+import { apiKeysQuery, meQuery } from "@/api/queries"
 import type { CreateApiKey } from "@/api/types/CreateApiKey"
 import type { CreatedApiKey } from "@/api/types/CreatedApiKey"
+import type { Me } from "@/api/types/Me"
 import { CopyValue, LoadError, Loading, PageHeader, Scopes, Time } from "@/components/common"
 import { Confirm } from "@/components/confirm"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -35,30 +36,32 @@ import {
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { WorkspaceAccessField, WorkspaceAccess, type WorkspaceChoice } from "@/components/workspace-access"
 import { isAdmin, useWorkspace } from "@/lib/workspace"
 
 export const Route = createFileRoute("/_app/settings/api-keys")({ component: ApiKeysPage })
 
 function ApiKeysPage() {
-  const workspace = useWorkspace()
-  const keys = useQuery(apiKeysQuery(workspace.id))
+  const { data: me } = useQuery(meQuery)
+  const keys = useQuery(apiKeysQuery)
   const queryClient = useQueryClient()
   const [created, setCreated] = useState<CreatedApiKey | null>(null)
   const revoke = useMutation({
-    mutationFn: (id: string) => api("DELETE", `/api-keys/${id}`, { workspace: workspace.id }),
+    mutationFn: (id: string) => api("DELETE", `/api-keys/${id}`),
     onSuccess: () => {
       toast.success("API key revoked")
-      return queryClient.invalidateQueries({ queryKey: ["api-keys"] })
+      return queryClient.invalidateQueries({ queryKey: apiKeysQuery.queryKey })
     },
     onError: (error) => toast.error(error.message),
   })
 
+  if (!me) return null
   return (
     <>
       <PageHeader
         title="API keys"
-        description={`Your personal keys for the REST API and MCP in ${workspace.name}. A key acts as you.`}
-        actions={<CreateKeyDialog onCreated={setCreated} />}
+        description="Your personal keys for the REST API and MCP, in the workspaces you pick. A key acts as you."
+        actions={<CreateKeyDialog me={me} onCreated={setCreated} />}
       />
       {keys.isPending ? (
         <Loading />
@@ -84,6 +87,7 @@ function ApiKeysPage() {
               <TableRow>
                 <TableHead className="pl-4">Label</TableHead>
                 <TableHead>Key</TableHead>
+                <TableHead>Workspaces</TableHead>
                 <TableHead>Scopes</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead>Last used</TableHead>
@@ -97,6 +101,7 @@ function ApiKeysPage() {
                 <TableRow key={key.id}>
                   <TableCell className="pl-4 font-medium">{key.label}</TableCell>
                   <TableCell className="font-mono text-xs text-muted-foreground">{key.keyHint}</TableCell>
+                  <TableCell><WorkspaceAccess all={key.allWorkspaces} workspaces={key.workspaces} /></TableCell>
                   <TableCell>
                     <Scopes scopes={key.scopes} />
                   </TableCell>
@@ -133,25 +138,34 @@ function ApiKeysPage() {
 const scopeOptions = [
   { scope: "read", label: "Read", description: "Read everything the key's owner can see." },
   { scope: "write", label: "Write", description: "Create and change issues, projects, comments and more." },
-  { scope: "admin", label: "Admin", description: "Workspace administration: members, teams, settings." },
+  {
+    scope: "admin",
+    label: "Admin",
+    description: "Administration of the workspaces where you're an admin: members, teams, settings.",
+  },
 ] as const
 
-function CreateKeyDialog({ onCreated }: { onCreated: (key: CreatedApiKey) => void }) {
-  const workspace = useWorkspace()
+function CreateKeyDialog({ me, onCreated }: { me: Me; onCreated: (key: CreatedApiKey) => void }) {
+  const selected = useWorkspace()
   const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
   const [label, setLabel] = useState("")
   const [scopes, setScopes] = useState<string[]>(["read", "write"])
-  const options = scopeOptions.filter((o) => o.scope !== "admin" || isAdmin(workspace.role))
+  const [workspaceIds, setWorkspaceIds] = useState<WorkspaceChoice>(null)
+  const adminSomewhere = me.workspaces.some(
+    (w) => isAdmin(w.role) && (workspaceIds === null || workspaceIds.includes(w.id)),
+  )
+  const options = scopeOptions.filter((o) => o.scope !== "admin" || adminSomewhere)
 
   const create = useMutation({
-    mutationFn: (body: CreateApiKey) => api<CreatedApiKey>("POST", "/api-keys", { body, workspace: workspace.id }),
+    mutationFn: (body: CreateApiKey) => api<CreatedApiKey>("POST", "/api-keys", { body }),
     onSuccess: (created) => {
       setOpen(false)
       setLabel("")
       setScopes(["read", "write"])
+      setWorkspaceIds(null)
       onCreated(created)
-      return queryClient.invalidateQueries({ queryKey: ["api-keys"] })
+      return queryClient.invalidateQueries({ queryKey: apiKeysQuery.queryKey })
     },
     onError: (error) => toast.error(error.message),
   })
@@ -161,7 +175,11 @@ function CreateKeyDialog({ onCreated }: { onCreated: (key: CreatedApiKey) => voi
 
   const submit = (event: FormEvent) => {
     event.preventDefault()
-    create.mutate({ label: label.trim(), scopes })
+    create.mutate({
+      label: label.trim(),
+      scopes: adminSomewhere ? scopes : scopes.filter((s) => s !== "admin"),
+      workspaceIds: workspaceIds ?? undefined,
+    })
   }
 
   return (
@@ -176,7 +194,7 @@ function CreateKeyDialog({ onCreated }: { onCreated: (key: CreatedApiKey) => voi
         <form onSubmit={submit} className="space-y-6">
           <DialogHeader>
             <DialogTitle>Create an API key</DialogTitle>
-            <DialogDescription>For {workspace.name}. You'll see the key once.</DialogDescription>
+            <DialogDescription>You'll see the key once.</DialogDescription>
           </DialogHeader>
           <FieldGroup>
             <Field>
@@ -210,12 +228,19 @@ function CreateKeyDialog({ onCreated }: { onCreated: (key: CreatedApiKey) => voi
                 ))}
               </FieldGroup>
             </FieldSet>
+            <WorkspaceAccessField
+              id="key-workspaces"
+              workspaces={me.workspaces}
+              value={workspaceIds}
+              preferred={selected.id}
+              onChange={setWorkspaceIds}
+            />
           </FieldGroup>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={create.isPending || !label.trim()}>
+            <Button type="submit" disabled={create.isPending || !label.trim() || workspaceIds?.length === 0}>
               {create.isPending && <Spinner />}
               Create key
             </Button>
@@ -233,7 +258,8 @@ function SecretDialog({ created, onClose }: { created: CreatedApiKey | null; onC
         <DialogHeader>
           <DialogTitle>Your new API key</DialogTitle>
           <DialogDescription>
-            “{created?.key.label}”, with {created?.key.scopes.join(", ")} access.
+            “{created?.key.label}”, with {created?.key.scopes.join(", ")} access to{" "}
+            {created?.key.allWorkspaces ? "all your workspaces" : created?.key.workspaces.join(", ")}.
           </DialogDescription>
         </DialogHeader>
         {created && <CopyValue value={created.secret} label="API key" />}

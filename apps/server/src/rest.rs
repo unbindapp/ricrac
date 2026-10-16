@@ -8,28 +8,31 @@ use axum::Router;
 use axum::body::Bytes;
 use axum::extract::{FromRequestParts, Path, RawQuery, State};
 use axum::http::request::Parts;
-use axum::http::{HeaderMap, Method, StatusCode, header};
+use axum::http::{Method, StatusCode, header};
 use axum::response::{IntoResponse, Response};
 use axum::routing::{MethodFilter, MethodRouter, get, post};
 use serde_json::{Map, Value, json};
-use uuid::Uuid;
 
-use crate::ctx::{ALL_SCOPES, Access, Ctx};
+use crate::ctx::{ALL_SCOPES, Caller};
 use crate::error::{ApiError, ApiResult};
 use crate::mcp::INSTRUCTIONS;
 use crate::ops::{self, Op};
 use crate::state::AppState;
 
-/// The caller of a `/v1` request: a bearer token, or the dashboard's session cookie with the
-/// workspace in `x-ricrac-workspace`.
-pub struct Caller(pub Ctx);
+/// The caller of a `/v1` request (a bearer token, or the dashboard's session cookie) and the
+/// workspace named in `x-ricrac-workspace`, used when the arguments don't name one.
+pub struct Authed {
+    caller: Caller,
+    workspace: Option<String>,
+}
 
-impl FromRequestParts<AppState> for Caller {
+impl FromRequestParts<AppState> for Authed {
     type Rejection = Response;
 
     async fn from_request_parts(parts: &mut Parts, state: &AppState) -> Result<Self, Self::Rejection> {
-        if let Some(ctx) = crate::oauth::bearer_ctx(state, &parts.headers).await {
-            return Ok(Self(ctx));
+        let workspace = parts.headers.get("x-ricrac-workspace").and_then(|v| v.to_str().ok()).map(String::from);
+        if let Some(caller) = crate::oauth::bearer_caller(state, &parts.headers).await {
+            return Ok(Self { caller, workspace });
         }
         if parts.headers.contains_key(header::AUTHORIZATION) {
             return Err(crate::oauth::unauthorized(state, &parts.headers));
@@ -40,32 +43,7 @@ impl FromRequestParts<AppState> for Caller {
         if parts.method != Method::GET && !parts.headers.contains_key("x-ricrac") {
             return Err(ApiError::forbidden("Missing x-ricrac header").into_response());
         }
-        let workspace = session_workspace(state, user, &parts.headers).await.map_err(IntoResponse::into_response)?;
-        let scopes = vec![Access::Read, Access::Write, Access::Admin];
-        match Ctx::load(state, user, workspace, scopes).await {
-            Ok(Some(ctx)) => Ok(Self(ctx)),
-            Ok(None) => Err(ApiError::forbidden("You aren't a member of that workspace").into_response()),
-            Err(e) => Err(e.into_response()),
-        }
-    }
-}
-
-/// The workspace named in `x-ricrac-workspace` (id or URL key), or the user's only one.
-pub async fn session_workspace(state: &AppState, user: Uuid, headers: &HeaderMap) -> ApiResult<Uuid> {
-    let named =
-        headers.get("x-ricrac-workspace").and_then(|v| v.to_str().ok()).map(str::trim).filter(|v| !v.is_empty());
-    let ids: Vec<Uuid> = sqlx::query_scalar(
-        "SELECT w.id FROM workspaces w JOIN workspace_members m ON m.workspace_id = w.id
-         WHERE m.user_id = $1 AND m.active AND ($2::text IS NULL OR w.id::text = $2 OR w.url_key = lower($2))",
-    )
-    .bind(user)
-    .bind(named)
-    .fetch_all(&state.db)
-    .await?;
-    match ids.as_slice() {
-        [one] => Ok(*one),
-        [] => Err(ApiError::forbidden("No such workspace")),
-        _ => Err(ApiError::bad_request("Name the workspace in the x-ricrac-workspace header")),
+        Ok(Self { caller: Caller::session(state, user), workspace })
     }
 }
 
@@ -83,12 +61,12 @@ pub fn router() -> Router<AppState> {
             };
             let name = op.name;
             let handler = move |State(state): State<AppState>,
-                                caller: Caller,
+                                authed: Authed,
                                 Path(params): Path<HashMap<String, String>>,
                                 RawQuery(query): RawQuery,
                                 body: Bytes| async move {
                 let _ = state;
-                call(name, caller.0, params, query, body).await
+                call(name, authed, params, query, body).await
             };
             let entry = paths.remove(path).unwrap_or_default();
             paths.insert(path, entry.on(filter, handler));
@@ -97,8 +75,8 @@ pub fn router() -> Router<AppState> {
     let mut router =
         Router::new().route("/", get(index)).route("/openapi.json", get(openapi)).route("/ops", get(list_ops)).route(
             "/ops/{name}",
-            post(|caller: Caller, Path(name): Path<String>, body: Bytes| async move {
-                call(&name, caller.0, HashMap::new(), None, body).await
+            post(|authed: Authed, Path(name): Path<String>, body: Bytes| async move {
+                call(&name, authed, HashMap::new(), None, body).await
             }),
         );
     for (path, method_router) in paths {
@@ -107,7 +85,13 @@ pub fn router() -> Router<AppState> {
     router.fallback(|| async { ApiError::not_found("No such endpoint; see /v1/openapi.json") })
 }
 
-async fn call(name: &str, ctx: Ctx, path: HashMap<String, String>, query: Option<String>, body: Bytes) -> Response {
+async fn call(
+    name: &str,
+    authed: Authed,
+    path: HashMap<String, String>,
+    query: Option<String>,
+    body: Bytes,
+) -> Response {
     let Some(op) = ops::find(name) else {
         return ApiError::not_found(format!("No operation {name}")).into_response();
     };
@@ -115,7 +99,7 @@ async fn call(name: &str, ctx: Ctx, path: HashMap<String, String>, query: Option
         Ok(args) => args,
         Err(e) => return e.into_response(),
     };
-    match op.call(ctx, args).await {
+    match op.call_as(&authed.caller, args, authed.workspace.as_deref()).await {
         Ok(value) => (StatusCode::OK, axum::Json(value)).into_response(),
         Err(e) => e.into_response(),
     }
@@ -234,7 +218,7 @@ async fn list_ops() -> axum::Json<Value> {
                 "description": op.description,
                 "access": op.access.as_str(),
                 "routes": op.routes.iter().map(|(m, p)| format!("{m} /v1{p}")).collect::<Vec<_>>(),
-                "arguments": op.schema,
+                "arguments": op.schema_with_workspace(false),
             })
         })
         .collect();
@@ -250,9 +234,9 @@ pub fn openapi_document(base: &str) -> Value {
     for op in ops::all() {
         for (n, (method, path)) in op.routes.iter().enumerate() {
             let in_path = path_params(path);
-            let properties = op.schema.get("properties").and_then(Value::as_object).cloned().unwrap_or_default();
-            let required: Vec<&str> = op
-                .schema
+            let schema = op.schema_with_workspace(false);
+            let properties = schema.get("properties").and_then(Value::as_object).cloned().unwrap_or_default();
+            let required: Vec<&str> = schema
                 .get("required")
                 .and_then(Value::as_array)
                 .map(|r| r.iter().filter_map(Value::as_str).collect())
@@ -293,7 +277,7 @@ pub fn openapi_document(base: &str) -> Value {
                     parameter
                 }));
             } else if !rest.is_empty() {
-                let mut body = op.schema.clone();
+                let mut body = schema.clone();
                 body["properties"] = Value::Object(rest);
                 if let Some(Value::Array(req)) = body.get_mut("required") {
                     req.retain(|r| !r.as_str().is_some_and(|r| in_path.contains(&r)));
@@ -343,7 +327,9 @@ pub async fn llms_txt(State(state): State<AppState>) -> Response {
         "# Ricrac\n\n{INSTRUCTIONS}\n\n## Connecting\n\n- MCP (streamable HTTP): {base}/mcp, with OAuth (discovery at \
          {base}/.well-known/oauth-authorization-server; dynamic registration and client ID metadata documents are supported).\n\
          - REST: {base}/v1, with `Authorization: Bearer <token>`. Tokens are OAuth access tokens or API keys (rr_key_...) made in \
-         the dashboard at {base}. Scopes: {}.\n- OpenAPI: {base}/v1/openapi.json. Every operation can also be called as \
+         the dashboard at {base}. Scopes: {}.\n- A token reaches one, several or all of your workspaces. When it reaches several, name \
+         the workspace in each call with the `workspace` argument (a URL key) or the `x-ricrac-workspace` header; \
+         `GET {base}/v1/workspaces` lists them.\n- OpenAPI: {base}/v1/openapi.json. Every operation can also be called as \
          `POST {base}/v1/ops/<name>` with its arguments as a JSON body.\n- Query strings take arrays as repeated or \
          comma-separated values and objects (like `filter`) as JSON.\n\n## Operations\n",
         ALL_SCOPES.join(", ")
