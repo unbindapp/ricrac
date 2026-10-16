@@ -1,0 +1,15 @@
+# Local Postgres for development: docker compose up -d
+services:
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: ricrac
+      POSTGRES_PASSWORD: ricrac
+      POSTGRES_DB: ricrac
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres:/var/lib/postgresql
+
+volumes:
+  postgres:
