@@ -121,7 +121,7 @@ func projectJSON(c *app.Ctx, withDescription bool) string {
 		'trashedAt', p.trashed_at,
 		'createdAt', p.created_at,
 		'updatedAt', p.updated_at
-	) || project_issue_stats(p.id, NULL))`, description, sqlLiteral(c.PublicURL()))
+	) || project_issue_stats(p.id, NULL, %s))`, description, sqlLiteral(c.PublicURL()), viewer(c))
 }
 
 // projectValue is one project's JSON, with its description.
@@ -180,11 +180,11 @@ func projectDetail(c *app.Ctx, q app.Querier, id uuid.UUID) (M, error) {
 			FROM documents d WHERE d.project_id = $1 AND d.trashed_at IS NULL),
 		'issueCountByStateType', (SELECT coalesce(jsonb_object_agg(x.type, x.n), '{}') FROM (
 			SELECT s.type, count(*) AS n FROM issues i JOIN workflow_states s ON s.id = i.state_id
-			WHERE i.project_id = $1 AND i.trashed_at IS NULL GROUP BY s.type) x),
+			WHERE i.project_id = $1 AND i.trashed_at IS NULL AND i.team_id = ANY($2) GROUP BY s.type) x),
 		'estimate', (SELECT jsonb_build_object('total', coalesce(sum(i.estimate), 0),
 				'completed', coalesce(sum(i.estimate) FILTER (WHERE s.type = 'completed'), 0))
 			FROM issues i JOIN workflow_states s ON s.id = i.state_id
-			WHERE i.project_id = $1 AND i.trashed_at IS NULL AND s.type <> 'canceled')
+			WHERE i.project_id = $1 AND i.trashed_at IS NULL AND s.type <> 'canceled' AND i.team_id = ANY($2))
 	)`, linksSQL("project_id"), visible)
 	more, err := app.One[M](c, q, sql, id, teams)
 	if err != nil {

@@ -337,3 +337,9 @@ func orEmpty(value *string) string {
 	}
 	return *value
 }
+
+// viewer is the caller's id as an SQL literal, for the SQL functions that count only what they
+// can see (project_issue_stats, initiative_progress). It is a UUID, so inlining it is safe.
+func viewer(c *app.Ctx) string {
+	return "'" + c.User.String() + "'::uuid"
+}

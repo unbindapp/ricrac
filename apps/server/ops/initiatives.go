@@ -69,7 +69,7 @@ func initiativeJSON(c *app.Ctx, withDescription bool) string {
 		'parent', initiative_ref(i.parent_id),
 		'projectCount', (SELECT count(*) FROM initiative_projects ip JOIN projects ipp ON ipp.id = ip.project_id
 			WHERE ip.initiative_id = i.id AND ipp.trashed_at IS NULL),
-		'progress', initiative_progress(i.id),
+		'progress', initiative_progress(i.id, %s),
 		'sortOrder', i.sort_order,
 		'startedAt', i.started_at,
 		'completedAt', i.completed_at,
@@ -78,7 +78,7 @@ func initiativeJSON(c *app.Ctx, withDescription bool) string {
 		'trashedAt', i.trashed_at,
 		'createdAt', i.created_at,
 		'updatedAt', i.updated_at
-	)`, description, sqlLiteral(c.PublicURL()))
+	)`, description, sqlLiteral(c.PublicURL()), viewer(c))
 }
 
 func initiativeValue(c *app.Ctx, q app.Querier, id uuid.UUID) (M, error) {
@@ -178,18 +178,18 @@ func getInitiative(c *app.Ctx, args IDArgs) (any, error) {
 	more, err := app.One[M](c, c.DB(), fmt.Sprintf(`SELECT jsonb_build_object(
 		'projects', (SELECT coalesce(jsonb_agg(project_ref(p.id) || jsonb_build_object(
 				'status', project_status_ref(p.status_id), 'health', p.health, 'lead', user_ref(p.lead_id),
-				'targetDate', p.target_date, 'progress', project_issue_stats(p.id, NULL)->'progress')
+				'targetDate', p.target_date, 'progress', project_issue_stats(p.id, NULL, %[3]s)->'progress')
 			ORDER BY ip.sort_order, p.name), '[]')
 			FROM initiative_projects ip JOIN projects p ON p.id = ip.project_id
-			WHERE ip.initiative_id = $1 AND p.trashed_at IS NULL AND %s),
+			WHERE ip.initiative_id = $1 AND p.trashed_at IS NULL AND %[1]s),
 		'subInitiatives', (SELECT coalesce(jsonb_agg(initiative_ref(c.id) || jsonb_build_object(
 				'status', c.status, 'health', c.health, 'owner', user_ref(c.owner_id),
-				'progress', initiative_progress(c.id)) ORDER BY c.sort_order, c.name), '[]')
+				'progress', initiative_progress(c.id, %[3]s)) ORDER BY c.sort_order, c.name), '[]')
 			FROM initiatives c WHERE c.parent_id = $1 AND c.trashed_at IS NULL),
-		'links', %s,
+		'links', %[2]s,
 		'documents', (SELECT coalesce(jsonb_agg(document_ref(d.id) ORDER BY d.sort_order, d.created_at), '[]')
 			FROM documents d WHERE d.initiative_id = $1 AND d.trashed_at IS NULL)
-	)`, projectVisible("p", 2), linksSQL("initiative_id")), id, teams)
+	)`, projectVisible("p", 2), linksSQL("initiative_id"), viewer(c)), id, teams)
 	if err != nil {
 		return nil, err
 	}

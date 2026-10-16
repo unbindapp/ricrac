@@ -273,3 +273,24 @@ func TestProjectStatusesAndLabels(t *testing.T) {
 	call(t, bob, "delete_project_label", M{"id": "Mobile"})
 	eq(t, call(t, bob, "get_project", M{"id": "P"}).At("labels").Len(), 0)
 }
+
+func TestProgressOnlyCountsIssuesTheReaderSees(t *testing.T) {
+	w := world(t)
+	bob := w.member("bob@acme.test", "Bob Jones", "member")
+	secret := w.createTeam("Secret", "SEC")
+	w.exec("UPDATE teams SET private = true WHERE id = $1", secret)
+	call(t, w.Ann, "save_project", M{"name": "Launch", "setTeams": []any{"ENG", "SEC"}})
+	call(t, w.Ann, "save_milestone", M{"project": "Launch", "name": "Beta"})
+	call(t, w.Ann, "save_issue", M{"team": "ENG", "title": "Public", "project": "Launch", "milestone": "Beta", "state": "Done"})
+	call(t, w.Ann, "save_issue", M{"team": "SEC", "title": "Hidden", "project": "Launch", "milestone": "Beta"})
+	call(t, w.Ann, "save_initiative", M{"name": "Grow", "addProjects": []any{"Launch"}})
+
+	eq(t, call(t, w.Ann, "get_project", M{"id": "Launch"}).At("issueCount").Num(), 2)
+	seen := call(t, bob, "get_project", M{"id": "Launch"})
+	eq(t, seen.At("issueCount").Num(), 1, "Bob isn't in the private team")
+	eq(t, seen.At("progress").Num(), 1)
+	eq(t, seen.At("issueCountByStateType").Len(), 1)
+	eq(t, call(t, bob, "get_milestone", M{"id": "Beta", "project": "Launch"}).At("issueCount").Num(), 1)
+	eq(t, call(t, bob, "get_initiative", M{"id": "Grow"}).At("progress").Num(), 1)
+	eq(t, call(t, w.Ann, "get_initiative", M{"id": "Grow"}).At("progress").Num(), 0.5)
+}

@@ -29,22 +29,24 @@ func milestoneOps() []*Op {
 	}
 }
 
-// milestoneJSON is the JSON of the milestone m, with its progress.
-const milestoneJSON = `(jsonb_build_object('id', m.id, 'name', m.name, 'description', m.description,
+// milestoneJSON is the JSON of the milestone m, with the progress of the issues the caller sees.
+func milestoneJSON(c *app.Ctx) string {
+	return `(jsonb_build_object('id', m.id, 'name', m.name, 'description', m.description,
 	'targetDate', m.target_date, 'sortOrder', m.sort_order, 'project', project_ref(m.project_id),
-	'createdAt', m.created_at, 'updatedAt', m.updated_at) || project_issue_stats(NULL, m.id))`
+	'createdAt', m.created_at, 'updatedAt', m.updated_at) || project_issue_stats(NULL, m.id, ` + viewer(c) + `))`
+}
 
 const milestoneOrder = "m.sort_order, m.target_date NULLS LAST, m.created_at"
 
 // projectMilestones is a project's milestones in order, as a JSON array.
 func projectMilestones(c *app.Ctx, q app.Querier, project uuid.UUID) (any, error) {
 	return app.One[any](c, q,
-		"SELECT coalesce(jsonb_agg("+milestoneJSON+" ORDER BY "+milestoneOrder+"), '[]') FROM project_milestones m WHERE m.project_id = $1",
+		"SELECT coalesce(jsonb_agg("+milestoneJSON(c)+" ORDER BY "+milestoneOrder+"), '[]') FROM project_milestones m WHERE m.project_id = $1",
 		project)
 }
 
 func milestoneValue(c *app.Ctx, q app.Querier, id uuid.UUID) (M, error) {
-	value, found, err := app.Maybe[M](c, q, "SELECT "+milestoneJSON+" FROM project_milestones m WHERE m.id = $1", id)
+	value, found, err := app.Maybe[M](c, q, "SELECT "+milestoneJSON(c)+" FROM project_milestones m WHERE m.id = $1", id)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +73,7 @@ func listMilestones(c *app.Ctx, args ListMilestonesArgs) (any, error) {
 		return nil, err
 	}
 	nodes, err := app.All[any](c, c.DB(),
-		"SELECT "+milestoneJSON+" FROM project_milestones m WHERE m.project_id = $1 ORDER BY "+milestoneOrder+" LIMIT $2 OFFSET $3",
+		"SELECT "+milestoneJSON(c)+" FROM project_milestones m WHERE m.project_id = $1 ORDER BY "+milestoneOrder+" LIMIT $2 OFFSET $3",
 		project, page.limit()+1, offset)
 	if err != nil {
 		return nil, err
