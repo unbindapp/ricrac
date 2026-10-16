@@ -29,7 +29,7 @@ func importOps() []*Op {
 				"in Ricrac. Pass the issues inline, or upload them as a JSON file with prepare_file_upload and pass its "+
 				"fileId, which keeps long descriptions out of the conversation. All or nothing, and nobody is notified. "+
 				"dryRun checks everything and reports without importing.",
-			importIssues),
+			importIssues).returns(ResultOf[ImportedIssues]()),
 	}
 }
 
@@ -585,4 +585,15 @@ func connectImported(c *app.Ctx, tx pgx.Tx, key string, ids map[int]uuid.UUID, i
 		}
 	}
 	return added, nil
+}
+
+/* Shapes */
+
+type ImportedIssues struct {
+	DryRun         bool     `json:"dryRun" doc:"Nothing was imported, only checked."`
+	Imported       int      `json:"imported" doc:"How many issues."`
+	Comments       int      `json:"comments" doc:"How many comments."`
+	Relations      int      `json:"relations" doc:"How many relations (relatedTo, blocks, blockedBy, duplicateOf)."`
+	Identifiers    []string `json:"identifiers"`
+	NextIdentifier string   `json:"nextIdentifier" doc:"The identifier the team's next issue gets."`
 }

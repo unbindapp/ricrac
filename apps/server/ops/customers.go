@@ -21,49 +21,49 @@ func customerOps() []*Op {
 			"List customers by name: domains, external ids, owner, status, tier, revenue, size and how many needs "+
 				"(requests) they have. Narrow by status, tier, owner or a query matching the name or a domain. Archived "+
 				"customers are left out unless includeArchived is set.",
-			listCustomers),
+			listCustomers).returns(ResultOf[PageOf[Customer]]()),
 		op("get_customer", app.Read, []string{"GET /customers/{id}"},
 			"Read a customer by id, slug, name, domain or external id, with their needs: what they asked for, linked to "+
 				"an issue or a project.",
-			getCustomer),
+			getCustomer).returns(ResultOf[CustomerDetail]()),
 		op("save_customer", app.Write, []string{"POST /customers", "PATCH /customers/{id}"},
 			"Create a customer (omit id; name is required) or update one (pass id: id, slug, name or domain). Omitted "+
 				"fields stay as they are; null clears a field. Domains are unique within the workspace. Status and tier "+
 				"take a name or id (see list_customer_statuses and list_customer_tiers); owner a person (id, name, email "+
 				"or \"me\").",
-			saveCustomer),
+			saveCustomer).returns(ResultOf[Customer]()),
 		op("delete_customer", app.Write, []string{"DELETE /customers/{id}"},
 			"Archive a customer. Their needs stay on the issues and projects they are linked to.",
-			deleteCustomer),
+			deleteCustomer).returns(ResultOf[Customer]()),
 		op("list_customer_statuses", app.Read, []string{"GET /customer-statuses"},
 			"The customer statuses of the workspace (e.g. Active, Prospect, Churned) in order.",
-			func(c *app.Ctx, args ListOptionsArgs) (any, error) { return listOptions(c, customerStatuses, args) }),
+			func(c *app.Ctx, args ListOptionsArgs) (any, error) { return listOptions(c, customerStatuses, args) }).returns(ResultOf[PageOf[CustomerStatus]]()),
 		op("save_customer_status", app.AdminAccess, []string{"POST /customer-statuses", "PATCH /customer-statuses/{id}"},
 			"Create a customer status (omit id; name is required) or update one (pass its id or name). Admins only.",
-			func(c *app.Ctx, args SaveOptionArgs) (any, error) { return saveOption(c, customerStatuses, args) }),
+			func(c *app.Ctx, args SaveOptionArgs) (any, error) { return saveOption(c, customerStatuses, args) }).returns(ResultOf[CustomerStatus]()),
 		op("delete_customer_status", app.AdminAccess, []string{"DELETE /customer-statuses/{id}"},
 			"Delete a customer status (id or name). Customers with it are left without a status. Admins only.",
-			func(c *app.Ctx, args IDArgs) (any, error) { return deleteOption(c, customerStatuses, args) }),
+			func(c *app.Ctx, args IDArgs) (any, error) { return deleteOption(c, customerStatuses, args) }).returns(ResultOf[DeletedCustomerOption]()),
 		op("list_customer_tiers", app.Read, []string{"GET /customer-tiers"},
 			"The customer tiers of the workspace (e.g. Enterprise, Growth) in order.",
-			func(c *app.Ctx, args ListOptionsArgs) (any, error) { return listOptions(c, customerTiers, args) }),
+			func(c *app.Ctx, args ListOptionsArgs) (any, error) { return listOptions(c, customerTiers, args) }).returns(ResultOf[PageOf[CustomerTier]]()),
 		op("save_customer_tier", app.AdminAccess, []string{"POST /customer-tiers", "PATCH /customer-tiers/{id}"},
 			"Create a customer tier (omit id; name is required) or update one (pass its id or name). Admins only.",
-			func(c *app.Ctx, args SaveOptionArgs) (any, error) { return saveOption(c, customerTiers, args) }),
+			func(c *app.Ctx, args SaveOptionArgs) (any, error) { return saveOption(c, customerTiers, args) }).returns(ResultOf[CustomerTier]()),
 		op("delete_customer_tier", app.AdminAccess, []string{"DELETE /customer-tiers/{id}"},
 			"Delete a customer tier (id or name). Customers in it are left without a tier. Admins only.",
-			func(c *app.Ctx, args IDArgs) (any, error) { return deleteOption(c, customerTiers, args) }),
+			func(c *app.Ctx, args IDArgs) (any, error) { return deleteOption(c, customerTiers, args) }).returns(ResultOf[DeletedCustomerOption]()),
 		op("list_customer_needs", app.Read, []string{"GET /customer-needs"},
 			"List customer needs (requests), newest first, for a customer, an issue or a project: the customer, the "+
 				"issue or project, the request text, priority (0 normal, 1 important) and a link to the source.",
-			listNeeds),
+			listNeeds).returns(ResultOf[PageOf[CustomerNeed]]()),
 		op("save_customer_need", app.Write, []string{"POST /customer-needs", "PATCH /customer-needs/{id}"},
 			"Record what a customer asked for (omit id; customer and exactly one of issue or project are required) or "+
 				"change a need (pass id). Issues take an identifier like ENG-123; projects a name, slug or id.",
-			saveNeed),
+			saveNeed).returns(ResultOf[CustomerNeed]()),
 		op("delete_customer_need", app.Write, []string{"DELETE /customer-needs/{id}"},
 			"Delete a customer need.",
-			deleteNeed),
+			deleteNeed).returns(ResultOf[DeletedCustomerNeed]()),
 	}
 }
 
@@ -817,4 +817,72 @@ func deleteNeed(c *app.Ctx, args IDArgs) (any, error) {
 		return nil, err
 	}
 	return M{"id": id, "deleted": true}, nil
+}
+
+/* Shapes */
+
+type Customer struct {
+	ID          string             `json:"id"`
+	SlugID      string             `json:"slugId"`
+	Name        string             `json:"name"`
+	Domains     []string           `json:"domains"`
+	ExternalIDs []string           `json:"externalIds" doc:"Its ids in other systems (CRM, billing)."`
+	LogoURL     *string            `json:"logoUrl"`
+	Owner       *UserRef           `json:"owner"`
+	Status      *CustomerStatusRef `json:"status"`
+	Tier        *CustomerTierRef   `json:"tier"`
+	Revenue     *int               `json:"revenue" doc:"Annual revenue."`
+	Size        *int               `json:"size" doc:"Number of employees."`
+	NeedCount   int                `json:"needCount"`
+	ArchivedAt  *string            `json:"archivedAt"`
+	CreatedAt   string             `json:"createdAt"`
+	UpdatedAt   string             `json:"updatedAt"`
+}
+
+type CustomerDetail struct {
+	Customer
+	Needs []CustomerNeed `json:"needs" doc:"Newest first, on issues and projects the caller can see."`
+}
+
+type CustomerNeed struct {
+	ID            string       `json:"id"`
+	Customer      *CustomerRef `json:"customer"`
+	Issue         *IssueRef    `json:"issue"`
+	Project       *ProjectRef  `json:"project"`
+	Body          *string      `json:"body" doc:"What the customer said, in Markdown."`
+	Priority      int          `json:"priority" doc:"0 normal, 1 important."`
+	AttachmentURL *string      `json:"attachmentUrl" doc:"Where the request came from."`
+	Creator       *UserRef     `json:"creator"`
+	CreatedAt     string       `json:"createdAt"`
+	UpdatedAt     string       `json:"updatedAt"`
+}
+
+type DeletedCustomerNeed struct {
+	ID      string `json:"id"`
+	Deleted bool   `json:"deleted"`
+}
+
+type CustomerStatus struct {
+	ID            string  `json:"id"`
+	Name          string  `json:"name"`
+	Color         string  `json:"color"`
+	Description   *string `json:"description"`
+	Position      float64 `json:"position"`
+	CustomerCount int     `json:"customerCount" doc:"Customers with it, archived ones left out."`
+}
+
+type CustomerTier struct {
+	ID            string  `json:"id"`
+	Name          string  `json:"name"`
+	Color         string  `json:"color"`
+	Description   *string `json:"description"`
+	Position      float64 `json:"position"`
+	CustomerCount int     `json:"customerCount" doc:"Customers in it, archived ones left out."`
+}
+
+// DeletedCustomerOption is what deleting a customer status or tier answers.
+type DeletedCustomerOption struct {
+	ID               string `json:"id"`
+	Deleted          bool   `json:"deleted"`
+	CustomersCleared int    `json:"customersCleared" doc:"Customers left without it."`
 }
