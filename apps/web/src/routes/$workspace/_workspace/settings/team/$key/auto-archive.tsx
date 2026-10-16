@@ -1,37 +1,54 @@
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { SettingsPage } from "@/components/layout/settings-page";
 import { SettingsSection } from "@/components/layout/settings-section";
-import { useRequiredTeamFromRoute } from "@/components/workspace/use-team-from-route";
+import { useTeamDetailFromRoute } from "@/components/workspace/use-team-from-route";
+import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
-import { useUpdateTeamMutation } from "@/lib/queries/teams";
+import { teamStatusesQuery, useSaveTeamMutation } from "@/lib/queries/teams";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/team/$key/auto-archive")({
   component: TeamAutoArchiveSettingsPage,
 });
 
-const NEVER = "0";
-const DEFAULT_ARCHIVE_MONTHS = 6;
-const months = [1, 3, 6, 9, 12, 24].map((n) => ({
-  value: String(n),
-  label: `After ${n} ${n === 1 ? "month" : "months"}`,
-}));
-const closeItems = [{ value: NEVER, label: "Never" }, ...months];
-const archiveItems = months;
+const NEVER = "never";
+const monthItems = [
+  { value: NEVER, label: "Never" },
+  ...[1, 3, 6, 9, 12].map((n) => ({
+    value: String(n),
+    label: `After ${n} ${n === 1 ? "month" : "months"}`,
+  })),
+];
+
+const toMonths = (value: string) => (value === NEVER ? null : Number(value));
+const fromMonths = (months: number | null) => (months === null ? NEVER : String(months));
 
 function TeamAutoArchiveSettingsPage() {
-  const team = useRequiredTeamFromRoute();
-  const { mutateAsync: updateTeam } = useUpdateTeamMutation();
+  const team = useTeamDetailFromRoute();
+  const { workspace } = useWorkspace();
+  const { data: statuses = [] } = useQuery(teamStatusesQuery(workspace.id, team.id));
+  const { mutateAsync: saveTeam } = useSaveTeamMutation(workspace.id);
+  const canceledItems = statuses
+    .filter((status) => status.type === "canceled")
+    .map((status) => ({ value: status.id, label: status.name }));
+
   const form = useAppForm({
     defaultValues: {
-      auto_close_months: String(team.auto_close_months ?? 0),
-      auto_archive_months: String(team.auto_archive_months ?? DEFAULT_ARCHIVE_MONTHS),
+      autoCloseMonths: fromMonths(team.autoCloseMonths),
+      autoCloseState: team.autoCloseState?.id ?? "",
+      autoArchiveMonths: fromMonths(team.autoArchiveMonths),
+      autoCloseParentIssues: team.autoCloseParentIssues,
+      autoCloseChildIssues: team.autoCloseChildIssues,
     },
     onSubmit: async ({ value, formApi }) => {
-      await updateTeam({
-        team_id: team.id,
-        auto_close_months: Number(value.auto_close_months),
-        auto_archive_months: Number(value.auto_archive_months),
+      await saveTeam({
+        id: team.id,
+        autoCloseMonths: toMonths(value.autoCloseMonths),
+        autoCloseState: value.autoCloseState || null,
+        autoArchiveMonths: toMonths(value.autoArchiveMonths),
+        autoCloseParentIssues: value.autoCloseParentIssues,
+        autoCloseChildIssues: value.autoCloseChildIssues,
       });
       formApi.reset(value);
     },
@@ -51,22 +68,51 @@ function TeamAutoArchiveSettingsPage() {
         }
       >
         <form.AppField
-          name="auto_close_months"
+          name="autoCloseMonths"
           children={(field) => (
             <field.SelectField
               label="Auto close"
-              description="Close issues that have not been updated for this long."
-              items={closeItems}
+              description="Close issues that haven't been updated for this long."
+              items={monthItems}
             />
           )}
         />
         <form.AppField
-          name="auto_archive_months"
+          name="autoCloseState"
+          children={(field) => (
+            <field.SelectField
+              label="Closed status"
+              description="The canceled status auto-closed issues move to."
+              placeholder="First canceled status"
+              items={canceledItems}
+            />
+          )}
+        />
+        <form.AppField
+          name="autoArchiveMonths"
           children={(field) => (
             <field.SelectField
               label="Auto archive"
               description="Archive completed and canceled issues after this long."
-              items={archiveItems}
+              items={monthItems}
+            />
+          )}
+        />
+        <form.AppField
+          name="autoCloseParentIssues"
+          children={(field) => (
+            <field.SwitchField
+              label="Complete parents"
+              description="A parent issue is completed when all its sub-issues are done."
+            />
+          )}
+        />
+        <form.AppField
+          name="autoCloseChildIssues"
+          children={(field) => (
+            <field.SwitchField
+              label="Close sub-issues"
+              description="Sub-issues are closed when their parent is closed."
             />
           )}
         />

@@ -1,6 +1,6 @@
 export const TEAM_KEY_MAX_LENGTH = 7;
 export const teamKeyPattern = /^[A-Z][A-Z0-9]{0,6}$/;
-export const workspaceSlugPattern = /^[a-z0-9-]{2,32}$/;
+export const workspaceUrlKeyPattern = /^[a-z0-9-]{2,32}$/;
 
 const identifierPattern = /^([A-Za-z][A-Za-z0-9]{0,6})-(\d+)$/;
 

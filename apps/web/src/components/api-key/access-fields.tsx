@@ -5,7 +5,7 @@ import type { TAccess } from "@/components/api-key/helpers";
 import { CheckboxList } from "@/components/shared/checkbox-list";
 import { WorkspaceIcon } from "@/components/workspace/workspace-icon";
 import { useFieldError } from "@/lib/hooks/use-app-form";
-import { meQuery, meWorkspaces } from "@/lib/queries/me";
+import { meQuery } from "@/lib/queries/me";
 
 export function WorkspaceAccessList({ field, access }: { field: AnyFieldApi; access: TAccess }) {
   const { data: me } = useQuery(meQuery);
@@ -16,18 +16,10 @@ export function WorkspaceAccessList({ field, access }: { field: AnyFieldApi; acc
       <p className="text-sm font-medium">Workspaces</p>
       <CheckboxList
         label="Workspaces"
-        items={meWorkspaces(me).map((workspace) => ({
+        items={(me?.workspaces ?? []).map((workspace) => ({
           value: workspace.id,
           label: workspace.name,
-          icon: (
-            <WorkspaceIcon
-              id={workspace.id}
-              name={workspace.name}
-              icon={workspace.icon}
-              color={workspace.color}
-              iconUrl={workspace.icon_url}
-            />
-          ),
+          icon: <WorkspaceIcon name={workspace.name} />,
         }))}
         value={field.state.value as string[]}
         onChange={(value) => {
@@ -42,8 +34,4 @@ export function WorkspaceAccessList({ field, access }: { field: AnyFieldApi; acc
       )}
     </div>
   );
-}
-
-export function roleDescription(subject: "key" | "application") {
-  return `The ${subject} can never do more than you can in a workspace.`;
 }

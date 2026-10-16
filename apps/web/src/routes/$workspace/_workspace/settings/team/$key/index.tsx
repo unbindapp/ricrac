@@ -3,12 +3,12 @@ import { z } from "zod";
 
 import { SettingsPage } from "@/components/layout/settings-page";
 import { SettingsSection } from "@/components/layout/settings-section";
-import { useRequiredTeamFromRoute } from "@/components/workspace/use-team-from-route";
+import { useTeamDetailFromRoute } from "@/components/workspace/use-team-from-route";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { sanitizeTeamKey } from "@/lib/helpers/identifiers";
 import { timezoneOptions } from "@/lib/helpers/timezones";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
-import { TeamFormSchema, useUpdateTeamMutation } from "@/lib/queries/teams";
+import { TeamFormSchema, useSaveTeamMutation } from "@/lib/queries/teams";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/team/$key/")({
   component: TeamGeneralSettingsPage,
@@ -25,10 +25,10 @@ const formSchema = TeamFormSchema.extend({
 const timezones = timezoneOptions();
 
 function TeamGeneralSettingsPage() {
-  const team = useRequiredTeamFromRoute();
+  const team = useTeamDetailFromRoute();
   const { workspace } = useWorkspace();
   const navigate = useNavigate();
-  const { mutateAsync: updateTeam } = useUpdateTeamMutation();
+  const { mutateAsync: saveTeam } = useSaveTeamMutation(workspace.id);
 
   const form = useAppForm({
     defaultValues: {
@@ -43,21 +43,21 @@ function TeamGeneralSettingsPage() {
     validators: { onChange: formSchema },
     onSubmit: async ({ value, formApi }) => {
       const parsed = formSchema.parse(value);
-      const res = await updateTeam({
-        team_id: team.id,
+      const saved = await saveTeam({
+        id: team.id,
         name: parsed.name,
         key: parsed.key,
-        description: parsed.description,
-        icon: value.icon,
-        color: value.color || undefined,
+        description: parsed.description.trim() || null,
+        icon: value.icon || null,
+        color: value.color || null,
         private: value.private,
         timezone: value.timezone,
       });
       formApi.reset(value);
-      if (res.data.key === team.key) return;
+      if (saved.key === team.key) return;
       await navigate({
         to: "/$workspace/settings/team/$key",
-        params: { workspace: workspace.slug, key: res.data.key },
+        params: { workspace: workspace.urlKey, key: saved.key },
       });
     },
   });
@@ -92,7 +92,7 @@ function TeamGeneralSettingsPage() {
           children={(field) => (
             <field.TextField
               label="Key"
-              description="Prefix of every issue identifier in this team."
+              description="Prefix of every issue identifier in this team. Changing it renames every issue; old identifiers keep working."
               transform={sanitizeTeamKey}
               className="font-mono"
             />
@@ -117,7 +117,7 @@ function TeamGeneralSettingsPage() {
           children={(field) => (
             <field.SwitchField
               label="Private team"
-              description="Only members and workspace admins can see a private team."
+              description="Only its members see a private team and its issues."
             />
           )}
         />

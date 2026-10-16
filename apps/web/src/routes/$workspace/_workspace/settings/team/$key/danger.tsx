@@ -6,7 +6,7 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { useRequiredTeamFromRoute } from "@/components/workspace/use-team-from-route";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { useDeleteTeamMutation } from "@/lib/queries/teams";
+import { useDeleteTeamMutation, useLeaveTeamMutation } from "@/lib/queries/teams";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/team/$key/danger")({
   component: TeamDangerSettingsPage,
@@ -16,13 +16,41 @@ function TeamDangerSettingsPage() {
   const team = useRequiredTeamFromRoute();
   const { workspace } = useWorkspace();
   const navigate = useNavigate();
-  const { mutateAsync: deleteTeam } = useDeleteTeamMutation();
+  const { mutateAsync: deleteTeam } = useDeleteTeamMutation(workspace.id);
+  const { mutateAsync: leaveTeam } = useLeaveTeamMutation(workspace.id);
+  const toWorkspace = () =>
+    navigate({ to: "/$workspace", params: { workspace: workspace.urlKey } });
   return (
-    <SettingsPage title="Danger zone" description="Actions here cannot be undone.">
+    <SettingsPage title="Danger zone" description="Leave or delete this team.">
+      {team.isMember && (
+        <SettingsSection
+          variant="destructive"
+          title="Leave team"
+          description="It leaves your sidebar. The last member of a private team can't leave it."
+          footer={
+            <ConfirmDialog
+              trigger={
+                <Button variant="outline" size="sm">
+                  Leave team
+                </Button>
+              }
+              title={`Leave ${team.name}`}
+              description={
+                team.private ? "You lose access to this private team and its issues." : undefined
+              }
+              confirmLabel="Leave team"
+              onConfirm={async () => {
+                await leaveTeam(team.id);
+                await toWorkspace();
+              }}
+            />
+          }
+        />
+      )}
       <SettingsSection
         variant="destructive"
         title="Delete team"
-        description="Deletes the team with all of its issues, workflow states and cycles."
+        description="Workspace admins and team owners can delete a team. It's archived: it leaves every list and its key becomes free, while its issues stay readable."
         footer={
           <ConfirmDialog
             trigger={
@@ -31,15 +59,12 @@ function TeamDangerSettingsPage() {
               </Button>
             }
             title={`Delete ${team.name}`}
-            description="Every issue in this team is deleted permanently."
+            description="The team leaves every list and its key becomes free."
             confirmLabel="Delete team"
             confirmText={team.key}
             onConfirm={async () => {
-              await deleteTeam({ teamId: team.id });
-              await navigate({
-                to: "/$workspace/settings/teams",
-                params: { workspace: workspace.slug },
-              });
+              await deleteTeam(team.id);
+              await toWorkspace();
             }}
           />
         }

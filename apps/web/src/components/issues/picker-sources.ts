@@ -7,7 +7,7 @@ import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { cyclesListQuery } from "@/lib/queries/cycles";
 import { labelTreeQuery } from "@/lib/queries/labels";
 import { projectsListQuery } from "@/lib/queries/projects";
-import { workspaceMembersQuery } from "@/lib/queries/workspaces";
+import { usersQuery } from "@/lib/queries/users";
 
 export function useTeam(teamId: string | undefined) {
   const { teams } = useTeams();
@@ -21,15 +21,13 @@ export function useTeamStates(teamId: string | undefined) {
 
 export function useWorkspaceUsers() {
   const { workspace } = useWorkspace();
-  const { data, isPending } = useQuery(workspaceMembersQuery(workspace.id));
-  const users: TUserSummary[] = (data?.members ?? [])
-    .filter((member) => member.user.active)
-    .map((member) => ({
-      id: member.user.id,
-      name: member.user.name,
-      display_name: member.user.display_name,
-      avatar_url: member.user.avatar_url,
-    }));
+  const { data, isPending } = useQuery(usersQuery(workspace.id));
+  const users: TUserSummary[] = (data ?? []).map((user) => ({
+    id: user.id,
+    name: user.name,
+    display_name: user.displayName,
+    avatar_url: user.avatarUrl,
+  }));
   return { users, isPending };
 }
 

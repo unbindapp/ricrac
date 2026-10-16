@@ -1,17 +1,13 @@
 import { cn } from "@/components/ui/utils";
 
-const markPaths = [
-  "M 438 386 H 733 C 749 386 759 393 770 404 L 806 439 C 826 457 824 481 804 505 L 545 665 C 526 678 504 675 488 660 C 470 642 471 619 487 604 L 698 465 H 439 C 417 465 400 448 398 426 C 395 403 413 386 438 386 Z",
-  "M 731 615 C 756 615 771 634 770 656 C 770 672 763 679 748 688 L 559 800 H 813 C 837 800 853 816 853 840 C 853 864 837 880 813 880 H 523 C 510 880 500 876 490 867 L 446 825 C 427 807 432 782 449 765 C 453 761 459 757 465 753 L 703 621 C 714 615 721 615 731 615 Z",
-];
+const glyph =
+  "M15 0a1 1 0 0 1 1 1v22a1 1 0 1 1-2 0V1a1 1 0 0 1 1-1m4 0a1 1 0 0 1 1 1v22a1 1 0 1 1-2 0V1a1 1 0 0 1 1-1m4 0a1 1 0 0 1 1 1v22a1 1 0 1 1-2 0V1a1 1 0 0 1 1-1M10.91.049a1 1 0 0 1 .18 1.992C5.994 2.501 2 6.784 2 12s3.994 9.5 9.09 9.959a1 1 0 0 1-.18 1.992C4.793 23.4 0 18.261 0 12 0 5.74 4.793.6 10.91.049m-.052 4.032a1 1 0 0 1 .284 1.98 6.001 6.001 0 0 0 0 11.878 1 1 0 0 1-.284 1.98 8.003 8.003 0 0 1 0-15.838m-.191 4.148a1 1 0 1 1 .666 1.884 2.002 2.002 0 0 0 0 3.774 1 1 0 0 1-.666 1.886 4.002 4.002 0 0 1 0-7.544";
 
 export function LogoMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 1254 1254" aria-hidden className={cn("size-5 shrink-0", className)}>
-      <rect width="1254" height="1254" rx="240" className="fill-logo" />
-      {markPaths.map((d) => (
-        <path key={d} d={d} className="fill-logo-foreground" />
-      ))}
+    <svg viewBox="-8 -8 40 40" aria-hidden className={cn("size-5 shrink-0", className)}>
+      <rect x="-8" y="-8" width="40" height="40" rx="10" className="fill-logo" />
+      <path d={glyph} className="fill-logo-foreground" />
     </svg>
   );
 }
@@ -20,7 +16,7 @@ export function Logo() {
   return (
     <span className="inline-flex items-center gap-2">
       <LogoMark className="size-8" />
-      <span className="text-xl leading-tight font-semibold">Zigzag</span>
+      <span className="text-xl leading-tight font-semibold">Ricrac</span>
     </span>
   );
 }

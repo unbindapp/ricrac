@@ -1,42 +1,28 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { MailIcon, Trash2Icon, UserPlusIcon, UsersIcon } from "lucide-react";
 import type { ReactNode } from "react";
-import {
-  LinkIcon,
-  MailIcon,
-  RotateCwIcon,
-  Trash2Icon,
-  UserPlusIcon,
-  UsersIcon,
-} from "lucide-react";
 
+import type { Invitation, WorkspaceUser } from "@/api/ops.gen";
 import { List, ListRow, ListRowText } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { SettingsPage } from "@/components/layout/settings-page";
 import { SettingsSection } from "@/components/layout/settings-section";
-import { useInvitationLinksStore } from "@/components/settings/invitation-links-store";
 import { InviteMemberDialog } from "@/components/settings/invite-member-dialog";
 import { Avatar } from "@/components/shared/avatar";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { RoleSelect } from "@/components/shared/role-select";
-import { TeamIcon } from "@/components/shared/team-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/toast";
 import { SimpleTooltip } from "@/components/ui/tooltip";
-import { useTeams } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { meQuery } from "@/lib/queries/me";
+import { useRemoveUserMutation, useUpdateUserMutation, usersQuery } from "@/lib/queries/users";
 import {
-  invitationsListQuery,
-  type TInvitation,
-  type TWorkspaceMember,
-  useRemoveWorkspaceMemberMutation,
-  useResendInvitationMutation,
-  useRevokeInvitationMutation,
-  useUpdateWorkspaceMemberMutation,
-  workspaceMembersQuery,
+  invitationsQuery,
+  type TWorkspaceRole,
+  useDeleteInvitationMutation,
+  WORKSPACE_ROLES,
   workspaceRoleLabels,
 } from "@/lib/queries/workspaces";
 
@@ -65,20 +51,23 @@ function WorkspaceMembersSettingsPage() {
 
 function MembersSection({ actions }: { actions: ReactNode }) {
   const { workspace } = useWorkspace();
-  const { data, isPending, error, refetch } = useQuery(workspaceMembersQuery(workspace.id));
-  const members = data?.members ?? [];
+  const { data: users = [], isPending, error, refetch } = useQuery(usersQuery(workspace.id));
   return (
-    <SettingsSection title="Members" actions={actions}>
+    <SettingsSection
+      title="Members"
+      description={peopleCount(users.length || workspace.memberCount)}
+      actions={actions}
+    >
       <ListStates
         isPending={isPending}
         error={error}
         onRetry={refetch}
-        isEmpty={members.length === 0}
+        isEmpty={users.length === 0}
         empty={{ icon: UsersIcon, title: "No members yet" }}
       >
         <List>
-          {members.map((member) => (
-            <MemberRow key={member.user.id} member={member} />
+          {users.map((user) => (
+            <MemberRow key={user.id} user={user} />
           ))}
         </List>
       </ListStates>
@@ -86,71 +75,81 @@ function MembersSection({ actions }: { actions: ReactNode }) {
   );
 }
 
-function MemberRow({ member }: { member: TWorkspaceMember }) {
-  const { workspace } = useWorkspace();
-  const { teams } = useTeams();
-  const { data: me } = useQuery(meQuery);
-  const isSelf = me?.user.id === member.user.id;
-  const { mutate: updateRole, isPending: isUpdating } = useUpdateWorkspaceMemberMutation(
-    workspace.id,
-  );
-  const { mutateAsync: remove } = useRemoveWorkspaceMemberMutation(workspace.id);
-  const memberTeams = teams.filter((team) => member.team_ids?.includes(team.id));
-  const name = member.user.name || member.user.display_name;
+function peopleCount(count: number) {
+  return `${count} ${count === 1 ? "person" : "people"}`;
+}
+
+/** Admins hand out every role but owner; owner changes need an owner. */
+function assignableRoles(myRole: TWorkspaceRole, theirRole: TWorkspaceRole) {
+  if (myRole === "owner") return WORKSPACE_ROLES;
+  if (theirRole === "owner") return [theirRole];
+  return WORKSPACE_ROLES.filter((role) => role !== "owner");
+}
+
+function MemberRow({ user }: { user: WorkspaceUser }) {
+  const { workspace, role: myRole } = useWorkspace();
+  const { mutate: update, isPending: isUpdating } = useUpdateUserMutation(workspace.id);
+  const { mutateAsync: remove } = useRemoveUserMutation(workspace.id);
+  const roles = assignableRoles(myRole, user.role);
+  const canRemove = !user.isMe && (myRole === "owner" || user.role !== "owner");
+  const teams = user.teams.map((team) => team.key).join(", ");
 
   return (
     <ListRow
       actions={
         <>
-          <div className="hidden items-center gap-1.5 sm:flex">
-            {memberTeams.slice(0, 3).map((team) => (
-              <SimpleTooltip key={team.id} content={team.name}>
-                <span>
-                  <TeamIcon teamKey={team.key} icon={team.icon} color={team.color} size="sm" />
-                </span>
-              </SimpleTooltip>
-            ))}
-            {memberTeams.length > 3 && (
-              <span className="text-muted-foreground text-xs">+{memberTeams.length - 3}</span>
-            )}
-          </div>
+          {teams && (
+            <SimpleTooltip content={user.teams.map((team) => team.name).join(", ")}>
+              <span className="text-muted-foreground hidden max-w-40 truncate font-mono text-xs sm:inline">
+                {teams}
+              </span>
+            </SimpleTooltip>
+          )}
           <RoleSelect
-            value={member.role}
-            label={`Role for ${name}`}
-            disabled={isSelf || isUpdating}
-            onChange={(role) =>
-              updateRole({ workspaceId: workspace.id, userId: member.user.id, role })
-            }
+            value={user.role}
+            roles={roles}
+            label={`Role for ${user.name}`}
+            disabled={user.isMe || roles.length === 1 || isUpdating}
+            onChange={(role) => update({ id: user.id, role })}
           />
           <ConfirmDialog
             trigger={
-              <Button variant="ghost" size="icon" aria-label={`Remove ${name}`} disabled={isSelf}>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label={`Remove ${user.name}`}
+                disabled={!canRemove}
+              >
                 <Trash2Icon className="size-4" />
               </Button>
             }
-            title={`Remove ${name}`}
-            description="They lose access to this workspace and leave all of its teams."
+            title={`Remove ${user.name}`}
+            description="They lose access to this workspace and leave all of its teams. Their issues, comments and history stay."
             confirmLabel="Remove member"
-            onConfirm={() => remove({ workspaceId: workspace.id, userId: member.user.id })}
+            onConfirm={() => remove(user.id)}
           />
         </>
       }
     >
-      <Avatar id={member.user.id} name={name} src={member.user.avatar_url} size="sm" />
-      <ListRowText primary={name} secondary={member.user.email} />
-      {!member.user.active && <Badge variant="muted">Inactive</Badge>}
+      <Avatar id={user.id} name={user.name} src={user.avatarUrl} size="sm" />
+      <ListRowText primary={user.name} secondary={user.email} />
+      {user.isMe && <Badge variant="muted">You</Badge>}
     </ListRow>
   );
 }
 
 function InvitationsSection() {
   const { workspace } = useWorkspace();
-  const { data, isPending, error, refetch } = useQuery(invitationsListQuery(workspace.id));
-  const invitations = data?.invitations ?? [];
+  const {
+    data: invitations = [],
+    isPending,
+    error,
+    refetch,
+  } = useQuery(invitationsQuery(workspace.id));
   return (
     <SettingsSection
       title="Pending invitations"
-      description="Invitations that have not been accepted yet."
+      description="They join when they sign in with the invited email."
     >
       <ListStates
         isPending={isPending}
@@ -170,60 +169,17 @@ function InvitationsSection() {
   );
 }
 
-function InvitationRow({ invitation }: { invitation: TInvitation }) {
+function InvitationRow({ invitation }: { invitation: Invitation }) {
   const { workspace } = useWorkspace();
-  const links = useInvitationLinksStore((state) => state.links);
-  const remember = useInvitationLinksStore((state) => state.remember);
-  const { mutateAsync: resend, isPending: isResending } = useResendInvitationMutation(workspace.id);
-  const { mutateAsync: revoke } = useRevokeInvitationMutation(workspace.id);
-  const input = { workspaceId: workspace.id, invitationId: invitation.id };
-
-  const resendInvitation = async () => {
-    const res = await resend(input).catch(() => null);
-    if (!res) return null;
-    if (res.data.link) remember(invitation.id, res.data.link);
-    return res;
-  };
-
-  const copyLink = async () => {
-    const known = links[invitation.id];
-    const link = known ?? (await resendInvitation())?.data.link;
-    if (!link) return;
-    await navigator.clipboard.writeText(link);
-    toast.add({ type: "success", title: known ? "Link copied" : "New invitation link copied" });
-  };
-
+  const { mutateAsync: revoke } = useDeleteInvitationMutation(workspace.id);
+  const teams = invitation.teams.map((team) => team.key).join(", ");
   return (
     <ListRow
       actions={
         <>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label={`Copy invitation link for ${invitation.email}`}
-            onClick={copyLink}
-          >
-            <LinkIcon className="size-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label={`Resend invitation to ${invitation.email}`}
-            isPending={isResending}
-            onClick={async () => {
-              const res = await resendInvitation();
-              if (!res) return;
-              toast.add({
-                type: "success",
-                title: res.data.emailed ? "Invitation resent" : "New link created",
-                description: res.data.emailed
-                  ? undefined
-                  : "Email is not set up. Copy the link to share it.",
-              });
-            }}
-          >
-            <RotateCwIcon className="size-4" />
-          </Button>
+          <span className="text-muted-foreground hidden text-xs sm:inline">
+            Expires <RelativeTime value={invitation.expiresAt} />
+          </span>
           <ConfirmDialog
             trigger={
               <Button
@@ -235,18 +191,18 @@ function InvitationRow({ invitation }: { invitation: TInvitation }) {
               </Button>
             }
             title="Revoke invitation"
-            description={`${invitation.email} can no longer use the invitation link.`}
+            description={`${invitation.email} can no longer join with it.`}
             confirmLabel="Revoke invitation"
-            onConfirm={() => revoke(input)}
+            onConfirm={() => revoke(invitation.id)}
           />
         </>
       }
     >
       <MailIcon className="text-muted-foreground size-4" />
-      <ListRowText primary={invitation.email} secondary={workspaceRoleLabels[invitation.role]} />
-      <span className="text-muted-foreground hidden text-xs sm:inline">
-        Expires <RelativeTime value={invitation.expires_at} />
-      </span>
+      <ListRowText
+        primary={invitation.email}
+        secondary={[workspaceRoleLabels[invitation.role], teams].filter(Boolean).join(" · ")}
+      />
     </ListRow>
   );
 }

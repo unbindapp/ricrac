@@ -12,7 +12,7 @@ import {
   githubLinkOf,
   type TGithubLink,
   type TPullRequestState,
-} from "@/components/integrations/github-link";
+} from "@/components/issues/github-link";
 import { List, ListRow, ListRowText } from "@/components/layout/list";
 import { SectionTitle } from "@/components/layout/section-title";
 import { RelativeTime } from "@/components/shared/relative-time";

@@ -10,20 +10,11 @@ export type RouterContext = {
   queryClient: QueryClient;
 };
 
-const PUBLIC_PATHS = new Set([
-  "/",
-  "/sign-in",
-  "/forgot-password",
-  "/reset-password",
-  "/welcome",
-  "/privacy",
-  "/terms",
-]);
-const PUBLIC_PREFIXES = ["/invite/"];
+const PUBLIC_PATHS = new Set(["/", "/sign-in", "/privacy", "/terms"]);
 
 function isPublicPath(pathname: string) {
   const normalized = pathname.length > 1 ? pathname.replace(/\/$/, "") : pathname;
-  return PUBLIC_PATHS.has(normalized) || PUBLIC_PREFIXES.some((p) => pathname.startsWith(p));
+  return PUBLIC_PATHS.has(normalized);
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({

@@ -1,49 +1,44 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { getGoClient } from "@/lib/server/client";
-import type { TGoClient, TInput, TListItem, TResponseData } from "@/lib/server/types";
+import type { CreateAPIKey } from "@/api/account.gen";
+import { account } from "@/lib/server/client";
 
-export type TApiKeyShallow = TListItem<TGoClient["apiKeys"]["list"]>;
-export type TApiKeyCreated = TResponseData<TGoClient["apiKeys"]["create"]>;
-export type TApiKeyCreateInput = TInput<TGoClient["apiKeys"]["create"]>;
+export const API_KEY_SCOPES = ["read", "write", "admin"] as const;
+export type TScope = (typeof API_KEY_SCOPES)[number];
 
-export const queryKeyApiKeys = {
-  list: () => ["api-keys", "list"] as const,
+export const scopeLabels: Record<TScope, string> = {
+  read: "Read",
+  write: "Write",
+  admin: "Admin",
 };
 
-export const apiKeysListQuery = () =>
-  queryOptions({
-    queryKey: queryKeyApiKeys.list(),
-    queryFn: async () => {
-      const res = await getGoClient().apiKeys.list({});
-      return { apiKeys: res.data ?? [] };
-    },
-  });
+export const scopeDescriptions: Record<TScope, string> = {
+  read: "Read everything you can see",
+  write: "Create and change issues, projects, comments and more",
+  admin: "Administer the workspaces where you're an admin: members, teams and settings",
+};
 
-export async function createApiKey(input: TApiKeyCreateInput) {
-  const res = await getGoClient().apiKeys.create(input);
-  return { data: res.data };
-}
+export const queryKeyApiKeys = ["api-keys"] as const;
 
-export async function deleteApiKey(input: { id: string }) {
-  const res = await getGoClient().apiKeys.delete({ id: input.id });
-  return { data: res.data };
-}
+export const apiKeysQuery = queryOptions({
+  queryKey: queryKeyApiKeys,
+  queryFn: () => account.apiKeys(),
+});
 
 export function useCreateApiKeyMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: createApiKey,
+    mutationFn: (input: CreateAPIKey) => account.createAPIKey(input),
     meta: { errorTitle: "Could not create API key" },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeyApiKeys.list() }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeyApiKeys }),
   });
 }
 
 export function useDeleteApiKeyMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deleteApiKey,
+    mutationFn: (id: string) => account.deleteAPIKey(id),
     meta: { errorTitle: "Could not revoke API key" },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeyApiKeys.list() }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeyApiKeys }),
   });
 }

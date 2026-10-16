@@ -39,7 +39,7 @@ import { useTeams } from "@/components/workspace/teams-provider";
 import { WorkspaceIcon } from "@/components/workspace/workspace-icon";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
-import { meQuery, meWorkspaces } from "@/lib/queries/me";
+import { meQuery } from "@/lib/queries/me";
 
 export function CommandPanel() {
   const isOpen = useCommandPanelStore((state) => state.isOpen);
@@ -86,7 +86,7 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
   const openNewProject = useNewProjectStore((state) => state.open);
   const openCreateTeam = useCreateTeamStore((state) => state.setOpen);
   const search = useCommandPanelSearch(query);
-  const params = { workspace: workspace.slug };
+  const params = { workspace: workspace.urlKey };
 
   const go = (link: LinkProps) => {
     onDone();
@@ -115,7 +115,7 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
           },
         ]
       : []),
-    ...(isAdmin
+    ...(canEdit
       ? [
           {
             id: "new-team",
@@ -186,22 +186,14 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
     })),
   ];
 
-  const workspaces: TAction[] = meWorkspaces(me)
+  const workspaces: TAction[] = (me?.workspaces ?? [])
     .filter((item) => item.id !== workspace.id)
     .map((item) => ({
       id: `ws-${item.id}`,
       label: `Switch to ${item.name}`,
-      keywords: [item.slug, "workspace"],
-      icon: (
-        <WorkspaceIcon
-          id={item.id}
-          name={item.name}
-          icon={item.icon}
-          color={item.color}
-          iconUrl={item.icon_url}
-        />
-      ),
-      run: () => go({ to: "/$workspace", params: { workspace: item.slug } }),
+      keywords: [item.urlKey, "workspace"],
+      icon: <WorkspaceIcon name={item.name} />,
+      run: () => go({ to: "/$workspace", params: { workspace: item.urlKey } }),
     }));
 
   const theme: TAction[] = [

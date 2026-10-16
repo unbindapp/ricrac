@@ -70,7 +70,7 @@ const buttonVariants = cva(
         loading: "opacity-75 disabled:opacity-75",
       },
       fadeOnDisabled: {
-        default: "disabled:opacity-50",
+        default: "disabled:not-data-pending:opacity-50",
         false: "",
       },
       forceMinSize: {
@@ -88,6 +88,14 @@ const buttonVariants = cva(
         flex: "inline-flex items-center justify-center",
       },
     },
+    compoundVariants: [
+      {
+        variant: ["default", "destructive", "warning", "success", "process", "change"],
+        fadeOnDisabled: "default",
+        className:
+          "disabled:not-data-pending:bg-muted disabled:not-data-pending:text-muted-foreground disabled:not-data-pending:opacity-100",
+      },
+    ],
     defaultVariants: {
       variant: "default",
       size: "default",

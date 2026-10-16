@@ -2,192 +2,104 @@ import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query
 import { z } from "zod";
 
 import { teamKeyPattern } from "@/lib/helpers/identifiers";
-import { getGoClient } from "@/lib/server/client";
-import type { TGoClient, TInput, TListItem, TResponseData } from "@/lib/server/types";
-
-export type TTeam = TResponseData<TGoClient["teams"]["get"]>;
-export type TTeamMember = TListItem<TGoClient["teams"]["members"]["list"]>;
-export type TWorkflowState = TListItem<TGoClient["teams"]["states"]["list"]>;
-export type TCreateTeamInput = TInput<TGoClient["teams"]["create"]>;
-export type TUpdateTeamInput = TInput<TGoClient["teams"]["update"]>;
-export type TCreateWorkflowStateInput = TInput<TGoClient["teams"]["states"]["create"]>;
-export type TUpdateWorkflowStateInput = TInput<TGoClient["teams"]["states"]["update"]>;
+import { queryKeyUsers } from "@/lib/queries/users";
+import { queryKeyWorkspace } from "@/lib/queries/workspaces";
+import { call, callAll, type OpArgs } from "@/lib/server/client";
 
 export const queryKeyTeams = {
-  all: () => ["teams"] as const,
-  list: (workspaceId: string) => ["teams", "list", workspaceId] as const,
-  detail: (workspaceId: string, key: string) => ["teams", "detail", workspaceId, key] as const,
-  members: (teamId: string) => ["teams", "members", teamId] as const,
-  states: (teamId: string) => ["teams", "states", teamId] as const,
+  all: (workspaceId: string) => [workspaceId, "teams"] as const,
+  list: (workspaceId: string) => [workspaceId, "teams", "list"] as const,
+  detail: (workspaceId: string, team: string) => [workspaceId, "teams", "detail", team] as const,
+  statuses: (workspaceId: string, team: string) =>
+    [workspaceId, "teams", "statuses", team] as const,
 };
 
-export const teamsListQuery = (workspaceId: string) =>
+export const teamsQuery = (workspaceId: string) =>
   queryOptions({
     queryKey: queryKeyTeams.list(workspaceId),
-    queryFn: async () => {
-      const res = await getGoClient().teams.list({ workspace_id: workspaceId });
-      return { teams: res.data ?? [] };
-    },
+    queryFn: () => callAll(workspaceId, "list_teams", {}),
   });
 
-export const teamByKeyQuery = (workspaceId: string, key: string) =>
+/** A team by its key (or id), with its members and statuses. */
+export const teamQuery = (workspaceId: string, team: string) =>
   queryOptions({
-    queryKey: queryKeyTeams.detail(workspaceId, key),
-    queryFn: async () => {
-      const res = await getGoClient().teams.get({ workspace_id: workspaceId, key });
-      return { team: res.data };
-    },
+    queryKey: queryKeyTeams.detail(workspaceId, team),
+    queryFn: () => call(workspaceId, "get_team", { id: team }),
   });
 
-export const teamMembersQuery = (teamId: string) =>
+export const teamStatusesQuery = (workspaceId: string, team: string) =>
   queryOptions({
-    queryKey: queryKeyTeams.members(teamId),
-    queryFn: async () => {
-      const res = await getGoClient().teams.members.list({ team_id: teamId });
-      return { members: res.data ?? [] };
-    },
+    queryKey: queryKeyTeams.statuses(workspaceId, team),
+    queryFn: () => callAll(workspaceId, "list_issue_statuses", { team }),
   });
 
-export const workflowStatesQuery = (teamId: string) =>
-  queryOptions({
-    queryKey: queryKeyTeams.states(teamId),
-    queryFn: async () => {
-      const res = await getGoClient().teams.states.list({ team_id: teamId });
-      return { states: res.data ?? [] };
-    },
-  });
-
-export async function createTeam(input: TCreateTeamInput) {
-  const res = await getGoClient().teams.create(input);
-  return { data: res.data };
-}
-
-export async function updateTeam(input: TUpdateTeamInput) {
-  const res = await getGoClient().teams.update(input);
-  return { data: res.data };
-}
-
-export async function deleteTeam(input: { teamId: string }) {
-  const res = await getGoClient().teams.delete({ team_id: input.teamId });
-  return { data: res.data };
-}
-
-export async function addTeamMember(input: { teamId: string; userId: string; owner?: boolean }) {
-  const res = await getGoClient().teams.members.add({
-    team_id: input.teamId,
-    user_id: input.userId,
-    owner: input.owner,
-  });
-  return { data: res.data };
-}
-
-export async function removeTeamMember(input: { teamId: string; userId: string }) {
-  const res = await getGoClient().teams.members.remove({
-    team_id: input.teamId,
-    user_id: input.userId,
-  });
-  return { data: res.data };
-}
-
-export async function createWorkflowState(input: TCreateWorkflowStateInput) {
-  const res = await getGoClient().teams.states.create(input);
-  return { data: res.data };
-}
-
-export async function updateWorkflowState(input: TUpdateWorkflowStateInput) {
-  const res = await getGoClient().teams.states.update(input);
-  return { data: res.data };
-}
-
-export async function deleteWorkflowState(input: { stateId: string; moveIssuesToStateId: string }) {
-  const res = await getGoClient().teams.states.delete({
-    state_id: input.stateId,
-    move_issues_to_state_id: input.moveIssuesToStateId,
-  });
-  return { data: res.data };
-}
-
-function useInvalidateTeams() {
+/** Teams show up in the workspace (its team list) and in people's teams, so all three refresh. */
+function useInvalidateTeams(workspaceId: string) {
   const queryClient = useQueryClient();
-  return () => queryClient.invalidateQueries({ queryKey: queryKeyTeams.all() });
+  return () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: queryKeyTeams.all(workspaceId) }),
+      queryClient.invalidateQueries({ queryKey: queryKeyWorkspace.detail(workspaceId) }),
+      queryClient.invalidateQueries({ queryKey: queryKeyUsers.all(workspaceId) }),
+    ]);
 }
 
-export function useCreateTeamMutation() {
-  const invalidate = useInvalidateTeams();
+export function useSaveTeamMutation(workspaceId: string) {
+  const invalidate = useInvalidateTeams(workspaceId);
   return useMutation({
-    mutationFn: createTeam,
-    meta: { errorTitle: "Could not create team" },
+    mutationFn: (args: OpArgs<"save_team">) => call(workspaceId, "save_team", args),
+    meta: { errorTitle: "Could not save team" },
     onSuccess: invalidate,
   });
 }
 
-export function useUpdateTeamMutation() {
-  const invalidate = useInvalidateTeams();
+export function useDeleteTeamMutation(workspaceId: string) {
+  const invalidate = useInvalidateTeams(workspaceId);
   return useMutation({
-    mutationFn: updateTeam,
-    meta: { errorTitle: "Could not update team" },
-    onSuccess: invalidate,
-  });
-}
-
-export function useDeleteTeamMutation() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: deleteTeam,
+    mutationFn: (team: string) => call(workspaceId, "delete_team", { id: team }),
     meta: { errorTitle: "Could not delete team" },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeyTeams.all() });
-      await queryClient.invalidateQueries({ queryKey: ["workspaces"] });
-    },
-  });
-}
-
-export function useAddTeamMemberMutation() {
-  const invalidate = useInvalidateTeams();
-  return useMutation({
-    mutationFn: addTeamMember,
-    meta: { errorTitle: "Could not add member" },
     onSuccess: invalidate,
   });
 }
 
-export function useRemoveTeamMemberMutation() {
-  const invalidate = useInvalidateTeams();
+export function useJoinTeamMutation(workspaceId: string) {
+  const invalidate = useInvalidateTeams(workspaceId);
   return useMutation({
-    mutationFn: removeTeamMember,
-    meta: { errorTitle: "Could not remove member" },
+    mutationFn: (team: string) => call(workspaceId, "join_team", { id: team }),
+    meta: { errorTitle: "Could not join team" },
     onSuccess: invalidate,
   });
 }
 
-export function useCreateWorkflowStateMutation() {
-  const invalidate = useInvalidateTeams();
+export function useLeaveTeamMutation(workspaceId: string) {
+  const invalidate = useInvalidateTeams(workspaceId);
   return useMutation({
-    mutationFn: createWorkflowState,
-    meta: { errorTitle: "Could not add state" },
+    mutationFn: (team: string) => call(workspaceId, "leave_team", { id: team }),
+    meta: { errorTitle: "Could not leave team" },
     onSuccess: invalidate,
   });
 }
 
-export function useUpdateWorkflowStateMutation() {
-  const invalidate = useInvalidateTeams();
+export function useSaveIssueStatusMutation(workspaceId: string) {
+  const invalidate = useInvalidateTeams(workspaceId);
   return useMutation({
-    mutationFn: updateWorkflowState,
-    meta: { errorTitle: "Could not update state" },
+    mutationFn: (args: OpArgs<"save_issue_status">) => call(workspaceId, "save_issue_status", args),
+    meta: { errorTitle: "Could not save status" },
     onSuccess: invalidate,
   });
 }
 
-export function useDeleteWorkflowStateMutation() {
-  const invalidate = useInvalidateTeams();
+export function useDeleteIssueStatusMutation(workspaceId: string) {
+  const invalidate = useInvalidateTeams(workspaceId);
   return useMutation({
-    mutationFn: deleteWorkflowState,
-    meta: { errorTitle: "Could not delete state" },
+    mutationFn: (args: OpArgs<"delete_issue_status">) =>
+      call(workspaceId, "delete_issue_status", args),
+    meta: { errorTitle: "Could not delete status" },
     onSuccess: invalidate,
   });
 }
 
-export const teamNameMaxLength = 64;
+export const teamNameMaxLength = 80;
 
 export const TeamFormSchema = z.object({
   name: z

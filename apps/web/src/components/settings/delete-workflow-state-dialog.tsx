@@ -1,6 +1,7 @@
 import { Trash2Icon } from "lucide-react";
 import { useState } from "react";
 
+import type { IssueStatus } from "@/api/ops.gen";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { StateIcon } from "@/components/shared/state-icon";
 import { Button } from "@/components/ui/button";
@@ -11,18 +12,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { type TWorkflowState, useDeleteWorkflowStateMutation } from "@/lib/queries/teams";
+import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { useDeleteIssueStatusMutation } from "@/lib/queries/teams";
 
 type TProps = {
-  state: TWorkflowState;
-  states: TWorkflowState[];
+  state: IssueStatus;
+  states: IssueStatus[];
 };
 
 export function DeleteWorkflowStateDialog({ state, states }: TProps) {
   const others = states.filter((candidate) => candidate.id !== state.id);
   const fallback = others.find((candidate) => candidate.type === state.type) ?? others[0];
   const [targetId, setTargetId] = useState<string | null>(fallback?.id ?? null);
-  const { mutateAsync: deleteState } = useDeleteWorkflowStateMutation();
+  const { workspace } = useWorkspace();
+  const { mutateAsync: deleteStatus } = useDeleteIssueStatusMutation(workspace.id);
   const items = others.map((candidate) => ({ value: candidate.id, label: candidate.name }));
 
   return (
@@ -38,19 +41,19 @@ export function DeleteWorkflowStateDialog({ state, states }: TProps) {
         </Button>
       }
       title={`Delete ${state.name}`}
-      description="Issues in this state move to the state you pick."
-      confirmLabel="Delete state"
+      description="Issues in this status move to the status you pick."
+      confirmLabel="Delete status"
       confirmDisabled={!targetId}
       onConfirm={async () => {
         if (!targetId) return;
-        await deleteState({ stateId: state.id, moveIssuesToStateId: targetId });
+        await deleteStatus({ id: state.id, moveIssuesTo: targetId });
       }}
     >
       <div className="flex flex-col gap-1.5">
         <p className="text-sm font-medium">Move issues to</p>
         <Select items={items} value={targetId} onValueChange={(value) => setTargetId(value)}>
           <SelectTrigger aria-label="Move issues to">
-            <SelectValue placeholder="Pick a state" />
+            <SelectValue placeholder="Pick a status" />
           </SelectTrigger>
           <SelectContent>
             {others.map((candidate) => (

@@ -9,7 +9,6 @@ import {
 } from "@/components/issues/use-issue-actions";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { FavoriteButton } from "@/components/favorites/favorite-button";
-import { GithubIssueChip } from "@/components/integrations/github-issue-chip";
 import {
   ArchiveAction,
   HeaderAction,
@@ -56,7 +55,6 @@ export function IssueDetailHeader({ issue, variant, onClose }: TProps) {
             { label: issue.identifier },
           ]}
         />
-        {issue.github_issue && <GithubIssueChip link={issue.github_issue} />}
       </div>
       <HeaderActions>
         <FavoriteButton kind="issue" entityId={issue.id} />

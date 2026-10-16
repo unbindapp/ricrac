@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 
 import {
@@ -14,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { deriveTeamKey, sanitizeTeamKey } from "@/lib/helpers/identifiers";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
-import { TeamFormSchema, useCreateTeamMutation } from "@/lib/queries/teams";
+import { TeamFormSchema, useSaveTeamMutation } from "@/lib/queries/teams";
 
 const formSchema = TeamFormSchema.extend({
   icon: z.string(),
@@ -42,21 +43,25 @@ export function CreateTeamDialog() {
 
 function CreateTeamForm({ onDone }: { onDone: () => void }) {
   const { workspace } = useWorkspace();
-  const { mutateAsync: createTeam } = useCreateTeamMutation();
+  const navigate = useNavigate();
+  const { mutateAsync: saveTeam } = useSaveTeamMutation(workspace.id);
   const form = useAppForm({
     defaultValues: { name: "", key: "", icon: "", color: "", private: false },
     validators: { onSubmit: formSchema },
     onSubmit: async ({ value }) => {
       const parsed = formSchema.parse(value);
-      await createTeam({
-        workspace_id: workspace.id,
+      const team = await saveTeam({
         name: parsed.name,
         key: parsed.key,
-        icon: value.icon || undefined,
-        color: value.color || undefined,
+        icon: value.icon || null,
+        color: value.color || null,
         private: value.private,
       });
       onDone();
+      await navigate({
+        to: "/$workspace/team/$key/issues",
+        params: { workspace: workspace.urlKey, key: team.key },
+      });
     },
   });
 
@@ -99,7 +104,7 @@ function CreateTeamForm({ onDone }: { onDone: () => void }) {
         children={(field) => (
           <field.SwitchField
             label="Private team"
-            description="Only members and workspace admins can see a private team."
+            description="Only its members see a private team and its issues."
           />
         )}
       />

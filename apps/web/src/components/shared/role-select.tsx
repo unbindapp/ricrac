@@ -5,37 +5,40 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  type TWorkspaceRole,
-  WORKSPACE_ROLES,
-  workspaceRoleLabels,
-} from "@/lib/queries/workspaces";
+import { type TWorkspaceRole, workspaceRoleLabels } from "@/lib/queries/workspaces";
 
-type TProps = {
-  value: TWorkspaceRole;
-  onChange: (role: TWorkspaceRole) => void;
+type TProps<R extends TWorkspaceRole> = {
+  value: R;
+  roles: R[];
+  onChange: (role: R) => void;
   disabled?: boolean;
   label: string;
 };
 
-const roleItems = WORKSPACE_ROLES.map((role) => ({
-  value: role,
-  label: workspaceRoleLabels[role],
-}));
+export function roleItems<R extends TWorkspaceRole>(roles: R[]) {
+  return roles.map((role) => ({ value: role, label: workspaceRoleLabels[role] }));
+}
 
-export function RoleSelect({ value, onChange, disabled, label }: TProps) {
+export function RoleSelect<R extends TWorkspaceRole>({
+  value,
+  roles,
+  onChange,
+  disabled,
+  label,
+}: TProps<R>) {
+  const items = roleItems(roles);
   return (
     <Select
-      items={roleItems}
+      items={items}
       value={value}
       disabled={disabled}
-      onValueChange={(next) => next && onChange(next as TWorkspaceRole)}
+      onValueChange={(next) => next && onChange(next as R)}
     >
       <SelectTrigger size="sm" aria-label={label} className="w-28">
         <SelectValue />
       </SelectTrigger>
       <SelectContent align="end">
-        {roleItems.map((item) => (
+        {items.map((item) => (
           <SelectItem key={item.value} value={item.value}>
             {item.label}
           </SelectItem>
@@ -44,5 +47,3 @@ export function RoleSelect({ value, onChange, disabled, label }: TProps) {
     </Select>
   );
 }
-
-export const roleSelectItems = roleItems;

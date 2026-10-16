@@ -1,37 +1,33 @@
 import { createContext, ReactNode, useContext, useMemo } from "react";
 
-import type { TMeWorkspace } from "@/lib/queries/me";
-import type { TWorkspaceRole } from "@/lib/queries/workspaces";
+import type { Workspace } from "@/api/ops.gen";
+import { canEditRole, isAdminRole, type TWorkspaceRole } from "@/lib/queries/workspaces";
 
 type TWorkspaceContext = {
-  workspace: TMeWorkspace;
+  /** Pass `workspace.id` to `call` and query keys, `workspace.urlKey` to route params. */
+  workspace: Workspace;
   role: TWorkspaceRole;
+  /** Owners, admins and members: everyone but guests. */
   canEdit: boolean;
+  /** Owners and admins. */
   isAdmin: boolean;
-  isSystemAdmin: boolean;
 };
 
 const WorkspaceContext = createContext<TWorkspaceContext | null>(null);
 
 export function WorkspaceProvider({
   workspace,
-  isSystemAdmin,
+  role,
   children,
 }: {
-  workspace: TMeWorkspace;
-  isSystemAdmin: boolean;
+  workspace: Workspace;
+  role: TWorkspaceRole;
   children: ReactNode;
 }) {
-  const value = useMemo<TWorkspaceContext>(() => {
-    const role: TWorkspaceRole = isSystemAdmin ? "admin" : workspace.role;
-    return {
-      workspace,
-      role,
-      canEdit: role === "admin" || role === "member",
-      isAdmin: role === "admin",
-      isSystemAdmin,
-    };
-  }, [workspace, isSystemAdmin]);
+  const value = useMemo<TWorkspaceContext>(
+    () => ({ workspace, role, canEdit: canEditRole(role), isAdmin: isAdminRole(role) }),
+    [workspace, role],
+  );
   return <WorkspaceContext.Provider value={value}>{children}</WorkspaceContext.Provider>;
 }
 

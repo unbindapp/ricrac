@@ -2,20 +2,20 @@ import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 
-import { roleDescription, WorkspaceAccessList } from "@/components/api-key/access-fields";
+import type { CreatedAPIKey } from "@/api/account.gen";
+import { WorkspaceAccessList } from "@/components/api-key/access-fields";
 import { ApiKeyCreatedDialog } from "@/components/api-key/api-key-created-dialog";
 import {
   accessFormShape,
   accessItems,
-  defaultExpiry,
-  expiresAtFrom,
-  expiryOptions,
   hasPickedWorkspace,
   pickWorkspaceMessage,
+  scopeLevelDescriptions,
+  scopeLevelItems,
+  scopesOf,
   type TAccess,
-  type TExpiryValue,
+  type TScopeLevel,
 } from "@/components/api-key/helpers";
-import { roleSelectItems } from "@/components/shared/role-select";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,24 +28,23 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
-import { type TApiKeyCreated, useCreateApiKeyMutation } from "@/lib/queries/api-keys";
-import type { TWorkspaceRole } from "@/lib/queries/workspaces";
+import { useCreateApiKeyMutation } from "@/lib/queries/api-keys";
 
 const formSchema = z
   .object({
-    name: z
+    label: z
       .string()
       .trim()
-      .min(1, "Name is required.")
-      .max(100, "Keep the name under 100 characters."),
+      .min(1, "Label is required.")
+      .max(80, "Keep the label under 80 characters."),
+    scopeLevel: z.enum(["read", "write", "admin"]),
     ...accessFormShape,
-    expiry: z.enum(["7d", "30d", "90d", "1y", "never"]),
   })
   .refine(hasPickedWorkspace, pickWorkspaceMessage);
 
-export function CreateApiKeyDialog({ takenNames }: { takenNames: string[] }) {
+export function CreateApiKeyDialog({ takenLabels }: { takenLabels: string[] }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [created, setCreated] = useState<TApiKeyCreated | null>(null);
+  const [created, setCreated] = useState<CreatedAPIKey | null>(null);
   return (
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -61,13 +60,12 @@ export function CreateApiKeyDialog({ takenNames }: { takenNames: string[] }) {
           <DialogHeader>
             <DialogTitle>Create API key</DialogTitle>
             <DialogDescription>
-              API keys let scripts and agents use Zigzag as you, limited to the role and workspaces
-              you pick.
+              Scripts and agents use Ricrac as you with it, never doing more than you can.
             </DialogDescription>
           </DialogHeader>
           {isOpen && (
             <CreateApiKeyForm
-              takenNames={takenNames}
+              takenLabels={takenLabels}
               onCreated={(key) => {
                 setIsOpen(false);
                 setCreated(key);
@@ -82,85 +80,76 @@ export function CreateApiKeyDialog({ takenNames }: { takenNames: string[] }) {
 }
 
 function CreateApiKeyForm({
-  takenNames,
+  takenLabels,
   onCreated,
 }: {
-  takenNames: string[];
-  onCreated: (key: TApiKeyCreated) => void;
+  takenLabels: string[];
+  onCreated: (key: CreatedAPIKey) => void;
 }) {
   const { mutateAsync: createKey } = useCreateApiKeyMutation();
   const form = useAppForm({
     defaultValues: {
-      name: "",
-      role: "member" as TWorkspaceRole,
+      label: "",
+      scopeLevel: "write" as TScopeLevel,
       access: "all" as TAccess,
-      workspace_ids: [] as string[],
-      expiry: defaultExpiry as TExpiryValue,
+      workspaceIds: [] as string[],
     },
     validators: { onSubmit: formSchema },
     onSubmit: async ({ value }) => {
-      const res = await createKey({
-        name: value.name.trim(),
-        role: value.role,
-        full_access: value.access === "all",
-        workspace_ids: value.access === "all" ? [] : value.workspace_ids,
-        expires_at: expiresAtFrom(value.expiry),
+      const created = await createKey({
+        label: value.label.trim(),
+        scopes: scopesOf(value.scopeLevel),
+        workspaceIds: value.access === "all" ? undefined : value.workspaceIds,
       });
-      onCreated(res.data);
+      onCreated(created);
     },
   });
 
   return (
     <form className="flex flex-col gap-4" onSubmit={submitHandler(form)} noValidate>
       <form.AppField
-        name="name"
+        name="label"
         validators={{
           onSubmit: ({ value }) =>
-            takenNames.includes(value.trim())
-              ? "You already have a key with this name."
+            takenLabels.includes(value.trim())
+              ? "You already have a key with this label."
               : undefined,
         }}
         children={(field) => (
           <field.TextField
-            label="Name"
+            label="Label"
             description="Something that tells you where the key is used."
             placeholder="CI pipeline"
             autoFocus
           />
         )}
       />
-      <form.AppField
-        name="role"
-        children={(field) => (
-          <field.SelectField
-            label="Role"
-            description={roleDescription("key")}
-            items={roleSelectItems}
-          />
-        )}
-      />
-      <form.AppField
-        name="access"
-        children={(field) => <field.SelectField label="Access" items={accessItems} />}
-      />
-      <form.Subscribe selector={(state) => state.values.access}>
-        {(access) => (
-          <form.Field
-            name="workspace_ids"
-            children={(field) => <WorkspaceAccessList field={field} access={access} />}
+      <form.Subscribe selector={(state) => state.values.scopeLevel}>
+        {(level) => (
+          <form.AppField
+            name="scopeLevel"
+            children={(field) => (
+              <field.SelectField
+                label="Permissions"
+                description={scopeLevelDescriptions[level]}
+                items={scopeLevelItems}
+              />
+            )}
           />
         )}
       </form.Subscribe>
       <form.AppField
-        name="expiry"
-        children={(field) => (
-          <field.SelectField
-            label="Expires"
-            description="An expired key stops working immediately."
-            items={expiryOptions.map((option) => ({ value: option.value, label: option.label }))}
+        name="access"
+        children={(field) => <field.SelectField label="Workspaces" items={accessItems} />}
+      />
+      <form.Subscribe selector={(state) => state.values.access}>
+        {(access) => (
+          <form.Field
+            name="workspaceIds"
+            children={(field) => <WorkspaceAccessList field={field} access={access} />}
           />
         )}
-      />
+      </form.Subscribe>
       <DialogFooter>
         <DialogClose
           render={

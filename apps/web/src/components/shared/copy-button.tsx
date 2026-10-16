@@ -6,14 +6,15 @@ import { useCopyToClipboard } from "@/lib/hooks/use-copy";
 type TProps = {
   value: string | undefined;
   label?: string;
+  variant?: "outline" | "ghost";
 };
 
-export function CopyButton({ value, label = "Copy" }: TProps) {
+export function CopyButton({ value, label = "Copy", variant = "outline" }: TProps) {
   const { copyToClipboard, isRecentlyCopied } = useCopyToClipboard();
   return (
     <Button
       type="button"
-      variant="outline"
+      variant={variant}
       size="icon"
       aria-label={isRecentlyCopied ? "Copied" : label}
       disabled={!value}

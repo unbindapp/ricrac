@@ -1,7 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import {
   ArchiveIcon,
-  GitPullRequestIcon,
   FileStackIcon,
   LockIcon,
   RefreshCwIcon,
@@ -29,17 +28,17 @@ export const Route = createFileRoute("/$workspace/_workspace/settings/team/$key"
 
 function TeamSettingsLayout() {
   const { key } = Route.useParams();
-  const { workspace, isAdmin } = useWorkspace();
+  const { workspace, canEdit } = useWorkspace();
   const { teamByKey, isPending, error, refetch } = useTeams();
   const team = teamByKey(key);
 
-  if (!isAdmin) {
+  if (!canEdit) {
     return (
       <PageContainer width="narrow">
         <EmptyState
           icon={LockIcon}
-          title="Admins only"
-          description="Ask a workspace admin to change team settings."
+          title="Members only"
+          description="Guests can't change team settings."
         />
       </PageContainer>
     );
@@ -69,7 +68,7 @@ function TeamSettingsLayout() {
     );
   }
 
-  const params = { workspace: workspace.slug, key: team.key };
+  const params = { workspace: workspace.urlKey, key: team.key };
   const tabs: TSettingsTab[] = [
     {
       label: "General",
@@ -96,11 +95,6 @@ function TeamSettingsLayout() {
       label: "Triage",
       icon: TriangleIcon,
       link: { to: "/$workspace/settings/team/$key/triage", params },
-    },
-    {
-      label: "GitHub",
-      icon: GitPullRequestIcon,
-      link: { to: "/$workspace/settings/team/$key/github", params },
     },
     {
       label: "Members",

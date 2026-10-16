@@ -3,10 +3,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SettingsPage } from "@/components/layout/settings-page";
 import { SettingsSection } from "@/components/layout/settings-section";
 import { EstimateBadge } from "@/components/shared/estimate-badge";
-import { useRequiredTeamFromRoute } from "@/components/workspace/use-team-from-route";
+import { useTeamDetailFromRoute } from "@/components/workspace/use-team-from-route";
+import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { estimateOptions, estimateTypeLabels, type TEstimateType } from "@/lib/helpers/estimates";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
-import { useUpdateTeamMutation } from "@/lib/queries/teams";
+import { useSaveTeamMutation } from "@/lib/queries/teams";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/team/$key/estimates")({
   component: TeamEstimatesSettingsPage,
@@ -18,17 +19,18 @@ const typeItems = (Object.keys(estimateTypeLabels) as TEstimateType[]).map((type
 }));
 
 function TeamEstimatesSettingsPage() {
-  const team = useRequiredTeamFromRoute();
-  const { mutateAsync: updateTeam } = useUpdateTeamMutation();
+  const team = useTeamDetailFromRoute();
+  const { workspace } = useWorkspace();
+  const { mutateAsync: saveTeam } = useSaveTeamMutation(workspace.id);
 
   const form = useAppForm({
     defaultValues: {
-      estimate_type: team.estimate_type as TEstimateType,
-      estimate_allow_zero: team.estimate_allow_zero,
-      estimate_extended: team.estimate_extended,
+      estimateType: team.estimateType,
+      estimateAllowZero: team.estimateAllowZero,
+      estimateExtended: team.estimateExtended,
     },
     onSubmit: async ({ value, formApi }) => {
-      await updateTeam({ team_id: team.id, ...value });
+      await saveTeam({ id: team.id, ...value });
       formApi.reset(value);
     },
   });
@@ -47,36 +49,36 @@ function TeamEstimatesSettingsPage() {
         }
       >
         <form.AppField
-          name="estimate_type"
+          name="estimateType"
           children={(field) => <field.SelectField label="Scale" items={typeItems} />}
         />
         <form.Subscribe selector={(state) => state.values}>
           {(values) => (
             <>
               <form.AppField
-                name="estimate_allow_zero"
+                name="estimateAllowZero"
                 children={(field) => (
                   <field.SwitchField
                     label="Allow zero"
                     description="Lets an issue be estimated at zero."
-                    disabled={values.estimate_type === "none"}
+                    disabled={values.estimateType === "notUsed"}
                   />
                 )}
               />
               <form.AppField
-                name="estimate_extended"
+                name="estimateExtended"
                 children={(field) => (
                   <field.SwitchField
                     label="Extended scale"
                     description="Adds two larger values to the scale."
-                    disabled={values.estimate_type === "none"}
+                    disabled={values.estimateType === "notUsed"}
                   />
                 )}
               />
               <EstimatePreview
-                type={values.estimate_type}
-                allowZero={values.estimate_allow_zero}
-                extended={values.estimate_extended}
+                type={values.estimateType}
+                allowZero={values.estimateAllowZero}
+                extended={values.estimateExtended}
               />
             </>
           )}

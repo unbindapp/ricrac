@@ -31,7 +31,7 @@
   --popover-foreground: hsl(220 25% 8%);
   --logo: hsl(0 0% 0%);
   --logo-foreground: hsl(0 0% 100%);
-  --primary: hsl(235 60% 55%);
+  --primary: hsl(220 25% 10%);
   --primary-foreground: hsl(0 0% 100%);
   --secondary: hsl(220 14% 94%);
   --secondary-foreground: hsl(220 25% 8%);
@@ -56,7 +56,7 @@
   --shadow-color: hsl(220 30% 10%);
   --border: hsl(220 14% 90%);
   --input: hsl(0 0% 100%);
-  --ring: hsl(235 60% 55%);
+  --ring: hsl(220 25% 10%);
 
   --chart-1: hsl(235 60% 55%);
   --chart-2: hsl(212 80% 45%);
@@ -69,7 +69,7 @@
   --chart-9: hsl(265 55% 45%);
   --chart-10: hsl(20 85% 40%);
 
-  --top-loader: hsl(235 60% 55%);
+  --top-loader: hsl(220 25% 10%);
 
   --barrier: hsl(220 30% 6%);
 
@@ -91,6 +91,8 @@
 }
 
 .dark {
+  --logo: hsl(0 0% 100%);
+  --logo-foreground: hsl(0 0% 0%);
   /* If you change --background, also update the anti-flash <style> in index.html */
   --background: hsl(222 16% 9%);
   --foreground: hsl(220 15% 93%);
@@ -98,7 +100,7 @@
   --card-hover: hsl(222 12% 16%);
   --popover: hsl(222 14% 12%);
   --popover-foreground: hsl(220 15% 93%);
-  --primary: hsl(235 70% 68%);
+  --primary: hsl(220 15% 93%);
   --primary-foreground: hsl(222 16% 9%);
   --secondary: hsl(222 12% 17%);
   --secondary-foreground: hsl(220 15% 93%);
@@ -123,7 +125,7 @@
   --shadow-color: hsl(222 20% 3%);
   --border: hsl(222 12% 20%);
   --input: hsl(222 14% 11%);
-  --ring: hsl(235 70% 68%);
+  --ring: hsl(220 15% 80%);
 
   --chart-1: hsl(235 70% 68%);
   --chart-2: hsl(212 90% 65%);
@@ -136,7 +138,7 @@
   --chart-9: hsl(255 80% 75%);
   --chart-10: hsl(40 80% 62%);
 
-  --top-loader: hsl(235 70% 68%);
+  --top-loader: hsl(220 15% 93%);
 
   --barrier: hsl(222 20% 3%);
 

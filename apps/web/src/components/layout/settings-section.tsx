@@ -4,7 +4,7 @@ import { cn } from "@/components/ui/utils";
 
 type TProps = {
   title: string;
-  description?: string;
+  description?: ReactNode;
   actions?: ReactNode;
   footer?: ReactNode;
   variant?: "default" | "destructive";

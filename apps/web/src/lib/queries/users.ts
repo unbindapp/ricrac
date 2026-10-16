@@ -1,69 +1,45 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { getGoClient } from "@/lib/server/client";
-import type { TGoClient, TInput, TListItem } from "@/lib/server/types";
-
-export type TUser = TListItem<TGoClient["users"]["list"]>;
-export type TCreateUserInput = TInput<TGoClient["users"]["create"]>;
-export type TUpdateUserInput = TInput<TGoClient["users"]["update"]>;
+import { queryKeyMe } from "@/lib/queries/me";
+import { call, callAll, type OpArgs } from "@/lib/server/client";
 
 export const queryKeyUsers = {
-  all: () => ["users"] as const,
-  list: (query: string) => ["users", "list", query] as const,
+  all: (workspaceId: string) => [workspaceId, "users"] as const,
+  list: (workspaceId: string) => [workspaceId, "users", "list"] as const,
+  me: (workspaceId: string) => [workspaceId, "users", "me"] as const,
 };
 
-export const usersListQuery = (query = "") =>
+/** Everyone in the workspace, removed members left out. */
+export const usersQuery = (workspaceId: string) =>
   queryOptions({
-    queryKey: queryKeyUsers.list(query),
-    queryFn: async () => {
-      const res = await getGoClient().users.list({ query: query || undefined, limit: 250 });
-      return { users: res.data ?? [] };
+    queryKey: queryKeyUsers.list(workspaceId),
+    queryFn: () => callAll(workspaceId, "list_users", {}),
+  });
+
+/** You as a member of the workspace: role, timezone and email notifications. */
+export const workspaceMeQuery = (workspaceId: string) =>
+  queryOptions({
+    queryKey: queryKeyUsers.me(workspaceId),
+    queryFn: () => call(workspaceId, "get_user", { id: "me" }),
+  });
+
+export function useUpdateUserMutation(workspaceId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (args: OpArgs<"update_user">) => call(workspaceId, "update_user", args),
+    meta: { errorTitle: "Could not update" },
+    onSuccess: async (user) => {
+      await queryClient.invalidateQueries({ queryKey: queryKeyUsers.all(workspaceId) });
+      if (user.isMe) await queryClient.invalidateQueries({ queryKey: queryKeyMe });
     },
   });
-
-export async function createUser(input: TCreateUserInput) {
-  const res = await getGoClient().users.create(input);
-  return { data: res.data };
 }
 
-export async function updateUser(input: TUpdateUserInput) {
-  const res = await getGoClient().users.update(input);
-  return { data: res.data };
-}
-
-export async function deleteUser(input: { userId: string }) {
-  const res = await getGoClient().users.delete({ user_id: input.userId });
-  return { data: res.data };
-}
-
-function useInvalidateUsers() {
+export function useRemoveUserMutation(workspaceId: string) {
   const queryClient = useQueryClient();
-  return () => queryClient.invalidateQueries({ queryKey: queryKeyUsers.all() });
-}
-
-export function useCreateUserMutation() {
-  const invalidate = useInvalidateUsers();
   return useMutation({
-    mutationFn: createUser,
-    meta: { errorTitle: "Could not create user" },
-    onSuccess: invalidate,
-  });
-}
-
-export function useUpdateUserMutation() {
-  const invalidate = useInvalidateUsers();
-  return useMutation({
-    mutationFn: updateUser,
-    meta: { errorTitle: "Could not update user" },
-    onSuccess: invalidate,
-  });
-}
-
-export function useDeleteUserMutation() {
-  const invalidate = useInvalidateUsers();
-  return useMutation({
-    mutationFn: deleteUser,
-    meta: { errorTitle: "Could not delete user" },
-    onSuccess: invalidate,
+    mutationFn: (id: string) => call(workspaceId, "remove_user", { id }),
+    meta: { errorTitle: "Could not remove member" },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [workspaceId] }),
   });
 }
