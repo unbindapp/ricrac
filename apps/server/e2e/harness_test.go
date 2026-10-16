@@ -288,6 +288,11 @@ func tryCall(c *app.Ctx, name string, args M) (J, error) {
 	if err := json.Unmarshal(app.Marshal(result), &value); err != nil {
 		panic(err)
 	}
+	if op.Result != nil {
+		if err := validate(op.Result, value, name); err != nil {
+			panic(fmt.Sprintf("%s answered something its result schema doesn't allow: %v", name, err))
+		}
+	}
 	return J{value}, nil
 }
 

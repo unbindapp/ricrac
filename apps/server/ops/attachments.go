@@ -24,25 +24,25 @@ func attachmentOps() []*Op {
 		op("create_attachment", app.Write, []string{"POST /attachments"},
 			"Attach a link (pull request, design, doc, error report, ...) to an issue. Attaching a URL the issue already "+
 				"has updates that attachment instead. The source (github, figma, slack, ...) is recognized from the URL.",
-			createAttachment),
-		op("get_attachment", app.Read, []string{"GET /attachments/{id}"}, "Read an attachment by id.", getAttachment),
+			createAttachment).returns(ResultOf[Attachment]()),
+		op("get_attachment", app.Read, []string{"GET /attachments/{id}"}, "Read an attachment by id.", getAttachment).returns(ResultOf[Attachment]()),
 		op("list_attachments", app.Read, []string{"GET /issues/{issue}/attachments"},
-			"List an issue's attachments, oldest first.", listAttachments),
-		op("delete_attachment", app.Write, []string{"DELETE /attachments/{id}"}, "Remove an attachment from its issue.", deleteAttachment),
+			"List an issue's attachments, oldest first.", listAttachments).returns(ResultOf[PageOf[Attachment]]()),
+		op("delete_attachment", app.Write, []string{"DELETE /attachments/{id}"}, "Remove an attachment from its issue.", deleteAttachment).returns(ResultOf[Deleted]()),
 		op("prepare_file_upload", app.Write, []string{"POST /files"},
 			"Get a one-time URL to upload a file (screenshot, log, recording, ...) to, valid for 15 minutes. Upload it "+
 				"by running the returned `curl` command with <file> replaced by the local path (an HTTP PUT of the raw bytes). "+
 				"Then embed the assetUrl in Markdown (`![name](assetUrl)` for images, `[name](assetUrl)` otherwise) in a "+
 				"description or comment, or attach it to an issue with create_attachment_from_upload. Agents that can't run "+
 				"commands use upload_file instead.",
-			prepareFileUpload),
+			prepareFileUpload).returns(ResultOf[PreparedUpload]()),
 		op("upload_file", app.Write, []string{"POST /files/inline"},
 			"Upload a small file (up to 5 MB) as base64 in the arguments, for agents that can't run commands; otherwise "+
 				"prefer prepare_file_upload. Embed the returned assetUrl in Markdown (`![name](assetUrl)`) or attach it to an "+
 				"issue with create_attachment_from_upload.",
-			uploadFile),
+			uploadFile).returns(ResultOf[UploadedFile]()),
 		op("create_attachment_from_upload", app.Write, []string{"POST /attachments/from-upload"},
-			"Attach an uploaded file (from prepare_file_upload or upload_file) to an issue.", createAttachmentFromUpload),
+			"Attach an uploaded file (from prepare_file_upload or upload_file) to an issue.", createAttachmentFromUpload).returns(ResultOf[Attachment]()),
 	}
 }
 

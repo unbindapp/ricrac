@@ -21,29 +21,29 @@ func commentOps() []*Op {
 		op("list_comments", app.Read, []string{"GET /comments"},
 			"List the comment threads on one issue, project, initiative, document, milestone or status update, oldest "+
 				"first. Each thread is its first comment with its replies, reactions and whether it was resolved.",
-			listComments),
+			listComments).returns(ResultOf[PageOf[CommentThread]]()),
 		op("save_comment", app.Write, []string{"POST /comments", "PATCH /comments/{id}"},
 			"Comment on an issue, project, initiative, document, milestone or status update (pass exactly one of them), "+
 				"or reply to a comment with parentId. Pass id and body to edit your own comment. The body is Markdown; "+
 				"mention people with @displayName or @email to notify them. Commenting on an issue subscribes you to it and "+
 				"notifies its subscribers.",
-			saveComment),
+			saveComment).returns(ResultOf[CommentDetail]()),
 		op("delete_comment", app.Write, []string{"DELETE /comments/{id}"},
 			"Delete a comment (your own, or any as a workspace admin). Deleting a thread's first comment deletes its replies.",
-			deleteComment),
+			deleteComment).returns(ResultOf[DeletedComment]()),
 		op("resolve_comment", app.Write, []string{"POST /comments/{id}/resolve"},
 			"Mark a comment thread as resolved. Pass the thread's first comment.",
-			func(c *app.Ctx, args IDArgs) (any, error) { return setResolved(c, args.ID, true) }),
+			func(c *app.Ctx, args IDArgs) (any, error) { return setResolved(c, args.ID, true) }).returns(ResultOf[CommentDetail]()),
 		op("unresolve_comment", app.Write, []string{"POST /comments/{id}/unresolve"},
 			"Reopen a resolved comment thread.",
-			func(c *app.Ctx, args IDArgs) (any, error) { return setResolved(c, args.ID, false) }),
+			func(c *app.Ctx, args IDArgs) (any, error) { return setResolved(c, args.ID, false) }).returns(ResultOf[CommentDetail]()),
 		op("add_reaction", app.Write, []string{"POST /reactions"},
 			"React with an emoji to an issue, a comment or a status update (exactly one). The emoji is a unicode emoji "+
 				"(👍) or a shortcode (+1, :tada:). Reacting twice with the same emoji changes nothing.",
-			addReaction),
+			addReaction).returns(ResultOf[Reaction]()),
 		op("remove_reaction", app.Write, []string{"DELETE /reactions/{id}", "POST /reactions/remove"},
 			"Take back one of your reactions: by its id, or by emoji and the issue, comment or status update.",
-			removeReaction),
+			removeReaction).returns(ResultOf[RemovedReaction]()),
 	}
 }
 

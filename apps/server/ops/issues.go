@@ -23,43 +23,43 @@ func issueOps() []*Op {
 			"List issues, newest update first. Narrow with the simple arguments (team, assignee \"me\", state, label, "+
 				"project, cycle, ...) and/or a `filter` object for anything more (and/or, comparators, relations). Archived "+
 				"and trashed issues are left out unless asked for. Descriptions are left out unless includeDescription is set.",
-			listIssues),
+			listIssues).returns(ResultOf[PageOf[Issue]]()),
 		op("get_issue", app.Read, []string{"GET /issues/{id}"},
 			"Read an issue by identifier (ENG-123), id or link: its fields, description, sub-issues, relations "+
 				"(blocks, blocked by, related, duplicates), attachments, subscribers and releases. Set includeComments or "+
 				"includeHistory to also get its comment threads or change history.",
-			getIssue),
+			getIssue).returns(ResultOf[IssueDetail]()),
 		op("save_issue", app.Write, []string{"POST /issues", "PATCH /issues/{id}"},
 			"Create an issue (omit id; team and title are required unless a template or parent provides them) or update "+
 				"one (pass id). Omitted fields stay as they are; null clears a field. People are given as id, name, email or "+
 				"\"me\"; states as name, type or id; labels, projects, cycles and milestones as name or id. Use patch to edit "+
 				"part of the description without resending it. Moving an issue to another team gives it a new identifier; "+
 				"the old one keeps working. Returns the issue as get_issue does, with relations and sub-issues.",
-			saveIssue),
+			saveIssue).returns(ResultOf[IssueDetail]()),
 		op("update_issues", app.Write, []string{"PATCH /issues"},
 			"Apply the same change to several issues at once, e.g. move them to a state, assign them, add a label or put "+
 				"them in a cycle. `changes` takes the fields of save_issue (without id). Stops at the first issue that fails; "+
 				"issues before it keep their change.",
-			updateIssues),
+			updateIssues).returns(ResultOf[UpdatedIssues]()),
 		op("delete_issue", app.Write, []string{"DELETE /issues/{id}"},
 			"Move an issue to the trash. It disappears from lists and is deleted for good after 30 days; restore_issue "+
 				"brings it back before then.",
-			trashIssue),
-		op("restore_issue", app.Write, []string{"POST /issues/{id}/restore"}, "Bring an issue back from the trash.", restoreIssue),
+			trashIssue).returns(ResultOf[Issue]()),
+		op("restore_issue", app.Write, []string{"POST /issues/{id}/restore"}, "Bring an issue back from the trash.", restoreIssue).returns(ResultOf[Issue]()),
 		op("archive_issue", app.Write, []string{"POST /issues/{id}/archive"},
 			"Archive an issue (and its sub-issues). Archived issues are kept and readable but left out of lists unless "+
 				"includeArchived is set. Closed issues are archived automatically after the team's auto-archive period.",
-			archiveIssue),
-		op("unarchive_issue", app.Write, []string{"POST /issues/{id}/unarchive"}, "Bring an archived issue back.", unarchiveIssue),
+			archiveIssue).returns(ResultOf[Issue]()),
+		op("unarchive_issue", app.Write, []string{"POST /issues/{id}/unarchive"}, "Bring an archived issue back.", unarchiveIssue).returns(ResultOf[Issue]()),
 		op("get_issue_history", app.Read, []string{"GET /issues/{id}/history"},
 			"The change history of an issue, oldest first: who changed which field from what to what, and when.",
-			getIssueHistory),
+			getIssueHistory).returns(ResultOf[IssueHistory]()),
 		op("share_issue", app.Write, []string{"POST /issues/{id}/shares"},
 			"Give a workspace member who can't see the issue's team (a guest, or someone outside a private team) access "+
 				"to this one issue. Only when the user asks to share it.",
-			shareIssue),
+			shareIssue).returns(ResultOf[IssueShare]()),
 		op("unshare_issue", app.Write, []string{"DELETE /issues/{id}/shares/{user}"},
-			"Take back access to an issue given with share_issue.", unshareIssue),
+			"Take back access to an issue given with share_issue.", unshareIssue).returns(ResultOf[IssueUnshare]()),
 	}
 }
 

@@ -157,6 +157,17 @@ func (p Page) wrap(nodes []any) (M, error) {
 	return M{"nodes": nodes, "pageInfo": M{"hasNextPage": hasNext, "endCursor": endCursor}}, nil
 }
 
+type PageInfo struct {
+	HasNextPage bool    `json:"hasNextPage"`
+	EndCursor   *string `json:"endCursor" doc:"Pass it as cursor to get the next page."`
+}
+
+// PageOf is the shape of a list operation's result.
+type PageOf[T any] struct {
+	Nodes    []T      `json:"nodes"`
+	PageInfo PageInfo `json:"pageInfo"`
+}
+
 // TextEdit is one edit of a Markdown text, applied in order with the others of a patch.
 type TextEdit struct {
 	Op         string `json:"op"`

@@ -32,7 +32,9 @@ type Op struct {
 	// arguments under the same name.
 	Routes []Route
 	// JSON Schema of the arguments.
-	Schema      M
+	Schema M
+	// JSON Schema of the result (see returns).
+	Result      M
 	inWorkspace func(*app.Ctx, M) (any, error)
 	forAccount  func(*app.Caller, M) (any, error)
 }
@@ -76,6 +78,13 @@ func accountOp[A any](name string, access app.Access, specs []string, descriptio
 			return handler(c, args)
 		},
 	}
+}
+
+// returns declares the shape of the operation's result, which the web client is typed from and
+// the end-to-end tests check every answer against.
+func (o *Op) returns(schema M) *Op {
+	o.Result = schema
+	return o
 }
 
 func (o *Op) Call(c *app.Ctx, args M) (any, error) {

@@ -71,12 +71,34 @@ func SchemaOf[A any]() M {
 	return cloneJSON(schema)
 }
 
+var resultCache sync.Map
+
+// ResultOf is the JSON Schema of what an operation answers: every field of a struct is there
+// unless tagged omitempty, pointers and Nullable may be null, and named structs carry their name
+// as title (the web client's type names).
+func ResultOf[T any]() M {
+	t := reflect.TypeFor[T]()
+	if cached, ok := resultCache.Load(t); ok {
+		return cloneJSON(cached.(M))
+	}
+	schema := schemas{result: true}.of(t)
+	resultCache.Store(t, schema)
+	return cloneJSON(schema)
+}
+
 func schemaFor(t reflect.Type) M {
+	return schemas{}.of(t)
+}
+
+// schemas builds argument schemas, or result schemas when result is set.
+type schemas struct{ result bool }
+
+func (s schemas) of(t reflect.Type) M {
 	if t.Implements(schemaerType) {
 		return reflect.Zero(t).Interface().(schemaer).JSONSchema()
 	}
 	if t.Implements(nullableType) {
-		inner := schemaFor(reflect.Zero(t).Interface().(nullable).innerType())
+		inner := s.of(reflect.Zero(t).Interface().(nullable).innerType())
 		return withNull(inner)
 	}
 	if t == rawType {
@@ -84,7 +106,7 @@ func schemaFor(t reflect.Type) M {
 	}
 	switch t.Kind() {
 	case reflect.Pointer:
-		return withNull(schemaFor(t.Elem()))
+		return withNull(s.of(t.Elem()))
 	case reflect.String:
 		return M{"type": "string"}
 	case reflect.Bool:
@@ -94,19 +116,19 @@ func schemaFor(t reflect.Type) M {
 	case reflect.Float32, reflect.Float64:
 		return M{"type": "number"}
 	case reflect.Slice, reflect.Array:
-		return M{"type": "array", "items": schemaFor(t.Elem())}
+		return M{"type": "array", "items": s.of(t.Elem())}
 	case reflect.Map:
 		if t.Elem().Kind() == reflect.Interface {
 			return M{"type": "object"}
 		}
-		return M{"type": "object", "additionalProperties": schemaFor(t.Elem())}
+		return M{"type": "object", "additionalProperties": s.of(t.Elem())}
 	case reflect.Interface:
 		return M{}
 	case reflect.Struct:
 		properties := M{}
 		var required []any
 		structFields(t, func(name string, field reflect.StructField, isRequired bool) {
-			property := schemaFor(field.Type)
+			property := s.of(field.Type)
 			if doc := field.Tag.Get("doc"); doc != "" {
 				property["description"] = doc
 			}
@@ -121,13 +143,17 @@ func schemaFor(t reflect.Type) M {
 				property["enum"] = list
 			}
 			properties[name] = property
-			if isRequired {
+			_, options, _ := strings.Cut(field.Tag.Get("json"), ",")
+			if isRequired || s.result && !strings.Contains(options, "omitempty") {
 				required = append(required, name)
 			}
 		})
 		schema := M{"type": "object", "properties": properties, "additionalProperties": false}
 		if len(required) > 0 {
 			schema["required"] = required
+		}
+		if s.result && t.Name() != "" && !strings.Contains(t.Name(), "[") {
+			schema["title"] = t.Name()
 		}
 		return schema
 	}
