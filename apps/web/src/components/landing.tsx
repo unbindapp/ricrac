@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router"
 import { BotIcon, CableIcon, KanbanIcon, RepeatIcon, TerminalIcon, UsersIcon } from "lucide-react"
 
 import { PublicPage } from "@/components/public-page"
@@ -77,22 +76,6 @@ export function Landing() {
           ))}
         </section>
 
-        <section className="max-w-2xl space-y-3">
-          <h2 className="text-xl font-semibold tracking-tight">Signing in with Google</h2>
-          <p className="leading-relaxed text-muted-foreground">
-            Ricrac uses Google only to know who you are. When you sign in, it receives your name, email address and
-            profile picture, which it uses for your account and to show you to the other members of your workspaces.
-            It can't see anything else in your Google account. The{" "}
-            <Link to="/privacy" className="text-foreground underline underline-offset-4">
-              Privacy Policy
-            </Link>{" "}
-            explains what's stored and how to remove it, and the{" "}
-            <Link to="/terms" className="text-foreground underline underline-offset-4">
-              Terms of Service
-            </Link>{" "}
-            cover using the service.
-          </p>
-        </section>
       </div>
     </PublicPage>
   )

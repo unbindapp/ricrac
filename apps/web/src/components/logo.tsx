@@ -5,9 +5,8 @@ const GLYPH =
 
 export function LogoMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 32 32" aria-hidden className={cn("size-6", className)}>
-      <rect width="32" height="32" rx="8" className="fill-foreground" />
-      <path transform="translate(3.2 8.32) scale(1.28)" d={GLYPH} className="fill-background" />
+    <svg viewBox="0 0 20 12" aria-hidden className={cn("h-4 w-auto fill-foreground", className)}>
+      <path d={GLYPH} />
     </svg>
   )
 }
