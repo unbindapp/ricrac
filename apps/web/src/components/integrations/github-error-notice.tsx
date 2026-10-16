@@ -1,5 +1,5 @@
 import { TriangleAlertIcon, XIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { githubErrorMessage } from "@/lib/helpers/github-sync";
@@ -8,14 +8,15 @@ const PARAM = "github_error";
 
 /** Why GitHub sent you back without connecting, read once from the URL and then dropped from it. */
 function useGithubErrorParam() {
-  const [reason, setReason] = useState(() => {
+  const [reason, setReason] = useState(() =>
+    new URLSearchParams(window.location.search).get(PARAM),
+  );
+  useEffect(() => {
     const url = new URL(window.location.href);
-    const value = url.searchParams.get(PARAM);
-    if (!value) return null;
+    if (!url.searchParams.has(PARAM)) return;
     url.searchParams.delete(PARAM);
     window.history.replaceState(window.history.state, "", url);
-    return value;
-  });
+  }, []);
   return { reason, dismiss: () => setReason(null) };
 }
 
