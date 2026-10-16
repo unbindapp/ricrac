@@ -523,8 +523,21 @@ pub async fn project_labels(ctx: &Ctx, values: &[String]) -> ApiResult<Vec<Uuid>
     Ok(ids)
 }
 
+/// SQL that is true when the pipeline in `column` has no teams or one the caller sees. The team
+/// ids are UUIDs, so inlining them is safe.
+async fn pipeline_visible(ctx: &Ctx, column: &str) -> ApiResult<String> {
+    let teams: Vec<String> = ctx.team_ids().await?.iter().map(Uuid::to_string).collect();
+    Ok(format!(
+        "AND (NOT EXISTS (SELECT 1 FROM release_pipeline_teams pt WHERE pt.pipeline_id = {column})
+          OR EXISTS (SELECT 1 FROM release_pipeline_teams pt WHERE pt.pipeline_id = {column}
+                     AND pt.team_id = ANY('{{{}}}'::uuid[])))",
+        teams.join(",")
+    ))
+}
+
 pub async fn release(ctx: &Ctx, value: &str) -> ApiResult<Uuid> {
-    named(ctx.db(), ctx.workspace, "releases", "name", "", "release", value).await
+    let extra = pipeline_visible(ctx, "releases.pipeline_id").await?;
+    named(ctx.db(), ctx.workspace, "releases", "name", &extra, "release", value).await
 }
 
 pub async fn releases(ctx: &Ctx, values: &[String]) -> ApiResult<Vec<Uuid>> {
@@ -539,7 +552,8 @@ pub async fn releases(ctx: &Ctx, values: &[String]) -> ApiResult<Vec<Uuid>> {
 }
 
 pub async fn pipeline(ctx: &Ctx, value: &str) -> ApiResult<Uuid> {
-    named(ctx.db(), ctx.workspace, "release_pipelines", "name", "", "release pipeline", value).await
+    let extra = pipeline_visible(ctx, "release_pipelines.id").await?;
+    named(ctx.db(), ctx.workspace, "release_pipelines", "name", &extra, "release pipeline", value).await
 }
 
 pub async fn customer(ctx: &Ctx, value: &str) -> ApiResult<Uuid> {

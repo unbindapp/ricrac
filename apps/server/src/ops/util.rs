@@ -90,7 +90,7 @@ fn parse_duration(value: &str) -> Option<Duration> {
     Some(if negative { -total } else { total })
 }
 
-/// Paging arguments, flattened into list operations.
+/// Paging, built from a list operation's `limit` and `cursor` arguments.
 #[derive(Deserialize, JsonSchema, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Page {
