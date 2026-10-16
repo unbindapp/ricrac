@@ -2,6 +2,7 @@ package ops
 
 import (
 	"context"
+	"slices"
 	"strings"
 	"unicode"
 
@@ -124,4 +125,40 @@ func CreateTeam(ctx context.Context, tx app.Querier, workspace, creator uuid.UUI
 		return uuid.Nil, err
 	}
 	return team, app.Exec(ctx, tx, "INSERT INTO team_members (team_id, user_id, owner) VALUES ($1, $2, true)", team, creator)
+}
+
+// CheckURLKey checks a workspace URL key: 2 to 32 lowercase letters, digits and dashes, not a
+// path the server uses.
+func CheckURLKey(key string) (string, error) {
+	key = strings.ToLower(strings.TrimSpace(key))
+	valid := len(key) >= 2 && len(key) <= 32 && !strings.HasPrefix(key, "-") && !strings.HasSuffix(key, "-")
+	for _, b := range []byte(key) {
+		if !(b >= 'a' && b <= 'z' || b >= '0' && b <= '9' || b == '-') {
+			valid = false
+		}
+	}
+	if !valid {
+		return "", app.BadRequest("The URL key is 2 to 32 lowercase letters, digits and dashes")
+	}
+	reserved := []string{"api", "v1", "mcp", "oauth", "assets", "files", "settings", "login", "admin", "docs", "llms.txt",
+		"uploads", "privacy", "terms"}
+	if slices.Contains(reserved, key) {
+		return "", app.BadRequest("%q is reserved", key)
+	}
+	return key, nil
+}
+
+// CheckTeamKey checks a team key: 1 to 7 letters and digits, starting with a letter.
+func CheckTeamKey(key string) (string, error) {
+	key = strings.ToUpper(strings.TrimSpace(key))
+	valid := len(key) >= 1 && len(key) <= 7 && key[0] >= 'A' && key[0] <= 'Z'
+	for _, b := range []byte(key) {
+		if !(b >= 'A' && b <= 'Z' || b >= '0' && b <= '9') {
+			valid = false
+		}
+	}
+	if !valid {
+		return "", app.BadRequest("A team key is 1 to 7 letters and digits, starting with a letter, like ENG")
+	}
+	return key, nil
 }
