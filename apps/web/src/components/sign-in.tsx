@@ -75,7 +75,7 @@ export function SignedOut({ title = "Sign in", description }: { title?: string; 
     <CenterPanel>
       <div className="space-y-2 text-center">
         <p className="text-balance text-muted-foreground">
-          Issue tracking for agents, with Linear's model, over MCP and a REST API.
+          Issue tracking for agents, over MCP and a REST API.
         </p>
       </div>
       <Card>

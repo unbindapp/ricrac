@@ -666,7 +666,7 @@ pub async fn revoke(
 /*                           Bearer checks                            */
 /* ------------------------------------------------------------------ */
 
-/// The token from `Authorization: Bearer <token>`, or a bare API key (as Linear accepts).
+/// The token from `Authorization: Bearer <token>`, or a bare API key.
 fn bearer(headers: &HeaderMap) -> Option<&str> {
     let value = headers.get(header::AUTHORIZATION)?.to_str().ok()?.trim();
     let token = value.strip_prefix("Bearer ").or_else(|| value.strip_prefix("bearer ")).unwrap_or(value);
@@ -762,7 +762,7 @@ mod tests {
         assert!(is_allowed_redirect("https://claude.ai/api/mcp/auth_callback"));
         assert!(is_allowed_redirect("http://localhost:33418/callback"));
         assert!(is_allowed_redirect("http://[::1]:8080/cb"));
-        assert!(is_allowed_redirect("motile://linear"));
+        assert!(is_allowed_redirect("motile://ricrac"));
         assert!(!is_allowed_redirect("http://evil.com/cb"));
         assert!(!is_allowed_redirect("http://localhost.evil.com/cb"));
         assert!(!is_allowed_redirect("javascript://alert(1)"));

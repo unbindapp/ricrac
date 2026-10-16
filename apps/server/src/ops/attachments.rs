@@ -122,7 +122,6 @@ fn source_type(url: &str, public_url: &str) -> &'static str {
         ("notion.so", "notion"),
         ("notion.site", "notion"),
         ("loom.com", "loom"),
-        ("linear.app", "linear"),
     ];
     if let Some((_, source)) = sources.iter().find(|(domain, _)| is(domain)) {
         return source;

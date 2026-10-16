@@ -1,7 +1,7 @@
 # Ricrac
 
-An issue tracker for agents. Ricrac has Linear's model and features (teams, issues, workflows,
-projects, initiatives, cycles, and the rest), but no interface for working in it: agents use it
+An issue tracker for agents. Ricrac has teams, issues, workflows, projects, initiatives, cycles
+and the rest, but no interface for working in it: agents use it
 through an MCP server and a REST API. People sign in with Google to a small dashboard to manage
 workspaces, members, API keys and OAuth apps, approve connections, and open read-only pages for the
 links agents share.
@@ -20,7 +20,7 @@ links agents share.
   sub-issues, relations (blocks, blocked by, related, duplicate), link attachments and uploaded
   files, subscribers, sharing with people outside the team, history, archive and trash, and
   changes to many issues at once.
-- **Filtering** with Linear's `IssueFilter` language (`and`/`or`, comparators, relation filters)
+- **Filtering** with a filter language (`and`/`or`, comparators, relation filters)
   and full-text search.
 - **Comments** in threads with replies, resolving and reactions, on issues, projects,
   initiatives, documents, milestones and status updates. **@mentions** notify people.

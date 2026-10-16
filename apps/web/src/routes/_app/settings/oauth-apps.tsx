@@ -81,7 +81,7 @@ function OAuthAppsPage() {
     <>
       <PageHeader
         title="OAuth apps"
-        description={`Apps that integrate with ${workspace.name} the way apps integrate with Linear: people authorize them and they act on their behalf.`}
+        description={`Apps that integrate with ${workspace.name}: people authorize them and they act on their behalf.`}
         actions={
           <Button onClick={() => setEditing({ app: null })}>
             <PlusIcon />

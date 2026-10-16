@@ -92,7 +92,7 @@ with their argument schemas; call them with call_operation.";
 const CALL_DESCRIPTION: &str = "Run any Ricrac operation by name with its arguments (see find_operations). Returns \
 the operation's result.";
 
-pub const INSTRUCTIONS: &str = "Ricrac is an issue tracker for agents, with Linear's model: a workspace has teams; \
+pub const INSTRUCTIONS: &str = "Ricrac is an issue tracker for agents: a workspace has teams; \
 teams have issues (identifiers like ENG-123), workflow statuses (triage, backlog, unstarted, started, completed, \
 canceled), labels, cycles and templates; projects (with milestones, status updates and documents) span teams and \
 roll up into initiatives. There are also comments, attachments, custom views, favorites, an inbox of notifications, \

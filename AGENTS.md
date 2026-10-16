@@ -1,6 +1,6 @@
 ## What is this?
 
-Ricrac is an issue tracker for agents, with Linear's features (without Linear's agent features).
+Ricrac is an issue tracker for agents.
 It has no interface of its own: agents use it through the MCP server (`/mcp`) and the REST API
 (`/v1`), and people sign in with Google to a small dashboard to manage their workspaces, API keys
 and OAuth apps. README.md covers features and configuration.
@@ -24,7 +24,7 @@ Dockerfile) and a `postgres` database service.
   comments are what agents read.
 - `ops/resolve.rs` turns what agents pass (names, keys, identifiers like ENG-123, "me", links)
   into ids and checks the caller may see the thing; errors list the valid options.
-  `ops/filter.rs` is the issue filter language (Linear's `IssueFilter`), used by `list_issues`
+  `ops/filter.rs` is the issue filter language, used by `list_issues`
   and custom views. `ops/events.rs` writes issue history, notifications, webhook deliveries and
   the audit log inside the change's transaction. `ops/util.rs` has the nullable-argument helper,
   dates and durations, paging, slugs and Markdown patches.
@@ -52,7 +52,7 @@ apps/server.
 
 ## Conventions
 
-- Output and arguments are camelCase, as in Linear's API. Timestamps are ISO 8601 UTC.
+- Output and arguments are camelCase. Timestamps are ISO 8601 UTC.
 - `save_*` creates without `id` and updates with it. Optional fields left out stay as they are;
   `null` clears them (`Option<Option<T>>` with `#[serde(default, deserialize_with = "nullable")]`
   and `#[schemars(with = "Option<T>")]`).

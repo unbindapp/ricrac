@@ -21,7 +21,7 @@ fn last_segment(value: &str) -> &str {
     path.rsplit('/').next().unwrap_or(value)
 }
 
-/// Linear-style slugs end in the id: `my-project-0a1b2c3d4e5f`.
+/// Slugs end in the id: `my-project-0a1b2c3d4e5f`.
 fn slug_tail(value: &str) -> &str {
     let segment = last_segment(value);
     match segment.rsplit_once('-') {

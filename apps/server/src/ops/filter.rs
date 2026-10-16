@@ -1,4 +1,4 @@
-//! The issue filter language, after Linear's `IssueFilter`: an object of fields with comparators,
+//! The issue filter language: an object of fields with comparators,
 //! combined with `and` / `or`, e.g.
 //! `{"state": {"type": {"in": ["started", "unstarted"]}}, "assignee": {"isMe": {"eq": true}}}`.
 //! Custom views store their filter in this form too. It compiles to SQL with bound values.
@@ -12,7 +12,7 @@ use super::util::parse_datetime;
 use crate::ctx::Ctx;
 use crate::error::{ApiError, ApiResult};
 
-pub const FILTER_HELP: &str = "A filter object, as in Linear's IssueFilter. Fields: id, number, title, description, \
+pub const FILTER_HELP: &str = "A filter object. Fields: id, number, title, description, \
 priority, estimate, dueDate, createdAt, updatedAt, startedAt, completedAt, canceledAt, archivedAt, triagedAt, \
 snoozedUntil, slaBreachesAt, state {id,name,type}, team {id,key,name}, assignee / creator {id,email,name,displayName,isMe}, \
 labels {some|every|none: {id,name,parent}}, project {id,name,slugId}, projectMilestone {id,name}, cycle {id,number,name,isActive}, \

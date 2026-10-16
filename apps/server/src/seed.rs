@@ -1,4 +1,4 @@
-//! What new workspaces and teams start with, as in Linear.
+//! What new workspaces and teams start with.
 
 use sqlx::PgConnection;
 use uuid::Uuid;

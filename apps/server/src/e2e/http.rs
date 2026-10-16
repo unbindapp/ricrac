@@ -204,7 +204,7 @@ async fn mcp_lists_and_calls_tools(db: PgPool) {
     )
     .await;
     assert_eq!(status, StatusCode::OK, "{init}");
-    assert!(init["result"]["instructions"].as_str().unwrap().contains("Linear"));
+    assert!(init["result"]["instructions"].as_str().unwrap().contains("issue tracker"));
     let (_, tools) = send(&router, rpc(json!({ "jsonrpc": "2.0", "id": 2, "method": "tools/list" }))).await;
     let names: Vec<&str> =
         tools["result"]["tools"].as_array().unwrap().iter().map(|t| t["name"].as_str().unwrap()).collect();

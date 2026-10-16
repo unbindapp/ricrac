@@ -1465,7 +1465,7 @@ async fn unarchive(ctx: Ctx, args: IdArgs) -> ApiResult<Value> {
     mark(&ctx, id, sql, "update").await
 }
 
-/// Linear-style slugs end in the id: `my-project-0a1b2c3d4e5f`.
+/// Slugs end in the id: `my-project-0a1b2c3d4e5f`.
 fn slug_tail(value: &str) -> &str {
     let value = value.trim();
     let segment =
