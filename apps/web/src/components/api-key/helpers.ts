@@ -1,60 +1,58 @@
-import { addDays, addYears } from "date-fns";
 import { z } from "zod";
+
+import type { TScope } from "@/lib/queries/api-keys";
 
 export type TAccess = "all" | "specific";
 
 export const accessItems: { value: TAccess; label: string }[] = [
-  { value: "all", label: "All my workspaces" },
-  { value: "specific", label: "Specific workspaces" },
+  { value: "all", label: "All my workspaces, including ones I join later" },
+  { value: "specific", label: "Only the workspaces I pick" },
 ];
 
-export const expiryOptions = [
-  { value: "7d", label: "7 days" },
-  { value: "30d", label: "30 days" },
-  { value: "90d", label: "90 days" },
-  { value: "1y", label: "1 year" },
-  { value: "never", label: "Never" },
-] as const;
+export type TScopeLevel = "read" | "write" | "admin";
 
-export type TExpiryValue = (typeof expiryOptions)[number]["value"];
-export const defaultExpiry: TExpiryValue = "90d";
+export const scopeLevelItems: { value: TScopeLevel; label: string }[] = [
+  { value: "read", label: "Read" },
+  { value: "write", label: "Read and write" },
+  { value: "admin", label: "Read, write and admin" },
+];
 
-export function expiresAtFrom(value: TExpiryValue, now = new Date()): string | undefined {
-  switch (value) {
-    case "7d":
-      return addDays(now, 7).toISOString();
-    case "30d":
-      return addDays(now, 30).toISOString();
-    case "90d":
-      return addDays(now, 90).toISOString();
-    case "1y":
-      return addYears(now, 1).toISOString();
-    case "never":
-      return undefined;
-  }
+export const scopeLevelDescriptions: Record<TScopeLevel, string> = {
+  read: "Reads everything you can see.",
+  write: "Also creates and changes issues, projects, comments and more.",
+  admin: "Also manages members, teams and settings where you're an admin.",
+};
+
+export function scopesOf(level: TScopeLevel): TScope[] {
+  if (level === "read") return ["read"];
+  if (level === "write") return ["read", "write"];
+  return ["read", "write", "admin"];
+}
+
+/** The widest of the scopes a key or grant holds. */
+export function scopeLevel(scopes: string[]): TScopeLevel {
+  if (scopes.includes("admin")) return "admin";
+  if (scopes.includes("write")) return "write";
+  return "read";
 }
 
 export const accessFormShape = {
-  role: z.enum(["admin", "member", "viewer"]),
   access: z.enum(["all", "specific"]),
-  workspace_ids: z.array(z.string()),
+  workspaceIds: z.array(z.string()),
 };
 
-export function hasPickedWorkspace(value: { access: TAccess; workspace_ids: string[] }) {
-  return value.access === "all" || value.workspace_ids.length > 0;
+export function hasPickedWorkspace(value: { access: TAccess; workspaceIds: string[] }) {
+  return value.access === "all" || value.workspaceIds.length > 0;
 }
 
 export const pickWorkspaceMessage = {
   message: "Pick at least one workspace.",
-  path: ["workspace_ids"],
+  path: ["workspaceIds"],
 };
 
-export function describeAccess(
-  access: { full_access: boolean; workspace_ids?: string[] | null },
-  workspaceNames: Record<string, string>,
-) {
-  if (access.full_access) return "All workspaces";
-  const names = (access.workspace_ids ?? []).map((id) => workspaceNames[id] ?? "Unknown workspace");
-  if (names.length === 0) return "No workspaces";
-  return names.join(", ");
+/** The workspaces part of a key or connected app, from the names the server lists. */
+export function describeAccess(access: { allWorkspaces: boolean; workspaces: string[] }) {
+  if (access.allWorkspaces) return "All workspaces";
+  if (access.workspaces.length === 0) return "No workspaces";
+  return access.workspaces.join(", ");
 }

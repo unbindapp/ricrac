@@ -19,6 +19,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { GripVerticalIcon, PencilIcon, PlusIcon, WorkflowIcon } from "lucide-react";
 import { useState } from "react";
 
+import type { IssueStatus, Team } from "@/api/ops.gen";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { List } from "@/components/layout/list";
@@ -36,12 +37,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useRequiredTeamFromRoute } from "@/components/workspace/use-team-from-route";
-import {
-  type TTeam,
-  type TWorkflowState,
-  useUpdateWorkflowStateMutation,
-  workflowStatesQuery,
-} from "@/lib/queries/teams";
+import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { teamStatusesQuery, useSaveIssueStatusMutation } from "@/lib/queries/teams";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/team/$key/workflow")({
   component: TeamWorkflowSettingsPage,
@@ -56,27 +53,32 @@ const typeDescriptions: Record<TStateType, string> = {
   canceled: "Issues that will not be done.",
 };
 
-function byPosition(a: TWorkflowState, b: TWorkflowState) {
+function byPosition(a: IssueStatus, b: IssueStatus) {
   return a.position - b.position;
 }
 
 function TeamWorkflowSettingsPage() {
   const team = useRequiredTeamFromRoute();
-  const { data, isPending, error, refetch } = useQuery(workflowStatesQuery(team.id));
-  const states = data?.states ?? [];
+  const { workspace } = useWorkspace();
+  const {
+    data: states = [],
+    isPending,
+    error,
+    refetch,
+  } = useQuery(teamStatusesQuery(workspace.id, team.id));
   const types = STATE_TYPES.filter(
-    (type) => type !== "triage" || team.triage_enabled || states.some((s) => s.type === "triage"),
+    (type) => type !== "triage" || team.triageEnabled || states.some((s) => s.type === "triage"),
   );
 
   return (
     <SettingsPage
       title="Workflow"
-      description="The states an issue moves through. Drag to reorder within a group."
+      description="The statuses an issue moves through. Drag to reorder within a group."
     >
       {isPending && <ListSkeleton />}
       {!isPending && error && <ErrorCard message={error.message} onRetry={() => void refetch()} />}
       {!isPending && !error && states.length === 0 && (
-        <EmptyState icon={WorkflowIcon} title="No workflow states yet" />
+        <EmptyState icon={WorkflowIcon} title="No statuses yet" />
       )}
       {!isPending &&
         !error &&
@@ -100,13 +102,14 @@ function StateGroup({
   states,
   allStates,
 }: {
-  team: TTeam;
+  team: Team;
   type: TStateType;
-  states: TWorkflowState[];
-  allStates: TWorkflowState[];
+  states: IssueStatus[];
+  allStates: IssueStatus[];
 }) {
+  const { workspace } = useWorkspace();
   const [dragOrder, setDragOrder] = useState<string[] | null>(null);
-  const { mutate: updateState } = useUpdateWorkflowStateMutation();
+  const { mutate: saveStatus } = useSaveIssueStatusMutation(workspace.id);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -114,9 +117,8 @@ function StateGroup({
   const ordered = dragOrder
     ? dragOrder
         .map((id) => states.find((state) => state.id === id))
-        .filter((state): state is TWorkflowState => !!state)
+        .filter((state): state is IssueStatus => !!state)
     : states;
-  const lastPosition = states.at(-1)?.position ?? 0;
 
   const onDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -127,8 +129,8 @@ function StateGroup({
     const before = ordered.find((state) => state.id === next[index - 1]);
     const after = ordered.find((state) => state.id === next[index + 1]);
     setDragOrder(next);
-    updateState(
-      { state_id: String(active.id), position: midpoint(before?.position, after?.position) },
+    saveStatus(
+      { id: String(active.id), position: midpoint(before?.position, after?.position) },
       { onSettled: () => setDragOrder(null) },
     );
   };
@@ -142,12 +144,11 @@ function StateGroup({
           mode="create"
           teamId={team.id}
           type={type}
-          position={lastPosition + 1}
           trigger={
             <Button
               variant="ghost"
               size="icon"
-              aria-label={`Add ${stateTypeLabels[type].toLowerCase()} state`}
+              aria-label={`Add ${stateTypeLabels[type].toLowerCase()} status`}
             >
               <PlusIcon className="size-4" />
             </Button>
@@ -156,7 +157,7 @@ function StateGroup({
       }
     >
       {ordered.length === 0 ? (
-        <p className="text-muted-foreground text-sm">No states of this type.</p>
+        <p className="text-muted-foreground text-sm">No statuses of this type.</p>
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
           <SortableContext
@@ -169,7 +170,7 @@ function StateGroup({
                   key={state.id}
                   state={state}
                   allStates={allStates}
-                  isDefault={team.default_state_id === state.id}
+                  isDefault={state.isDefault}
                 />
               ))}
             </List>
@@ -192,8 +193,8 @@ function SortableStateRow({
   allStates,
   isDefault,
 }: {
-  state: TWorkflowState;
-  allStates: TWorkflowState[];
+  state: IssueStatus;
+  allStates: IssueStatus[];
   isDefault: boolean;
 }) {
   const {

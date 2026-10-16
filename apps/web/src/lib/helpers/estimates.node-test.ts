@@ -4,7 +4,7 @@ import { test } from "node:test";
 import { estimateOptions, formatEstimate } from "./estimates.ts";
 
 test("no options when estimates are off", () => {
-  assert.deepEqual(estimateOptions({ type: "none", allowZero: true, extended: true }), []);
+  assert.deepEqual(estimateOptions({ type: "notUsed", allowZero: true, extended: true }), []);
 });
 
 test("scales follow the type and the extended flag", () => {
@@ -19,7 +19,7 @@ test("scales follow the type and the extended flag", () => {
 });
 
 test("t-shirt estimates read as sizes", () => {
-  assert.equal(formatEstimate(3, "tshirt"), "M");
-  assert.equal(formatEstimate(21, "tshirt"), "XXXL");
+  assert.equal(formatEstimate(3, "tShirt"), "M");
+  assert.equal(formatEstimate(21, "tShirt"), "XXXL");
   assert.equal(formatEstimate(3, "linear"), "3");
 });

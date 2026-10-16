@@ -8,19 +8,28 @@ import { List } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { SettingsPage } from "@/components/layout/settings-page";
 import { SettingsSection } from "@/components/layout/settings-section";
-import { apiKeysListQuery } from "@/lib/queries/api-keys";
+import { apiKeysQuery } from "@/lib/queries/api-keys";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/account/api-keys")({
   component: AccountApiKeysSettingsPage,
 });
 
 function AccountApiKeysSettingsPage() {
-  const { data, isPending, error, refetch } = useQuery(apiKeysListQuery());
-  const apiKeys = data?.apiKeys ?? [];
-  const create = <CreateApiKeyDialog takenNames={apiKeys.map((key) => key.name)} />;
+  const { data: apiKeys = [], isPending, error, refetch } = useQuery(apiKeysQuery);
+  const create = <CreateApiKeyDialog takenLabels={apiKeys.map((key) => key.label)} />;
   return (
     <SettingsPage title="API keys" description="Keys for scripts, CI and agents.">
-      <SettingsSection title="API keys" actions={create}>
+      <SettingsSection
+        title="API keys"
+        description={
+          <>
+            Send one as a bearer token to the REST API at{" "}
+            <span className="font-mono text-xs">{window.location.origin}/v1</span> or the MCP
+            server.
+          </>
+        }
+        actions={create}
+      >
         <ListStates
           isPending={isPending}
           error={error}

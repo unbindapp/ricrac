@@ -27,7 +27,7 @@ import {
   useCreateTemplateMutation,
   useUpdateTemplateMutation,
 } from "@/lib/queries/templates";
-import { workspaceMembersQuery } from "@/lib/queries/workspaces";
+import { usersQuery } from "@/lib/queries/users";
 
 const NONE = "none";
 
@@ -87,7 +87,7 @@ function TemplateForm(props: TProps & { onDone: () => void }) {
   const teamId = props.mode === "edit" ? (props.template.team_id ?? undefined) : props.teamId;
   const team = teams.find((candidate) => candidate.id === teamId);
   const { data: labelData } = useQuery(labelTreeQuery({ workspaceId: props.workspaceId, teamId }));
-  const { data: memberData } = useQuery(workspaceMembersQuery(props.workspaceId));
+  const { data: users } = useQuery(usersQuery(props.workspaceId));
 
   const labelItems = (labelData?.labels ?? []).flatMap((label) =>
     (label.is_group ? label.children : [label]).map((item) => ({
@@ -116,10 +116,7 @@ function TemplateForm(props: TProps & { onDone: () => void }) {
   ];
   const assigneeItems = [
     { value: NONE, label: "Unassigned" },
-    ...(memberData?.members ?? []).map((member) => ({
-      value: member.user.id,
-      label: member.user.name,
-    })),
+    ...(users ?? []).map((user) => ({ value: user.id, label: user.name })),
   ];
 
   const form = useAppForm({

@@ -1,84 +1,52 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
+import type { WorkspaceSummary } from "@/api/account.gen";
 import { AuthShell } from "@/components/layout/auth-shell";
 import { Button } from "@/components/ui/button";
-import { slugify } from "@/lib/helpers/identifiers";
-import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
-import { useLogoutMutation } from "@/lib/queries/auth";
-import { meQuery, meWorkspaces } from "@/lib/queries/me";
-import {
-  fetchWorkspaceLandingPath,
-  useCreateWorkspaceMutation,
-  WorkspaceFormSchema,
-} from "@/lib/queries/workspaces";
+import { CreateWorkspaceForm } from "@/components/workspace/create-workspace-form";
+import { PendingInvitations } from "@/components/workspace/pending-invitations";
+import { meQuery, signOut } from "@/lib/queries/me";
 
 export const Route = createFileRoute("/create-workspace/")({
   component: CreateWorkspace,
 });
 
 function CreateWorkspace() {
-  const router = useRouter();
-  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { data: me } = useQuery(meQuery);
-  const hasWorkspaces = meWorkspaces(me).length > 0;
-  const { mutateAsync: create } = useCreateWorkspaceMutation();
-  const { mutate: signOut, isPending: isSigningOut } = useLogoutMutation();
-
-  const form = useAppForm({
-    defaultValues: { name: "", slug: "" },
-    validators: { onSubmit: WorkspaceFormSchema },
-    onSubmit: async ({ value }) => {
-      const parsed = WorkspaceFormSchema.parse(value);
-      const res = await create(parsed);
-      router.history.push(await fetchWorkspaceLandingPath(queryClient, res.data));
-    },
-  });
+  const invitations = me?.invitations ?? [];
+  const hasWorkspaces = (me?.workspaces.length ?? 0) > 0;
+  const open = (workspace: WorkspaceSummary) =>
+    navigate({ to: "/$workspace", params: { workspace: workspace.urlKey } });
 
   return (
     <AuthShell
-      title="Create a workspace"
+      title={invitations.length > 0 ? "Join or create a workspace" : "Create a workspace"}
       description={
         hasWorkspaces
           ? "Workspaces hold teams, projects and issues."
-          : "You are not a member of any workspace yet. Create one, or ask an admin for an invitation."
+          : "You aren't in a workspace yet. Create one, or ask someone to invite you."
       }
       footer={
-        <Button
-          variant="ghost"
-          size="sm"
-          isPending={isSigningOut}
-          onClick={() => signOut(undefined, { onSuccess: () => router.history.push("/sign-in") })}
-        >
-          Sign out
-        </Button>
+        <>
+          {me && <p>Signed in as {me.email}</p>}
+          <Button variant="ghost" size="sm" onClick={() => void signOut()}>
+            Sign out
+          </Button>
+        </>
       }
     >
-      <form className="flex w-full flex-col gap-4" onSubmit={submitHandler(form)} noValidate>
-        <form.AppField
-          name="name"
-          listeners={{
-            onChange: ({ value }) => {
-              if (form.getFieldMeta("slug")?.isDirty) return;
-              form.setFieldValue("slug", slugify(value), { dontUpdateMeta: true });
-            },
-          }}
-          children={(field) => <field.TextField label="Name" placeholder="Acme" autoFocus />}
-        />
-        <form.AppField
-          name="slug"
-          children={(field) => (
-            <field.TextField
-              label="URL"
-              description="Lowercase letters, numbers and dashes."
-              transform={(v) => v.toLowerCase()}
-            />
-          )}
-        />
-        <form.AppForm>
-          <form.SubmitButton className="w-full">Create workspace</form.SubmitButton>
-        </form.AppForm>
-      </form>
+      {invitations.length > 0 && (
+        <section className="flex w-full flex-col gap-2">
+          <h2 className="text-base font-semibold">Invitations</h2>
+          <PendingInvitations invitations={invitations} onAccepted={open} />
+        </section>
+      )}
+      <section className="flex w-full flex-col gap-2">
+        {invitations.length > 0 && <h2 className="text-base font-semibold">New workspace</h2>}
+        <CreateWorkspaceForm onCreated={open} />
+      </section>
     </AuthShell>
   );
 }

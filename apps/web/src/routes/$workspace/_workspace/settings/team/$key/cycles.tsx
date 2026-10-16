@@ -2,48 +2,56 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { SettingsPage } from "@/components/layout/settings-page";
 import { SettingsSection } from "@/components/layout/settings-section";
-import { useRequiredTeamFromRoute } from "@/components/workspace/use-team-from-route";
+import { useTeamDetailFromRoute } from "@/components/workspace/use-team-from-route";
+import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
-import { useUpdateTeamMutation } from "@/lib/queries/teams";
+import { useSaveTeamMutation } from "@/lib/queries/teams";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/team/$key/cycles")({
   component: TeamCyclesSettingsPage,
 });
 
-const weeks = (from: number, to: number) =>
+const numbered = (from: number, to: number, label: (n: number) => string) =>
   Array.from({ length: to - from + 1 }, (_, i) => from + i).map((n) => ({
     value: String(n),
-    label: n === 0 ? "No cooldown" : `${n} ${n === 1 ? "week" : "weeks"}`,
+    label: label(n),
   }));
 
-const durationItems = weeks(1, 8);
-const cooldownItems = weeks(0, 4);
+const weeks = (n: number) => `${n} ${n === 1 ? "week" : "weeks"}`;
+const durationItems = numbered(1, 8, weeks);
+const cooldownItems = numbered(0, 4, (n) => (n === 0 ? "No cooldown" : weeks(n)));
+const upcomingItems = numbered(1, 8, (n) => `${n} ${n === 1 ? "cycle" : "cycles"}`);
 const dayItems = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map(
-  (label, index) => ({ value: String(index + 1), label }),
+  (label, index) => ({ value: String((index + 1) % 7), label }),
 );
 
 function TeamCyclesSettingsPage() {
-  const team = useRequiredTeamFromRoute();
-  const { mutateAsync: updateTeam } = useUpdateTeamMutation();
+  const team = useTeamDetailFromRoute();
+  const { workspace } = useWorkspace();
+  const { mutateAsync: saveTeam } = useSaveTeamMutation(workspace.id);
 
   const form = useAppForm({
     defaultValues: {
-      cycles_enabled: team.cycles_enabled,
-      cycle_duration_weeks: String(team.cycle_duration_weeks),
-      cycle_cooldown_weeks: String(team.cycle_cooldown_weeks),
-      cycle_start_day: String(team.cycle_start_day),
-      cycle_auto_move: team.cycle_auto_move,
-      cycle_auto_add_started: team.cycle_auto_add_started,
+      cyclesEnabled: team.cyclesEnabled,
+      cycleDurationWeeks: String(team.cycleDurationWeeks),
+      cycleCooldownWeeks: String(team.cycleCooldownWeeks),
+      cycleStartDay: String(team.cycleStartDay),
+      upcomingCycleCount: String(team.upcomingCycleCount),
+      cycleRollover: team.cycleRollover,
+      cycleAutoAddStarted: team.cycleAutoAddStarted,
+      cycleAutoAddCompleted: team.cycleAutoAddCompleted,
     },
     onSubmit: async ({ value, formApi }) => {
-      await updateTeam({
-        team_id: team.id,
-        cycles_enabled: value.cycles_enabled,
-        cycle_duration_weeks: Number(value.cycle_duration_weeks),
-        cycle_cooldown_weeks: Number(value.cycle_cooldown_weeks),
-        cycle_start_day: Number(value.cycle_start_day),
-        cycle_auto_move: value.cycle_auto_move,
-        cycle_auto_add_started: value.cycle_auto_add_started,
+      await saveTeam({
+        id: team.id,
+        cyclesEnabled: value.cyclesEnabled,
+        cycleDurationWeeks: Number(value.cycleDurationWeeks),
+        cycleCooldownWeeks: Number(value.cycleCooldownWeeks),
+        cycleStartDay: Number(value.cycleStartDay),
+        upcomingCycleCount: Number(value.upcomingCycleCount),
+        cycleRollover: value.cycleRollover,
+        cycleAutoAddStarted: value.cycleAutoAddStarted,
+        cycleAutoAddCompleted: value.cycleAutoAddCompleted,
       });
       formApi.reset(value);
     },
@@ -63,7 +71,7 @@ function TeamCyclesSettingsPage() {
         }
       >
         <form.AppField
-          name="cycles_enabled"
+          name="cyclesEnabled"
           children={(field) => (
             <field.SwitchField
               label="Enable cycles"
@@ -71,17 +79,17 @@ function TeamCyclesSettingsPage() {
             />
           )}
         />
-        <form.Subscribe selector={(state) => state.values.cycles_enabled}>
+        <form.Subscribe selector={(state) => state.values.cyclesEnabled}>
           {(enabled) => (
             <>
               <form.AppField
-                name="cycle_duration_weeks"
+                name="cycleDurationWeeks"
                 children={(field) => (
                   <field.SelectField label="Duration" items={durationItems} disabled={!enabled} />
                 )}
               />
               <form.AppField
-                name="cycle_cooldown_weeks"
+                name="cycleCooldownWeeks"
                 children={(field) => (
                   <field.SelectField
                     label="Cooldown"
@@ -92,13 +100,24 @@ function TeamCyclesSettingsPage() {
                 )}
               />
               <form.AppField
-                name="cycle_start_day"
+                name="cycleStartDay"
                 children={(field) => (
                   <field.SelectField label="Start day" items={dayItems} disabled={!enabled} />
                 )}
               />
               <form.AppField
-                name="cycle_auto_move"
+                name="upcomingCycleCount"
+                children={(field) => (
+                  <field.SelectField
+                    label="Upcoming cycles"
+                    description="How many cycles are planned ahead."
+                    items={upcomingItems}
+                    disabled={!enabled}
+                  />
+                )}
+              />
+              <form.AppField
+                name="cycleRollover"
                 children={(field) => (
                   <field.SwitchField
                     label="Move unfinished issues"
@@ -108,11 +127,21 @@ function TeamCyclesSettingsPage() {
                 )}
               />
               <form.AppField
-                name="cycle_auto_add_started"
+                name="cycleAutoAddStarted"
                 children={(field) => (
                   <field.SwitchField
                     label="Add started issues"
-                    description="An issue that moves to a started state joins the active cycle."
+                    description="An issue that moves to a started status joins the current cycle."
+                    disabled={!enabled}
+                  />
+                )}
+              />
+              <form.AppField
+                name="cycleAutoAddCompleted"
+                children={(field) => (
+                  <field.SwitchField
+                    label="Add completed issues"
+                    description="An issue completed outside a cycle joins the current one."
                     disabled={!enabled}
                   />
                 )}

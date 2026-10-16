@@ -1,26 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { MonitorIcon, MoonIcon, SunIcon, UploadIcon, XIcon } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { type ReactNode } from "react";
 import { z } from "zod";
 
+import type { WorkspaceUserDetail } from "@/api/ops.gen";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
-import { PropertyRow } from "@/components/layout/property-row";
 import { SettingsPage } from "@/components/layout/settings-page";
 import { SettingsSection } from "@/components/layout/settings-section";
 import { defaultTheme, type TTheme } from "@/components/providers/themes";
-import { githubLoginSchema } from "@/components/integrations/github-sync";
 import { Avatar } from "@/components/shared/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { FileTrigger } from "@/components/ui/file-trigger";
+import { Switch } from "@/components/ui/switch";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { timezoneOptions } from "@/lib/helpers/timezones";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
-import { meQuery, NO_AVATAR_UPLOAD_ID, type TMe, useUpdateMeMutation } from "@/lib/queries/me";
-import { imageUploadAccept, useCreateUploadMutation } from "@/lib/queries/uploads";
+import { useUpdateUserMutation, workspaceMeQuery } from "@/lib/queries/users";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/account/")({
   component: AccountProfileSettingsPage,
@@ -36,25 +32,25 @@ const themeOptions: { value: TTheme; label: string; icon: ReactNode }[] = [
 
 const formSchema = z.object({
   name: z.string().trim().min(1, "Name is required."),
-  display_name: z
+  displayName: z
     .string()
     .trim()
-    .regex(/^[a-z0-9._-]{2,32}$/, "Use 2 to 32 lowercase letters, numbers, dots or dashes."),
-  timezone: z.string().min(1),
-  github_login: githubLoginSchema,
+    .min(1, "Display name is required.")
+    .regex(/^@?\S+$/, "Use one word, like ann."),
+  timezone: z.string(),
 });
 
 function AccountProfileSettingsPage() {
-  const { data: me, isPending, error, refetch } = useQuery(meQuery);
+  const { workspace } = useWorkspace();
+  const { data: me, isPending, error, refetch } = useQuery(workspaceMeQuery(workspace.id));
   return (
-    <SettingsPage title="Profile" description="How you appear to others in Zigzag.">
+    <SettingsPage title="Profile" description="How you appear to the people you work with.">
       {isPending && <ListSkeleton rows={3} />}
       {!isPending && error && <ErrorCard message={error.message} onRetry={() => void refetch()} />}
       {me && (
         <>
-          <AvatarSection me={me} />
           <ProfileSection me={me} />
-          <SignInMethodsSection me={me} />
+          <NotificationsSection me={me} />
           <AppearanceSection />
         </>
       )}
@@ -62,67 +58,31 @@ function AccountProfileSettingsPage() {
   );
 }
 
-function AvatarSection({ me }: { me: TMe }) {
+function ProfileSection({ me }: { me: WorkspaceUserDetail }) {
   const { workspace } = useWorkspace();
-  const { mutateAsync: upload, isPending: isUploading } = useCreateUploadMutation();
-  const { mutateAsync: updateMe, isPending: isSaving } = useUpdateMeMutation();
-  const user = me.user;
-  return (
-    <SettingsSection title="Avatar" description="A square image works best.">
-      <div className="flex items-center gap-4">
-        <Avatar id={user.id} name={user.name} src={user.avatar_url} size="xl" />
-        <FileTrigger
-          accept={imageUploadAccept}
-          onSelect={async ([file]) => {
-            const res = await upload({ workspaceId: workspace.id, file }).catch(() => null);
-            if (!res) return;
-            await updateMe({ avatar_upload_id: res.data.id }).catch(() => undefined);
-          }}
-        >
-          {(open) => (
-            <Button variant="outline" size="sm" onClick={open} isPending={isUploading || isSaving}>
-              <UploadIcon className="size-4" />
-              Upload image
-            </Button>
-          )}
-        </FileTrigger>
-        {user.avatar_url && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() =>
-              updateMe({ avatar_upload_id: NO_AVATAR_UPLOAD_ID }).catch(() => undefined)
-            }
-          >
-            <XIcon className="size-4" />
-            Remove
-          </Button>
-        )}
-      </div>
-    </SettingsSection>
-  );
-}
-
-function ProfileSection({ me }: { me: TMe }) {
-  const { mutateAsync: updateMe } = useUpdateMeMutation();
+  const { mutateAsync: update } = useUpdateUserMutation(workspace.id);
   const form = useAppForm({
-    defaultValues: {
-      name: me.user.name,
-      display_name: me.user.display_name,
-      timezone: me.user.timezone || "UTC",
-      github_login: me.user.github_login ?? "",
-    },
+    defaultValues: { name: me.name, displayName: me.displayName, timezone: me.timezone ?? "" },
     validators: { onChange: formSchema },
     onSubmit: async ({ value, formApi }) => {
       const parsed = formSchema.parse(value);
-      await updateMe(parsed);
-      formApi.reset(parsed);
+      const user = await update({
+        id: "me",
+        name: parsed.name,
+        displayName: parsed.displayName,
+        timezone: parsed.timezone || null,
+      });
+      formApi.reset({
+        name: user.name,
+        displayName: user.displayName,
+        timezone: user.timezone ?? "",
+      });
     },
   });
   return (
     <SettingsSection
       title="Details"
-      description={`Signed in as ${me.user.email}.`}
+      description="Your picture comes from your Google account."
       onSubmit={submitHandler(form)}
       footer={
         <form.AppForm>
@@ -132,32 +92,34 @@ function ProfileSection({ me }: { me: TMe }) {
         </form.AppForm>
       }
     >
+      <div className="flex items-center gap-3">
+        <Avatar id={me.id} name={me.name} src={me.avatarUrl} size="xl" />
+        <div className="flex min-w-0 flex-col">
+          <p className="truncate text-sm font-medium">{me.name}</p>
+          <p className="text-muted-foreground truncate text-sm">{me.email}</p>
+        </div>
+      </div>
       <form.AppField
         name="name"
         children={(field) => <field.TextField label="Full name" autoComplete="name" />}
       />
       <form.AppField
-        name="display_name"
+        name="displayName"
         children={(field) => (
           <field.TextField
-            label="Username"
-            description="Others mention you with @ followed by this name."
-            transform={(v) => v.toLowerCase()}
+            label="Display name"
+            description="One word. People mention you with @ followed by it."
           />
         )}
       />
       <form.AppField
         name="timezone"
-        children={(field) => <field.SelectField label="Timezone" items={timezones} />}
-      />
-      <form.AppField
-        name="github_login"
         children={(field) => (
-          <field.TextField
-            label="GitHub username"
-            placeholder="octocat"
-            autoComplete="off"
-            description="Issues and comments you write on synced repositories show as yours, and assigning you here assigns you on GitHub."
+          <field.SelectField
+            label="Timezone"
+            description="Shown to the people you work with, so they know your local time."
+            placeholder="Not set"
+            items={timezones}
           />
         )}
       />
@@ -165,32 +127,23 @@ function ProfileSection({ me }: { me: TMe }) {
   );
 }
 
-function SignInMethodsSection({ me }: { me: TMe }) {
+function NotificationsSection({ me }: { me: WorkspaceUserDetail }) {
+  const { workspace } = useWorkspace();
+  const { mutate: update, isPending } = useUpdateUserMutation(workspace.id);
+  const isOn = me.emailNotifications ?? false;
   return (
-    <SettingsSection title="Sign-in methods" description="Ways you can sign in to this account.">
-      <PropertyRow label="Password">
-        {me.user.has_password ? (
-          <Badge variant="success">Set</Badge>
-        ) : (
-          <>
-            <Badge variant="muted">Not set</Badge>
-            <Link
-              to="/forgot-password"
-              className="text-muted-foreground has-hover:hover:text-foreground text-sm underline-offset-4 has-hover:hover:underline"
-            >
-              Set one with a reset link
-            </Link>
-          </>
-        )}
-      </PropertyRow>
-      <PropertyRow label="Google">
-        {me.user.google_linked ? (
-          <Badge variant="success">Linked</Badge>
-        ) : (
-          <Badge variant="muted">Not linked</Badge>
-        )}
-      </PropertyRow>
-    </SettingsSection>
+    <SettingsSection
+      title="Email notifications"
+      description={`Unread notifications are emailed to ${me.email}.`}
+      actions={
+        <Switch
+          aria-label="Email notifications"
+          checked={isOn}
+          disabled={isPending}
+          onCheckedChange={(checked) => update({ id: "me", emailNotifications: checked })}
+        />
+      }
+    />
   );
 }
 

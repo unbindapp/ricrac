@@ -17,6 +17,7 @@ import {
   UserCircleIcon,
 } from "lucide-react";
 
+import type { Team } from "@/api/ops.gen";
 import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
 import { SidebarFavorites } from "@/components/favorites/sidebar-favorites";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
@@ -37,18 +38,17 @@ import { useTeams } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
 import { notificationCountsQuery } from "@/lib/queries/notifications";
-import { type TTeam } from "@/lib/queries/teams";
 
 type TProps = {
   onNavigate?: () => void;
 };
 
 export function Sidebar({ onNavigate }: TProps) {
-  const { workspace, canEdit, isAdmin } = useWorkspace();
+  const { workspace, canEdit } = useWorkspace();
   const openCommandPanel = useCommandPanelStore((state) => state.setOpen);
   const openNewIssue = useNewIssueStore((state) => state.open);
   const openCreateTeam = useOpenCreateTeam(onNavigate);
-  const params = { workspace: workspace.slug };
+  const params = { workspace: workspace.urlKey };
 
   return (
     <div className="bg-card flex h-full w-full flex-col">
@@ -139,7 +139,7 @@ export function Sidebar({ onNavigate }: TProps) {
           <SidebarSection
             title="Your teams"
             action={
-              isAdmin && (
+              canEdit && (
                 <Button
                   variant="ghost"
                   size="icon"
@@ -183,7 +183,7 @@ function useOpenCreateTeam(onNavigate?: () => void) {
 }
 
 function TeamsNav({ onNavigate }: TProps) {
-  const { isAdmin } = useWorkspace();
+  const { canEdit } = useWorkspace();
   const { myTeams, isPending, error, refetch } = useTeams();
   const openCreateTeam = useOpenCreateTeam(onNavigate);
   if (isPending) {
@@ -206,7 +206,7 @@ function TeamsNav({ onNavigate }: TProps) {
       </Button>
     );
   }
-  if (myTeams.length === 0 && isAdmin) {
+  if (myTeams.length === 0 && canEdit) {
     return (
       <Button
         variant="ghost"
@@ -225,9 +225,9 @@ function TeamsNav({ onNavigate }: TProps) {
   return myTeams.map((team) => <TeamNav key={team.id} team={team} onNavigate={onNavigate} />);
 }
 
-function TeamNav({ team, onNavigate }: { team: TTeam } & TProps) {
+function TeamNav({ team, onNavigate }: { team: Team } & TProps) {
   const { workspace } = useWorkspace();
-  const params = { workspace: workspace.slug, key: team.key };
+  const params = { workspace: workspace.urlKey, key: team.key };
   return (
     <SidebarCollapsible
       label={team.name}
@@ -245,7 +245,7 @@ function TeamNav({ team, onNavigate }: { team: TTeam } & TProps) {
         link={{ to: "/$workspace/team/$key/backlog", params }}
         onNavigate={onNavigate}
       />
-      {team.triage_enabled && (
+      {team.triageEnabled && (
         <SidebarNavItem
           label="Triage"
           icon={TriangleIcon}
@@ -253,7 +253,7 @@ function TeamNav({ team, onNavigate }: { team: TTeam } & TProps) {
           onNavigate={onNavigate}
         />
       )}
-      {team.cycles_enabled && (
+      {team.cyclesEnabled && (
         <SidebarNavItem
           label="Cycles"
           icon={RefreshCwIcon}
@@ -273,7 +273,7 @@ function TeamNav({ team, onNavigate }: { team: TTeam } & TProps) {
 
 function SidebarFooter({ onNavigate }: TProps) {
   const { workspace, isAdmin } = useWorkspace();
-  const params = { workspace: workspace.slug };
+  const params = { workspace: workspace.urlKey };
   return (
     <div className="flex items-center gap-2 border-t p-2">
       <LinkButton

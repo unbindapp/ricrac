@@ -8,7 +8,7 @@ import {
   sanitizeTeamKey,
   slugify,
   teamKeyPattern,
-  workspaceSlugPattern,
+  workspaceUrlKeyPattern,
 } from "./identifiers.ts";
 
 test("identifiers parse into key and number", () => {
@@ -46,7 +46,7 @@ test("typed keys are sanitized", () => {
 test("slugs are lowercase dashed and bounded", () => {
   assert.equal(slugify("Acme Corp!"), "acme-corp");
   assert.equal(slugify("  --Hello__World--  "), "hello-world");
-  assert.match(slugify("Zigzag Labs"), workspaceSlugPattern);
+  assert.match(slugify("Ricrac Labs"), workspaceUrlKeyPattern);
   assert.equal(slugify("a".repeat(40)).length, 32);
   assert.equal(slugify("abc def", 4), "abc");
 });

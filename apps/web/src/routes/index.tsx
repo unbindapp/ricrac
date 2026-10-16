@@ -1,18 +1,16 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { LandingPage } from "@/components/landing/landing-page";
-import { getLastWorkspaceSlug } from "@/lib/last-workspace";
-import { meQuery, meWorkspaces } from "@/lib/queries/me";
+import { landingWorkspace } from "@/lib/last-workspace";
+import { meQuery } from "@/lib/queries/me";
 
 export const Route = createFileRoute("/")({
   beforeLoad: async ({ context }) => {
     const me = await context.queryClient.ensureQueryData(meQuery);
     if (!me) return;
-    const workspaces = meWorkspaces(me);
-    const lastSlug = getLastWorkspaceSlug();
-    const workspace = workspaces.find((w) => w.slug === lastSlug) ?? workspaces[0];
+    const workspace = landingWorkspace(me.workspaces);
     if (!workspace) throw redirect({ to: "/create-workspace" });
-    throw redirect({ to: "/$workspace", params: { workspace: workspace.slug } });
+    throw redirect({ to: "/$workspace", params: { workspace: workspace.urlKey } });
   },
   component: LandingPage,
 });

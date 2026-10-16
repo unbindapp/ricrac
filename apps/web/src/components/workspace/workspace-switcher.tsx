@@ -1,17 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate, useRouter } from "@tanstack/react-router";
+import { type LinkProps, useNavigate } from "@tanstack/react-router";
 import {
   CheckIcon,
   ChevronDownIcon,
+  DoorOpenIcon,
   LogOutIcon,
+  MailIcon,
   PlusIcon,
-  ServerIcon,
   SettingsIcon,
   UserIcon,
 } from "lucide-react";
+import { useState } from "react";
 
-import { WorkspaceIcon } from "@/components/workspace/workspace-icon";
-import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -22,124 +23,97 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useLogoutMutation } from "@/lib/queries/auth";
-import { meQuery, meWorkspaces } from "@/lib/queries/me";
+import { LeaveWorkspaceDialog } from "@/components/workspace/leave-workspace-dialog";
+import { WorkspaceIcon } from "@/components/workspace/workspace-icon";
+import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { meQuery, signOut } from "@/lib/queries/me";
 
 export function WorkspaceSwitcher({ onNavigate }: { onNavigate?: () => void }) {
-  const { workspace, isAdmin, isSystemAdmin } = useWorkspace();
+  const { workspace, isAdmin } = useWorkspace();
   const { data: me } = useQuery(meQuery);
   const navigate = useNavigate();
-  const router = useRouter();
-  const { mutate: signOut } = useLogoutMutation();
-  const workspaces = meWorkspaces(me);
+  const [isLeaving, setIsLeaving] = useState(false);
+  const params = { workspace: workspace.urlKey };
+  const invitationCount = me?.invitations.length ?? 0;
 
-  const go = (to: () => void) => {
-    to();
+  const go = (link: LinkProps) => {
     onNavigate?.();
+    void navigate(link);
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <Button
-            variant="ghost"
-            size="sm"
-            forceMinSize={false}
-            aria-label="Switch workspace"
-            className="min-w-0 flex-1 justify-start"
-          >
-            <WorkspaceIcon
-              id={workspace.id}
-              name={workspace.name}
-              icon={workspace.icon}
-              color={workspace.color}
-              iconUrl={workspace.icon_url}
-            />
-            <span className="min-w-0 truncate">{workspace.name}</span>
-            <ChevronDownIcon className="text-muted-foreground size-3.5" />
-          </Button>
-        }
-      />
-      <DropdownMenuContent className="w-64">
-        <DropdownMenuGroup>
-          <DropdownMenuLabel>{me?.user.email}</DropdownMenuLabel>
-          {workspaces.map((item) => (
-            <DropdownMenuItem
-              key={item.id}
-              onClick={() =>
-                go(() => navigate({ to: "/$workspace", params: { workspace: item.slug } }))
-              }
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              variant="ghost"
+              size="sm"
+              forceMinSize={false}
+              aria-label="Switch workspace"
+              className="min-w-0 flex-1 justify-start"
             >
-              <WorkspaceIcon
-                id={item.id}
-                name={item.name}
-                icon={item.icon}
-                color={item.color}
-                iconUrl={item.icon_url}
-              />
-              <span className="min-w-0 flex-1 truncate">{item.name}</span>
-              {item.id === workspace.id && <CheckIcon className="size-4" />}
+              <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} />
+              <span className="min-w-0 truncate">{workspace.name}</span>
+              <ChevronDownIcon className="text-muted-foreground size-3.5" />
+            </Button>
+          }
+        />
+        <DropdownMenuContent className="w-64">
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>{me?.email}</DropdownMenuLabel>
+            {me?.workspaces.map((item) => (
+              <DropdownMenuItem
+                key={item.id}
+                onClick={() => go({ to: "/$workspace", params: { workspace: item.urlKey } })}
+              >
+                <WorkspaceIcon
+                  name={item.name}
+                  logoUrl={item.id === workspace.id ? workspace.logoUrl : null}
+                />
+                <span className="min-w-0 flex-1 truncate">{item.name}</span>
+                {item.id === workspace.id && <CheckIcon className="size-4" />}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            {isAdmin && (
+              <DropdownMenuItem onClick={() => go({ to: "/$workspace/settings", params })}>
+                <SettingsIcon className="size-4" />
+                Workspace settings
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuItem onClick={() => go({ to: "/$workspace/settings/account", params })}>
+              <UserIcon className="size-4" />
+              Account settings
             </DropdownMenuItem>
-          ))}
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          {isAdmin && (
-            <DropdownMenuItem
-              onClick={() =>
-                go(() =>
-                  navigate({ to: "/$workspace/settings", params: { workspace: workspace.slug } }),
-                )
-              }
-            >
-              <SettingsIcon className="size-4" />
-              Workspace settings
+            <DropdownMenuItem onClick={() => go({ to: "/create-workspace" })}>
+              {invitationCount > 0 ? (
+                <MailIcon className="size-4" />
+              ) : (
+                <PlusIcon className="size-4" />
+              )}
+              <span className="flex-1">
+                {invitationCount > 0 ? "Join or create workspace" : "Create workspace"}
+              </span>
+              {invitationCount > 0 && <Badge variant="muted">{invitationCount}</Badge>}
             </DropdownMenuItem>
-          )}
-          {isSystemAdmin && (
-            <DropdownMenuItem
-              onClick={() =>
-                go(() =>
-                  navigate({
-                    to: "/$workspace/settings/system",
-                    params: { workspace: workspace.slug },
-                  }),
-                )
-              }
-            >
-              <ServerIcon className="size-4" />
-              System settings
+            <DropdownMenuItem onClick={() => setIsLeaving(true)}>
+              <DoorOpenIcon className="size-4" />
+              Leave workspace
             </DropdownMenuItem>
-          )}
-          <DropdownMenuItem
-            onClick={() =>
-              go(() =>
-                navigate({
-                  to: "/$workspace/settings/account",
-                  params: { workspace: workspace.slug },
-                }),
-              )
-            }
-          >
-            <UserIcon className="size-4" />
-            Account settings
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => go(() => navigate({ to: "/create-workspace" }))}>
-            <PlusIcon className="size-4" />
-            Create workspace
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem
-            onClick={() => signOut(undefined, { onSuccess: () => router.history.push("/sign-in") })}
-          >
-            <LogOutIcon className="size-4" />
-            Sign out
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => void signOut()}>
+              <LogOutIcon className="size-4" />
+              Sign out
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <LeaveWorkspaceDialog isOpen={isLeaving} onOpenChange={setIsLeaving} />
+    </>
   );
 }

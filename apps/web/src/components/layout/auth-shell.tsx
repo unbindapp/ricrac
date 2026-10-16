@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { ReactNode } from "react";
 
 import { Logo } from "@/components/icons/logo";
@@ -18,7 +19,9 @@ export function AuthShell({ title, description, children, footer, width = "defau
         className="flex w-full max-w-sm flex-col gap-6 data-[width=wide]:max-w-xl"
       >
         <div className="flex flex-col items-center gap-4 text-center">
-          <Logo />
+          <Link to="/" aria-label="Ricrac home">
+            <Logo />
+          </Link>
           <div className="flex flex-col gap-1">
             <h1 className="text-xl leading-tight font-semibold">{title}</h1>
             {description && <p className="text-muted-foreground text-sm">{description}</p>}

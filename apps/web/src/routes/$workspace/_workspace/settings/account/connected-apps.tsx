@@ -8,27 +8,31 @@ import { ListStates } from "@/components/layout/list-states";
 import { SettingsPage } from "@/components/layout/settings-page";
 import { SettingsSection } from "@/components/layout/settings-section";
 import { CopyField } from "@/components/shared/copy-button";
-import { connectedAppsListQuery } from "@/lib/queries/connected-apps";
+import { appConfigQuery } from "@/lib/queries/me";
+import { connectedAppsQuery } from "@/lib/queries/connected-apps";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/account/connected-apps")({
   component: AccountConnectedAppsSettingsPage,
 });
 
 function AccountConnectedAppsSettingsPage() {
-  const { data, isPending, error, refetch } = useQuery(connectedAppsListQuery());
-  const apps = data?.connectedApps ?? [];
+  const { data: apps = [], isPending, error, refetch } = useQuery(connectedAppsQuery);
+  const { data: config } = useQuery(appConfigQuery);
   return (
     <SettingsPage
       title="Connected apps"
-      description="Applications you authorized to use Zigzag on your behalf."
+      description="Agents and apps you allowed to use Ricrac as you."
     >
       <SettingsSection
         title="MCP server"
-        description="Add this URL to an MCP client. It asks you to approve access here."
+        description="Add this URL to Claude, ChatGPT, Codex, Cursor or another MCP client. It asks you to allow it here."
       >
-        <CopyField value={`${window.location.origin}/mcp`} label="MCP server URL" />
+        <CopyField
+          value={config?.mcpUrl ?? `${window.location.origin}/mcp`}
+          label="MCP server URL"
+        />
       </SettingsSection>
-      <SettingsSection title="Authorized apps">
+      <SettingsSection title="Connected apps">
         <ListStates
           isPending={isPending}
           error={error}

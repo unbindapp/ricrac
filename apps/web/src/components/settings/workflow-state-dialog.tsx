@@ -1,6 +1,7 @@
 import { ReactElement, useState } from "react";
 import { z } from "zod";
 
+import type { IssueStatus } from "@/api/ops.gen";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,13 +13,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { type TStateType, stateTypeLabels } from "@/components/shared/state-icon";
-import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
-import {
-  type TWorkflowState,
-  useCreateWorkflowStateMutation,
-  useUpdateWorkflowStateMutation,
-} from "@/lib/queries/teams";
+import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { DEFAULT_STATE_COLORS } from "@/lib/helpers/colors";
+import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
+import { useSaveIssueStatusMutation } from "@/lib/queries/teams";
 
 export const defaultStateColors: Record<TStateType, string> = DEFAULT_STATE_COLORS;
 
@@ -31,16 +29,16 @@ const formSchema = z.object({
 type TProps = {
   trigger: ReactElement;
 } & (
-  | { mode: "create"; teamId: string; type: TStateType; position: number; state?: never }
-  | { mode: "edit"; state: TWorkflowState; teamId?: never; type?: never; position?: never }
+  | { mode: "create"; teamId: string; type: TStateType; state?: never }
+  | { mode: "edit"; state: IssueStatus; teamId?: never; type?: never }
 );
 
 export function WorkflowStateDialog(props: TProps) {
   const [isOpen, setIsOpen] = useState(false);
   const title =
     props.mode === "create"
-      ? `Add ${stateTypeLabels[props.type].toLowerCase()} state`
-      : "Edit state";
+      ? `Add ${stateTypeLabels[props.type].toLowerCase()} status`
+      : "Edit status";
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger render={props.trigger} />
@@ -55,8 +53,8 @@ export function WorkflowStateDialog(props: TProps) {
 }
 
 function WorkflowStateForm(props: TProps & { onDone: () => void }) {
-  const { mutateAsync: createState } = useCreateWorkflowStateMutation();
-  const { mutateAsync: updateState } = useUpdateWorkflowStateMutation();
+  const { workspace } = useWorkspace();
+  const { mutateAsync: saveStatus } = useSaveIssueStatusMutation(workspace.id);
   const form = useAppForm({
     defaultValues:
       props.mode === "edit"
@@ -69,17 +67,13 @@ function WorkflowStateForm(props: TProps & { onDone: () => void }) {
     validators: { onSubmit: formSchema },
     onSubmit: async ({ value }) => {
       const parsed = formSchema.parse(value);
+      const fields = { ...parsed, description: parsed.description.trim() || null };
       if (props.mode === "edit") {
-        await updateState({ state_id: props.state.id, ...parsed });
+        await saveStatus({ id: props.state.id, ...fields });
         props.onDone();
         return;
       }
-      await createState({
-        team_id: props.teamId,
-        type: props.type,
-        position: props.position,
-        ...parsed,
-      });
+      await saveStatus({ team: props.teamId, type: props.type, ...fields });
       props.onDone();
     },
   });
@@ -101,7 +95,7 @@ function WorkflowStateForm(props: TProps & { onDone: () => void }) {
         />
         <form.AppForm>
           <form.SubmitButton size="sm">
-            {props.mode === "edit" ? "Save" : "Add state"}
+            {props.mode === "edit" ? "Save" : "Add status"}
           </form.SubmitButton>
         </form.AppForm>
       </DialogFooter>

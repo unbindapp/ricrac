@@ -36,9 +36,19 @@ export function useUpdateMeMutation() {
   });
 }
 
-/** Where Google sign-in starts; it comes back to returnTo. */
-export function signInHref(returnTo = "/") {
-  return `/api/auth/sign-in?return_to=${encodeURIComponent(returnTo)}`;
+/** A path on this site to go on to, or null for anything that could leave it. */
+export function safeRedirect(path: string | undefined): string | null {
+  if (!path?.startsWith("/") || path.startsWith("//") || path.startsWith("/\\")) return null;
+  return path;
+}
+
+/**
+ * Where Google sign-in starts. Google comes back to the sign-in page, which goes on to `redirect`
+ * or shows why signing in failed.
+ */
+export function signInHref(redirect?: string) {
+  const back = redirect ? `/sign-in?redirect=${encodeURIComponent(redirect)}` : "/sign-in";
+  return `/api/auth/sign-in?return_to=${encodeURIComponent(back)}`;
 }
 
 export async function signOut() {

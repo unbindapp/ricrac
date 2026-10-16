@@ -1,5 +1,5 @@
 import type * as Account from "@/api/account.gen";
-import type { OpName, Ops } from "@/api/ops.gen";
+import type { OpName, Ops, PageInfo } from "@/api/ops.gen";
 
 export class ApiError extends Error {
   status: number;
@@ -19,7 +19,11 @@ type Options = {
 };
 
 /** Calls the server. Writes carry the x-ricrac header the server requires against CSRF. */
-export async function request<T>(method: Method, url: string, { body, workspace }: Options = {}): Promise<T> {
+export async function request<T>(
+  method: Method,
+  url: string,
+  { body, workspace }: Options = {},
+): Promise<T> {
   const headers: Record<string, string> = { accept: "application/json" };
   if (method !== "GET") headers["x-ricrac"] = "1";
   if (body !== undefined) headers["content-type"] = "application/json";
@@ -38,15 +42,55 @@ export async function request<T>(method: Method, url: string, { body, workspace 
   }
   const data = await response.json().catch(() => undefined);
   if (response.ok) return data as T;
-  throw new ApiError(response.status, typeof data?.error === "string" ? data.error : response.statusText);
+  throw new ApiError(
+    response.status,
+    typeof data?.error === "string" ? data.error : response.statusText,
+  );
 }
 
 export type OpArgs<N extends OpName> = Ops[N]["args"];
 export type OpResult<N extends OpName> = Ops[N]["result"];
 
 /** Runs an operation of the tracker in a workspace, as POST /v1/ops/<name>. */
-export function call<N extends OpName>(workspace: string, name: N, args: OpArgs<N>): Promise<OpResult<N>> {
+export function call<N extends OpName>(
+  workspace: string,
+  name: N,
+  args: OpArgs<N>,
+): Promise<OpResult<N>> {
   return request<OpResult<N>>("POST", `/v1/ops/${name}`, { body: args, workspace });
+}
+
+type PagedOpName = {
+  [N in OpName]: Ops[N]["result"] extends { nodes: unknown[]; pageInfo: PageInfo } ? N : never;
+}[OpName];
+
+export type OpNode<N extends PagedOpName> = OpResult<N>["nodes"][number];
+
+const PAGE_SIZE = 250;
+
+/** Runs a list operation page by page and returns every node, for lists that stay small. */
+export async function callAll<N extends PagedOpName>(
+  workspace: string,
+  name: N,
+  args: Omit<OpArgs<N>, "cursor" | "limit">,
+): Promise<OpNode<N>[]> {
+  const nodes: OpNode<N>[] = [];
+  let cursor: string | null = null;
+  do {
+    const page: OpResult<N> = await call(workspace, name, {
+      ...args,
+      cursor,
+      limit: PAGE_SIZE,
+    } as OpArgs<N>);
+    nodes.push(...page.nodes);
+    cursor = page.pageInfo.hasNextPage ? page.pageInfo.endCursor : null;
+  } while (cursor);
+  return nodes;
+}
+
+/** Zigzag's client, until every area runs on `call`: unported modules still load and fail when used. */
+export function getGoClient(): never {
+  throw new ApiError(0, "This page isn't connected to Ricrac yet.");
 }
 
 /** The dashboard API under /api: the account, workspaces, keys and apps. */
@@ -60,12 +104,15 @@ export const account = {
   deleteWorkspace: (id: string, body: Account.DeleteWorkspace) =>
     request<unknown>("DELETE", `/api/workspaces/${id}`, { body }),
   leaveWorkspace: (id: string) => request<unknown>("POST", `/api/workspaces/${id}/leave`),
-  acceptInvitation: (id: string) => request<Account.WorkspaceSummary>("POST", `/api/invitations/${id}/accept`),
+  acceptInvitation: (id: string) =>
+    request<Account.WorkspaceSummary>("POST", `/api/invitations/${id}/accept`),
   declineInvitation: (id: string) => request<unknown>("DELETE", `/api/invitations/${id}`),
   apiKeys: () => request<Account.APIKey[]>("GET", "/api/api-keys"),
-  createAPIKey: (body: Account.CreateAPIKey) => request<Account.CreatedAPIKey>("POST", "/api/api-keys", { body }),
+  createAPIKey: (body: Account.CreateAPIKey) =>
+    request<Account.CreatedAPIKey>("POST", "/api/api-keys", { body }),
   deleteAPIKey: (id: string) => request<unknown>("DELETE", `/api/api-keys/${id}`),
-  oauthApps: (workspace: string) => request<Account.OAuthApp[]>("GET", "/api/oauth-apps", { workspace }),
+  oauthApps: (workspace: string) =>
+    request<Account.OAuthApp[]>("GET", "/api/oauth-apps", { workspace }),
   createOAuthApp: (workspace: string, body: Account.SaveOAuthApp) =>
     request<Account.OAuthAppSecret>("POST", "/api/oauth-apps", { body, workspace }),
   updateOAuthApp: (workspace: string, id: string, body: Account.SaveOAuthApp) =>
@@ -76,6 +123,8 @@ export const account = {
     request<Account.OAuthAppSecret>("POST", `/api/oauth-apps/${id}/secret`, { workspace }),
   connectedApps: () => request<Account.ConnectedApp[]>("GET", "/api/connected-apps"),
   revokeConnectedApp: (id: string) => request<unknown>("DELETE", `/api/connected-apps/${id}`),
-  oauthClient: (query: string) => request<Account.OAuthClientInfo>("GET", `/api/oauth/client?${query}`),
-  oauthDecide: (body: Account.OAuthDecision) => request<Account.OAuthRedirect>("POST", "/api/oauth/decide", { body }),
+  oauthClient: (query: string) =>
+    request<Account.OAuthClientInfo>("GET", `/api/oauth/client?${query}`),
+  oauthDecide: (body: Account.OAuthDecision) =>
+    request<Account.OAuthRedirect>("POST", "/api/oauth/decide", { body }),
 };
