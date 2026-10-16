@@ -7,10 +7,6 @@ import (
 	"github.com/google/uuid"
 )
 
-func names(list J) []string {
-	return list.At("nodes").Strings("name")
-}
-
 func kinds(w *World, user uuid.UUID) []string {
 	return w.strings("SELECT type FROM notifications WHERE user_id = $1 ORDER BY created_at", user)
 }
