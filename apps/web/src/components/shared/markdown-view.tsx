@@ -39,7 +39,7 @@ function urlTransform(url: string) {
 
 export function MarkdownView({ markdown }: TProps) {
   return (
-    <div data-slot="markdown-view" className="zz-prose w-full">
+    <div data-slot="markdown-view" className="rr-prose w-full">
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMentions]}
         urlTransform={urlTransform}

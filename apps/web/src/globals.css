@@ -323,106 +323,119 @@
 }
 
 @layer components {
-  .zz-prose {
+  .rr-prose {
     @apply text-sm leading-relaxed wrap-break-word;
   }
-  .zz-prose > * + * {
+  .rr-prose > * + * {
     @apply mt-2;
   }
-  .zz-prose h1 {
+  .rr-prose h1 {
     @apply mt-4 text-xl leading-tight font-semibold;
   }
-  .zz-prose h2 {
+  .rr-prose h2 {
     @apply mt-4 text-lg leading-tight font-semibold;
   }
-  .zz-prose h3 {
+  .rr-prose h3 {
     @apply mt-3 text-base leading-tight font-semibold;
   }
-  .zz-prose a {
+  .rr-prose a {
     @apply text-primary underline underline-offset-2;
   }
-  .zz-prose ul {
+  .rr-prose ul {
     @apply list-disc pl-5;
   }
-  .zz-prose ol {
+  .rr-prose ol {
     @apply list-decimal pl-5;
   }
-  .zz-prose li > p {
+  .rr-prose li > p {
     @apply m-0;
   }
-  .zz-prose blockquote {
+  .rr-prose blockquote {
     @apply text-muted-foreground border-l-2 pl-3;
   }
-  .zz-prose hr {
+  .rr-prose hr {
     @apply my-4 border-t;
   }
-  .zz-prose code {
+  .rr-prose code {
     @apply bg-muted rounded-sm px-1 py-0.5 font-mono text-xs;
   }
-  .zz-prose pre {
+  .rr-prose pre {
     @apply bg-card overflow-x-auto rounded-md border p-3 font-mono text-xs;
   }
-  .zz-prose pre code {
+  .rr-prose pre code {
     @apply bg-transparent p-0;
   }
-  .zz-prose img {
+  .rr-prose img {
     @apply max-w-full rounded-md border;
   }
-  .zz-prose table {
+  .rr-prose table {
     @apply w-full border-collapse text-sm;
   }
-  .zz-prose th,
-  .zz-prose td {
+  .rr-prose th,
+  .rr-prose td {
     @apply border px-2 py-1 text-left;
   }
-  .zz-prose ul[data-type="taskList"],
-  .zz-prose ul.contains-task-list {
+  .rr-prose ul[data-type="taskList"],
+  .rr-prose ul.contains-task-list {
     @apply list-none pl-0;
   }
-  .zz-prose ul[data-type="taskList"] li {
+  .rr-prose ul[data-type="taskList"] li {
     @apply flex items-start gap-2;
   }
-  .zz-prose ul[data-type="taskList"] li > label {
+  .rr-prose ul[data-type="taskList"] li > label {
     @apply mt-0.5 flex shrink-0 items-center;
   }
-  .zz-prose ul[data-type="taskList"] li > div {
+  .rr-prose ul[data-type="taskList"] li > div {
     @apply min-w-0 flex-1;
   }
-  .zz-prose [data-type="mention"] {
+  .rr-prose ul.contains-task-list li {
+    @apply flex items-start gap-2;
+  }
+  .rr-prose input[type="checkbox"] {
+    @apply border-border bg-background mt-1 size-3.5 shrink-0 appearance-none rounded-sm border;
+  }
+  .rr-prose input[type="checkbox"]:checked {
+    @apply border-primary bg-primary bg-center bg-no-repeat;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 8.5l3 3 6-7'/%3E%3C/svg%3E");
+  }
+  .dark .rr-prose input[type="checkbox"]:checked {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 8.5l3 3 6-7'/%3E%3C/svg%3E");
+  }
+  .rr-prose [data-type="mention"] {
     @apply bg-primary/3-10 text-primary rounded-sm px-1 font-medium;
   }
-  .zz-prose .ProseMirror {
+  .rr-prose .ProseMirror {
     @apply outline-none;
   }
-  .zz-prose .ProseMirror > * + * {
+  .rr-prose .ProseMirror > * + * {
     @apply mt-2;
   }
-  .zz-prose p.is-editor-empty:first-child::before {
+  .rr-prose p.is-editor-empty:first-child::before {
     @apply text-muted-foreground pointer-events-none float-left h-0;
     content: attr(data-placeholder);
   }
-  .zz-prose .hljs-comment,
-  .zz-prose .hljs-quote {
+  .rr-prose .hljs-comment,
+  .rr-prose .hljs-quote {
     @apply text-muted-foreground italic;
   }
-  .zz-prose .hljs-keyword,
-  .zz-prose .hljs-selector-tag,
-  .zz-prose .hljs-built_in {
+  .rr-prose .hljs-keyword,
+  .rr-prose .hljs-selector-tag,
+  .rr-prose .hljs-built_in {
     @apply text-primary;
   }
-  .zz-prose .hljs-string,
-  .zz-prose .hljs-attr,
-  .zz-prose .hljs-template-variable {
+  .rr-prose .hljs-string,
+  .rr-prose .hljs-attr,
+  .rr-prose .hljs-template-variable {
     @apply text-success;
   }
-  .zz-prose .hljs-number,
-  .zz-prose .hljs-literal,
-  .zz-prose .hljs-type {
+  .rr-prose .hljs-number,
+  .rr-prose .hljs-literal,
+  .rr-prose .hljs-type {
     @apply text-warning;
   }
-  .zz-prose .hljs-title,
-  .zz-prose .hljs-function,
-  .zz-prose .hljs-name {
+  .rr-prose .hljs-title,
+  .rr-prose .hljs-function,
+  .rr-prose .hljs-name {
     @apply text-process;
   }
 }
