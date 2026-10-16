@@ -258,6 +258,7 @@ func All() []*Op {
 			customerOps(),
 			releaseOps(),
 			webhookOps(),
+			githubOps(),
 		} {
 			registry = append(registry, group...)
 		}

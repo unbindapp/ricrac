@@ -199,11 +199,14 @@ func linked(reachable []Reached, args map[string]any, base string) *Reached {
 // through the REST API, MCP or the dashboard.
 type Ctx struct {
 	context.Context
-	State     *State
+	State *State
+	// uuid.Nil for changes Ricrac makes itself (see Origin).
 	User      uuid.UUID
 	Workspace uuid.UUID
 	Role      Role
 	Scopes    []Access
+	// Set for changes that come from elsewhere, like GitHub, rather than a caller.
+	Origin *Origin
 
 	teamsOnce sync.Once
 	teams     []uuid.UUID
@@ -224,9 +227,32 @@ func LoadCtx(ctx context.Context, state *State, user, workspace uuid.UUID, scope
 	return &Ctx{Context: ctx, State: state, User: user, Workspace: workspace, Role: parsed, Scopes: scopes}, nil
 }
 
+// Origin is where a change Ricrac makes on its own comes from. Issue history records it.
+type Origin struct {
+	// What happened, e.g. "Pull request #12 merged".
+	Label string
+	URL   string
+	// The change mirrors one made on GitHub, so it isn't sent back there.
+	FromGitHubIssue bool
+}
+
+// SystemCtx is Ricrac itself acting in a workspace, as actor (a member, or uuid.Nil for nobody),
+// seeing every team.
+func SystemCtx(ctx context.Context, state *State, workspace, actor uuid.UUID, origin Origin) *Ctx {
+	return &Ctx{Context: ctx, State: state, User: actor, Workspace: workspace, Role: Owner, Scopes: EveryAccess, Origin: &origin}
+}
+
+// Actor is the user making the change, nil when Ricrac makes it on its own.
+func (c *Ctx) Actor() *uuid.UUID {
+	if c.User == uuid.Nil {
+		return nil
+	}
+	return &c.User
+}
+
 // Fresh is the same caller with nothing cached, as a new request would see it.
 func (c *Ctx) Fresh() *Ctx {
-	return &Ctx{Context: c.Context, State: c.State, User: c.User, Workspace: c.Workspace, Role: c.Role, Scopes: c.Scopes}
+	return &Ctx{Context: c.Context, State: c.State, User: c.User, Workspace: c.Workspace, Role: c.Role, Scopes: c.Scopes, Origin: c.Origin}
 }
 
 func (c *Ctx) DB() *pgxpool.Pool {
@@ -272,15 +298,15 @@ func (c *Ctx) RequireMember() error {
 }
 
 // TeamIDs is the teams whose issues this user can see: every public team (except for guests)
-// and the private teams they belong to. Archived teams are included so their issues stay
-// readable.
+// and the private teams they belong to; all of them for Ricrac itself (Origin). Archived teams
+// are included so their issues stay readable.
 func (c *Ctx) TeamIDs() ([]uuid.UUID, error) {
 	c.teamsOnce.Do(func() {
 		c.teams, c.teamsErr = All[uuid.UUID](c, c.State.DB,
 			`SELECT t.id FROM teams t WHERE t.workspace_id = $1 AND (
-				($2 AND NOT t.private)
+				$4 OR ($2 AND NOT t.private)
 				OR EXISTS (SELECT 1 FROM team_members m WHERE m.team_id = t.id AND m.user_id = $3)
-			 )`, c.Workspace, c.Role != Guest, c.User)
+			 )`, c.Workspace, c.Role != Guest, c.User, c.Origin != nil)
 		if c.teams == nil {
 			c.teams = []uuid.UUID{}
 		}

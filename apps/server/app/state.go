@@ -7,6 +7,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"ricrac/github"
 	"ricrac/mail"
 )
 
@@ -20,12 +21,20 @@ type State struct {
 	Deliveries chan struct{}
 	// Sends emails; nil when email is off.
 	Mailer mail.Sender
+	// Calls GitHub as the app; nil when the GitHub integration is off.
+	GitHub *github.App
+	// Wakes the GitHub sender when changes for GitHub are queued.
+	GitHubWork chan struct{}
 }
 
 func NewState(db *pgxpool.Pool, config Config) *State {
 	var mailer mail.Sender
 	if config.Mail != nil {
 		mailer = mail.SMTP{Config: *config.Mail}
+	}
+	var gitHub *github.App
+	if config.GitHub != nil {
+		gitHub = github.NewApp(*config.GitHub, &http.Client{Timeout: 30 * time.Second})
 	}
 	return &State{
 		DB:         db,
@@ -35,6 +44,8 @@ func NewState(db *pgxpool.Pool, config Config) *State {
 		Limiter:    NewRateLimiter(20, 15*time.Minute),
 		Deliveries: make(chan struct{}, 1),
 		Mailer:     mailer,
+		GitHub:     gitHub,
+		GitHubWork: make(chan struct{}, 1),
 	}
 }
 
@@ -42,6 +53,14 @@ func NewState(db *pgxpool.Pool, config Config) *State {
 func (s *State) QueueDeliveries() {
 	select {
 	case s.Deliveries <- struct{}{}:
+	default:
+	}
+}
+
+// QueueGitHub wakes the GitHub sender without waiting for it.
+func (s *State) QueueGitHub() {
+	select {
+	case s.GitHubWork <- struct{}{}:
 	default:
 	}
 }

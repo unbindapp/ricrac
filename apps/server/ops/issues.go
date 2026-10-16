@@ -931,7 +931,7 @@ func createIssue(c *app.Ctx, tx pgx.Tx, args SaveIssueArgs) (uuid.UUID, error) {
 	id, err := app.One[uuid.UUID](c, tx,
 		`INSERT INTO issues (workspace_id, team_id, number, title, description, state_id, priority, creator_id, sort_order, estimate)
 		 VALUES ($1, $2, $3, $4, $5, $6, 0, $7, $8, $9) RETURNING id`,
-		c.Workspace, team, number, title, orEmpty(args.Description), state, c.User, sortOrder, estimate)
+		c.Workspace, team, number, title, orEmpty(args.Description), state, c.Actor(), sortOrder, estimate)
 	if err != nil {
 		return uuid.Nil, err
 	}

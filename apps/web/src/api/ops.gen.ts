@@ -513,6 +513,90 @@ export type FavoriteCycle = {
   team: TeamRef
 }
 
+export type GitHubAccount = {
+  githubLogin: string | null
+}
+
+export type GitHubBackfill = {
+  commentsCreated: number
+  includeClosed: boolean
+  issuesCreated: number
+  issuesUpdated: number
+  skipped: number
+  status: "pending" | "running" | "completed" | "failed"
+}
+
+export type GitHubConnect = {
+  expiresAt: string
+  installUrl: string
+}
+
+export type GitHubDisconnected = {
+  /** The GitHub account whose installation was forgotten. */
+  disconnected: string
+}
+
+export type GitHubInstallation = {
+  /** The GitHub user or organization it is installed on. */
+  account: string
+  accountType: "User" | "Organization"
+  createdAt: string
+  /** GitHub's installation id. */
+  id: number
+  installer: UserRef | null
+  /** The last webhook event, like pull_request.opened. */
+  lastEvent: string | null
+  lastEventAt: string | null
+  /** Where to pick its repositories or uninstall it on GitHub. */
+  manageUrl: string
+  suspendedAt: string | null
+}
+
+export type GitHubIntegration = {
+  /** Whether this Ricrac server has a GitHub App set up. */
+  configured: boolean
+  /** Your linked GitHub login. */
+  githubLogin: string | null
+  /** The app's install page; connect_github gives the link that comes back to this workspace. */
+  installUrl: string | null
+  installations: GitHubInstallation[]
+  repoSyncs: GitHubRepoSync[]
+}
+
+export type GitHubRepoSync = {
+  /** The import of the repository's existing issues; null when none was asked for. */
+  backfill: GitHubBackfill | null
+  createdAt: string
+  id: string
+  installationId: number
+  /** Why the last change from or to GitHub failed; null after one succeeds. */
+  lastError: string | null
+  lastSyncedAt: string | null
+  linkedIssueCount: number
+  project: ProjectRef | null
+  repository: GitHubRepositoryRef
+  team: TeamRef
+  updatedAt: string
+}
+
+export type GitHubRepository = {
+  defaultBranch: string
+  fullName: string
+  hasIssues: boolean
+  id: number
+  installationId: number
+  private: boolean
+  /** The id of its sync with a team, if it has one. */
+  repoSync: string | null
+  url: string
+}
+
+export type GitHubRepositoryRef = {
+  fullName: string
+  id: number
+  url: string
+}
+
 export type HistoryEntry = {
   action: string
   actor: UserRef | null
@@ -1400,6 +1484,10 @@ export type TeamDetail = {
   estimateAllowZero: boolean
   estimateExtended: boolean
   estimateType: "notUsed" | "exponential" | "fibonacci" | "linear" | "tShirt"
+  /** Where merged pull requests that fix issues move them; null for the first completed status. */
+  githubPrMergedState: StateRef | null
+  /** Where GitHub pull requests and branches move issues; null for the first started status. */
+  githubPrOpenedState: StateRef | null
   icon: string | null
   id: string
   isMember: boolean
@@ -1795,6 +1883,10 @@ export type SaveTeamArgs = {
   estimateExtended?: boolean | null
   /** notUsed, exponential, fibonacci, linear or tShirt. */
   estimateType?: string | null
+  /** The status issues move to when a pull request that fixes them merges (name or id); null for the first completed status. */
+  githubPrMergedState?: string | null
+  /** The status issues move to when a GitHub pull request or branch mentioning them opens (name or id); null for the first started status. */
+  githubPrOpenedState?: string | null
   /** An emoji or icon name; null clears it. */
   icon?: string | null
   /** Only to change a team: its key, name or id. Omit to create one. */
@@ -3408,6 +3500,50 @@ export type ListWebhookDeliveriesArgs = {
   limit?: number | null
 }
 
+export type GetGithubIntegrationArgs = Record<string, never>
+
+export type ConnectGithubArgs = Record<string, never>
+
+export type DisconnectGithubArgs = {
+  /** The GitHub account (login) or installation id to forget; needed when GitHub is installed on several. */
+  installation?: string | null
+}
+
+export type ListGithubRepositoriesArgs = {
+  /** The endCursor of the previous page, to continue after it. */
+  cursor?: string | null
+  /** How many to return, 50 by default, at most 250. */
+  limit?: number | null
+}
+
+export type ListGithubRepoSyncsArgs = {
+  /** The endCursor of the previous page, to continue after it. */
+  cursor?: string | null
+  /** How many to return, 50 by default, at most 250. */
+  limit?: number | null
+}
+
+export type SaveGithubRepoSyncArgs = {
+  /** Import the repository's existing issues and comments: on create unless false; true imports again. */
+  backfill?: boolean | null
+  /** Only to change a sync: its id or the repository (owner/name). Omit to create one. */
+  id?: string | null
+  /** The import includes closed issues too (default false). */
+  includeClosed?: boolean | null
+  /** Project name, slug or id issues from GitHub join; null for none. */
+  project?: string | null
+  /** The repository as owner/name or GitHub id, among list_github_repositories. Required to create. */
+  repository?: string | null
+  /** Team key, name or id whose issues the repository's are. Required to create. */
+  team?: string | null
+}
+
+export type DeleteGithubRepoSyncArgs = {
+  id: string
+}
+
+export type DisconnectGithubAccountArgs = Record<string, never>
+
 export interface Ops {
   list_workspaces: { args: ListWorkspacesArgs; result: WorkspaceList }
   get_workspace: { args: GetWorkspaceArgs; result: Workspace }
@@ -3639,6 +3775,20 @@ export interface Ops {
   nodes: WebhookDelivery[]
   pageInfo: PageInfo
 } }
+  get_github_integration: { args: GetGithubIntegrationArgs; result: GitHubIntegration }
+  connect_github: { args: ConnectGithubArgs; result: GitHubConnect }
+  disconnect_github: { args: DisconnectGithubArgs; result: GitHubDisconnected }
+  list_github_repositories: { args: ListGithubRepositoriesArgs; result: {
+  nodes: GitHubRepository[]
+  pageInfo: PageInfo
+} }
+  list_github_repo_syncs: { args: ListGithubRepoSyncsArgs; result: {
+  nodes: GitHubRepoSync[]
+  pageInfo: PageInfo
+} }
+  save_github_repo_sync: { args: SaveGithubRepoSyncArgs; result: GitHubRepoSync }
+  delete_github_repo_sync: { args: DeleteGithubRepoSyncArgs; result: Deleted }
+  disconnect_github_account: { args: DisconnectGithubAccountArgs; result: GitHubAccount }
 }
 
 export type OpName = keyof Ops

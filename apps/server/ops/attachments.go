@@ -147,7 +147,7 @@ func saveAttachment(c *app.Ctx, tx pgx.Tx, issue uuid.UUID, url, title string, s
 			subtitle = coalesce($5, attachments.subtitle), metadata = coalesce($6, attachments.metadata),
 			icon_url = coalesce($7, attachments.icon_url), updated_at = now()
 		 RETURNING id, xmax = 0`,
-		c.Workspace, issue, url, title, trimmedSubtitle, metadata, iconURL, sourceType(url, c.PublicURL()), c.User)
+		c.Workspace, issue, url, title, trimmedSubtitle, metadata, iconURL, sourceType(url, c.PublicURL()), c.Actor())
 	if err != nil {
 		return uuid.Nil, err
 	}

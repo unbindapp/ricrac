@@ -187,6 +187,7 @@ type Me struct {
 	Name        string              `json:"name"`
 	DisplayName string              `json:"displayName"`
 	AvatarURL   *string             `json:"avatarUrl"`
+	GitHubLogin *string             `json:"githubLogin"`
 	Workspaces  []WorkspaceSummary  `json:"workspaces"`
 	Invitations []PendingInvitation `json:"invitations"`
 }
@@ -209,8 +210,8 @@ func (a *account) loadMe(r *http.Request) (*Me, error) {
 	}
 	user, found, err := app.Row[struct {
 		Email, Name, DisplayName string
-		AvatarURL                *string
-	}](ctx, a.state.DB, "SELECT email, name, display_name, avatar_url FROM users WHERE id = $1", id)
+		AvatarURL, GitHubLogin   *string
+	}](ctx, a.state.DB, "SELECT email, name, display_name, avatar_url, github_login FROM users WHERE id = $1", id)
 	if err != nil || !found {
 		return nil, err
 	}
@@ -230,7 +231,7 @@ func (a *account) loadMe(r *http.Request) (*Me, error) {
 		return nil, err
 	}
 	return &Me{
-		ID: id, Email: user.Email, Name: user.Name, DisplayName: user.DisplayName, AvatarURL: user.AvatarURL,
+		ID: id, Email: user.Email, Name: user.Name, DisplayName: user.DisplayName, AvatarURL: user.AvatarURL, GitHubLogin: user.GitHubLogin,
 		Workspaces: nonNil(workspaces), Invitations: nonNil(invitations),
 	}, nil
 }

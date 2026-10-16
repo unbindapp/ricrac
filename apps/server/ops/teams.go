@@ -105,7 +105,9 @@ const teamSettingsJSON = `jsonb_build_object(
 	'autoCloseState', state_ref(t.auto_close_state_id),
 	'autoCloseParentIssues', t.auto_close_parent_issues,
 	'autoCloseChildIssues', t.auto_close_child_issues,
-	'defaultIssueState', state_ref(t.default_issue_state_id))`
+	'defaultIssueState', state_ref(t.default_issue_state_id),
+	'githubPrOpenedState', state_ref(t.github_pr_opened_state_id),
+	'githubPrMergedState', state_ref(t.github_pr_merged_state_id))`
 
 // teamValue is everything about one team, as get_team answers.
 func teamValue(c *app.Ctx, q app.Querier, team uuid.UUID) (M, error) {
@@ -294,6 +296,8 @@ type SaveTeamArgs struct {
 	AutoCloseParentIssues        *bool             `json:"autoCloseParentIssues" doc:"Complete a parent issue when all its sub-issues are done."`
 	AutoCloseChildIssues         *bool             `json:"autoCloseChildIssues" doc:"Close the sub-issues when their parent is closed."`
 	DefaultIssueState            *string           `json:"defaultIssueState" doc:"The status new issues start in (a backlog or unstarted status: name or id)."`
+	GitHubPROpenedState          Nullable[string]  `json:"githubPrOpenedState" doc:"The status issues move to when a GitHub pull request or branch mentioning them opens (name or id); null for the first started status."`
+	GitHubPRMergedState          Nullable[string]  `json:"githubPrMergedState" doc:"The status issues move to when a pull request that fixes them merges (name or id); null for the first completed status."`
 	AddMembers                   []string          `json:"addMembers" doc:"People to add to the team: id, name, email or \"me\"."`
 	RemoveMembers                []string          `json:"removeMembers" doc:"People to take off the team."`
 }
@@ -581,6 +585,25 @@ func applyTeam(c *app.Ctx, tx pgx.Tx, team uuid.UUID, args SaveTeamArgs, creatin
 			return app.BadRequest("defaultIssueState must be a backlog or unstarted status, not %s", kind)
 		}
 		if err := setTeam(c, tx, team, "default_issue_state_id", state); err != nil {
+			return err
+		}
+	}
+	for _, setting := range []struct {
+		column string
+		value  Nullable[string]
+	}{{"github_pr_opened_state_id", args.GitHubPROpenedState}, {"github_pr_merged_state_id", args.GitHubPRMergedState}} {
+		if !setting.value.Set {
+			continue
+		}
+		var state *uuid.UUID
+		if setting.value.Valid {
+			id, err := findState(c, tx, team, setting.value.Value)
+			if err != nil {
+				return err
+			}
+			state = &id
+		}
+		if err := setTeam(c, tx, team, setting.column, state); err != nil {
 			return err
 		}
 	}
@@ -1114,6 +1137,8 @@ type TeamDetail struct {
 	AutoCloseParentIssues        bool         `json:"autoCloseParentIssues"`
 	AutoCloseChildIssues         bool         `json:"autoCloseChildIssues"`
 	DefaultIssueState            *StateRef    `json:"defaultIssueState"`
+	GitHubPROpenedState          *StateRef    `json:"githubPrOpenedState" doc:"Where GitHub pull requests and branches move issues; null for the first started status."`
+	GitHubPRMergedState          *StateRef    `json:"githubPrMergedState" doc:"Where merged pull requests that fix issues move them; null for the first completed status."`
 	States                       []TeamStatus `json:"states" doc:"Its active statuses in board order."`
 	Members                      []TeamMember `json:"members"`
 	LabelCount                   int          `json:"labelCount"`
