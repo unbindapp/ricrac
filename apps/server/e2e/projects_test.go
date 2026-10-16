@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func kinds(w *World, user uuid.UUID) []string {
+func notificationKinds(w *World, user uuid.UUID) []string {
 	return w.strings("SELECT type FROM notifications WHERE user_id = $1 ORDER BY created_at", user)
 }
 
@@ -26,7 +26,7 @@ func TestCreatesProjectsWithMilestonesAndIssueProgress(t *testing.T) {
 	eq(t, project.At("targetDateResolution").Str(), "quarter")
 	eq(t, project.At("priorityLabel").Str(), "High")
 	eq[any](t, project.At("progress").V, 0.0)
-	eqList(t, kinds(w, bob.User), []string{"projectAssigned"})
+	eqList(t, notificationKinds(w, bob.User), []string{"projectAssigned"})
 	found := call(t, w.Ann, "get_project", M{"id": project.At("url").Str()})
 	eq(t, found.At("id").Str(), project.At("id").Str(), "found by link")
 
@@ -117,8 +117,8 @@ func TestStatusUpdatesSetHealthAndNotify(t *testing.T) {
 	project := call(t, w.Ann, "get_project", M{"id": "Apollo"})
 	eq(t, project.At("health").Str(), "atRisk")
 	eq(t, project.At("latestUpdate", "id").Str(), first.At("id").Str())
-	eqList(t, kinds(w, bob.User), []string{"projectUpdateCreated"})
-	eqList(t, kinds(w, cat.User), []string{"projectUpdateMention"})
+	eqList(t, notificationKinds(w, bob.User), []string{"projectUpdateCreated"})
+	eqList(t, notificationKinds(w, cat.User), []string{"projectUpdateMention"})
 
 	second := call(t, w.Ann, "save_status_update", M{"project": "Apollo", "body": "Still slipping"})
 	eq(t, second.At("health").Str(), "atRisk", "the previous update's health")
@@ -156,7 +156,7 @@ func TestInitiativesGroupProjectsWithProgress(t *testing.T) {
 	looped := fails(t, w.Ann, "save_initiative", M{"id": "Grow 2030", "parent": "Grow EU"})
 	contains(t, looped, "itself")
 	call(t, w.Ann, "save_status_update", M{"initiative": "Grow 2030", "body": "Going well"})
-	eqList(t, kinds(w, bob.User), []string{"initiativeUpdateCreated"})
+	eqList(t, notificationKinds(w, bob.User), []string{"initiativeUpdateCreated"})
 
 	got := call(t, w.Ann, "get_initiative", M{"id": "grow 2030"})
 	eq(t, got.At("projects").Len(), 2)

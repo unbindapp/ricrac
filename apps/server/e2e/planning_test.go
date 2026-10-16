@@ -151,10 +151,6 @@ func TestDocumentsKeepVersionsAndFollowVisibility(t *testing.T) {
 	eq(t, moved.At("issue", "identifier").Str(), "ENG-1")
 }
 
-func names(list J) []string {
-	return list.At("nodes").Strings("name")
-}
-
 func TestCustomViewsFilterIssues(t *testing.T) {
 	w := world(t)
 	bob := w.member("bob@acme.test", "Bob Jones", "member")
