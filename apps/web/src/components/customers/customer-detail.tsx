@@ -47,7 +47,7 @@ import {
   useDeleteCustomerMutation,
   useSaveCustomerMutation,
 } from "@/lib/queries/customers";
-import { isApiError } from "@/lib/server/errors";
+import { isNotFoundError } from "@/lib/server/errors";
 
 export function CustomerDetail({ slug }: { slug: string }) {
   const { workspace } = useWorkspace();
@@ -59,7 +59,7 @@ export function CustomerDetail({ slug }: { slug: string }) {
       </PageContainer>
     );
   }
-  if (error && isApiError(error, 404)) {
+  if (isNotFoundError(error)) {
     return (
       <PageContainer>
         <EntityNotFound

@@ -42,7 +42,7 @@ import {
   useSaveReleaseMutation,
   useSaveReleaseNoteMutation,
 } from "@/lib/queries/releases";
-import { isApiError } from "@/lib/server/errors";
+import { isNotFoundError } from "@/lib/server/errors";
 
 export function ReleaseDetail({ slug }: { slug: string }) {
   const { workspace } = useWorkspace();
@@ -55,7 +55,7 @@ export function ReleaseDetail({ slug }: { slug: string }) {
       </PageContainer>
     );
   }
-  if (release.error && isApiError(release.error, 404)) {
+  if (isNotFoundError(release.error)) {
     return (
       <PageContainer>
         <EntityNotFound
