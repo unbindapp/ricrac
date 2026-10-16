@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-import { LabelDialog } from "@/components/labels/label-dialog";
+import type { TLabelDialogTarget } from "@/components/labels/label-dialog";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,115 +19,101 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/components/ui/toast";
+import { useWorkspace } from "@/components/workspace/workspace-provider";
 import {
   type TLabel,
-  type TLabelTree,
-  useArchiveLabelMutation,
   useDeleteLabelMutation,
-  useUnarchiveLabelMutation,
+  useRestoreLabelMutation,
+  useRetireLabelMutation,
 } from "@/lib/queries/labels";
 
-type TOpenDialog = "edit" | "add" | "delete" | null;
+type TProps = {
+  label: TLabel;
+  onOpen: (target: TLabelDialogTarget) => void;
+};
 
-export function LabelRowMenu({ label, groups }: { label: TLabel; groups: TLabelTree[] }) {
-  const [dialog, setDialog] = useState<TOpenDialog>(null);
-  const { mutate: archive } = useArchiveLabelMutation();
-  const { mutate: unarchive } = useUnarchiveLabelMutation();
-  const { mutateAsync: deleteLabel } = useDeleteLabelMutation();
-  const noun = label.is_group ? "group" : "label";
-  const close = (open: boolean) => {
-    if (!open) setDialog(null);
-  };
+function deleteDescription(label: TLabel) {
+  const uses =
+    label.issueCount === 0
+      ? "No issue has it."
+      : `It comes off ${label.issueCount} ${label.issueCount === 1 ? "issue" : "issues"}.`;
+  if (label.isGroup) return `The group and its labels are deleted for good. ${uses}`;
+  return `${uses} To keep it on those issues but stop new uses, retire it instead.`;
+}
+
+export function LabelRowMenu({ label, onOpen }: TProps) {
+  const { workspace } = useWorkspace();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const retire = useRetireLabelMutation(workspace.id);
+  const restore = useRestoreLabelMutation(workspace.id);
+  const { mutateAsync: deleteLabel } = useDeleteLabelMutation(workspace.id);
+  const noun = label.isGroup ? "group" : "label";
 
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
-            <Button variant="ghost" size="icon" aria-label={`Actions for ${label.name}`}>
+            <Button
+              variant="ghost"
+              size="icon"
+              forceMinSize={false}
+              aria-label={`Actions for ${label.name}`}
+              className="text-muted-foreground -mr-1 size-7"
+            >
               <EllipsisIcon className="size-4" />
             </Button>
           }
         />
         <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem onClick={() => setDialog("edit")}>
+          <DropdownMenuItem onClick={() => onOpen({ mode: "edit", label })}>
             <PencilIcon className="size-4" />
             Edit {noun}
           </DropdownMenuItem>
-          {label.is_group && !label.archived_at && (
-            <DropdownMenuItem onClick={() => setDialog("add")}>
+          {label.isGroup && !label.retiredAt && (
+            <DropdownMenuItem
+              onClick={() => onOpen({ mode: "create", isGroup: false, parent: label.id })}
+            >
               <PlusIcon className="size-4" />
               Add label to group
             </DropdownMenuItem>
           )}
-          {label.archived_at ? (
-            <DropdownMenuItem
-              onClick={() =>
-                unarchive(
-                  { labelId: label.id },
-                  {
-                    onSuccess: () =>
-                      toast.add({ type: "success", title: `Restored ${label.name}` }),
-                  },
-                )
-              }
-            >
+          {label.retiredAt ? (
+            <DropdownMenuItem onClick={() => restore.mutate(label.id)}>
               <ArchiveRestoreIcon className="size-4" />
-              Unarchive
+              Restore {noun}
             </DropdownMenuItem>
           ) : (
             <DropdownMenuItem
               onClick={() =>
-                archive(
-                  { labelId: label.id },
-                  {
-                    onSuccess: () =>
-                      toast.add({ type: "success", title: `Archived ${label.name}` }),
-                  },
-                )
+                retire.mutate(label.id, {
+                  onSuccess: () =>
+                    toast.add({
+                      type: "success",
+                      title: `Retired ${label.name}`,
+                      description: "It stays on its issues but can't be added anymore.",
+                    }),
+                })
               }
             >
               <ArchiveIcon className="size-4" />
-              Archive
+              Retire {noun}
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-destructive" onClick={() => setDialog("delete")}>
+          <DropdownMenuItem className="text-destructive" onClick={() => setIsDeleting(true)}>
             <Trash2Icon className="size-4" />
             Delete {noun}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <LabelDialog
-        mode="edit"
-        label={label}
-        groups={groups}
-        open={dialog === "edit"}
-        onOpenChange={close}
-      />
-      {label.is_group && (
-        <LabelDialog
-          mode="create"
-          workspaceId={label.workspace_id}
-          teamId={label.team_id ?? undefined}
-          isGroup={false}
-          parentId={label.id}
-          groups={groups}
-          open={dialog === "add"}
-          onOpenChange={close}
-        />
-      )}
       <ConfirmDialog
-        open={dialog === "delete"}
-        onOpenChange={close}
+        open={isDeleting}
+        onOpenChange={setIsDeleting}
         title={`Delete ${label.name}`}
-        description={
-          label.is_group
-            ? "Deletes the group and every label in it, and removes them from all issues."
-            : "Deletes the label and removes it from all issues. Archive it instead to keep it on existing issues."
-        }
+        description={deleteDescription(label)}
         confirmLabel={`Delete ${noun}`}
-        onConfirm={() => deleteLabel({ labelId: label.id })}
+        onConfirm={() => deleteLabel(label.id)}
       />
     </>
   );

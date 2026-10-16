@@ -144,9 +144,7 @@ export function Sidebar({ onNavigate }: TProps) {
               onNavigate={onNavigate}
             />
           </SidebarSection>
-          <SidebarSection title="Favorites">
-            <SidebarFavorites onNavigate={onNavigate} />
-          </SidebarSection>
+          <SidebarFavorites onNavigate={onNavigate} />
           <SidebarSection
             title="Your teams"
             action={

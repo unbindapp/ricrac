@@ -1,35 +1,44 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { ALL_TEAMS, toCreateInput, webhookFormSchema } from "./webhook-form.ts";
+import { ALL_TEAMS, resourceLabel, toSaveArgs, webhookFormSchema } from "./webhook-form.ts";
 
 const valid = {
-  url: " https://hooks.example.com/zigzag ",
+  url: " https://hooks.example.com/ricrac ",
   label: " Slack bridge ",
-  events: ["issue.created"],
+  resourceTypes: ["Issue", "Comment"],
   team: ALL_TEAMS,
   enabled: true,
 };
 
-test("a complete form passes and maps to the create input", () => {
+test("a complete form maps to save_webhook's arguments", () => {
   const parsed = webhookFormSchema.parse(valid);
-  assert.deepEqual(toCreateInput("ws", parsed), {
-    workspace_id: "ws",
-    url: "https://hooks.example.com/zigzag",
+  assert.deepEqual(toSaveArgs(parsed), {
+    url: "https://hooks.example.com/ricrac",
     label: "Slack bridge",
-    events: ["issue.created"],
+    resourceTypes: ["Issue", "Comment"],
+    team: null,
     enabled: true,
-    team_id: undefined,
   });
-  assert.equal(toCreateInput("ws", { ...parsed, team: "team-1" }).team_id, "team-1");
+  assert.equal(toSaveArgs({ ...parsed, team: "team-1" }).team, "team-1");
+  assert.equal(toSaveArgs({ ...parsed, label: "  " }).label, null);
 });
 
-test("urls must be http or https and events are required", () => {
-  assert.equal(webhookFormSchema.safeParse({ ...valid, url: "ftp://x" }).success, false);
-  assert.equal(webhookFormSchema.safeParse({ ...valid, url: "hooks.example.com" }).success, false);
-  assert.equal(webhookFormSchema.safeParse({ ...valid, events: [] }).success, false);
+test("urls are https, or http on localhost, and something must be received", () => {
   assert.equal(
-    webhookFormSchema.safeParse({ ...valid, events: ["issue.exploded"] }).success,
+    webhookFormSchema.safeParse({ ...valid, url: "http://localhost:8080/x" }).success,
+    true,
+  );
+  assert.equal(webhookFormSchema.safeParse({ ...valid, url: "http://example.com" }).success, false);
+  assert.equal(webhookFormSchema.safeParse({ ...valid, url: "hooks.example.com" }).success, false);
+  assert.equal(webhookFormSchema.safeParse({ ...valid, resourceTypes: [] }).success, false);
+  assert.equal(
+    webhookFormSchema.safeParse({ ...valid, resourceTypes: ["Explosion"] }).success,
     false,
   );
+});
+
+test("resource types read as words", () => {
+  assert.equal(resourceLabel("IssueLabel"), "Issue label");
+  assert.equal(resourceLabel("Issue"), "Issue");
 });

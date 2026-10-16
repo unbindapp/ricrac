@@ -1,143 +1,82 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
-import { z } from "zod";
 
-import { hexColorPattern } from "@/lib/helpers/colors";
-import { LIST_REFETCH_INTERVAL_MS } from "@/lib/queries/issues";
-import { getGoClient } from "@/lib/server/client";
-import type { TGoClient, TInput, TListItem, TResponseData } from "@/lib/server/types";
+import type { IssueLabel } from "@/api/ops.gen";
+import { call, callAll, type OpArgs } from "@/lib/server/client";
 
-export type TLabelTree = TListItem<TGoClient["labels"]["list"]>;
-export type TLabel = TResponseData<TGoClient["labels"]["create"]>;
-export type TCreateLabelInput = TInput<TGoClient["labels"]["create"]>;
-export type TUpdateLabelInput = TInput<TGoClient["labels"]["update"]>;
-
-export type TLabelScope = {
-  workspaceId: string;
-  teamId?: string;
-  allTeams?: boolean;
-  includeArchived?: boolean;
-};
+export type TLabel = IssueLabel;
+export type TLabelGroupType = NonNullable<IssueLabel["groupType"]>;
+/** A label with the labels of its group, when it is one. */
+export type TLabelNode = TLabel & { labels: TLabel[] };
 
 export const queryKeyLabels = {
-  all: () => ["labels"] as const,
-  tree: (scope: TLabelScope) =>
-    [
-      "labels",
-      "tree",
-      scope.workspaceId,
-      scope.teamId ?? null,
-      Boolean(scope.allTeams),
-      Boolean(scope.includeArchived),
-    ] as const,
+  all: (workspaceId: string) => [workspaceId, "labels"] as const,
+  list: (workspaceId: string, team: string | null, includeRetired: boolean) =>
+    [workspaceId, "labels", "list", team, includeRetired] as const,
 };
 
-export const labelTreeQuery = (scope: TLabelScope) =>
+/** With team: its labels and the workspace's; without: the workspace's and every visible team's. */
+export const labelsQuery = (
+  workspaceId: string,
+  { team = null, includeRetired = false }: { team?: string | null; includeRetired?: boolean } = {},
+) =>
   queryOptions({
-    queryKey: queryKeyLabels.tree(scope),
-    queryFn: async () => {
-      const res = await getGoClient().labels.list({
-        workspace_id: scope.workspaceId,
-        team_id: scope.teamId,
-        all_teams: scope.allTeams,
-        include_archived: scope.includeArchived,
-      });
-      return { labels: res.data ?? [] };
-    },
-    refetchInterval: LIST_REFETCH_INTERVAL_MS,
+    queryKey: queryKeyLabels.list(workspaceId, team, includeRetired),
+    queryFn: () => callAll(workspaceId, "list_issue_labels", { team, includeRetired }),
   });
 
-export async function createLabel(input: TCreateLabelInput) {
-  const res = await getGoClient().labels.create(input);
-  return { data: res.data };
+/** Top-level labels and groups, each group holding its labels, both by name. */
+export function labelTree(labels: TLabel[]): TLabelNode[] {
+  const byName = (a: TLabel, b: TLabel) => a.name.localeCompare(b.name);
+  return labels
+    .filter((label) => !label.parent)
+    .sort(byName)
+    .map((label) => ({
+      ...label,
+      labels: labels.filter((child) => child.parent?.id === label.id).sort(byName),
+    }));
 }
 
-export async function updateLabel(input: TUpdateLabelInput) {
-  const res = await getGoClient().labels.update(input);
-  return { data: res.data };
-}
-
-export async function archiveLabel(input: { labelId: string }) {
-  const res = await getGoClient().labels.archive({ label_id: input.labelId });
-  return { data: res.data };
-}
-
-export async function unarchiveLabel(input: { labelId: string }) {
-  const res = await getGoClient().labels.unarchive({ label_id: input.labelId });
-  return { data: res.data };
-}
-
-export async function deleteLabel(input: { labelId: string }) {
-  const res = await getGoClient().labels.delete({ label_id: input.labelId });
-  return { data: res.data };
-}
-
-function useInvalidateLabels() {
+function useInvalidateLabels(workspaceId: string) {
   const queryClient = useQueryClient();
-  return async () => {
-    await queryClient.invalidateQueries({ queryKey: queryKeyLabels.all() });
-    await queryClient.invalidateQueries({ queryKey: ["favorites"] });
-  };
+  return () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: queryKeyLabels.all(workspaceId) }),
+      queryClient.invalidateQueries({ queryKey: [workspaceId, "issues"] }),
+    ]);
 }
 
-export function useCreateLabelMutation() {
-  const invalidate = useInvalidateLabels();
+export function useSaveLabelMutation(workspaceId: string) {
+  const invalidate = useInvalidateLabels(workspaceId);
   return useMutation({
-    mutationFn: createLabel,
-    meta: { errorTitle: "Could not create label" },
+    mutationFn: (args: OpArgs<"save_issue_label">) => call(workspaceId, "save_issue_label", args),
+    meta: { errorTitle: "Could not save label" },
     onSuccess: invalidate,
   });
 }
 
-export function useUpdateLabelMutation() {
-  const invalidate = useInvalidateLabels();
+export function useRetireLabelMutation(workspaceId: string) {
+  const invalidate = useInvalidateLabels(workspaceId);
   return useMutation({
-    mutationFn: updateLabel,
-    meta: { errorTitle: "Could not update label" },
+    mutationFn: (id: string) => call(workspaceId, "retire_issue_label", { id }),
+    meta: { errorTitle: "Could not retire label" },
     onSuccess: invalidate,
   });
 }
 
-export function useArchiveLabelMutation() {
-  const invalidate = useInvalidateLabels();
+export function useRestoreLabelMutation(workspaceId: string) {
+  const invalidate = useInvalidateLabels(workspaceId);
   return useMutation({
-    mutationFn: archiveLabel,
-    meta: { errorTitle: "Could not archive label" },
-    onSuccess: invalidate,
-  });
-}
-
-export function useUnarchiveLabelMutation() {
-  const invalidate = useInvalidateLabels();
-  return useMutation({
-    mutationFn: unarchiveLabel,
+    mutationFn: (id: string) => call(workspaceId, "restore_issue_label", { id }),
     meta: { errorTitle: "Could not restore label" },
     onSuccess: invalidate,
   });
 }
 
-export function useDeleteLabelMutation() {
-  const invalidate = useInvalidateLabels();
-  const queryClient = useQueryClient();
+export function useDeleteLabelMutation(workspaceId: string) {
+  const invalidate = useInvalidateLabels(workspaceId);
   return useMutation({
-    mutationFn: deleteLabel,
+    mutationFn: (id: string) => call(workspaceId, "delete_issue_label", { id }),
     meta: { errorTitle: "Could not delete label" },
-    onSuccess: async () => {
-      await invalidate();
-      await queryClient.invalidateQueries({ queryKey: ["issues"] });
-    },
+    onSuccess: invalidate,
   });
 }
-
-export const labelNameMaxLength = 64;
-
-export const LabelFormSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, "Name is required.")
-    .max(labelNameMaxLength, `Name should be at most ${labelNameMaxLength} characters.`),
-  color: z.string().regex(hexColorPattern, "Pick a color."),
-  description: z.string().trim().max(500, "Keep the description under 500 characters."),
-  parentId: z.string(),
-  groupSingleSelect: z.boolean(),
-});

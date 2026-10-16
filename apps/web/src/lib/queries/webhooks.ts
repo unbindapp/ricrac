@@ -1,81 +1,82 @@
-import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  infiniteQueryOptions,
+  queryOptions,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 
-import { getGoClient } from "@/lib/server/client";
-import type { TGoClient, TInput, TListItem, TResponseData } from "@/lib/server/types";
+import type { Webhook, WebhookDelivery } from "@/api/ops.gen";
+import { call, callAll, type OpArgs } from "@/lib/server/client";
 
-export type TWebhook = TListItem<TGoClient["webhooks"]["list"]>;
-export type TWebhookCreated = TResponseData<TGoClient["webhooks"]["create"]>;
-export type TCreateWebhookInput = TInput<TGoClient["webhooks"]["create"]>;
-export type TUpdateWebhookInput = TInput<TGoClient["webhooks"]["update"]>;
+export type TWebhook = Webhook;
+export type TWebhookDelivery = WebhookDelivery;
+
 export const queryKeyWebhooks = {
-  all: () => ["webhooks"] as const,
-  list: (workspaceId: string) => ["webhooks", "list", workspaceId] as const,
+  all: (workspaceId: string) => [workspaceId, "webhooks"] as const,
+  list: (workspaceId: string) => [workspaceId, "webhooks", "list"] as const,
+  deliveries: (workspaceId: string, id: string) =>
+    [workspaceId, "webhooks", "deliveries", id] as const,
 };
 
-export const webhooksListQuery = (workspaceId: string) =>
+export const webhooksQuery = (workspaceId: string) =>
   queryOptions({
     queryKey: queryKeyWebhooks.list(workspaceId),
-    queryFn: async () => {
-      const res = await getGoClient().webhooks.list({ workspace_id: workspaceId });
-      return { webhooks: res.data ?? [] };
-    },
+    queryFn: () => callAll(workspaceId, "list_webhooks", {}),
   });
 
-export async function createWebhook(input: TCreateWebhookInput) {
-  const res = await getGoClient().webhooks.create(input);
-  return { data: res.data };
-}
+const DELIVERIES_PAGE_SIZE = 20;
 
-export async function updateWebhook(input: TUpdateWebhookInput) {
-  const res = await getGoClient().webhooks.update(input);
-  return { data: res.data };
-}
+/** A webhook's deliveries, newest first, a page at a time. */
+export const webhookDeliveriesQuery = (workspaceId: string, id: string) =>
+  infiniteQueryOptions({
+    queryKey: queryKeyWebhooks.deliveries(workspaceId, id),
+    queryFn: ({ pageParam }) =>
+      call(workspaceId, "list_webhook_deliveries", {
+        id,
+        cursor: pageParam,
+        limit: DELIVERIES_PAGE_SIZE,
+      }),
+    initialPageParam: null as string | null,
+    getNextPageParam: (page) => (page.pageInfo.hasNextPage ? page.pageInfo.endCursor : null),
+    refetchInterval: (query) =>
+      query.state.data?.pages[0]?.nodes.some((delivery) => delivery.nextAttemptAt) ? 5000 : false,
+  });
 
-export async function deleteWebhook({ webhookId }: { webhookId: string }) {
-  const res = await getGoClient().webhooks.delete({ webhook_id: webhookId });
-  return { data: res.data };
-}
-
-export async function testWebhook({ webhookId }: { webhookId: string }) {
-  const res = await getGoClient().webhooks.test({ webhook_id: webhookId });
-  return { data: res.data };
-}
-
-function useInvalidateWebhooks() {
+function useInvalidateWebhooks(workspaceId: string) {
   const queryClient = useQueryClient();
-  return () => queryClient.invalidateQueries({ queryKey: queryKeyWebhooks.all() });
+  return () => queryClient.invalidateQueries({ queryKey: queryKeyWebhooks.all(workspaceId) });
 }
 
-export function useCreateWebhookMutation() {
-  const invalidate = useInvalidateWebhooks();
+export function useSaveWebhookMutation(workspaceId: string) {
+  const invalidate = useInvalidateWebhooks(workspaceId);
   return useMutation({
-    mutationFn: createWebhook,
-    meta: { errorTitle: "Could not create webhook" },
+    mutationFn: (args: OpArgs<"save_webhook">) => call(workspaceId, "save_webhook", args),
+    meta: { errorTitle: "Could not save webhook" },
     onSuccess: invalidate,
   });
 }
 
-export function useUpdateWebhookMutation() {
-  const invalidate = useInvalidateWebhooks();
+export function useDeleteWebhookMutation(workspaceId: string) {
+  const invalidate = useInvalidateWebhooks(workspaceId);
   return useMutation({
-    mutationFn: updateWebhook,
-    meta: { errorTitle: "Could not update webhook" },
-    onSuccess: invalidate,
-  });
-}
-
-export function useDeleteWebhookMutation() {
-  const invalidate = useInvalidateWebhooks();
-  return useMutation({
-    mutationFn: deleteWebhook,
+    mutationFn: (id: string) => call(workspaceId, "delete_webhook", { id }),
     meta: { errorTitle: "Could not delete webhook" },
     onSuccess: invalidate,
   });
 }
 
-export function useTestWebhookMutation() {
+export function useRotateWebhookSecretMutation(workspaceId: string) {
   return useMutation({
-    mutationFn: testWebhook,
-    meta: { errorTitle: "Could not send a test event" },
+    mutationFn: (id: string) => call(workspaceId, "rotate_webhook_secret", { id }),
+    meta: { errorTitle: "Could not rotate the secret" },
+  });
+}
+
+export function useTestWebhookMutation(workspaceId: string) {
+  const invalidate = useInvalidateWebhooks(workspaceId);
+  return useMutation({
+    mutationFn: (id: string) => call(workspaceId, "test_webhook", { id }),
+    meta: { errorTitle: "Could not send a test" },
+    onSettled: invalidate,
   });
 }

@@ -1,63 +1,92 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { PlusIcon, RefreshCwIcon } from "lucide-react";
+import { PlusIcon, RefreshCwIcon, SettingsIcon } from "lucide-react";
+import { useState } from "react";
 
-import { CycleDialog } from "@/components/cycles/cycle-dialog";
+import { CycleDialog, type TCycleDialogTarget } from "@/components/cycles/cycle-dialog";
 import { CycleList } from "@/components/cycles/cycle-list";
 import { EmptyState } from "@/components/layout/empty-state";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button, LinkButton } from "@/components/ui/button";
+import { SimpleTooltip } from "@/components/ui/tooltip";
 import { teamCrumb } from "@/components/workspace/team-crumb";
 import { useRequiredTeamFromRoute } from "@/components/workspace/use-team-from-route";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { cyclesListQuery } from "@/lib/queries/cycles";
+import { cyclesQuery } from "@/lib/queries/cycles";
+import { teamQuery } from "@/lib/queries/teams";
 
 export const Route = createFileRoute("/$workspace/_workspace/team/$key/cycles")({
-  component: TeamKeyCyclesPage,
+  component: TeamCyclesPage,
 });
 
-function TeamKeyCyclesPage() {
-  const { workspace, isAdmin } = useWorkspace();
+function TeamCyclesPage() {
+  const { workspace, canEdit, isAdmin } = useWorkspace();
   const team = useRequiredTeamFromRoute();
-  const { data } = useQuery({ ...cyclesListQuery(team.id), enabled: team.cycles_enabled });
-  const latest = [...(data?.cycles ?? [])].sort((a, b) => b.ends_at.localeCompare(a.ends_at))[0];
+  const params = { workspace: workspace.urlKey, key: team.key };
+  const { data: cycles } = useQuery({
+    ...cyclesQuery(workspace.id, team.id, true),
+    enabled: team.cyclesEnabled,
+  });
+  const { data: detail } = useQuery({ ...teamQuery(workspace.id, team.id), enabled: canEdit });
+  const [dialog, setDialog] = useState<TCycleDialogTarget | null>(null);
+
+  const openNewCycle = () => {
+    const lastEnd = Math.max(
+      Date.now(),
+      ...(cycles ?? []).map((cycle) => Date.parse(cycle.endsAt)),
+    );
+    setDialog({
+      mode: "create",
+      startsOn: new Date(lastEnd),
+      weeks: detail?.cycleDurationWeeks ?? 2,
+    });
+  };
 
   return (
     <PageContainer>
       <PageHeader
         title="Cycles"
         icon={<RefreshCwIcon />}
-        breadcrumb={[teamCrumb(team, workspace.slug), { label: "Cycles" }]}
+        breadcrumb={[teamCrumb(team, workspace.urlKey), { label: "Cycles" }]}
         actions={
-          isAdmin &&
-          team.cycles_enabled && (
-            <CycleDialog
-              mode="create"
-              team={team}
-              after={latest}
-              trigger={
-                <Button>
+          team.cyclesEnabled && (
+            <>
+              {isAdmin && (
+                <SimpleTooltip content="Cycle settings">
+                  <LinkButton
+                    to="/$workspace/settings/team/$key/cycles"
+                    params={params}
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Cycle settings"
+                  >
+                    <SettingsIcon className="size-4" />
+                  </LinkButton>
+                </SimpleTooltip>
+              )}
+              {canEdit && (
+                <Button size="sm" onClick={openNewCycle}>
                   <PlusIcon className="size-4" />
                   New cycle
                 </Button>
-              }
-            />
+              )}
+            </>
           )
         }
       />
-      {team.cycles_enabled ? (
-        <CycleList team={team} workspaceSlug={workspace.slug} />
+      {team.cyclesEnabled ? (
+        <CycleList team={team} />
       ) : (
         <EmptyState
           icon={RefreshCwIcon}
           title="Cycles are off for this team"
-          description="Cycles are fixed time boxes; unfinished issues roll over to the next one."
+          description="Cycles are repeating time boxes, like two-week sprints. Unfinished issues can roll over to the next one."
           action={
             isAdmin && (
               <LinkButton
                 to="/$workspace/settings/team/$key/cycles"
-                params={{ workspace: workspace.slug, key: team.key }}
+                params={params}
                 variant="outline"
                 size="sm"
               >
@@ -67,6 +96,7 @@ function TeamKeyCyclesPage() {
           }
         />
       )}
+      <CycleDialog team={team} target={dialog} onClose={() => setDialog(null)} />
     </PageContainer>
   );
 }

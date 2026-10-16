@@ -1,153 +1,153 @@
-import { ReactElement, useState } from "react";
+import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { colorFromId } from "@/lib/helpers/colors";
+import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { colorFromId, hexColorPattern } from "@/lib/helpers/colors";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
-import {
-  LabelFormSchema,
-  type TLabel,
-  type TLabelTree,
-  useCreateLabelMutation,
-  useUpdateLabelMutation,
-} from "@/lib/queries/labels";
+import { type TLabel, type TLabelGroupType, useSaveLabelMutation } from "@/lib/queries/labels";
 
 const NO_GROUP = "none";
 
-type TProps = {
-  trigger?: ReactElement;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  groups: TLabelTree[];
-} & (
-  | {
-      mode: "create";
-      workspaceId: string;
-      teamId?: string;
-      isGroup: boolean;
-      parentId?: string;
-      label?: never;
-    }
-  | {
-      mode: "edit";
-      label: TLabel;
-      workspaceId?: never;
-      teamId?: never;
-      isGroup?: never;
-      parentId?: never;
-    }
-);
+const labelFormSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, "Name is required.")
+    .max(80, "Keep the name under 80 characters.")
+    .refine((name) => !name.includes("/"), "Names can't contain a slash."),
+  color: z.string().regex(hexColorPattern, "Pick a color."),
+  description: z.string().trim().max(500, "Keep the description under 500 characters."),
+  parent: z.string(),
+  groupType: z.enum(["singleSelect", "multiSelect"]),
+});
 
-export function LabelDialog(props: TProps) {
-  const [internalOpen, setInternalOpen] = useState(false);
-  const isOpen = props.open ?? internalOpen;
-  const setOpen = (next: boolean) => {
-    setInternalOpen(next);
-    props.onOpenChange?.(next);
-  };
-  const isGroup = props.mode === "edit" ? props.label.is_group : props.isGroup;
+const groupTypeItems: { value: TLabelGroupType; label: string }[] = [
+  { value: "singleSelect", label: "Single select: an issue takes one of its labels" },
+  { value: "multiSelect", label: "Multi select: an issue takes any of its labels" },
+];
+
+export type TLabelDialogTarget =
+  { mode: "create"; isGroup: boolean; parent?: string } | { mode: "edit"; label: TLabel };
+
+type TProps = {
+  /** What the dialog creates or edits; null keeps it closed. */
+  target: TLabelDialogTarget | null;
+  onClose: () => void;
+  /** The team the label belongs to; null for a workspace label. */
+  team: { id: string; name: string } | null;
+  /** The groups a label can go in. */
+  groups: TLabel[];
+};
+
+export function LabelDialog({ target, onClose, team, groups }: TProps) {
+  const isGroup = target?.mode === "edit" ? target.label.isGroup : !!target?.isGroup;
   const noun = isGroup ? "group" : "label";
+  const scope = team ? `Only ${team.name} uses it.` : "Every team can use it.";
   return (
-    <Dialog open={isOpen} onOpenChange={setOpen}>
-      {props.trigger && <DialogTrigger render={props.trigger} />}
+    <Dialog open={target !== null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="w-md max-w-full">
         <DialogHeader>
-          <DialogTitle>{props.mode === "edit" ? `Edit ${noun}` : `New ${noun}`}</DialogTitle>
+          <DialogTitle>{target?.mode === "edit" ? `Edit ${noun}` : `New ${noun}`}</DialogTitle>
+          {target?.mode === "create" && <DialogDescription>{scope}</DialogDescription>}
         </DialogHeader>
-        {isOpen && <LabelForm {...props} asGroup={isGroup} onDone={() => setOpen(false)} />}
+        {target && (
+          <LabelForm
+            target={target}
+            team={team}
+            groups={groups}
+            isGroup={isGroup}
+            onDone={onClose}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );
 }
 
 function LabelForm({
-  asGroup,
+  target,
+  team,
+  groups,
+  isGroup,
   onDone,
-  ...props
-}: TProps & { asGroup: boolean; onDone: () => void }) {
-  const { mutateAsync: createLabel } = useCreateLabelMutation();
-  const { mutateAsync: updateLabel } = useUpdateLabelMutation();
+}: Omit<TProps, "target" | "onClose"> & {
+  target: TLabelDialogTarget;
+  isGroup: boolean;
+  onDone: () => void;
+}) {
+  const { workspace } = useWorkspace();
+  const { mutateAsync: saveLabel } = useSaveLabelMutation(workspace.id);
+  const label = target.mode === "edit" ? target.label : null;
   const groupItems = [
     { value: NO_GROUP, label: "No group" },
-    ...props.groups.map((group) => ({ value: group.id, label: group.name })),
+    ...groups.map((group) => ({
+      value: group.id,
+      label: group.team || !team ? group.name : `${group.name} (workspace)`,
+    })),
   ];
   const form = useAppForm({
-    defaultValues:
-      props.mode === "edit"
-        ? {
-            name: props.label.name,
-            color: props.label.color,
-            description: props.label.description,
-            parentId: props.label.parent_id ?? NO_GROUP,
-            groupSingleSelect: props.label.group_single_select,
-          }
-        : {
-            name: "",
-            color: colorFromId(crypto.randomUUID()),
-            description: "",
-            parentId: props.parentId ?? NO_GROUP,
-            groupSingleSelect: false,
-          },
-    validators: { onSubmit: LabelFormSchema },
+    defaultValues: {
+      name: label?.name ?? "",
+      color: label?.color ?? colorFromId(crypto.randomUUID()),
+      description: label?.description ?? "",
+      parent: label?.parent?.id ?? (target.mode === "create" && target.parent) ?? NO_GROUP,
+      groupType: label?.groupType ?? ("singleSelect" as TLabelGroupType),
+    },
+    validators: { onSubmit: labelFormSchema },
     onSubmit: async ({ value }) => {
-      const parsed = LabelFormSchema.parse(value);
-      const parentId = parsed.parentId === NO_GROUP ? undefined : parsed.parentId;
-      if (props.mode === "edit") {
-        await updateLabel({
-          label_id: props.label.id,
-          name: parsed.name,
-          color: parsed.color,
-          description: parsed.description,
-          ...(asGroup
-            ? { group_single_select: parsed.groupSingleSelect }
-            : { parent_id: parentId ?? "00000000-0000-0000-0000-000000000000" }),
-        });
-        onDone();
-        return;
-      }
-      await createLabel({
-        workspace_id: props.workspaceId,
-        team_id: props.teamId,
+      const parsed = labelFormSchema.parse(value);
+      const fields = {
         name: parsed.name,
         color: parsed.color,
-        description: parsed.description || undefined,
-        is_group: asGroup || undefined,
-        group_single_select: asGroup ? parsed.groupSingleSelect : undefined,
-        parent_id: asGroup ? undefined : parentId,
-      });
+        description: parsed.description || null,
+        ...(isGroup
+          ? { groupType: parsed.groupType }
+          : { parent: parsed.parent === NO_GROUP ? null : parsed.parent }),
+      };
+      if (label) await saveLabel({ id: label.id, ...fields });
+      else await saveLabel({ ...fields, isGroup, team: team?.id ?? null });
       onDone();
     },
   });
+
   return (
     <form className="flex flex-col gap-4" onSubmit={submitHandler(form)} noValidate>
+      <form.AppField
+        name="name"
+        children={(field) => (
+          <field.TextField
+            label="Name"
+            autoFocus
+            placeholder={isGroup ? "Type" : "Bug"}
+            autoComplete="off"
+          />
+        )}
+      />
       <form.AppField name="color" children={(field) => <field.ColorField label="Color" />} />
-      <form.AppField name="name" children={(field) => <field.TextField label="Name" autoFocus />} />
       <form.AppField
         name="description"
-        children={(field) => <field.TextareaField label="Description" rows={2} />}
+        children={(field) => (
+          <field.TextareaField label="Description" rows={2} placeholder="Optional" />
+        )}
       />
-      {asGroup ? (
+      {isGroup ? (
         <form.AppField
-          name="groupSingleSelect"
-          children={(field) => (
-            <field.SwitchField
-              label="Single select"
-              description="An issue can carry only one label of this group."
-            />
-          )}
+          name="groupType"
+          children={(field) => <field.SelectField label="Selection" items={groupTypeItems} />}
         />
       ) : (
         groupItems.length > 1 && (
           <form.AppField
-            name="parentId"
+            name="parent"
             children={(field) => <field.SelectField label="Group" items={groupItems} />}
           />
         )
@@ -162,7 +162,7 @@ function LabelForm({
         />
         <form.AppForm>
           <form.SubmitButton size="sm">
-            {props.mode === "edit" ? "Save" : asGroup ? "Create group" : "Create label"}
+            {label ? "Save" : isGroup ? "Create group" : "Create label"}
           </form.SubmitButton>
         </form.AppForm>
       </DialogFooter>

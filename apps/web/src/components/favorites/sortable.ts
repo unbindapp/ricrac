@@ -21,7 +21,7 @@ export function midpoint(before: number | undefined, after: number | undefined) 
   return (before + after) / 2;
 }
 
-export function reorderedPosition<T extends { id: string; sort_order: number }>(
+export function reorderedPosition<T extends { id: string; sortOrder: number }>(
   items: T[],
   event: DragEndEvent,
 ) {
@@ -35,7 +35,7 @@ export function reorderedPosition<T extends { id: string; sort_order: number }>(
   return {
     id: String(active.id),
     order,
-    sortOrder: midpoint(before?.sort_order, after?.sort_order),
+    sortOrder: midpoint(before?.sortOrder, after?.sortOrder),
   };
 }
 

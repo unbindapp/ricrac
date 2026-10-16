@@ -1,107 +1,106 @@
-import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
-import { z } from "zod";
+import {
+  infiniteQueryOptions,
+  queryOptions,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 
-import { LIST_REFETCH_INTERVAL_MS } from "@/lib/queries/issues";
-import { getGoClient } from "@/lib/server/client";
-import { isApiError } from "@/lib/server/errors";
-import type { TGoClient, TInput, TListItem, TResponseData } from "@/lib/server/types";
+import type { CustomView } from "@/api/ops.gen";
+import { queryKeyFavorites } from "@/lib/queries/favorites";
+import { call, callAll, type OpArgs } from "@/lib/server/client";
 
-export type TView = TListItem<TGoClient["views"]["list"]>;
-export type TViewDetail = TResponseData<TGoClient["views"]["get"]>;
-export type TViewDisplay = TView["display"];
-export type TCreateViewInput = TInput<TGoClient["views"]["create"]>;
-export type TUpdateViewInput = TInput<TGoClient["views"]["update"]>;
+export type TView = CustomView;
+export type TViewModel = CustomView["model"];
+export type TFilter = Record<string, unknown>;
 
 export const queryKeyViews = {
-  all: () => ["views"] as const,
-  list: (workspaceId: string) => ["views", "list", workspaceId] as const,
-  detail: (viewId: string) => ["views", "detail", viewId] as const,
+  all: (workspaceId: string) => [workspaceId, "views"] as const,
+  list: (workspaceId: string) => [workspaceId, "views", "list"] as const,
+  detail: (workspaceId: string, view: string) => [workspaceId, "views", "detail", view] as const,
+  results: (workspaceId: string, model: TViewModel, team: string | null, filter: TFilter) =>
+    [workspaceId, "views", "results", model, team, filter] as const,
 };
 
-export const viewsListQuery = (workspaceId: string) =>
+export const viewsQuery = (workspaceId: string) =>
   queryOptions({
     queryKey: queryKeyViews.list(workspaceId),
-    queryFn: async () => {
-      const res = await getGoClient().views.list({ workspace_id: workspaceId, kind: "issue" });
-      return { views: res.data ?? [] };
-    },
-    refetchInterval: LIST_REFETCH_INTERVAL_MS,
+    queryFn: () => callAll(workspaceId, "list_custom_views", {}),
   });
 
-export const viewQuery = (viewId: string) =>
+/** A view by id, slug or link tail (its route param). */
+export const viewQuery = (workspaceId: string, view: string) =>
   queryOptions({
-    queryKey: queryKeyViews.detail(viewId),
-    queryFn: async () => {
-      const res = await getGoClient().views.get({ view_id: viewId });
-      return { view: res.data };
-    },
-    retry: retryUnlessNotFound,
+    queryKey: queryKeyViews.detail(workspaceId, view),
+    queryFn: () => call(workspaceId, "get_custom_view", { id: view }),
+    retry: false,
   });
 
-export async function createView(input: TCreateViewInput) {
-  const res = await getGoClient().views.create(input);
-  return { data: res.data };
+/** The part of a view's link after /view/: its name and slug id, which get_custom_view takes. */
+export function viewParam(view: Pick<TView, "url" | "slugId">) {
+  return view.url.split("/view/")[1] ?? view.slugId;
 }
 
-export async function updateView(input: TUpdateViewInput) {
-  const res = await getGoClient().views.update(input);
-  return { data: res.data };
-}
+const RESULTS_PAGE_SIZE = 100;
 
-export async function deleteView(input: { viewId: string }) {
-  const res = await getGoClient().views.delete({ view_id: input.viewId });
-  return { data: res.data };
-}
+/** The issues a filter matches, as an issue view shows them (also unsaved edits of its filter). */
+export const viewIssuesQuery = (workspaceId: string, team: string | null, filter: TFilter) =>
+  infiniteQueryOptions({
+    queryKey: queryKeyViews.results(workspaceId, "issue", team, filter),
+    queryFn: ({ pageParam }) =>
+      call(workspaceId, "list_issues", {
+        team,
+        filter,
+        cursor: pageParam,
+        limit: RESULTS_PAGE_SIZE,
+      }),
+    initialPageParam: null as string | null,
+    getNextPageParam: (page) => (page.pageInfo.hasNextPage ? page.pageInfo.endCursor : null),
+  });
 
-function useInvalidateViews() {
+export const viewProjectsQuery = (workspaceId: string, team: string | null, filter: TFilter) =>
+  infiniteQueryOptions({
+    queryKey: queryKeyViews.results(workspaceId, "project", team, filter),
+    queryFn: ({ pageParam }) =>
+      call(workspaceId, "list_projects", {
+        team,
+        filter,
+        cursor: pageParam,
+        limit: RESULTS_PAGE_SIZE,
+      }),
+    initialPageParam: null as string | null,
+    getNextPageParam: (page) => (page.pageInfo.hasNextPage ? page.pageInfo.endCursor : null),
+  });
+
+/** The projects a view filter can pick from. */
+export const projectOptionsQuery = (workspaceId: string) =>
+  queryOptions({
+    queryKey: [workspaceId, "views", "projectOptions"] as const,
+    queryFn: () => callAll(workspaceId, "list_projects", {}),
+  });
+
+function useInvalidateViews(workspaceId: string) {
   const queryClient = useQueryClient();
-  return async () => {
-    await queryClient.invalidateQueries({ queryKey: queryKeyViews.all() });
-    await queryClient.invalidateQueries({ queryKey: ["favorites"] });
-  };
+  return () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: queryKeyViews.all(workspaceId) }),
+      queryClient.invalidateQueries({ queryKey: queryKeyFavorites.all(workspaceId) }),
+    ]);
 }
 
-export function useCreateViewMutation() {
-  const invalidate = useInvalidateViews();
+export function useSaveViewMutation(workspaceId: string) {
+  const invalidate = useInvalidateViews(workspaceId);
   return useMutation({
-    mutationFn: createView,
+    mutationFn: (args: OpArgs<"save_custom_view">) => call(workspaceId, "save_custom_view", args),
     meta: { errorTitle: "Could not save view" },
     onSuccess: invalidate,
   });
 }
 
-export function useUpdateViewMutation() {
-  const invalidate = useInvalidateViews();
+export function useDeleteViewMutation(workspaceId: string) {
+  const invalidate = useInvalidateViews(workspaceId);
   return useMutation({
-    mutationFn: updateView,
-    meta: { errorTitle: "Could not update view" },
-    onSuccess: invalidate,
-  });
-}
-
-export function useDeleteViewMutation() {
-  const invalidate = useInvalidateViews();
-  return useMutation({
-    mutationFn: deleteView,
+    mutationFn: (id: string) => call(workspaceId, "delete_custom_view", { id }),
     meta: { errorTitle: "Could not delete view" },
     onSuccess: invalidate,
   });
-}
-
-export const viewNameMaxLength = 64;
-
-export const ViewFormSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, "Name is required.")
-    .max(viewNameMaxLength, `Name should be at most ${viewNameMaxLength} characters.`),
-  description: z.string().trim().max(500, "Keep the description under 500 characters."),
-  icon: z.string(),
-  color: z.string(),
-  shared: z.boolean(),
-});
-
-function retryUnlessNotFound(failureCount: number, error: Error) {
-  return !isApiError(error, 404) && failureCount < 3;
 }

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { LinearImport } from "@/components/import/linear-import";
+import { ImportFormat } from "@/components/import/import-format";
+import { IssueImport } from "@/components/import/issue-import";
 import { SettingsPage } from "@/components/layout/settings-page";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/_admin/import")({
@@ -9,8 +10,12 @@ export const Route = createFileRoute("/$workspace/_workspace/settings/_admin/imp
 
 function ImportSettingsPage() {
   return (
-    <SettingsPage title="Import" description="Import a Linear export into this workspace.">
-      <LinearImport />
+    <SettingsPage
+      title="Import"
+      description="Move issues from another tracker into a team, as a JSON file."
+    >
+      <IssueImport />
+      <ImportFormat />
     </SettingsPage>
   );
 }

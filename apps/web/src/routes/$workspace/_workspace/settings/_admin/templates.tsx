@@ -9,15 +9,13 @@ export const Route = createFileRoute("/$workspace/_workspace/settings/_admin/tem
 });
 
 function TemplatesSettingsPage() {
-  const { workspace, isAdmin } = useWorkspace();
+  const { canEdit } = useWorkspace();
   return (
-    <SettingsPage title="Templates" description="Templates for new issues, projects and documents.">
-      <TemplateManager
-        workspaceId={workspace.id}
-        canEdit={isAdmin}
-        title="Issue templates"
-        description="Every team can start an issue from these."
-      />
+    <SettingsPage
+      title="Templates"
+      description="What new issues, projects and documents start from, for every team or one."
+    >
+      <TemplateManager team={null} canEdit={canEdit} />
     </SettingsPage>
   );
 }
