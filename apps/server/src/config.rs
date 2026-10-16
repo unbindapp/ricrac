@@ -10,9 +10,6 @@ pub struct Config {
     /// Sign-in with Google. Without them nobody can sign in, but tokens keep working.
     pub google_client_id: Option<String>,
     pub google_client_secret: Option<String>,
-    /// Who may create an account: emails (`ann@example.com`) or domains (`@example.com`). Empty
-    /// lets anyone in. People invited to a workspace may always sign in.
-    pub allowed_emails: Vec<String>,
     /// Largest upload accepted, in bytes.
     pub max_upload_size: usize,
     /// Force the `Secure` flag on cookies. When unset it is derived from `X-Forwarded-Proto`.
@@ -44,9 +41,6 @@ impl Config {
             Some(mb) => mb.parse().map_err(|_| "MAX_UPLOAD_MB must be a number")?,
             None => 25,
         };
-        let allowed_emails = env("ALLOWED_EMAILS")
-            .map(|list| list.split(',').map(|e| e.trim().to_lowercase()).filter(|e| !e.is_empty()).collect())
-            .unwrap_or_default();
         let secure_cookies = match env("SECURE_COOKIES").as_deref() {
             Some("true" | "1") => Some(true),
             Some("false" | "0") => Some(false),
@@ -59,7 +53,6 @@ impl Config {
             secret_key,
             google_client_id: env("GOOGLE_CLIENT_ID"),
             google_client_secret: env("GOOGLE_CLIENT_SECRET"),
-            allowed_emails,
             max_upload_size: max_upload_mb * 1024 * 1024,
             secure_cookies,
         })
@@ -67,15 +60,6 @@ impl Config {
 
     pub fn google(&self) -> Option<(&str, &str)> {
         Some((self.google_client_id.as_deref()?, self.google_client_secret.as_deref()?))
-    }
-
-    pub fn allows_signup(&self, email: &str) -> bool {
-        let email = email.to_lowercase();
-        self.allowed_emails.is_empty()
-            || self.allowed_emails.iter().any(|rule| match rule.strip_prefix('@') {
-                Some(domain) => email.rsplit_once('@').is_some_and(|(_, d)| d == domain),
-                None => *rule == email,
-            })
     }
 
     /// Cookie names on https carry the `__Host-` prefix, so no other host can set them.
@@ -90,30 +74,4 @@ impl Config {
 
 fn env(name: &str) -> Option<String> {
     std::env::var(name).ok().map(|v| v.trim().to_string()).filter(|v| !v.is_empty())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn signup_rules() {
-        let mut config = Config {
-            port: 0,
-            database_url: String::new(),
-            public_url: "https://r.example".into(),
-            secret_key: String::new(),
-            google_client_id: None,
-            google_client_secret: None,
-            allowed_emails: vec![],
-            max_upload_size: 0,
-            secure_cookies: None,
-        };
-        assert!(config.allows_signup("anyone@x.com"));
-        config.allowed_emails = vec!["ann@x.com".into(), "@corp.com".into()];
-        assert!(config.allows_signup("Ann@X.com"));
-        assert!(config.allows_signup("bob@corp.com"));
-        assert!(!config.allows_signup("bob@x.com"));
-        assert!(!config.allows_signup("bob@evilcorp.com"));
-    }
 }

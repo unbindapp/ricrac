@@ -16,7 +16,6 @@ const signInErrors: Record<string, string> = {
   denied: "Sign-in was canceled in Google.",
   failed: "Signing in with Google didn't work. Please try again.",
   unverified: "Your Google account's email address isn't verified yet.",
-  not_allowed: "This Ricrac server doesn't take new accounts from that email address. Ask an admin to invite you.",
   not_configured: "Sign-in with Google isn't set up on this server yet.",
 }
 

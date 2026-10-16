@@ -28,7 +28,6 @@ pub fn config() -> Config {
         secret_key: "test-secret-key-that-is-long-enough-123".into(),
         google_client_id: None,
         google_client_secret: None,
-        allowed_emails: vec![],
         max_upload_size: 1024 * 1024,
         secure_cookies: None,
     }

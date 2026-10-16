@@ -61,7 +61,6 @@ links agents share.
 | `PUBLIC_URL` | External base URL, e.g. `https://ricrac.example.com`. |
 | `SECRET_KEY` | At least 32 characters; signs session cookies. |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Sign-in with Google. The OAuth client's redirect URI is `<PUBLIC_URL>/api/auth/callback/google`. |
-| `ALLOWED_EMAILS` | Who may create an account: emails or `@domains`, comma-separated. Empty lets anyone in. People with an invitation can always sign in. |
 | `MAX_UPLOAD_MB` | Largest uploaded file, 25 by default. |
 | `PORT` | 3000 by default. |
 

@@ -155,8 +155,7 @@ pub async fn callback(
         return fail(&pending.return_to, "unverified");
     }
     let user = match upsert_user(&state, &identity).await {
-        Ok(Some(user)) => user,
-        Ok(None) => return fail(&pending.return_to, "not_allowed"),
+        Ok(user) => user,
         Err(err) => {
             tracing::error!("saving the user failed: {err}");
             return fail(&pending.return_to, "failed");
@@ -238,8 +237,8 @@ fn identity_from_id_token(id_token: &str, client_id: &str, nonce: &str) -> Resul
     })
 }
 
-/// Creates or refreshes the user. New accounts need an allowed email or an invitation.
-pub async fn upsert_user(state: &AppState, identity: &Identity) -> Result<Option<Uuid>, sqlx::Error> {
+/// Creates or refreshes the user.
+pub async fn upsert_user(state: &AppState, identity: &Identity) -> Result<Uuid, sqlx::Error> {
     let existing: Option<Uuid> = sqlx::query_scalar(
         "SELECT id FROM users WHERE google_subject = $1 OR email = $2 ORDER BY google_subject = $1 DESC LIMIT 1",
     )
@@ -257,19 +256,11 @@ pub async fn upsert_user(state: &AppState, identity: &Identity) -> Result<Option
         .bind(&identity.picture)
         .execute(&state.db)
         .await?;
-        return Ok(Some(id));
-    }
-    let invited: bool =
-        sqlx::query_scalar("SELECT EXISTS (SELECT 1 FROM invitations WHERE email = $1 AND expires_at > now())")
-            .bind(&identity.email)
-            .fetch_one(&state.db)
-            .await?;
-    if !invited && !state.config.allows_signup(&identity.email) {
-        return Ok(None);
+        return Ok(id);
     }
     let name = identity.name.clone().unwrap_or_else(|| identity.email.split('@').next().unwrap_or("").to_string());
     let display_name = display_name(&name, &identity.email);
-    let id = sqlx::query_scalar(
+    sqlx::query_scalar(
         "INSERT INTO users (google_subject, email, name, display_name, avatar_url) VALUES ($1, $2, $3, $4, $5) RETURNING id",
     )
     .bind(&identity.subject)
@@ -278,8 +269,7 @@ pub async fn upsert_user(state: &AppState, identity: &Identity) -> Result<Option
     .bind(&display_name)
     .bind(&identity.picture)
     .fetch_one(&state.db)
-    .await?;
-    Ok(Some(id))
+    .await
 }
 
 /// A short handle for @mentions: the first name, lowercased, or the email's local part.
