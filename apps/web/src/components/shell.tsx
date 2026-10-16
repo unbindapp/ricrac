@@ -151,7 +151,7 @@ function WorkspaceSwitcher({ me, current, onCreate }: { me: Me; current: Workspa
 function WorkspaceBadge({ name }: { name: string }) {
   return (
     <span
-      className="flex size-5 shrink-0 items-center justify-center rounded bg-primary text-[0.65rem] font-semibold text-primary-foreground"
+      className="flex size-5 shrink-0 items-center justify-center rounded bg-primary text-[0.65rem] font-semibold text-primary-foreground!"
       aria-hidden
     >
       {name.slice(0, 1).toUpperCase()}
