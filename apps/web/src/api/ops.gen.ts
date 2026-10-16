@@ -54,6 +54,22 @@ export type CommentReaction = {
   user: UserRef | null
 }
 
+export type CommentSearchHit = {
+  id: string
+  /** The commented issue's. */
+  identifier: string
+  issue: IssueRef
+  rank: number
+  /** The matching text, with matches in **bold**. */
+  snippet: string
+  /** For comments, the issue's. */
+  title: string
+  type: "comment"
+  updatedAt: string
+  url: string
+  user: UserRef | null
+}
+
 export type CommentThread = {
   body: string
   createdAt: string
@@ -68,12 +84,108 @@ export type CommentThread = {
   user: UserRef | null
 }
 
+export type CustomView = {
+  color: string | null
+  createdAt: string
+  description: string | null
+  display: Record<string, unknown>
+  filter: Record<string, unknown>
+  icon: string | null
+  id: string
+  model: "issue" | "project" | "initiative"
+  name: string
+  owner: UserRef | null
+  shared: boolean
+  slugId: string
+  team: TeamRef | null
+  updatedAt: string
+  url: string
+}
+
+export type Cycle = {
+  archivedAt: string | null
+  completedAt: string | null
+  createdAt: string
+  description: string | null
+  endsAt: string
+  /** The counts of each day the cycle ran. */
+  history: CycleSnapshot[]
+  id: string
+  isActive: boolean
+  isFuture: boolean
+  isPast: boolean
+  name: string | null
+  number: number
+  /** The share of its issues completed, 0 to 1. */
+  progress: number
+  scope: CycleScope
+  startsAt: string
+  team: TeamRef
+  updatedAt: string
+  url: string
+}
+
+export type CycleDetail = {
+  archivedAt: string | null
+  completedAt: string | null
+  createdAt: string
+  description: string | null
+  endsAt: string
+  /** The counts of each day the cycle ran. */
+  history: CycleSnapshot[]
+  id: string
+  isActive: boolean
+  isFuture: boolean
+  isPast: boolean
+  /** Unless includeIssues is false. */
+  issues?: CycleIssue[]
+  name: string | null
+  number: number
+  /** The share of its issues completed, 0 to 1. */
+  progress: number
+  scope: CycleScope
+  startsAt: string
+  team: TeamRef
+  updatedAt: string
+  url: string
+}
+
+export type CycleIssue = {
+  assignee: UserRef | null
+  estimate: number | null
+  id: string
+  identifier: string
+  priority: number
+  state: StateRef
+  title: string
+}
+
 export type CycleRef = {
   endsAt: string
   id: string
   name: string | null
   number: number
   startsAt: string
+}
+
+export type CycleScope = {
+  canceled: number
+  completed: number
+  completedEstimate: number
+  estimate: number
+  issues: number
+  started: number
+  startedEstimate: number
+  unstarted: number
+}
+
+export type CycleSnapshot = {
+  completed: number
+  completedEstimate: number
+  date: string
+  scope: number
+  scopeEstimate: number
+  started: number
 }
 
 export type Deleted = {
@@ -85,10 +197,123 @@ export type DeletedComment = {
   deletedReplies: number
 }
 
+export type DeletedCustomView = {
+  deleted: boolean
+  id: string
+  name: string
+}
+
+export type DeletedTemplate = {
+  deleted: boolean
+  id: string
+  name: string
+}
+
+export type Document = {
+  color: string | null
+  /** Markdown; in lists only with includeContent. */
+  content?: string
+  createdAt: string
+  creator: UserRef | null
+  cycle: CycleRef | null
+  icon: string | null
+  id: string
+  initiative: InitiativeRef | null
+  issue: IssueRef | null
+  project: ProjectRef | null
+  release: ReleaseRef | null
+  slugId: string
+  team: TeamRef | null
+  title: string
+  trashed: boolean
+  trashedAt: string | null
+  updatedAt: string
+  updatedBy: UserRef | null
+  url: string
+}
+
+export type DocumentDetail = {
+  color: string | null
+  /** Markdown; in lists only with includeContent. */
+  content?: string
+  createdAt: string
+  creator: UserRef | null
+  cycle: CycleRef | null
+  icon: string | null
+  id: string
+  initiative: InitiativeRef | null
+  issue: IssueRef | null
+  project: ProjectRef | null
+  release: ReleaseRef | null
+  slugId: string
+  team: TeamRef | null
+  title: string
+  trashed: boolean
+  trashedAt: string | null
+  updatedAt: string
+  updatedBy: UserRef | null
+  url: string
+  versionCount: number
+}
+
 export type DocumentRef = {
   id: string
   slugId: string
   title: string
+}
+
+export type DocumentSearchHit = {
+  id: string
+  project: ProjectRef | null
+  rank: number
+  /** The matching text, with matches in **bold**. */
+  snippet: string
+  /** For comments, the issue's. */
+  title: string
+  type: "document"
+  updatedAt: string
+  url: string
+}
+
+export type DocumentVersion = {
+  author: UserRef | null
+  content: string
+  createdAt: string
+  document: DocumentRef
+  id: number
+  title: string
+}
+
+export type DocumentVersionSummary = {
+  author: UserRef | null
+  createdAt: string
+  id: number
+  title: string
+}
+
+export type Favorite = {
+  createdAt: string
+  folder: string | null
+  id: string
+  sortOrder: number
+  /** What it points at, in the short form of its type. */
+  target: IssueRef | ProjectRef | InitiativeRef | FavoriteCycle | FavoriteCustomView | DocumentRef | LabelRef | TeamRef | UserRef | ReleaseRef
+  type: "issue" | "project" | "initiative" | "cycle" | "customView" | "document" | "label" | "team" | "user" | "release"
+}
+
+export type FavoriteCustomView = {
+  id: string
+  name: string
+  slugId: string
+}
+
+export type FavoriteCycle = {
+  endsAt: string
+  id: string
+  name: string | null
+  number: number
+  startsAt: string
+  team: TeamRef
 }
 
 export type HistoryEntry = {
@@ -99,10 +324,29 @@ export type HistoryEntry = {
   createdAt: string
 }
 
+export type Inbox = {
+  nodes: Notification[]
+  pageInfo: PageInfo
+  unreadCount: number
+}
+
 export type InitiativeRef = {
   id: string
   name: string
   slugId: string
+}
+
+export type InitiativeSearchHit = {
+  id: string
+  rank: number
+  /** The matching text, with matches in **bold**. */
+  snippet: string
+  status: "planned" | "active" | "completed"
+  /** For comments, the issue's. */
+  title: string
+  type: "initiative"
+  updatedAt: string
+  url: string
 }
 
 export type Issue = {
@@ -253,6 +497,21 @@ export type IssueRelations = {
   related: IssueRef[]
 }
 
+export type IssueSearchHit = {
+  id: string
+  identifier: string
+  rank: number
+  /** The matching text, with matches in **bold**. */
+  snippet: string
+  state: StateRef
+  team: TeamRef
+  /** For comments, the issue's. */
+  title: string
+  type: "issue"
+  updatedAt: string
+  url: string
+}
+
 export type IssueShare = {
   shared: string
   with: string
@@ -271,10 +530,43 @@ export type LabelRef = {
   parent: string | null
 }
 
+export type MarkedAllRead = {
+  /** How many were marked read. */
+  marked: number
+}
+
+export type MarkedNotifications = {
+  nodes: Notification[]
+}
+
 export type MilestoneRef = {
   id: string
   name: string
   targetDate: string | null
+}
+
+export type Notification = {
+  actor: UserRef | null
+  archivedAt: string | null
+  comment: NotificationComment | null
+  createdAt: string
+  document: DocumentRef | null
+  id: string
+  initiative: InitiativeRef | null
+  issue: IssueRef | null
+  project: ProjectRef | null
+  readAt: string | null
+  snoozedUntil: string | null
+  statusUpdate: Ref | null
+  summary: string
+  /** What happened, e.g. issueAssignedToYou, issueMention, issueNewComment. */
+  type: string
+}
+
+export type NotificationComment = {
+  /** Its first 200 characters. */
+  body: string
+  id: string
 }
 
 export type PageInfo = {
@@ -298,6 +590,26 @@ export type ProjectRef = {
   slugId: string
 }
 
+export type ProjectSearchHit = {
+  id: string
+  rank: number
+  /** The matching text, with matches in **bold**. */
+  snippet: string
+  status: ProjectStatusRef
+  /** For comments, the issue's. */
+  title: string
+  type: "project"
+  updatedAt: string
+  url: string
+}
+
+export type ProjectStatusRef = {
+  color: string
+  id: string
+  name: string
+  type: "backlog" | "planned" | "started" | "paused" | "completed" | "canceled"
+}
+
 export type Reaction = {
   comment: Ref | null
   createdAt: string
@@ -319,8 +631,17 @@ export type ReleaseRef = {
   version: string | null
 }
 
+export type RemovedFavorite = {
+  id: string
+  removed: boolean
+}
+
 export type RemovedReaction = {
   removed: string
+}
+
+export type SearchResults = {
+  nodes: (IssueSearchHit | ProjectSearchHit | DocumentSearchHit | InitiativeSearchHit | CommentSearchHit)[]
 }
 
 export type StateRef = {
@@ -334,6 +655,42 @@ export type TeamRef = {
   id: string
   key: string
   name: string
+}
+
+export type Template = {
+  createdAt: string
+  creator: UserRef | null
+  description: string | null
+  id: string
+  name: string
+  /** When a recurring template next creates an issue. */
+  nextRunAt: string | null
+  recurrence: TemplateRecurrence | null
+  team: TeamRef | null
+  type: "issue" | "project" | "document"
+  updatedAt: string
+}
+
+export type TemplateDetail = {
+  createdAt: string
+  creator: UserRef | null
+  /** What the template fills in. */
+  data: Record<string, unknown>
+  description: string | null
+  id: string
+  name: string
+  /** When a recurring template next creates an issue. */
+  nextRunAt: string | null
+  recurrence: TemplateRecurrence | null
+  team: TeamRef | null
+  type: "issue" | "project" | "document"
+  updatedAt: string
+}
+
+export type TemplateRecurrence = {
+  every: number
+  startsAt: string
+  unit: "day" | "week" | "month"
 }
 
 export type UpdatedIssues = {
@@ -2198,32 +2555,47 @@ export interface Ops {
   restore_initiative: { args: RestoreInitiativeArgs; result: unknown }
   archive_initiative: { args: ArchiveInitiativeArgs; result: unknown }
   unarchive_initiative: { args: UnarchiveInitiativeArgs; result: unknown }
-  list_cycles: { args: ListCyclesArgs; result: unknown }
-  get_cycle: { args: GetCycleArgs; result: unknown }
-  save_cycle: { args: SaveCycleArgs; result: unknown }
-  archive_cycle: { args: ArchiveCycleArgs; result: unknown }
-  list_documents: { args: ListDocumentsArgs; result: unknown }
-  get_document: { args: GetDocumentArgs; result: unknown }
-  save_document: { args: SaveDocumentArgs; result: unknown }
-  delete_document: { args: DeleteDocumentArgs; result: unknown }
-  restore_document: { args: RestoreDocumentArgs; result: unknown }
-  list_document_versions: { args: ListDocumentVersionsArgs; result: unknown }
-  get_document_version: { args: GetDocumentVersionArgs; result: unknown }
-  list_custom_views: { args: ListCustomViewsArgs; result: unknown }
-  get_custom_view: { args: GetCustomViewArgs; result: unknown }
-  save_custom_view: { args: SaveCustomViewArgs; result: unknown }
-  delete_custom_view: { args: DeleteCustomViewArgs; result: unknown }
-  list_favorites: { args: ListFavoritesArgs; result: unknown }
-  add_favorite: { args: AddFavoriteArgs; result: unknown }
-  remove_favorite: { args: RemoveFavoriteArgs; result: unknown }
-  list_templates: { args: ListTemplatesArgs; result: unknown }
-  get_template: { args: GetTemplateArgs; result: unknown }
-  save_template: { args: SaveTemplateArgs; result: unknown }
-  delete_template: { args: DeleteTemplateArgs; result: unknown }
-  get_notifications: { args: GetNotificationsArgs; result: unknown }
-  mark_notification: { args: MarkNotificationArgs; result: unknown }
-  mark_all_notifications_read: { args: MarkAllNotificationsReadArgs; result: unknown }
-  search: { args: SearchArgs; result: unknown }
+  list_cycles: { args: ListCyclesArgs; result: {
+  nodes: Cycle[]
+  pageInfo: PageInfo
+} }
+  get_cycle: { args: GetCycleArgs; result: CycleDetail }
+  save_cycle: { args: SaveCycleArgs; result: Cycle }
+  archive_cycle: { args: ArchiveCycleArgs; result: Cycle }
+  list_documents: { args: ListDocumentsArgs; result: {
+  nodes: Document[]
+  pageInfo: PageInfo
+} }
+  get_document: { args: GetDocumentArgs; result: DocumentDetail }
+  save_document: { args: SaveDocumentArgs; result: DocumentDetail }
+  delete_document: { args: DeleteDocumentArgs; result: DocumentDetail }
+  restore_document: { args: RestoreDocumentArgs; result: DocumentDetail }
+  list_document_versions: { args: ListDocumentVersionsArgs; result: DocumentVersionSummary[] }
+  get_document_version: { args: GetDocumentVersionArgs; result: DocumentVersion }
+  list_custom_views: { args: ListCustomViewsArgs; result: {
+  nodes: CustomView[]
+  pageInfo: PageInfo
+} }
+  get_custom_view: { args: GetCustomViewArgs; result: CustomView }
+  save_custom_view: { args: SaveCustomViewArgs; result: CustomView }
+  delete_custom_view: { args: DeleteCustomViewArgs; result: DeletedCustomView }
+  list_favorites: { args: ListFavoritesArgs; result: {
+  nodes: Favorite[]
+  pageInfo: PageInfo
+} }
+  add_favorite: { args: AddFavoriteArgs; result: Favorite }
+  remove_favorite: { args: RemoveFavoriteArgs; result: RemovedFavorite }
+  list_templates: { args: ListTemplatesArgs; result: {
+  nodes: Template[]
+  pageInfo: PageInfo
+} }
+  get_template: { args: GetTemplateArgs; result: TemplateDetail }
+  save_template: { args: SaveTemplateArgs; result: TemplateDetail }
+  delete_template: { args: DeleteTemplateArgs; result: DeletedTemplate }
+  get_notifications: { args: GetNotificationsArgs; result: Inbox }
+  mark_notification: { args: MarkNotificationArgs; result: MarkedNotifications }
+  mark_all_notifications_read: { args: MarkAllNotificationsReadArgs; result: MarkedAllRead }
+  search: { args: SearchArgs; result: SearchResults }
   list_customers: { args: ListCustomersArgs; result: unknown }
   get_customer: { args: GetCustomerArgs; result: unknown }
   save_customer: { args: SaveCustomerArgs; result: unknown }

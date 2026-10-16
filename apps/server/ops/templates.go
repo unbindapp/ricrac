@@ -24,10 +24,10 @@ func templateOps() []*Op {
 		op("list_templates", app.Read, []string{"GET /templates"},
 			"List the issue, project and document templates (without their data; read one with get_template). "+
 				"save_issue, save_project and save_document take a template's name or id.",
-			listTemplates),
+			listTemplates).returns(ResultOf[PageOf[Template]]()),
 		op("get_template", app.Read, []string{"GET /templates/{id}"},
 			"Read a template by id or name (with type when names repeat across types), including the data it fills in.",
-			getTemplate),
+			getTemplate).returns(ResultOf[TemplateDetail]()),
 		op("save_template", app.Write, []string{"POST /templates", "PATCH /templates/{id}"},
 			"Create a template (omit id; name, type and data are required) or update one (pass id). data holds what "+
 				"it fills in, by type. issue: title, description, team, state, priority, estimate, assignee, labels, "+
@@ -35,10 +35,10 @@ func templateOps() []*Op {
 				"summary, description, state, priority, lead, labels, teams, milestones ([{name, description, "+
 				"targetDate}]) and issues (save_issue objects). document: title, content. An issue template with a "+
 				"recurrence creates an issue from itself on that schedule (recurring issues), as its creator.",
-			saveTemplate),
+			saveTemplate).returns(ResultOf[TemplateDetail]()),
 		op("delete_template", app.Write, []string{"DELETE /templates/{id}"},
 			"Delete a template. Things made from it keep what it filled in.",
-			deleteTemplate),
+			deleteTemplate).returns(ResultOf[DeletedTemplate]()),
 	}
 }
 
@@ -532,4 +532,36 @@ func deleteTemplate(c *app.Ctx, args DeleteTemplateArgs) (any, error) {
 		return nil, err
 	}
 	return M{"deleted": true, "id": id, "name": value["name"]}, nil
+}
+
+/* Shapes */
+
+type Template struct {
+	ID          string              `json:"id"`
+	Name        string              `json:"name"`
+	Description *string             `json:"description"`
+	Type        string              `json:"type" enum:"issue,project,document"`
+	Team        *TeamRef            `json:"team"`
+	Creator     *UserRef            `json:"creator"`
+	Recurrence  *TemplateRecurrence `json:"recurrence"`
+	NextRunAt   *string             `json:"nextRunAt" doc:"When a recurring template next creates an issue."`
+	CreatedAt   string              `json:"createdAt"`
+	UpdatedAt   string              `json:"updatedAt"`
+}
+
+type TemplateRecurrence struct {
+	Every    int    `json:"every"`
+	Unit     string `json:"unit" enum:"day,week,month"`
+	StartsAt string `json:"startsAt"`
+}
+
+type TemplateDetail struct {
+	Template
+	Data M `json:"data" doc:"What the template fills in."`
+}
+
+type DeletedTemplate struct {
+	Deleted bool   `json:"deleted"`
+	ID      string `json:"id"`
+	Name    string `json:"name"`
 }

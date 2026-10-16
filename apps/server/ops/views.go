@@ -20,18 +20,18 @@ func viewOps() []*Op {
 		op("list_custom_views", app.Read, []string{"GET /views"},
 			"List the custom views the caller can use: those shared with the workspace and their own. Issue views "+
 				"apply to list_issues with customView.",
-			listViews),
+			listViews).returns(ResultOf[PageOf[CustomView]]()),
 		op("get_custom_view", app.Read, []string{"GET /views/{id}"},
 			"Read a custom view by id, slug, link or name: its filter and display settings.",
-			getView),
+			getView).returns(ResultOf[CustomView]()),
 		op("save_custom_view", app.Write, []string{"POST /views", "PATCH /views/{id}"},
 			"Create a custom view (omit id; name and filter are required) or update one (pass id). Issue views take "+
 				"the filter of list_issues, which is checked when saving. Views are personal unless shared; only their "+
 				"owner (or an admin, for shared views) can change them.",
-			saveView),
+			saveView).returns(ResultOf[CustomView]()),
 		op("delete_custom_view", app.Write, []string{"DELETE /views/{id}"},
 			"Delete a custom view. Only its owner (or an admin, for a shared view) can.",
-			deleteView),
+			deleteView).returns(ResultOf[DeletedCustomView]()),
 	}
 }
 
@@ -363,4 +363,30 @@ func deleteView(c *app.Ctx, args IDArgs) (any, error) {
 		return nil, err
 	}
 	return M{"deleted": true, "id": id, "name": value["name"]}, nil
+}
+
+/* Shapes */
+
+type CustomView struct {
+	ID          string   `json:"id"`
+	SlugID      string   `json:"slugId"`
+	Name        string   `json:"name"`
+	Description *string  `json:"description"`
+	Icon        *string  `json:"icon"`
+	Color       *string  `json:"color"`
+	Model       string   `json:"model" enum:"issue,project,initiative"`
+	Filter      M        `json:"filter"`
+	Display     M        `json:"display"`
+	Shared      bool     `json:"shared"`
+	Team        *TeamRef `json:"team"`
+	Owner       *UserRef `json:"owner"`
+	URL         string   `json:"url"`
+	CreatedAt   string   `json:"createdAt"`
+	UpdatedAt   string   `json:"updatedAt"`
+}
+
+type DeletedCustomView struct {
+	Deleted bool   `json:"deleted"`
+	ID      string `json:"id"`
+	Name    string `json:"name"`
 }

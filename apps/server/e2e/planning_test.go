@@ -203,6 +203,29 @@ func TestFavoritesAreAddedOnceAndHideWhatIsGone(t *testing.T) {
 	fails(t, w.Ann, "remove_favorite", M{"id": first.At("id").V})
 }
 
+func TestFavoritesShowWhatTheyPointAt(t *testing.T) {
+	w := world(t)
+	enableCycles(w)
+	call(t, w.Ann, "save_project", M{"name": "Apollo", "setTeams": []any{"ENG"}})
+	call(t, w.Ann, "save_initiative", M{"name": "Grow"})
+	call(t, w.Ann, "save_document", M{"title": "Runbook", "team": "ENG"})
+	call(t, w.Ann, "save_custom_view", M{"name": "Urgent", "filter": M{"priority": M{"eq": 1}}})
+	for _, f := range []M{
+		{"type": "project", "target": "Apollo"},
+		{"type": "initiative", "target": "Grow"},
+		{"type": "cycle", "target": "current", "team": "ENG"},
+		{"type": "customView", "target": "Urgent"},
+		{"type": "document", "target": "Runbook"},
+		{"type": "label", "target": "Bug"},
+	} {
+		call(t, w.Ann, "add_favorite", f)
+	}
+	list := call(t, w.Ann, "list_favorites", M{})
+	eqList(t, list.At("nodes").Strings("type"), []string{"project", "initiative", "cycle", "customView", "document", "label"})
+	eq(t, list.At("nodes", 2, "target", "team", "key").Str(), "ENG")
+	eq(t, list.At("nodes", 4, "target", "title").Str(), "Runbook")
+}
+
 func TestTemplatesFillInIssuesAndDocuments(t *testing.T) {
 	w := world(t)
 	gus := w.member("gus@acme.test", "Gus Guest", "guest")

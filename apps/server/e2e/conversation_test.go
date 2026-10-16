@@ -374,6 +374,10 @@ func TestSearchFindsWhatTheCallerCanSee(t *testing.T) {
 	guestComments := call(t, gus, "search", M{"query": "deadlock", "types": []any{"comment"}})
 	eq(t, guestComments.At("nodes").Len(), 0)
 
+	call(t, w.Ann, "save_initiative", M{"name": "Login everywhere"})
+	initiatives := call(t, w.Ann, "search", M{"query": "login", "types": []any{"initiative"}})
+	eq(t, initiatives.At("nodes", 0, "status").Str(), "planned")
+
 	bad := fails(t, w.Ann, "search", M{"query": "x", "types": []any{"widgets"}})
 	contains(t, bad, "initiative")
 }

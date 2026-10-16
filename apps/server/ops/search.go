@@ -20,7 +20,7 @@ func searchOps() []*Op {
 			"Search issues, projects, documents and initiatives (and comments, when asked for) by words, best matches "+
 				"first, titles before text. An issue identifier like ENG-12 finds that issue. Each result has its type, title, "+
 				"link and a snippet of the matching text with matches in **bold**.",
-			search),
+			search).returns(ResultOf[SearchResults]()),
 	}
 }
 
@@ -231,4 +231,63 @@ func search(c *app.Ctx, args SearchArgs) (any, error) {
 		nodes = append(nodes, hit.Value)
 	}
 	return M{"nodes": nodes}, nil
+}
+
+/* Shapes */
+
+type SearchResults struct {
+	Nodes []SearchHit `json:"nodes"`
+}
+
+// SearchHit is one of the kinds of search results, told apart by type.
+type SearchHit struct{}
+
+func (SearchHit) JSONSchema() M {
+	return M{"anyOf": []any{
+		ResultOf[IssueSearchHit](), ResultOf[ProjectSearchHit](), ResultOf[DocumentSearchHit](),
+		ResultOf[InitiativeSearchHit](), ResultOf[CommentSearchHit](),
+	}}
+}
+
+type searchHitBase struct {
+	ID        string  `json:"id"`
+	Title     string  `json:"title" doc:"For comments, the issue's."`
+	URL       string  `json:"url"`
+	Snippet   string  `json:"snippet" doc:"The matching text, with matches in **bold**."`
+	Rank      float64 `json:"rank"`
+	UpdatedAt string  `json:"updatedAt"`
+}
+
+type IssueSearchHit struct {
+	Type string `json:"type" enum:"issue"`
+	searchHitBase
+	Identifier string   `json:"identifier"`
+	State      StateRef `json:"state"`
+	Team       TeamRef  `json:"team"`
+}
+
+type ProjectSearchHit struct {
+	Type string `json:"type" enum:"project"`
+	searchHitBase
+	Status ProjectStatusRef `json:"status"`
+}
+
+type DocumentSearchHit struct {
+	Type string `json:"type" enum:"document"`
+	searchHitBase
+	Project *ProjectRef `json:"project"`
+}
+
+type InitiativeSearchHit struct {
+	Type string `json:"type" enum:"initiative"`
+	searchHitBase
+	Status string `json:"status" enum:"planned,active,completed"`
+}
+
+type CommentSearchHit struct {
+	Type string `json:"type" enum:"comment"`
+	searchHitBase
+	Identifier string   `json:"identifier" doc:"The commented issue's."`
+	Issue      IssueRef `json:"issue"`
+	User       *UserRef `json:"user"`
 }

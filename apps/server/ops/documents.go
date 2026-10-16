@@ -21,30 +21,30 @@ func documentOps() []*Op {
 			"List documents, most recently updated first. Narrow to those of a project, initiative, team, issue, "+
 				"cycle or release, by creator, or by words in the title or content. Contents are left out unless "+
 				"includeContent is set; read one with get_document.",
-			listDocuments),
+			listDocuments).returns(ResultOf[PageOf[Document]]()),
 		op("get_document", app.Read, []string{"GET /documents/{id}"},
 			"Read a document by id, slug, link or title: its Markdown content, where it belongs and how many earlier "+
 				"versions are kept.",
-			getDocument),
+			getDocument).returns(ResultOf[DocumentDetail]()),
 		op("save_document", app.Write, []string{"POST /documents", "PATCH /documents/{id}"},
 			"Create a document (omit id; title and exactly one of project, initiative, team, issue, cycle or release "+
 				"are required, unless a template gives the title) or update one (pass id). Use patch to edit part of the "+
 				"content without resending it. Passing a parent on update moves the document there. People mentioned "+
 				"with @displayName or @email are notified. The previous content is kept as a version.",
-			saveDocument),
+			saveDocument).returns(ResultOf[DocumentDetail]()),
 		op("delete_document", app.Write, []string{"DELETE /documents/{id}"},
 			"Move a document to the trash. It is deleted for good after 30 days; restore_document brings it back.",
-			trashDocument),
+			trashDocument).returns(ResultOf[DocumentDetail]()),
 		op("restore_document", app.Write, []string{"POST /documents/{id}/restore"},
 			"Bring a document back from the trash.",
-			restoreDocument),
+			restoreDocument).returns(ResultOf[DocumentDetail]()),
 		op("list_document_versions", app.Read, []string{"GET /documents/{id}/versions"},
 			"The earlier versions of a document, newest first (without their content; read one with "+
 				"get_document_version).",
-			listDocumentVersions),
+			listDocumentVersions).returns(ResultOf[[]DocumentVersionSummary]()),
 		op("get_document_version", app.Read, []string{"GET /document-versions/{id}"},
 			"Read an earlier version of a document: its title and content as they were.",
-			getDocumentVersion),
+			getDocumentVersion).returns(ResultOf[DocumentVersion]()),
 	}
 }
 
@@ -614,4 +614,49 @@ func getDocumentVersion(c *app.Ctx, args IDArgs) (any, error) {
 		return nil, notFound
 	}
 	return found.Value, nil
+}
+
+/* Shapes */
+
+type Document struct {
+	ID         string         `json:"id"`
+	SlugID     string         `json:"slugId"`
+	Title      string         `json:"title"`
+	Content    string         `json:"content,omitempty" doc:"Markdown; in lists only with includeContent."`
+	URL        string         `json:"url"`
+	Icon       *string        `json:"icon"`
+	Color      *string        `json:"color"`
+	Project    *ProjectRef    `json:"project"`
+	Initiative *InitiativeRef `json:"initiative"`
+	Team       *TeamRef       `json:"team"`
+	Issue      *IssueRef      `json:"issue"`
+	Cycle      *CycleRef      `json:"cycle"`
+	Release    *ReleaseRef    `json:"release"`
+	Creator    *UserRef       `json:"creator"`
+	UpdatedBy  *UserRef       `json:"updatedBy"`
+	Trashed    bool           `json:"trashed"`
+	TrashedAt  *string        `json:"trashedAt"`
+	CreatedAt  string         `json:"createdAt"`
+	UpdatedAt  string         `json:"updatedAt"`
+}
+
+type DocumentDetail struct {
+	Document
+	VersionCount int `json:"versionCount"`
+}
+
+type DocumentVersionSummary struct {
+	ID        int      `json:"id"`
+	Title     string   `json:"title"`
+	Author    *UserRef `json:"author"`
+	CreatedAt string   `json:"createdAt"`
+}
+
+type DocumentVersion struct {
+	ID        int         `json:"id"`
+	Document  DocumentRef `json:"document"`
+	Title     string      `json:"title"`
+	Content   string      `json:"content"`
+	Author    *UserRef    `json:"author"`
+	CreatedAt string      `json:"createdAt"`
 }
