@@ -59,11 +59,11 @@ func webhookOps() []*Op {
 		op("list_webhooks", app.AdminAccess, []string{"GET /webhooks"},
 			"List the workspace's webhooks: URL, label, team, the resource types they receive and whether they are "+
 				"enabled. Secrets are never shown. Admins only.",
-			listWebhooks),
+			listWebhooks).returns(ResultOf[PageOf[Webhook]]()),
 		op("get_webhook", app.AdminAccess, []string{"GET /webhooks/{id}"},
 			"Read a webhook with its last 20 deliveries (action, type, status code, error, attempts and when it was "+
 				"delivered or given up). Admins only.",
-			getWebhook),
+			getWebhook).returns(ResultOf[WebhookDetail]()),
 		op("save_webhook", app.AdminAccess, []string{"POST /webhooks", "PATCH /webhooks/{id}"},
 			"Create a webhook (omit id; url is required) or update one (pass id). Ricrac POSTs a JSON body "+
 				"{action (create, update, remove), type (the resource type), data (the entity as the API shows it), "+
@@ -75,22 +75,22 @@ func webhookOps() []*Op {
 				"webhookTimestamp is more than a minute old. The secret (rr_whs_...) is returned once, on create; "+
 				"rotate_webhook_secret makes a new one. Answer with a 2xx within 10 seconds; anything else is retried "+
 				"after 1m, 5m, 30m, 2h and 6h, then given up. Redirects aren't followed. Admins only.",
-			saveWebhook),
+			saveWebhook).returns(ResultOf[SavedWebhook]()),
 		op("rotate_webhook_secret", app.AdminAccess, []string{"POST /webhooks/{id}/secret"},
 			"Replace a webhook's signing secret and return the new one (shown only now). Deliveries from now on are "+
 				"signed with it. Admins only.",
-			rotateWebhookSecret),
+			rotateWebhookSecret).returns(ResultOf[WebhookSecret]()),
 		op("delete_webhook", app.AdminAccess, []string{"DELETE /webhooks/{id}"},
 			"Delete a webhook and its queued deliveries. Admins only.",
-			deleteWebhook),
+			deleteWebhook).returns(ResultOf[DeletedWebhook]()),
 		op("test_webhook", app.AdminAccess, []string{"POST /webhooks/{id}/test"},
 			"Send a ping ({action: \"test\", type: \"Ping\", data: {webhookId}}) to a webhook right away and report "+
 				"what the receiver answered. A failed ping isn't retried. Admins only.",
-			testWebhook),
+			testWebhook).returns(ResultOf[WebhookPing]()),
 		op("list_webhook_deliveries", app.AdminAccess, []string{"GET /webhooks/{id}/deliveries"},
 			"A webhook's deliveries, newest first: action, type, status code, error, attempts, the next attempt and "+
 				"when it was delivered or given up. Deliveries are kept for 14 days. Admins only.",
-			listDeliveries),
+			listDeliveries).returns(ResultOf[PageOf[WebhookDelivery]]()),
 	}
 }
 
@@ -525,4 +525,58 @@ func DeliverDueWebhooks(ctx context.Context, state *app.State) (int, error) {
 		return 0, err
 	}
 	return len(due), nil
+}
+
+/* Shapes */
+
+type Webhook struct {
+	ID            string   `json:"id"`
+	URL           string   `json:"url"`
+	Label         *string  `json:"label"`
+	Team          *TeamRef `json:"team" doc:"Only changes in this team; null for every team."`
+	ResourceTypes []string `json:"resourceTypes"`
+	Enabled       bool     `json:"enabled"`
+	Creator       *UserRef `json:"creator"`
+	CreatedAt     string   `json:"createdAt"`
+	UpdatedAt     string   `json:"updatedAt"`
+}
+
+type SavedWebhook struct {
+	Webhook
+	Secret string `json:"secret,omitempty" doc:"The signing secret, only when the webhook is created."`
+}
+
+type WebhookDetail struct {
+	Webhook
+	Deliveries []WebhookDelivery `json:"deliveries" doc:"The last 20, newest first."`
+}
+
+type WebhookDelivery struct {
+	ID            string  `json:"id"`
+	Action        string  `json:"action" enum:"create,update,remove,test"`
+	Type          string  `json:"type" doc:"The resource type, or Ping for test_webhook."`
+	StatusCode    *int    `json:"statusCode"`
+	Error         *string `json:"error"`
+	Attempts      int     `json:"attempts"`
+	NextAttemptAt *string `json:"nextAttemptAt" doc:"While it is still pending."`
+	DeliveredAt   *string `json:"deliveredAt"`
+	FailedAt      *string `json:"failedAt" doc:"When it was given up."`
+	CreatedAt     string  `json:"createdAt"`
+}
+
+type WebhookSecret struct {
+	ID     string `json:"id"`
+	Secret string `json:"secret"`
+}
+
+type WebhookPing struct {
+	DeliveryID string  `json:"deliveryId"`
+	Delivered  bool    `json:"delivered"`
+	StatusCode *int    `json:"statusCode"`
+	Error      *string `json:"error"`
+}
+
+type DeletedWebhook struct {
+	ID      string `json:"id"`
+	Deleted bool   `json:"deleted"`
 }

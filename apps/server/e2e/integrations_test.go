@@ -219,6 +219,23 @@ func TestCustomersWithNeedsStatusesAndTiers(t *testing.T) {
 	eq(t, call(t, w.Ann, "list_customer_needs", M{}).At("nodes").Len(), 0)
 }
 
+func TestManagesCustomerStatusesAndTiers(t *testing.T) {
+	w := world(t)
+	trial := call(t, w.Ann, "save_customer_status", M{"name": "Trial", "description": "Trying it out"})
+	eq(t, trial.At("description").Str(), "Trying it out")
+	eq(t, trial.At("customerCount").Num(), 0)
+	call(t, w.Ann, "save_customer", M{"name": "Globex", "status": "Trial"})
+	renamed := call(t, w.Ann, "save_customer_status", M{"id": "Trial", "name": "Pilot", "description": nil})
+	check(t, renamed.At("description").IsNull())
+	eq(t, renamed.At("customerCount").Num(), 1)
+	eq(t, call(t, w.Ann, "delete_customer_status", M{"id": "Pilot"}).At("customersCleared").Num(), 1)
+	check(t, call(t, w.Ann, "get_customer", M{"id": "Globex"}).At("status").IsNull())
+
+	call(t, w.Ann, "save_customer_tier", M{"name": "Growth", "position": 2})
+	call(t, w.Ann, "save_customer_tier", M{"name": "Enterprise", "position": 1})
+	eqList(t, names(call(t, w.Ann, "list_customer_tiers", M{})), []string{"Enterprise", "Growth"})
+}
+
 func names(list J) []string {
 	return list.At("nodes").Strings("name")
 }
@@ -276,4 +293,16 @@ func TestReleasesMoveThroughStagesWithIssuesAndNotes(t *testing.T) {
 
 	call(t, w.Ann, "delete_release", M{"id": "Spring"})
 	eqList(t, names(call(t, w.Ann, "list_releases", M{"pipeline": "Web"})), []string{"Winter", "Autumn", "Summer"})
+
+	read = call(t, w.Ann, "get_release_note", M{"id": note.At("id").V})
+	eq(t, read.At("content").Str(), "Faster pages\nAnd fixes")
+	call(t, w.Ann, "delete_release_note", M{"id": note.At("slugId").V})
+	eq(t, call(t, w.Ann, "list_release_notes", M{}).At("nodes").Len(), 0)
+
+	read = call(t, w.Ann, "get_release_pipeline", M{"id": "Web"})
+	eqList(t, read.At("stages").Strings("name"), []string{"In Progress", "Released", "Canceled", "QA"})
+	eq(t, read.At("releaseCount").Num(), 3)
+	archived := call(t, w.Ann, "delete_release_pipeline", M{"id": "Web"})
+	check(t, archived.At("archivedAt").IsString())
+	eq(t, call(t, w.Ann, "list_release_pipelines", M{}).At("nodes").Len(), 0)
 }

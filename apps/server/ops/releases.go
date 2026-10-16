@@ -22,62 +22,62 @@ func releaseOps() []*Op {
 			"List release pipelines by name: type (continuous: every merge ships; scheduled: releases are planned "+
 				"ahead), whether they deploy to production and how many releases they have. Set includeStages / "+
 				"includeTeams to also get their stages and teams.",
-			listPipelines),
+			listPipelines).returns(ResultOf[PageOf[ReleasePipeline]]()),
 		op("get_release_pipeline", app.Read, []string{"GET /release-pipelines/{id}"},
 			"Read a release pipeline by id, slug or name, with its stages (in order) and teams.",
-			getPipeline),
+			getPipeline).returns(ResultOf[ReleasePipeline]()),
 		op("save_release_pipeline", app.Write, []string{"POST /release-pipelines", "PATCH /release-pipelines/{id}"},
 			"Create a release pipeline (omit id; name is required) or update one (pass id, slug or name). New "+
 				"pipelines get the stages Planned, In Progress, Released and Canceled; change them with "+
 				"save_release_stage. Teams are given as key, name or id.",
-			savePipeline),
+			savePipeline).returns(ResultOf[ReleasePipeline]()),
 		op("delete_release_pipeline", app.Write, []string{"DELETE /release-pipelines/{id}"},
 			"Archive a release pipeline. Its releases stay readable.",
-			deletePipeline),
+			deletePipeline).returns(ResultOf[ReleasePipeline]()),
 		op("save_release_stage", app.Write, []string{"POST /release-stages", "PATCH /release-stages/{id}"},
 			"Add a stage to a release pipeline (omit id; pipeline, name and type are required) or change one (pass its "+
 				"id). The type (planned, started, completed, canceled) decides which timestamps releases get when they "+
 				"move into it.",
-			saveStage),
+			saveStage).returns(ResultOf[ReleaseStageDetail]()),
 		op("delete_release_stage", app.Write, []string{"DELETE /release-stages/{id}"},
 			"Delete a release stage. When releases are in it, moveReleasesTo (another stage of the pipeline: name, "+
 				"type or id) is required.",
-			deleteStage),
+			deleteStage).returns(ResultOf[DeletedReleaseStage]()),
 		op("list_releases", app.Read, []string{"GET /releases"},
 			"List releases, newest first: name, version, pipeline, stage, dates, commit and how many issues they ship. "+
 				"Narrow by pipeline, stage (a type like started works across pipelines; a stage name needs pipeline) or a "+
 				"query on the name, version or commit. Archived releases are left out unless includeArchived is set.",
-			listReleases),
+			listReleases).returns(ResultOf[PageOf[Release]]()),
 		op("get_release", app.Read, []string{"GET /releases/{id}"},
 			"Read a release by id, slug or name, with the issues in it (with their status) and the release notes "+
 				"that cover it.",
-			getRelease),
+			getRelease).returns(ResultOf[ReleaseDetail]()),
 		op("save_release", app.Write, []string{"POST /releases", "PATCH /releases/{id}"},
 			"Create a release (omit id; name and pipeline are required) or update one (pass id, slug or name). "+
 				"Omitted fields stay as they are; null clears a field. New releases start in the pipeline's first planned "+
 				"stage unless stage is given. Moving to a started, completed or canceled stage stamps startedAt, "+
 				"completedAt or canceledAt unless you pass them; moving back to planned clears them. Add issues to a "+
 				"release with save_issue (addReleases, removeReleases, setReleases).",
-			saveRelease),
+			saveRelease).returns(ResultOf[Release]()),
 		op("delete_release", app.Write, []string{"DELETE /releases/{id}"},
 			"Archive a release. It stays readable and keeps its issues.",
-			deleteRelease),
+			deleteRelease).returns(ResultOf[Release]()),
 		op("list_release_notes", app.Read, []string{"GET /release-notes"},
 			"List release notes, newest first, optionally of one pipeline: title, pipeline, the releases they cover "+
 				"and who wrote them. Read the content with get_release_note.",
-			listNotes),
+			listNotes).returns(ResultOf[PageOf[ReleaseNote]]()),
 		op("get_release_note", app.Read, []string{"GET /release-notes/{id}"},
 			"Read a release note by id or slug: title, Markdown content, pipeline and the releases it covers.",
-			getNote),
+			getNote).returns(ResultOf[ReleaseNote]()),
 		op("save_release_note", app.Write, []string{"POST /release-notes", "PATCH /release-notes/{id}"},
 			"Create release notes (omit id; pipeline is required) or update them (pass id or slug). Name the releases "+
 				"they cover with releases, or with rangeFromRelease and rangeToRelease for every release of the pipeline "+
 				"created between the two, inclusive. The title defaults to the newest release's name and version. Use "+
 				"patch to edit part of the content without resending it.",
-			saveNote),
+			saveNote).returns(ResultOf[ReleaseNote]()),
 		op("delete_release_note", app.Write, []string{"DELETE /release-notes/{id}"},
 			"Delete release notes. The releases stay.",
-			deleteNote),
+			deleteNote).returns(ResultOf[DeletedReleaseNote]()),
 	}
 }
 
@@ -215,6 +215,9 @@ func releaseID(c *app.Ctx, value string) (uuid.UUID, error) {
 func idOrSlug(value string) string {
 	value = strings.TrimRight(strings.TrimSpace(value), "/")
 	segment := value[strings.LastIndex(value, "/")+1:]
+	if _, ok := asUUID(segment); ok {
+		return segment
+	}
 	i := strings.LastIndex(segment, "-")
 	if i < 0 {
 		return segment
@@ -1229,4 +1232,95 @@ func deleteNote(c *app.Ctx, args IDArgs) (any, error) {
 		return nil, err
 	}
 	return M{"id": id, "deleted": true}, nil
+}
+
+/* Shapes */
+
+type ReleasePipeline struct {
+	ID           string         `json:"id"`
+	SlugID       string         `json:"slugId"`
+	Name         string         `json:"name"`
+	Type         string         `json:"type" enum:"continuous,scheduled"`
+	IsProduction bool           `json:"isProduction"`
+	ReleaseCount int            `json:"releaseCount" doc:"Releases in it, archived ones left out."`
+	ArchivedAt   *string        `json:"archivedAt"`
+	CreatedAt    string         `json:"createdAt"`
+	UpdatedAt    string         `json:"updatedAt"`
+	Stages       []ReleaseStage `json:"stages,omitempty" doc:"In order; in lists only with includeStages."`
+	Teams        []TeamRef      `json:"teams,omitempty" doc:"In lists only with includeTeams."`
+}
+
+type ReleaseStage struct {
+	ID       string  `json:"id"`
+	Name     string  `json:"name"`
+	Type     string  `json:"type" enum:"planned,started,completed,canceled"`
+	Color    string  `json:"color"`
+	Position float64 `json:"position"`
+}
+
+type ReleaseStageDetail struct {
+	ReleaseStage
+	Pipeline ReleasePipelineRef `json:"pipeline"`
+}
+
+type DeletedReleaseStage struct {
+	ID            string `json:"id"`
+	Deleted       bool   `json:"deleted"`
+	ReleasesMoved int    `json:"releasesMoved" doc:"Releases moved to moveReleasesTo."`
+}
+
+type Release struct {
+	ID          string             `json:"id"`
+	SlugID      string             `json:"slugId"`
+	Name        string             `json:"name"`
+	Version     *string            `json:"version"`
+	Description *string            `json:"description" doc:"Markdown."`
+	CommitSHA   *string            `json:"commitSha"`
+	Pipeline    ReleasePipelineRef `json:"pipeline"`
+	Stage       *ReleaseStageRef   `json:"stage"`
+	StartDate   *string            `json:"startDate"`
+	TargetDate  *string            `json:"targetDate"`
+	StartedAt   *string            `json:"startedAt"`
+	CompletedAt *string            `json:"completedAt"`
+	CanceledAt  *string            `json:"canceledAt"`
+	IssueCount  int                `json:"issueCount"`
+	Creator     *UserRef           `json:"creator"`
+	ArchivedAt  *string            `json:"archivedAt"`
+	CreatedAt   string             `json:"createdAt"`
+	UpdatedAt   string             `json:"updatedAt"`
+}
+
+type ReleaseDetail struct {
+	Release
+	Issues       []ReleaseIssue       `json:"issues" doc:"The issues in it the caller can see."`
+	ReleaseNotes []ReleaseNoteSummary `json:"releaseNotes" doc:"Newest first."`
+}
+
+type ReleaseIssue struct {
+	IssueRef
+	Assignee *UserRef `json:"assignee"`
+}
+
+type ReleaseNoteSummary struct {
+	ID        string `json:"id"`
+	SlugID    string `json:"slugId"`
+	Title     string `json:"title"`
+	CreatedAt string `json:"createdAt"`
+}
+
+type ReleaseNote struct {
+	ID        string             `json:"id"`
+	SlugID    string             `json:"slugId"`
+	Title     string             `json:"title"`
+	Content   string             `json:"content,omitempty" doc:"Markdown; not in lists."`
+	Pipeline  ReleasePipelineRef `json:"pipeline"`
+	Releases  []ReleaseRef       `json:"releases"`
+	Creator   *UserRef           `json:"creator"`
+	CreatedAt string             `json:"createdAt"`
+	UpdatedAt string             `json:"updatedAt"`
+}
+
+type DeletedReleaseNote struct {
+	ID      string `json:"id"`
+	Deleted bool   `json:"deleted"`
 }

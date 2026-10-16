@@ -111,6 +111,104 @@ export type CustomView = {
   url: string
 }
 
+export type Customer = {
+  archivedAt: string | null
+  createdAt: string
+  domains: string[]
+  /** Its ids in other systems (CRM, billing). */
+  externalIds: string[]
+  id: string
+  logoUrl: string | null
+  name: string
+  needCount: number
+  owner: UserRef | null
+  /** Annual revenue. */
+  revenue: number | null
+  /** Number of employees. */
+  size: number | null
+  slugId: string
+  status: CustomerStatusRef | null
+  tier: CustomerTierRef | null
+  updatedAt: string
+}
+
+export type CustomerDetail = {
+  archivedAt: string | null
+  createdAt: string
+  domains: string[]
+  /** Its ids in other systems (CRM, billing). */
+  externalIds: string[]
+  id: string
+  logoUrl: string | null
+  name: string
+  needCount: number
+  /** Newest first, on issues and projects the caller can see. */
+  needs: CustomerNeed[]
+  owner: UserRef | null
+  /** Annual revenue. */
+  revenue: number | null
+  /** Number of employees. */
+  size: number | null
+  slugId: string
+  status: CustomerStatusRef | null
+  tier: CustomerTierRef | null
+  updatedAt: string
+}
+
+export type CustomerNeed = {
+  /** Where the request came from. */
+  attachmentUrl: string | null
+  /** What the customer said, in Markdown. */
+  body: string | null
+  createdAt: string
+  creator: UserRef | null
+  customer: CustomerRef | null
+  id: string
+  issue: IssueRef | null
+  /** 0 normal, 1 important. */
+  priority: number
+  project: ProjectRef | null
+  updatedAt: string
+}
+
+export type CustomerRef = {
+  id: string
+  name: string
+  slugId: string
+}
+
+export type CustomerStatus = {
+  color: string
+  /** Customers with it, archived ones left out. */
+  customerCount: number
+  description: string | null
+  id: string
+  name: string
+  position: number
+}
+
+export type CustomerStatusRef = {
+  color: string
+  id: string
+  name: string
+}
+
+export type CustomerTier = {
+  color: string
+  /** Customers in it, archived ones left out. */
+  customerCount: number
+  description: string | null
+  id: string
+  name: string
+  position: number
+}
+
+export type CustomerTierRef = {
+  color: string
+  id: string
+  name: string
+}
+
 export type Cycle = {
   archivedAt: string | null
   completedAt: string | null
@@ -212,6 +310,18 @@ export type DeletedCustomView = {
   name: string
 }
 
+export type DeletedCustomerNeed = {
+  deleted: boolean
+  id: string
+}
+
+export type DeletedCustomerOption = {
+  /** Customers left without it. */
+  customersCleared: number
+  deleted: boolean
+  id: string
+}
+
 export type DeletedIssueLabel = {
   deleted: string
   removedFromIssues: number
@@ -255,6 +365,18 @@ export type DeletedProjectStatus = {
   movedProjects: number
 }
 
+export type DeletedReleaseNote = {
+  deleted: boolean
+  id: string
+}
+
+export type DeletedReleaseStage = {
+  deleted: boolean
+  id: string
+  /** Releases moved to moveReleasesTo. */
+  releasesMoved: number
+}
+
 export type DeletedStatusUpdate = {
   deleted: boolean
   id: string
@@ -269,6 +391,11 @@ export type DeletedTemplate = {
   deleted: boolean
   id: string
   name: string
+}
+
+export type DeletedWebhook = {
+  deleted: boolean
+  id: string
 }
 
 export type Document = {
@@ -392,6 +519,20 @@ export type HistoryEntry = {
   /** Changed fields, each {from, to}. */
   changes: Record<string, unknown>
   createdAt: string
+}
+
+export type ImportedIssues = {
+  /** How many comments. */
+  comments: number
+  /** Nothing was imported, only checked. */
+  dryRun: boolean
+  identifiers: string[]
+  /** How many issues. */
+  imported: number
+  /** The identifier the team's next issue gets. */
+  nextIdentifier: string
+  /** How many relations (relatedTo, blocks, blockedBy, duplicateOf). */
+  relations: number
 }
 
 export type Inbox = {
@@ -1013,11 +1154,134 @@ export type Ref = {
   id: string
 }
 
+export type Release = {
+  archivedAt: string | null
+  canceledAt: string | null
+  commitSha: string | null
+  completedAt: string | null
+  createdAt: string
+  creator: UserRef | null
+  /** Markdown. */
+  description: string | null
+  id: string
+  issueCount: number
+  name: string
+  pipeline: ReleasePipelineRef
+  slugId: string
+  stage: ReleaseStageRef | null
+  startDate: string | null
+  startedAt: string | null
+  targetDate: string | null
+  updatedAt: string
+  version: string | null
+}
+
+export type ReleaseDetail = {
+  archivedAt: string | null
+  canceledAt: string | null
+  commitSha: string | null
+  completedAt: string | null
+  createdAt: string
+  creator: UserRef | null
+  /** Markdown. */
+  description: string | null
+  id: string
+  issueCount: number
+  /** The issues in it the caller can see. */
+  issues: ReleaseIssue[]
+  name: string
+  pipeline: ReleasePipelineRef
+  /** Newest first. */
+  releaseNotes: ReleaseNoteSummary[]
+  slugId: string
+  stage: ReleaseStageRef | null
+  startDate: string | null
+  startedAt: string | null
+  targetDate: string | null
+  updatedAt: string
+  version: string | null
+}
+
+export type ReleaseIssue = {
+  assignee: UserRef | null
+  id: string
+  identifier: string
+  state: StateRef
+  title: string
+}
+
+export type ReleaseNote = {
+  /** Markdown; not in lists. */
+  content?: string
+  createdAt: string
+  creator: UserRef | null
+  id: string
+  pipeline: ReleasePipelineRef
+  releases: ReleaseRef[]
+  slugId: string
+  title: string
+  updatedAt: string
+}
+
+export type ReleaseNoteSummary = {
+  createdAt: string
+  id: string
+  slugId: string
+  title: string
+}
+
+export type ReleasePipeline = {
+  archivedAt: string | null
+  createdAt: string
+  id: string
+  isProduction: boolean
+  name: string
+  /** Releases in it, archived ones left out. */
+  releaseCount: number
+  slugId: string
+  /** In order; in lists only with includeStages. */
+  stages?: ReleaseStage[]
+  /** In lists only with includeTeams. */
+  teams?: TeamRef[]
+  type: "continuous" | "scheduled"
+  updatedAt: string
+}
+
+export type ReleasePipelineRef = {
+  id: string
+  name: string
+  slugId: string
+}
+
 export type ReleaseRef = {
   id: string
   name: string
   slugId: string
   version: string | null
+}
+
+export type ReleaseStage = {
+  color: string
+  id: string
+  name: string
+  position: number
+  type: "planned" | "started" | "completed" | "canceled"
+}
+
+export type ReleaseStageDetail = {
+  color: string
+  id: string
+  name: string
+  pipeline: ReleasePipelineRef
+  position: number
+  type: "planned" | "started" | "completed" | "canceled"
+}
+
+export type ReleaseStageRef = {
+  color: string
+  id: string
+  name: string
+  type: string
 }
 
 export type RemovedFavorite = {
@@ -1031,6 +1295,21 @@ export type RemovedReaction = {
 
 export type RemovedUser = {
   removed: string
+}
+
+export type SavedWebhook = {
+  createdAt: string
+  creator: UserRef | null
+  enabled: boolean
+  id: string
+  label: string | null
+  resourceTypes: string[]
+  /** The signing secret, only when the webhook is created. */
+  secret?: string
+  /** Only changes in this team; null for every team. */
+  team: TeamRef | null
+  updatedAt: string
+  url: string
 }
 
 export type SearchResults = {
@@ -1258,6 +1537,62 @@ export type UserRef = {
   email: string
   id: string
   name: string
+}
+
+export type Webhook = {
+  createdAt: string
+  creator: UserRef | null
+  enabled: boolean
+  id: string
+  label: string | null
+  resourceTypes: string[]
+  /** Only changes in this team; null for every team. */
+  team: TeamRef | null
+  updatedAt: string
+  url: string
+}
+
+export type WebhookDelivery = {
+  action: "create" | "update" | "remove" | "test"
+  attempts: number
+  createdAt: string
+  deliveredAt: string | null
+  error: string | null
+  /** When it was given up. */
+  failedAt: string | null
+  id: string
+  /** While it is still pending. */
+  nextAttemptAt: string | null
+  statusCode: number | null
+  /** The resource type, or Ping for test_webhook. */
+  type: string
+}
+
+export type WebhookDetail = {
+  createdAt: string
+  creator: UserRef | null
+  /** The last 20, newest first. */
+  deliveries: WebhookDelivery[]
+  enabled: boolean
+  id: string
+  label: string | null
+  resourceTypes: string[]
+  /** Only changes in this team; null for every team. */
+  team: TeamRef | null
+  updatedAt: string
+  url: string
+}
+
+export type WebhookPing = {
+  delivered: boolean
+  deliveryId: string
+  error: string | null
+  statusCode: number | null
+}
+
+export type WebhookSecret = {
+  id: string
+  secret: string
 }
 
 export type Workspace = {
@@ -3134,7 +3469,7 @@ export interface Ops {
   get_issue_history: { args: GetIssueHistoryArgs; result: IssueHistory }
   share_issue: { args: ShareIssueArgs; result: IssueShare }
   unshare_issue: { args: UnshareIssueArgs; result: IssueUnshare }
-  import_issues: { args: ImportIssuesArgs; result: unknown }
+  import_issues: { args: ImportIssuesArgs; result: ImportedIssues }
   list_comments: { args: ListCommentsArgs; result: {
   nodes: CommentThread[]
   pageInfo: PageInfo
@@ -3243,40 +3578,67 @@ export interface Ops {
   mark_notification: { args: MarkNotificationArgs; result: MarkedNotifications }
   mark_all_notifications_read: { args: MarkAllNotificationsReadArgs; result: MarkedAllRead }
   search: { args: SearchArgs; result: SearchResults }
-  list_customers: { args: ListCustomersArgs; result: unknown }
-  get_customer: { args: GetCustomerArgs; result: unknown }
-  save_customer: { args: SaveCustomerArgs; result: unknown }
-  delete_customer: { args: DeleteCustomerArgs; result: unknown }
-  list_customer_statuses: { args: ListCustomerStatusesArgs; result: unknown }
-  save_customer_status: { args: SaveCustomerStatusArgs; result: unknown }
-  delete_customer_status: { args: DeleteCustomerStatusArgs; result: unknown }
-  list_customer_tiers: { args: ListCustomerTiersArgs; result: unknown }
-  save_customer_tier: { args: SaveCustomerTierArgs; result: unknown }
-  delete_customer_tier: { args: DeleteCustomerTierArgs; result: unknown }
-  list_customer_needs: { args: ListCustomerNeedsArgs; result: unknown }
-  save_customer_need: { args: SaveCustomerNeedArgs; result: unknown }
-  delete_customer_need: { args: DeleteCustomerNeedArgs; result: unknown }
-  list_release_pipelines: { args: ListReleasePipelinesArgs; result: unknown }
-  get_release_pipeline: { args: GetReleasePipelineArgs; result: unknown }
-  save_release_pipeline: { args: SaveReleasePipelineArgs; result: unknown }
-  delete_release_pipeline: { args: DeleteReleasePipelineArgs; result: unknown }
-  save_release_stage: { args: SaveReleaseStageArgs; result: unknown }
-  delete_release_stage: { args: DeleteReleaseStageArgs; result: unknown }
-  list_releases: { args: ListReleasesArgs; result: unknown }
-  get_release: { args: GetReleaseArgs; result: unknown }
-  save_release: { args: SaveReleaseArgs; result: unknown }
-  delete_release: { args: DeleteReleaseArgs; result: unknown }
-  list_release_notes: { args: ListReleaseNotesArgs; result: unknown }
-  get_release_note: { args: GetReleaseNoteArgs; result: unknown }
-  save_release_note: { args: SaveReleaseNoteArgs; result: unknown }
-  delete_release_note: { args: DeleteReleaseNoteArgs; result: unknown }
-  list_webhooks: { args: ListWebhooksArgs; result: unknown }
-  get_webhook: { args: GetWebhookArgs; result: unknown }
-  save_webhook: { args: SaveWebhookArgs; result: unknown }
-  rotate_webhook_secret: { args: RotateWebhookSecretArgs; result: unknown }
-  delete_webhook: { args: DeleteWebhookArgs; result: unknown }
-  test_webhook: { args: TestWebhookArgs; result: unknown }
-  list_webhook_deliveries: { args: ListWebhookDeliveriesArgs; result: unknown }
+  list_customers: { args: ListCustomersArgs; result: {
+  nodes: Customer[]
+  pageInfo: PageInfo
+} }
+  get_customer: { args: GetCustomerArgs; result: CustomerDetail }
+  save_customer: { args: SaveCustomerArgs; result: Customer }
+  delete_customer: { args: DeleteCustomerArgs; result: Customer }
+  list_customer_statuses: { args: ListCustomerStatusesArgs; result: {
+  nodes: CustomerStatus[]
+  pageInfo: PageInfo
+} }
+  save_customer_status: { args: SaveCustomerStatusArgs; result: CustomerStatus }
+  delete_customer_status: { args: DeleteCustomerStatusArgs; result: DeletedCustomerOption }
+  list_customer_tiers: { args: ListCustomerTiersArgs; result: {
+  nodes: CustomerTier[]
+  pageInfo: PageInfo
+} }
+  save_customer_tier: { args: SaveCustomerTierArgs; result: CustomerTier }
+  delete_customer_tier: { args: DeleteCustomerTierArgs; result: DeletedCustomerOption }
+  list_customer_needs: { args: ListCustomerNeedsArgs; result: {
+  nodes: CustomerNeed[]
+  pageInfo: PageInfo
+} }
+  save_customer_need: { args: SaveCustomerNeedArgs; result: CustomerNeed }
+  delete_customer_need: { args: DeleteCustomerNeedArgs; result: DeletedCustomerNeed }
+  list_release_pipelines: { args: ListReleasePipelinesArgs; result: {
+  nodes: ReleasePipeline[]
+  pageInfo: PageInfo
+} }
+  get_release_pipeline: { args: GetReleasePipelineArgs; result: ReleasePipeline }
+  save_release_pipeline: { args: SaveReleasePipelineArgs; result: ReleasePipeline }
+  delete_release_pipeline: { args: DeleteReleasePipelineArgs; result: ReleasePipeline }
+  save_release_stage: { args: SaveReleaseStageArgs; result: ReleaseStageDetail }
+  delete_release_stage: { args: DeleteReleaseStageArgs; result: DeletedReleaseStage }
+  list_releases: { args: ListReleasesArgs; result: {
+  nodes: Release[]
+  pageInfo: PageInfo
+} }
+  get_release: { args: GetReleaseArgs; result: ReleaseDetail }
+  save_release: { args: SaveReleaseArgs; result: Release }
+  delete_release: { args: DeleteReleaseArgs; result: Release }
+  list_release_notes: { args: ListReleaseNotesArgs; result: {
+  nodes: ReleaseNote[]
+  pageInfo: PageInfo
+} }
+  get_release_note: { args: GetReleaseNoteArgs; result: ReleaseNote }
+  save_release_note: { args: SaveReleaseNoteArgs; result: ReleaseNote }
+  delete_release_note: { args: DeleteReleaseNoteArgs; result: DeletedReleaseNote }
+  list_webhooks: { args: ListWebhooksArgs; result: {
+  nodes: Webhook[]
+  pageInfo: PageInfo
+} }
+  get_webhook: { args: GetWebhookArgs; result: WebhookDetail }
+  save_webhook: { args: SaveWebhookArgs; result: SavedWebhook }
+  rotate_webhook_secret: { args: RotateWebhookSecretArgs; result: WebhookSecret }
+  delete_webhook: { args: DeleteWebhookArgs; result: DeletedWebhook }
+  test_webhook: { args: TestWebhookArgs; result: WebhookPing }
+  list_webhook_deliveries: { args: ListWebhookDeliveriesArgs; result: {
+  nodes: WebhookDelivery[]
+  pageInfo: PageInfo
+} }
 }
 
 export type OpName = keyof Ops
