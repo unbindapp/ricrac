@@ -745,7 +745,7 @@ async fn update_many(ctx: Ctx, args: UpdateManyArgs) -> ApiResult<Value> {
     Ok(json!({ "updated": updated }))
 }
 
-struct TeamSettings {
+pub struct TeamSettings {
     estimate_type: String,
     estimate_allow_zero: bool,
     estimate_extended: bool,
@@ -753,7 +753,7 @@ struct TeamSettings {
     triage_enabled: bool,
 }
 
-async fn team_settings(db: &mut PgConnection, team: Uuid) -> ApiResult<TeamSettings> {
+pub async fn team_settings(db: &mut PgConnection, team: Uuid) -> ApiResult<TeamSettings> {
     let row: (String, bool, bool, Option<f64>, bool) = sqlx::query_as(
         "SELECT estimate_type, estimate_allow_zero, estimate_extended, default_estimate, triage_enabled FROM teams WHERE id = $1",
     )
@@ -789,7 +789,7 @@ pub fn allowed_estimates(kind: &str, allow_zero: bool, extended: bool) -> Vec<f6
     values
 }
 
-fn check_estimate(settings: &TeamSettings, estimate: f64) -> ApiResult<f64> {
+pub fn check_estimate(settings: &TeamSettings, estimate: f64) -> ApiResult<f64> {
     if settings.estimate_type == "notUsed" {
         return Err(ApiError::bad_request(
             "This team doesn't use estimates; turn them on with save_team (estimateType)",

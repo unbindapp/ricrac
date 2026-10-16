@@ -21,6 +21,7 @@ pub mod documents;
 pub mod events;
 pub mod favorites;
 pub mod filter;
+pub mod import;
 pub mod initiatives;
 pub mod issues;
 pub mod labels;
@@ -190,6 +191,7 @@ static OPS: LazyLock<Vec<Op>> = LazyLock::new(|| {
         states::ops(),
         labels::ops(),
         issues::ops(),
+        import::ops(),
         comments::ops(),
         attachments::ops(),
         projects::ops(),

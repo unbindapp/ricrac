@@ -18,8 +18,9 @@ links agents share.
   descriptions with partial patches, status, priority, estimate, assignee, labels (with
   single- or multi-select groups), project and milestone, cycle, due date, SLA, snoozing,
   sub-issues, relations (blocks, blocked by, related, duplicate), link attachments and uploaded
-  files, subscribers, sharing with people outside the team, history, archive and trash, and
-  changes to many issues at once.
+  files, subscribers, sharing with people outside the team, history, archive and trash,
+  changes to many issues at once, and imports from other trackers that keep issue numbers,
+  dates, authors and comments.
 - **Filtering** with a filter language (`and`/`or`, comparators, relation filters)
   and full-text search.
 - **Comments** in threads with replies, resolving and reactions, on issues, projects,

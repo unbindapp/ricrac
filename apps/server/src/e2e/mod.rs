@@ -3,6 +3,7 @@
 
 mod conversation;
 mod http;
+mod import;
 mod integrations;
 mod issues;
 mod planning;

@@ -87,7 +87,7 @@ struct CallOperationArgs {
 const FIND_DESCRIPTION: &str = "Find operations beyond the tools listed here: webhooks, customers and customer needs, \
 releases, pipelines and release notes, favorites, document versions, templates and custom views (saving/deleting), \
 project and issue labels and statuses (saving/deleting), cycles (saving/archiving), teams and members (saving, \
-inviting, roles), archiving/restoring, sharing, the audit log, and more. With a query, returns the matching operations \
+inviting, roles), archiving/restoring, sharing, the audit log, importing issues from another tracker, and more. With a query, returns the matching operations \
 with their argument schemas; call them with call_operation.";
 
 const CALL_DESCRIPTION: &str = "Run any Ricrac operation by name with its arguments (see find_operations). Returns \
