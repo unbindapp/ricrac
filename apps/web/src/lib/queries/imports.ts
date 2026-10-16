@@ -1,45 +1,47 @@
-import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { getGoClient } from "@/lib/server/client";
-import type { TGoClient, TInput, TListItem, TResponseData } from "@/lib/server/types";
+import type { ImportIssuesArgs } from "@/api/ops.gen";
+import { call } from "@/lib/server/client";
 
-export type TImport = TListItem<TGoClient["imports"]["list"]>;
-export type TImportReport = TResponseData<TGoClient["imports"]["linear"]>;
-export type TImportLinearInput = TInput<TGoClient["imports"]["linear"]>;
-export type TLinearExport = TImportLinearInput["export"];
+export type TImportIssue = ImportIssuesArgs["issues"] extends (infer T)[] | undefined ? T : never;
 
-const LIST_REFETCH_INTERVAL_MS = 15 * 1000;
+/** Bodies above this go up as a file (prepare_file_upload) instead: requests stop at 8 MB. */
+const INLINE_LIMIT_BYTES = 6 * 1024 * 1024;
 
-export const queryKeyImports = {
-  all: () => ["imports"] as const,
-  list: (workspaceId: string) => ["imports", "list", workspaceId] as const,
-};
-
-export const importsListQuery = (workspaceId: string) =>
-  queryOptions({
-    queryKey: queryKeyImports.list(workspaceId),
-    queryFn: async () => {
-      const res = await getGoClient().imports.list({ workspace_id: workspaceId });
-      return { imports: res.data ?? [] };
-    },
-    refetchInterval: LIST_REFETCH_INTERVAL_MS,
+async function uploadIssuesFile(workspaceId: string, issues: TImportIssue[]) {
+  const body = new Blob([JSON.stringify({ issues })], { type: "application/json" });
+  const upload = await call(workspaceId, "prepare_file_upload", {
+    name: "issues.json",
+    contentType: "application/json",
+    size: body.size,
   });
-
-export async function importLinear(input: TImportLinearInput) {
-  const res = await getGoClient().imports.linear(input);
-  return { data: res.data };
+  const response = await fetch(new URL(upload.uploadUrl).pathname, { method: "PUT", body });
+  if (!response.ok) throw new Error("Could not upload the issues");
+  return upload.fileId;
 }
 
-export function useImportLinearMutation() {
+/** Imports issues into a team; dryRun only checks them and reports. */
+export async function importIssues(
+  workspaceId: string,
+  { team, issues, dryRun }: { team: string; issues: TImportIssue[]; dryRun: boolean },
+) {
+  const size = new Blob([JSON.stringify(issues)]).size;
+  if (size <= INLINE_LIMIT_BYTES) {
+    return call(workspaceId, "import_issues", { team, issues, dryRun });
+  }
+  const fileId = await uploadIssuesFile(workspaceId, issues);
+  return call(workspaceId, "import_issues", { team, fileId, dryRun });
+}
+
+export function useImportIssuesMutation(workspaceId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: importLinear,
-    meta: { errorTitle: "Could not import the Linear export" },
-    onSuccess: ({ data }) => {
-      if (data.dry_run) {
-        return queryClient.invalidateQueries({ queryKey: queryKeyImports.all() });
-      }
-      return queryClient.invalidateQueries();
+    mutationFn: (input: { team: string; issues: TImportIssue[]; dryRun: boolean }) =>
+      importIssues(workspaceId, input),
+    meta: { silent: true },
+    onSuccess: (result) => {
+      if (result.dryRun) return;
+      return queryClient.invalidateQueries({ queryKey: [workspaceId] });
     },
   });
 }

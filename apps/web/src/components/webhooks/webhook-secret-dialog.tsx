@@ -11,31 +11,33 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { TWebhookCreated } from "@/lib/queries/webhooks";
 
 type TProps = {
-  created: TWebhookCreated | null;
+  /** The new secret and whether it came with a new webhook; null keeps the dialog closed. */
+  secret: { value: string; isNew: boolean } | null;
   onClose: () => void;
 };
 
-export function WebhookSecretDialog({ created, onClose }: TProps) {
+export function WebhookSecretDialog({ secret, onClose }: TProps) {
   return (
-    <Dialog open={created !== null} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={secret !== null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent hideXButton className="w-lg max-w-full">
         <DialogHeader>
-          <DialogTitle>Webhook created</DialogTitle>
+          <DialogTitle>{secret?.isNew ? "Webhook created" : "New signing secret"}</DialogTitle>
           <DialogDescription>
-            Use this secret to check that deliveries come from Zigzag. It will not be shown again.
+            Check deliveries with this secret. It isn't shown again.
           </DialogDescription>
         </DialogHeader>
-        <CopyField value={created?.secret ?? ""} label="Signing secret" />
+        <CopyField value={secret?.value ?? ""} label="Signing secret" />
         <p className="text-muted-foreground text-sm">
-          Every delivery carries an X-Zigzag-Signature header: sha256= followed by the hex
-          HMAC-SHA256 of the raw body, keyed with this secret.
+          Each delivery has a <span className="font-mono text-xs">Ricrac-Signature</span> header:
+          the hex HMAC-SHA256 of the raw body, keyed with this secret. Compute it over the exact
+          bytes you receive, compare in constant time, and refuse bodies whose{" "}
+          <span className="font-mono text-xs">webhookTimestamp</span> is over a minute old.
         </p>
         <div className="bg-warning/3-10 text-warning flex items-start gap-1.5 rounded-md px-3 py-2 text-sm">
           <TriangleAlertIcon className="mt-0.5 size-4 shrink-0" />
-          <p>Copy the secret now. Delete and recreate the webhook if you lose it.</p>
+          <p>Copy it now. If you lose it, rotate the secret to get a new one.</p>
         </div>
         <DialogFooter>
           <DialogClose render={<Button size="sm">Done</Button>} />

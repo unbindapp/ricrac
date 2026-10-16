@@ -4,8 +4,8 @@ import { sortStates } from "@/components/issues/grouping";
 import type { TUserSummary } from "@/lib/queries/issues";
 import { useTeams } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { cyclesListQuery } from "@/lib/queries/cycles";
-import { labelTreeQuery } from "@/lib/queries/labels";
+import { cyclesQuery } from "@/lib/queries/cycles";
+import { labelsQuery } from "@/lib/queries/labels";
 import { projectsListQuery } from "@/lib/queries/projects";
 import { usersQuery } from "@/lib/queries/users";
 
@@ -33,10 +33,8 @@ export function useWorkspaceUsers() {
 
 export function useLabels(teamId: string | undefined) {
   const { workspace } = useWorkspace();
-  const { data, isPending } = useQuery(
-    labelTreeQuery({ workspaceId: workspace.id, teamId, allTeams: !teamId }),
-  );
-  return { labels: data?.labels ?? [], isPending };
+  const { data, isPending } = useQuery(labelsQuery(workspace.id, { team: teamId }));
+  return { labels: data ?? [], isPending };
 }
 
 function useWorkspaceProjects() {
@@ -60,9 +58,10 @@ export function useMilestones(projectId: string | undefined) {
 }
 
 export function useCycles(teamId: string | undefined) {
+  const { workspace } = useWorkspace();
   const team = useTeam(teamId);
-  const enabled = Boolean(teamId && team?.cycles_enabled);
-  const { data, isPending } = useQuery({ ...cyclesListQuery(teamId ?? ""), enabled });
-  const cycles = (data?.cycles ?? []).filter((cycle) => !cycle.is_past);
+  const enabled = Boolean(teamId && team?.cyclesEnabled);
+  const { data, isPending } = useQuery({ ...cyclesQuery(workspace.id, teamId ?? ""), enabled });
+  const cycles = (data ?? []).filter((cycle) => !cycle.isPast);
   return { cycles, isPending: enabled && isPending, enabled };
 }

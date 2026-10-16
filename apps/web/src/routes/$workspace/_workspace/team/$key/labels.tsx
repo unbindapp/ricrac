@@ -9,31 +9,25 @@ import { useRequiredTeamFromRoute } from "@/components/workspace/use-team-from-r
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 
 export const Route = createFileRoute("/$workspace/_workspace/team/$key/labels")({
-  component: TeamKeyLabelsPage,
+  component: TeamLabelsPage,
 });
 
-function TeamKeyLabelsPage() {
-  const { workspace, isAdmin } = useWorkspace();
+function TeamLabelsPage() {
+  const { workspace, canEdit } = useWorkspace();
   const team = useRequiredTeamFromRoute();
   return (
-    <PageContainer>
+    <PageContainer width="narrow">
       <PageHeader
         title="Labels"
         icon={<TagIcon />}
-        breadcrumb={[teamCrumb(team, workspace.slug), { label: "Labels" }]}
+        breadcrumb={[teamCrumb(team, workspace.urlKey), { label: "Labels" }]}
       />
+      <LabelManager team={team} canEdit={canEdit} title={`${team.name} labels`} />
       <LabelManager
-        workspaceId={workspace.id}
-        teamId={team.id}
-        canEdit={isAdmin}
-        title={`${team.name} labels`}
-        description="Labels only this team uses."
-      />
-      <LabelManager
-        workspaceId={workspace.id}
-        canEdit={isAdmin}
+        team={null}
+        canEdit={canEdit}
         title="Workspace labels"
-        description="Labels every team shares."
+        description="Shared by every team."
       />
     </PageContainer>
   );
