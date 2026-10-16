@@ -5,75 +5,79 @@ It has no interface of its own: agents use it through the MCP server (`/mcp`) an
 (`/v1`), and people sign in with Google to a small dashboard to manage their workspaces, API keys
 and OAuth apps. README.md covers features and configuration.
 
-Two apps: `apps/server` is the Rust server (Axum, sqlx on Postgres) and `apps/web` the dashboard
+Two apps: `apps/server` is the Go server (net/http, pgx on Postgres) and `apps/web` the dashboard
 (Vite, React, TanStack Router + Query, Tailwind, shadcn), embedded into the server binary at
 build time. Production is the `Ricrac` project on Unbind: the `ricrac` service (this repo's
 Dockerfile) and a `postgres` database service.
 
 ## Repo Structure:
 
-### apps/server (Rust, Axum, sqlx 0.8 on Postgres)
+### apps/server (Go, module `ricrac`, pgx on Postgres)
 
 - `ops/` holds every operation of the tracker, defined once with `op(name, access, routes,
-  description, handler)`. `ops::all()` feeds the MCP tools (`mcp.rs`), the REST routes, the generic
-  `POST /v1/ops/{name}` and the OpenAPI document (`rest.rs`). MCP lists the everyday operations
-  (`mcp::CORE`) as tools and reaches the rest through `find_operations` and `call_operation`, so a
-  session doesn't start with every definition; `/mcp?tools=all` lists them all. A handler is
-  `async fn(ctx: Ctx, args: Args) -> ApiResult<Value>`; `Args` derives `Deserialize` and
-  `JsonSchema` with `#[serde(rename_all = "camelCase", deny_unknown_fields)]`, and its doc
-  comments are what agents read.
-- `ops/resolve.rs` turns what agents pass (names, keys, identifiers like ENG-123, "me", links)
+  description, handler)`. `ops.All()` feeds the MCP tools (`server/mcp.go`), the REST routes, the
+  generic `POST /v1/ops/{name}` and the OpenAPI document (`server/rest.go`). MCP lists the everyday
+  operations (`CORE` in `server/mcp.go`) as tools and reaches the rest through `find_operations`
+  and `call_operation`, so a session doesn't start with every definition; `/mcp?tools=all` lists
+  them all. A handler is `func(c *app.Ctx, args Args) (any, error)`; `Args` is a struct with
+  camelCase `json` tags, and its `doc` tags (and `enum`) are what agents read (`ops/schema.go`
+  turns it into a JSON Schema; unknown fields are refused, plain fields are required).
+- `ops/resolve.go` turns what agents pass (names, keys, identifiers like ENG-123, "me", links)
   into ids and checks the caller may see the thing; errors list the valid options.
-  `ops/filter.rs` is the issue filter language, used by `list_issues`
-  and custom views. `ops/events.rs` writes issue history, notifications, webhook deliveries and
-  the audit log inside the change's transaction. `ops/util.rs` has the nullable-argument helper,
-  dates and durations, paging, slugs and Markdown patches.
-- `ctx.rs` is the caller: `Caller` is the user, token scopes and the workspaces the token reaches
-  (one, several or all); `Caller::ctx` picks the one a call acts in (the `workspace` argument,
-  links among the arguments, or the only one) and gives a `Ctx`: user, workspace, role (owner,
-  admin, member, guest), scopes and the teams they can see (private teams only for their members;
-  guests only their teams). Operations defined with `account_op` run with the `Caller` instead.
+  `ops/filter.go` is the issue filter language, used by `list_issues` and custom views.
+  `ops/events.go` writes issue history, notifications, webhook deliveries and the audit log inside
+  the change's transaction. `ops/util.go` has dates and durations, paging, slugs and Markdown
+  patches. `ops/seed.go` is what new workspaces and teams start with. `ops/email.go` queues emails
+  (invitations, notification digests) in the change's transaction and sends them.
+- `app/` is what everything shares: config from the environment, `State`, errors, signed keys, the
+  DB helpers (`app.One`, `Maybe`, `All`, `Rows`, `Row`, `Exec`, the `app.SQL` builder) and the
+  migrator (it keeps sqlx's `_sqlx_migrations` bookkeeping). `app/ctx.go` is the caller: `Caller`
+  is the user, token scopes and the workspaces the token reaches (one, several or all);
+  `Caller.Ctx` picks the one a call acts in (the `workspace` argument, links among the arguments,
+  or the only one) and gives a `Ctx`: user, workspace, role (owner, admin, member, guest), scopes
+  and the teams they can see (private teams only for their members; guests only their teams).
+  Operations defined with `accountOp` run with the `Caller` instead.
 - `migrations/0002_refs.sql` defines `user_ref`, `team_ref`, `state_ref`, `issue_ref`,
   `project_ref`, ... SQL functions: every response shows a referenced thing in the same short JSON
   form. Responses are built in SQL with `jsonb_build_object` (at most 100 arguments per call;
   join two with `||`).
-- `oauth.rs` is the OAuth 2.1 server (discovery, dynamic registration, client ID metadata
+- `server/oauth.go` is the OAuth 2.1 server (discovery, dynamic registration, client ID metadata
   documents, dashboard apps, PKCE, rotating refresh tokens, revocation) and the bearer check for
   `/v1` and `/mcp`, which also takes API keys (`rr_key_...`). Grants and keys reach the
   workspaces chosen when they were made, or all of the user's (`workspace_ids` NULL).
-- `google.rs` is sign-in with Google; `account.rs` the dashboard's JSON API under `/api`
-  (workspaces, invitations, API keys, OAuth apps, connected apps, OAuth consent). Its types are
-  exported to TypeScript with ts-rs.
-- `jobs.rs` runs the automations every minute (auto-archive, auto-close, trash, snoozes, due
-  dates, cycles, recurring issues from templates) and delivers webhooks. `seed.rs` is what new workspaces and teams start with.
-- `files.rs` serves uploads; `spa.rs` serves `apps/web/dist`.
+- `server/google.go` is sign-in with Google; `server/account.go` the dashboard's JSON API under
+  `/api` (workspaces, invitations, API keys, OAuth apps, connected apps, OAuth consent).
+- `server/jobs.go` runs the automations every minute (auto-archive, auto-close, trash, snoozes,
+  due dates, cycles, recurring issues from templates, emails) and delivers webhooks.
+- `server/files.go` serves uploads; `server/spa.go` serves the web build copied into
+  `server/dist` (the committed `index.html` is a placeholder).
+- `mail/` renders emails (`mail/templates`) and sends them over SMTP.
 
 ### apps/web (Vite, React, TanStack Router + Query, Tailwind, shadcn)
 
 `src/routes` are the pages (file routes), `src/api` the API client and queries,
-`src/components/ui` are shadcn components. `src/api/types` is generated by `cargo test` in
-apps/server.
+`src/components/ui` are shadcn components.
 
 ## Conventions
 
 - Output and arguments are camelCase. Timestamps are ISO 8601 UTC.
 - `save_*` creates without `id` and updates with it. Optional fields left out stay as they are;
-  `null` clears them (`Option<Option<T>>` with `#[serde(default, deserialize_with = "nullable")]`
-  and `#[schemars(with = "Option<T>")]`).
+  `null` clears them (`Nullable[T]` fields).
 - Lists take `limit` and `cursor` and answer `{ nodes, pageInfo: { hasNextPage, endCursor } }`
-  through `util::Page`.
-- Reading a NULL jsonb into `serde_json::Value` fails: select `Option<Value>` or `coalesce`.
+  through `Page`.
+- pgx can't type a bare `$n` that is only used in `CASE`, `coalesce` or `jsonb_build_object`:
+  cast it (`$2::uuid`, `$6::jsonb`).
 - Deleting issues, projects, initiatives and documents moves them to the trash (`trashed_at`);
   the trash is emptied after 30 days.
-- Every mutation runs in one transaction, records history (issues) and emits a webhook event
-  (`events::emit`) with the entity's JSON.
+- Every mutation runs in one transaction (`inTx`), records history (issues) and emits a webhook
+  event (`emit`) with the entity's JSON.
 
 ## General Rules:
 
 - Keep it simple. Do not overcomplicate things.
 - Do not leave paragraphs of comments on top of the code. You should try to avoid them as much as possible with understandable function names and code. If they are necessary even then, make them concise. Remove such comments when you come by them in the codebase. Comments should always move with code, not be left behind.
 - Use guard statement patterns in any code you write.
-- Do not edit generated code: `Cargo.lock`, `bun.lock`, `src/routeTree.gen.ts`, `src/api/types`.
+- Do not edit generated code: `go.sum`, `bun.lock`, `src/routeTree.gen.ts`, `src/api/types`.
   Never edit an applied migration in `migrations/`, add a new one.
 - Do not write useless tests; tests should cover input/output behaviour.
 - Reinvent the wheel but do not reinvent the car. If you are solving a simple problem do not
@@ -92,22 +96,22 @@ apps/server.
 
 ## Development
 
-Needs Rust stable, Bun and Docker (for Postgres).
+Needs Go 1.26, Bun and Docker (for Postgres).
 
     docker compose up -d                       # Postgres on localhost:5436
-    cd apps/server && cargo run                # with the variables from .env.example exported
+    cd apps/server && go run .                 # with the variables from .env.example exported
     cd apps/web && bun install && bun dev      # http://localhost:5173, proxies to the server
 
-Checks (`cargo test` needs the compose Postgres; `.cargo/config.toml` points `DATABASE_URL` at
-it and each test gets a throwaway database):
+Checks (`go test` needs the compose Postgres, or `DATABASE_URL` pointing at another one; each
+end-to-end test gets a throwaway database):
 
-    cd apps/server && cargo fmt && cargo clippy --all-targets && cargo test
+    cd apps/server && gofmt -l . && go vet ./... && go test ./...
     cd apps/web && bun run lint && bun run build
 
-The end-to-end tests live in `apps/server/src/e2e/`: each starts from `world()` (a workspace
+The end-to-end tests live in `apps/server/e2e/`: each starts from `world(t)` (a workspace
 "acme" owned by Ann with the team ENG) and calls operations with `call`, `fails` and
-`try_call`; `http.rs` goes through the real router (REST, OAuth, MCP). Behaviour changes need a
-test there.
+`tryCall`; `http_test.go` goes through the real router (REST, OAuth, MCP). Behaviour changes need
+a test there.
 
 For browser checks use headless Chromium through `playwright-core`, never the editor's preview tab.
 

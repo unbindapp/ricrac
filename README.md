@@ -10,6 +10,8 @@ links agents share.
 
 - **Workspaces** with members and roles (owner, admin, member, guest), email invitations and an
   audit log.
+- **Email**: invitations, and digests of notifications still unread after a couple of minutes
+  (each person can turn them off).
 - **Teams** with keys (ENG), private teams, sub-teams, members, and settings: estimates
   (exponential, Fibonacci, linear, t-shirt), cycles, triage with responsibility rotations,
   auto-archive, auto-close, and auto-closing parents and sub-issues.
@@ -64,10 +66,11 @@ links agents share.
 | `PUBLIC_URL` | External base URL, e.g. `https://ricrac.example.com`. |
 | `SECRET_KEY` | At least 32 characters; signs session cookies. |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Sign-in with Google. The OAuth client's redirect URI is `<PUBLIC_URL>/api/auth/callback/google`. |
+| `SMTP_URL`, `EMAIL_FROM` | Email for invitations and notification digests, e.g. `smtps://resend:<API key>@smtp.resend.com:465` and `Ricrac <notifications@example.com>`. Without them no emails are sent. |
 | `MAX_UPLOAD_MB` | Largest uploaded file, 25 by default. |
 | `PORT` | 3000 by default. |
 
 ## Development
 
-See AGENTS.md. In short: `docker compose up -d`, then `cargo run` in `apps/server` and
+See AGENTS.md. In short: `docker compose up -d`, then `go run .` in `apps/server` and
 `bun dev` in `apps/web`.

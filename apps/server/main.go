@@ -24,6 +24,9 @@ func main() {
 	if !config.GoogleConfigured() {
 		slog.Warn("GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET aren't set: nobody can sign in")
 	}
+	if config.Mail == nil {
+		slog.Warn("SMTP_URL and EMAIL_FROM aren't set: no emails are sent")
+	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	db, err := app.Connect(ctx, config.DatabaseURL)
