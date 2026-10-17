@@ -19,7 +19,6 @@ import (
 	"ricrac/internal/legacy"
 	repository "ricrac/internal/repositories"
 	oauth_service "ricrac/internal/services/oauth"
-	"ricrac/ops"
 	"ricrac/server"
 )
 
