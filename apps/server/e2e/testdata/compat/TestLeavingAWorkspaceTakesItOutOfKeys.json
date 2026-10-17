@@ -1,0 +1,200 @@
+[
+  {
+    "auth": "session",
+    "body": {
+      "key": {
+        "allWorkspaces": false,
+        "createdAt": "\u003ctimeZ\u003e",
+        "id": "\u003cid1\u003e",
+        "keyHint": "rr_key_\u003chint\u003e",
+        "label": "agent",
+        "lastUsedAt": null,
+        "scopes": [
+          "read"
+        ],
+        "workspaces": [
+          "Beta"
+        ]
+      },
+      "secret": "rr_key_\u003csecret1\u003e"
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/api/api-keys",
+    "request": {
+      "label": "agent",
+      "scopes": [
+        "read"
+      ],
+      "workspaceIds": [
+        "\u003cid2\u003e"
+      ]
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "key": {
+        "allWorkspaces": false,
+        "createdAt": "\u003ctimeZ\u003e",
+        "id": "\u003cid3\u003e",
+        "keyHint": "rr_key_\u003chint\u003e",
+        "label": "agent",
+        "lastUsedAt": null,
+        "scopes": [
+          "read"
+        ],
+        "workspaces": [
+          "Acme",
+          "Beta"
+        ]
+      },
+      "secret": "rr_key_\u003csecret2\u003e"
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/api/api-keys",
+    "request": {
+      "label": "agent",
+      "scopes": [
+        "read"
+      ],
+      "workspaceIds": [
+        "\u003cid4\u003e",
+        "\u003cid2\u003e"
+      ]
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "key": {
+        "allWorkspaces": true,
+        "createdAt": "\u003ctimeZ\u003e",
+        "id": "\u003cid5\u003e",
+        "keyHint": "rr_key_\u003chint\u003e",
+        "label": "agent",
+        "lastUsedAt": null,
+        "scopes": [
+          "read"
+        ],
+        "workspaces": []
+      },
+      "secret": "rr_key_\u003csecret3\u003e"
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/api/api-keys",
+    "request": {
+      "label": "agent",
+      "scopes": [
+        "read"
+      ],
+      "workspaceIds": null
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "Only workspace admins can make keys with the admin scope"
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/api/api-keys",
+    "request": {
+      "label": "admin",
+      "scopes": [
+        "admin"
+      ],
+      "workspaceIds": [
+        "\u003cid2\u003e"
+      ]
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "ok": true
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/api/workspaces/\u003cid2\u003e/leave",
+    "request": {},
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": [
+      {
+        "allWorkspaces": true,
+        "createdAt": "\u003ctimeZ\u003e",
+        "id": "\u003cid5\u003e",
+        "keyHint": "rr_key_\u003chint\u003e",
+        "label": "agent",
+        "lastUsedAt": null,
+        "scopes": [
+          "read"
+        ],
+        "workspaces": []
+      },
+      {
+        "allWorkspaces": false,
+        "createdAt": "\u003ctimeZ\u003e",
+        "id": "\u003cid3\u003e",
+        "keyHint": "rr_key_\u003chint\u003e",
+        "label": "agent",
+        "lastUsedAt": null,
+        "scopes": [
+          "read"
+        ],
+        "workspaces": [
+          "Acme"
+        ]
+      }
+    ],
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "GET",
+    "path": "/api/api-keys",
+    "status": 200
+  }
+]

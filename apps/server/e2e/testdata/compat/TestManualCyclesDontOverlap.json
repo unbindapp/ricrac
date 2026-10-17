@@ -1,0 +1,583 @@
+[
+  {
+    "auth": "session",
+    "body": {
+      "error": "This team doesn't use cycles; turn them on with save_team (cyclesEnabled) first"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_cycle",
+    "request": {
+      "endsAt": "2030-01-15",
+      "startsAt": "2030-01-01",
+      "team": "ENG"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "Those dates overlap cycle 1 (\u003ctime+00:00\u003e to \u003ctime+00:00\u003e); a team's cycles can't overlap"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_cycle",
+    "request": {
+      "endsAt": "P3D",
+      "startsAt": "-PT1H",
+      "team": "ENG"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "description": null,
+      "endsAt": "\u003ctime+00:00\u003e",
+      "history": [],
+      "id": "\u003cid1\u003e",
+      "isActive": false,
+      "isFuture": true,
+      "isPast": false,
+      "name": "Launch",
+      "number": 4,
+      "progress": 0,
+      "scope": {
+        "canceled": 0,
+        "completed": 0,
+        "completedEstimate": 0,
+        "estimate": 0,
+        "issues": 0,
+        "started": 0,
+        "startedEstimate": 0,
+        "unstarted": 0
+      },
+      "startsAt": "\u003ctime+00:00\u003e",
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/team/ENG/cycle/4"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_cycle",
+    "request": {
+      "endsAt": "2030-01-15",
+      "name": "Launch",
+      "startsAt": "2030-01-01",
+      "team": "ENG"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "endsAt must be after startsAt"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_cycle",
+    "request": {
+      "endsAt": "2029-12-01",
+      "id": "\u003cid1\u003e"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "description": null,
+      "endsAt": "\u003ctime+00:00\u003e",
+      "history": [],
+      "id": "\u003cid1\u003e",
+      "isActive": false,
+      "isFuture": true,
+      "isPast": false,
+      "name": "Big launch",
+      "number": 4,
+      "progress": 0,
+      "scope": {
+        "canceled": 0,
+        "completed": 0,
+        "completedEstimate": 0,
+        "estimate": 0,
+        "issues": 0,
+        "started": 0,
+        "startedEstimate": 0,
+        "unstarted": 0
+      },
+      "startsAt": "\u003ctime+00:00\u003e",
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/team/ENG/cycle/4"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_cycle",
+    "request": {
+      "id": "Launch",
+      "name": "Big launch",
+      "team": "ENG"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "The current cycle can't be archived; wait until it is completed"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/archive_cycle",
+    "request": {
+      "id": "current",
+      "team": "ENG"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-1-later",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid3\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": {
+        "endsAt": "\u003ctime+00:00\u003e",
+        "id": "\u003cid1\u003e",
+        "name": "Big launch",
+        "number": 4,
+        "startsAt": "\u003ctime+00:00\u003e"
+      },
+      "description": "",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid4\u003e",
+      "identifier": "ENG-1",
+      "labels": [],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid5\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid3\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Later",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue",
+    "request": {
+      "cycle": "4",
+      "title": "Later"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": "\u003ctime+00:00\u003e",
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "description": null,
+      "endsAt": "\u003ctime+00:00\u003e",
+      "history": [],
+      "id": "\u003cid1\u003e",
+      "isActive": false,
+      "isFuture": true,
+      "isPast": false,
+      "name": "Big launch",
+      "number": 4,
+      "progress": 0,
+      "scope": {
+        "canceled": 0,
+        "completed": 0,
+        "completedEstimate": 0,
+        "estimate": 0,
+        "issues": 0,
+        "started": 0,
+        "startedEstimate": 0,
+        "unstarted": 0
+      },
+      "startsAt": "\u003ctime+00:00\u003e",
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/team/ENG/cycle/4"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/archive_cycle",
+    "request": {
+      "id": "\u003cid1\u003e"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-1-later",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid3\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid4\u003e",
+      "identifier": "ENG-1",
+      "labels": [],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid5\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid3\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Later",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_issue",
+    "request": {
+      "id": "ENG-1"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "description": null,
+          "endsAt": "\u003ctime+00:00\u003e",
+          "history": [],
+          "id": "\u003cid6\u003e",
+          "isActive": false,
+          "isFuture": true,
+          "isPast": false,
+          "name": null,
+          "number": 3,
+          "progress": 0,
+          "scope": {
+            "canceled": 0,
+            "completed": 0,
+            "completedEstimate": 0,
+            "estimate": 0,
+            "issues": 0,
+            "started": 0,
+            "startedEstimate": 0,
+            "unstarted": 0
+          },
+          "startsAt": "\u003ctime+00:00\u003e",
+          "team": {
+            "id": "\u003cid2\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/team/ENG/cycle/3"
+        },
+        {
+          "archivedAt": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "description": null,
+          "endsAt": "\u003ctime+00:00\u003e",
+          "history": [],
+          "id": "\u003cid7\u003e",
+          "isActive": false,
+          "isFuture": true,
+          "isPast": false,
+          "name": null,
+          "number": 2,
+          "progress": 0,
+          "scope": {
+            "canceled": 0,
+            "completed": 0,
+            "completedEstimate": 0,
+            "estimate": 0,
+            "issues": 0,
+            "started": 0,
+            "startedEstimate": 0,
+            "unstarted": 0
+          },
+          "startsAt": "\u003ctime+00:00\u003e",
+          "team": {
+            "id": "\u003cid2\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/team/ENG/cycle/2"
+        },
+        {
+          "archivedAt": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "description": null,
+          "endsAt": "\u003ctime+00:00\u003e",
+          "history": [
+            {
+              "completed": 0,
+              "completedEstimate": 0,
+              "date": "2026-10-17",
+              "scope": 0,
+              "scopeEstimate": 0,
+              "started": 0
+            }
+          ],
+          "id": "\u003cid8\u003e",
+          "isActive": true,
+          "isFuture": false,
+          "isPast": false,
+          "name": null,
+          "number": 1,
+          "progress": 0,
+          "scope": {
+            "canceled": 0,
+            "completed": 0,
+            "completedEstimate": 0,
+            "estimate": 0,
+            "issues": 0,
+            "started": 0,
+            "startedEstimate": 0,
+            "unstarted": 0
+          },
+          "startsAt": "\u003ctime+00:00\u003e",
+          "team": {
+            "id": "\u003cid2\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/team/ENG/cycle/1"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_cycles",
+    "request": {
+      "team": "ENG"
+    },
+    "status": 200
+  }
+]

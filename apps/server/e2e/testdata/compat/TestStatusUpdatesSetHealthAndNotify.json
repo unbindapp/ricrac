@@ -1,0 +1,775 @@
+[
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "canceledAt": null,
+      "canceledIssueCount": 0,
+      "color": null,
+      "completedAt": null,
+      "completedIssueCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "documents": [],
+      "estimate": {
+        "completed": 0,
+        "total": 0
+      },
+      "health": null,
+      "icon": null,
+      "id": "\u003cid2\u003e",
+      "initiatives": [],
+      "issueCount": 0,
+      "issueCountByStateType": {},
+      "labels": [],
+      "latestUpdate": null,
+      "lead": null,
+      "leadTeam": null,
+      "links": [],
+      "members": [
+        {
+          "displayName": "bob",
+          "email": "bob@acme.test",
+          "id": "\u003cid3\u003e",
+          "name": "Bob Jones"
+        }
+      ],
+      "milestones": [],
+      "name": "Apollo",
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "progress": 0,
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "related": []
+      },
+      "slugId": "\u003cslug1\u003e",
+      "sortOrder": 1000,
+      "startDate": null,
+      "startDateResolution": null,
+      "startedAt": null,
+      "status": {
+        "color": "#bec2c8",
+        "id": "\u003cid4\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        },
+        {
+          "displayName": "bob",
+          "email": "bob@acme.test",
+          "id": "\u003cid3\u003e",
+          "name": "Bob Jones"
+        }
+      ],
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "teams": [
+        {
+          "id": "\u003cid5\u003e",
+          "key": "ENG",
+          "name": "Engineering"
+        }
+      ],
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/project/apollo-\u003cslug1\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_project",
+    "request": {
+      "addMembers": [
+        "bob"
+      ],
+      "name": "Apollo",
+      "setTeams": [
+        "ENG"
+      ]
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "body": "Slipping, cc @cat",
+      "commentCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "editedAt": null,
+      "health": "atRisk",
+      "id": "\u003cid6\u003e",
+      "initiative": null,
+      "project": {
+        "id": "\u003cid2\u003e",
+        "name": "Apollo",
+        "slugId": "\u003cslug1\u003e"
+      },
+      "reactions": [],
+      "type": "project",
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "user": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_status_update",
+    "request": {
+      "body": "Slipping, cc @cat",
+      "health": "atRisk",
+      "project": "Apollo"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "canceledAt": null,
+      "canceledIssueCount": 0,
+      "color": null,
+      "completedAt": null,
+      "completedIssueCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "documents": [],
+      "estimate": {
+        "completed": 0,
+        "total": 0
+      },
+      "health": "atRisk",
+      "icon": null,
+      "id": "\u003cid2\u003e",
+      "initiatives": [],
+      "issueCount": 0,
+      "issueCountByStateType": {},
+      "labels": [],
+      "latestUpdate": {
+        "body": "Slipping, cc @cat",
+        "commentCount": 0,
+        "createdAt": "\u003ctime+00:00\u003e",
+        "editedAt": null,
+        "health": "atRisk",
+        "id": "\u003cid6\u003e",
+        "initiative": null,
+        "project": {
+          "id": "\u003cid2\u003e",
+          "name": "Apollo",
+          "slugId": "\u003cslug1\u003e"
+        },
+        "reactions": [],
+        "type": "project",
+        "updatedAt": "\u003ctime+00:00\u003e",
+        "user": {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      },
+      "lead": null,
+      "leadTeam": null,
+      "links": [],
+      "members": [
+        {
+          "displayName": "bob",
+          "email": "bob@acme.test",
+          "id": "\u003cid3\u003e",
+          "name": "Bob Jones"
+        }
+      ],
+      "milestones": [],
+      "name": "Apollo",
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "progress": 0,
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "related": []
+      },
+      "slugId": "\u003cslug1\u003e",
+      "sortOrder": 1000,
+      "startDate": null,
+      "startDateResolution": null,
+      "startedAt": null,
+      "status": {
+        "color": "#bec2c8",
+        "id": "\u003cid4\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        },
+        {
+          "displayName": "bob",
+          "email": "bob@acme.test",
+          "id": "\u003cid3\u003e",
+          "name": "Bob Jones"
+        }
+      ],
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "teams": [
+        {
+          "id": "\u003cid5\u003e",
+          "key": "ENG",
+          "name": "Engineering"
+        }
+      ],
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/project/apollo-\u003cslug1\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_project",
+    "request": {
+      "id": "Apollo"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "body": "Still slipping",
+      "commentCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "editedAt": null,
+      "health": "atRisk",
+      "id": "\u003cid7\u003e",
+      "initiative": null,
+      "project": {
+        "id": "\u003cid2\u003e",
+        "name": "Apollo",
+        "slugId": "\u003cslug1\u003e"
+      },
+      "reactions": [],
+      "type": "project",
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "user": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_status_update",
+    "request": {
+      "body": "Still slipping",
+      "project": "Apollo"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "body": "Back on track",
+      "commentCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "editedAt": null,
+      "health": "onTrack",
+      "id": "\u003cid8\u003e",
+      "initiative": null,
+      "project": {
+        "id": "\u003cid2\u003e",
+        "name": "Apollo",
+        "slugId": "\u003cslug1\u003e"
+      },
+      "reactions": [],
+      "type": "project",
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "user": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_status_update",
+    "request": {
+      "body": "Back on track",
+      "health": "onTrack",
+      "project": "Apollo"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "body": "Back on track",
+          "commentCount": 0,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "editedAt": null,
+          "health": "onTrack",
+          "id": "\u003cid8\u003e",
+          "initiative": null,
+          "project": {
+            "id": "\u003cid2\u003e",
+            "name": "Apollo",
+            "slugId": "\u003cslug1\u003e"
+          },
+          "reactions": [],
+          "type": "project",
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "user": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          }
+        },
+        {
+          "body": "Still slipping",
+          "commentCount": 0,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "editedAt": null,
+          "health": "atRisk",
+          "id": "\u003cid7\u003e",
+          "initiative": null,
+          "project": {
+            "id": "\u003cid2\u003e",
+            "name": "Apollo",
+            "slugId": "\u003cslug1\u003e"
+          },
+          "reactions": [],
+          "type": "project",
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "user": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          }
+        },
+        {
+          "body": "Slipping, cc @cat",
+          "commentCount": 0,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "editedAt": null,
+          "health": "atRisk",
+          "id": "\u003cid6\u003e",
+          "initiative": null,
+          "project": {
+            "id": "\u003cid2\u003e",
+            "name": "Apollo",
+            "slugId": "\u003cslug1\u003e"
+          },
+          "reactions": [],
+          "type": "project",
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "user": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          }
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_status_updates",
+    "request": {
+      "project": "Apollo"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "Only the author can edit a status update"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_status_update",
+    "request": {
+      "body": "Mine now",
+      "id": "\u003cid8\u003e"
+    },
+    "status": 403
+  },
+  {
+    "auth": "session",
+    "body": {
+      "body": "Back on track",
+      "commentCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "editedAt": "\u003ctime+00:00\u003e",
+      "health": "offTrack",
+      "id": "\u003cid8\u003e",
+      "initiative": null,
+      "project": {
+        "id": "\u003cid2\u003e",
+        "name": "Apollo",
+        "slugId": "\u003cslug1\u003e"
+      },
+      "reactions": [],
+      "type": "project",
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "user": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_status_update",
+    "request": {
+      "health": "offTrack",
+      "id": "\u003cid8\u003e"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "canceledAt": null,
+      "canceledIssueCount": 0,
+      "color": null,
+      "completedAt": null,
+      "completedIssueCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "documents": [],
+      "estimate": {
+        "completed": 0,
+        "total": 0
+      },
+      "health": "offTrack",
+      "icon": null,
+      "id": "\u003cid2\u003e",
+      "initiatives": [],
+      "issueCount": 0,
+      "issueCountByStateType": {},
+      "labels": [],
+      "latestUpdate": {
+        "body": "Back on track",
+        "commentCount": 0,
+        "createdAt": "\u003ctime+00:00\u003e",
+        "editedAt": "\u003ctime+00:00\u003e",
+        "health": "offTrack",
+        "id": "\u003cid8\u003e",
+        "initiative": null,
+        "project": {
+          "id": "\u003cid2\u003e",
+          "name": "Apollo",
+          "slugId": "\u003cslug1\u003e"
+        },
+        "reactions": [],
+        "type": "project",
+        "updatedAt": "\u003ctime+00:00\u003e",
+        "user": {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      },
+      "lead": null,
+      "leadTeam": null,
+      "links": [],
+      "members": [
+        {
+          "displayName": "bob",
+          "email": "bob@acme.test",
+          "id": "\u003cid3\u003e",
+          "name": "Bob Jones"
+        }
+      ],
+      "milestones": [],
+      "name": "Apollo",
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "progress": 0,
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "related": []
+      },
+      "slugId": "\u003cslug1\u003e",
+      "sortOrder": 1000,
+      "startDate": null,
+      "startDateResolution": null,
+      "startedAt": null,
+      "status": {
+        "color": "#bec2c8",
+        "id": "\u003cid4\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        },
+        {
+          "displayName": "bob",
+          "email": "bob@acme.test",
+          "id": "\u003cid3\u003e",
+          "name": "Bob Jones"
+        }
+      ],
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "teams": [
+        {
+          "id": "\u003cid5\u003e",
+          "key": "ENG",
+          "name": "Engineering"
+        }
+      ],
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/project/apollo-\u003cslug1\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_project",
+    "request": {
+      "id": "Apollo"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "Only the author or a workspace admin can delete a status update"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/delete_status_update",
+    "request": {
+      "id": "\u003cid8\u003e"
+    },
+    "status": 403
+  },
+  {
+    "auth": "session",
+    "body": {
+      "deleted": true,
+      "id": "\u003cid8\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/delete_status_update",
+    "request": {
+      "id": "\u003cid8\u003e"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "canceledAt": null,
+          "canceledIssueCount": 0,
+          "color": null,
+          "completedAt": null,
+          "completedIssueCount": 0,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "health": "atRisk",
+          "icon": null,
+          "id": "\u003cid2\u003e",
+          "initiatives": [],
+          "issueCount": 0,
+          "labels": [],
+          "lead": null,
+          "leadTeam": null,
+          "name": "Apollo",
+          "priority": 0,
+          "priorityLabel": "No priority",
+          "progress": 0,
+          "slugId": "\u003cslug1\u003e",
+          "sortOrder": 1000,
+          "startDate": null,
+          "startDateResolution": null,
+          "startedAt": null,
+          "status": {
+            "color": "#bec2c8",
+            "id": "\u003cid4\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "summary": null,
+          "targetDate": null,
+          "targetDateResolution": null,
+          "teams": [
+            {
+              "id": "\u003cid5\u003e",
+              "key": "ENG",
+              "name": "Engineering"
+            }
+          ],
+          "trashed": false,
+          "trashedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/project/apollo-\u003cslug1\u003e"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_projects",
+    "request": {
+      "health": "atRisk"
+    },
+    "status": 200
+  }
+]

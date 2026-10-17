@@ -9,8 +9,6 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-
-	"ricrac/server"
 )
 
 // Comments, reactions, notifications, attachments, uploads and search.
@@ -141,7 +139,7 @@ func TestCommentsNotifySubscribersParticipantsAndMentioned(t *testing.T) {
 	withSnoozed := call(t, w.Ann, "get_notifications", M{"includeSnoozed": true})
 	eq(t, withSnoozed.At("nodes").Len(), 2)
 	w.exec("UPDATE notifications SET snoozed_until = now() - interval '1 minute' WHERE id = $1::uuid", newest)
-	if err := server.Automations(context.Background(), w.State); err != nil {
+	if err := w.B.Automations(context.Background()); err != nil {
 		t.Fatal(err)
 	}
 	inbox = call(t, w.Ann, "get_notifications", M{})
@@ -234,7 +232,7 @@ func TestFilesUploadOnceAndDownloadForMembers(t *testing.T) {
 	contains(t, prepared.At("curl").Str(), uploadURL)
 	eq(t, prepared.At("markdown").Str(), "![shot.png]("+assetURL+")")
 
-	router := server.Router(w.State)
+	router := w.Router
 	uploadPath := strings.TrimPrefix(uploadURL, "http://localhost:3000")
 	filePath := strings.TrimPrefix(assetURL, "http://localhost:3000")
 	key := apiKey(w, "read", "write")
@@ -275,7 +273,7 @@ func TestFilesUploadOnceAndDownloadForMembers(t *testing.T) {
 	check(t, strings.HasPrefix(headers.Get("Content-Disposition"), `inline; filename="shot.png"`), headers.Get("Content-Disposition"))
 
 	cookie := func(user uuid.UUID) string {
-		return w.State.Keys.SessionCookie + "=" + w.State.Keys.SessionToken(user)
+		return w.session(user)
 	}
 	status, _, body = getFile(filePath, "Cookie", cookie(w.Ann.User))
 	eq(t, status, http.StatusOK)

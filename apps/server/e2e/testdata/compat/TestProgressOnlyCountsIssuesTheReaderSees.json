@@ -1,0 +1,857 @@
+[
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "canceledAt": null,
+      "canceledIssueCount": 0,
+      "color": null,
+      "completedAt": null,
+      "completedIssueCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "documents": [],
+      "estimate": {
+        "completed": 0,
+        "total": 0
+      },
+      "health": null,
+      "icon": null,
+      "id": "\u003cid2\u003e",
+      "initiatives": [],
+      "issueCount": 0,
+      "issueCountByStateType": {},
+      "labels": [],
+      "latestUpdate": null,
+      "lead": null,
+      "leadTeam": null,
+      "links": [],
+      "members": [],
+      "milestones": [],
+      "name": "Launch",
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "progress": 0,
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "related": []
+      },
+      "slugId": "\u003cslug1\u003e",
+      "sortOrder": 1000,
+      "startDate": null,
+      "startDateResolution": null,
+      "startedAt": null,
+      "status": {
+        "color": "#bec2c8",
+        "id": "\u003cid3\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "teams": [
+        {
+          "id": "\u003cid4\u003e",
+          "key": "ENG",
+          "name": "Engineering"
+        },
+        {
+          "id": "\u003cid5\u003e",
+          "key": "SEC",
+          "name": "Secret"
+        }
+      ],
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/project/launch-\u003cslug1\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_project",
+    "request": {
+      "name": "Launch",
+      "setTeams": [
+        "ENG",
+        "SEC"
+      ]
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "canceledIssueCount": 0,
+      "completedIssueCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "description": null,
+      "id": "\u003cid6\u003e",
+      "issueCount": 0,
+      "name": "Beta",
+      "progress": 0,
+      "project": {
+        "id": "\u003cid2\u003e",
+        "name": "Launch",
+        "slugId": "\u003cslug1\u003e"
+      },
+      "sortOrder": 0,
+      "targetDate": null,
+      "updatedAt": "\u003ctime+00:00\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_milestone",
+    "request": {
+      "name": "Beta",
+      "project": "Launch"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-1-public",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": "\u003ctime+00:00\u003e",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid7\u003e",
+      "identifier": "ENG-1",
+      "labels": [],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": {
+        "id": "\u003cid2\u003e",
+        "name": "Launch",
+        "slugId": "\u003cslug1\u003e"
+      },
+      "projectMilestone": {
+        "id": "\u003cid6\u003e",
+        "name": "Beta",
+        "targetDate": null
+      },
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": "\u003ctime+00:00\u003e",
+      "startedTriageAt": null,
+      "state": {
+        "color": "#5e6ad2",
+        "id": "\u003cid8\u003e",
+        "name": "Done",
+        "type": "completed"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid4\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Public",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue",
+    "request": {
+      "milestone": "Beta",
+      "project": "Launch",
+      "state": "Done",
+      "team": "ENG",
+      "title": "Public"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "sec-1-hidden",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid9\u003e",
+      "identifier": "SEC-1",
+      "labels": [],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": {
+        "id": "\u003cid2\u003e",
+        "name": "Launch",
+        "slugId": "\u003cslug1\u003e"
+      },
+      "projectMilestone": {
+        "id": "\u003cid6\u003e",
+        "name": "Beta",
+        "targetDate": null
+      },
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid10\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid5\u003e",
+        "key": "SEC",
+        "name": "Secret"
+      },
+      "title": "Hidden",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/SEC-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue",
+    "request": {
+      "milestone": "Beta",
+      "project": "Launch",
+      "team": "SEC",
+      "title": "Hidden"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "color": null,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "health": null,
+      "icon": null,
+      "id": "\u003cid11\u003e",
+      "name": "Grow",
+      "owner": null,
+      "parent": null,
+      "progress": 0.5,
+      "projectCount": 1,
+      "slugId": "\u003cslug2\u003e",
+      "sortOrder": 1000,
+      "startedAt": null,
+      "status": "planned",
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/initiative/grow-\u003cslug2\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_initiative",
+    "request": {
+      "addProjects": [
+        "Launch"
+      ],
+      "name": "Grow"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "canceledAt": null,
+      "canceledIssueCount": 0,
+      "color": null,
+      "completedAt": null,
+      "completedIssueCount": 1,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "documents": [],
+      "estimate": {
+        "completed": 0,
+        "total": 0
+      },
+      "health": null,
+      "icon": null,
+      "id": "\u003cid2\u003e",
+      "initiatives": [
+        {
+          "id": "\u003cid11\u003e",
+          "name": "Grow",
+          "slugId": "\u003cslug2\u003e"
+        }
+      ],
+      "issueCount": 2,
+      "issueCountByStateType": {
+        "backlog": 1,
+        "completed": 1
+      },
+      "labels": [],
+      "latestUpdate": null,
+      "lead": null,
+      "leadTeam": null,
+      "links": [],
+      "members": [],
+      "milestones": [
+        {
+          "canceledIssueCount": 0,
+          "completedIssueCount": 1,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "description": null,
+          "id": "\u003cid6\u003e",
+          "issueCount": 2,
+          "name": "Beta",
+          "progress": 0.5,
+          "project": {
+            "id": "\u003cid2\u003e",
+            "name": "Launch",
+            "slugId": "\u003cslug1\u003e"
+          },
+          "sortOrder": 0,
+          "targetDate": null,
+          "updatedAt": "\u003ctime+00:00\u003e"
+        }
+      ],
+      "name": "Launch",
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "progress": 0.5,
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "related": []
+      },
+      "slugId": "\u003cslug1\u003e",
+      "sortOrder": 1000,
+      "startDate": null,
+      "startDateResolution": null,
+      "startedAt": null,
+      "status": {
+        "color": "#bec2c8",
+        "id": "\u003cid3\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "teams": [
+        {
+          "id": "\u003cid4\u003e",
+          "key": "ENG",
+          "name": "Engineering"
+        },
+        {
+          "id": "\u003cid5\u003e",
+          "key": "SEC",
+          "name": "Secret"
+        }
+      ],
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/project/launch-\u003cslug1\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_project",
+    "request": {
+      "id": "Launch"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "canceledAt": null,
+      "canceledIssueCount": 0,
+      "color": null,
+      "completedAt": null,
+      "completedIssueCount": 1,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "documents": [],
+      "estimate": {
+        "completed": 0,
+        "total": 0
+      },
+      "health": null,
+      "icon": null,
+      "id": "\u003cid2\u003e",
+      "initiatives": [
+        {
+          "id": "\u003cid11\u003e",
+          "name": "Grow",
+          "slugId": "\u003cslug2\u003e"
+        }
+      ],
+      "issueCount": 1,
+      "issueCountByStateType": {
+        "completed": 1
+      },
+      "labels": [],
+      "latestUpdate": null,
+      "lead": null,
+      "leadTeam": null,
+      "links": [],
+      "members": [],
+      "milestones": [
+        {
+          "canceledIssueCount": 0,
+          "completedIssueCount": 1,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "description": null,
+          "id": "\u003cid6\u003e",
+          "issueCount": 1,
+          "name": "Beta",
+          "progress": 1,
+          "project": {
+            "id": "\u003cid2\u003e",
+            "name": "Launch",
+            "slugId": "\u003cslug1\u003e"
+          },
+          "sortOrder": 0,
+          "targetDate": null,
+          "updatedAt": "\u003ctime+00:00\u003e"
+        }
+      ],
+      "name": "Launch",
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "progress": 1,
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "related": []
+      },
+      "slugId": "\u003cslug1\u003e",
+      "sortOrder": 1000,
+      "startDate": null,
+      "startDateResolution": null,
+      "startedAt": null,
+      "status": {
+        "color": "#bec2c8",
+        "id": "\u003cid3\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "teams": [
+        {
+          "id": "\u003cid4\u003e",
+          "key": "ENG",
+          "name": "Engineering"
+        },
+        {
+          "id": "\u003cid5\u003e",
+          "key": "SEC",
+          "name": "Secret"
+        }
+      ],
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/project/launch-\u003cslug1\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_project",
+    "request": {
+      "id": "Launch"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "canceledIssueCount": 0,
+      "completedIssueCount": 1,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "description": null,
+      "id": "\u003cid6\u003e",
+      "issueCount": 1,
+      "issues": [
+        {
+          "assignee": null,
+          "id": "\u003cid7\u003e",
+          "identifier": "ENG-1",
+          "priority": 0,
+          "state": {
+            "color": "#5e6ad2",
+            "id": "\u003cid8\u003e",
+            "name": "Done",
+            "type": "completed"
+          },
+          "title": "Public"
+        }
+      ],
+      "name": "Beta",
+      "progress": 1,
+      "project": {
+        "id": "\u003cid2\u003e",
+        "name": "Launch",
+        "slugId": "\u003cslug1\u003e"
+      },
+      "sortOrder": 0,
+      "targetDate": null,
+      "updatedAt": "\u003ctime+00:00\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_milestone",
+    "request": {
+      "id": "Beta",
+      "project": "Launch"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "color": null,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "documents": [],
+      "health": null,
+      "icon": null,
+      "id": "\u003cid11\u003e",
+      "latestUpdate": null,
+      "links": [],
+      "name": "Grow",
+      "owner": null,
+      "parent": null,
+      "progress": 1,
+      "projectCount": 1,
+      "projects": [
+        {
+          "health": null,
+          "id": "\u003cid2\u003e",
+          "lead": null,
+          "name": "Launch",
+          "progress": 1,
+          "slugId": "\u003cslug1\u003e",
+          "status": {
+            "color": "#bec2c8",
+            "id": "\u003cid3\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "targetDate": null
+        }
+      ],
+      "slugId": "\u003cslug2\u003e",
+      "sortOrder": 1000,
+      "startedAt": null,
+      "status": "planned",
+      "subInitiatives": [],
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/initiative/grow-\u003cslug2\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_initiative",
+    "request": {
+      "id": "Grow"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "color": null,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "documents": [],
+      "health": null,
+      "icon": null,
+      "id": "\u003cid11\u003e",
+      "latestUpdate": null,
+      "links": [],
+      "name": "Grow",
+      "owner": null,
+      "parent": null,
+      "progress": 0.5,
+      "projectCount": 1,
+      "projects": [
+        {
+          "health": null,
+          "id": "\u003cid2\u003e",
+          "lead": null,
+          "name": "Launch",
+          "progress": 0.5,
+          "slugId": "\u003cslug1\u003e",
+          "status": {
+            "color": "#bec2c8",
+            "id": "\u003cid3\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "targetDate": null
+        }
+      ],
+      "slugId": "\u003cslug2\u003e",
+      "sortOrder": 1000,
+      "startedAt": null,
+      "status": "planned",
+      "subInitiatives": [],
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/initiative/grow-\u003cslug2\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_initiative",
+    "request": {
+      "id": "Grow"
+    },
+    "status": 200
+  }
+]

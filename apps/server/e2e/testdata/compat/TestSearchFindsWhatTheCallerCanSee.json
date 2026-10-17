@@ -1,0 +1,847 @@
+[
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-1-login-page-crashes",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "The login button throws an error.",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid2\u003e",
+      "identifier": "ENG-1",
+      "labels": [],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid3\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid4\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Login page crashes",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue",
+    "request": {
+      "description": "The login button throws an error.",
+      "team": "ENG",
+      "title": "Login page crashes"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-2-signup-flow",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "Mentions login once.",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid5\u003e",
+      "identifier": "ENG-2",
+      "labels": [],
+      "number": 2,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -2000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid3\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid4\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Signup flow",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-2"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue",
+    "request": {
+      "description": "Mentions login once.",
+      "team": "ENG",
+      "title": "Signup flow"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "des-1-login-mockups",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid6\u003e",
+      "identifier": "DES-1",
+      "labels": [],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid7\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid8\u003e",
+        "key": "DES",
+        "name": "Design"
+      },
+      "title": "Login mockups",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/DES-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue",
+    "request": {
+      "team": "DES",
+      "title": "Login mockups"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "body": "There is a deadlock in the scheduler",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "document": null,
+      "editedAt": null,
+      "id": "\u003cid9\u003e",
+      "initiative": null,
+      "issue": {
+        "id": "\u003cid5\u003e",
+        "identifier": "ENG-2",
+        "state": {
+          "color": "#bec2c8",
+          "id": "\u003cid3\u003e",
+          "name": "Backlog",
+          "type": "backlog"
+        },
+        "title": "Signup flow"
+      },
+      "parentId": null,
+      "project": null,
+      "projectMilestone": null,
+      "quotedText": null,
+      "reactions": [],
+      "resolvedAt": null,
+      "resolvingUser": null,
+      "statusUpdate": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-2#comment-\u003cid9\u003e",
+      "user": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_comment",
+    "request": {
+      "body": "There is a deadlock in the scheduler",
+      "issueId": "ENG-2"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "id": "\u003cid2\u003e",
+          "identifier": "ENG-1",
+          "rank": 0.66871977,
+          "snippet": "**login** button throws an error",
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid3\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "team": {
+            "id": "\u003cid4\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Login page crashes",
+          "type": "issue",
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/ENG-1"
+        },
+        {
+          "id": "\u003cid10\u003e",
+          "rank": 0.6079271,
+          "snippet": "**Login** Revamp",
+          "status": {
+            "color": "#bec2c8",
+            "id": "\u003cid11\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "title": "Login Revamp!",
+          "type": "project",
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/project/login-revamp-\u003cslug1\u003e"
+        },
+        {
+          "id": "\u003cid6\u003e",
+          "identifier": "DES-1",
+          "rank": 0.6079271,
+          "snippet": "**Login** mockups",
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid7\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "team": {
+            "id": "\u003cid8\u003e",
+            "key": "DES",
+            "name": "Design"
+          },
+          "title": "Login mockups",
+          "type": "issue",
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/DES-1"
+        },
+        {
+          "id": "\u003cid12\u003e",
+          "project": null,
+          "rank": 0.24317084,
+          "snippet": "debug **login** crashes in production",
+          "title": "Runbook",
+          "type": "document",
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/document/runbook-\u003cslug2\u003e"
+        },
+        {
+          "id": "\u003cid5\u003e",
+          "identifier": "ENG-2",
+          "rank": 0.24317084,
+          "snippet": "Mentions **login** once",
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid3\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "team": {
+            "id": "\u003cid4\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Signup flow",
+          "type": "issue",
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/ENG-2"
+        }
+      ]
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/search",
+    "request": {
+      "query": "login"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "id": "\u003cid5\u003e",
+          "identifier": "ENG-2",
+          "rank": 0,
+          "snippet": "Mentions login once.",
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid3\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "team": {
+            "id": "\u003cid4\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Signup flow",
+          "type": "issue",
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/ENG-2"
+        }
+      ]
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/search",
+    "request": {
+      "query": "eng-2"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "id": "\u003cid2\u003e",
+          "identifier": "ENG-1",
+          "rank": 0,
+          "snippet": "The login button throws an error.",
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid3\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "team": {
+            "id": "\u003cid4\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Login page crashes",
+          "type": "issue",
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/ENG-1"
+        }
+      ]
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/search",
+    "request": {
+      "query": "crash",
+      "types": [
+        "issue"
+      ]
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "id": "\u003cid6\u003e",
+          "identifier": "DES-1",
+          "rank": 0.6079271,
+          "snippet": "**Login** mockups",
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid7\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "team": {
+            "id": "\u003cid8\u003e",
+            "key": "DES",
+            "name": "Design"
+          },
+          "title": "Login mockups",
+          "type": "issue",
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/DES-1"
+        }
+      ]
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/search",
+    "request": {
+      "query": "login",
+      "team": "DES"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "id": "\u003cid9\u003e",
+          "identifier": "ENG-2",
+          "issue": {
+            "id": "\u003cid5\u003e",
+            "identifier": "ENG-2",
+            "state": {
+              "color": "#bec2c8",
+              "id": "\u003cid3\u003e",
+              "name": "Backlog",
+              "type": "backlog"
+            },
+            "title": "Signup flow"
+          },
+          "rank": 0.06079271,
+          "snippet": "There is a **deadlock** in the scheduler",
+          "title": "Signup flow",
+          "type": "comment",
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/ENG-2#comment-\u003cid9\u003e",
+          "user": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          }
+        }
+      ]
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/search",
+    "request": {
+      "query": "deadlock",
+      "types": [
+        "comments"
+      ]
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": []
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/search",
+    "request": {
+      "query": "deadlock"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "id": "\u003cid6\u003e",
+          "identifier": "DES-1",
+          "rank": 0.6079271,
+          "snippet": "**Login** mockups",
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid7\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "team": {
+            "id": "\u003cid8\u003e",
+            "key": "DES",
+            "name": "Design"
+          },
+          "title": "Login mockups",
+          "type": "issue",
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/DES-1"
+        }
+      ]
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/search",
+    "request": {
+      "query": "login",
+      "types": [
+        "issue",
+        "project",
+        "document",
+        "comment"
+      ]
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": []
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/search",
+    "request": {
+      "query": "deadlock",
+      "types": [
+        "comment"
+      ]
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "color": null,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "health": null,
+      "icon": null,
+      "id": "\u003cid13\u003e",
+      "name": "Login everywhere",
+      "owner": null,
+      "parent": null,
+      "progress": 0,
+      "projectCount": 0,
+      "slugId": "\u003cslug3\u003e",
+      "sortOrder": 1000,
+      "startedAt": null,
+      "status": "planned",
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/initiative/login-everywhere-\u003cslug3\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_initiative",
+    "request": {
+      "name": "Login everywhere"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "id": "\u003cid13\u003e",
+          "rank": 0.6079271,
+          "snippet": "**Login** everywhere",
+          "status": "planned",
+          "title": "Login everywhere",
+          "type": "initiative",
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/initiative/login-everywhere-\u003cslug3\u003e"
+        }
+      ]
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/search",
+    "request": {
+      "query": "login",
+      "types": [
+        "initiative"
+      ]
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "\"widgets\" isn't a type to search; use issue, project, document, initiative, comment"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/search",
+    "request": {
+      "query": "x",
+      "types": [
+        "widgets"
+      ]
+    },
+    "status": 400
+  }
+]

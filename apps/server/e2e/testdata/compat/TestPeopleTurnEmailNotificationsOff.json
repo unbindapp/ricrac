@@ -1,0 +1,124 @@
+[
+  {
+    "auth": "session",
+    "body": {
+      "active": true,
+      "avatarUrl": null,
+      "displayName": "bob",
+      "email": "bob@acme.test",
+      "emailNotifications": true,
+      "id": "\u003cid1\u003e",
+      "isMe": true,
+      "joinedAt": "\u003ctime+00:00\u003e",
+      "name": "Bob Jones",
+      "openIssueCount": 0,
+      "role": "member",
+      "teams": [],
+      "timezone": null
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_user",
+    "request": {
+      "id": "me"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "active": true,
+      "avatarUrl": null,
+      "displayName": "bob",
+      "email": "bob@acme.test",
+      "emailNotifications": false,
+      "id": "\u003cid1\u003e",
+      "isMe": true,
+      "joinedAt": "\u003ctime+00:00\u003e",
+      "name": "Bob Jones",
+      "openIssueCount": 0,
+      "role": "member",
+      "teams": [],
+      "timezone": null
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/update_user",
+    "request": {
+      "emailNotifications": false,
+      "id": "me"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "active": true,
+      "avatarUrl": null,
+      "displayName": "bob",
+      "email": "bob@acme.test",
+      "emailNotifications": null,
+      "id": "\u003cid1\u003e",
+      "isMe": false,
+      "joinedAt": "\u003ctime+00:00\u003e",
+      "name": "Bob Jones",
+      "openIssueCount": 0,
+      "role": "member",
+      "teams": [],
+      "timezone": null
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_user",
+    "request": {
+      "id": "bob"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "You can only change your own name, display name, timezone and email notifications"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/update_user",
+    "request": {
+      "emailNotifications": true,
+      "id": "bob"
+    },
+    "status": 403
+  }
+]

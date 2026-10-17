@@ -1,0 +1,199 @@
+[
+  {
+    "body": {
+      "error": "X-Hub-Signature-256 doesn't match the webhook secret"
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/github/webhook",
+    "request": {
+      "installation": {
+        "id": 77
+      },
+      "zen": "Keep it logically awesome."
+    },
+    "status": 401
+  },
+  {
+    "body": {
+      "error": "X-Hub-Signature-256 doesn't match the webhook secret"
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/github/webhook",
+    "request": {
+      "installation": {
+        "id": 77
+      },
+      "zen": "Keep it logically awesome."
+    },
+    "status": 401
+  },
+  {
+    "body": {
+      "error": "X-Hub-Signature-256 doesn't match the webhook secret"
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/github/webhook",
+    "request": {
+      "installation": {
+        "id": 77
+      },
+      "zen": "Keep it logically awesome."
+    },
+    "status": 401
+  },
+  {
+    "auth": "session",
+    "body": {
+      "configured": true,
+      "githubLogin": null,
+      "installUrl": "\u003clocal-server\u003e/apps/ricrac-test/installations/new",
+      "installations": [
+        {
+          "account": "acme-org",
+          "accountType": "Organization",
+          "createdAt": "\u003ctime+00:00\u003e",
+          "id": 77,
+          "installer": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "lastEvent": null,
+          "lastEventAt": null,
+          "manageUrl": "\u003clocal-server\u003e/organizations/acme-org/settings/installations/77",
+          "suspendedAt": null
+        }
+      ],
+      "repoSyncs": []
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_github_integration",
+    "request": {},
+    "status": 200
+  },
+  {
+    "body": {
+      "ok": true
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/github/webhook",
+    "request": {
+      "hook": {
+        "active": true,
+        "config": {
+          "content_type": "json",
+          "insecure_ssl": "0",
+          "url": "https://zigzag.example.com/api/go/integrations/github/webhook"
+        },
+        "events": [
+          "pull_request",
+          "push"
+        ],
+        "id": 512345678,
+        "name": "web",
+        "type": "Repository"
+      },
+      "hook_id": 512345678,
+      "installation": {
+        "account": {
+          "login": "acme-org"
+        },
+        "id": 77
+      },
+      "repository": {
+        "default_branch": "master",
+        "full_name": "unbindapp/unbind",
+        "html_url": "https://github.com/unbindapp/unbind",
+        "id": 700000001,
+        "name": "unbind",
+        "node_id": "R_kgDOKbcdef",
+        "private": false
+      },
+      "sender": {
+        "id": 1234567,
+        "login": "bbedward",
+        "type": "User"
+      },
+      "zen": "Keep it logically awesome."
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "configured": true,
+      "githubLogin": null,
+      "installUrl": "\u003clocal-server\u003e/apps/ricrac-test/installations/new",
+      "installations": [
+        {
+          "account": "acme-org",
+          "accountType": "Organization",
+          "createdAt": "\u003ctime+00:00\u003e",
+          "id": 77,
+          "installer": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "lastEvent": "ping",
+          "lastEventAt": "\u003ctime+00:00\u003e",
+          "manageUrl": "\u003clocal-server\u003e/organizations/acme-org/settings/installations/77",
+          "suspendedAt": null
+        }
+      ],
+      "repoSyncs": []
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_github_integration",
+    "request": {},
+    "status": 200
+  }
+]

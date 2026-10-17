@@ -1,0 +1,1289 @@
+[
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-1-spec",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid2\u003e",
+      "identifier": "ENG-1",
+      "labels": [],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid3\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid4\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Spec",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue",
+    "request": {
+      "title": "Spec"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "color": null,
+      "content": "Hello @bob",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "icon": "📐",
+      "id": "\u003cid5\u003e",
+      "initiative": null,
+      "issue": null,
+      "project": null,
+      "release": null,
+      "slugId": "\u003cslug1\u003e",
+      "team": {
+        "id": "\u003cid4\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Design Notes!",
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "updatedBy": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "url": "http://localhost:3000/acme/document/design-notes-\u003cslug1\u003e",
+      "versionCount": 0
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_document",
+    "request": {
+      "content": "Hello @bob",
+      "icon": "📐",
+      "team": "ENG",
+      "title": "Design Notes!"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "A document belongs to one of project, initiative, team, issue, cycle or release; pass only one"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_document",
+    "request": {
+      "issue": "ENG-1",
+      "team": "ENG",
+      "title": "x"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "Say where the document belongs: one of project, initiative, team, issue, cycle or release"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_document",
+    "request": {
+      "title": "x"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "color": null,
+      "content": "",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "icon": null,
+      "id": "\u003cid6\u003e",
+      "initiative": null,
+      "issue": {
+        "id": "\u003cid2\u003e",
+        "identifier": "ENG-1",
+        "state": {
+          "color": "#bec2c8",
+          "id": "\u003cid3\u003e",
+          "name": "Backlog",
+          "type": "backlog"
+        },
+        "title": "Spec"
+      },
+      "project": null,
+      "release": null,
+      "slugId": "\u003cslug2\u003e",
+      "team": null,
+      "title": "Issue doc",
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "updatedBy": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "url": "http://localhost:3000/acme/document/issue-doc-\u003cslug2\u003e",
+      "versionCount": 0
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_document",
+    "request": {
+      "issue": "ENG-1",
+      "title": "Issue doc"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "color": null,
+      "content": "Hi @bob",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "icon": "📐",
+      "id": "\u003cid5\u003e",
+      "initiative": null,
+      "issue": null,
+      "project": null,
+      "release": null,
+      "slugId": "\u003cslug1\u003e",
+      "team": {
+        "id": "\u003cid4\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Design Notes!",
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "updatedBy": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "url": "http://localhost:3000/acme/document/design-notes-\u003cslug1\u003e",
+      "versionCount": 1
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_document",
+    "request": {
+      "id": "\u003cslug1\u003e",
+      "patch": [
+        {
+          "new_string": "Hi",
+          "old_string": "Hello",
+          "op": "replace"
+        }
+      ]
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "color": null,
+      "content": "Third",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "icon": "📐",
+      "id": "\u003cid5\u003e",
+      "initiative": null,
+      "issue": null,
+      "project": null,
+      "release": null,
+      "slugId": "\u003cslug1\u003e",
+      "team": {
+        "id": "\u003cid4\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Design Notes!",
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "updatedBy": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "url": "http://localhost:3000/acme/document/design-notes-\u003cslug1\u003e",
+      "versionCount": 1
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_document",
+    "request": {
+      "content": "Third",
+      "id": "\u003cid5\u003e"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "color": null,
+      "content": "Bob's",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "icon": "📐",
+      "id": "\u003cid5\u003e",
+      "initiative": null,
+      "issue": null,
+      "project": null,
+      "release": null,
+      "slugId": "\u003cslug1\u003e",
+      "team": {
+        "id": "\u003cid4\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Design Notes!",
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "updatedBy": {
+        "displayName": "bob",
+        "email": "bob@acme.test",
+        "id": "\u003cid7\u003e",
+        "name": "Bob Jones"
+      },
+      "url": "http://localhost:3000/acme/document/design-notes-\u003cslug1\u003e",
+      "versionCount": 2
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_document",
+    "request": {
+      "content": "Bob's",
+      "id": "http://localhost:3000/acme/document/design-notes-\u003cslug1\u003e"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": [
+      {
+        "author": {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        },
+        "createdAt": "\u003ctime+00:00\u003e",
+        "id": 2,
+        "title": "Design Notes!"
+      },
+      {
+        "author": {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        },
+        "createdAt": "\u003ctime+00:00\u003e",
+        "id": 1,
+        "title": "Design Notes!"
+      }
+    ],
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_document_versions",
+    "request": {
+      "id": "\u003cid5\u003e"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "author": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "content": "Third",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "document": {
+        "id": "\u003cid5\u003e",
+        "slugId": "\u003cslug1\u003e",
+        "title": "Design Notes!"
+      },
+      "id": 2,
+      "title": "Design Notes!"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_document_version",
+    "request": {
+      "id": "2"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "color": null,
+      "content": "Third",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "icon": "📐",
+      "id": "\u003cid5\u003e",
+      "initiative": null,
+      "issue": null,
+      "project": null,
+      "release": null,
+      "slugId": "\u003cslug1\u003e",
+      "team": {
+        "id": "\u003cid4\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Design Notes!",
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "updatedBy": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "url": "http://localhost:3000/acme/document/design-notes-\u003cslug1\u003e",
+      "versionCount": 3
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_document",
+    "request": {
+      "id": "\u003cslug1\u003e",
+      "restoreVersion": 2
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "color": null,
+      "content": "Hello @bob",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "icon": "📐",
+      "id": "\u003cid5\u003e",
+      "initiative": null,
+      "issue": null,
+      "project": null,
+      "release": null,
+      "slugId": "\u003cslug1\u003e",
+      "team": {
+        "id": "\u003cid4\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Design Notes!",
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "updatedBy": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "url": "http://localhost:3000/acme/document/design-notes-\u003cslug1\u003e",
+      "versionCount": 4
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_document",
+    "request": {
+      "id": "\u003cslug1\u003e",
+      "restoreVersion": 1
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "restoreVersion brings back a version's title and content; don't pass title, content or patch with it"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_document",
+    "request": {
+      "content": "x",
+      "id": "\u003cslug1\u003e",
+      "restoreVersion": 1
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "No version 999999 of this document; list_document_versions lists them"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_document",
+    "request": {
+      "id": "\u003cslug1\u003e",
+      "restoreVersion": 999999
+    },
+    "status": 404
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "restoreVersion only applies when updating"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_document",
+    "request": {
+      "restoreVersion": 1,
+      "team": "ENG",
+      "title": "New"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "color": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "cycle": null,
+          "icon": "📐",
+          "id": "\u003cid5\u003e",
+          "initiative": null,
+          "issue": null,
+          "project": null,
+          "release": null,
+          "slugId": "\u003cslug1\u003e",
+          "team": {
+            "id": "\u003cid4\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Design Notes!",
+          "trashed": false,
+          "trashedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "updatedBy": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "url": "http://localhost:3000/acme/document/design-notes-\u003cslug1\u003e"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_documents",
+    "request": {
+      "team": "ENG"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "color": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "cycle": null,
+          "icon": null,
+          "id": "\u003cid6\u003e",
+          "initiative": null,
+          "issue": {
+            "id": "\u003cid2\u003e",
+            "identifier": "ENG-1",
+            "state": {
+              "color": "#bec2c8",
+              "id": "\u003cid3\u003e",
+              "name": "Backlog",
+              "type": "backlog"
+            },
+            "title": "Spec"
+          },
+          "project": null,
+          "release": null,
+          "slugId": "\u003cslug2\u003e",
+          "team": null,
+          "title": "Issue doc",
+          "trashed": false,
+          "trashedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "updatedBy": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "url": "http://localhost:3000/acme/document/issue-doc-\u003cslug2\u003e"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_documents",
+    "request": {
+      "issue": "ENG-1"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "color": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "cycle": null,
+          "icon": "📐",
+          "id": "\u003cid5\u003e",
+          "initiative": null,
+          "issue": null,
+          "project": null,
+          "release": null,
+          "slugId": "\u003cslug1\u003e",
+          "team": {
+            "id": "\u003cid4\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Design Notes!",
+          "trashed": false,
+          "trashedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "updatedBy": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "url": "http://localhost:3000/acme/document/design-notes-\u003cslug1\u003e"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_documents",
+    "request": {
+      "query": "design"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "color": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "cycle": null,
+          "icon": "📐",
+          "id": "\u003cid5\u003e",
+          "initiative": null,
+          "issue": null,
+          "project": null,
+          "release": null,
+          "slugId": "\u003cslug1\u003e",
+          "team": {
+            "id": "\u003cid4\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Design Notes!",
+          "trashed": false,
+          "trashedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "updatedBy": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "url": "http://localhost:3000/acme/document/design-notes-\u003cslug1\u003e"
+        },
+        {
+          "color": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "cycle": null,
+          "icon": null,
+          "id": "\u003cid6\u003e",
+          "initiative": null,
+          "issue": {
+            "id": "\u003cid2\u003e",
+            "identifier": "ENG-1",
+            "state": {
+              "color": "#bec2c8",
+              "id": "\u003cid3\u003e",
+              "name": "Backlog",
+              "type": "backlog"
+            },
+            "title": "Spec"
+          },
+          "project": null,
+          "release": null,
+          "slugId": "\u003cslug2\u003e",
+          "team": null,
+          "title": "Issue doc",
+          "trashed": false,
+          "trashedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "updatedBy": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "url": "http://localhost:3000/acme/document/issue-doc-\u003cslug2\u003e"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_documents",
+    "request": {},
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_documents",
+    "request": {},
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "No document \"\u003cid5\u003e\""
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_document",
+    "request": {
+      "id": "\u003cid5\u003e"
+    },
+    "status": 404
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "No document version \"2\""
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_document_version",
+    "request": {
+      "id": "2"
+    },
+    "status": 404
+  },
+  {
+    "auth": "session",
+    "body": {
+      "color": null,
+      "content": "Hello @bob",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "icon": "📐",
+      "id": "\u003cid5\u003e",
+      "initiative": null,
+      "issue": null,
+      "project": null,
+      "release": null,
+      "slugId": "\u003cslug1\u003e",
+      "team": {
+        "id": "\u003cid4\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Design Notes!",
+      "trashed": true,
+      "trashedAt": "\u003ctime+00:00\u003e",
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "updatedBy": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "url": "http://localhost:3000/acme/document/design-notes-\u003cslug1\u003e",
+      "versionCount": 4
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/delete_document",
+    "request": {
+      "id": "\u003cid5\u003e"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "color": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "cycle": null,
+          "icon": null,
+          "id": "\u003cid6\u003e",
+          "initiative": null,
+          "issue": {
+            "id": "\u003cid2\u003e",
+            "identifier": "ENG-1",
+            "state": {
+              "color": "#bec2c8",
+              "id": "\u003cid3\u003e",
+              "name": "Backlog",
+              "type": "backlog"
+            },
+            "title": "Spec"
+          },
+          "project": null,
+          "release": null,
+          "slugId": "\u003cslug2\u003e",
+          "team": null,
+          "title": "Issue doc",
+          "trashed": false,
+          "trashedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "updatedBy": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "url": "http://localhost:3000/acme/document/issue-doc-\u003cslug2\u003e"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_documents",
+    "request": {},
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "No document \"\u003cid5\u003e\". Options: Issue doc."
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_document",
+    "request": {
+      "id": "\u003cid5\u003e"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "color": null,
+      "content": "Hello @bob",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "icon": "📐",
+      "id": "\u003cid5\u003e",
+      "initiative": null,
+      "issue": null,
+      "project": null,
+      "release": null,
+      "slugId": "\u003cslug1\u003e",
+      "team": {
+        "id": "\u003cid4\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Design Notes!",
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "updatedBy": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "url": "http://localhost:3000/acme/document/design-notes-\u003cslug1\u003e",
+      "versionCount": 4
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/restore_document",
+    "request": {
+      "id": "\u003cid5\u003e"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "color": null,
+      "content": "Hello @bob",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "icon": "📐",
+      "id": "\u003cid5\u003e",
+      "initiative": null,
+      "issue": {
+        "id": "\u003cid2\u003e",
+        "identifier": "ENG-1",
+        "state": {
+          "color": "#bec2c8",
+          "id": "\u003cid3\u003e",
+          "name": "Backlog",
+          "type": "backlog"
+        },
+        "title": "Spec"
+      },
+      "project": null,
+      "release": null,
+      "slugId": "\u003cslug1\u003e",
+      "team": null,
+      "title": "Design Notes!",
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "updatedBy": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "url": "http://localhost:3000/acme/document/design-notes-\u003cslug1\u003e",
+      "versionCount": 4
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_document",
+    "request": {
+      "id": "\u003cid5\u003e",
+      "issue": "ENG-1"
+    },
+    "status": 200
+  }
+]

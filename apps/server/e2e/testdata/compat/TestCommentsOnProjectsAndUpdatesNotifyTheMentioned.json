@@ -1,0 +1,258 @@
+[
+  {
+    "auth": "session",
+    "body": {
+      "body": "@bob what's left?",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "document": null,
+      "editedAt": null,
+      "id": "\u003cid1\u003e",
+      "initiative": null,
+      "issue": null,
+      "parentId": null,
+      "project": {
+        "id": "\u003cid2\u003e",
+        "name": "Launch",
+        "slugId": "\u003cslug1\u003e"
+      },
+      "projectMilestone": null,
+      "quotedText": null,
+      "reactions": [],
+      "resolvedAt": null,
+      "resolvingUser": null,
+      "statusUpdate": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": null,
+      "user": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid3\u003e",
+        "name": "Ann Smith"
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_comment",
+    "request": {
+      "body": "@bob what's left?",
+      "projectId": "Launch"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "body": "Nice progress",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "document": null,
+      "editedAt": null,
+      "id": "\u003cid4\u003e",
+      "initiative": null,
+      "issue": null,
+      "parentId": null,
+      "project": null,
+      "projectMilestone": null,
+      "quotedText": null,
+      "reactions": [],
+      "resolvedAt": null,
+      "resolvingUser": null,
+      "statusUpdate": {
+        "id": "\u003cid5\u003e"
+      },
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": null,
+      "user": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid3\u003e",
+        "name": "Ann Smith"
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_comment",
+    "request": {
+      "body": "Nice progress",
+      "statusUpdateId": "\u003cid5\u003e"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "actor": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid3\u003e",
+            "name": "Ann Smith"
+          },
+          "archivedAt": null,
+          "comment": {
+            "body": "Nice progress",
+            "id": "\u003cid4\u003e"
+          },
+          "createdAt": "\u003ctime+00:00\u003e",
+          "document": null,
+          "id": "\u003cid6\u003e",
+          "initiative": null,
+          "issue": null,
+          "project": {
+            "id": "\u003cid2\u003e",
+            "name": "Launch",
+            "slugId": "\u003cslug1\u003e"
+          },
+          "readAt": null,
+          "snoozedUntil": null,
+          "statusUpdate": {
+            "id": "\u003cid5\u003e"
+          },
+          "summary": "Ann Smith commented on the update on Launch",
+          "type": "projectUpdateNewComment"
+        },
+        {
+          "actor": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid3\u003e",
+            "name": "Ann Smith"
+          },
+          "archivedAt": null,
+          "comment": {
+            "body": "@bob what's left?",
+            "id": "\u003cid1\u003e"
+          },
+          "createdAt": "\u003ctime+00:00\u003e",
+          "document": null,
+          "id": "\u003cid7\u003e",
+          "initiative": null,
+          "issue": null,
+          "project": {
+            "id": "\u003cid2\u003e",
+            "name": "Launch",
+            "slugId": "\u003cslug1\u003e"
+          },
+          "readAt": null,
+          "snoozedUntil": null,
+          "statusUpdate": null,
+          "summary": "Ann Smith mentioned you in a comment on Launch",
+          "type": "projectCommentMention"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      },
+      "unreadCount": 2
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_notifications",
+    "request": {},
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "body": "@bob what's left?",
+          "createdAt": "\u003ctime+00:00\u003e",
+          "editedAt": null,
+          "id": "\u003cid1\u003e",
+          "quotedText": null,
+          "reactions": [],
+          "replies": [],
+          "resolvedAt": null,
+          "resolvingUser": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "user": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid3\u003e",
+            "name": "Ann Smith"
+          }
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_comments",
+    "request": {
+      "projectId": "Launch"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "comment": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "emoji": "rocket",
+      "id": "\u003cid8\u003e",
+      "issue": null,
+      "statusUpdate": {
+        "id": "\u003cid5\u003e"
+      },
+      "user": {
+        "displayName": "bob",
+        "email": "bob@acme.test",
+        "id": "\u003cid9\u003e",
+        "name": "Bob Jones"
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/add_reaction",
+    "request": {
+      "emoji": "rocket",
+      "statusUpdateId": "\u003cid5\u003e"
+    },
+    "status": 200
+  }
+]

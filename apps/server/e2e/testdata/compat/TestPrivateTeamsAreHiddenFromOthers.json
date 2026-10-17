@@ -1,0 +1,1073 @@
+[
+  {
+    "auth": "session",
+    "body": {
+      "allowedEstimates": [],
+      "archivedAt": null,
+      "autoArchiveMonths": 6,
+      "autoCloseChildIssues": false,
+      "autoCloseMonths": null,
+      "autoCloseParentIssues": false,
+      "autoCloseState": {
+        "color": "#95a2b3",
+        "id": "\u003cid1\u003e",
+        "name": "Canceled",
+        "type": "canceled"
+      },
+      "color": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "currentCycle": null,
+      "cycleAutoAddCompleted": true,
+      "cycleAutoAddStarted": true,
+      "cycleCooldownWeeks": 0,
+      "cycleDurationWeeks": 2,
+      "cycleRollover": true,
+      "cycleStartDay": 1,
+      "cyclesEnabled": false,
+      "defaultEstimate": null,
+      "defaultIssueState": {
+        "color": "#bec2c8",
+        "id": "\u003cid2\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "description": null,
+      "estimateAllowZero": false,
+      "estimateExtended": false,
+      "estimateType": "notUsed",
+      "githubPrMergedState": null,
+      "githubPrOpenedState": null,
+      "icon": null,
+      "id": "\u003cid3\u003e",
+      "isMember": true,
+      "issueCount": 0,
+      "key": "SEC",
+      "labelCount": 0,
+      "memberCount": 1,
+      "members": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid4\u003e",
+          "name": "Ann Smith",
+          "owner": true
+        }
+      ],
+      "name": "Secret",
+      "parent": null,
+      "private": true,
+      "requirePriorityToLeaveTriage": false,
+      "states": [
+        {
+          "color": "#bec2c8",
+          "description": null,
+          "id": "\u003cid2\u003e",
+          "name": "Backlog",
+          "position": 0,
+          "type": "backlog"
+        },
+        {
+          "color": "#e2e2e2",
+          "description": null,
+          "id": "\u003cid5\u003e",
+          "name": "Todo",
+          "position": 1,
+          "type": "unstarted"
+        },
+        {
+          "color": "#f2c94c",
+          "description": null,
+          "id": "\u003cid6\u003e",
+          "name": "In Progress",
+          "position": 2,
+          "type": "started"
+        },
+        {
+          "color": "#4cb782",
+          "description": null,
+          "id": "\u003cid7\u003e",
+          "name": "In Review",
+          "position": 3,
+          "type": "started"
+        },
+        {
+          "color": "#5e6ad2",
+          "description": null,
+          "id": "\u003cid8\u003e",
+          "name": "Done",
+          "position": 4,
+          "type": "completed"
+        },
+        {
+          "color": "#95a2b3",
+          "description": null,
+          "id": "\u003cid1\u003e",
+          "name": "Canceled",
+          "position": 5,
+          "type": "canceled"
+        },
+        {
+          "color": "#95a2b3",
+          "description": null,
+          "id": "\u003cid9\u003e",
+          "name": "Duplicate",
+          "position": 6,
+          "type": "canceled"
+        }
+      ],
+      "subTeams": [],
+      "timezone": "UTC",
+      "triage": {
+        "action": "none",
+        "enabled": false,
+        "responsible": []
+      },
+      "triageAction": "none",
+      "triageEnabled": false,
+      "triageResponsible": [],
+      "triageRotationStart": null,
+      "triageRotationWeeks": null,
+      "upcomingCycleCount": 2,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/team/SEC"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_team",
+    "request": {
+      "key": "SEC",
+      "name": "Secret",
+      "private": true
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "sec-1-hidden",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid4\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid10\u003e",
+      "identifier": "SEC-1",
+      "labels": [],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid2\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid4\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid3\u003e",
+        "key": "SEC",
+        "name": "Secret"
+      },
+      "title": "Hidden",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/SEC-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue",
+    "request": {
+      "team": "SEC",
+      "title": "Hidden"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "color": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "cyclesEnabled": false,
+          "description": null,
+          "icon": null,
+          "id": "\u003cid11\u003e",
+          "isMember": false,
+          "issueCount": 0,
+          "key": "ENG",
+          "memberCount": 1,
+          "name": "Engineering",
+          "parent": null,
+          "private": false,
+          "timezone": "UTC",
+          "triageEnabled": false,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/team/ENG"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_teams",
+    "request": {},
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "No team matches \"SEC\". Options: ENG (Engineering)."
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_team",
+    "request": {
+      "id": "SEC"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "No issue \"SEC-1\"; use an identifier like ENG-123 or an id"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_issue",
+    "request": {
+      "id": "SEC-1"
+    },
+    "status": 404
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "No team matches \"SEC\". Options: ENG (Engineering)."
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/join_team",
+    "request": {
+      "id": "SEC"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_issues",
+    "request": {},
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "createdAt": "\u003ctime+00:00\u003e",
+      "id": "\u003cid12\u003e",
+      "issueCount": 0,
+      "logoUrl": null,
+      "memberCount": 3,
+      "name": "Acme",
+      "role": "member",
+      "teams": [
+        {
+          "id": "\u003cid11\u003e",
+          "key": "ENG",
+          "name": "Engineering",
+          "private": false
+        }
+      ],
+      "url": "http://localhost:3000/acme",
+      "urlKey": "acme"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_workspace",
+    "request": {},
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "allowedEstimates": [],
+      "archivedAt": null,
+      "autoArchiveMonths": 6,
+      "autoCloseChildIssues": false,
+      "autoCloseMonths": null,
+      "autoCloseParentIssues": false,
+      "autoCloseState": {
+        "color": "#95a2b3",
+        "id": "\u003cid1\u003e",
+        "name": "Canceled",
+        "type": "canceled"
+      },
+      "color": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "currentCycle": null,
+      "cycleAutoAddCompleted": true,
+      "cycleAutoAddStarted": true,
+      "cycleCooldownWeeks": 0,
+      "cycleDurationWeeks": 2,
+      "cycleRollover": true,
+      "cycleStartDay": 1,
+      "cyclesEnabled": false,
+      "defaultEstimate": null,
+      "defaultIssueState": {
+        "color": "#bec2c8",
+        "id": "\u003cid2\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "description": null,
+      "estimateAllowZero": false,
+      "estimateExtended": false,
+      "estimateType": "notUsed",
+      "githubPrMergedState": null,
+      "githubPrOpenedState": null,
+      "icon": null,
+      "id": "\u003cid3\u003e",
+      "isMember": true,
+      "issueCount": 1,
+      "key": "SEC",
+      "labelCount": 0,
+      "memberCount": 2,
+      "members": [
+        {
+          "displayName": "ada",
+          "email": "ada@acme.test",
+          "id": "\u003cid13\u003e",
+          "name": "Ada Admin",
+          "owner": false
+        },
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid4\u003e",
+          "name": "Ann Smith",
+          "owner": true
+        }
+      ],
+      "name": "Secret",
+      "parent": null,
+      "private": true,
+      "requirePriorityToLeaveTriage": false,
+      "states": [
+        {
+          "color": "#bec2c8",
+          "description": null,
+          "id": "\u003cid2\u003e",
+          "name": "Backlog",
+          "position": 0,
+          "type": "backlog"
+        },
+        {
+          "color": "#e2e2e2",
+          "description": null,
+          "id": "\u003cid5\u003e",
+          "name": "Todo",
+          "position": 1,
+          "type": "unstarted"
+        },
+        {
+          "color": "#f2c94c",
+          "description": null,
+          "id": "\u003cid6\u003e",
+          "name": "In Progress",
+          "position": 2,
+          "type": "started"
+        },
+        {
+          "color": "#4cb782",
+          "description": null,
+          "id": "\u003cid7\u003e",
+          "name": "In Review",
+          "position": 3,
+          "type": "started"
+        },
+        {
+          "color": "#5e6ad2",
+          "description": null,
+          "id": "\u003cid8\u003e",
+          "name": "Done",
+          "position": 4,
+          "type": "completed"
+        },
+        {
+          "color": "#95a2b3",
+          "description": null,
+          "id": "\u003cid1\u003e",
+          "name": "Canceled",
+          "position": 5,
+          "type": "canceled"
+        },
+        {
+          "color": "#95a2b3",
+          "description": null,
+          "id": "\u003cid9\u003e",
+          "name": "Duplicate",
+          "position": 6,
+          "type": "canceled"
+        }
+      ],
+      "subTeams": [],
+      "timezone": "UTC",
+      "triage": {
+        "action": "none",
+        "enabled": false,
+        "responsible": []
+      },
+      "triageAction": "none",
+      "triageEnabled": false,
+      "triageResponsible": [],
+      "triageRotationStart": null,
+      "triageRotationWeeks": null,
+      "upcomingCycleCount": 2,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/team/SEC"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/join_team",
+    "request": {
+      "id": "SEC"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "allowedEstimates": [],
+      "archivedAt": null,
+      "autoArchiveMonths": 6,
+      "autoCloseChildIssues": false,
+      "autoCloseMonths": null,
+      "autoCloseParentIssues": false,
+      "autoCloseState": {
+        "color": "#95a2b3",
+        "id": "\u003cid1\u003e",
+        "name": "Canceled",
+        "type": "canceled"
+      },
+      "color": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "currentCycle": null,
+      "cycleAutoAddCompleted": true,
+      "cycleAutoAddStarted": true,
+      "cycleCooldownWeeks": 0,
+      "cycleDurationWeeks": 2,
+      "cycleRollover": true,
+      "cycleStartDay": 1,
+      "cyclesEnabled": false,
+      "defaultEstimate": null,
+      "defaultIssueState": {
+        "color": "#bec2c8",
+        "id": "\u003cid2\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "description": null,
+      "estimateAllowZero": false,
+      "estimateExtended": false,
+      "estimateType": "notUsed",
+      "githubPrMergedState": null,
+      "githubPrOpenedState": null,
+      "icon": null,
+      "id": "\u003cid3\u003e",
+      "isMember": true,
+      "issueCount": 1,
+      "key": "SEC",
+      "labelCount": 0,
+      "memberCount": 3,
+      "members": [
+        {
+          "displayName": "ada",
+          "email": "ada@acme.test",
+          "id": "\u003cid13\u003e",
+          "name": "Ada Admin",
+          "owner": false
+        },
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid4\u003e",
+          "name": "Ann Smith",
+          "owner": true
+        },
+        {
+          "displayName": "bob",
+          "email": "bob@acme.test",
+          "id": "\u003cid14\u003e",
+          "name": "Bob Jones",
+          "owner": false
+        }
+      ],
+      "name": "Secret",
+      "parent": null,
+      "private": true,
+      "requirePriorityToLeaveTriage": false,
+      "states": [
+        {
+          "color": "#bec2c8",
+          "description": null,
+          "id": "\u003cid2\u003e",
+          "name": "Backlog",
+          "position": 0,
+          "type": "backlog"
+        },
+        {
+          "color": "#e2e2e2",
+          "description": null,
+          "id": "\u003cid5\u003e",
+          "name": "Todo",
+          "position": 1,
+          "type": "unstarted"
+        },
+        {
+          "color": "#f2c94c",
+          "description": null,
+          "id": "\u003cid6\u003e",
+          "name": "In Progress",
+          "position": 2,
+          "type": "started"
+        },
+        {
+          "color": "#4cb782",
+          "description": null,
+          "id": "\u003cid7\u003e",
+          "name": "In Review",
+          "position": 3,
+          "type": "started"
+        },
+        {
+          "color": "#5e6ad2",
+          "description": null,
+          "id": "\u003cid8\u003e",
+          "name": "Done",
+          "position": 4,
+          "type": "completed"
+        },
+        {
+          "color": "#95a2b3",
+          "description": null,
+          "id": "\u003cid1\u003e",
+          "name": "Canceled",
+          "position": 5,
+          "type": "canceled"
+        },
+        {
+          "color": "#95a2b3",
+          "description": null,
+          "id": "\u003cid9\u003e",
+          "name": "Duplicate",
+          "position": 6,
+          "type": "canceled"
+        }
+      ],
+      "subTeams": [],
+      "timezone": "UTC",
+      "triage": {
+        "action": "none",
+        "enabled": false,
+        "responsible": []
+      },
+      "triageAction": "none",
+      "triageEnabled": false,
+      "triageResponsible": [],
+      "triageRotationStart": null,
+      "triageRotationWeeks": null,
+      "upcomingCycleCount": 2,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/team/SEC"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_team",
+    "request": {
+      "addMembers": [
+        "bob"
+      ],
+      "id": "SEC"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "sec-1-hidden",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid4\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid10\u003e",
+      "identifier": "SEC-1",
+      "labels": [],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid2\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid4\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid3\u003e",
+        "key": "SEC",
+        "name": "Secret"
+      },
+      "title": "Hidden",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/SEC-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_issue",
+    "request": {
+      "id": "SEC-1"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "allowedEstimates": [],
+      "archivedAt": null,
+      "autoArchiveMonths": 6,
+      "autoCloseChildIssues": false,
+      "autoCloseMonths": null,
+      "autoCloseParentIssues": false,
+      "autoCloseState": {
+        "color": "#95a2b3",
+        "id": "\u003cid1\u003e",
+        "name": "Canceled",
+        "type": "canceled"
+      },
+      "color": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "currentCycle": null,
+      "cycleAutoAddCompleted": true,
+      "cycleAutoAddStarted": true,
+      "cycleCooldownWeeks": 0,
+      "cycleDurationWeeks": 2,
+      "cycleRollover": true,
+      "cycleStartDay": 1,
+      "cyclesEnabled": false,
+      "defaultEstimate": null,
+      "defaultIssueState": {
+        "color": "#bec2c8",
+        "id": "\u003cid2\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "description": null,
+      "estimateAllowZero": false,
+      "estimateExtended": false,
+      "estimateType": "notUsed",
+      "githubPrMergedState": null,
+      "githubPrOpenedState": null,
+      "icon": null,
+      "id": "\u003cid3\u003e",
+      "isMember": false,
+      "issueCount": 1,
+      "key": "SEC",
+      "labelCount": 0,
+      "memberCount": 1,
+      "members": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid4\u003e",
+          "name": "Ann Smith",
+          "owner": true
+        }
+      ],
+      "name": "Secret",
+      "parent": null,
+      "private": true,
+      "requirePriorityToLeaveTriage": false,
+      "states": [
+        {
+          "color": "#bec2c8",
+          "description": null,
+          "id": "\u003cid2\u003e",
+          "name": "Backlog",
+          "position": 0,
+          "type": "backlog"
+        },
+        {
+          "color": "#e2e2e2",
+          "description": null,
+          "id": "\u003cid5\u003e",
+          "name": "Todo",
+          "position": 1,
+          "type": "unstarted"
+        },
+        {
+          "color": "#f2c94c",
+          "description": null,
+          "id": "\u003cid6\u003e",
+          "name": "In Progress",
+          "position": 2,
+          "type": "started"
+        },
+        {
+          "color": "#4cb782",
+          "description": null,
+          "id": "\u003cid7\u003e",
+          "name": "In Review",
+          "position": 3,
+          "type": "started"
+        },
+        {
+          "color": "#5e6ad2",
+          "description": null,
+          "id": "\u003cid8\u003e",
+          "name": "Done",
+          "position": 4,
+          "type": "completed"
+        },
+        {
+          "color": "#95a2b3",
+          "description": null,
+          "id": "\u003cid1\u003e",
+          "name": "Canceled",
+          "position": 5,
+          "type": "canceled"
+        },
+        {
+          "color": "#95a2b3",
+          "description": null,
+          "id": "\u003cid9\u003e",
+          "name": "Duplicate",
+          "position": 6,
+          "type": "canceled"
+        }
+      ],
+      "subTeams": [],
+      "timezone": "UTC",
+      "triage": {
+        "action": "none",
+        "enabled": false,
+        "responsible": []
+      },
+      "triageAction": "none",
+      "triageEnabled": false,
+      "triageResponsible": [],
+      "triageRotationStart": null,
+      "triageRotationWeeks": null,
+      "upcomingCycleCount": 2,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/team/SEC"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_team",
+    "request": {
+      "id": "SEC",
+      "removeMembers": [
+        "ada",
+        "me"
+      ]
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "You're the last member of this private team; add someone else or delete the team"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/leave_team",
+    "request": {
+      "id": "SEC"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "A private team needs at least one member"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_team",
+    "request": {
+      "id": "SEC",
+      "removeMembers": [
+        "ann"
+      ]
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "left": {
+        "id": "\u003cid11\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/leave_team",
+    "request": {
+      "id": "ENG"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "You aren't a member of this team"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/leave_team",
+    "request": {
+      "id": "ENG"
+    },
+    "status": 400
+  }
+]

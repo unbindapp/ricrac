@@ -1,0 +1,3547 @@
+[
+  {
+    "auth": "bearer",
+    "body": {
+      "id": 1,
+      "jsonrpc": "2.0",
+      "result": {
+        "_meta": {
+          "io.modelcontextprotocol/serverInfo": {
+            "name": "ricrac",
+            "version": "0.1.0"
+          }
+        },
+        "cacheScope": "private",
+        "capabilities": {
+          "tools": {}
+        },
+        "instructions": "Ricrac is an issue tracker for agents: a workspace has teams; teams have issues (identifiers like ENG-123), workflow statuses (triage, backlog, unstarted, started, completed, canceled), labels, cycles and templates; projects (with milestones, status updates and documents) span teams and roll up into initiatives. There are also comments, attachments, custom views, favorites, an inbox of notifications, customers, releases and webhooks.\n\nReferencing things: wherever a tool takes a person, team, status, label, project, cycle or milestone you may pass a name, key or identifier instead of an id. People also take an email or \"me\". Issues take their identifier (ENG-123), id or link. Errors list the valid options when a name doesn't match.\n\nWriting: descriptions, comments, documents and updates are Markdown; write literal newlines, not escape sequences. Mention people with @displayName or @email: they are notified and subscribed. To change part of a long description or document, pass `patch` edits instead of resending it all.\n\nWorkspaces: a connection may reach several workspaces; list_workspaces lists them. When it reaches more than one, every tool takes a `workspace` argument (the URL key, like \"acme\") naming the one to act in. Identifiers like ENG-123 and names are only unique within a workspace; Ricrac links already name theirs.\n\nSaving: save_* tools create when you omit `id` and update when you pass it; omitted fields stay as they are and null clears a field. List tools page with `limit` and `cursor` (pass pageInfo.endCursor). Start with get_workspace or list_teams to learn the teams and their keys, and list_issue_statuses for a team's workflow.\n\nMore operations: the tools listed cover everyday work. Everything else (webhooks, customers, releases, favorites, templates and views management, team and member administration, archiving, sharing, ...) is found with find_operations and run with call_operation.",
+        "resultType": "complete",
+        "supportedVersions": [
+          "2024-11-05",
+          "2025-03-26",
+          "2025-06-18",
+          "2025-11-25",
+          "2026-07-28"
+        ],
+        "ttlMs": 0
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/mcp",
+    "request": {
+      "id": 1,
+      "jsonrpc": "2.0",
+      "method": "server/discover"
+    },
+    "status": 200
+  },
+  {
+    "auth": "bearer",
+    "body": {
+      "id": 2,
+      "jsonrpc": "2.0",
+      "result": {
+        "capabilities": {
+          "tools": {}
+        },
+        "instructions": "Ricrac is an issue tracker for agents: a workspace has teams; teams have issues (identifiers like ENG-123), workflow statuses (triage, backlog, unstarted, started, completed, canceled), labels, cycles and templates; projects (with milestones, status updates and documents) span teams and roll up into initiatives. There are also comments, attachments, custom views, favorites, an inbox of notifications, customers, releases and webhooks.\n\nReferencing things: wherever a tool takes a person, team, status, label, project, cycle or milestone you may pass a name, key or identifier instead of an id. People also take an email or \"me\". Issues take their identifier (ENG-123), id or link. Errors list the valid options when a name doesn't match.\n\nWriting: descriptions, comments, documents and updates are Markdown; write literal newlines, not escape sequences. Mention people with @displayName or @email: they are notified and subscribed. To change part of a long description or document, pass `patch` edits instead of resending it all.\n\nWorkspaces: a connection may reach several workspaces; list_workspaces lists them. When it reaches more than one, every tool takes a `workspace` argument (the URL key, like \"acme\") naming the one to act in. Identifiers like ENG-123 and names are only unique within a workspace; Ricrac links already name theirs.\n\nSaving: save_* tools create when you omit `id` and update when you pass it; omitted fields stay as they are and null clears a field. List tools page with `limit` and `cursor` (pass pageInfo.endCursor). Start with get_workspace or list_teams to learn the teams and their keys, and list_issue_statuses for a team's workflow.\n\nMore operations: the tools listed cover everyday work. Everything else (webhooks, customers, releases, favorites, templates and views management, team and member administration, archiving, sharing, ...) is found with find_operations and run with call_operation.",
+        "protocolVersion": "2026-07-28",
+        "resultType": "complete",
+        "serverInfo": {
+          "name": "ricrac",
+          "version": "0.1.0"
+        }
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/mcp",
+    "request": {
+      "id": 2,
+      "jsonrpc": "2.0",
+      "method": "initialize",
+      "params": {
+        "protocolVersion": "2026-07-28"
+      }
+    },
+    "status": 200
+  },
+  {
+    "auth": "bearer",
+    "body": {
+      "id": 3,
+      "jsonrpc": "2.0",
+      "result": {
+        "cacheScope": "private",
+        "resultType": "complete",
+        "tools": [
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "List the workspaces this token reaches: name, URL key, link and your role. When there are several, pass the URL key as `workspace` to the other operations.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {},
+              "type": "object"
+            },
+            "name": "list_workspaces"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "The workspace: its name, URL key and link, your role, the teams you can see (key, name, private) and how many members and issues it has.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {},
+              "type": "object"
+            },
+            "name": "get_workspace"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "List the workspace's members with their role, teams and whether they are you. Narrow with query (name, display name or email) or team; removed members are left out unless includeInactive is set.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "cursor": {
+                  "description": "The endCursor of the previous page, to continue after it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "includeInactive": {
+                  "description": "Also list removed members.",
+                  "type": "boolean"
+                },
+                "limit": {
+                  "description": "How many to return, 50 by default, at most 250.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "query": {
+                  "description": "Part of a name, display name or email.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "team": {
+                  "description": "Only members of this team (key, name or id).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "list_users"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "Read a member by id, name, display name, email or \"me\": role, teams, timezone and how many open issues are assigned to them. Removed members can be read by id.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "name": "get_user"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "List the teams you can see (private teams only if you're in them) with key, name, whether you're a member, member and open issue counts and whether cycles and triage are on. Narrow with query (name or key) or mine.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "cursor": {
+                  "description": "The endCursor of the previous page, to continue after it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "includeArchived": {
+                  "description": "Also list archived teams.",
+                  "type": "boolean"
+                },
+                "limit": {
+                  "description": "How many to return, 50 by default, at most 250.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "mine": {
+                  "description": "Only teams you are a member of.",
+                  "type": "boolean"
+                },
+                "query": {
+                  "description": "Part of a team's name or key.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "list_teams"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "Read a team by key, name or id: all its settings (estimates, cycles, triage, auto-archive and auto-close), its statuses in order, members (with owners), sub-teams, current cycle, default status and who is on triage.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "name": "get_team"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "List a team's workflow statuses in board order (triage, backlog, unstarted, started, completed, canceled, then position): name, type, color, how many issues are in each and which is the default for new issues.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "cursor": {
+                  "description": "The endCursor of the previous page, to continue after it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "includeArchived": {
+                  "description": "Also list archived statuses.",
+                  "type": "boolean"
+                },
+                "limit": {
+                  "description": "How many to return, 50 by default, at most 250.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "team": {
+                  "description": "Team key, name or id.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "team"
+              ],
+              "type": "object"
+            },
+            "name": "list_issue_statuses"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "List issue labels. With team: that team's labels and the workspace labels (the ones its issues can use); without: workspace labels and the labels of every team you can see. Groups (isGroup) hold child labels; an issue takes one child of a singleSelect group. Retired labels are left out unless includeRetired is set.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "cursor": {
+                  "description": "The endCursor of the previous page, to continue after it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "includeRetired": {
+                  "description": "Also list retired labels.",
+                  "type": "boolean"
+                },
+                "limit": {
+                  "description": "How many to return, 50 by default, at most 250.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "query": {
+                  "description": "Part of a label's name.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "team": {
+                  "description": "Team key, name or id: its labels and the workspace labels.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "list_issue_labels"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": false,
+              "openWorldHint": false,
+              "readOnlyHint": false
+            },
+            "description": "Create an issue label (omit id; name is required; with team it's that team's label, without it a workspace label) or change one (id = id or name). Set isGroup to make a group that holds labels, and parent to put a label in a group (null takes it out). Names are unique within their team (or the workspace) and group. Omitted fields stay as they are; null clears a field.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "color": {
+                  "description": "Hex color like #eb5757; picked for you on create when omitted.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "description": {
+                  "description": "Null clears it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "groupType": {
+                  "description": "For groups: singleSelect (an issue takes one of its labels, the default) or multiSelect.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "description": "Only to change a label: its id or name (Group/Label for a label in a group). Omit to create one.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "isGroup": {
+                  "description": "A group holds labels and can't be put on issues itself.",
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "name": {
+                  "description": "Required to create.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent": {
+                  "description": "The group (name or id) to put the label in; null takes it out of its group. A team label's group is a workspace group or a group of the same team.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "team": {
+                  "description": "Team key, name or id. On create, makes it a team label (omit for a workspace label); on update, picks between labels of the same name.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "save_issue_label"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "List issues, newest update first. Narrow with the simple arguments (team, assignee \"me\", state, label, project, cycle, ...) and/or a `filter` object for anything more (and/or, comparators, relations). Archived and trashed issues are left out unless asked for. Descriptions are left out unless includeDescription is set.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "assignee": {
+                  "description": "Person (id, name, email or \"me\"), or \"null\" for unassigned issues.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "createdAt": {
+                  "description": "Created after: ISO 8601 date/time or a duration like -P1D.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "creator": {
+                  "description": "Person who created the issues (id, name, email or \"me\").",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "cursor": {
+                  "description": "The endCursor of the previous page, to continue after it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "customView": {
+                  "description": "A saved custom view (name, slug or id) whose filter applies too.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "cycle": {
+                  "description": "Cycle number, name or id, or \"current\", \"next\", \"previous\".",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "dueBefore": {
+                  "description": "Due on or before this date (or duration from now, e.g. P1W).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "filter": {
+                  "description": "Any further conditions. See the filter help in the description of this field: Fields: id, number, title, description, priority, estimate, dueDate, createdAt, updatedAt, startedAt, completedAt, canceledAt, archivedAt, triagedAt, snoozedUntil, slaBreachesAt, state {id,name,type}, team {id,key,name}, assignee / creator {id,email,name,displayName,isMe}, labels {some|every|none: {id,name,parent}}, project {id,name,slugId}, projectMilestone {id,name}, cycle {id,number,name,isActive}, parent {id,identifier}, subscribers {some: user}, hasBlockedByRelations, hasBlockingRelations, hasRelatedRelations, hasDuplicateRelations, children {some: filter}, searchableContent {contains}, and, or. Comparators: eq, neq, in, nin, lt, lte, gt, gte, contains, notContains, startsWith, endsWith, null. Example: {\"or\": [{\"priority\": {\"lte\": 2, \"neq\": 0}}, {\"labels\": {\"some\": {\"name\": {\"eq\": \"Bug\"}}}}]}"
+                },
+                "includeArchived": {
+                  "type": "boolean"
+                },
+                "includeDescription": {
+                  "description": "Include each issue's description.",
+                  "type": "boolean"
+                },
+                "includeSubTeams": {
+                  "description": "With team: also issues of its sub-teams.",
+                  "type": "boolean"
+                },
+                "includeTrashed": {
+                  "type": "boolean"
+                },
+                "label": {
+                  "description": "Label name or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "limit": {
+                  "description": "How many to return, 50 by default, at most 250.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "milestone": {
+                  "description": "Project milestone name or id (name needs project).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "orderBy": {
+                  "description": "updatedAt (default), createdAt, priority, dueDate, manual (the team's board order) or identifier.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parentId": {
+                  "description": "Sub-issues of this issue (identifier or id).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "priority": {
+                  "description": "0 none, 1 urgent, 2 high, 3 medium, 4 low.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "project": {
+                  "description": "Project name, slug or id, or \"null\" for issues in no project.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "query": {
+                  "description": "Words to find in the title, description or comments.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "release": {
+                  "description": "Release name, slug or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "state": {
+                  "description": "Status name, type (triage, backlog, unstarted, started, completed, canceled) or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "subscriber": {
+                  "description": "Person subscribed to the issues (id, name, email or \"me\").",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "team": {
+                  "description": "Team key, name or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "updatedAt": {
+                  "description": "Updated after: ISO 8601 date/time or a duration like -P1W.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "list_issues"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "Read an issue by identifier (ENG-123), id or link: its fields, description, sub-issues, relations (blocks, blocked by, related, duplicates), attachments, subscribers and releases. Set includeComments or includeHistory to also get its comment threads or change history.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "description": "Identifier (ENG-123), id or link.",
+                  "type": "string"
+                },
+                "includeComments": {
+                  "description": "Also return the comment threads.",
+                  "type": "boolean"
+                },
+                "includeHistory": {
+                  "description": "Also return the change history.",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "name": "get_issue"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": false,
+              "openWorldHint": false,
+              "readOnlyHint": false
+            },
+            "description": "Create an issue (omit id; team and title are required unless a template or parent provides them) or update one (pass id). Omitted fields stay as they are; null clears a field. People are given as id, name, email or \"me\"; states as name, type or id; labels, projects, cycles and milestones as name or id. Use patch to edit part of the description without resending it. Moving an issue to another team gives it a new identifier; the old one keeps working. Returns the issue as get_issue does, with relations and sub-issues.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "addLabels": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "addReleases": {
+                  "description": "Release names, slugs or ids to add.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "addSubscribers": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "assignee": {
+                  "description": "Person (id, name, email or \"me\"); null unassigns.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "blockedBy": {
+                  "description": "Issues blocking this one (added to existing relations).",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "blocks": {
+                  "description": "Issues this one blocks (added to existing relations).",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "cycle": {
+                  "description": "Cycle number, name or id, or \"current\" / \"next\"; null removes it from its cycle.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "description": {
+                  "description": "Markdown. Mention people with @displayName or @email; they are notified and subscribed.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "dueDate": {
+                  "description": "YYYY-MM-DD; null clears it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "duplicateOf": {
+                  "description": "The issue this duplicates; null removes the duplicate relation. Marking a duplicate moves it to a canceled status.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "estimate": {
+                  "description": "Estimate points on the team's scale; null clears it. T-shirt sizes are XS=1, S=2, M=3, L=5, XL=8, XXL=13, XXXL=21.",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "description": "Only to update an issue: its identifier (ENG-123), id or link. Omit to create one.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "labels": {
+                  "description": "Replace all labels with these (names or ids; Group/Child for a label in a group).",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "links": {
+                  "description": "Links to attach ({url, title}); a link already on the issue is updated.",
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "title": {
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "url",
+                      "title"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "milestone": {
+                  "description": "Project milestone name or id; null clears it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parentId": {
+                  "description": "Parent issue (identifier or id), making this a sub-issue; null detaches it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "patch": {
+                  "description": "Edits to the current description instead of the whole text, applied in order, all or none.",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "description": "Replace text that occurs exactly once (or every occurrence with replace_all).",
+                        "properties": {
+                          "new_string": {
+                            "type": "string"
+                          },
+                          "old_string": {
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "replace",
+                            "type": "string"
+                          },
+                          "replace_all": {
+                            "default": false,
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "old_string",
+                          "new_string"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Insert text directly before an anchor that occurs exactly once.",
+                        "properties": {
+                          "anchor": {
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "insert_before",
+                            "type": "string"
+                          },
+                          "text": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "anchor",
+                          "text"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Insert text directly after an anchor that occurs exactly once.",
+                        "properties": {
+                          "anchor": {
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "insert_after",
+                            "type": "string"
+                          },
+                          "text": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "anchor",
+                          "text"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Insert text at the very start.",
+                        "properties": {
+                          "op": {
+                            "const": "prepend",
+                            "type": "string"
+                          },
+                          "text": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "text"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Insert text at the very end.",
+                        "properties": {
+                          "op": {
+                            "const": "append",
+                            "type": "string"
+                          },
+                          "text": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "text"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Replace from `from` (inclusive) up to `to` (exclusive, kept), each occurring once.",
+                        "properties": {
+                          "from": {
+                            "type": "string"
+                          },
+                          "new_string": {
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "replace_range",
+                            "type": "string"
+                          },
+                          "to": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "from",
+                          "to",
+                          "new_string"
+                        ],
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                },
+                "priority": {
+                  "description": "1 urgent, 2 high, 3 medium, 4 low; 0 means no priority (not the highest).",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "project": {
+                  "description": "Project name, slug or id; null removes the issue from its project.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "relatedTo": {
+                  "description": "Issues related to this one (added).",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "removeBlockedBy": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "removeBlocks": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "removeLabels": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "removeRelatedTo": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "removeReleases": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "removeSubscribers": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "setReleases": {
+                  "description": "Replace all releases with these.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "slaBreachesAt": {
+                  "description": "When the SLA breaches (ISO 8601); null removes the SLA.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "slaType": {
+                  "description": "\"all\" or \"onlyBusinessDays\".",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "snoozedUntil": {
+                  "description": "Hide the issue from triage / inbox until this time (ISO 8601 or duration like P1W); null wakes it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "sortOrder": {
+                  "description": "Position on the team's board (lower is higher up).",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "state": {
+                  "description": "Status name, type (backlog, unstarted, started, completed, canceled, triage) or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "subIssueSortOrder": {
+                  "description": "Position among its parent's sub-issues.",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "team": {
+                  "description": "Team key, name or id. Required to create (unless parentId or the template sets it); changing it moves the issue.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "template": {
+                  "description": "Issue template name or id, applied on create: it fills in fields and sub-issues the arguments don't set.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "title": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "save_issue"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": false,
+              "openWorldHint": false,
+              "readOnlyHint": false
+            },
+            "description": "Apply the same change to several issues at once, e.g. move them to a state, assign them, add a label or put them in a cycle. `changes` takes the fields of save_issue (without id). Stops at the first issue that fails; issues before it keep their change.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "changes": {
+                  "description": "The change: an object with save_issue's fields (except id and template), e.g. {\"state\": \"Done\"}, {\"assignee\": \"me\", \"addLabels\": [\"Bug\"]} or {\"cycle\": \"current\"}.",
+                  "type": "object"
+                },
+                "ids": {
+                  "description": "Identifiers (ENG-123) or ids of the issues to change, at most 100.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            },
+            "name": "update_issues"
+          },
+          {
+            "annotations": {
+              "destructiveHint": true,
+              "idempotentHint": false,
+              "openWorldHint": false,
+              "readOnlyHint": false
+            },
+            "description": "Move an issue to the trash. It disappears from lists and is deleted for good after 30 days; restore_issue brings it back before then.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "name": "delete_issue"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "The change history of an issue, oldest first: who changed which field from what to what, and when.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "name": "get_issue_history"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "List the comment threads on one issue, project, initiative, document, milestone or status update, oldest first. Each thread is its first comment with its replies, reactions and whether it was resolved.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "cursor": {
+                  "description": "The endCursor of the previous page.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "documentId": {
+                  "description": "Document title, slug or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "initiativeId": {
+                  "description": "Initiative name, slug or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "issueId": {
+                  "description": "Issue identifier (ENG-123), id or link.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "limit": {
+                  "description": "How many threads to return, 50 by default, at most 250.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "milestoneId": {
+                  "description": "Project milestone id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "projectId": {
+                  "description": "Project name, slug or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "statusUpdateId": {
+                  "description": "Status update id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "list_comments"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": false,
+              "openWorldHint": false,
+              "readOnlyHint": false
+            },
+            "description": "Comment on an issue, project, initiative, document, milestone or status update (pass exactly one of them), or reply to a comment with parentId. Pass id and body to edit your own comment. The body is Markdown; mention people with @displayName or @email to notify them. Commenting on an issue subscribes you to it and notifies its subscribers.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "body": {
+                  "description": "Markdown. Mention people with @displayName or @email; they are notified.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "documentId": {
+                  "description": "Document title, slug or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "description": "Only to edit one of your comments: its id. Omit to create a comment.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "initiativeId": {
+                  "description": "Initiative name, slug or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "issueId": {
+                  "description": "Issue identifier (ENG-123), id or link.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "milestoneId": {
+                  "description": "Project milestone id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parentId": {
+                  "description": "The comment to reply to; the reply joins its thread.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "projectId": {
+                  "description": "Project name, slug or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "quotedText": {
+                  "description": "The passage of the document or description the comment is about.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "statusUpdateId": {
+                  "description": "Status update id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "save_comment"
+          },
+          {
+            "annotations": {
+              "destructiveHint": true,
+              "idempotentHint": false,
+              "openWorldHint": false,
+              "readOnlyHint": false
+            },
+            "description": "Delete a comment (your own, or any as a workspace admin). Deleting a thread's first comment deletes its replies.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "name": "delete_comment"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": false,
+              "openWorldHint": false,
+              "readOnlyHint": false
+            },
+            "description": "React with an emoji to an issue, a comment or a status update (exactly one). The emoji is a unicode emoji (👍) or a shortcode (+1, :tada:). Reacting twice with the same emoji changes nothing.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "commentId": {
+                  "description": "Comment id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "emoji": {
+                  "description": "A unicode emoji (👍) or a shortcode (+1, :tada:).",
+                  "type": "string"
+                },
+                "issueId": {
+                  "description": "Issue identifier (ENG-123), id or link.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "statusUpdateId": {
+                  "description": "Status update id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "emoji"
+              ],
+              "type": "object"
+            },
+            "name": "add_reaction"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": false,
+              "openWorldHint": false,
+              "readOnlyHint": false
+            },
+            "description": "Attach a link (pull request, design, doc, error report, ...) to an issue. Attaching a URL the issue already has updates that attachment instead. The source (github, figma, slack, ...) is recognized from the URL.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "iconUrl": {
+                  "description": "Link to an icon to show with it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "issue": {
+                  "description": "Issue identifier (ENG-123), id or link.",
+                  "type": "string"
+                },
+                "metadata": {
+                  "description": "Any JSON object to keep with the attachment.",
+                  "type": "object"
+                },
+                "subtitle": {
+                  "description": "A second line, e.g. a PR's state or a file's size.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "description": "The link to attach.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue",
+                "url",
+                "title"
+              ],
+              "type": "object"
+            },
+            "name": "create_attachment"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": false,
+              "openWorldHint": false,
+              "readOnlyHint": false
+            },
+            "description": "Get a one-time URL to upload a file (screenshot, log, recording, ...) to, valid for 15 minutes. Upload it by running the returned `curl` command with \u003cfile\u003e replaced by the local path (an HTTP PUT of the raw bytes). Then embed the assetUrl in Markdown (`![name](assetUrl)` for images, `[name](assetUrl)` otherwise) in a description or comment, or attach it to an issue with create_attachment_from_upload. Agents that can't run commands use upload_file instead.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "contentType": {
+                  "description": "Its MIME type, e.g. image/png.",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "The file name, e.g. screenshot.png.",
+                  "type": "string"
+                },
+                "size": {
+                  "description": "Its size in bytes.",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "name",
+                "contentType",
+                "size"
+              ],
+              "type": "object"
+            },
+            "name": "prepare_file_upload"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": false,
+              "openWorldHint": false,
+              "readOnlyHint": false
+            },
+            "description": "Upload a small file (up to 5 MB) as base64 in the arguments, for agents that can't run commands; otherwise prefer prepare_file_upload. Embed the returned assetUrl in Markdown (`![name](assetUrl)`) or attach it to an issue with create_attachment_from_upload.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "base64": {
+                  "description": "The file's bytes in base64 (a data: URL works too).",
+                  "type": "string"
+                },
+                "contentType": {
+                  "description": "Its MIME type, e.g. image/png.",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "The file name, e.g. screenshot.png.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "contentType",
+                "base64"
+              ],
+              "type": "object"
+            },
+            "name": "upload_file"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "List projects in teams you can see, most recently updated first. Narrow with team, status (name or type: backlog, planned, started, paused, completed, canceled), lead (\"me\"), member, initiative, label, health, priority, query, or a saved project view (customView). Archived and trashed projects are left out unless asked for; descriptions unless includeDescription is set. Each project has its progress: completed issues / (all - canceled).",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "cursor": {
+                  "description": "The endCursor of the previous page.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "customView": {
+                  "description": "A saved project view (name, slug or id) whose filter applies too.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "filter": {
+                  "description": "Further conditions, as in project views. Fields: status {id,name,type}, lead {id,isMe}, team {id,key}, priority, health, name, startDate, targetDate, and, or. Comparators: eq, neq, in, nin, lt, lte, gt, gte, null; dates take ISO 8601 or a duration from now like P2W. Example: {\"status\": {\"type\": {\"in\": [\"planned\", \"started\"]}}, \"targetDate\": {\"lt\": \"P1M\"}}"
+                },
+                "health": {
+                  "description": "onTrack, atRisk or offTrack.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "includeArchived": {
+                  "type": "boolean"
+                },
+                "includeDescription": {
+                  "description": "Include each project's description.",
+                  "type": "boolean"
+                },
+                "includeTrashed": {
+                  "type": "boolean"
+                },
+                "initiative": {
+                  "description": "Initiative name, slug or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "label": {
+                  "description": "Project label name or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "lead": {
+                  "description": "Lead (id, name, email or \"me\"), or \"null\" for projects without one.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "limit": {
+                  "description": "How many to return, 50 by default, at most 250.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "member": {
+                  "description": "A project member (id, name, email or \"me\").",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "orderBy": {
+                  "description": "updatedAt (default), createdAt, targetDate, priority or manual.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "priority": {
+                  "description": "0 none, 1 urgent, 2 high, 3 medium, 4 low.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "query": {
+                  "description": "Words to find in the name, summary or description.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "description": "Project status name, type (backlog, planned, started, paused, completed, canceled) or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "team": {
+                  "description": "Team key, name or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "list_projects"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "Read a project by id, slug, link or name: its fields and description, members, milestones with their progress, latest status update, links, dependencies (blocks, blocked by, related), documents, issue counts by status type and estimate sums.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "name": "get_project"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": false,
+              "openWorldHint": false,
+              "readOnlyHint": false
+            },
+            "description": "Create a project (omit id; name and at least one team via setTeams or addTeams are required) or update one (pass id). Omitted fields stay as they are; null clears a field. People are given as id, name, email or \"me\"; the status (state) as name, type or id. Use patch to edit part of the description. A project template (create only) adds its milestones and issues. A new lead is notified; so are people @mentioned in the description.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "addInitiatives": {
+                  "description": "Initiatives (names, slugs or ids) to add the project to.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "addLabels": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "addMembers": {
+                  "description": "People to add as members (they are subscribed).",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "addTeams": {
+                  "description": "Teams (keys, names or ids) to add.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "blockedBy": {
+                  "description": "Projects blocking this one (added).",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "blocks": {
+                  "description": "Projects this one blocks (added to existing dependencies).",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "color": {
+                  "description": "Hex color like #5e6ad2; null clears it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "description": {
+                  "description": "Markdown. Mention people with @displayName or @email; they are notified.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "icon": {
+                  "description": "An emoji or icon name; null clears it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "description": "Only to update a project: its id, slug, link or name. Omit to create one.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "labels": {
+                  "description": "Replace all project labels with these (names or ids; Group/Label for a label in a group).",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "lead": {
+                  "description": "Person (id, name, email or \"me\"); null removes the lead.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "leadTeam": {
+                  "description": "One of the project's teams (key, name or id) that leads it; null clears it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "links": {
+                  "description": "Links to add ({url, title}); a link already on the project gets the new title.",
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "title": {
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "url",
+                      "title"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "name": {
+                  "description": "Required to create.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "patch": {
+                  "description": "Edits to the current description instead of the whole text, applied in order, all or none.",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "description": "Replace text that occurs exactly once (or every occurrence with replace_all).",
+                        "properties": {
+                          "new_string": {
+                            "type": "string"
+                          },
+                          "old_string": {
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "replace",
+                            "type": "string"
+                          },
+                          "replace_all": {
+                            "default": false,
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "old_string",
+                          "new_string"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Insert text directly before an anchor that occurs exactly once.",
+                        "properties": {
+                          "anchor": {
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "insert_before",
+                            "type": "string"
+                          },
+                          "text": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "anchor",
+                          "text"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Insert text directly after an anchor that occurs exactly once.",
+                        "properties": {
+                          "anchor": {
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "insert_after",
+                            "type": "string"
+                          },
+                          "text": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "anchor",
+                          "text"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Insert text at the very start.",
+                        "properties": {
+                          "op": {
+                            "const": "prepend",
+                            "type": "string"
+                          },
+                          "text": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "text"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Insert text at the very end.",
+                        "properties": {
+                          "op": {
+                            "const": "append",
+                            "type": "string"
+                          },
+                          "text": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "text"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Replace from `from` (inclusive) up to `to` (exclusive, kept), each occurring once.",
+                        "properties": {
+                          "from": {
+                            "type": "string"
+                          },
+                          "new_string": {
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "replace_range",
+                            "type": "string"
+                          },
+                          "to": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "from",
+                          "to",
+                          "new_string"
+                        ],
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                },
+                "priority": {
+                  "description": "0 none, 1 urgent, 2 high, 3 medium, 4 low.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "relatedTo": {
+                  "description": "Projects related to this one (added).",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "removeBlockedBy": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "removeBlocks": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "removeInitiatives": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "removeLabels": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "removeLinks": {
+                  "description": "URLs of links to remove.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "removeMembers": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "removeRelatedTo": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "removeTeams": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "setInitiatives": {
+                  "description": "Replace all initiatives with these.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "setTeams": {
+                  "description": "Replace all teams with these. A project keeps at least one team.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "sortOrder": {
+                  "description": "Position in manually ordered lists (lower is higher up).",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "startDate": {
+                  "description": "YYYY-MM-DD; null clears it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "startDateResolution": {
+                  "description": "How precise startDate is: month, quarter, halfYear or year; null means the exact day.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "state": {
+                  "description": "Project status name, type (backlog, planned, started, paused, completed, canceled) or id. New projects start in the first backlog status.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "summary": {
+                  "description": "A one-line summary, at most 255 characters; null clears it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "targetDate": {
+                  "description": "YYYY-MM-DD; null clears it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "targetDateResolution": {
+                  "description": "How precise targetDate is: month, quarter, halfYear or year; null means the exact day.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "template": {
+                  "description": "Project template name or id, applied on create: it fills in what the arguments don't set and adds its milestones and issues.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "save_project"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "The workspace's project statuses in order, each with its type (backlog, planned, started, paused, completed, canceled) and how many projects are in it.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "cursor": {
+                  "description": "The endCursor of the previous page.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "limit": {
+                  "description": "How many to return, 50 by default, at most 250.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "list_project_statuses"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "List a project's milestones in order, each with its issue counts and progress (completed issues / (all - canceled)).",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "cursor": {
+                  "description": "The endCursor of the previous page.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "limit": {
+                  "description": "How many to return, 50 by default, at most 250.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "project": {
+                  "description": "Project name, slug, link or id.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "project"
+              ],
+              "type": "object"
+            },
+            "name": "list_milestones"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": false,
+              "openWorldHint": false,
+              "readOnlyHint": false
+            },
+            "description": "Create a milestone in a project (omit id; project and name are required) or change one (pass its id, or its name with the project). Names are unique within a project. Put issues in it with save_issue (milestone).",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "description": {
+                  "description": "Markdown; null clears it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "description": "Only to change a milestone: its id, or its name together with project. Omit to create one.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "name": {
+                  "description": "Required to create; unique within the project.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "project": {
+                  "description": "Project name, slug or id. Required to create.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "sortOrder": {
+                  "description": "Position among the project's milestones (lower comes first; ties go by target date).",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "targetDate": {
+                  "description": "YYYY-MM-DD; null clears it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "save_milestone"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "Status updates, newest first: of one project or initiative, or, without either, the recent updates across the projects you can see and the initiatives. Pass id to read one update.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "createdAt": {
+                  "description": "Created after: ISO 8601 date/time or a duration like -P1W.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "cursor": {
+                  "description": "The endCursor of the previous page.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "description": "One status update by id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "initiative": {
+                  "description": "Initiative name, slug, link or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "limit": {
+                  "description": "How many to return, 50 by default, at most 250.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "project": {
+                  "description": "Project name, slug, link or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "type": {
+                  "description": "project or initiative updates only.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "user": {
+                  "description": "Author (id, name, email or \"me\").",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "get_status_updates"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": false,
+              "openWorldHint": false,
+              "readOnlyHint": false
+            },
+            "description": "Post a status update on a project or initiative (omit id; body is required) with its health: onTrack, atRisk or offTrack (by default the previous update's, else onTrack). The newest update's health becomes the project's or initiative's. Members and subscribers of the project (or the initiative's owner) are notified, and so are people @mentioned. Pass id to edit your own update.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "body": {
+                  "description": "Markdown. Mention people with @displayName or @email; they are notified. Required to post.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "health": {
+                  "description": "onTrack, atRisk or offTrack.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "description": "Only to edit an update: its id. Omit to post one.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "initiative": {
+                  "description": "Initiative name, slug, link or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "project": {
+                  "description": "Project name, slug, link or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "type": {
+                  "description": "project or initiative; follows from which of them is given.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "save_status_update"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "List initiatives, most recently updated first, each with its project count and progress (the average of its projects'). Narrow with status (planned, active, completed), owner, parent or query. Archived ones are left out unless includeArchived is set.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "cursor": {
+                  "description": "The endCursor of the previous page.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "includeArchived": {
+                  "type": "boolean"
+                },
+                "includeDescription": {
+                  "description": "Include each initiative's description.",
+                  "type": "boolean"
+                },
+                "includeTrashed": {
+                  "type": "boolean"
+                },
+                "limit": {
+                  "description": "How many to return, 50 by default, at most 250.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "owner": {
+                  "description": "Owner (id, name, email or \"me\").",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent": {
+                  "description": "Sub-initiatives of this initiative (name, slug or id), or \"null\" for top-level ones.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "query": {
+                  "description": "Words in the name, summary or description.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "description": "planned, active or completed.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "list_initiatives"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "Read an initiative by id, slug, link or name: its fields and description, projects (with status, progress, health and lead), sub-initiatives, latest status update, links and documents.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "name": "get_initiative"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": false,
+              "openWorldHint": false,
+              "readOnlyHint": false
+            },
+            "description": "Create an initiative (omit id; name is required) or update one (pass id). Omitted fields stay as they are; null clears a field. Add projects with addProjects or setProjects; nest it under another initiative with parent.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "addProjects": {
+                  "description": "Projects (names, slugs or ids) to add.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "color": {
+                  "description": "Hex color like #5e6ad2; null clears it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "description": {
+                  "description": "Markdown.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "icon": {
+                  "description": "An emoji or icon name; null clears it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "description": "Only to update an initiative: its id, slug, link or name. Omit to create one.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "links": {
+                  "description": "Links to add ({url, title}); a link already on the initiative gets the new title.",
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "title": {
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "url",
+                      "title"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "name": {
+                  "description": "Required to create.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "owner": {
+                  "description": "Person (id, name, email or \"me\"); null removes the owner.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent": {
+                  "description": "The initiative (name, slug or id) this one is part of; null makes it top-level.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "patch": {
+                  "description": "Edits to the current description instead of the whole text, applied in order, all or none.",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "description": "Replace text that occurs exactly once (or every occurrence with replace_all).",
+                        "properties": {
+                          "new_string": {
+                            "type": "string"
+                          },
+                          "old_string": {
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "replace",
+                            "type": "string"
+                          },
+                          "replace_all": {
+                            "default": false,
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "old_string",
+                          "new_string"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Insert text directly before an anchor that occurs exactly once.",
+                        "properties": {
+                          "anchor": {
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "insert_before",
+                            "type": "string"
+                          },
+                          "text": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "anchor",
+                          "text"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Insert text directly after an anchor that occurs exactly once.",
+                        "properties": {
+                          "anchor": {
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "insert_after",
+                            "type": "string"
+                          },
+                          "text": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "anchor",
+                          "text"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Insert text at the very start.",
+                        "properties": {
+                          "op": {
+                            "const": "prepend",
+                            "type": "string"
+                          },
+                          "text": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "text"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Insert text at the very end.",
+                        "properties": {
+                          "op": {
+                            "const": "append",
+                            "type": "string"
+                          },
+                          "text": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "text"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Replace from `from` (inclusive) up to `to` (exclusive, kept), each occurring once.",
+                        "properties": {
+                          "from": {
+                            "type": "string"
+                          },
+                          "new_string": {
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "replace_range",
+                            "type": "string"
+                          },
+                          "to": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "from",
+                          "to",
+                          "new_string"
+                        ],
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                },
+                "removeLinks": {
+                  "description": "URLs of links to remove.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "removeProjects": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "setProjects": {
+                  "description": "Replace all projects with these.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "sortOrder": {
+                  "description": "Position in manually ordered lists.",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "description": "planned (the default), active or completed.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "summary": {
+                  "description": "A one-line summary, at most 255 characters; null clears it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "targetDate": {
+                  "description": "YYYY-MM-DD; null clears it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "targetDateResolution": {
+                  "description": "How precise targetDate is: month, quarter, halfYear or year; null means the exact day.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "save_initiative"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "List a team's cycles with their progress (issue counts by state type, estimate sums, daily history). type narrows to the current, previous or next cycle, the upcoming ones or the completed ones. Newest first, except upcoming (soonest first). Archived cycles are left out unless includeArchived is set.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "cursor": {
+                  "description": "The endCursor of the previous page, to continue after it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "includeArchived": {
+                  "type": "boolean"
+                },
+                "limit": {
+                  "description": "How many to return, 50 by default, at most 250.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "team": {
+                  "description": "Team key, name or id.",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "current, previous, next, upcoming, completed or all (default).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "team"
+              ],
+              "type": "object"
+            },
+            "name": "list_cycles"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "Read a cycle by id, or by number, name or \"current\" / \"next\" / \"previous\" together with team: its dates, progress, daily history and issues (unless includeIssues is false).",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "description": "The cycle's id, or its number, name or \"current\" / \"next\" / \"previous\" (with team).",
+                  "type": "string"
+                },
+                "includeIssues": {
+                  "description": "List the cycle's issues (default true).",
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "team": {
+                  "description": "Team key, name or id, when id isn't the cycle's id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "name": "get_cycle"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "List documents, most recently updated first. Narrow to those of a project, initiative, team, issue, cycle or release, by creator, or by words in the title or content. Contents are left out unless includeContent is set; read one with get_document.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "creator": {
+                  "description": "Person who created the documents (id, name, email or \"me\").",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "cursor": {
+                  "description": "The endCursor of the previous page, to continue after it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "cycle": {
+                  "description": "Cycle id, or its number, name or \"current\" with team.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "includeContent": {
+                  "description": "Include each document's content.",
+                  "type": "boolean"
+                },
+                "includeTrashed": {
+                  "type": "boolean"
+                },
+                "initiative": {
+                  "description": "Initiative name, slug or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "issue": {
+                  "description": "Issue identifier (ENG-123) or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "limit": {
+                  "description": "How many to return, 50 by default, at most 250.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "orderBy": {
+                  "description": "updatedAt (default) or createdAt, newest first.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "project": {
+                  "description": "Project name, slug or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "query": {
+                  "description": "Words to find in the title or content.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "release": {
+                  "description": "Release name, slug or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "team": {
+                  "description": "Team key, name or id: the team's documents (with cycle, only the team the cycle belongs to).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "list_documents"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "Read a document by id, slug, link or title: its Markdown content, where it belongs and how many earlier versions are kept.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "name": "get_document"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": false,
+              "openWorldHint": false,
+              "readOnlyHint": false
+            },
+            "description": "Create a document (omit id; title and exactly one of project, initiative, team, issue, cycle or release are required, unless a template gives the title) or update one (pass id). Use patch to edit part of the content without resending it. Passing a parent on update moves the document there. People mentioned with @displayName or @email are notified. The previous content is kept as a version.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "color": {
+                  "description": "Hex color like #5e6ad2; null clears it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "content": {
+                  "description": "Markdown. Mention people with @displayName or @email; they are notified.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "cycle": {
+                  "description": "Parent cycle: id, or number, name or \"current\" with team.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "icon": {
+                  "description": "An emoji or icon name; null clears it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "description": "Only to update a document: its id, slug, link or title. Omit to create one.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "initiative": {
+                  "description": "Parent initiative: name, slug or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "issue": {
+                  "description": "Parent issue: identifier (ENG-123) or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "patch": {
+                  "description": "Edits to the current content instead of the whole text, applied in order, all or none.",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "description": "Replace text that occurs exactly once (or every occurrence with replace_all).",
+                        "properties": {
+                          "new_string": {
+                            "type": "string"
+                          },
+                          "old_string": {
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "replace",
+                            "type": "string"
+                          },
+                          "replace_all": {
+                            "default": false,
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "old_string",
+                          "new_string"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Insert text directly before an anchor that occurs exactly once.",
+                        "properties": {
+                          "anchor": {
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "insert_before",
+                            "type": "string"
+                          },
+                          "text": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "anchor",
+                          "text"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Insert text directly after an anchor that occurs exactly once.",
+                        "properties": {
+                          "anchor": {
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "insert_after",
+                            "type": "string"
+                          },
+                          "text": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "anchor",
+                          "text"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Insert text at the very start.",
+                        "properties": {
+                          "op": {
+                            "const": "prepend",
+                            "type": "string"
+                          },
+                          "text": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "text"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Insert text at the very end.",
+                        "properties": {
+                          "op": {
+                            "const": "append",
+                            "type": "string"
+                          },
+                          "text": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "text"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "description": "Replace from `from` (inclusive) up to `to` (exclusive, kept), each occurring once.",
+                        "properties": {
+                          "from": {
+                            "type": "string"
+                          },
+                          "new_string": {
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "replace_range",
+                            "type": "string"
+                          },
+                          "to": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "from",
+                          "to",
+                          "new_string"
+                        ],
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                },
+                "project": {
+                  "description": "Parent project: name, slug or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "release": {
+                  "description": "Parent release: name, slug or id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "restoreVersion": {
+                  "description": "An earlier version (its id from list_document_versions) to bring back on update: its title and content replace the current ones, which are kept as a version.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "team": {
+                  "description": "Parent team: key, name or id (or the team of the cycle, with cycle).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "template": {
+                  "description": "Document template name or id, applied on create: it gives the title and content the arguments don't.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "title": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "save_document"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "List the custom views the caller can use: those shared with the workspace and their own. Issue views apply to list_issues with customView.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "cursor": {
+                  "description": "The endCursor of the previous page, to continue after it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "limit": {
+                  "description": "How many to return, 50 by default, at most 250.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "model": {
+                  "description": "issue, project or initiative.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "query": {
+                  "description": "Words in the name or description.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "shared": {
+                  "description": "true: only views shared with the workspace; false: only the caller's personal views.",
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "team": {
+                  "description": "Team key, name or id: that team's views.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "list_custom_views"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "List the issue, project and document templates (without their data; read one with get_template). save_issue, save_project and save_document take a template's name or id.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "cursor": {
+                  "description": "The endCursor of the previous page, to continue after it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "limit": {
+                  "description": "How many to return, 50 by default, at most 250.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "team": {
+                  "description": "Team key, name or id: the team's templates and the workspace-wide ones.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "type": {
+                  "description": "issue, project or document.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "list_templates"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "Read a template by id or name (with type when names repeat across types), including the data it fills in.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "description": "The template's id or name.",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "issue, project or document, when templates of several types share the name.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "name": "get_template"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "Your inbox, newest first: assignments, mentions, comments, replies, status changes and more, with how many are unread. Archived notifications and snoozed ones (until they wake) are left out unless asked for.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "cursor": {
+                  "description": "The endCursor of the previous page, to continue after it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "includeArchived": {
+                  "description": "Also archived ones.",
+                  "type": "boolean"
+                },
+                "includeSnoozed": {
+                  "description": "Also ones snoozed until later.",
+                  "type": "boolean"
+                },
+                "limit": {
+                  "description": "How many to return, 50 by default, at most 250.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "type": {
+                  "description": "Only this type, e.g. issueAssignedToYou, issueMention, issueNewComment, issueCommentReply, issueStatusChanged.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "unreadOnly": {
+                  "description": "Only unread ones.",
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "name": "get_notifications"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": false,
+              "openWorldHint": false,
+              "readOnlyHint": false
+            },
+            "description": "Mark one or more of your notifications read or unread, archive or unarchive them, or snooze them until a time (it comes back unread then) or unsnooze them.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "action": {
+                  "description": "read, unread, archive, unarchive, snooze or unsnooze.",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "One notification's id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "ids": {
+                  "description": "Several notifications' ids.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "until": {
+                  "description": "For snooze: until when, as ISO 8601 or a duration from now like PT3H or P1D.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "action"
+              ],
+              "type": "object"
+            },
+            "name": "mark_notification"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "Search issues, projects, documents and initiatives (and comments, when asked for) by words, best matches first, titles before text. An issue identifier like ENG-12 finds that issue. Each result has its type, title, link and a snippet of the matching text with matches in **bold**.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "includeArchived": {
+                  "description": "Also archived issues, projects and initiatives.",
+                  "type": "boolean"
+                },
+                "limit": {
+                  "description": "How many results, 20 by default, at most 50.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "query": {
+                  "description": "Words to find; \"quoted phrases\", OR and -excluded words work too.",
+                  "type": "string"
+                },
+                "team": {
+                  "description": "Only things of this team (key, name or id).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "types": {
+                  "description": "What to search: issue, project, document, initiative, comment. All but comment by default.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "query"
+              ],
+              "type": "object"
+            },
+            "name": "search"
+          },
+          {
+            "annotations": {
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false,
+              "readOnlyHint": true
+            },
+            "description": "Find operations beyond the tools listed here: webhooks, customers and customer needs, releases, pipelines and release notes, favorites, document versions, templates and custom views (saving/deleting), project and issue labels and statuses (saving/deleting), cycles (saving/archiving), teams and members (saving, inviting, roles), archiving/restoring, sharing, the audit log, importing issues from another tracker, the GitHub integration, and more. With a query, returns the matching operations with their argument schemas; call them with call_operation.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "query": {
+                  "description": "Words to look for in operation names and descriptions, e.g. \"webhook\", \"customer\", \"release note\", \"favorite\", \"archive project\". Leave out to list every operation by name.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "name": "find_operations"
+          },
+          {
+            "description": "Run any Ricrac operation by name with its arguments (see find_operations). Returns the operation's result.",
+            "inputSchema": {
+              "additionalProperties": false,
+              "properties": {
+                "arguments": {
+                  "description": "Its arguments, as described by find_operations.",
+                  "type": "object"
+                },
+                "name": {
+                  "description": "The operation's name, from find_operations.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "type": "object"
+            },
+            "name": "call_operation"
+          }
+        ],
+        "ttlMs": 0
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/mcp",
+    "request": {
+      "id": 3,
+      "jsonrpc": "2.0",
+      "method": "tools/list"
+    },
+    "status": 200
+  },
+  {
+    "auth": "bearer",
+    "body": {
+      "id": 4,
+      "jsonrpc": "2.0",
+      "result": {
+        "content": [
+          {
+            "text": "{\"nodes\":[{\"id\":\"\u003cid1\u003e\",\"name\":\"Acme\",\"role\":\"owner\",\"url\":\"http://localhost:3000/acme\",\"urlKey\":\"acme\"}]}",
+            "type": "text"
+          }
+        ],
+        "isError": false,
+        "resultType": "complete"
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/mcp",
+    "request": {
+      "id": 4,
+      "jsonrpc": "2.0",
+      "method": "tools/call",
+      "params": {
+        "arguments": {},
+        "name": "list_workspaces"
+      }
+    },
+    "status": 200
+  },
+  {
+    "auth": "bearer",
+    "body": {
+      "id": 5,
+      "jsonrpc": "2.0",
+      "result": {
+        "content": [
+          {
+            "text": "No issue \"ENG-99\"; use an identifier like ENG-123 or an id",
+            "type": "text"
+          }
+        ],
+        "isError": true,
+        "resultType": "complete"
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/mcp",
+    "request": {
+      "id": 5,
+      "jsonrpc": "2.0",
+      "method": "tools/call",
+      "params": {
+        "arguments": {
+          "id": "ENG-99"
+        },
+        "name": "get_issue"
+      }
+    },
+    "status": 200
+  },
+  {
+    "auth": "bearer",
+    "body": {
+      "id": 6,
+      "jsonrpc": "2.0",
+      "result": {
+        "content": [
+          {
+            "text": "{\"nodes\":[{\"id\":\"\u003cid1\u003e\",\"name\":\"Acme\",\"role\":\"owner\",\"url\":\"http://localhost:3000/acme\",\"urlKey\":\"acme\"}]}",
+            "type": "text"
+          }
+        ],
+        "isError": false,
+        "resultType": "complete"
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/mcp",
+    "request": {
+      "id": 6,
+      "jsonrpc": "2.0",
+      "method": "tools/call",
+      "params": {
+        "_meta": {
+          "io.modelcontextprotocol/protocolVersion": "2026-07-28"
+        },
+        "arguments": {},
+        "name": "list_workspaces"
+      }
+    },
+    "status": 200
+  },
+  {
+    "auth": "bearer",
+    "body": {
+      "id": 7,
+      "jsonrpc": "2.0",
+      "result": {
+        "content": [
+          {
+            "text": "{\"nodes\":[{\"id\":\"\u003cid1\u003e\",\"name\":\"Acme\",\"role\":\"owner\",\"url\":\"http://localhost:3000/acme\",\"urlKey\":\"acme\"}]}",
+            "type": "text"
+          }
+        ],
+        "isError": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/mcp",
+    "request": {
+      "id": 7,
+      "jsonrpc": "2.0",
+      "method": "tools/call",
+      "params": {
+        "arguments": {},
+        "name": "list_workspaces"
+      }
+    },
+    "status": 200
+  }
+]
