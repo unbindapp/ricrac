@@ -1,5 +1,5 @@
 // Fills a development server with a workspace to click through:
-// node scripts/seed.mjs "$(cd ../server && go run . session ann@acme.test)" [http://localhost:3000]
+// node scripts/seed.mjs "$(cd ../server && go run ./cmd/server session ann@acme.test)" [http://localhost:3000]
 const [cookie, base = "http://localhost:3000"] = process.argv.slice(2);
 if (!cookie) {
   console.error("Pass a session cookie: node scripts/seed.mjs <cookie> [server]");

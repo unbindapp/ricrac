@@ -1,0 +1,178 @@
+[
+  {
+    "auth": "session",
+    "body": {
+      "assetUrl": "http://localhost:3000/files/\u003cid1\u003e",
+      "contentType": "application/json",
+      "fileId": "\u003cid1\u003e",
+      "markdown": "[issues.json](http://localhost:3000/files/\u003cid1\u003e)",
+      "name": "issues.json",
+      "size": 74
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/upload_file",
+    "request": {
+      "base64": "\u003ctoken1\u003e=",
+      "contentType": "application/json",
+      "name": "issues.json"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "comments": 0,
+      "dryRun": false,
+      "identifiers": [
+        "ENG-42"
+      ],
+      "imported": 1,
+      "nextIdentifier": "ENG-43",
+      "relations": 0
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/import_issues",
+    "request": {
+      "fileId": "\u003cid1\u003e",
+      "team": "ENG"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-42-from-a-file",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid2\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "Long text",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid3\u003e",
+      "identifier": "ENG-42",
+      "labels": [],
+      "number": 42,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid4\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid2\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid5\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "From a file",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-42"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_issue",
+    "request": {
+      "id": "ENG-42"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "Pass either issues or fileId"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/import_issues",
+    "request": {
+      "fileId": "\u003cid1\u003e",
+      "issues": [],
+      "team": "ENG"
+    },
+    "status": 400
+  }
+]

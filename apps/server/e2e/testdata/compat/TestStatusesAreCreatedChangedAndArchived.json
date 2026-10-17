@@ -1,0 +1,1055 @@
+[
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "color": "#f2c94c",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "description": "Testing",
+      "id": "\u003cid1\u003e",
+      "isAutoCloseState": false,
+      "isDefault": false,
+      "issueCount": 0,
+      "name": "QA",
+      "position": 4,
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "type": "started",
+      "updatedAt": "\u003ctime+00:00\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue_status",
+    "request": {
+      "description": "Testing",
+      "name": "QA",
+      "team": "ENG",
+      "type": "started"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "color": "#bec2c8",
+          "createdAt": "\u003ctime+00:00\u003e",
+          "description": null,
+          "id": "\u003cid3\u003e",
+          "isAutoCloseState": false,
+          "isDefault": true,
+          "issueCount": 0,
+          "name": "Backlog",
+          "position": 0,
+          "team": {
+            "id": "\u003cid2\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "type": "backlog",
+          "updatedAt": "\u003ctime+00:00\u003e"
+        },
+        {
+          "archivedAt": null,
+          "color": "#e2e2e2",
+          "createdAt": "\u003ctime+00:00\u003e",
+          "description": null,
+          "id": "\u003cid4\u003e",
+          "isAutoCloseState": false,
+          "isDefault": false,
+          "issueCount": 0,
+          "name": "Todo",
+          "position": 1,
+          "team": {
+            "id": "\u003cid2\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "type": "unstarted",
+          "updatedAt": "\u003ctime+00:00\u003e"
+        },
+        {
+          "archivedAt": null,
+          "color": "#f2c94c",
+          "createdAt": "\u003ctime+00:00\u003e",
+          "description": null,
+          "id": "\u003cid5\u003e",
+          "isAutoCloseState": false,
+          "isDefault": false,
+          "issueCount": 0,
+          "name": "In Progress",
+          "position": 2,
+          "team": {
+            "id": "\u003cid2\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "type": "started",
+          "updatedAt": "\u003ctime+00:00\u003e"
+        },
+        {
+          "archivedAt": null,
+          "color": "#4cb782",
+          "createdAt": "\u003ctime+00:00\u003e",
+          "description": null,
+          "id": "\u003cid6\u003e",
+          "isAutoCloseState": false,
+          "isDefault": false,
+          "issueCount": 0,
+          "name": "In Review",
+          "position": 3,
+          "team": {
+            "id": "\u003cid2\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "type": "started",
+          "updatedAt": "\u003ctime+00:00\u003e"
+        },
+        {
+          "archivedAt": null,
+          "color": "#f2c94c",
+          "createdAt": "\u003ctime+00:00\u003e",
+          "description": "Testing",
+          "id": "\u003cid1\u003e",
+          "isAutoCloseState": false,
+          "isDefault": false,
+          "issueCount": 0,
+          "name": "QA",
+          "position": 4,
+          "team": {
+            "id": "\u003cid2\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "type": "started",
+          "updatedAt": "\u003ctime+00:00\u003e"
+        },
+        {
+          "archivedAt": null,
+          "color": "#5e6ad2",
+          "createdAt": "\u003ctime+00:00\u003e",
+          "description": null,
+          "id": "\u003cid7\u003e",
+          "isAutoCloseState": false,
+          "isDefault": false,
+          "issueCount": 0,
+          "name": "Done",
+          "position": 4,
+          "team": {
+            "id": "\u003cid2\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "type": "completed",
+          "updatedAt": "\u003ctime+00:00\u003e"
+        },
+        {
+          "archivedAt": null,
+          "color": "#95a2b3",
+          "createdAt": "\u003ctime+00:00\u003e",
+          "description": null,
+          "id": "\u003cid8\u003e",
+          "isAutoCloseState": true,
+          "isDefault": false,
+          "issueCount": 0,
+          "name": "Canceled",
+          "position": 5,
+          "team": {
+            "id": "\u003cid2\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "type": "canceled",
+          "updatedAt": "\u003ctime+00:00\u003e"
+        },
+        {
+          "archivedAt": null,
+          "color": "#95a2b3",
+          "createdAt": "\u003ctime+00:00\u003e",
+          "description": null,
+          "id": "\u003cid9\u003e",
+          "isAutoCloseState": false,
+          "isDefault": false,
+          "issueCount": 0,
+          "name": "Duplicate",
+          "position": 6,
+          "team": {
+            "id": "\u003cid2\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "type": "canceled",
+          "updatedAt": "\u003ctime+00:00\u003e"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_issue_statuses",
+    "request": {
+      "team": "ENG"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "The team already has a status named \"qa\""
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue_status",
+    "request": {
+      "name": "qa",
+      "team": "ENG",
+      "type": "started"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "\"doing\" isn't a status type; use triage, backlog, unstarted, started, completed or canceled"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue_status",
+    "request": {
+      "name": "X",
+      "team": "ENG",
+      "type": "doing"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-1-check",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid10\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid11\u003e",
+      "identifier": "ENG-1",
+      "labels": [],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": "\u003ctime+00:00\u003e",
+      "startedTriageAt": null,
+      "state": {
+        "color": "#f2c94c",
+        "id": "\u003cid1\u003e",
+        "name": "QA",
+        "type": "started"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid10\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Check",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue",
+    "request": {
+      "state": "QA",
+      "title": "Check"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-2-check-more",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid10\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid12\u003e",
+      "identifier": "ENG-2",
+      "labels": [],
+      "number": 2,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -2000,
+      "startedAt": "\u003ctime+00:00\u003e",
+      "startedTriageAt": null,
+      "state": {
+        "color": "#f2c94c",
+        "id": "\u003cid1\u003e",
+        "name": "QA",
+        "type": "started"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid10\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Check more",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-2"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue",
+    "request": {
+      "state": "QA",
+      "title": "Check more"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "color": "#f2c94c",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "description": null,
+      "id": "\u003cid1\u003e",
+      "isAutoCloseState": false,
+      "isDefault": false,
+      "issueCount": 2,
+      "name": "Testing",
+      "position": 4,
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "type": "started",
+      "updatedAt": "\u003ctime+00:00\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue_status",
+    "request": {
+      "description": null,
+      "id": "QA",
+      "name": "Testing",
+      "team": "ENG"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "2 issues are in this status, so its type can't change; move them or create a new status"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue_status",
+    "request": {
+      "id": "\u003cid1\u003e",
+      "type": "completed"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "2 issues are in Testing; pass moveIssuesTo (a status of the same team)"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/delete_issue_status",
+    "request": {
+      "id": "\u003cid1\u003e"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": "\u003ctime+00:00\u003e",
+      "color": "#f2c94c",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "description": null,
+      "id": "\u003cid1\u003e",
+      "isAutoCloseState": false,
+      "isDefault": false,
+      "issueCount": 0,
+      "movedIssues": 2,
+      "movedTo": {
+        "color": "#5e6ad2",
+        "id": "\u003cid7\u003e",
+        "name": "Done",
+        "type": "completed"
+      },
+      "name": "Testing",
+      "position": 4,
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "type": "started",
+      "updatedAt": "\u003ctime+00:00\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/delete_issue_status",
+    "request": {
+      "id": "\u003cid1\u003e",
+      "moveIssuesTo": "Done"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-1-check",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": "\u003ctime+00:00\u003e",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid10\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "history": [
+        {
+          "action": "created",
+          "actor": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid10\u003e",
+            "name": "Ann Smith"
+          },
+          "changes": {},
+          "createdAt": "\u003ctime+00:00\u003e"
+        },
+        {
+          "action": "updated",
+          "actor": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid10\u003e",
+            "name": "Ann Smith"
+          },
+          "changes": {
+            "state": {
+              "from": {
+                "color": "#f2c94c",
+                "id": "\u003cid1\u003e",
+                "name": "Testing",
+                "type": "started"
+              },
+              "to": {
+                "color": "#5e6ad2",
+                "id": "\u003cid7\u003e",
+                "name": "Done",
+                "type": "completed"
+              }
+            }
+          },
+          "createdAt": "\u003ctime+00:00\u003e"
+        }
+      ],
+      "id": "\u003cid11\u003e",
+      "identifier": "ENG-1",
+      "labels": [],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": "\u003ctime+00:00\u003e",
+      "startedTriageAt": null,
+      "state": {
+        "color": "#5e6ad2",
+        "id": "\u003cid7\u003e",
+        "name": "Done",
+        "type": "completed"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid10\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Check",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_issue",
+    "request": {
+      "id": "ENG-1",
+      "includeHistory": true
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": "\u003ctime+00:00\u003e",
+      "color": "#f2c94c",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "description": null,
+      "id": "\u003cid1\u003e",
+      "isAutoCloseState": false,
+      "isDefault": false,
+      "issueCount": 0,
+      "name": "Testing",
+      "position": 4,
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "type": "started",
+      "updatedAt": "\u003ctime+00:00\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_issue_status",
+    "request": {
+      "id": "\u003cid1\u003e"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "Backlog is the team's default status; pass moveIssuesTo (a status of the same team)"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/delete_issue_status",
+    "request": {
+      "id": "Backlog",
+      "team": "ENG"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": "\u003ctime+00:00\u003e",
+      "color": "#bec2c8",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "description": null,
+      "id": "\u003cid3\u003e",
+      "isAutoCloseState": false,
+      "isDefault": false,
+      "issueCount": 0,
+      "movedIssues": 0,
+      "movedTo": {
+        "color": "#e2e2e2",
+        "id": "\u003cid4\u003e",
+        "name": "Todo",
+        "type": "unstarted"
+      },
+      "name": "Backlog",
+      "position": 0,
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "type": "backlog",
+      "updatedAt": "\u003ctime+00:00\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/delete_issue_status",
+    "request": {
+      "id": "Backlog",
+      "moveIssuesTo": "Todo",
+      "team": "ENG"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "allowedEstimates": [],
+      "archivedAt": null,
+      "autoArchiveMonths": 6,
+      "autoCloseChildIssues": false,
+      "autoCloseMonths": null,
+      "autoCloseParentIssues": false,
+      "autoCloseState": {
+        "color": "#95a2b3",
+        "id": "\u003cid8\u003e",
+        "name": "Canceled",
+        "type": "canceled"
+      },
+      "color": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "currentCycle": null,
+      "cycleAutoAddCompleted": true,
+      "cycleAutoAddStarted": true,
+      "cycleCooldownWeeks": 0,
+      "cycleDurationWeeks": 2,
+      "cycleRollover": true,
+      "cycleStartDay": 1,
+      "cyclesEnabled": false,
+      "defaultEstimate": null,
+      "defaultIssueState": {
+        "color": "#e2e2e2",
+        "id": "\u003cid4\u003e",
+        "name": "Todo",
+        "type": "unstarted"
+      },
+      "description": null,
+      "estimateAllowZero": false,
+      "estimateExtended": false,
+      "estimateType": "notUsed",
+      "githubPrMergedState": null,
+      "githubPrOpenedState": null,
+      "icon": null,
+      "id": "\u003cid2\u003e",
+      "isMember": true,
+      "issueCount": 0,
+      "key": "ENG",
+      "labelCount": 0,
+      "memberCount": 1,
+      "members": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid10\u003e",
+          "name": "Ann Smith",
+          "owner": true
+        }
+      ],
+      "name": "Engineering",
+      "parent": null,
+      "private": false,
+      "requirePriorityToLeaveTriage": false,
+      "states": [
+        {
+          "color": "#e2e2e2",
+          "description": null,
+          "id": "\u003cid4\u003e",
+          "name": "Todo",
+          "position": 1,
+          "type": "unstarted"
+        },
+        {
+          "color": "#f2c94c",
+          "description": null,
+          "id": "\u003cid5\u003e",
+          "name": "In Progress",
+          "position": 2,
+          "type": "started"
+        },
+        {
+          "color": "#4cb782",
+          "description": null,
+          "id": "\u003cid6\u003e",
+          "name": "In Review",
+          "position": 3,
+          "type": "started"
+        },
+        {
+          "color": "#5e6ad2",
+          "description": null,
+          "id": "\u003cid7\u003e",
+          "name": "Done",
+          "position": 4,
+          "type": "completed"
+        },
+        {
+          "color": "#95a2b3",
+          "description": null,
+          "id": "\u003cid8\u003e",
+          "name": "Canceled",
+          "position": 5,
+          "type": "canceled"
+        },
+        {
+          "color": "#95a2b3",
+          "description": null,
+          "id": "\u003cid9\u003e",
+          "name": "Duplicate",
+          "position": 6,
+          "type": "canceled"
+        }
+      ],
+      "subTeams": [],
+      "timezone": "UTC",
+      "triage": {
+        "action": "none",
+        "enabled": false,
+        "responsible": []
+      },
+      "triageAction": "none",
+      "triageEnabled": false,
+      "triageResponsible": [],
+      "triageRotationStart": null,
+      "triageRotationWeeks": null,
+      "upcomingCycleCount": 2,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/team/ENG"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_team",
+    "request": {
+      "id": "ENG"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "A team needs at least one completed status"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/delete_issue_status",
+    "request": {
+      "id": "Done",
+      "moveIssuesTo": "Todo",
+      "team": "ENG"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": "\u003ctime+00:00\u003e",
+      "color": "#95a2b3",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "description": null,
+      "id": "\u003cid9\u003e",
+      "isAutoCloseState": false,
+      "isDefault": false,
+      "issueCount": 0,
+      "movedIssues": 0,
+      "movedTo": null,
+      "name": "Duplicate",
+      "position": 6,
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "type": "canceled",
+      "updatedAt": "\u003ctime+00:00\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/delete_issue_status",
+    "request": {
+      "id": "Duplicate",
+      "team": "ENG"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "A team needs at least one canceled status"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/delete_issue_status",
+    "request": {
+      "id": "Canceled",
+      "moveIssuesTo": "Todo",
+      "team": "ENG"
+    },
+    "status": 400
+  }
+]

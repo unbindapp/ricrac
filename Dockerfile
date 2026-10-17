@@ -7,14 +7,14 @@ COPY apps/web ./
 RUN bun run build
 
 # ---------- server (embeds the web build) ----------
-FROM golang:1.26-alpine AS server
+FROM golang:1.27-alpine AS server
 ENV CGO_ENABLED=0 GOFLAGS="-trimpath -buildvcs=false"
 WORKDIR /app/apps/server
 COPY apps/server/go.mod apps/server/go.sum ./
 RUN go mod download
 COPY apps/server ./
-COPY --from=web /app/apps/web/dist ./server/dist
-RUN --mount=type=cache,target=/root/.cache/go-build go build -ldflags "-s -w" -o /out/ricrac .
+COPY --from=web /app/apps/web/dist ./internal/web/dist
+RUN --mount=type=cache,target=/root/.cache/go-build go build -ldflags "-s -w" -o /out/ricrac ./cmd/server
 
 # ---------- runtime ----------
 FROM gcr.io/distroless/static-debian12:nonroot

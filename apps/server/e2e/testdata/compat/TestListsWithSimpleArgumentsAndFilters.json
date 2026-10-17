@@ -1,0 +1,1399 @@
+[
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": {
+        "displayName": "bob",
+        "email": "bob@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Bob Jones"
+      },
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-1-urgent-bug",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid2\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid3\u003e",
+      "identifier": "ENG-1",
+      "labels": [
+        {
+          "color": "#eb5757",
+          "id": "\u003cid4\u003e",
+          "name": "Bug",
+          "parent": null
+        }
+      ],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 1,
+      "priorityLabel": "Urgent",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid5\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid2\u003e",
+          "name": "Ann Smith"
+        },
+        {
+          "displayName": "bob",
+          "email": "bob@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Bob Jones"
+        }
+      ],
+      "team": {
+        "id": "\u003cid6\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Urgent bug",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue",
+    "request": {
+      "assignee": "bob",
+      "labels": [
+        "Bug"
+      ],
+      "priority": 1,
+      "title": "Urgent bug"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid2\u003e",
+        "name": "Ann Smith"
+      },
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-2-feature-work",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid2\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid7\u003e",
+      "identifier": "ENG-2",
+      "labels": [
+        {
+          "color": "#bb87fc",
+          "id": "\u003cid8\u003e",
+          "name": "Feature",
+          "parent": null
+        }
+      ],
+      "number": 2,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 3,
+      "priorityLabel": "Medium",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -2000,
+      "startedAt": "\u003ctime+00:00\u003e",
+      "startedTriageAt": null,
+      "state": {
+        "color": "#f2c94c",
+        "id": "\u003cid9\u003e",
+        "name": "In Progress",
+        "type": "started"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid2\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid6\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Feature work",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-2"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue",
+    "request": {
+      "assignee": "me",
+      "labels": [
+        "Feature"
+      ],
+      "priority": 3,
+      "state": "started",
+      "title": "Feature work"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-3-unassigned-idea",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid2\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "about payments",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid10\u003e",
+      "identifier": "ENG-3",
+      "labels": [],
+      "number": 3,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -3000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid5\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid2\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid6\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Unassigned idea",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-3"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue",
+    "request": {
+      "description": "about payments",
+      "title": "Unassigned idea"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "assignee": {
+            "displayName": "bob",
+            "email": "bob@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Bob Jones"
+          },
+          "autoArchivedAt": null,
+          "autoClosedAt": null,
+          "branchName": "eng-1-urgent-bug",
+          "canceledAt": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid2\u003e",
+            "name": "Ann Smith"
+          },
+          "cycle": null,
+          "dueDate": null,
+          "estimate": null,
+          "id": "\u003cid3\u003e",
+          "identifier": "ENG-1",
+          "labels": [
+            {
+              "color": "#eb5757",
+              "id": "\u003cid4\u003e",
+              "name": "Bug",
+              "parent": null
+            }
+          ],
+          "number": 1,
+          "parent": null,
+          "previousIdentifiers": [],
+          "priority": 1,
+          "priorityLabel": "Urgent",
+          "project": null,
+          "projectMilestone": null,
+          "slaBreachesAt": null,
+          "slaStartedAt": null,
+          "slaType": null,
+          "snoozedUntil": null,
+          "sortOrder": -1000,
+          "startedAt": null,
+          "startedTriageAt": null,
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid5\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "subIssueCount": 0,
+          "subIssueSortOrder": null,
+          "team": {
+            "id": "\u003cid6\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Urgent bug",
+          "trashed": false,
+          "trashedAt": null,
+          "triagedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/ENG-1"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_issues",
+    "request": {
+      "assignee": "me"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "assignee": null,
+          "autoArchivedAt": null,
+          "autoClosedAt": null,
+          "branchName": "eng-3-unassigned-idea",
+          "canceledAt": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid2\u003e",
+            "name": "Ann Smith"
+          },
+          "cycle": null,
+          "dueDate": null,
+          "estimate": null,
+          "id": "\u003cid10\u003e",
+          "identifier": "ENG-3",
+          "labels": [],
+          "number": 3,
+          "parent": null,
+          "previousIdentifiers": [],
+          "priority": 0,
+          "priorityLabel": "No priority",
+          "project": null,
+          "projectMilestone": null,
+          "slaBreachesAt": null,
+          "slaStartedAt": null,
+          "slaType": null,
+          "snoozedUntil": null,
+          "sortOrder": -3000,
+          "startedAt": null,
+          "startedTriageAt": null,
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid5\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "subIssueCount": 0,
+          "subIssueSortOrder": null,
+          "team": {
+            "id": "\u003cid6\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Unassigned idea",
+          "trashed": false,
+          "trashedAt": null,
+          "triagedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/ENG-3"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_issues",
+    "request": {
+      "assignee": "null"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "assignee": {
+            "displayName": "bob",
+            "email": "bob@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Bob Jones"
+          },
+          "autoArchivedAt": null,
+          "autoClosedAt": null,
+          "branchName": "eng-1-urgent-bug",
+          "canceledAt": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid2\u003e",
+            "name": "Ann Smith"
+          },
+          "cycle": null,
+          "dueDate": null,
+          "estimate": null,
+          "id": "\u003cid3\u003e",
+          "identifier": "ENG-1",
+          "labels": [
+            {
+              "color": "#eb5757",
+              "id": "\u003cid4\u003e",
+              "name": "Bug",
+              "parent": null
+            }
+          ],
+          "number": 1,
+          "parent": null,
+          "previousIdentifiers": [],
+          "priority": 1,
+          "priorityLabel": "Urgent",
+          "project": null,
+          "projectMilestone": null,
+          "slaBreachesAt": null,
+          "slaStartedAt": null,
+          "slaType": null,
+          "snoozedUntil": null,
+          "sortOrder": -1000,
+          "startedAt": null,
+          "startedTriageAt": null,
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid5\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "subIssueCount": 0,
+          "subIssueSortOrder": null,
+          "team": {
+            "id": "\u003cid6\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Urgent bug",
+          "trashed": false,
+          "trashedAt": null,
+          "triagedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/ENG-1"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_issues",
+    "request": {
+      "label": "bug"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "assignee": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid2\u003e",
+            "name": "Ann Smith"
+          },
+          "autoArchivedAt": null,
+          "autoClosedAt": null,
+          "branchName": "eng-2-feature-work",
+          "canceledAt": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid2\u003e",
+            "name": "Ann Smith"
+          },
+          "cycle": null,
+          "dueDate": null,
+          "estimate": null,
+          "id": "\u003cid7\u003e",
+          "identifier": "ENG-2",
+          "labels": [
+            {
+              "color": "#bb87fc",
+              "id": "\u003cid8\u003e",
+              "name": "Feature",
+              "parent": null
+            }
+          ],
+          "number": 2,
+          "parent": null,
+          "previousIdentifiers": [],
+          "priority": 3,
+          "priorityLabel": "Medium",
+          "project": null,
+          "projectMilestone": null,
+          "slaBreachesAt": null,
+          "slaStartedAt": null,
+          "slaType": null,
+          "snoozedUntil": null,
+          "sortOrder": -2000,
+          "startedAt": "\u003ctime+00:00\u003e",
+          "startedTriageAt": null,
+          "state": {
+            "color": "#f2c94c",
+            "id": "\u003cid9\u003e",
+            "name": "In Progress",
+            "type": "started"
+          },
+          "subIssueCount": 0,
+          "subIssueSortOrder": null,
+          "team": {
+            "id": "\u003cid6\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Feature work",
+          "trashed": false,
+          "trashedAt": null,
+          "triagedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/ENG-2"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_issues",
+    "request": {
+      "state": "started"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "assignee": null,
+          "autoArchivedAt": null,
+          "autoClosedAt": null,
+          "branchName": "eng-3-unassigned-idea",
+          "canceledAt": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid2\u003e",
+            "name": "Ann Smith"
+          },
+          "cycle": null,
+          "dueDate": null,
+          "estimate": null,
+          "id": "\u003cid10\u003e",
+          "identifier": "ENG-3",
+          "labels": [],
+          "number": 3,
+          "parent": null,
+          "previousIdentifiers": [],
+          "priority": 0,
+          "priorityLabel": "No priority",
+          "project": null,
+          "projectMilestone": null,
+          "slaBreachesAt": null,
+          "slaStartedAt": null,
+          "slaType": null,
+          "snoozedUntil": null,
+          "sortOrder": -3000,
+          "startedAt": null,
+          "startedTriageAt": null,
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid5\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "subIssueCount": 0,
+          "subIssueSortOrder": null,
+          "team": {
+            "id": "\u003cid6\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Unassigned idea",
+          "trashed": false,
+          "trashedAt": null,
+          "triagedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/ENG-3"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_issues",
+    "request": {
+      "query": "payments"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "assignee": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid2\u003e",
+            "name": "Ann Smith"
+          },
+          "autoArchivedAt": null,
+          "autoClosedAt": null,
+          "branchName": "eng-2-feature-work",
+          "canceledAt": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid2\u003e",
+            "name": "Ann Smith"
+          },
+          "cycle": null,
+          "dueDate": null,
+          "estimate": null,
+          "id": "\u003cid7\u003e",
+          "identifier": "ENG-2",
+          "labels": [
+            {
+              "color": "#bb87fc",
+              "id": "\u003cid8\u003e",
+              "name": "Feature",
+              "parent": null
+            }
+          ],
+          "number": 2,
+          "parent": null,
+          "previousIdentifiers": [],
+          "priority": 3,
+          "priorityLabel": "Medium",
+          "project": null,
+          "projectMilestone": null,
+          "slaBreachesAt": null,
+          "slaStartedAt": null,
+          "slaType": null,
+          "snoozedUntil": null,
+          "sortOrder": -2000,
+          "startedAt": "\u003ctime+00:00\u003e",
+          "startedTriageAt": null,
+          "state": {
+            "color": "#f2c94c",
+            "id": "\u003cid9\u003e",
+            "name": "In Progress",
+            "type": "started"
+          },
+          "subIssueCount": 0,
+          "subIssueSortOrder": null,
+          "team": {
+            "id": "\u003cid6\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Feature work",
+          "trashed": false,
+          "trashedAt": null,
+          "triagedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/ENG-2"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_issues",
+    "request": {
+      "query": "ENG-2"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "assignee": {
+            "displayName": "bob",
+            "email": "bob@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Bob Jones"
+          },
+          "autoArchivedAt": null,
+          "autoClosedAt": null,
+          "branchName": "eng-1-urgent-bug",
+          "canceledAt": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid2\u003e",
+            "name": "Ann Smith"
+          },
+          "cycle": null,
+          "dueDate": null,
+          "estimate": null,
+          "id": "\u003cid3\u003e",
+          "identifier": "ENG-1",
+          "labels": [
+            {
+              "color": "#eb5757",
+              "id": "\u003cid4\u003e",
+              "name": "Bug",
+              "parent": null
+            }
+          ],
+          "number": 1,
+          "parent": null,
+          "previousIdentifiers": [],
+          "priority": 1,
+          "priorityLabel": "Urgent",
+          "project": null,
+          "projectMilestone": null,
+          "slaBreachesAt": null,
+          "slaStartedAt": null,
+          "slaType": null,
+          "snoozedUntil": null,
+          "sortOrder": -1000,
+          "startedAt": null,
+          "startedTriageAt": null,
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid5\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "subIssueCount": 0,
+          "subIssueSortOrder": null,
+          "team": {
+            "id": "\u003cid6\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Urgent bug",
+          "trashed": false,
+          "trashedAt": null,
+          "triagedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/ENG-1"
+        },
+        {
+          "archivedAt": null,
+          "assignee": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid2\u003e",
+            "name": "Ann Smith"
+          },
+          "autoArchivedAt": null,
+          "autoClosedAt": null,
+          "branchName": "eng-2-feature-work",
+          "canceledAt": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid2\u003e",
+            "name": "Ann Smith"
+          },
+          "cycle": null,
+          "dueDate": null,
+          "estimate": null,
+          "id": "\u003cid7\u003e",
+          "identifier": "ENG-2",
+          "labels": [
+            {
+              "color": "#bb87fc",
+              "id": "\u003cid8\u003e",
+              "name": "Feature",
+              "parent": null
+            }
+          ],
+          "number": 2,
+          "parent": null,
+          "previousIdentifiers": [],
+          "priority": 3,
+          "priorityLabel": "Medium",
+          "project": null,
+          "projectMilestone": null,
+          "slaBreachesAt": null,
+          "slaStartedAt": null,
+          "slaType": null,
+          "snoozedUntil": null,
+          "sortOrder": -2000,
+          "startedAt": "\u003ctime+00:00\u003e",
+          "startedTriageAt": null,
+          "state": {
+            "color": "#f2c94c",
+            "id": "\u003cid9\u003e",
+            "name": "In Progress",
+            "type": "started"
+          },
+          "subIssueCount": 0,
+          "subIssueSortOrder": null,
+          "team": {
+            "id": "\u003cid6\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Feature work",
+          "trashed": false,
+          "trashedAt": null,
+          "triagedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/ENG-2"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_issues",
+    "request": {
+      "filter": {
+        "or": [
+          {
+            "priority": {
+              "lte": 2,
+              "neq": 0
+            }
+          },
+          {
+            "labels": {
+              "some": {
+                "name": {
+                  "eq": "feature"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "orderBy": "priority"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "assignee": null,
+          "autoArchivedAt": null,
+          "autoClosedAt": null,
+          "branchName": "eng-3-unassigned-idea",
+          "canceledAt": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid2\u003e",
+            "name": "Ann Smith"
+          },
+          "cycle": null,
+          "dueDate": null,
+          "estimate": null,
+          "id": "\u003cid10\u003e",
+          "identifier": "ENG-3",
+          "labels": [],
+          "number": 3,
+          "parent": null,
+          "previousIdentifiers": [],
+          "priority": 0,
+          "priorityLabel": "No priority",
+          "project": null,
+          "projectMilestone": null,
+          "slaBreachesAt": null,
+          "slaStartedAt": null,
+          "slaType": null,
+          "snoozedUntil": null,
+          "sortOrder": -3000,
+          "startedAt": null,
+          "startedTriageAt": null,
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid5\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "subIssueCount": 0,
+          "subIssueSortOrder": null,
+          "team": {
+            "id": "\u003cid6\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Unassigned idea",
+          "trashed": false,
+          "trashedAt": null,
+          "triagedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/ENG-3"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_issues",
+    "request": {
+      "filter": {
+        "labels": {
+          "null": true
+        }
+      }
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "Unknown filter field \"colour\". A filter object. Fields: id, number, title, description, priority, estimate, dueDate, createdAt, updatedAt, startedAt, completedAt, canceledAt, archivedAt, triagedAt, snoozedUntil, slaBreachesAt, state {id,name,type}, team {id,key,name}, assignee / creator {id,email,name,displayName,isMe}, labels {some|every|none: {id,name,parent}}, project {id,name,slugId}, projectMilestone {id,name}, cycle {id,number,name,isActive}, parent {id,identifier}, subscribers {some: user}, hasBlockedByRelations, hasBlockingRelations, hasRelatedRelations, hasDuplicateRelations, children {some: filter}, searchableContent {contains}, and, or. Comparators: eq, neq, in, nin, lt, lte, gt, gte, contains, notContains, startsWith, endsWith, null (true for empty). Dates take ISO 8601 or durations like -P2W. Text compares ignore case. Example: {\"or\": [{\"priority\": {\"lte\": 2, \"neq\": 0}}, {\"labels\": {\"some\": {\"name\": {\"eq\": \"Bug\"}}}}]}"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_issues",
+    "request": {
+      "filter": {
+        "colour": {
+          "eq": "red"
+        }
+      }
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "assignee": {
+            "displayName": "bob",
+            "email": "bob@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Bob Jones"
+          },
+          "autoArchivedAt": null,
+          "autoClosedAt": null,
+          "branchName": "eng-1-urgent-bug",
+          "canceledAt": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid2\u003e",
+            "name": "Ann Smith"
+          },
+          "cycle": null,
+          "dueDate": null,
+          "estimate": null,
+          "id": "\u003cid3\u003e",
+          "identifier": "ENG-1",
+          "labels": [
+            {
+              "color": "#eb5757",
+              "id": "\u003cid4\u003e",
+              "name": "Bug",
+              "parent": null
+            }
+          ],
+          "number": 1,
+          "parent": null,
+          "previousIdentifiers": [],
+          "priority": 1,
+          "priorityLabel": "Urgent",
+          "project": null,
+          "projectMilestone": null,
+          "slaBreachesAt": null,
+          "slaStartedAt": null,
+          "slaType": null,
+          "snoozedUntil": null,
+          "sortOrder": -1000,
+          "startedAt": null,
+          "startedTriageAt": null,
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid5\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "subIssueCount": 0,
+          "subIssueSortOrder": null,
+          "team": {
+            "id": "\u003cid6\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Urgent bug",
+          "trashed": false,
+          "trashedAt": null,
+          "triagedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/ENG-1"
+        },
+        {
+          "archivedAt": null,
+          "assignee": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid2\u003e",
+            "name": "Ann Smith"
+          },
+          "autoArchivedAt": null,
+          "autoClosedAt": null,
+          "branchName": "eng-2-feature-work",
+          "canceledAt": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid2\u003e",
+            "name": "Ann Smith"
+          },
+          "cycle": null,
+          "dueDate": null,
+          "estimate": null,
+          "id": "\u003cid7\u003e",
+          "identifier": "ENG-2",
+          "labels": [
+            {
+              "color": "#bb87fc",
+              "id": "\u003cid8\u003e",
+              "name": "Feature",
+              "parent": null
+            }
+          ],
+          "number": 2,
+          "parent": null,
+          "previousIdentifiers": [],
+          "priority": 3,
+          "priorityLabel": "Medium",
+          "project": null,
+          "projectMilestone": null,
+          "slaBreachesAt": null,
+          "slaStartedAt": null,
+          "slaType": null,
+          "snoozedUntil": null,
+          "sortOrder": -2000,
+          "startedAt": "\u003ctime+00:00\u003e",
+          "startedTriageAt": null,
+          "state": {
+            "color": "#f2c94c",
+            "id": "\u003cid9\u003e",
+            "name": "In Progress",
+            "type": "started"
+          },
+          "subIssueCount": 0,
+          "subIssueSortOrder": null,
+          "team": {
+            "id": "\u003cid6\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Feature work",
+          "trashed": false,
+          "trashedAt": null,
+          "triagedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/ENG-2"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": "bzoy",
+        "hasNextPage": true
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_issues",
+    "request": {
+      "limit": 2,
+      "orderBy": "identifier"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "assignee": null,
+          "autoArchivedAt": null,
+          "autoClosedAt": null,
+          "branchName": "eng-3-unassigned-idea",
+          "canceledAt": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid2\u003e",
+            "name": "Ann Smith"
+          },
+          "cycle": null,
+          "dueDate": null,
+          "estimate": null,
+          "id": "\u003cid10\u003e",
+          "identifier": "ENG-3",
+          "labels": [],
+          "number": 3,
+          "parent": null,
+          "previousIdentifiers": [],
+          "priority": 0,
+          "priorityLabel": "No priority",
+          "project": null,
+          "projectMilestone": null,
+          "slaBreachesAt": null,
+          "slaStartedAt": null,
+          "slaType": null,
+          "snoozedUntil": null,
+          "sortOrder": -3000,
+          "startedAt": null,
+          "startedTriageAt": null,
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid5\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "subIssueCount": 0,
+          "subIssueSortOrder": null,
+          "team": {
+            "id": "\u003cid6\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Unassigned idea",
+          "trashed": false,
+          "trashedAt": null,
+          "triagedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/ENG-3"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_issues",
+    "request": {
+      "cursor": "bzoy",
+      "limit": 2,
+      "orderBy": "identifier"
+    },
+    "status": 200
+  }
+]

@@ -1,0 +1,2729 @@
+[
+  {
+    "kind": "github",
+    "method": "POST",
+    "path": "/app/installations/77/access_tokens"
+  },
+  {
+    "kind": "github",
+    "method": "GET",
+    "path": "/installation/repositories?per_page=100\u0026page=1"
+  },
+  {
+    "auth": "session",
+    "body": {
+      "backfill": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "id": "\u003cid1\u003e",
+      "installationId": 77,
+      "lastError": null,
+      "lastSyncedAt": null,
+      "linkedIssueCount": 0,
+      "project": null,
+      "repository": {
+        "fullName": "unbindapp/unbind",
+        "id": 700000001,
+        "url": "\u003clocal-server\u003e/unbindapp/unbind"
+      },
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "updatedAt": "\u003ctime+00:00\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_github_repo_sync",
+    "request": {
+      "backfill": false,
+      "repository": "unbindapp/unbind",
+      "team": "ENG"
+    },
+    "status": 200
+  },
+  {
+    "body": {
+      "ok": true
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/github/webhook",
+    "request": {
+      "action": "opened",
+      "installation": {
+        "account": {
+          "login": "acme-org"
+        },
+        "id": 77
+      },
+      "issue": {
+        "active_lock_reason": null,
+        "assignee": {
+          "id": 9000001,
+          "login": "Eve-GH",
+          "type": "User"
+        },
+        "assignees": [
+          {
+            "id": 9000001,
+            "login": "Eve-GH",
+            "type": "User"
+          }
+        ],
+        "author_association": "NONE",
+        "body": "The log stream closes with **1006** after about ten minutes.",
+        "closed_at": null,
+        "comments": 0,
+        "comments_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/comments",
+        "created_at": "\u003ctimeZ\u003e",
+        "events_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/events",
+        "html_url": "https://github.com/unbindapp/unbind/issues/1347",
+        "id": 3500001347,
+        "labels": [
+          {
+            "color": "d73a4a",
+            "default": true,
+            "description": "Something isn't working",
+            "id": 208045946,
+            "name": "bug",
+            "node_id": "MDU6TGFiZWwyMDgwNDU5NDY=",
+            "url": "https://api.github.com/repos/unbindapp/unbind/labels/bug"
+          }
+        ],
+        "labels_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/labels{/name}",
+        "locked": false,
+        "milestone": null,
+        "node_id": "I_kwDOKbcdef6zAAAB",
+        "number": 1347,
+        "performed_via_github_app": null,
+        "reactions": {
+          "total_count": 0,
+          "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/reactions"
+        },
+        "repository_url": "https://api.github.com/repos/unbindapp/unbind",
+        "state": "open",
+        "state_reason": null,
+        "timeline_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/timeline",
+        "title": "Deploy logs stop streaming after 10 minutes",
+        "updated_at": "\u003ctimeZ\u003e",
+        "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347",
+        "user": {
+          "id": 583231,
+          "login": "octocat",
+          "node_id": "MDQ6VXNlcjU4MzIzMQ==",
+          "site_admin": false,
+          "type": "User"
+        }
+      },
+      "repository": {
+        "default_branch": "master",
+        "full_name": "unbindapp/unbind",
+        "has_issues": true,
+        "html_url": "https://github.com/unbindapp/unbind",
+        "id": 700000001,
+        "name": "unbind",
+        "node_id": "R_kgDOKbcdef",
+        "owner": {
+          "id": 150000001,
+          "login": "unbindapp",
+          "type": "Organization"
+        },
+        "private": false
+      },
+      "sender": {
+        "id": 583231,
+        "login": "octocat",
+        "type": "User"
+      }
+    },
+    "status": 200
+  },
+  {
+    "body": {
+      "ok": true
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/github/webhook",
+    "request": {
+      "action": "opened",
+      "installation": {
+        "account": {
+          "login": "acme-org"
+        },
+        "id": 77
+      },
+      "issue": {
+        "active_lock_reason": null,
+        "assignee": {
+          "id": 9000001,
+          "login": "Eve-GH",
+          "type": "User"
+        },
+        "assignees": [
+          {
+            "id": 9000001,
+            "login": "Eve-GH",
+            "type": "User"
+          }
+        ],
+        "author_association": "NONE",
+        "body": "The log stream closes with **1006** after about ten minutes.",
+        "closed_at": null,
+        "comments": 0,
+        "comments_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/comments",
+        "created_at": "\u003ctimeZ\u003e",
+        "events_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/events",
+        "html_url": "https://github.com/unbindapp/unbind/issues/1347",
+        "id": 3500001347,
+        "labels": [
+          {
+            "color": "d73a4a",
+            "default": true,
+            "description": "Something isn't working",
+            "id": 208045946,
+            "name": "bug",
+            "node_id": "MDU6TGFiZWwyMDgwNDU5NDY=",
+            "url": "https://api.github.com/repos/unbindapp/unbind/labels/bug"
+          }
+        ],
+        "labels_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/labels{/name}",
+        "locked": false,
+        "milestone": null,
+        "node_id": "I_kwDOKbcdef6zAAAB",
+        "number": 1347,
+        "performed_via_github_app": null,
+        "reactions": {
+          "total_count": 0,
+          "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/reactions"
+        },
+        "repository_url": "https://api.github.com/repos/unbindapp/unbind",
+        "state": "open",
+        "state_reason": null,
+        "timeline_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/timeline",
+        "title": "Deploy logs stop streaming after 10 minutes",
+        "updated_at": "\u003ctimeZ\u003e",
+        "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347",
+        "user": {
+          "id": 583231,
+          "login": "octocat",
+          "node_id": "MDQ6VXNlcjU4MzIzMQ==",
+          "site_admin": false,
+          "type": "User"
+        }
+      },
+      "repository": {
+        "default_branch": "master",
+        "full_name": "unbindapp/unbind",
+        "has_issues": true,
+        "html_url": "https://github.com/unbindapp/unbind",
+        "id": 700000001,
+        "name": "unbind",
+        "node_id": "R_kgDOKbcdef",
+        "owner": {
+          "id": 150000001,
+          "login": "unbindapp",
+          "type": "Organization"
+        },
+        "private": false
+      },
+      "sender": {
+        "id": 583231,
+        "login": "octocat",
+        "type": "User"
+      }
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "assignee": {
+            "displayName": "eve",
+            "email": "eve@acme.test",
+            "id": "\u003cid3\u003e",
+            "name": "Eve"
+          },
+          "autoArchivedAt": null,
+          "autoClosedAt": null,
+          "branchName": "\u003ctoken1\u003e",
+          "canceledAt": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": null,
+          "cycle": null,
+          "description": "The log stream closes with **1006** after about ten minutes.",
+          "dueDate": null,
+          "estimate": null,
+          "id": "\u003cid4\u003e",
+          "identifier": "ENG-1",
+          "labels": [
+            {
+              "color": "#eb5757",
+              "id": "\u003cid5\u003e",
+              "name": "Bug",
+              "parent": null
+            }
+          ],
+          "number": 1,
+          "parent": null,
+          "previousIdentifiers": [],
+          "priority": 0,
+          "priorityLabel": "No priority",
+          "project": null,
+          "projectMilestone": null,
+          "slaBreachesAt": null,
+          "slaStartedAt": null,
+          "slaType": null,
+          "snoozedUntil": null,
+          "sortOrder": -1000,
+          "startedAt": null,
+          "startedTriageAt": null,
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid6\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "subIssueCount": 0,
+          "subIssueSortOrder": null,
+          "team": {
+            "id": "\u003cid2\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "title": "Deploy logs stop streaming after 10 minutes",
+          "trashed": false,
+          "trashedAt": null,
+          "triagedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/issue/ENG-1"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_issues",
+    "request": {
+      "includeDescription": true
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "history": [
+        {
+          "action": "created",
+          "actor": null,
+          "changes": {
+            "github": {
+              "label": "Synced from GitHub #1347 by @octocat",
+              "url": "https://github.com/unbindapp/unbind/issues/1347"
+            }
+          },
+          "createdAt": "\u003ctime+00:00\u003e"
+        }
+      ],
+      "identifier": "ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_issue_history",
+    "request": {
+      "id": "ENG-1"
+    },
+    "status": 200
+  },
+  {
+    "body": {
+      "ok": true
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/github/webhook",
+    "request": {
+      "action": "labeled",
+      "installation": {
+        "account": {
+          "login": "acme-org"
+        },
+        "id": 77
+      },
+      "issue": {
+        "active_lock_reason": null,
+        "assignee": {
+          "id": 9000001,
+          "login": "Eve-GH",
+          "type": "User"
+        },
+        "assignees": [
+          {
+            "id": 9000001,
+            "login": "Eve-GH",
+            "type": "User"
+          }
+        ],
+        "author_association": "NONE",
+        "body": "The log stream closes with **1006** after about ten minutes.",
+        "closed_at": null,
+        "comments": 0,
+        "comments_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/comments",
+        "created_at": "\u003ctimeZ\u003e",
+        "events_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/events",
+        "html_url": "https://github.com/unbindapp/unbind/issues/1347",
+        "id": 3500001347,
+        "labels": [
+          {
+            "color": "d73a4a",
+            "default": true,
+            "description": "Something isn't working",
+            "id": 208045946,
+            "name": "bug",
+            "node_id": "MDU6TGFiZWwyMDgwNDU5NDY=",
+            "url": "https://api.github.com/repos/unbindapp/unbind/labels/bug"
+          },
+          {
+            "color": "0e8a16",
+            "default": false,
+            "description": "",
+            "id": 208045947,
+            "name": "websocket",
+            "node_id": "MDU6TGFiZWwyMDgwNDU5NDc=",
+            "url": "https://api.github.com/repos/unbindapp/unbind/labels/websocket"
+          }
+        ],
+        "labels_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/labels{/name}",
+        "locked": false,
+        "milestone": null,
+        "node_id": "I_kwDOKbcdef6zAAAB",
+        "number": 1347,
+        "performed_via_github_app": null,
+        "reactions": {
+          "total_count": 0,
+          "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/reactions"
+        },
+        "repository_url": "https://api.github.com/repos/unbindapp/unbind",
+        "state": "open",
+        "state_reason": null,
+        "timeline_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/timeline",
+        "title": "Deploy logs stop streaming after 10 minutes",
+        "updated_at": "\u003ctimeZ\u003e",
+        "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347",
+        "user": {
+          "id": 583231,
+          "login": "octocat",
+          "node_id": "MDQ6VXNlcjU4MzIzMQ==",
+          "site_admin": false,
+          "type": "User"
+        }
+      },
+      "label": {
+        "color": "0e8a16",
+        "default": false,
+        "description": "",
+        "id": 208045947,
+        "name": "websocket",
+        "node_id": "MDU6TGFiZWwyMDgwNDU5NDc=",
+        "url": "https://api.github.com/repos/unbindapp/unbind/labels/websocket"
+      },
+      "repository": {
+        "default_branch": "master",
+        "full_name": "unbindapp/unbind",
+        "has_issues": true,
+        "html_url": "https://github.com/unbindapp/unbind",
+        "id": 700000001,
+        "name": "unbind",
+        "node_id": "R_kgDOKbcdef",
+        "owner": {
+          "id": 150000001,
+          "login": "unbindapp",
+          "type": "Organization"
+        },
+        "private": false
+      },
+      "sender": {
+        "id": 583231,
+        "login": "octocat",
+        "type": "User"
+      }
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": {
+        "displayName": "eve",
+        "email": "eve@acme.test",
+        "id": "\u003cid3\u003e",
+        "name": "Eve"
+      },
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "\u003ctoken1\u003e",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": null,
+      "cycle": null,
+      "description": "The log stream closes with **1006** after about ten minutes.",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid4\u003e",
+      "identifier": "ENG-1",
+      "labels": [
+        {
+          "color": "#eb5757",
+          "id": "\u003cid5\u003e",
+          "name": "Bug",
+          "parent": null
+        },
+        {
+          "color": "#0e8a16",
+          "id": "\u003cid7\u003e",
+          "name": "websocket",
+          "parent": null
+        }
+      ],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid6\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "eve",
+          "email": "eve@acme.test",
+          "id": "\u003cid3\u003e",
+          "name": "Eve"
+        }
+      ],
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Deploy logs stop streaming after 10 minutes",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_issue",
+    "request": {
+      "id": "ENG-1"
+    },
+    "status": 200
+  },
+  {
+    "body": {
+      "ok": true
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/github/webhook",
+    "request": {
+      "action": "edited",
+      "changes": {
+        "title": {
+          "from": "Deploy logs stop streaming after 10 minutes"
+        }
+      },
+      "installation": {
+        "account": {
+          "login": "acme-org"
+        },
+        "id": 77
+      },
+      "issue": {
+        "active_lock_reason": null,
+        "assignee": {
+          "id": 9000001,
+          "login": "Eve-GH",
+          "type": "User"
+        },
+        "assignees": [
+          {
+            "id": 9000001,
+            "login": "Eve-GH",
+            "type": "User"
+          }
+        ],
+        "author_association": "NONE",
+        "body": "The log stream closes with **1006** after about ten minutes.",
+        "closed_at": null,
+        "comments": 0,
+        "comments_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/comments",
+        "created_at": "\u003ctimeZ\u003e",
+        "events_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/events",
+        "html_url": "https://github.com/unbindapp/unbind/issues/1347",
+        "id": 3500001347,
+        "labels": [
+          {
+            "color": "d73a4a",
+            "default": true,
+            "description": "Something isn't working",
+            "id": 208045946,
+            "name": "bug",
+            "node_id": "MDU6TGFiZWwyMDgwNDU5NDY=",
+            "url": "https://api.github.com/repos/unbindapp/unbind/labels/bug"
+          }
+        ],
+        "labels_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/labels{/name}",
+        "locked": false,
+        "milestone": null,
+        "node_id": "I_kwDOKbcdef6zAAAB",
+        "number": 1347,
+        "performed_via_github_app": null,
+        "reactions": {
+          "total_count": 0,
+          "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/reactions"
+        },
+        "repository_url": "https://api.github.com/repos/unbindapp/unbind",
+        "state": "open",
+        "state_reason": null,
+        "timeline_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/timeline",
+        "title": "Deploy logs stop streaming after 10 minutes on Firefox",
+        "updated_at": "\u003ctimeZ\u003e",
+        "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347",
+        "user": {
+          "id": 583231,
+          "login": "octocat",
+          "node_id": "MDQ6VXNlcjU4MzIzMQ==",
+          "site_admin": false,
+          "type": "User"
+        }
+      },
+      "repository": {
+        "default_branch": "master",
+        "full_name": "unbindapp/unbind",
+        "has_issues": true,
+        "html_url": "https://github.com/unbindapp/unbind",
+        "id": 700000001,
+        "name": "unbind",
+        "node_id": "R_kgDOKbcdef",
+        "owner": {
+          "id": 150000001,
+          "login": "unbindapp",
+          "type": "Organization"
+        },
+        "private": false
+      },
+      "sender": {
+        "id": 583231,
+        "login": "octocat",
+        "type": "User"
+      }
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": {
+        "displayName": "eve",
+        "email": "eve@acme.test",
+        "id": "\u003cid3\u003e",
+        "name": "Eve"
+      },
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "\u003ctoken1\u003e",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": null,
+      "cycle": null,
+      "description": "The log stream closes with **1006** after about ten minutes.",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid4\u003e",
+      "identifier": "ENG-1",
+      "labels": [
+        {
+          "color": "#eb5757",
+          "id": "\u003cid5\u003e",
+          "name": "Bug",
+          "parent": null
+        },
+        {
+          "color": "#0e8a16",
+          "id": "\u003cid7\u003e",
+          "name": "websocket",
+          "parent": null
+        }
+      ],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid6\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "eve",
+          "email": "eve@acme.test",
+          "id": "\u003cid3\u003e",
+          "name": "Eve"
+        }
+      ],
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Deploy logs stop streaming after 10 minutes",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_issue",
+    "request": {
+      "id": "ENG-1"
+    },
+    "status": 200
+  },
+  {
+    "body": {
+      "ok": true
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/github/webhook",
+    "request": {
+      "action": "edited",
+      "changes": {
+        "title": {
+          "from": "Deploy logs stop streaming after 10 minutes"
+        }
+      },
+      "installation": {
+        "account": {
+          "login": "acme-org"
+        },
+        "id": 77
+      },
+      "issue": {
+        "active_lock_reason": null,
+        "assignee": {
+          "id": 9000001,
+          "login": "Eve-GH",
+          "type": "User"
+        },
+        "assignees": [
+          {
+            "id": 9000001,
+            "login": "Eve-GH",
+            "type": "User"
+          }
+        ],
+        "author_association": "NONE",
+        "body": "The log stream closes with **1006** after about ten minutes.",
+        "closed_at": null,
+        "comments": 0,
+        "comments_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/comments",
+        "created_at": "\u003ctimeZ\u003e",
+        "events_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/events",
+        "html_url": "https://github.com/unbindapp/unbind/issues/1347",
+        "id": 3500001347,
+        "labels": [
+          {
+            "color": "d73a4a",
+            "default": true,
+            "description": "Something isn't working",
+            "id": 208045946,
+            "name": "bug",
+            "node_id": "MDU6TGFiZWwyMDgwNDU5NDY=",
+            "url": "https://api.github.com/repos/unbindapp/unbind/labels/bug"
+          }
+        ],
+        "labels_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/labels{/name}",
+        "locked": false,
+        "milestone": null,
+        "node_id": "I_kwDOKbcdef6zAAAB",
+        "number": 1347,
+        "performed_via_github_app": null,
+        "reactions": {
+          "total_count": 0,
+          "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/reactions"
+        },
+        "repository_url": "https://api.github.com/repos/unbindapp/unbind",
+        "state": "open",
+        "state_reason": null,
+        "timeline_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/timeline",
+        "title": "Deploy logs stop streaming after 10 minutes on Firefox",
+        "updated_at": "\u003ctimeZ\u003e",
+        "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347",
+        "user": {
+          "id": 583231,
+          "login": "octocat",
+          "node_id": "MDQ6VXNlcjU4MzIzMQ==",
+          "site_admin": false,
+          "type": "User"
+        }
+      },
+      "repository": {
+        "default_branch": "master",
+        "full_name": "unbindapp/unbind",
+        "has_issues": true,
+        "html_url": "https://github.com/unbindapp/unbind",
+        "id": 700000001,
+        "name": "unbind",
+        "node_id": "R_kgDOKbcdef",
+        "owner": {
+          "id": 150000001,
+          "login": "unbindapp",
+          "type": "Organization"
+        },
+        "private": false
+      },
+      "sender": {
+        "id": 583231,
+        "login": "octocat",
+        "type": "User"
+      }
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": {
+        "displayName": "eve",
+        "email": "eve@acme.test",
+        "id": "\u003cid3\u003e",
+        "name": "Eve"
+      },
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "\u003ctoken1\u003e",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": null,
+      "cycle": null,
+      "description": "The log stream closes with **1006** after about ten minutes.",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid4\u003e",
+      "identifier": "ENG-1",
+      "labels": [
+        {
+          "color": "#eb5757",
+          "id": "\u003cid5\u003e",
+          "name": "Bug",
+          "parent": null
+        },
+        {
+          "color": "#0e8a16",
+          "id": "\u003cid7\u003e",
+          "name": "websocket",
+          "parent": null
+        }
+      ],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid6\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "eve",
+          "email": "eve@acme.test",
+          "id": "\u003cid3\u003e",
+          "name": "Eve"
+        }
+      ],
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Deploy logs stop streaming after 10 minutes on Firefox",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_issue",
+    "request": {
+      "id": "ENG-1"
+    },
+    "status": 200
+  },
+  {
+    "body": {
+      "ok": true
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/github/webhook",
+    "request": {
+      "action": "closed",
+      "installation": {
+        "account": {
+          "login": "acme-org"
+        },
+        "id": 77
+      },
+      "issue": {
+        "active_lock_reason": null,
+        "assignee": {
+          "id": 9000001,
+          "login": "Eve-GH",
+          "type": "User"
+        },
+        "assignees": [
+          {
+            "id": 9000001,
+            "login": "Eve-GH",
+            "type": "User"
+          }
+        ],
+        "author_association": "NONE",
+        "body": "The log stream closes with **1006** after about ten minutes.",
+        "closed_at": "\u003ctimeZ\u003e",
+        "comments": 0,
+        "comments_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/comments",
+        "created_at": "\u003ctimeZ\u003e",
+        "events_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/events",
+        "html_url": "https://github.com/unbindapp/unbind/issues/1347",
+        "id": 3500001347,
+        "labels": [
+          {
+            "color": "d73a4a",
+            "default": true,
+            "description": "Something isn't working",
+            "id": 208045946,
+            "name": "bug",
+            "node_id": "MDU6TGFiZWwyMDgwNDU5NDY=",
+            "url": "https://api.github.com/repos/unbindapp/unbind/labels/bug"
+          }
+        ],
+        "labels_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/labels{/name}",
+        "locked": false,
+        "milestone": null,
+        "node_id": "I_kwDOKbcdef6zAAAB",
+        "number": 1347,
+        "performed_via_github_app": null,
+        "reactions": {
+          "total_count": 0,
+          "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/reactions"
+        },
+        "repository_url": "https://api.github.com/repos/unbindapp/unbind",
+        "state": "closed",
+        "state_reason": "not_planned",
+        "timeline_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/timeline",
+        "title": "Deploy logs stop streaming after 10 minutes",
+        "updated_at": "\u003ctimeZ\u003e",
+        "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347",
+        "user": {
+          "id": 583231,
+          "login": "octocat",
+          "node_id": "MDQ6VXNlcjU4MzIzMQ==",
+          "site_admin": false,
+          "type": "User"
+        }
+      },
+      "repository": {
+        "default_branch": "master",
+        "full_name": "unbindapp/unbind",
+        "has_issues": true,
+        "html_url": "https://github.com/unbindapp/unbind",
+        "id": 700000001,
+        "name": "unbind",
+        "node_id": "R_kgDOKbcdef",
+        "owner": {
+          "id": 150000001,
+          "login": "unbindapp",
+          "type": "Organization"
+        },
+        "private": false
+      },
+      "sender": {
+        "id": 9000001,
+        "login": "Eve-GH",
+        "type": "User"
+      }
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": {
+        "displayName": "eve",
+        "email": "eve@acme.test",
+        "id": "\u003cid3\u003e",
+        "name": "Eve"
+      },
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "\u003ctoken1\u003e",
+      "canceledAt": "\u003ctime+00:00\u003e",
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": null,
+      "cycle": null,
+      "description": "The log stream closes with **1006** after about ten minutes.",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid4\u003e",
+      "identifier": "ENG-1",
+      "labels": [
+        {
+          "color": "#eb5757",
+          "id": "\u003cid5\u003e",
+          "name": "Bug",
+          "parent": null
+        },
+        {
+          "color": "#0e8a16",
+          "id": "\u003cid7\u003e",
+          "name": "websocket",
+          "parent": null
+        }
+      ],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#95a2b3",
+        "id": "\u003cid8\u003e",
+        "name": "Canceled",
+        "type": "canceled"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "eve",
+          "email": "eve@acme.test",
+          "id": "\u003cid3\u003e",
+          "name": "Eve"
+        }
+      ],
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Deploy logs stop streaming after 10 minutes on Firefox",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_issue",
+    "request": {
+      "id": "ENG-1"
+    },
+    "status": 200
+  },
+  {
+    "body": {
+      "ok": true
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/github/webhook",
+    "request": {
+      "action": "reopened",
+      "installation": {
+        "account": {
+          "login": "acme-org"
+        },
+        "id": 77
+      },
+      "issue": {
+        "active_lock_reason": null,
+        "assignee": {
+          "id": 9000001,
+          "login": "Eve-GH",
+          "type": "User"
+        },
+        "assignees": [
+          {
+            "id": 9000001,
+            "login": "Eve-GH",
+            "type": "User"
+          }
+        ],
+        "author_association": "NONE",
+        "body": "The log stream closes with **1006** after about ten minutes.",
+        "closed_at": null,
+        "comments": 0,
+        "comments_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/comments",
+        "created_at": "\u003ctimeZ\u003e",
+        "events_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/events",
+        "html_url": "https://github.com/unbindapp/unbind/issues/1347",
+        "id": 3500001347,
+        "labels": [
+          {
+            "color": "d73a4a",
+            "default": true,
+            "description": "Something isn't working",
+            "id": 208045946,
+            "name": "bug",
+            "node_id": "MDU6TGFiZWwyMDgwNDU5NDY=",
+            "url": "https://api.github.com/repos/unbindapp/unbind/labels/bug"
+          }
+        ],
+        "labels_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/labels{/name}",
+        "locked": false,
+        "milestone": null,
+        "node_id": "I_kwDOKbcdef6zAAAB",
+        "number": 1347,
+        "performed_via_github_app": null,
+        "reactions": {
+          "total_count": 0,
+          "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/reactions"
+        },
+        "repository_url": "https://api.github.com/repos/unbindapp/unbind",
+        "state": "open",
+        "state_reason": "reopened",
+        "timeline_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/timeline",
+        "title": "Deploy logs stop streaming after 10 minutes",
+        "updated_at": "\u003ctimeZ\u003e",
+        "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347",
+        "user": {
+          "id": 583231,
+          "login": "octocat",
+          "node_id": "MDQ6VXNlcjU4MzIzMQ==",
+          "site_admin": false,
+          "type": "User"
+        }
+      },
+      "repository": {
+        "default_branch": "master",
+        "full_name": "unbindapp/unbind",
+        "has_issues": true,
+        "html_url": "https://github.com/unbindapp/unbind",
+        "id": 700000001,
+        "name": "unbind",
+        "node_id": "R_kgDOKbcdef",
+        "owner": {
+          "id": 150000001,
+          "login": "unbindapp",
+          "type": "Organization"
+        },
+        "private": false
+      },
+      "sender": {
+        "id": 9000001,
+        "login": "Eve-GH",
+        "type": "User"
+      }
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": {
+        "displayName": "eve",
+        "email": "eve@acme.test",
+        "id": "\u003cid3\u003e",
+        "name": "Eve"
+      },
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "\u003ctoken1\u003e",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": null,
+      "cycle": null,
+      "description": "The log stream closes with **1006** after about ten minutes.",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid4\u003e",
+      "identifier": "ENG-1",
+      "labels": [
+        {
+          "color": "#eb5757",
+          "id": "\u003cid5\u003e",
+          "name": "Bug",
+          "parent": null
+        },
+        {
+          "color": "#0e8a16",
+          "id": "\u003cid7\u003e",
+          "name": "websocket",
+          "parent": null
+        }
+      ],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid6\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "eve",
+          "email": "eve@acme.test",
+          "id": "\u003cid3\u003e",
+          "name": "Eve"
+        }
+      ],
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Deploy logs stop streaming after 10 minutes on Firefox",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_issue",
+    "request": {
+      "id": "ENG-1"
+    },
+    "status": 200
+  },
+  {
+    "body": {
+      "ok": true
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/github/webhook",
+    "request": {
+      "action": "unassigned",
+      "assignee": {
+        "login": "Eve-GH"
+      },
+      "installation": {
+        "account": {
+          "login": "acme-org"
+        },
+        "id": 77
+      },
+      "issue": {
+        "active_lock_reason": null,
+        "assignee": {
+          "id": 9000001,
+          "login": "Eve-GH",
+          "type": "User"
+        },
+        "assignees": [
+          {
+            "id": 9000001,
+            "login": "Eve-GH",
+            "type": "User"
+          }
+        ],
+        "author_association": "NONE",
+        "body": "The log stream closes with **1006** after about ten minutes.",
+        "closed_at": null,
+        "comments": 0,
+        "comments_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/comments",
+        "created_at": "\u003ctimeZ\u003e",
+        "events_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/events",
+        "html_url": "https://github.com/unbindapp/unbind/issues/1347",
+        "id": 3500001347,
+        "labels": [
+          {
+            "color": "d73a4a",
+            "default": true,
+            "description": "Something isn't working",
+            "id": 208045946,
+            "name": "bug",
+            "node_id": "MDU6TGFiZWwyMDgwNDU5NDY=",
+            "url": "https://api.github.com/repos/unbindapp/unbind/labels/bug"
+          }
+        ],
+        "labels_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/labels{/name}",
+        "locked": false,
+        "milestone": null,
+        "node_id": "I_kwDOKbcdef6zAAAB",
+        "number": 1347,
+        "performed_via_github_app": null,
+        "reactions": {
+          "total_count": 0,
+          "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/reactions"
+        },
+        "repository_url": "https://api.github.com/repos/unbindapp/unbind",
+        "state": "open",
+        "state_reason": "reopened",
+        "timeline_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/timeline",
+        "title": "Deploy logs stop streaming after 10 minutes",
+        "updated_at": "\u003ctimeZ\u003e",
+        "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347",
+        "user": {
+          "id": 583231,
+          "login": "octocat",
+          "node_id": "MDQ6VXNlcjU4MzIzMQ==",
+          "site_admin": false,
+          "type": "User"
+        }
+      },
+      "repository": {
+        "default_branch": "master",
+        "full_name": "unbindapp/unbind",
+        "has_issues": true,
+        "html_url": "https://github.com/unbindapp/unbind",
+        "id": 700000001,
+        "name": "unbind",
+        "node_id": "R_kgDOKbcdef",
+        "owner": {
+          "id": 150000001,
+          "login": "unbindapp",
+          "type": "Organization"
+        },
+        "private": false
+      },
+      "sender": {
+        "id": 9000001,
+        "login": "Eve-GH",
+        "type": "User"
+      }
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "\u003ctoken1\u003e",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": null,
+      "cycle": null,
+      "description": "The log stream closes with **1006** after about ten minutes.",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid4\u003e",
+      "identifier": "ENG-1",
+      "labels": [
+        {
+          "color": "#eb5757",
+          "id": "\u003cid5\u003e",
+          "name": "Bug",
+          "parent": null
+        },
+        {
+          "color": "#0e8a16",
+          "id": "\u003cid7\u003e",
+          "name": "websocket",
+          "parent": null
+        }
+      ],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid6\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "eve",
+          "email": "eve@acme.test",
+          "id": "\u003cid3\u003e",
+          "name": "Eve"
+        }
+      ],
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Deploy logs stop streaming after 10 minutes on Firefox",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_issue",
+    "request": {
+      "id": "ENG-1"
+    },
+    "status": 200
+  },
+  {
+    "body": {
+      "ok": true
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/github/webhook",
+    "request": {
+      "action": "created",
+      "comment": {
+        "author_association": "NONE",
+        "body": "Same here on the staging cluster.",
+        "created_at": "\u003ctimeZ\u003e",
+        "html_url": "https://github.com/unbindapp/unbind/issues/1347#issuecomment-2400000001",
+        "id": 2400000001,
+        "issue_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347",
+        "node_id": "IC_kwDOKbcdef6Pabcd",
+        "performed_via_github_app": null,
+        "reactions": {
+          "total_count": 0
+        },
+        "updated_at": "\u003ctimeZ\u003e",
+        "url": "https://api.github.com/repos/unbindapp/unbind/issues/comments/2400000001",
+        "user": {
+          "id": 583231,
+          "login": "octocat",
+          "type": "User"
+        }
+      },
+      "installation": {
+        "account": {
+          "login": "acme-org"
+        },
+        "id": 77
+      },
+      "issue": {
+        "active_lock_reason": null,
+        "assignee": {
+          "id": 9000001,
+          "login": "Eve-GH",
+          "type": "User"
+        },
+        "assignees": [
+          {
+            "id": 9000001,
+            "login": "Eve-GH",
+            "type": "User"
+          }
+        ],
+        "author_association": "NONE",
+        "body": "The log stream closes with **1006** after about ten minutes.",
+        "closed_at": null,
+        "comments": 1,
+        "comments_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/comments",
+        "created_at": "\u003ctimeZ\u003e",
+        "events_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/events",
+        "html_url": "https://github.com/unbindapp/unbind/issues/1347",
+        "id": 3500001347,
+        "labels": [
+          {
+            "color": "d73a4a",
+            "default": true,
+            "description": "Something isn't working",
+            "id": 208045946,
+            "name": "bug",
+            "node_id": "MDU6TGFiZWwyMDgwNDU5NDY=",
+            "url": "https://api.github.com/repos/unbindapp/unbind/labels/bug"
+          }
+        ],
+        "labels_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/labels{/name}",
+        "locked": false,
+        "milestone": null,
+        "node_id": "I_kwDOKbcdef6zAAAB",
+        "number": 1347,
+        "performed_via_github_app": null,
+        "reactions": {
+          "total_count": 0,
+          "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/reactions"
+        },
+        "repository_url": "https://api.github.com/repos/unbindapp/unbind",
+        "state": "open",
+        "state_reason": null,
+        "timeline_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/timeline",
+        "title": "Deploy logs stop streaming after 10 minutes",
+        "updated_at": "\u003ctimeZ\u003e",
+        "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347",
+        "user": {
+          "id": 583231,
+          "login": "octocat",
+          "node_id": "MDQ6VXNlcjU4MzIzMQ==",
+          "site_admin": false,
+          "type": "User"
+        }
+      },
+      "repository": {
+        "default_branch": "master",
+        "full_name": "unbindapp/unbind",
+        "has_issues": true,
+        "html_url": "https://github.com/unbindapp/unbind",
+        "id": 700000001,
+        "name": "unbind",
+        "node_id": "R_kgDOKbcdef",
+        "owner": {
+          "id": 150000001,
+          "login": "unbindapp",
+          "type": "Organization"
+        },
+        "private": false
+      },
+      "sender": {
+        "id": 583231,
+        "login": "octocat",
+        "type": "User"
+      }
+    },
+    "status": 200
+  },
+  {
+    "body": {
+      "ok": true
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/github/webhook",
+    "request": {
+      "action": "created",
+      "comment": {
+        "author_association": "NONE",
+        "body": "Same here on the staging cluster.",
+        "created_at": "\u003ctimeZ\u003e",
+        "html_url": "https://github.com/unbindapp/unbind/issues/1347#issuecomment-2400000001",
+        "id": 2400000001,
+        "issue_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347",
+        "node_id": "IC_kwDOKbcdef6Pabcd",
+        "performed_via_github_app": null,
+        "reactions": {
+          "total_count": 0
+        },
+        "updated_at": "\u003ctimeZ\u003e",
+        "url": "https://api.github.com/repos/unbindapp/unbind/issues/comments/2400000001",
+        "user": {
+          "id": 583231,
+          "login": "octocat",
+          "type": "User"
+        }
+      },
+      "installation": {
+        "account": {
+          "login": "acme-org"
+        },
+        "id": 77
+      },
+      "issue": {
+        "active_lock_reason": null,
+        "assignee": {
+          "id": 9000001,
+          "login": "Eve-GH",
+          "type": "User"
+        },
+        "assignees": [
+          {
+            "id": 9000001,
+            "login": "Eve-GH",
+            "type": "User"
+          }
+        ],
+        "author_association": "NONE",
+        "body": "The log stream closes with **1006** after about ten minutes.",
+        "closed_at": null,
+        "comments": 1,
+        "comments_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/comments",
+        "created_at": "\u003ctimeZ\u003e",
+        "events_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/events",
+        "html_url": "https://github.com/unbindapp/unbind/issues/1347",
+        "id": 3500001347,
+        "labels": [
+          {
+            "color": "d73a4a",
+            "default": true,
+            "description": "Something isn't working",
+            "id": 208045946,
+            "name": "bug",
+            "node_id": "MDU6TGFiZWwyMDgwNDU5NDY=",
+            "url": "https://api.github.com/repos/unbindapp/unbind/labels/bug"
+          }
+        ],
+        "labels_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/labels{/name}",
+        "locked": false,
+        "milestone": null,
+        "node_id": "I_kwDOKbcdef6zAAAB",
+        "number": 1347,
+        "performed_via_github_app": null,
+        "reactions": {
+          "total_count": 0,
+          "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/reactions"
+        },
+        "repository_url": "https://api.github.com/repos/unbindapp/unbind",
+        "state": "open",
+        "state_reason": null,
+        "timeline_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/timeline",
+        "title": "Deploy logs stop streaming after 10 minutes",
+        "updated_at": "\u003ctimeZ\u003e",
+        "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347",
+        "user": {
+          "id": 583231,
+          "login": "octocat",
+          "node_id": "MDQ6VXNlcjU4MzIzMQ==",
+          "site_admin": false,
+          "type": "User"
+        }
+      },
+      "repository": {
+        "default_branch": "master",
+        "full_name": "unbindapp/unbind",
+        "has_issues": true,
+        "html_url": "https://github.com/unbindapp/unbind",
+        "id": 700000001,
+        "name": "unbind",
+        "node_id": "R_kgDOKbcdef",
+        "owner": {
+          "id": 150000001,
+          "login": "unbindapp",
+          "type": "Organization"
+        },
+        "private": false
+      },
+      "sender": {
+        "id": 583231,
+        "login": "octocat",
+        "type": "User"
+      }
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "body": "**@octocat on GitHub**\n\nSame here on the staging cluster.",
+          "createdAt": "\u003ctime+00:00\u003e",
+          "editedAt": null,
+          "id": "\u003cid9\u003e",
+          "quotedText": null,
+          "reactions": [],
+          "replies": [],
+          "resolvedAt": null,
+          "resolvingUser": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "user": null
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_comments",
+    "request": {
+      "issueId": "ENG-1"
+    },
+    "status": 200
+  },
+  {
+    "body": {
+      "ok": true
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/github/webhook",
+    "request": {
+      "action": "edited",
+      "changes": {
+        "body": {
+          "from": "Same here on the staging cluster."
+        }
+      },
+      "comment": {
+        "author_association": "NONE",
+        "body": "Same here on the staging and production clusters.",
+        "created_at": "\u003ctimeZ\u003e",
+        "html_url": "https://github.com/unbindapp/unbind/issues/1347#issuecomment-2400000001",
+        "id": 2400000001,
+        "issue_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347",
+        "node_id": "IC_kwDOKbcdef6Pabcd",
+        "performed_via_github_app": null,
+        "reactions": {
+          "total_count": 0
+        },
+        "updated_at": "\u003ctimeZ\u003e",
+        "url": "https://api.github.com/repos/unbindapp/unbind/issues/comments/2400000001",
+        "user": {
+          "id": 583231,
+          "login": "octocat",
+          "type": "User"
+        }
+      },
+      "installation": {
+        "account": {
+          "login": "acme-org"
+        },
+        "id": 77
+      },
+      "issue": {
+        "active_lock_reason": null,
+        "assignee": {
+          "id": 9000001,
+          "login": "Eve-GH",
+          "type": "User"
+        },
+        "assignees": [
+          {
+            "id": 9000001,
+            "login": "Eve-GH",
+            "type": "User"
+          }
+        ],
+        "author_association": "NONE",
+        "body": "The log stream closes with **1006** after about ten minutes.",
+        "closed_at": null,
+        "comments": 1,
+        "comments_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/comments",
+        "created_at": "\u003ctimeZ\u003e",
+        "events_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/events",
+        "html_url": "https://github.com/unbindapp/unbind/issues/1347",
+        "id": 3500001347,
+        "labels": [
+          {
+            "color": "d73a4a",
+            "default": true,
+            "description": "Something isn't working",
+            "id": 208045946,
+            "name": "bug",
+            "node_id": "MDU6TGFiZWwyMDgwNDU5NDY=",
+            "url": "https://api.github.com/repos/unbindapp/unbind/labels/bug"
+          }
+        ],
+        "labels_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/labels{/name}",
+        "locked": false,
+        "milestone": null,
+        "node_id": "I_kwDOKbcdef6zAAAB",
+        "number": 1347,
+        "performed_via_github_app": null,
+        "reactions": {
+          "total_count": 0,
+          "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/reactions"
+        },
+        "repository_url": "https://api.github.com/repos/unbindapp/unbind",
+        "state": "open",
+        "state_reason": null,
+        "timeline_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/timeline",
+        "title": "Deploy logs stop streaming after 10 minutes",
+        "updated_at": "\u003ctimeZ\u003e",
+        "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347",
+        "user": {
+          "id": 583231,
+          "login": "octocat",
+          "node_id": "MDQ6VXNlcjU4MzIzMQ==",
+          "site_admin": false,
+          "type": "User"
+        }
+      },
+      "repository": {
+        "default_branch": "master",
+        "full_name": "unbindapp/unbind",
+        "has_issues": true,
+        "html_url": "https://github.com/unbindapp/unbind",
+        "id": 700000001,
+        "name": "unbind",
+        "node_id": "R_kgDOKbcdef",
+        "owner": {
+          "id": 150000001,
+          "login": "unbindapp",
+          "type": "Organization"
+        },
+        "private": false
+      },
+      "sender": {
+        "id": 583231,
+        "login": "octocat",
+        "type": "User"
+      }
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "body": "**@octocat on GitHub**\n\nSame here on the staging and production clusters.",
+          "createdAt": "\u003ctime+00:00\u003e",
+          "editedAt": "\u003ctime+00:00\u003e",
+          "id": "\u003cid9\u003e",
+          "quotedText": null,
+          "reactions": [],
+          "replies": [],
+          "resolvedAt": null,
+          "resolvingUser": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "user": null
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_comments",
+    "request": {
+      "issueId": "ENG-1"
+    },
+    "status": 200
+  },
+  {
+    "body": {
+      "ok": true
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/github/webhook",
+    "request": {
+      "action": "created",
+      "comment": {
+        "author_association": "NONE",
+        "body": "Looking into it.",
+        "created_at": "\u003ctimeZ\u003e",
+        "html_url": "https://github.com/unbindapp/unbind/issues/1347#issuecomment-2400000001",
+        "id": 2400000002,
+        "issue_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347",
+        "node_id": "IC_kwDOKbcdef6Pabcd",
+        "performed_via_github_app": null,
+        "reactions": {
+          "total_count": 0
+        },
+        "updated_at": "\u003ctimeZ\u003e",
+        "url": "https://api.github.com/repos/unbindapp/unbind/issues/comments/2400000001",
+        "user": {
+          "login": "Eve-GH"
+        }
+      },
+      "installation": {
+        "account": {
+          "login": "acme-org"
+        },
+        "id": 77
+      },
+      "issue": {
+        "active_lock_reason": null,
+        "assignee": {
+          "id": 9000001,
+          "login": "Eve-GH",
+          "type": "User"
+        },
+        "assignees": [
+          {
+            "id": 9000001,
+            "login": "Eve-GH",
+            "type": "User"
+          }
+        ],
+        "author_association": "NONE",
+        "body": "The log stream closes with **1006** after about ten minutes.",
+        "closed_at": null,
+        "comments": 1,
+        "comments_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/comments",
+        "created_at": "\u003ctimeZ\u003e",
+        "events_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/events",
+        "html_url": "https://github.com/unbindapp/unbind/issues/1347",
+        "id": 3500001347,
+        "labels": [
+          {
+            "color": "d73a4a",
+            "default": true,
+            "description": "Something isn't working",
+            "id": 208045946,
+            "name": "bug",
+            "node_id": "MDU6TGFiZWwyMDgwNDU5NDY=",
+            "url": "https://api.github.com/repos/unbindapp/unbind/labels/bug"
+          }
+        ],
+        "labels_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/labels{/name}",
+        "locked": false,
+        "milestone": null,
+        "node_id": "I_kwDOKbcdef6zAAAB",
+        "number": 1347,
+        "performed_via_github_app": null,
+        "reactions": {
+          "total_count": 0,
+          "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/reactions"
+        },
+        "repository_url": "https://api.github.com/repos/unbindapp/unbind",
+        "state": "open",
+        "state_reason": null,
+        "timeline_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/timeline",
+        "title": "Deploy logs stop streaming after 10 minutes",
+        "updated_at": "\u003ctimeZ\u003e",
+        "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347",
+        "user": {
+          "id": 583231,
+          "login": "octocat",
+          "node_id": "MDQ6VXNlcjU4MzIzMQ==",
+          "site_admin": false,
+          "type": "User"
+        }
+      },
+      "repository": {
+        "default_branch": "master",
+        "full_name": "unbindapp/unbind",
+        "has_issues": true,
+        "html_url": "https://github.com/unbindapp/unbind",
+        "id": 700000001,
+        "name": "unbind",
+        "node_id": "R_kgDOKbcdef",
+        "owner": {
+          "id": 150000001,
+          "login": "unbindapp",
+          "type": "Organization"
+        },
+        "private": false
+      },
+      "sender": {
+        "id": 583231,
+        "login": "octocat",
+        "type": "User"
+      }
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "body": "**@octocat on GitHub**\n\nSame here on the staging and production clusters.",
+          "createdAt": "\u003ctime+00:00\u003e",
+          "editedAt": "\u003ctime+00:00\u003e",
+          "id": "\u003cid9\u003e",
+          "quotedText": null,
+          "reactions": [],
+          "replies": [],
+          "resolvedAt": null,
+          "resolvingUser": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "user": null
+        },
+        {
+          "body": "Looking into it.",
+          "createdAt": "\u003ctime+00:00\u003e",
+          "editedAt": null,
+          "id": "\u003cid10\u003e",
+          "quotedText": null,
+          "reactions": [],
+          "replies": [],
+          "resolvedAt": null,
+          "resolvingUser": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "user": {
+            "displayName": "eve",
+            "email": "eve@acme.test",
+            "id": "\u003cid3\u003e",
+            "name": "Eve"
+          }
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_comments",
+    "request": {
+      "issueId": "ENG-1"
+    },
+    "status": 200
+  },
+  {
+    "body": {
+      "ok": true
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/github/webhook",
+    "request": {
+      "action": "deleted",
+      "comment": {
+        "author_association": "NONE",
+        "body": "Same here on the staging cluster.",
+        "created_at": "\u003ctimeZ\u003e",
+        "html_url": "https://github.com/unbindapp/unbind/issues/1347#issuecomment-2400000001",
+        "id": 2400000001,
+        "issue_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347",
+        "node_id": "IC_kwDOKbcdef6Pabcd",
+        "performed_via_github_app": null,
+        "reactions": {
+          "total_count": 0
+        },
+        "updated_at": "\u003ctimeZ\u003e",
+        "url": "https://api.github.com/repos/unbindapp/unbind/issues/comments/2400000001",
+        "user": {
+          "id": 583231,
+          "login": "octocat",
+          "type": "User"
+        }
+      },
+      "installation": {
+        "account": {
+          "login": "acme-org"
+        },
+        "id": 77
+      },
+      "issue": {
+        "active_lock_reason": null,
+        "assignee": {
+          "id": 9000001,
+          "login": "Eve-GH",
+          "type": "User"
+        },
+        "assignees": [
+          {
+            "id": 9000001,
+            "login": "Eve-GH",
+            "type": "User"
+          }
+        ],
+        "author_association": "NONE",
+        "body": "The log stream closes with **1006** after about ten minutes.",
+        "closed_at": null,
+        "comments": 1,
+        "comments_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/comments",
+        "created_at": "\u003ctimeZ\u003e",
+        "events_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/events",
+        "html_url": "https://github.com/unbindapp/unbind/issues/1347",
+        "id": 3500001347,
+        "labels": [
+          {
+            "color": "d73a4a",
+            "default": true,
+            "description": "Something isn't working",
+            "id": 208045946,
+            "name": "bug",
+            "node_id": "MDU6TGFiZWwyMDgwNDU5NDY=",
+            "url": "https://api.github.com/repos/unbindapp/unbind/labels/bug"
+          }
+        ],
+        "labels_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/labels{/name}",
+        "locked": false,
+        "milestone": null,
+        "node_id": "I_kwDOKbcdef6zAAAB",
+        "number": 1347,
+        "performed_via_github_app": null,
+        "reactions": {
+          "total_count": 0,
+          "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/reactions"
+        },
+        "repository_url": "https://api.github.com/repos/unbindapp/unbind",
+        "state": "open",
+        "state_reason": null,
+        "timeline_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/timeline",
+        "title": "Deploy logs stop streaming after 10 minutes",
+        "updated_at": "\u003ctimeZ\u003e",
+        "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347",
+        "user": {
+          "id": 583231,
+          "login": "octocat",
+          "node_id": "MDQ6VXNlcjU4MzIzMQ==",
+          "site_admin": false,
+          "type": "User"
+        }
+      },
+      "repository": {
+        "default_branch": "master",
+        "full_name": "unbindapp/unbind",
+        "has_issues": true,
+        "html_url": "https://github.com/unbindapp/unbind",
+        "id": 700000001,
+        "name": "unbind",
+        "node_id": "R_kgDOKbcdef",
+        "owner": {
+          "id": 150000001,
+          "login": "unbindapp",
+          "type": "Organization"
+        },
+        "private": false
+      },
+      "sender": {
+        "id": 583231,
+        "login": "octocat",
+        "type": "User"
+      }
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "body": "Looking into it.",
+          "createdAt": "\u003ctime+00:00\u003e",
+          "editedAt": null,
+          "id": "\u003cid10\u003e",
+          "quotedText": null,
+          "reactions": [],
+          "replies": [],
+          "resolvedAt": null,
+          "resolvingUser": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "user": {
+            "displayName": "eve",
+            "email": "eve@acme.test",
+            "id": "\u003cid3\u003e",
+            "name": "Eve"
+          }
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_comments",
+    "request": {
+      "issueId": "ENG-1"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "backfill": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "id": "\u003cid1\u003e",
+          "installationId": 77,
+          "lastError": null,
+          "lastSyncedAt": "\u003ctime+00:00\u003e",
+          "linkedIssueCount": 1,
+          "project": null,
+          "repository": {
+            "fullName": "unbindapp/unbind",
+            "id": 700000001,
+            "url": "\u003clocal-server\u003e/unbindapp/unbind"
+          },
+          "team": {
+            "id": "\u003cid2\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "updatedAt": "\u003ctime+00:00\u003e"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_github_repo_syncs",
+    "request": {},
+    "status": 200
+  },
+  {
+    "body": {
+      "ok": true
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/github/webhook",
+    "request": {
+      "action": "deleted",
+      "installation": {
+        "account": {
+          "login": "acme-org"
+        },
+        "id": 77
+      },
+      "issue": {
+        "active_lock_reason": null,
+        "assignee": {
+          "id": 9000001,
+          "login": "Eve-GH",
+          "type": "User"
+        },
+        "assignees": [
+          {
+            "id": 9000001,
+            "login": "Eve-GH",
+            "type": "User"
+          }
+        ],
+        "author_association": "NONE",
+        "body": "The log stream closes with **1006** after about ten minutes.",
+        "closed_at": null,
+        "comments": 0,
+        "comments_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/comments",
+        "created_at": "\u003ctimeZ\u003e",
+        "events_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/events",
+        "html_url": "https://github.com/unbindapp/unbind/issues/1347",
+        "id": 3500001347,
+        "labels": [
+          {
+            "color": "d73a4a",
+            "default": true,
+            "description": "Something isn't working",
+            "id": 208045946,
+            "name": "bug",
+            "node_id": "MDU6TGFiZWwyMDgwNDU5NDY=",
+            "url": "https://api.github.com/repos/unbindapp/unbind/labels/bug"
+          }
+        ],
+        "labels_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/labels{/name}",
+        "locked": false,
+        "milestone": null,
+        "node_id": "I_kwDOKbcdef6zAAAB",
+        "number": 1347,
+        "performed_via_github_app": null,
+        "reactions": {
+          "total_count": 0,
+          "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/reactions"
+        },
+        "repository_url": "https://api.github.com/repos/unbindapp/unbind",
+        "state": "open",
+        "state_reason": null,
+        "timeline_url": "https://api.github.com/repos/unbindapp/unbind/issues/1347/timeline",
+        "title": "Deploy logs stop streaming after 10 minutes",
+        "updated_at": "\u003ctimeZ\u003e",
+        "url": "https://api.github.com/repos/unbindapp/unbind/issues/1347",
+        "user": {
+          "id": 583231,
+          "login": "octocat",
+          "node_id": "MDQ6VXNlcjU4MzIzMQ==",
+          "site_admin": false,
+          "type": "User"
+        }
+      },
+      "repository": {
+        "default_branch": "master",
+        "full_name": "unbindapp/unbind",
+        "has_issues": true,
+        "html_url": "https://github.com/unbindapp/unbind",
+        "id": 700000001,
+        "name": "unbind",
+        "node_id": "R_kgDOKbcdef",
+        "owner": {
+          "id": 150000001,
+          "login": "unbindapp",
+          "type": "Organization"
+        },
+        "private": false
+      },
+      "sender": {
+        "id": 583231,
+        "login": "octocat",
+        "type": "User"
+      }
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "\u003ctoken1\u003e",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 1,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": null,
+      "cycle": null,
+      "description": "The log stream closes with **1006** after about ten minutes.",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid4\u003e",
+      "identifier": "ENG-1",
+      "labels": [
+        {
+          "color": "#eb5757",
+          "id": "\u003cid5\u003e",
+          "name": "Bug",
+          "parent": null
+        },
+        {
+          "color": "#0e8a16",
+          "id": "\u003cid7\u003e",
+          "name": "websocket",
+          "parent": null
+        }
+      ],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid6\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "eve",
+          "email": "eve@acme.test",
+          "id": "\u003cid3\u003e",
+          "name": "Eve"
+        }
+      ],
+      "team": {
+        "id": "\u003cid2\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Deploy logs stop streaming after 10 minutes on Firefox",
+      "trashed": true,
+      "trashedAt": "\u003ctime+00:00\u003e",
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_issue",
+    "request": {
+      "id": "ENG-1"
+    },
+    "status": 200
+  }
+]

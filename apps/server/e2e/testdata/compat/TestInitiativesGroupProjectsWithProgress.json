@@ -1,0 +1,1660 @@
+[
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "canceledAt": null,
+      "canceledIssueCount": 0,
+      "color": null,
+      "completedAt": null,
+      "completedIssueCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "documents": [],
+      "estimate": {
+        "completed": 0,
+        "total": 0
+      },
+      "health": null,
+      "icon": null,
+      "id": "\u003cid2\u003e",
+      "initiatives": [],
+      "issueCount": 0,
+      "issueCountByStateType": {},
+      "labels": [],
+      "latestUpdate": null,
+      "lead": null,
+      "leadTeam": null,
+      "links": [],
+      "members": [],
+      "milestones": [],
+      "name": "One",
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "progress": 0,
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "related": []
+      },
+      "slugId": "\u003cslug1\u003e",
+      "sortOrder": 1000,
+      "startDate": null,
+      "startDateResolution": null,
+      "startedAt": null,
+      "status": {
+        "color": "#bec2c8",
+        "id": "\u003cid3\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "teams": [
+        {
+          "id": "\u003cid4\u003e",
+          "key": "ENG",
+          "name": "Engineering"
+        }
+      ],
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/project/one-\u003cslug1\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_project",
+    "request": {
+      "name": "One",
+      "setTeams": [
+        "ENG"
+      ]
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "canceledAt": null,
+      "canceledIssueCount": 0,
+      "color": null,
+      "completedAt": null,
+      "completedIssueCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "documents": [],
+      "estimate": {
+        "completed": 0,
+        "total": 0
+      },
+      "health": null,
+      "icon": null,
+      "id": "\u003cid5\u003e",
+      "initiatives": [],
+      "issueCount": 0,
+      "issueCountByStateType": {},
+      "labels": [],
+      "latestUpdate": null,
+      "lead": null,
+      "leadTeam": null,
+      "links": [],
+      "members": [],
+      "milestones": [],
+      "name": "Two",
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "progress": 0,
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "related": []
+      },
+      "slugId": "\u003cslug2\u003e",
+      "sortOrder": 2000,
+      "startDate": null,
+      "startDateResolution": null,
+      "startedAt": null,
+      "status": {
+        "color": "#bec2c8",
+        "id": "\u003cid3\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "teams": [
+        {
+          "id": "\u003cid4\u003e",
+          "key": "ENG",
+          "name": "Engineering"
+        }
+      ],
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/project/two-\u003cslug2\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_project",
+    "request": {
+      "name": "Two",
+      "setTeams": [
+        "ENG"
+      ]
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-1-done",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": "\u003ctime+00:00\u003e",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid6\u003e",
+      "identifier": "ENG-1",
+      "labels": [],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": {
+        "id": "\u003cid2\u003e",
+        "name": "One",
+        "slugId": "\u003cslug1\u003e"
+      },
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": "\u003ctime+00:00\u003e",
+      "startedTriageAt": null,
+      "state": {
+        "color": "#5e6ad2",
+        "id": "\u003cid7\u003e",
+        "name": "Done",
+        "type": "completed"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid4\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Done",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue",
+    "request": {
+      "project": "One",
+      "state": "Done",
+      "title": "Done"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-2-open",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid8\u003e",
+      "identifier": "ENG-2",
+      "labels": [],
+      "number": 2,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": {
+        "id": "\u003cid5\u003e",
+        "name": "Two",
+        "slugId": "\u003cslug2\u003e"
+      },
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -2000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid9\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid4\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Open",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-2"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue",
+    "request": {
+      "project": "Two",
+      "title": "Open"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "color": null,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "health": null,
+      "icon": null,
+      "id": "\u003cid10\u003e",
+      "name": "Grow 2030",
+      "owner": {
+        "displayName": "bob",
+        "email": "bob@acme.test",
+        "id": "\u003cid11\u003e",
+        "name": "Bob Jones"
+      },
+      "parent": null,
+      "progress": 0.5,
+      "projectCount": 2,
+      "slugId": "\u003cslug3\u003e",
+      "sortOrder": 1000,
+      "startedAt": null,
+      "status": "planned",
+      "summary": null,
+      "targetDate": "2030-12-31",
+      "targetDateResolution": null,
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/initiative/grow-2030-\u003cslug3\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_initiative",
+    "request": {
+      "links": [
+        {
+          "title": "OKRs",
+          "url": "https://x.dev/okr"
+        }
+      ],
+      "name": "Grow 2030",
+      "owner": "bob",
+      "setProjects": [
+        "One",
+        "Two"
+      ],
+      "targetDate": "2030-12-31"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "color": null,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "health": null,
+      "icon": null,
+      "id": "\u003cid10\u003e",
+      "name": "Grow 2030",
+      "owner": {
+        "displayName": "bob",
+        "email": "bob@acme.test",
+        "id": "\u003cid11\u003e",
+        "name": "Bob Jones"
+      },
+      "parent": null,
+      "progress": 0.5,
+      "projectCount": 2,
+      "slugId": "\u003cslug3\u003e",
+      "sortOrder": 1000,
+      "startedAt": "\u003ctime+00:00\u003e",
+      "status": "active",
+      "summary": null,
+      "targetDate": "2030-12-31",
+      "targetDateResolution": null,
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/initiative/grow-2030-\u003cslug3\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_initiative",
+    "request": {
+      "id": "\u003cslug3\u003e",
+      "status": "active"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "color": null,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "health": null,
+      "icon": null,
+      "id": "\u003cid12\u003e",
+      "name": "Grow EU",
+      "owner": null,
+      "parent": {
+        "id": "\u003cid10\u003e",
+        "name": "Grow 2030",
+        "slugId": "\u003cslug3\u003e"
+      },
+      "progress": 0,
+      "projectCount": 0,
+      "slugId": "\u003cslug4\u003e",
+      "sortOrder": 2000,
+      "startedAt": null,
+      "status": "planned",
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/initiative/grow-eu-\u003cslug4\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_initiative",
+    "request": {
+      "name": "Grow EU",
+      "parent": "Grow 2030"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "An initiative can't be part of itself or of its own sub-initiatives"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_initiative",
+    "request": {
+      "id": "Grow 2030",
+      "parent": "Grow EU"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "body": "Going well",
+      "commentCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "editedAt": null,
+      "health": "onTrack",
+      "id": "\u003cid13\u003e",
+      "initiative": {
+        "id": "\u003cid10\u003e",
+        "name": "Grow 2030",
+        "slugId": "\u003cslug3\u003e"
+      },
+      "project": null,
+      "reactions": [],
+      "type": "initiative",
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "user": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_status_update",
+    "request": {
+      "body": "Going well",
+      "initiative": "Grow 2030"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "color": null,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "documents": [],
+      "health": "onTrack",
+      "icon": null,
+      "id": "\u003cid10\u003e",
+      "latestUpdate": {
+        "body": "Going well",
+        "commentCount": 0,
+        "createdAt": "\u003ctime+00:00\u003e",
+        "editedAt": null,
+        "health": "onTrack",
+        "id": "\u003cid13\u003e",
+        "initiative": {
+          "id": "\u003cid10\u003e",
+          "name": "Grow 2030",
+          "slugId": "\u003cslug3\u003e"
+        },
+        "project": null,
+        "reactions": [],
+        "type": "initiative",
+        "updatedAt": "\u003ctime+00:00\u003e",
+        "user": {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      },
+      "links": [
+        {
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "id": "\u003cid14\u003e",
+          "label": "OKRs",
+          "url": "https://x.dev/okr"
+        }
+      ],
+      "name": "Grow 2030",
+      "owner": {
+        "displayName": "bob",
+        "email": "bob@acme.test",
+        "id": "\u003cid11\u003e",
+        "name": "Bob Jones"
+      },
+      "parent": null,
+      "progress": 0.5,
+      "projectCount": 2,
+      "projects": [
+        {
+          "health": null,
+          "id": "\u003cid2\u003e",
+          "lead": null,
+          "name": "One",
+          "progress": 1,
+          "slugId": "\u003cslug1\u003e",
+          "status": {
+            "color": "#bec2c8",
+            "id": "\u003cid3\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "targetDate": null
+        },
+        {
+          "health": null,
+          "id": "\u003cid5\u003e",
+          "lead": null,
+          "name": "Two",
+          "progress": 0,
+          "slugId": "\u003cslug2\u003e",
+          "status": {
+            "color": "#bec2c8",
+            "id": "\u003cid3\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "targetDate": null
+        }
+      ],
+      "slugId": "\u003cslug3\u003e",
+      "sortOrder": 1000,
+      "startedAt": "\u003ctime+00:00\u003e",
+      "status": "active",
+      "subInitiatives": [
+        {
+          "health": null,
+          "id": "\u003cid12\u003e",
+          "name": "Grow EU",
+          "owner": null,
+          "progress": 0,
+          "slugId": "\u003cslug4\u003e",
+          "status": "planned"
+        }
+      ],
+      "summary": null,
+      "targetDate": "2030-12-31",
+      "targetDateResolution": null,
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/initiative/grow-2030-\u003cslug3\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_initiative",
+    "request": {
+      "id": "grow 2030"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "canceledAt": null,
+      "canceledIssueCount": 0,
+      "color": null,
+      "completedAt": null,
+      "completedIssueCount": 1,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "documents": [],
+      "estimate": {
+        "completed": 0,
+        "total": 0
+      },
+      "health": null,
+      "icon": null,
+      "id": "\u003cid2\u003e",
+      "initiatives": [
+        {
+          "id": "\u003cid10\u003e",
+          "name": "Grow 2030",
+          "slugId": "\u003cslug3\u003e"
+        }
+      ],
+      "issueCount": 1,
+      "issueCountByStateType": {
+        "completed": 1
+      },
+      "labels": [],
+      "latestUpdate": null,
+      "lead": null,
+      "leadTeam": null,
+      "links": [],
+      "members": [],
+      "milestones": [],
+      "name": "One",
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "progress": 1,
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "related": []
+      },
+      "slugId": "\u003cslug1\u003e",
+      "sortOrder": 1000,
+      "startDate": null,
+      "startDateResolution": null,
+      "startedAt": null,
+      "status": {
+        "color": "#bec2c8",
+        "id": "\u003cid3\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "teams": [
+        {
+          "id": "\u003cid4\u003e",
+          "key": "ENG",
+          "name": "Engineering"
+        }
+      ],
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/project/one-\u003cslug1\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_project",
+    "request": {
+      "id": "One"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "color": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "health": "onTrack",
+          "icon": null,
+          "id": "\u003cid10\u003e",
+          "name": "Grow 2030",
+          "owner": {
+            "displayName": "bob",
+            "email": "bob@acme.test",
+            "id": "\u003cid11\u003e",
+            "name": "Bob Jones"
+          },
+          "parent": null,
+          "progress": 0.5,
+          "projectCount": 2,
+          "slugId": "\u003cslug3\u003e",
+          "sortOrder": 1000,
+          "startedAt": "\u003ctime+00:00\u003e",
+          "status": "active",
+          "summary": null,
+          "targetDate": "2030-12-31",
+          "targetDateResolution": null,
+          "trashed": false,
+          "trashedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/initiative/grow-2030-\u003cslug3\u003e"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_initiatives",
+    "request": {
+      "status": "active"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "color": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "health": null,
+          "icon": null,
+          "id": "\u003cid12\u003e",
+          "name": "Grow EU",
+          "owner": null,
+          "parent": {
+            "id": "\u003cid10\u003e",
+            "name": "Grow 2030",
+            "slugId": "\u003cslug3\u003e"
+          },
+          "progress": 0,
+          "projectCount": 0,
+          "slugId": "\u003cslug4\u003e",
+          "sortOrder": 2000,
+          "startedAt": null,
+          "status": "planned",
+          "summary": null,
+          "targetDate": null,
+          "targetDateResolution": null,
+          "trashed": false,
+          "trashedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/initiative/grow-eu-\u003cslug4\u003e"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_initiatives",
+    "request": {
+      "parent": "Grow 2030"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "canceledAt": null,
+          "canceledIssueCount": 0,
+          "color": null,
+          "completedAt": null,
+          "completedIssueCount": 0,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "health": null,
+          "icon": null,
+          "id": "\u003cid5\u003e",
+          "initiatives": [
+            {
+              "id": "\u003cid10\u003e",
+              "name": "Grow 2030",
+              "slugId": "\u003cslug3\u003e"
+            }
+          ],
+          "issueCount": 1,
+          "labels": [],
+          "lead": null,
+          "leadTeam": null,
+          "name": "Two",
+          "priority": 0,
+          "priorityLabel": "No priority",
+          "progress": 0,
+          "slugId": "\u003cslug2\u003e",
+          "sortOrder": 2000,
+          "startDate": null,
+          "startDateResolution": null,
+          "startedAt": null,
+          "status": {
+            "color": "#bec2c8",
+            "id": "\u003cid3\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "summary": null,
+          "targetDate": null,
+          "targetDateResolution": null,
+          "teams": [
+            {
+              "id": "\u003cid4\u003e",
+              "key": "ENG",
+              "name": "Engineering"
+            }
+          ],
+          "trashed": false,
+          "trashedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/project/two-\u003cslug2\u003e"
+        },
+        {
+          "archivedAt": null,
+          "canceledAt": null,
+          "canceledIssueCount": 0,
+          "color": null,
+          "completedAt": null,
+          "completedIssueCount": 1,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "health": null,
+          "icon": null,
+          "id": "\u003cid2\u003e",
+          "initiatives": [
+            {
+              "id": "\u003cid10\u003e",
+              "name": "Grow 2030",
+              "slugId": "\u003cslug3\u003e"
+            }
+          ],
+          "issueCount": 1,
+          "labels": [],
+          "lead": null,
+          "leadTeam": null,
+          "name": "One",
+          "priority": 0,
+          "priorityLabel": "No priority",
+          "progress": 1,
+          "slugId": "\u003cslug1\u003e",
+          "sortOrder": 1000,
+          "startDate": null,
+          "startDateResolution": null,
+          "startedAt": null,
+          "status": {
+            "color": "#bec2c8",
+            "id": "\u003cid3\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "summary": null,
+          "targetDate": null,
+          "targetDateResolution": null,
+          "teams": [
+            {
+              "id": "\u003cid4\u003e",
+              "key": "ENG",
+              "name": "Engineering"
+            }
+          ],
+          "trashed": false,
+          "trashedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/project/one-\u003cslug1\u003e"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_projects",
+    "request": {
+      "initiative": "\u003cslug3\u003e"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "color": null,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "health": null,
+      "icon": null,
+      "id": "\u003cid12\u003e",
+      "name": "Grow EU",
+      "owner": null,
+      "parent": {
+        "id": "\u003cid10\u003e",
+        "name": "Grow 2030",
+        "slugId": "\u003cslug3\u003e"
+      },
+      "progress": 0,
+      "projectCount": 0,
+      "slugId": "\u003cslug4\u003e",
+      "sortOrder": 2000,
+      "startedAt": null,
+      "status": "planned",
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "trashed": true,
+      "trashedAt": "\u003ctime+00:00\u003e",
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/initiative/grow-eu-\u003cslug4\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/delete_initiative",
+    "request": {
+      "id": "Grow EU"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "color": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "health": "onTrack",
+          "icon": null,
+          "id": "\u003cid10\u003e",
+          "name": "Grow 2030",
+          "owner": {
+            "displayName": "bob",
+            "email": "bob@acme.test",
+            "id": "\u003cid11\u003e",
+            "name": "Bob Jones"
+          },
+          "parent": null,
+          "progress": 0.5,
+          "projectCount": 2,
+          "slugId": "\u003cslug3\u003e",
+          "sortOrder": 1000,
+          "startedAt": "\u003ctime+00:00\u003e",
+          "status": "active",
+          "summary": null,
+          "targetDate": "2030-12-31",
+          "targetDateResolution": null,
+          "trashed": false,
+          "trashedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/initiative/grow-2030-\u003cslug3\u003e"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_initiatives",
+    "request": {},
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "color": null,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "health": null,
+      "icon": null,
+      "id": "\u003cid12\u003e",
+      "name": "Grow EU",
+      "owner": null,
+      "parent": {
+        "id": "\u003cid10\u003e",
+        "name": "Grow 2030",
+        "slugId": "\u003cslug3\u003e"
+      },
+      "progress": 0,
+      "projectCount": 0,
+      "slugId": "\u003cslug4\u003e",
+      "sortOrder": 2000,
+      "startedAt": null,
+      "status": "planned",
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/initiative/grow-eu-\u003cslug4\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/restore_initiative",
+    "request": {
+      "id": "Grow EU"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "color": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "health": null,
+          "icon": null,
+          "id": "\u003cid12\u003e",
+          "name": "Grow EU",
+          "owner": null,
+          "parent": {
+            "id": "\u003cid10\u003e",
+            "name": "Grow 2030",
+            "slugId": "\u003cslug3\u003e"
+          },
+          "progress": 0,
+          "projectCount": 0,
+          "slugId": "\u003cslug4\u003e",
+          "sortOrder": 2000,
+          "startedAt": null,
+          "status": "planned",
+          "summary": null,
+          "targetDate": null,
+          "targetDateResolution": null,
+          "trashed": false,
+          "trashedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/initiative/grow-eu-\u003cslug4\u003e"
+        },
+        {
+          "archivedAt": null,
+          "color": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "health": "onTrack",
+          "icon": null,
+          "id": "\u003cid10\u003e",
+          "name": "Grow 2030",
+          "owner": {
+            "displayName": "bob",
+            "email": "bob@acme.test",
+            "id": "\u003cid11\u003e",
+            "name": "Bob Jones"
+          },
+          "parent": null,
+          "progress": 0.5,
+          "projectCount": 2,
+          "slugId": "\u003cslug3\u003e",
+          "sortOrder": 1000,
+          "startedAt": "\u003ctime+00:00\u003e",
+          "status": "active",
+          "summary": null,
+          "targetDate": "2030-12-31",
+          "targetDateResolution": null,
+          "trashed": false,
+          "trashedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/initiative/grow-2030-\u003cslug3\u003e"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_initiatives",
+    "request": {},
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": "\u003ctime+00:00\u003e",
+      "color": null,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "health": null,
+      "icon": null,
+      "id": "\u003cid12\u003e",
+      "name": "Grow EU",
+      "owner": null,
+      "parent": {
+        "id": "\u003cid10\u003e",
+        "name": "Grow 2030",
+        "slugId": "\u003cslug3\u003e"
+      },
+      "progress": 0,
+      "projectCount": 0,
+      "slugId": "\u003cslug4\u003e",
+      "sortOrder": 2000,
+      "startedAt": null,
+      "status": "planned",
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/initiative/grow-eu-\u003cslug4\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/archive_initiative",
+    "request": {
+      "id": "Grow EU"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "color": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "health": "onTrack",
+          "icon": null,
+          "id": "\u003cid10\u003e",
+          "name": "Grow 2030",
+          "owner": {
+            "displayName": "bob",
+            "email": "bob@acme.test",
+            "id": "\u003cid11\u003e",
+            "name": "Bob Jones"
+          },
+          "parent": null,
+          "progress": 0.5,
+          "projectCount": 2,
+          "slugId": "\u003cslug3\u003e",
+          "sortOrder": 1000,
+          "startedAt": "\u003ctime+00:00\u003e",
+          "status": "active",
+          "summary": null,
+          "targetDate": "2030-12-31",
+          "targetDateResolution": null,
+          "trashed": false,
+          "trashedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/initiative/grow-2030-\u003cslug3\u003e"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_initiatives",
+    "request": {},
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": "\u003ctime+00:00\u003e",
+          "color": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "health": null,
+          "icon": null,
+          "id": "\u003cid12\u003e",
+          "name": "Grow EU",
+          "owner": null,
+          "parent": {
+            "id": "\u003cid10\u003e",
+            "name": "Grow 2030",
+            "slugId": "\u003cslug3\u003e"
+          },
+          "progress": 0,
+          "projectCount": 0,
+          "slugId": "\u003cslug4\u003e",
+          "sortOrder": 2000,
+          "startedAt": null,
+          "status": "planned",
+          "summary": null,
+          "targetDate": null,
+          "targetDateResolution": null,
+          "trashed": false,
+          "trashedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/initiative/grow-eu-\u003cslug4\u003e"
+        },
+        {
+          "archivedAt": null,
+          "color": null,
+          "completedAt": null,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "health": "onTrack",
+          "icon": null,
+          "id": "\u003cid10\u003e",
+          "name": "Grow 2030",
+          "owner": {
+            "displayName": "bob",
+            "email": "bob@acme.test",
+            "id": "\u003cid11\u003e",
+            "name": "Bob Jones"
+          },
+          "parent": null,
+          "progress": 0.5,
+          "projectCount": 2,
+          "slugId": "\u003cslug3\u003e",
+          "sortOrder": 1000,
+          "startedAt": "\u003ctime+00:00\u003e",
+          "status": "active",
+          "summary": null,
+          "targetDate": "2030-12-31",
+          "targetDateResolution": null,
+          "trashed": false,
+          "trashedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/initiative/grow-2030-\u003cslug3\u003e"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_initiatives",
+    "request": {
+      "includeArchived": true
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "color": null,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "health": null,
+      "icon": null,
+      "id": "\u003cid12\u003e",
+      "name": "Grow EU",
+      "owner": null,
+      "parent": {
+        "id": "\u003cid10\u003e",
+        "name": "Grow 2030",
+        "slugId": "\u003cslug3\u003e"
+      },
+      "progress": 0,
+      "projectCount": 0,
+      "slugId": "\u003cslug4\u003e",
+      "sortOrder": 2000,
+      "startedAt": null,
+      "status": "planned",
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/initiative/grow-eu-\u003cslug4\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/unarchive_initiative",
+    "request": {
+      "id": "Grow EU"
+    },
+    "status": 200
+  }
+]

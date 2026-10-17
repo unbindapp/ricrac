@@ -1,0 +1,137 @@
+[
+  {
+    "auth": "session",
+    "body": {
+      "active": true,
+      "avatarUrl": null,
+      "displayName": "bobby",
+      "email": "bob@acme.test",
+      "emailNotifications": true,
+      "id": "\u003cid1\u003e",
+      "isMe": true,
+      "joinedAt": "\u003ctime+00:00\u003e",
+      "name": "Bob Jones",
+      "openIssueCount": 0,
+      "role": "member",
+      "teams": [],
+      "timezone": "Europe/Berlin"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/update_user",
+    "request": {
+      "displayName": "bobby",
+      "id": "me",
+      "timezone": "Europe/Berlin"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "active": true,
+      "avatarUrl": null,
+      "displayName": "bobby",
+      "email": "bob@acme.test",
+      "emailNotifications": true,
+      "id": "\u003cid1\u003e",
+      "isMe": true,
+      "joinedAt": "\u003ctime+00:00\u003e",
+      "name": "Bob Jones",
+      "openIssueCount": 0,
+      "role": "member",
+      "teams": [],
+      "timezone": null
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/update_user",
+    "request": {
+      "id": "me",
+      "timezone": null
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "\"Mars/Base\" isn't a timezone; use an IANA name like Europe/Berlin or UTC"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/update_user",
+    "request": {
+      "id": "me",
+      "timezone": "Mars/Base"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "You can only change your own name, display name, timezone and email notifications"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/update_user",
+    "request": {
+      "id": "ann",
+      "name": "Annie"
+    },
+    "status": 403
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "You can only change your own name, display name, timezone and email notifications"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/update_user",
+    "request": {
+      "displayName": "b",
+      "id": "bob"
+    },
+    "status": 403
+  }
+]

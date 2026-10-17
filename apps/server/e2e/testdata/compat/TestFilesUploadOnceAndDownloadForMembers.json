@@ -1,0 +1,469 @@
+[
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-1-crash",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid2\u003e",
+      "identifier": "ENG-1",
+      "labels": [],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid3\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid4\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Crash",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue",
+    "request": {
+      "team": "ENG",
+      "title": "Crash"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "assetUrl": "http://localhost:3000/files/\u003cid5\u003e",
+      "curl": "curl -sS --fail-with-body -X PUT -H 'content-type: image/png' --data-binary @\u003cfile\u003e 'http://localhost:3000/uploads/rr_up_\u003csecret1\u003e'",
+      "expiresAt": "\u003ctimeZ\u003e",
+      "fileId": "\u003cid5\u003e",
+      "markdown": "![shot.png](http://localhost:3000/files/\u003cid5\u003e)",
+      "uploadUrl": "http://localhost:3000/uploads/rr_up_\u003csecret1\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/prepare_file_upload",
+    "request": {
+      "contentType": "image/png",
+      "name": "shot.png",
+      "size": 15
+    },
+    "status": 200
+  },
+  {
+    "auth": "bearer",
+    "body": {
+      "error": "No such file"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "GET",
+    "path": "/files/\u003cid5\u003e",
+    "status": 404
+  },
+  {
+    "body": {
+      "assetUrl": "http://localhost:3000/files/\u003cid5\u003e",
+      "fileId": "\u003cid5\u003e",
+      "size": 15
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "PUT",
+    "path": "/uploads/rr_up_\u003csecret1\u003e",
+    "request": "�PNG fake image",
+    "status": 200
+  },
+  {
+    "body": {
+      "error": "This upload URL is unknown, expired or already used; get a new one with prepare_file_upload"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "PUT",
+    "path": "/uploads/rr_up_\u003csecret1\u003e",
+    "request": "�PNG fake image",
+    "status": 404
+  },
+  {
+    "body": {
+      "error": "Not signed in"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "GET",
+    "path": "/files/\u003cid5\u003e",
+    "status": 401
+  },
+  {
+    "auth": "bearer",
+    "body": {
+      "error": "Not signed in"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "GET",
+    "path": "/files/\u003cid5\u003e",
+    "status": 401
+  },
+  {
+    "auth": "bearer",
+    "body": "�PNG fake image",
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Cache-Control": "private, max-age=3600",
+      "Content-Disposition": "inline; filename=\"shot.png\"; filename*=UTF-8''shot%2Epng",
+      "Content-Security-Policy": "sandbox",
+      "Content-Type": "image/png",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "GET",
+    "path": "/files/\u003cid5\u003e",
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": "�PNG fake image",
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Cache-Control": "private, max-age=3600",
+      "Content-Disposition": "inline; filename=\"shot.png\"; filename*=UTF-8''shot%2Epng",
+      "Content-Security-Policy": "sandbox",
+      "Content-Type": "image/png",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "GET",
+    "path": "/files/\u003cid5\u003e",
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "No such file"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "GET",
+    "path": "/files/\u003cid5\u003e",
+    "status": 404
+  },
+  {
+    "auth": "session",
+    "body": {
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "iconUrl": null,
+      "id": "\u003cid6\u003e",
+      "issue": {
+        "id": "\u003cid2\u003e",
+        "identifier": "ENG-1",
+        "state": {
+          "color": "#bec2c8",
+          "id": "\u003cid3\u003e",
+          "name": "Backlog",
+          "type": "backlog"
+        },
+        "title": "Crash"
+      },
+      "metadata": {
+        "contentType": "image/png",
+        "fileId": "\u003cid5\u003e",
+        "name": "shot.png",
+        "size": 15
+      },
+      "sourceType": "upload",
+      "subtitle": "image/png, 15 B",
+      "title": "shot.png",
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/files/\u003cid5\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/create_attachment_from_upload",
+    "request": {
+      "fileId": "\u003cid5\u003e",
+      "issue": "ENG-1"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "assetUrl": "http://localhost:3000/files/\u003cid7\u003e",
+      "contentType": "text/html",
+      "fileId": "\u003cid7\u003e",
+      "markdown": "[notes.html](http://localhost:3000/files/\u003cid7\u003e)",
+      "name": "notes.html",
+      "size": 11
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/upload_file",
+    "request": {
+      "base64": "PGgxPmhpPC9oMT4=",
+      "contentType": "text/html",
+      "name": "notes.html"
+    },
+    "status": 200
+  },
+  {
+    "auth": "bearer",
+    "body": "\u003ch1\u003ehi\u003c/h1\u003e",
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Cache-Control": "private, max-age=3600",
+      "Content-Disposition": "attachment; filename=\"notes.html\"; filename*=UTF-8''notes%2Ehtml",
+      "Content-Security-Policy": "sandbox",
+      "Content-Type": "text/html",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "GET",
+    "path": "/files/\u003cid7\u003e",
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "size is the file's size in bytes, at most 1048576"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/prepare_file_upload",
+    "request": {
+      "contentType": "application/octet-stream",
+      "name": "big.bin",
+      "size": 2097152
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "\"png\" isn't a content type; use one like image/png, text/plain or application/pdf"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/prepare_file_upload",
+    "request": {
+      "contentType": "png",
+      "name": "x",
+      "size": 1
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "assetUrl": "http://localhost:3000/files/\u003cid8\u003e",
+      "curl": "curl -sS --fail-with-body -X PUT -H 'content-type: text/plain' --data-binary @\u003cfile\u003e 'http://localhost:3000/uploads/rr_up_\u003csecret2\u003e'",
+      "expiresAt": "\u003ctimeZ\u003e",
+      "fileId": "\u003cid8\u003e",
+      "markdown": "[later.txt](http://localhost:3000/files/\u003cid8\u003e)",
+      "uploadUrl": "http://localhost:3000/uploads/rr_up_\u003csecret2\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/prepare_file_upload",
+    "request": {
+      "contentType": "text/plain",
+      "name": "later.txt",
+      "size": 1
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "The file hasn't been uploaded yet; PUT it to its uploadUrl first"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/create_attachment_from_upload",
+    "request": {
+      "fileId": "\u003cid8\u003e",
+      "issue": "ENG-1"
+    },
+    "status": 400
+  }
+]

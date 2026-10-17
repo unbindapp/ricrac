@@ -1,0 +1,519 @@
+template: testify
+template-data:
+  unroll-variadic: true
+include-auto-generated: true
+packages:
+  ricrac/internal/repositories:
+    config:
+      dir: ./mocks/repository
+    interfaces:
+      TxInterface:
+        config:
+          dir: ./mocks/repository/tx
+          filename: tx_mock.go
+          structname: TxMock
+          pkgname: mocks_repository_tx
+  ricrac/internal/repositories/repositories:
+    config:
+      dir: ./mocks/repositories
+    interfaces:
+      RepositoriesInterface:
+        config:
+          filename: repositories_mock.go
+          structname: RepositoriesMock
+          pkgname: mocks_repositories
+  ricrac/internal/repositories/access:
+    config:
+      dir: ./mocks/repository/access
+    interfaces:
+      AccessRepositoryInterface:
+        config:
+          filename: access_repository_mock.go
+          structname: AccessRepositoryMock
+          pkgname: mocks_repository_access
+  ricrac/internal/repositories/resolve:
+    config:
+      dir: ./mocks/repository/resolve
+    interfaces:
+      ResolveRepositoryInterface:
+        config:
+          filename: resolve_repository_mock.go
+          structname: ResolveRepositoryMock
+          pkgname: mocks_repository_resolve
+  ricrac/internal/repositories/events:
+    config:
+      dir: ./mocks/repository/events
+    interfaces:
+      EventsRepositoryInterface:
+        config:
+          filename: events_repository_mock.go
+          structname: EventsRepositoryMock
+          pkgname: mocks_repository_events
+  ricrac/internal/repositories/label:
+    config:
+      dir: ./mocks/repository/label
+    interfaces:
+      LabelRepositoryInterface:
+        config:
+          filename: label_repository_mock.go
+          structname: LabelRepositoryMock
+          pkgname: mocks_repository_label
+  ricrac/internal/services/resolve:
+    config:
+      dir: ./mocks/services/resolve
+    interfaces:
+      ResolveServiceInterface:
+        config:
+          filename: resolve_service_mock.go
+          structname: ResolveServiceMock
+          pkgname: mocks_services_resolve
+  ricrac/internal/services/events:
+    config:
+      dir: ./mocks/services/events
+    interfaces:
+      EventsServiceInterface:
+        config:
+          filename: events_service_mock.go
+          structname: EventsServiceMock
+          pkgname: mocks_services_events
+  ricrac/internal/repositories/issue:
+    config:
+      dir: ./mocks/repository/issue
+    interfaces:
+      IssueRepositoryInterface:
+        config:
+          filename: issue_repository_mock.go
+          structname: IssueRepositoryMock
+          pkgname: mocks_repository_issue
+  ricrac/internal/repositories/comment:
+    config:
+      dir: ./mocks/repository/comment
+    interfaces:
+      CommentRepositoryInterface:
+        config:
+          filename: comment_repository_mock.go
+          structname: CommentRepositoryMock
+          pkgname: mocks_repository_comment
+  ricrac/internal/repositories/attachment:
+    config:
+      dir: ./mocks/repository/attachment
+    interfaces:
+      AttachmentRepositoryInterface:
+        config:
+          filename: attachment_repository_mock.go
+          structname: AttachmentRepositoryMock
+          pkgname: mocks_repository_attachment
+  ricrac/internal/repositories/seed:
+    config:
+      dir: ./mocks/repository/seed
+    interfaces:
+      SeedRepositoryInterface:
+        config:
+          filename: seed_repository_mock.go
+          structname: SeedRepositoryMock
+          pkgname: mocks_repository_seed
+  ricrac/internal/services/issue:
+    config:
+      dir: ./mocks/services/issue
+    interfaces:
+      IssueServiceInterface:
+        config:
+          filename: issue_service_mock.go
+          structname: IssueServiceMock
+          pkgname: mocks_services_issue
+  ricrac/internal/services/comment:
+    config:
+      dir: ./mocks/services/comment
+    interfaces:
+      CommentServiceInterface:
+        config:
+          filename: comment_service_mock.go
+          structname: CommentServiceMock
+          pkgname: mocks_services_comment
+  ricrac/internal/services/attachment:
+    config:
+      dir: ./mocks/services/attachment
+    interfaces:
+      AttachmentServiceInterface:
+        config:
+          filename: attachment_service_mock.go
+          structname: AttachmentServiceMock
+          pkgname: mocks_services_attachment
+  ricrac/internal/services/seed:
+    config:
+      dir: ./mocks/services/seed
+    interfaces:
+      SeedServiceInterface:
+        config:
+          filename: seed_service_mock.go
+          structname: SeedServiceMock
+          pkgname: mocks_services_seed
+  ricrac/internal/repositories/notification:
+    config:
+      dir: ./mocks/repository/notification
+    interfaces:
+      NotificationRepositoryInterface:
+        config:
+          filename: notification_repository_mock.go
+          structname: NotificationRepositoryMock
+          pkgname: mocks_repository_notification
+  ricrac/internal/repositories/search:
+    config:
+      dir: ./mocks/repository/search
+    interfaces:
+      SearchRepositoryInterface:
+        config:
+          filename: search_repository_mock.go
+          structname: SearchRepositoryMock
+          pkgname: mocks_repository_search
+  ricrac/internal/services/notification:
+    config:
+      dir: ./mocks/services/notification
+    interfaces:
+      NotificationServiceInterface:
+        config:
+          filename: notification_service_mock.go
+          structname: NotificationServiceMock
+          pkgname: mocks_services_notification
+  ricrac/internal/services/search:
+    config:
+      dir: ./mocks/services/search
+    interfaces:
+      SearchServiceInterface:
+        config:
+          filename: search_service_mock.go
+          structname: SearchServiceMock
+          pkgname: mocks_services_search
+  ricrac/internal/repositories/account:
+    config:
+      dir: ./mocks/repository/account
+    interfaces:
+      AccountRepositoryInterface:
+        config:
+          filename: account_repository_mock.go
+          structname: AccountRepositoryMock
+          pkgname: mocks_repository_account
+  ricrac/internal/repositories/oauth:
+    config:
+      dir: ./mocks/repository/oauth
+    interfaces:
+      OAuthRepositoryInterface:
+        config:
+          filename: oauth_repository_mock.go
+          structname: OAuthRepositoryMock
+          pkgname: mocks_repository_oauth
+  ricrac/internal/services/access:
+    config:
+      dir: ./mocks/services/access
+    interfaces:
+      AccessServiceInterface:
+        config:
+          filename: access_service_mock.go
+          structname: AccessServiceMock
+          pkgname: mocks_services_access
+  ricrac/internal/services/account:
+    config:
+      dir: ./mocks/services/account
+    interfaces:
+      AccountServiceInterface:
+        config:
+          filename: account_service_mock.go
+          structname: AccountServiceMock
+          pkgname: mocks_services_account
+  ricrac/internal/repositories/workspace:
+    config:
+      dir: ./mocks/repository/workspace
+    interfaces:
+      WorkspaceRepositoryInterface:
+        config:
+          filename: workspace_repository_mock.go
+          structname: WorkspaceRepositoryMock
+          pkgname: mocks_repository_workspace
+  ricrac/internal/repositories/team:
+    config:
+      dir: ./mocks/repository/team
+    interfaces:
+      TeamRepositoryInterface:
+        config:
+          filename: team_repository_mock.go
+          structname: TeamRepositoryMock
+          pkgname: mocks_repository_team
+  ricrac/internal/repositories/state:
+    config:
+      dir: ./mocks/repository/state
+    interfaces:
+      StateRepositoryInterface:
+        config:
+          filename: state_repository_mock.go
+          structname: StateRepositoryMock
+          pkgname: mocks_repository_state
+  ricrac/internal/repositories/email:
+    config:
+      dir: ./mocks/repository/email
+    interfaces:
+      EmailRepositoryInterface:
+        config:
+          filename: email_repository_mock.go
+          structname: EmailRepositoryMock
+          pkgname: mocks_repository_email
+  ricrac/internal/services/workspace:
+    config:
+      dir: ./mocks/services/workspace
+    interfaces:
+      WorkspaceServiceInterface:
+        config:
+          filename: workspace_service_mock.go
+          structname: WorkspaceServiceMock
+          pkgname: mocks_services_workspace
+  ricrac/internal/services/team:
+    config:
+      dir: ./mocks/services/team
+    interfaces:
+      TeamServiceInterface:
+        config:
+          filename: team_service_mock.go
+          structname: TeamServiceMock
+          pkgname: mocks_services_team
+  ricrac/internal/services/state:
+    config:
+      dir: ./mocks/services/state
+    interfaces:
+      StateServiceInterface:
+        config:
+          filename: state_service_mock.go
+          structname: StateServiceMock
+          pkgname: mocks_services_state
+  ricrac/internal/services/email:
+    config:
+      dir: ./mocks/services/email
+    interfaces:
+      EmailServiceInterface:
+        config:
+          filename: email_service_mock.go
+          structname: EmailServiceMock
+          pkgname: mocks_services_email
+  ricrac/internal/repositories/cycle:
+    config:
+      dir: ./mocks/repository/cycle
+    interfaces:
+      CycleRepositoryInterface:
+        config:
+          filename: cycle_repository_mock.go
+          structname: CycleRepositoryMock
+          pkgname: mocks_repository_cycle
+  ricrac/internal/repositories/document:
+    config:
+      dir: ./mocks/repository/document
+    interfaces:
+      DocumentRepositoryInterface:
+        config:
+          filename: document_repository_mock.go
+          structname: DocumentRepositoryMock
+          pkgname: mocks_repository_document
+  ricrac/internal/repositories/favorite:
+    config:
+      dir: ./mocks/repository/favorite
+    interfaces:
+      FavoriteRepositoryInterface:
+        config:
+          filename: favorite_repository_mock.go
+          structname: FavoriteRepositoryMock
+          pkgname: mocks_repository_favorite
+  ricrac/internal/repositories/template:
+    config:
+      dir: ./mocks/repository/template
+    interfaces:
+      TemplateRepositoryInterface:
+        config:
+          filename: template_repository_mock.go
+          structname: TemplateRepositoryMock
+          pkgname: mocks_repository_template
+  ricrac/internal/services/cycle:
+    config:
+      dir: ./mocks/services/cycle
+    interfaces:
+      CycleServiceInterface:
+        config:
+          filename: cycle_service_mock.go
+          structname: CycleServiceMock
+          pkgname: mocks_services_cycle
+  ricrac/internal/services/document:
+    config:
+      dir: ./mocks/services/document
+    interfaces:
+      DocumentServiceInterface:
+        config:
+          filename: document_service_mock.go
+          structname: DocumentServiceMock
+          pkgname: mocks_services_document
+  ricrac/internal/services/favorite:
+    config:
+      dir: ./mocks/services/favorite
+    interfaces:
+      FavoriteServiceInterface:
+        config:
+          filename: favorite_service_mock.go
+          structname: FavoriteServiceMock
+          pkgname: mocks_services_favorite
+  ricrac/internal/services/template:
+    config:
+      dir: ./mocks/services/template
+    interfaces:
+      TemplateServiceInterface:
+        config:
+          filename: template_service_mock.go
+          structname: TemplateServiceMock
+          pkgname: mocks_services_template
+  ricrac/internal/repositories/customer:
+    config:
+      dir: ./mocks/repository/customer
+    interfaces:
+      CustomerRepositoryInterface:
+        config:
+          filename: customer_repository_mock.go
+          structname: CustomerRepositoryMock
+          pkgname: mocks_repository_customer
+  ricrac/internal/repositories/release:
+    config:
+      dir: ./mocks/repository/release
+    interfaces:
+      ReleaseRepositoryInterface:
+        config:
+          filename: release_repository_mock.go
+          structname: ReleaseRepositoryMock
+          pkgname: mocks_repository_release
+  ricrac/internal/repositories/webhook:
+    config:
+      dir: ./mocks/repository/webhook
+    interfaces:
+      WebhookRepositoryInterface:
+        config:
+          filename: webhook_repository_mock.go
+          structname: WebhookRepositoryMock
+          pkgname: mocks_repository_webhook
+  ricrac/internal/services/customer:
+    config:
+      dir: ./mocks/services/customer
+    interfaces:
+      CustomerServiceInterface:
+        config:
+          filename: customer_service_mock.go
+          structname: CustomerServiceMock
+          pkgname: mocks_services_customer
+  ricrac/internal/services/release:
+    config:
+      dir: ./mocks/services/release
+    interfaces:
+      ReleaseServiceInterface:
+        config:
+          filename: release_service_mock.go
+          structname: ReleaseServiceMock
+          pkgname: mocks_services_release
+  ricrac/internal/services/webhook:
+    config:
+      dir: ./mocks/services/webhook
+    interfaces:
+      WebhookServiceInterface:
+        config:
+          filename: webhook_service_mock.go
+          structname: WebhookServiceMock
+          pkgname: mocks_services_webhook
+  ricrac/internal/repositories/project:
+    config:
+      dir: ./mocks/repository/project
+    interfaces:
+      ProjectRepositoryInterface:
+        config:
+          filename: project_repository_mock.go
+          structname: ProjectRepositoryMock
+          pkgname: mocks_repository_project
+  ricrac/internal/repositories/milestone:
+    config:
+      dir: ./mocks/repository/milestone
+    interfaces:
+      MilestoneRepositoryInterface:
+        config:
+          filename: milestone_repository_mock.go
+          structname: MilestoneRepositoryMock
+          pkgname: mocks_repository_milestone
+  ricrac/internal/repositories/statusupdate:
+    config:
+      dir: ./mocks/repository/statusupdate
+    interfaces:
+      StatusUpdateRepositoryInterface:
+        config:
+          filename: statusupdate_repository_mock.go
+          structname: StatusUpdateRepositoryMock
+          pkgname: mocks_repository_statusupdate
+  ricrac/internal/repositories/initiative:
+    config:
+      dir: ./mocks/repository/initiative
+    interfaces:
+      InitiativeRepositoryInterface:
+        config:
+          filename: initiative_repository_mock.go
+          structname: InitiativeRepositoryMock
+          pkgname: mocks_repository_initiative
+  ricrac/internal/services/project:
+    config:
+      dir: ./mocks/services/project
+    interfaces:
+      ProjectServiceInterface:
+        config:
+          filename: project_service_mock.go
+          structname: ProjectServiceMock
+          pkgname: mocks_services_project
+  ricrac/internal/services/milestone:
+    config:
+      dir: ./mocks/services/milestone
+    interfaces:
+      MilestoneServiceInterface:
+        config:
+          filename: milestone_service_mock.go
+          structname: MilestoneServiceMock
+          pkgname: mocks_services_milestone
+  ricrac/internal/services/statusupdate:
+    config:
+      dir: ./mocks/services/statusupdate
+    interfaces:
+      StatusUpdateServiceInterface:
+        config:
+          filename: statusupdate_service_mock.go
+          structname: StatusUpdateServiceMock
+          pkgname: mocks_services_statusupdate
+  ricrac/internal/repositories/view:
+    config:
+      dir: ./mocks/repository/view
+    interfaces:
+      ViewRepositoryInterface:
+        config:
+          filename: view_repository_mock.go
+          structname: ViewRepositoryMock
+          pkgname: mocks_repository_view
+  ricrac/internal/services/view:
+    config:
+      dir: ./mocks/services/view
+    interfaces:
+      ViewServiceInterface:
+        config:
+          filename: view_service_mock.go
+          structname: ViewServiceMock
+          pkgname: mocks_services_view
+  ricrac/internal/repositories/github:
+    config:
+      dir: ./mocks/repository/github
+    interfaces:
+      GitHubRepositoryInterface:
+        config:
+          filename: github_repository_mock.go
+          structname: GitHubRepositoryMock
+          pkgname: mocks_repository_github
+  ricrac/internal/services/github:
+    config:
+      dir: ./mocks/services/github
+    interfaces:
+      GitHubServiceInterface:
+        config:
+          filename: github_service_mock.go
+          structname: GitHubServiceMock
+          pkgname: mocks_services_github

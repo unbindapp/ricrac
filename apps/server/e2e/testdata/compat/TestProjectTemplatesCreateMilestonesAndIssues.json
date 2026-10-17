@@ -1,0 +1,375 @@
+[
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "canceledAt": null,
+      "canceledIssueCount": 0,
+      "color": null,
+      "completedAt": null,
+      "completedIssueCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "## Plan",
+      "documents": [],
+      "estimate": {
+        "completed": 0,
+        "total": 0
+      },
+      "health": null,
+      "icon": null,
+      "id": "\u003cid2\u003e",
+      "initiatives": [],
+      "issueCount": 3,
+      "issueCountByStateType": {
+        "backlog": 3
+      },
+      "labels": [],
+      "latestUpdate": null,
+      "lead": null,
+      "leadTeam": null,
+      "links": [],
+      "members": [],
+      "milestones": [
+        {
+          "canceledIssueCount": 0,
+          "completedIssueCount": 0,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "description": null,
+          "id": "\u003cid3\u003e",
+          "issueCount": 1,
+          "name": "Alpha",
+          "progress": 0,
+          "project": {
+            "id": "\u003cid2\u003e",
+            "name": "Mobile launch",
+            "slugId": "\u003cslug1\u003e"
+          },
+          "sortOrder": 0,
+          "targetDate": null,
+          "updatedAt": "\u003ctime+00:00\u003e"
+        },
+        {
+          "canceledIssueCount": 0,
+          "completedIssueCount": 0,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "description": null,
+          "id": "\u003cid4\u003e",
+          "issueCount": 1,
+          "name": "Release",
+          "progress": 0,
+          "project": {
+            "id": "\u003cid2\u003e",
+            "name": "Mobile launch",
+            "slugId": "\u003cslug1\u003e"
+          },
+          "sortOrder": 1,
+          "targetDate": "2030-06-01",
+          "updatedAt": "\u003ctime+00:00\u003e"
+        }
+      ],
+      "name": "Mobile launch",
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "progress": 0,
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "related": []
+      },
+      "slugId": "\u003cslug1\u003e",
+      "sortOrder": 1000,
+      "startDate": null,
+      "startDateResolution": null,
+      "startedAt": null,
+      "status": {
+        "color": "#e2e2e2",
+        "id": "\u003cid5\u003e",
+        "name": "Planned",
+        "type": "planned"
+      },
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "summary": "A launch",
+      "targetDate": null,
+      "targetDateResolution": null,
+      "teams": [
+        {
+          "id": "\u003cid6\u003e",
+          "key": "ENG",
+          "name": "Engineering"
+        }
+      ],
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/project/mobile-launch-\u003cslug1\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_project",
+    "request": {
+      "name": "Mobile launch",
+      "template": "Launch"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-1-write-the-plan",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid7\u003e",
+      "identifier": "ENG-1",
+      "labels": [],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 2,
+      "priorityLabel": "High",
+      "project": {
+        "id": "\u003cid2\u003e",
+        "name": "Mobile launch",
+        "slugId": "\u003cslug1\u003e"
+      },
+      "projectMilestone": {
+        "id": "\u003cid3\u003e",
+        "name": "Alpha",
+        "targetDate": null
+      },
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid8\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid6\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Write the plan",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_issue",
+    "request": {
+      "id": "ENG-1"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "canceledAt": null,
+      "canceledIssueCount": 0,
+      "color": null,
+      "completedAt": null,
+      "completedIssueCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "## Plan",
+      "documents": [],
+      "estimate": {
+        "completed": 0,
+        "total": 0
+      },
+      "health": null,
+      "icon": null,
+      "id": "\u003cid9\u003e",
+      "initiatives": [],
+      "issueCount": 3,
+      "issueCountByStateType": {
+        "backlog": 3
+      },
+      "labels": [],
+      "latestUpdate": null,
+      "lead": null,
+      "leadTeam": null,
+      "links": [],
+      "members": [],
+      "milestones": [
+        {
+          "canceledIssueCount": 0,
+          "completedIssueCount": 0,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "description": null,
+          "id": "\u003cid10\u003e",
+          "issueCount": 1,
+          "name": "Alpha",
+          "progress": 0,
+          "project": {
+            "id": "\u003cid9\u003e",
+            "name": "Web launch",
+            "slugId": "\u003cslug2\u003e"
+          },
+          "sortOrder": 0,
+          "targetDate": null,
+          "updatedAt": "\u003ctime+00:00\u003e"
+        },
+        {
+          "canceledIssueCount": 0,
+          "completedIssueCount": 0,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "description": null,
+          "id": "\u003cid11\u003e",
+          "issueCount": 1,
+          "name": "Release",
+          "progress": 0,
+          "project": {
+            "id": "\u003cid9\u003e",
+            "name": "Web launch",
+            "slugId": "\u003cslug2\u003e"
+          },
+          "sortOrder": 1,
+          "targetDate": "2030-06-01",
+          "updatedAt": "\u003ctime+00:00\u003e"
+        }
+      ],
+      "name": "Web launch",
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "progress": 0,
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "related": []
+      },
+      "slugId": "\u003cslug2\u003e",
+      "sortOrder": 2000,
+      "startDate": null,
+      "startDateResolution": null,
+      "startedAt": "\u003ctime+00:00\u003e",
+      "status": {
+        "color": "#f2c94c",
+        "id": "\u003cid12\u003e",
+        "name": "In Progress",
+        "type": "started"
+      },
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "summary": "A launch",
+      "targetDate": null,
+      "targetDateResolution": null,
+      "teams": [
+        {
+          "id": "\u003cid6\u003e",
+          "key": "ENG",
+          "name": "Engineering"
+        }
+      ],
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/project/web-launch-\u003cslug2\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_project",
+    "request": {
+      "name": "Web launch",
+      "state": "started",
+      "template": "Launch"
+    },
+    "status": 200
+  }
+]

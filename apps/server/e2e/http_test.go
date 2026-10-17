@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -15,22 +14,14 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-
-	"ricrac/app"
-	"ricrac/server"
 )
 
 // The REST API, OAuth and MCP through the real router.
 
-func send(router http.Handler, request *http.Request) (int, J) {
-	recorder := httptest.NewRecorder()
-	router.ServeHTTP(recorder, request)
-	body, _ := io.ReadAll(recorder.Result().Body)
-	var value any
-	if err := json.Unmarshal(body, &value); err != nil {
-		value = string(body)
-	}
-	return recorder.Code, J{value}
+// oauthRequest is what a client asks for on the consent screen.
+type oauthRequest struct {
+	ClientID, RedirectURI, ResponseType                 string
+	CodeChallenge, CodeChallengeMethod, State, Resource *string
 }
 
 func apiKey(w *World, scopes ...string) string {
@@ -39,16 +30,16 @@ func apiKey(w *World, scopes ...string) string {
 
 // keyReaching is a key of Ann's for these workspaces, or all of hers when nil.
 func keyReaching(w *World, workspaces []uuid.UUID, scopes ...string) string {
-	key := app.RandomSecret(server.APIKeyPrefix)
+	key := randomSecret("rr_key_")
 	w.exec("INSERT INTO api_keys (workspace_ids, user_id, label, key_hash, key_hint, scopes) VALUES ($1, $2, 'test', $3, 'x', $4)",
-		workspaces, w.Ann.User, app.SecretHash(key), scopes)
+		workspaces, w.Ann.User, secretHash(key), scopes)
 	return key
 }
 
 func request(method, uri, token string, body any) *http.Request {
 	var reader io.Reader
 	if body != nil {
-		reader = strings.NewReader(string(app.Marshal(body)))
+		reader = strings.NewReader(string(marshal(body)))
 	}
 	req := httptest.NewRequest(method, uri, reader)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -60,7 +51,7 @@ func request(method, uri, token string, body any) *http.Request {
 
 func TestRESTRoutesAndScopes(t *testing.T) {
 	w := world(t)
-	router := server.Router(w.State)
+	router := w.Router
 	key := apiKey(w, "read", "write")
 	status, created := send(router, request("POST", "/v1/issues", key, M{"team": "ENG", "title": "From REST"}))
 	eq(t, status, http.StatusOK, created.JSON())
@@ -94,17 +85,17 @@ func tokenRequest(form url.Values) *http.Request {
 
 func TestOAuthFlowGivesATokenForTheChosenWorkspace(t *testing.T) {
 	w := world(t)
-	router := server.Router(w.State)
+	router := w.Router
 	register := httptest.NewRequest("POST", "/oauth/register",
 		strings.NewReader(`{"client_name": "Claude", "redirect_uris": ["http://localhost/callback"]}`))
 	register.Header.Set("Content-Type", "application/json")
 	status, client := send(router, register)
 	eq(t, status, http.StatusCreated, client.JSON())
 	clientID := client.At("client_id").Str()
-	verifier := app.RandomSecret("")
+	verifier := randomSecret("")
 	sum := sha256.Sum256([]byte(verifier))
 	challenge, method, state, resource := base64.RawURLEncoding.EncodeToString(sum[:]), "S256", "xyz", "http://localhost:3000/mcp"
-	req := &server.OAuthRequest{
+	req := oauthRequest{
 		ClientID:            clientID,
 		RedirectURI:         "http://localhost:4567/callback",
 		ResponseType:        "code",
@@ -117,10 +108,10 @@ func TestOAuthFlowGivesATokenForTheChosenWorkspace(t *testing.T) {
 	w.exec("UPDATE workspace_members SET active = false WHERE workspace_id = $1", stranger)
 	ctx := context.Background()
 	for _, workspaces := range [][]uuid.UUID{{}, {w.Workspace, stranger}} {
-		_, err := server.Decide(ctx, w.State, w.Ann.User, workspaces, req, true)
+		_, err := w.B.OAuthDecide(ctx, w.Ann.User, workspaces, req)
 		check(t, err != nil, "granting ", workspaces, " should fail")
 	}
-	redirect, err := server.Decide(ctx, w.State, w.Ann.User, []uuid.UUID{w.Workspace}, req, true)
+	redirect, err := w.B.OAuthDecide(ctx, w.Ann.User, []uuid.UUID{w.Workspace}, req)
 	check(t, err == nil, err)
 	check(t, strings.HasPrefix(redirect, "http://localhost:4567/callback?code=") && strings.Contains(redirect, "state=xyz"), redirect)
 	parsed, _ := url.Parse(redirect)
@@ -160,7 +151,7 @@ func TestOAuthFlowGivesATokenForTheChosenWorkspace(t *testing.T) {
 }
 
 func rpc(uri, key string, body any) *http.Request {
-	req := httptest.NewRequest("POST", uri, strings.NewReader(string(app.Marshal(body))))
+	req := httptest.NewRequest("POST", uri, strings.NewReader(string(marshal(body))))
 	req.Host = "localhost:3000"
 	req.Header.Set("Authorization", "Bearer "+key)
 	req.Header.Set("Content-Type", "application/json")
@@ -175,7 +166,7 @@ func toolNames(tools J) []string {
 
 func TestMCPListsAndCallsTools(t *testing.T) {
 	w := world(t)
-	router := server.Router(w.State)
+	router := w.Router
 	key := apiKey(w, "read", "write", "admin")
 	status, _ := send(router, httptest.NewRequest("POST", "/mcp", nil))
 	eq(t, status, http.StatusUnauthorized)
@@ -207,7 +198,7 @@ func TestMCPListsAndCallsTools(t *testing.T) {
 
 func TestMCPAnswersBatchesNotificationsAndChecksTheHost(t *testing.T) {
 	w := world(t)
-	router := server.Router(w.State)
+	router := w.Router
 	key := apiKey(w, "read")
 	status, batch := send(router, rpc("/mcp", key, []any{
 		M{"jsonrpc": "2.0", "method": "notifications/initialized"},
@@ -243,7 +234,7 @@ func TestMCPAnswersBatchesNotificationsAndChecksTheHost(t *testing.T) {
 
 func TestMCPSpeaksTheStatelessRevision(t *testing.T) {
 	w := world(t)
-	router := server.Router(w.State)
+	router := w.Router
 	key := apiKey(w, "read", "write")
 	modern := func(body any) J {
 		req := rpc("/mcp", key, body)
@@ -276,7 +267,7 @@ func TestMCPSpeaksTheStatelessRevision(t *testing.T) {
 func TestTokensForSeveralWorkspacesNameOnePerCall(t *testing.T) {
 	w := world(t)
 	beta := w.secondWorkspace("Beta", "beta", "OPS")
-	router := server.Router(w.State)
+	router := w.Router
 	all := keyReaching(w, nil, "read", "write")
 
 	status, failure := send(router, request("POST", "/v1/issues", all, M{"team": "ENG", "title": "In Acme"}))
@@ -307,7 +298,7 @@ func TestTokensForSeveralWorkspacesNameOnePerCall(t *testing.T) {
 
 func TestMCPToolsTakeTheWorkspaceWhenTheTokenReachesSeveral(t *testing.T) {
 	w := world(t)
-	router := server.Router(w.State)
+	router := w.Router
 	all := keyReaching(w, nil, "read", "write")
 	listTools := func() []J {
 		_, tools := send(router, rpc("/mcp", all, M{"jsonrpc": "2.0", "id": 1, "method": "tools/list"}))
@@ -338,10 +329,10 @@ func TestLeavingAWorkspaceTakesItOutOfKeys(t *testing.T) {
 	beta := w.secondWorkspace("Beta", "beta", "OPS")
 	bob := w.member("bob@acme.test", "Bob", "member").User
 	w.exec("INSERT INTO workspace_members (workspace_id, user_id, role) VALUES ($1, $2, 'member')", beta, bob)
-	router := server.Router(w.State)
-	cookie := fmt.Sprintf("%s=%s", w.State.Keys.SessionCookie, w.State.Keys.SessionToken(bob))
+	router := w.Router
+	cookie := w.session(bob)
 	dashboard := func(method, uri string, body any) *http.Request {
-		req := httptest.NewRequest(method, uri, strings.NewReader(string(app.Marshal(body))))
+		req := httptest.NewRequest(method, uri, strings.NewReader(string(marshal(body))))
 		req.Header.Set("Cookie", cookie)
 		req.Header.Set("X-Ricrac", "1")
 		req.Header.Set("Content-Type", "application/json")

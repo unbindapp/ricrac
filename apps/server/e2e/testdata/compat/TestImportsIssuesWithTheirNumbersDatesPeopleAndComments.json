@@ -1,0 +1,531 @@
+[
+  {
+    "auth": "session",
+    "body": {
+      "comments": 2,
+      "dryRun": false,
+      "identifiers": [
+        "ENG-5",
+        "ENG-7",
+        "ENG-8"
+      ],
+      "imported": 3,
+      "nextIdentifier": "ENG-9",
+      "relations": 2
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/import_issues",
+    "request": {
+      "issues": [
+        {
+          "assignee": "bob@acme.test",
+          "comments": [
+            {
+              "author": "bob@acme.test",
+              "body": "Seen on staging",
+              "createdAt": "\u003ctimeZ\u003e"
+            },
+            {
+              "body": "Fixed",
+              "createdAt": "\u003ctimeZ\u003e"
+            }
+          ],
+          "completedAt": "\u003ctimeZ\u003e",
+          "createdAt": "\u003ctimeZ\u003e",
+          "creator": "bob@acme.test",
+          "description": "Steps for @bob\n\n1. Open  \n2. Crash\n",
+          "labels": [
+            "Bug"
+          ],
+          "links": [
+            {
+              "subtitle": "master",
+              "title": "Fix login",
+              "url": "https://github.com/acme/app/pull/4"
+            }
+          ],
+          "number": 5,
+          "priority": 2,
+          "state": "Done",
+          "title": "Login fails"
+        },
+        {
+          "blockedBy": [
+            "ENG-8"
+          ],
+          "number": 7,
+          "parent": "ENG-5",
+          "relatedTo": [
+            "ENG-5"
+          ],
+          "title": "Login is slow"
+        },
+        {
+          "state": "Todo",
+          "title": "Numbered next"
+        }
+      ],
+      "team": "ENG"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": {
+        "displayName": "bob",
+        "email": "bob@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Bob Jones"
+      },
+      "attachments": [
+        {
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid2\u003e",
+            "name": "Ann Smith"
+          },
+          "id": "\u003cid3\u003e",
+          "metadata": {},
+          "sourceType": "github",
+          "subtitle": "master",
+          "title": "Fix login",
+          "url": "https://github.com/acme/app/pull/4"
+        }
+      ],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-5-login-fails",
+      "canceledAt": null,
+      "children": [
+        {
+          "assignee": null,
+          "id": "\u003cid4\u003e",
+          "identifier": "ENG-7",
+          "priority": 0,
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid5\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "title": "Login is slow"
+        }
+      ],
+      "commentCount": 2,
+      "comments": [
+        {
+          "body": "Seen on staging",
+          "createdAt": "\u003ctime+00:00\u003e",
+          "editedAt": null,
+          "id": "\u003cid6\u003e",
+          "quotedText": null,
+          "reactions": [],
+          "replies": [],
+          "resolvedAt": null,
+          "resolvingUser": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "user": {
+            "displayName": "bob",
+            "email": "bob@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Bob Jones"
+          }
+        },
+        {
+          "body": "Fixed",
+          "createdAt": "\u003ctime+00:00\u003e",
+          "editedAt": null,
+          "id": "\u003cid7\u003e",
+          "quotedText": null,
+          "reactions": [],
+          "replies": [],
+          "resolvedAt": null,
+          "resolvingUser": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "user": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid2\u003e",
+            "name": "Ann Smith"
+          }
+        }
+      ],
+      "completedAt": "\u003ctime+00:00\u003e",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "bob",
+        "email": "bob@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Bob Jones"
+      },
+      "cycle": null,
+      "description": "Steps for @bob\n\n1. Open  \n2. Crash\n",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid8\u003e",
+      "identifier": "ENG-5",
+      "labels": [
+        {
+          "color": "#eb5757",
+          "id": "\u003cid9\u003e",
+          "name": "Bug",
+          "parent": null
+        }
+      ],
+      "number": 5,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 2,
+      "priorityLabel": "High",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": [
+          {
+            "id": "\u003cid4\u003e",
+            "identifier": "ENG-7",
+            "state": {
+              "color": "#bec2c8",
+              "id": "\u003cid5\u003e",
+              "name": "Backlog",
+              "type": "backlog"
+            },
+            "title": "Login is slow"
+          }
+        ]
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": "\u003ctime+00:00\u003e",
+      "startedTriageAt": null,
+      "state": {
+        "color": "#5e6ad2",
+        "id": "\u003cid10\u003e",
+        "name": "Done",
+        "type": "completed"
+      },
+      "subIssueCount": 1,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "bob",
+          "email": "bob@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Bob Jones"
+        }
+      ],
+      "team": {
+        "id": "\u003cid11\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Login fails",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-5"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_issue",
+    "request": {
+      "id": "ENG-5",
+      "includeComments": true
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-9-after-the-import",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid2\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid12\u003e",
+      "identifier": "ENG-9",
+      "labels": [],
+      "number": 9,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -4000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid5\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid2\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid11\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "After the import",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-9"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue",
+    "request": {
+      "team": "ENG",
+      "title": "After the import"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-7-login-is-slow",
+      "canceledAt": null,
+      "children": [],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid2\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid4\u003e",
+      "identifier": "ENG-7",
+      "labels": [],
+      "number": 7,
+      "parent": {
+        "id": "\u003cid8\u003e",
+        "identifier": "ENG-5",
+        "state": {
+          "color": "#5e6ad2",
+          "id": "\u003cid10\u003e",
+          "name": "Done",
+          "type": "completed"
+        },
+        "title": "Login fails"
+      },
+      "previousIdentifiers": [],
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [
+          {
+            "id": "\u003cid13\u003e",
+            "identifier": "ENG-8",
+            "state": {
+              "color": "#e2e2e2",
+              "id": "\u003cid14\u003e",
+              "name": "Todo",
+              "type": "unstarted"
+            },
+            "title": "Numbered next"
+          }
+        ],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": [
+          {
+            "id": "\u003cid8\u003e",
+            "identifier": "ENG-5",
+            "state": {
+              "color": "#5e6ad2",
+              "id": "\u003cid10\u003e",
+              "name": "Done",
+              "type": "completed"
+            },
+            "title": "Login fails"
+          }
+        ]
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -2000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid5\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 0,
+      "subIssueSortOrder": 1000,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid2\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid11\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Login is slow",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-7"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_issue",
+    "request": {
+      "id": "ENG-7"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "comments": 0,
+      "dryRun": false,
+      "identifiers": [
+        "ENG-6"
+      ],
+      "imported": 1,
+      "nextIdentifier": "ENG-10",
+      "relations": 0
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/import_issues",
+    "request": {
+      "issues": [
+        {
+          "number": 6,
+          "title": "Filled gap"
+        }
+      ],
+      "team": "ENG"
+    },
+    "status": 200
+  }
+]

@@ -6,32 +6,33 @@ import (
 	"strings"
 	"sync"
 	"testing"
-
-	"ricrac/mail"
-	"ricrac/ops"
 )
 
 // outbox records the emails it is asked to send, failing while fail is set.
 type outbox struct {
 	mu   sync.Mutex
-	sent []mail.Message
+	sent []mailMessage
 	fail bool
+	tape *tape
 }
 
-func (o *outbox) Send(_ context.Context, message mail.Message) error {
+func (o *outbox) Send(_ context.Context, message mailMessage) error {
 	o.mu.Lock()
 	defer o.mu.Unlock()
 	if o.fail {
 		return errors.New("smtp is down")
 	}
+	if o.tape != nil {
+		o.tape.email(message.To, message.Subject, message.Text, message.HTML)
+	}
 	o.sent = append(o.sent, message)
 	return nil
 }
 
-func (o *outbox) to(address string) []mail.Message {
+func (o *outbox) to(address string) []mailMessage {
 	o.mu.Lock()
 	defer o.mu.Unlock()
-	var found []mail.Message
+	var found []mailMessage
 	for _, m := range o.sent {
 		if m.To == address {
 			found = append(found, m)
@@ -42,15 +43,15 @@ func (o *outbox) to(address string) []mail.Message {
 
 func sendEmails(t *testing.T, w *World) {
 	t.Helper()
-	if err := ops.SendEmails(context.Background(), w.State); err != nil {
+	if err := w.B.SendEmails(context.Background()); err != nil {
 		t.Fatalf("send emails: %v", err)
 	}
 }
 
 func TestUnreadNotificationsAreEmailedAsADigest(t *testing.T) {
 	w := world(t)
-	box := &outbox{}
-	w.State.Mailer = box
+	box := &outbox{tape: w.tape}
+	w.B.SetMailer(box)
 	w.member("bob@acme.test", "Bob Jones", "member")
 	cat := w.member("cat@acme.test", "Cat Lee", "member")
 	w.exec("UPDATE users SET email_notifications = false WHERE id = $1", cat.User)
@@ -61,7 +62,7 @@ func TestUnreadNotificationsAreEmailedAsADigest(t *testing.T) {
 	sendEmails(t, w)
 	eq(t, len(box.sent), 0, "notifications wait a moment in case they're read")
 
-	w.exec("UPDATE notifications SET created_at = now() - interval '3 minutes'")
+	w.exec("UPDATE notifications SET created_at = created_at - interval '3 minutes'")
 	w.exec("UPDATE notifications SET read_at = now() WHERE issue_id = (SELECT id FROM issues WHERE number = 2)")
 	sendEmails(t, w)
 	toBob := box.to("bob@acme.test")
@@ -85,11 +86,11 @@ func TestUnreadNotificationsAreEmailedAsADigest(t *testing.T) {
 
 func TestFailedEmailsAreRetried(t *testing.T) {
 	w := world(t)
-	box := &outbox{fail: true}
-	w.State.Mailer = box
+	box := &outbox{fail: true, tape: w.tape}
+	w.B.SetMailer(box)
 	w.member("bob@acme.test", "Bob Jones", "member")
 	call(t, w.Ann, "save_issue", M{"title": "Fix login", "assignee": "bob"})
-	w.exec("UPDATE notifications SET created_at = now() - interval '3 minutes'")
+	w.exec("UPDATE notifications SET created_at = created_at - interval '3 minutes'")
 	sendEmails(t, w)
 	eq(t, len(box.sent), 0)
 	eqList(t, w.strings("SELECT error FROM emails"), []string{"smtp is down"})
@@ -103,8 +104,8 @@ func TestFailedEmailsAreRetried(t *testing.T) {
 
 func TestInvitationsAreEmailed(t *testing.T) {
 	w := world(t)
-	box := &outbox{}
-	w.State.Mailer = box
+	box := &outbox{tape: w.tape}
+	w.B.SetMailer(box)
 	call(t, w.Ann, "invite_user", M{"email": "New@Example.com", "role": "admin"})
 	sendEmails(t, w)
 	sent := box.to("new@example.com")

@@ -1,0 +1,778 @@
+[
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "canceledAt": null,
+      "canceledIssueCount": 0,
+      "color": null,
+      "completedAt": null,
+      "completedIssueCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "documents": [],
+      "estimate": {
+        "completed": 0,
+        "total": 0
+      },
+      "health": null,
+      "icon": null,
+      "id": "\u003cid2\u003e",
+      "initiatives": [],
+      "issueCount": 0,
+      "issueCountByStateType": {},
+      "labels": [],
+      "latestUpdate": null,
+      "lead": null,
+      "leadTeam": null,
+      "links": [],
+      "members": [],
+      "milestones": [],
+      "name": "Secret",
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "progress": 0,
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "related": []
+      },
+      "slugId": "\u003cslug1\u003e",
+      "sortOrder": 1000,
+      "startDate": null,
+      "startDateResolution": null,
+      "startedAt": null,
+      "status": {
+        "color": "#bec2c8",
+        "id": "\u003cid3\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "teams": [
+        {
+          "id": "\u003cid4\u003e",
+          "key": "ENG",
+          "name": "Engineering"
+        }
+      ],
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/project/secret-\u003cslug1\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_project",
+    "request": {
+      "name": "Secret",
+      "setTeams": [
+        "ENG"
+      ]
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_projects",
+    "request": {},
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "No project \"Secret\". There are none."
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_project",
+    "request": {
+      "id": "Secret"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "canceledAt": null,
+      "canceledIssueCount": 0,
+      "color": null,
+      "completedAt": null,
+      "completedIssueCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "description": "",
+      "documents": [],
+      "estimate": {
+        "completed": 0,
+        "total": 0
+      },
+      "health": null,
+      "icon": null,
+      "id": "\u003cid2\u003e",
+      "initiatives": [],
+      "issueCount": 0,
+      "issueCountByStateType": {},
+      "labels": [],
+      "latestUpdate": null,
+      "lead": null,
+      "leadTeam": null,
+      "links": [],
+      "members": [],
+      "milestones": [],
+      "name": "Secret",
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "progress": 0,
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "related": []
+      },
+      "slugId": "\u003cslug1\u003e",
+      "sortOrder": 1000,
+      "startDate": null,
+      "startDateResolution": null,
+      "startedAt": null,
+      "status": {
+        "color": "#bec2c8",
+        "id": "\u003cid3\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "teams": [
+        {
+          "id": "\u003cid4\u003e",
+          "key": "ENG",
+          "name": "Engineering"
+        }
+      ],
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/project/secret-\u003cslug1\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_project",
+    "request": {
+      "id": "Secret"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "canceledAt": null,
+      "canceledIssueCount": 0,
+      "color": null,
+      "completedAt": null,
+      "completedIssueCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "description": "",
+      "health": null,
+      "icon": null,
+      "id": "\u003cid2\u003e",
+      "initiatives": [],
+      "issueCount": 0,
+      "labels": [],
+      "lead": null,
+      "leadTeam": null,
+      "name": "Secret",
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "progress": 0,
+      "slugId": "\u003cslug1\u003e",
+      "sortOrder": 1000,
+      "startDate": null,
+      "startDateResolution": null,
+      "startedAt": null,
+      "status": {
+        "color": "#bec2c8",
+        "id": "\u003cid3\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "teams": [
+        {
+          "id": "\u003cid4\u003e",
+          "key": "ENG",
+          "name": "Engineering"
+        }
+      ],
+      "trashed": true,
+      "trashedAt": "\u003ctime+00:00\u003e",
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/project/secret-\u003cslug1\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/delete_project",
+    "request": {
+      "id": "Secret"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_projects",
+    "request": {},
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "canceledAt": null,
+          "canceledIssueCount": 0,
+          "color": null,
+          "completedAt": null,
+          "completedIssueCount": 0,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "health": null,
+          "icon": null,
+          "id": "\u003cid2\u003e",
+          "initiatives": [],
+          "issueCount": 0,
+          "labels": [],
+          "lead": null,
+          "leadTeam": null,
+          "name": "Secret",
+          "priority": 0,
+          "priorityLabel": "No priority",
+          "progress": 0,
+          "slugId": "\u003cslug1\u003e",
+          "sortOrder": 1000,
+          "startDate": null,
+          "startDateResolution": null,
+          "startedAt": null,
+          "status": {
+            "color": "#bec2c8",
+            "id": "\u003cid3\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "summary": null,
+          "targetDate": null,
+          "targetDateResolution": null,
+          "teams": [
+            {
+              "id": "\u003cid4\u003e",
+              "key": "ENG",
+              "name": "Engineering"
+            }
+          ],
+          "trashed": true,
+          "trashedAt": "\u003ctime+00:00\u003e",
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/project/secret-\u003cslug1\u003e"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_projects",
+    "request": {
+      "includeTrashed": true
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "No project \"Secret\". There are none."
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_project",
+    "request": {
+      "id": "Secret"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "canceledAt": null,
+      "canceledIssueCount": 0,
+      "color": null,
+      "completedAt": null,
+      "completedIssueCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "description": "",
+      "health": null,
+      "icon": null,
+      "id": "\u003cid2\u003e",
+      "initiatives": [],
+      "issueCount": 0,
+      "labels": [],
+      "lead": null,
+      "leadTeam": null,
+      "name": "Secret",
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "progress": 0,
+      "slugId": "\u003cslug1\u003e",
+      "sortOrder": 1000,
+      "startDate": null,
+      "startDateResolution": null,
+      "startedAt": null,
+      "status": {
+        "color": "#bec2c8",
+        "id": "\u003cid3\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "teams": [
+        {
+          "id": "\u003cid4\u003e",
+          "key": "ENG",
+          "name": "Engineering"
+        }
+      ],
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/project/secret-\u003cslug1\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/restore_project",
+    "request": {
+      "id": "Secret"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": "\u003ctime+00:00\u003e",
+      "canceledAt": null,
+      "canceledIssueCount": 0,
+      "color": null,
+      "completedAt": null,
+      "completedIssueCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "description": "",
+      "health": null,
+      "icon": null,
+      "id": "\u003cid2\u003e",
+      "initiatives": [],
+      "issueCount": 0,
+      "labels": [],
+      "lead": null,
+      "leadTeam": null,
+      "name": "Secret",
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "progress": 0,
+      "slugId": "\u003cslug1\u003e",
+      "sortOrder": 1000,
+      "startDate": null,
+      "startDateResolution": null,
+      "startedAt": null,
+      "status": {
+        "color": "#bec2c8",
+        "id": "\u003cid3\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "teams": [
+        {
+          "id": "\u003cid4\u003e",
+          "key": "ENG",
+          "name": "Engineering"
+        }
+      ],
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/project/secret-\u003cslug1\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/archive_project",
+    "request": {
+      "id": "Secret"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_projects",
+    "request": {},
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": "\u003ctime+00:00\u003e",
+          "canceledAt": null,
+          "canceledIssueCount": 0,
+          "color": null,
+          "completedAt": null,
+          "completedIssueCount": 0,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "health": null,
+          "icon": null,
+          "id": "\u003cid2\u003e",
+          "initiatives": [],
+          "issueCount": 0,
+          "labels": [],
+          "lead": null,
+          "leadTeam": null,
+          "name": "Secret",
+          "priority": 0,
+          "priorityLabel": "No priority",
+          "progress": 0,
+          "slugId": "\u003cslug1\u003e",
+          "sortOrder": 1000,
+          "startDate": null,
+          "startDateResolution": null,
+          "startedAt": null,
+          "status": {
+            "color": "#bec2c8",
+            "id": "\u003cid3\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "summary": null,
+          "targetDate": null,
+          "targetDateResolution": null,
+          "teams": [
+            {
+              "id": "\u003cid4\u003e",
+              "key": "ENG",
+              "name": "Engineering"
+            }
+          ],
+          "trashed": false,
+          "trashedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/project/secret-\u003cslug1\u003e"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_projects",
+    "request": {
+      "includeArchived": true
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "canceledAt": null,
+      "canceledIssueCount": 0,
+      "color": null,
+      "completedAt": null,
+      "completedIssueCount": 0,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "description": "",
+      "health": null,
+      "icon": null,
+      "id": "\u003cid2\u003e",
+      "initiatives": [],
+      "issueCount": 0,
+      "labels": [],
+      "lead": null,
+      "leadTeam": null,
+      "name": "Secret",
+      "priority": 0,
+      "priorityLabel": "No priority",
+      "progress": 0,
+      "slugId": "\u003cslug1\u003e",
+      "sortOrder": 1000,
+      "startDate": null,
+      "startDateResolution": null,
+      "startedAt": null,
+      "status": {
+        "color": "#bec2c8",
+        "id": "\u003cid3\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "summary": null,
+      "targetDate": null,
+      "targetDateResolution": null,
+      "teams": [
+        {
+          "id": "\u003cid4\u003e",
+          "key": "ENG",
+          "name": "Engineering"
+        }
+      ],
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/project/secret-\u003cslug1\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/unarchive_project",
+    "request": {
+      "id": "Secret"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "archivedAt": null,
+          "canceledAt": null,
+          "canceledIssueCount": 0,
+          "color": null,
+          "completedAt": null,
+          "completedIssueCount": 0,
+          "createdAt": "\u003ctime+00:00\u003e",
+          "health": null,
+          "icon": null,
+          "id": "\u003cid2\u003e",
+          "initiatives": [],
+          "issueCount": 0,
+          "labels": [],
+          "lead": null,
+          "leadTeam": null,
+          "name": "Secret",
+          "priority": 0,
+          "priorityLabel": "No priority",
+          "progress": 0,
+          "slugId": "\u003cslug1\u003e",
+          "sortOrder": 1000,
+          "startDate": null,
+          "startDateResolution": null,
+          "startedAt": null,
+          "status": {
+            "color": "#bec2c8",
+            "id": "\u003cid3\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "summary": null,
+          "targetDate": null,
+          "targetDateResolution": null,
+          "teams": [
+            {
+              "id": "\u003cid4\u003e",
+              "key": "ENG",
+              "name": "Engineering"
+            }
+          ],
+          "trashed": false,
+          "trashedAt": null,
+          "updatedAt": "\u003ctime+00:00\u003e",
+          "url": "http://localhost:3000/acme/project/secret-\u003cslug1\u003e"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_projects",
+    "request": {},
+    "status": 200
+  }
+]

@@ -1,0 +1,711 @@
+[
+  {
+    "auth": "session",
+    "body": {
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "data": {
+        "description": "## Steps",
+        "labels": [
+          "Bug"
+        ],
+        "priority": 2,
+        "subIssues": [
+          {
+            "title": "Reproduce"
+          },
+          {
+            "priority": 1,
+            "title": "Fix"
+          }
+        ]
+      },
+      "description": null,
+      "id": "\u003cid2\u003e",
+      "name": "Bug report",
+      "nextRunAt": null,
+      "recurrence": null,
+      "team": {
+        "id": "\u003cid3\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "type": "issue",
+      "updatedAt": "\u003ctime+00:00\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_template",
+    "request": {
+      "data": {
+        "description": "## Steps",
+        "labels": [
+          "Bug"
+        ],
+        "priority": 2,
+        "subIssues": [
+          {
+            "title": "Reproduce"
+          },
+          {
+            "priority": 1,
+            "title": "Fix"
+          }
+        ]
+      },
+      "name": "Bug report",
+      "team": "ENG",
+      "type": "issue"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "Invalid issue template data: unknown field `titel`, expected one of `title`, `description`, `team`, `state`, `priority`, `estimate`, `assignee`, `labels`, `project`, `cycle`, `dueDate`, `subIssues`"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_template",
+    "request": {
+      "data": {
+        "titel": "x"
+      },
+      "name": "x",
+      "type": "issue"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "Invalid issue template data: unknown field `titel`, expected one of `id`, `team`, `title`, `description`, `patch`, `state`, `priority`, `estimate`, `assignee`, `labels`, `addLabels`, `removeLabels`, `project`, `milestone`, `cycle`, `parentId`, `dueDate`, `blocks`, `blockedBy`, `relatedTo`, `removeBlocks`, `removeBlockedBy`, `removeRelatedTo`, `duplicateOf`, `links`, `addSubscribers`, `removeSubscribers`, `addReleases`, `removeReleases`, `setReleases`, `snoozedUntil`, `slaBreachesAt`, `slaType`, `sortOrder`, `subIssueSortOrder`, `template`"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_template",
+    "request": {
+      "data": {
+        "subIssues": [
+          {
+            "titel": "x"
+          }
+        ]
+      },
+      "name": "x",
+      "type": "issue"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "Invalid project template data: unknown field `due`, expected one of `name`, `description`, `targetDate`"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_template",
+    "request": {
+      "data": {
+        "milestones": [
+          {
+            "due": "x",
+            "name": "M1"
+          }
+        ]
+      },
+      "name": "x",
+      "type": "project"
+    },
+    "status": 400
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "Guests can't do this"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_template",
+    "request": {
+      "data": {},
+      "name": "x",
+      "type": "document"
+    },
+    "status": 403
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [
+        {
+          "createdAt": "\u003ctime+00:00\u003e",
+          "creator": {
+            "displayName": "ann",
+            "email": "ann@acme.test",
+            "id": "\u003cid1\u003e",
+            "name": "Ann Smith"
+          },
+          "description": null,
+          "id": "\u003cid2\u003e",
+          "name": "Bug report",
+          "nextRunAt": null,
+          "recurrence": null,
+          "team": {
+            "id": "\u003cid3\u003e",
+            "key": "ENG",
+            "name": "Engineering"
+          },
+          "type": "issue",
+          "updatedAt": "\u003ctime+00:00\u003e"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_templates",
+    "request": {
+      "type": "issue"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "nodes": [],
+      "pageInfo": {
+        "endCursor": null,
+        "hasNextPage": false
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/list_templates",
+    "request": {},
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "data": {
+        "description": "## Steps",
+        "labels": [
+          "Bug"
+        ],
+        "priority": 2,
+        "subIssues": [
+          {
+            "title": "Reproduce"
+          },
+          {
+            "priority": 1,
+            "title": "Fix"
+          }
+        ]
+      },
+      "description": null,
+      "id": "\u003cid2\u003e",
+      "name": "Bug report",
+      "nextRunAt": null,
+      "recurrence": null,
+      "team": {
+        "id": "\u003cid3\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "type": "issue",
+      "updatedAt": "\u003ctime+00:00\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_template",
+    "request": {
+      "id": "bug report"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-1-bug-crash",
+      "canceledAt": null,
+      "children": [
+        {
+          "assignee": null,
+          "id": "\u003cid4\u003e",
+          "identifier": "ENG-2",
+          "priority": 0,
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid5\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "title": "Reproduce"
+        },
+        {
+          "assignee": null,
+          "id": "\u003cid6\u003e",
+          "identifier": "ENG-3",
+          "priority": 1,
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid5\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "title": "Fix"
+        }
+      ],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "## Steps",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid7\u003e",
+      "identifier": "ENG-1",
+      "labels": [
+        {
+          "color": "#eb5757",
+          "id": "\u003cid8\u003e",
+          "name": "Bug",
+          "parent": null
+        }
+      ],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 2,
+      "priorityLabel": "High",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid5\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 2,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid3\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Bug: crash",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_issue",
+    "request": {
+      "template": "Bug report",
+      "title": "Bug: crash"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "archivedAt": null,
+      "assignee": null,
+      "attachments": [],
+      "autoArchivedAt": null,
+      "autoClosedAt": null,
+      "branchName": "eng-1-bug-crash",
+      "canceledAt": null,
+      "children": [
+        {
+          "assignee": null,
+          "id": "\u003cid4\u003e",
+          "identifier": "ENG-2",
+          "priority": 0,
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid5\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "title": "Reproduce"
+        },
+        {
+          "assignee": null,
+          "id": "\u003cid6\u003e",
+          "identifier": "ENG-3",
+          "priority": 1,
+          "state": {
+            "color": "#bec2c8",
+            "id": "\u003cid5\u003e",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "title": "Fix"
+        }
+      ],
+      "commentCount": 0,
+      "completedAt": null,
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "description": "## Steps",
+      "documents": [],
+      "dueDate": null,
+      "estimate": null,
+      "id": "\u003cid7\u003e",
+      "identifier": "ENG-1",
+      "labels": [
+        {
+          "color": "#eb5757",
+          "id": "\u003cid8\u003e",
+          "name": "Bug",
+          "parent": null
+        }
+      ],
+      "number": 1,
+      "parent": null,
+      "previousIdentifiers": [],
+      "priority": 2,
+      "priorityLabel": "High",
+      "project": null,
+      "projectMilestone": null,
+      "reactions": [],
+      "relations": {
+        "blockedBy": [],
+        "blocks": [],
+        "duplicateOf": null,
+        "duplicates": [],
+        "related": []
+      },
+      "releases": [],
+      "sharedWith": [],
+      "slaBreachesAt": null,
+      "slaStartedAt": null,
+      "slaType": null,
+      "snoozedUntil": null,
+      "sortOrder": -1000,
+      "startedAt": null,
+      "startedTriageAt": null,
+      "state": {
+        "color": "#bec2c8",
+        "id": "\u003cid5\u003e",
+        "name": "Backlog",
+        "type": "backlog"
+      },
+      "subIssueCount": 2,
+      "subIssueSortOrder": null,
+      "subscribers": [
+        {
+          "displayName": "ann",
+          "email": "ann@acme.test",
+          "id": "\u003cid1\u003e",
+          "name": "Ann Smith"
+        }
+      ],
+      "team": {
+        "id": "\u003cid3\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "Bug: crash",
+      "trashed": false,
+      "trashedAt": null,
+      "triagedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "url": "http://localhost:3000/acme/issue/ENG-1"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_issue",
+    "request": {
+      "id": "ENG-1"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "data": {
+        "content": "## Problem",
+        "title": "RFC"
+      },
+      "description": null,
+      "id": "\u003cid9\u003e",
+      "name": "RFC",
+      "nextRunAt": null,
+      "recurrence": null,
+      "team": null,
+      "type": "document",
+      "updatedAt": "\u003ctime+00:00\u003e"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_template",
+    "request": {
+      "data": {
+        "content": "## Problem",
+        "title": "RFC"
+      },
+      "name": "RFC",
+      "type": "document"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "color": null,
+      "content": "## Problem",
+      "createdAt": "\u003ctime+00:00\u003e",
+      "creator": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "cycle": null,
+      "icon": null,
+      "id": "\u003cid10\u003e",
+      "initiative": null,
+      "issue": null,
+      "project": null,
+      "release": null,
+      "slugId": "\u003cslug1\u003e",
+      "team": {
+        "id": "\u003cid3\u003e",
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "title": "RFC",
+      "trashed": false,
+      "trashedAt": null,
+      "updatedAt": "\u003ctime+00:00\u003e",
+      "updatedBy": {
+        "displayName": "ann",
+        "email": "ann@acme.test",
+        "id": "\u003cid1\u003e",
+        "name": "Ann Smith"
+      },
+      "url": "http://localhost:3000/acme/document/rfc-\u003cslug1\u003e",
+      "versionCount": 0
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/save_document",
+    "request": {
+      "team": "ENG",
+      "template": "RFC"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "deleted": true,
+      "id": "\u003cid2\u003e",
+      "name": "Bug report"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/delete_template",
+    "request": {
+      "id": "\u003cid2\u003e"
+    },
+    "status": 200
+  },
+  {
+    "auth": "session",
+    "body": {
+      "error": "No template \"Bug report\"; list_templates shows them"
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "www-authenticate,mcp-session-id",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "kind": "http",
+    "method": "POST",
+    "path": "/v1/ops/get_template",
+    "request": {
+      "id": "Bug report"
+    },
+    "status": 404
+  }
+]

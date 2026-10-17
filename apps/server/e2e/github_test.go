@@ -3,8 +3,11 @@ package e2e
 import (
 	"bytes"
 	"context"
+	"crypto/hmac"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -20,10 +23,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-
-	"ricrac/app"
-	"ricrac/github"
-	"ricrac/server"
 )
 
 // GitHub through a fake GitHub API: connecting the app, webhooks, linking, the two-way issue sync
@@ -67,6 +66,7 @@ type fakeGitHub struct {
 	comments      map[int][]M
 	// Refuse what the app does with its installation token.
 	failing bool
+	tape    *tape
 }
 
 var issuePath = regexp.MustCompile(`^/repos/[^/]+/[^/]+/issues/(\d+)$`)
@@ -86,6 +86,9 @@ func newFakeGitHub(t *testing.T) *fakeGitHub {
 
 func (f *fakeGitHub) serve(w http.ResponseWriter, r *http.Request) {
 	raw, _ := io.ReadAll(r.Body)
+	if f.tape != nil {
+		f.tape.outbound("github", r, raw)
+	}
 	var body M
 	if r.Header.Get("Content-Type") == "application/json" {
 		_ = json.Unmarshal(raw, &body)
@@ -98,10 +101,10 @@ func (f *fakeGitHub) serve(w http.ResponseWriter, r *http.Request) {
 	f.requests = append(f.requests, fakeRequest{r.Method, r.URL.Path, r.URL.RawQuery, body})
 	f.mu.Unlock()
 	path := r.URL.Path
-	answer := func(value any) { app.WriteJSON(w, http.StatusOK, value) }
+	answer := func(value any) { writeJSON(w, http.StatusOK, value) }
 	switch {
 	case f.failing && strings.HasPrefix(path, "/repos/"):
-		app.WriteJSON(w, http.StatusForbidden, M{"message": "Resource not accessible by integration"})
+		writeJSON(w, http.StatusForbidden, M{"message": "Resource not accessible by integration"})
 	case strings.HasSuffix(path, "/access_tokens"):
 		answer(M{"token": "ghs_installation", "expires_at": time.Now().Add(time.Hour)})
 	case path == "/login/oauth/access_token":
@@ -158,13 +161,9 @@ type gitHubWorld struct {
 func withGitHub(t *testing.T) *gitHubWorld {
 	w := world(t)
 	fake := newFakeGitHub(t)
-	config := github.Config{
-		AppID: 1, Slug: "ricrac-test", PrivateKey: testAppKey(t), WebhookSecret: webhookSecret,
-		ClientID: "Iv1.test", ClientSecret: "client-secret", APIURL: fake.server.URL, WebURL: fake.server.URL,
-	}
-	w.State.Config.GitHub = &config
-	w.State.GitHub = github.NewApp(config, fake.server.Client())
-	return &gitHubWorld{w, fake, server.Router(w.State)}
+	fake.tape = w.tape
+	w.B.ConfigureGitHub(fake.server.URL, fake.server.Client(), testAppKey(t), webhookSecret)
+	return &gitHubWorld{w, fake, w.Router}
 }
 
 // connect stores the installation as the setup callback does.
@@ -194,10 +193,10 @@ func (g *gitHubWorld) deliver(t *testing.T, event, file string, edit func(M)) in
 	if edit != nil {
 		edit(payload)
 	}
-	body := app.Marshal(payload)
+	body := marshal(payload)
 	req := httptest.NewRequest("POST", "/github/webhook", bytes.NewReader(body))
 	req.Header.Set("X-GitHub-Event", event)
-	req.Header.Set("X-Hub-Signature-256", github.Sign(webhookSecret, body))
+	req.Header.Set("X-Hub-Signature-256", githubSign(webhookSecret, body))
 	status, answer := send(g.router, req)
 	if status != http.StatusOK {
 		t.Logf("%s answered %d: %s", file, status, answer.JSON())
@@ -208,7 +207,7 @@ func (g *gitHubWorld) deliver(t *testing.T, event, file string, edit func(M)) in
 func (g *gitHubWorld) runJobs(t *testing.T) {
 	t.Helper()
 	for range 10 {
-		busy, err := server.GitHubJobs(context.Background(), g.State)
+		busy, err := g.B.GitHubJobs(context.Background())
 		if err != nil {
 			t.Fatalf("GitHub jobs: %v", err)
 		}
@@ -224,7 +223,7 @@ func (g *gitHubWorld) browse(t *testing.T, user uuid.UUID, uri string) string {
 	t.Helper()
 	req := httptest.NewRequest("GET", uri, nil)
 	if user != uuid.Nil {
-		req.AddCookie(&http.Cookie{Name: g.State.Keys.SessionCookie, Value: g.State.Keys.SessionToken(user)})
+		req.Header.Set("Cookie", g.session(user))
 	}
 	recorder := httptest.NewRecorder()
 	g.router.ServeHTTP(recorder, req)
@@ -258,7 +257,7 @@ func TestConnectingGitHubChecksTheInstallerCanReachTheInstallation(t *testing.T)
 	eq(t, setup(g.Ann.User, "99", state), "/acme/settings/integrations?github_error=not_your_installation")
 	eq(t, setup(bob.User, "77", state), "/acme/settings/integrations?github_error=signed_out")
 	eq(t, setup(g.Ann.User, "77", state+"x"), "/?github_error=expired")
-	old := g.State.Keys.Sign(fmt.Sprintf("github-install:%d:%s:%s", time.Now().Add(-time.Minute).Unix(), g.Workspace, g.Ann.User))
+	old := g.B.Sign(fmt.Sprintf("github-install:%d:%s:%s", time.Now().Add(-time.Minute).Unix(), g.Workspace, g.Ann.User))
 	eq(t, setup(g.Ann.User, "77", old), "/acme/settings/integrations?github_error=expired", "an old link still finds its workspace")
 	eq(t, g.browse(t, g.Ann.User, "/api/github/callback?setup_action=request&state="+url.QueryEscape(state)),
 		"/acme/settings/integrations?github_error=requested")
@@ -302,7 +301,7 @@ func TestPeopleLinkTheirGitHubAccount(t *testing.T) {
 		"/acme/settings/account?github_error=failed")
 	eq(t, g.browse(t, g.Ann.User, "/api/github/callback?code=good-code&state="+url.QueryEscape(query.Get("state"))), "/acme/settings/account")
 	req := httptest.NewRequest("GET", "/api/me", nil)
-	req.AddCookie(&http.Cookie{Name: g.State.Keys.SessionCookie, Value: g.State.Keys.SessionToken(g.Ann.User)})
+	req.Header.Set("Cookie", g.session(g.Ann.User))
 	_, me := send(g.router, req)
 	eq(t, me.At("githubLogin").Str(), "ann-gh", me.JSON())
 	check(t, call(t, g.Ann, "disconnect_github_account", nil).At("githubLogin").IsNull())
@@ -313,7 +312,7 @@ func TestGitHubWebhooksNeedTheirSignature(t *testing.T) {
 	g := withGitHub(t)
 	g.connect()
 	body := []byte(`{"zen": "Keep it logically awesome.", "installation": {"id": 77}}`)
-	for _, signature := range []string{"", github.Sign("wrong", body), "sha256=zz"} {
+	for _, signature := range []string{"", githubSign("wrong", body), "sha256=zz"} {
 		req := httptest.NewRequest("POST", "/github/webhook", bytes.NewReader(body))
 		req.Header.Set("X-GitHub-Event", "ping")
 		req.Header.Set("X-Hub-Signature-256", signature)
@@ -484,10 +483,10 @@ func TestRicracChangesGoToGitHubButNotBack(t *testing.T) {
 	g.runJobs(t)
 	patches := g.fake.sent("PATCH", "/repos/unbindapp/unbind/issues/1347")
 	eq(t, len(patches), 2)
-	eq(t, string(app.Marshal(patches[0].Body)), `{"title":"Logs stop after ten minutes"}`)
-	eq(t, string(app.Marshal(patches[1].Body)), `{"state":"closed","state_reason":"completed"}`)
-	eq(t, string(app.Marshal(g.fake.sent("POST", "/issues/1347/assignees")[0].Body)), `{"assignees":["ann-gh"]}`)
-	eq(t, string(app.Marshal(g.fake.sent("POST", "/issues/1347/labels")[0].Body)), `{"labels":["ui"]}`)
+	eq(t, string(marshal(patches[0].Body)), `{"title":"Logs stop after ten minutes"}`)
+	eq(t, string(marshal(patches[1].Body)), `{"state":"closed","state_reason":"completed"}`)
+	eq(t, string(marshal(g.fake.sent("POST", "/issues/1347/assignees")[0].Body)), `{"assignees":["ann-gh"]}`)
+	eq(t, string(marshal(g.fake.sent("POST", "/issues/1347/labels")[0].Body)), `{"labels":["ui"]}`)
 	eq(t, len(g.fake.sent("DELETE", "/issues/1347/labels/Bug")), 1)
 	eq(t, scalar[int](g.World, "SELECT count(*) FROM github_outbox"), 0)
 
@@ -584,4 +583,17 @@ func TestBackfillImportsARepositorysIssues(t *testing.T) {
 	eq(t, call(t, g.Ann, "list_github_repo_syncs", nil).At("nodes", 0, "backfill", "issuesUpdated").Num(), 1.0)
 	eq(t, call(t, g.Ann, "get_issue", M{"id": "ENG-1"}).At("title").Str(), "First, renamed")
 	eq(t, scalar[int](g.World, "SELECT count(*) FROM github_outbox"), 0)
+}
+
+func writeJSON(w http.ResponseWriter, status int, value any) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	_, _ = w.Write(marshal(value))
+}
+
+// githubSign is GitHub's X-Hub-Signature-256 of a webhook body.
+func githubSign(secret string, body []byte) string {
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write(body)
+	return "sha256=" + hex.EncodeToString(mac.Sum(nil))
 }
