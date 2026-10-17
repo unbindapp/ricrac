@@ -25,6 +25,21 @@ type Querier interface {
 	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
 }
 
+// Open opens a pool in UTC, leaving the schema as it is.
+func Open(ctx context.Context, databaseURL string) (*pgxpool.Pool, error) {
+	config, err := pgxpool.ParseConfig(databaseURL)
+	if err != nil {
+		return nil, err
+	}
+	config.MaxConns = 20
+	config.ConnConfig.RuntimeParams["timezone"] = "UTC"
+	config.AfterConnect = func(_ context.Context, conn *pgx.Conn) error {
+		pgxuuid.Register(conn.TypeMap())
+		return nil
+	}
+	return pgxpool.NewWithConfig(ctx, config)
+}
+
 // Connect opens a pool in UTC and brings the schema up to date.
 func Connect(ctx context.Context, databaseURL string) (*pgxpool.Pool, error) {
 	config, err := pgxpool.ParseConfig(databaseURL)

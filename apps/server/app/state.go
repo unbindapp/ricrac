@@ -7,8 +7,8 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"ricrac/github"
-	"ricrac/mail"
+	"ricrac/internal/infrastructure/mail"
+	"ricrac/internal/integrations/github"
 )
 
 type State struct {

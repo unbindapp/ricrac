@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5"
 
 	"ricrac/app"
-	"ricrac/mail"
+	"ricrac/internal/infrastructure/mail"
 )
 
 // Emails are queued in the transaction of the change that causes them and sent by the job loop,

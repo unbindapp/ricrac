@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"ricrac/github"
-	"ricrac/mail"
+	"ricrac/internal/infrastructure/mail"
+	"ricrac/internal/integrations/github"
 )
 
 type Config struct {

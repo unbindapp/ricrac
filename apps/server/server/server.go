@@ -16,6 +16,11 @@ const maxBody = 8 * 1024 * 1024
 
 // Router serves everything; main serves it and the end-to-end tests call it.
 func Router(state *app.State) http.Handler {
+	return compress(securityHeaders(limitBody(cors(Mux(state)))))
+}
+
+// Mux routes requests without the wrappers Router adds.
+func Mux(state *app.State) *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /.well-known/oauth-protected-resource", protectedResource(state))
 	mux.HandleFunc("GET /.well-known/oauth-protected-resource/mcp", protectedResource(state))
@@ -33,7 +38,7 @@ func Router(state *app.State) http.Handler {
 	accountRoutes(mux, state)
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) { _, _ = w.Write([]byte("ok")) })
 	mux.HandleFunc("/", serveSPA)
-	return compress(securityHeaders(limitBody(cors(mux))))
+	return mux
 }
 
 // isPublic is what other origins call with bearer tokens, never cookies alone: MCP, OAuth, the

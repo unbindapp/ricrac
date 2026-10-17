@@ -17,7 +17,7 @@ import (
 	"github.com/jackc/pgx/v5"
 
 	"ricrac/app"
-	"ricrac/github"
+	"ricrac/internal/integrations/github"
 	"ricrac/ops"
 )
 

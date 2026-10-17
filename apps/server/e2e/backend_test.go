@@ -10,8 +10,14 @@ import (
 	"github.com/jackc/pgx/v5"
 
 	"ricrac/app"
-	"ricrac/github"
-	"ricrac/mail"
+	"ricrac/config"
+	"ricrac/internal/api/oapi"
+	"ricrac/internal/api/router"
+	apiserver "ricrac/internal/api/server"
+	"ricrac/internal/infrastructure/database"
+	"ricrac/internal/legacy"
+	"ricrac/internal/infrastructure/mail"
+	"ricrac/internal/integrations/github"
 	"ricrac/ops"
 	"ricrac/server"
 )
@@ -19,36 +25,46 @@ import (
 // backend is the server under test, seen from the tests: its router, its jobs and the few
 // things tests set up that have no endpoint.
 type backend struct {
-	t      *testing.T
-	state  *app.State
-	tape   *tape
-	router http.Handler
+	t        *testing.T
+	state    *app.State
+	tape     *tape
+	router   http.Handler
+	registry *oapi.Registry
+	server   *apiserver.Server
+	bridge   *legacy.Bridge
 }
 
 type mailMessage = mail.Message
 
 func migrateDatabase(ctx context.Context, url string) error {
-	pool, err := app.Connect(ctx, url)
+	client, db, err := database.Open(ctx, url)
 	if err != nil {
 		return err
 	}
-	pool.Close()
-	return nil
+	defer client.Close()
+	return database.Migrate(ctx, db)
 }
 
 func newBackend(t *testing.T, url string, tp *tape) *backend {
-	pool, err := app.Connect(context.Background(), url)
+	ctx := context.Background()
+	cfg := config.Config{DatabaseURL: url, PublicURL: publicURL, SecretKey: "test-secret-key-that-is-long-enough-123", MaxUploadSize: 1024 * 1024}
+	client, _, err := database.Open(ctx, url)
 	if err != nil {
 		t.Fatalf("connect: %v", err)
 	}
-	t.Cleanup(pool.Close)
-	config := app.Config{PublicURL: publicURL, SecretKey: "test-secret-key-that-is-long-enough-123", MaxUploadSize: 1024 * 1024}
-	return &backend{t: t, state: app.NewState(pool, config), tape: tp}
+	t.Cleanup(func() { _ = client.Close() })
+	bridge, err := legacy.New(ctx, cfg)
+	if err != nil {
+		t.Fatalf("connect: %v", err)
+	}
+	t.Cleanup(bridge.Close)
+	return &backend{t: t, state: bridge.State, tape: tp, server: apiserver.New(cfg, client), bridge: bridge}
 }
 
 func (b *backend) Router() http.Handler {
 	if b.router == nil {
-		b.router = server.Router(b.state)
+		b.server.Cfg = config.Config(b.state.Config)
+		b.router, b.registry = router.New(b.server, b.bridge)
 	}
 	return b.router
 }
@@ -63,7 +79,8 @@ func (b *backend) Sign(payload string) string {
 }
 
 func (b *backend) ResultSchema(op string) M {
-	found := ops.Find(op)
+	b.Router()
+	found := b.registry.Find(op)
 	if found == nil {
 		return nil
 	}

@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5"
 
 	"ricrac/app"
-	"ricrac/github"
+	"ricrac/internal/integrations/github"
 )
 
 // GitHub, as a GitHub App: admins install it on their GitHub account or organization and pick

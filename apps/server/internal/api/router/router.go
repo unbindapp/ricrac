@@ -1,0 +1,99 @@
+// Package router puts everything on one chi router: the operations through Huma, the API's
+// documents, MCP and the rest of the HTTP surface.
+package router
+
+import (
+	"bytes"
+	"encoding/json"
+	"io"
+	"net/http"
+
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/adapters/humachi"
+	"github.com/go-chi/chi/v5"
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
+
+	"ricrac/internal/api/meta"
+	"ricrac/internal/api/middleware"
+	"ricrac/internal/api/oapi"
+	"ricrac/internal/api/server"
+	"ricrac/internal/common/errdefs"
+	"ricrac/internal/mcpserver"
+)
+
+// Fallback serves what isn't ported to the new server yet.
+type Fallback interface {
+	Mux() http.Handler
+	AddOps(reg *oapi.Registry)
+	Order() []string
+}
+
+// HumaConfig answers errors as {"error": message} and writes JSON without escaping <, > and &.
+func HumaConfig() huma.Config {
+	huma.NewError = func(status int, message string, errs ...error) huma.StatusError {
+		return &errdefs.Error{Status: status, Message: message}
+	}
+	format := huma.Format{
+		Marshal: func(w io.Writer, v any) error {
+			encoder := json.NewEncoder(w)
+			encoder.SetEscapeHTML(false)
+			return encoder.Encode(v)
+		},
+		Unmarshal: func(data []byte, v any) error {
+			decoder := json.NewDecoder(bytes.NewReader(data))
+			return decoder.Decode(v)
+		},
+	}
+	return huma.Config{
+		OpenAPI: &huma.OpenAPI{
+			OpenAPI: "3.1.0",
+			Info:    &huma.Info{Title: "Ricrac", Version: meta.Version},
+			Components: &huma.Components{
+				Schemas: huma.NewMapRegistry("#/components/schemas/", huma.DefaultSchemaNamer),
+			},
+		},
+		Formats:       map[string]huma.Format{"application/json": format, "json": format},
+		DefaultFormat: "application/json",
+	}
+}
+
+// New is the server's router and its operations.
+func New(srv *server.Server, fallback Fallback) (http.Handler, *oapi.Registry) {
+	r := chi.NewRouter()
+	r.Use(middleware.Compress, middleware.SecurityHeaders, middleware.LimitBody, middleware.CORS, chimiddleware.GetHead)
+	api := humachi.New(r, HumaConfig())
+	reg := oapi.NewRegistry(api, srv.AccessService)
+	RegisterHandlers(srv, reg)
+	if fallback != nil {
+		fallback.AddOps(reg)
+		reg.Order(fallback.Order())
+	}
+	authn := middleware.NewAuth(srv.Cfg, srv.Keys, srv.AccessService)
+	reg.Mount(authn.RESTCaller)
+
+	docs := meta.NewHandler(srv.Cfg, reg)
+	r.Get("/v1", docs.Index())
+	r.Get("/v1/", docs.Index())
+	r.Get("/v1/openapi.json", docs.OpenAPI)
+	r.Get("/v1/ops", docs.ListOps)
+	r.Get("/llms.txt", docs.LLMsTxt())
+	r.Post("/v1/ops/{name}", func(w http.ResponseWriter, req *http.Request) {
+		if _, _, ok := authn.RESTCaller(w, req); !ok {
+			return
+		}
+		errdefs.Write(w, errdefs.NotFound("No operation %s", chi.URLParam(req, "name")))
+	})
+	r.Handle("/mcp", authn.RequireBearer(mcpserver.New(srv.Cfg, reg, srv.AccessService).Handler()))
+	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) { _, _ = w.Write([]byte("ok")) })
+	if fallback != nil {
+		rest := fallback.Mux()
+		r.NotFound(rest.ServeHTTP)
+		r.MethodNotAllowed(rest.ServeHTTP)
+	}
+	return r, reg
+}
+
+// RegisterHandlers puts every handler group's operations on the registry, in the order they
+// are listed.
+func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
+}

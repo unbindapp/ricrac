@@ -13,7 +13,7 @@ import (
 	"github.com/jackc/pgx/v5"
 
 	"ricrac/app"
-	"ricrac/github"
+	"ricrac/internal/integrations/github"
 )
 
 // GitHub's webhook events: the installation's lifecycle, pull requests, branches and commits that

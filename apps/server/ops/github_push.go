@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 
 	"ricrac/app"
-	"ricrac/github"
+	"ricrac/internal/integrations/github"
 )
 
 // Changes made in Ricrac to issues linked to GitHub issues, and to their comments, go to GitHub:

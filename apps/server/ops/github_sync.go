@@ -15,7 +15,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 
 	"ricrac/app"
-	"ricrac/github"
+	"ricrac/internal/integrations/github"
 )
 
 // Issues and comments of synced repositories, from GitHub: webhook events and the import of a
