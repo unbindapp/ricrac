@@ -195,7 +195,9 @@ function IssueRow({ issue, showMilestone }: { issue: Issue; showMilestone: boole
       params={{ workspace: workspace.urlKey, identifier: issue.identifier }}
       className="has-hover:hover:bg-accent focus-visible:bg-accent flex h-9 w-full items-center gap-3 border-b px-3 text-sm outline-hidden last:border-b-0"
     >
-      <PriorityIcon priority={issue.priority} />
+      <span className="flex size-4 shrink-0">
+        {issue.priority !== 0 && <PriorityIcon priority={issue.priority} />}
+      </span>
       <span className="text-muted-foreground w-16 shrink-0 font-mono text-xs">
         {issue.identifier}
       </span>
@@ -211,7 +213,7 @@ function IssueRow({ issue, showMilestone }: { issue: Issue; showMilestone: boole
         {issue.assignee && (
           <SimpleTooltip content={issue.assignee.name}>
             <span className="flex">
-              <PersonAvatar user={issue.assignee} size="xs" />
+              <PersonAvatar user={issue.assignee} />
             </span>
           </SimpleTooltip>
         )}
