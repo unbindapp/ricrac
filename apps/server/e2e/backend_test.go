@@ -19,7 +19,6 @@ import (
 	"ricrac/internal/legacy"
 	repository "ricrac/internal/repositories"
 	oauth_service "ricrac/internal/services/oauth"
-	"ricrac/server"
 )
 
 // backend is the server under test, seen from the tests: its router, its jobs and the few
@@ -64,7 +63,7 @@ func newBackend(t *testing.T, url string, tp *tape) *backend {
 func (b *backend) Router() http.Handler {
 	if b.router == nil {
 		b.server.Cfg = config.Config(b.state.Config)
-		b.router, b.registry = router.New(b.server, b.bridge)
+		b.router, b.registry = router.New(b.server, nil)
 	}
 	return b.router
 }
@@ -114,7 +113,7 @@ func (b *backend) ConfigureGitHub(apiURL string, client *http.Client, key *rsa.P
 		ClientID: "Iv1.test", ClientSecret: "client-secret", APIURL: apiURL, WebURL: apiURL,
 	}
 	b.state.Config.GitHub = &config
-	b.state.GitHub = github.NewApp(config, client)
+	b.server.GitHubService.SetApp(github.NewApp(config, client))
 	b.router = nil
 }
 
@@ -149,5 +148,5 @@ func (b *backend) DeliverDueWebhooks(ctx context.Context) (int, error) {
 }
 
 func (b *backend) GitHubJobs(ctx context.Context) (bool, error) {
-	return server.GitHubJobs(ctx, b.state)
+	return b.server.GitHubService.GitHubJobs(ctx)
 }

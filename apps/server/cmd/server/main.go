@@ -60,7 +60,7 @@ func main() {
 	}
 	defer bridge.Close()
 	bridge.StartJobs(ctx)
-	handler, _ := router.New(server.New(cfg, client, bridge), bridge)
+	handler, _ := router.New(server.New(cfg, client, bridge), nil)
 	address := fmt.Sprintf("0.0.0.0:%d", cfg.Port)
 	srv := &http.Server{Addr: address, Handler: handler, ReadHeaderTimeout: 30 * time.Second}
 	failed := make(chan error, 1)

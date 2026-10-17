@@ -17,6 +17,7 @@ import (
 	email_repo "ricrac/internal/repositories/email"
 	events_repo "ricrac/internal/repositories/events"
 	favorite_repo "ricrac/internal/repositories/favorite"
+	github_repo "ricrac/internal/repositories/github"
 	initiative_repo "ricrac/internal/repositories/initiative"
 	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
@@ -70,6 +71,7 @@ type Repositories struct {
 	statusUpdate statusupdate_repo.StatusUpdateRepositoryInterface
 	initiative   initiative_repo.InitiativeRepositoryInterface
 	view         view_repo.ViewRepositoryInterface
+	github       github_repo.GitHubRepositoryInterface
 }
 
 func NewRepositories(db *ent.Client) *Repositories {
@@ -105,6 +107,7 @@ func NewRepositories(db *ent.Client) *Repositories {
 		statusUpdate: statusupdate_repo.NewStatusUpdateRepository(db),
 		initiative:   initiative_repo.NewInitiativeRepository(db),
 		view:         view_repo.NewViewRepository(db),
+		github:       github_repo.NewGitHubRepository(db),
 	}
 }
 
@@ -235,4 +238,8 @@ func (r *Repositories) Initiative() initiative_repo.InitiativeRepositoryInterfac
 
 func (r *Repositories) View() view_repo.ViewRepositoryInterface {
 	return r.view
+}
+
+func (r *Repositories) GitHub() github_repo.GitHubRepositoryInterface {
+	return r.github
 }

@@ -17,6 +17,7 @@ import (
 	email_service "ricrac/internal/services/email"
 	events_service "ricrac/internal/services/events"
 	favorite_service "ricrac/internal/services/favorite"
+	github_service "ricrac/internal/services/github"
 	initiative_service "ricrac/internal/services/initiative"
 	issue_service "ricrac/internal/services/issue"
 	label_service "ricrac/internal/services/label"
@@ -75,4 +76,5 @@ type Server struct {
 	StatusUpdateService *statusupdate_service.StatusUpdateService
 	InitiativeService   *initiative_service.InitiativeService
 	ViewService         *view_service.ViewService
+	GitHubService       *github_service.GitHubService
 }

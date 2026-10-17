@@ -19,6 +19,7 @@ import (
 	"ricrac/internal/repositories/email"
 	"ricrac/internal/repositories/events"
 	"ricrac/internal/repositories/favorite"
+	"ricrac/internal/repositories/github"
 	"ricrac/internal/repositories/initiative"
 	"ricrac/internal/repositories/issue"
 	"ricrac/internal/repositories/label"
@@ -626,6 +627,52 @@ func (_c *RepositoriesMock_Favorite_Call) Return(favoriteRepositoryInterface fav
 }
 
 func (_c *RepositoriesMock_Favorite_Call) RunAndReturn(run func() favorite_repo.FavoriteRepositoryInterface) *RepositoriesMock_Favorite_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GitHub provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) GitHub() github_repo.GitHubRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GitHub")
+	}
+
+	var r0 github_repo.GitHubRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() github_repo.GitHubRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(github_repo.GitHubRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_GitHub_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GitHub'
+type RepositoriesMock_GitHub_Call struct {
+	*mock.Call
+}
+
+// GitHub is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) GitHub() *RepositoriesMock_GitHub_Call {
+	return &RepositoriesMock_GitHub_Call{Call: _e.mock.On("GitHub")}
+}
+
+func (_c *RepositoriesMock_GitHub_Call) Run(run func()) *RepositoriesMock_GitHub_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_GitHub_Call) Return(gitHubRepositoryInterface github_repo.GitHubRepositoryInterface) *RepositoriesMock_GitHub_Call {
+	_c.Call.Return(gitHubRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_GitHub_Call) RunAndReturn(run func() github_repo.GitHubRepositoryInterface) *RepositoriesMock_GitHub_Call {
 	_c.Call.Return(run)
 	return _c
 }

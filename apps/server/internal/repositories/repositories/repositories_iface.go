@@ -17,6 +17,7 @@ import (
 	email_repo "ricrac/internal/repositories/email"
 	events_repo "ricrac/internal/repositories/events"
 	favorite_repo "ricrac/internal/repositories/favorite"
+	github_repo "ricrac/internal/repositories/github"
 	initiative_repo "ricrac/internal/repositories/initiative"
 	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
@@ -73,4 +74,5 @@ type RepositoriesInterface interface {
 	StatusUpdate() statusupdate_repo.StatusUpdateRepositoryInterface
 	Initiative() initiative_repo.InitiativeRepositoryInterface
 	View() view_repo.ViewRepositoryInterface
+	GitHub() github_repo.GitHubRepositoryInterface
 }

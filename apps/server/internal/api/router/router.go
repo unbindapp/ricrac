@@ -22,6 +22,7 @@ import (
 	documents_handler "ricrac/internal/api/handlers/documents"
 	favorites_handler "ricrac/internal/api/handlers/favorites"
 	files_handler "ricrac/internal/api/handlers/files"
+	github_handler "ricrac/internal/api/handlers/github"
 	initiatives_handler "ricrac/internal/api/handlers/initiatives"
 	issues_handler "ricrac/internal/api/handlers/issues"
 	labels_handler "ricrac/internal/api/handlers/labels"
@@ -116,6 +117,7 @@ func New(srv *server.Server, fallback Fallback) (http.Handler, *oapi.Registry) {
 	})
 	r.Handle("/mcp", authn.RequireBearer(mcpserver.New(srv.Cfg, reg, srv.AccessService).Handler()))
 	files_handler.Mount(r, srv, authn)
+	github_handler.Mount(r, srv)
 	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) { _, _ = w.Write([]byte("ok")) })
 	unmatched := unmatchedHandler(fallback)
 	r.NotFound(unmatched)
@@ -141,6 +143,8 @@ func unmatchedHandler(fallback Fallback) http.HandlerFunc {
 		switch {
 		case pattern == "/api/" || pattern == "" && strings.HasPrefix(r.URL.Path, "/api/"):
 			account_handler.NotFound(w, r)
+		case pattern == "" && strings.HasPrefix(r.URL.Path, "/v1/"):
+			errdefs.Write(w, errdefs.NotFound("No such endpoint; see /v1/openapi.json"))
 		case pattern == "":
 			web.Serve(w, r)
 		default:
@@ -156,22 +160,23 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	teams_handler.RegisterHandlers(srv, reg)
 	states_handler.RegisterHandlers(srv, reg)
 	labels_handler.RegisterHandlers(srv, reg)
+	issues_handler.RegisterHandlers(srv, reg)
+	issues_handler.RegisterImportHandlers(srv, reg)
 	comments_handler.RegisterHandlers(srv, reg)
 	attachments_handler.RegisterHandlers(srv, reg)
-	notifications_handler.RegisterHandlers(srv, reg)
-	search_handler.RegisterHandlers(srv, reg)
-	cycles_handler.RegisterHandlers(srv, reg)
-	documents_handler.RegisterHandlers(srv, reg)
-	favorites_handler.RegisterHandlers(srv, reg)
-	templates_handler.RegisterHandlers(srv, reg)
-	customers_handler.RegisterHandlers(srv, reg)
-	releases_handler.RegisterHandlers(srv, reg)
-	webhooks_handler.RegisterHandlers(srv, reg)
 	projects_handler.RegisterHandlers(srv, reg)
 	milestones_handler.RegisterHandlers(srv, reg)
 	statusupdates_handler.RegisterHandlers(srv, reg)
 	initiatives_handler.RegisterHandlers(srv, reg)
-	issues_handler.RegisterHandlers(srv, reg)
-	issues_handler.RegisterImportHandlers(srv, reg)
+	cycles_handler.RegisterHandlers(srv, reg)
+	documents_handler.RegisterHandlers(srv, reg)
 	views_handler.RegisterHandlers(srv, reg)
+	favorites_handler.RegisterHandlers(srv, reg)
+	templates_handler.RegisterHandlers(srv, reg)
+	notifications_handler.RegisterHandlers(srv, reg)
+	search_handler.RegisterHandlers(srv, reg)
+	customers_handler.RegisterHandlers(srv, reg)
+	releases_handler.RegisterHandlers(srv, reg)
+	webhooks_handler.RegisterHandlers(srv, reg)
+	github_handler.RegisterHandlers(srv, reg)
 }

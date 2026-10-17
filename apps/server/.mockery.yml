@@ -499,3 +499,21 @@ packages:
           filename: view_service_mock.go
           structname: ViewServiceMock
           pkgname: mocks_services_view
+  ricrac/internal/repositories/github:
+    config:
+      dir: ./mocks/repository/github
+    interfaces:
+      GitHubRepositoryInterface:
+        config:
+          filename: github_repository_mock.go
+          structname: GitHubRepositoryMock
+          pkgname: mocks_repository_github
+  ricrac/internal/services/github:
+    config:
+      dir: ./mocks/services/github
+    interfaces:
+      GitHubServiceInterface:
+        config:
+          filename: github_service_mock.go
+          structname: GitHubServiceMock
+          pkgname: mocks_services_github

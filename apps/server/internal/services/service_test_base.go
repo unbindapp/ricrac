@@ -19,6 +19,7 @@ import (
 	mocks_repository_email "ricrac/mocks/repository/email"
 	mocks_repository_events "ricrac/mocks/repository/events"
 	mocks_repository_favorite "ricrac/mocks/repository/favorite"
+	mocks_repository_github "ricrac/mocks/repository/github"
 	mocks_repository_initiative "ricrac/mocks/repository/initiative"
 	mocks_repository_issue "ricrac/mocks/repository/issue"
 	mocks_repository_label "ricrac/mocks/repository/label"
@@ -73,6 +74,7 @@ type ServiceTestSuite struct {
 	MockStatusUpdateRepo *mocks_repository_statusupdate.StatusUpdateRepositoryMock
 	MockInitiativeRepo   *mocks_repository_initiative.InitiativeRepositoryMock
 	MockViewRepo         *mocks_repository_view.ViewRepositoryMock
+	MockGitHubRepo       *mocks_repository_github.GitHubRepositoryMock
 }
 
 func (suite *ServiceTestSuite) SetupTest() {
@@ -106,6 +108,7 @@ func (suite *ServiceTestSuite) SetupTest() {
 	suite.MockStatusUpdateRepo = mocks_repository_statusupdate.NewStatusUpdateRepositoryMock(suite.T())
 	suite.MockInitiativeRepo = mocks_repository_initiative.NewInitiativeRepositoryMock(suite.T())
 	suite.MockViewRepo = mocks_repository_view.NewViewRepositoryMock(suite.T())
+	suite.MockGitHubRepo = mocks_repository_github.NewGitHubRepositoryMock(suite.T())
 
 	suite.MockRepo.EXPECT().Access().Return(suite.MockAccessRepo).Maybe()
 	suite.MockRepo.EXPECT().Resolve().Return(suite.MockResolveRepo).Maybe()
@@ -135,6 +138,7 @@ func (suite *ServiceTestSuite) SetupTest() {
 	suite.MockRepo.EXPECT().StatusUpdate().Return(suite.MockStatusUpdateRepo).Maybe()
 	suite.MockRepo.EXPECT().Initiative().Return(suite.MockInitiativeRepo).Maybe()
 	suite.MockRepo.EXPECT().View().Return(suite.MockViewRepo).Maybe()
+	suite.MockRepo.EXPECT().GitHub().Return(suite.MockGitHubRepo).Maybe()
 }
 
 // ExpectTx runs WithTx bodies directly; repository mocks match the tx argument with mock.Anything.
