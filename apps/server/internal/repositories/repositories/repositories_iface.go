@@ -13,7 +13,9 @@ import (
 	events_repo "ricrac/internal/repositories/events"
 	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
+	notification_repo "ricrac/internal/repositories/notification"
 	resolve_repo "ricrac/internal/repositories/resolve"
+	search_repo "ricrac/internal/repositories/search"
 	seed_repo "ricrac/internal/repositories/seed"
 	"time"
 )
@@ -33,4 +35,6 @@ type RepositoriesInterface interface {
 	Comment() comment_repo.CommentRepositoryInterface
 	Attachment() attachment_repo.AttachmentRepositoryInterface
 	Automation() automation_repo.AutomationRepositoryInterface
+	Notification() notification_repo.NotificationRepositoryInterface
+	Search() search_repo.SearchRepositoryInterface
 }

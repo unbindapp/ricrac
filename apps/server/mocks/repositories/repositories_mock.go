@@ -15,7 +15,9 @@ import (
 	"ricrac/internal/repositories/events"
 	"ricrac/internal/repositories/issue"
 	"ricrac/internal/repositories/label"
+	"ricrac/internal/repositories/notification"
 	"ricrac/internal/repositories/resolve"
+	"ricrac/internal/repositories/search"
 	"ricrac/internal/repositories/seed"
 	"time"
 
@@ -426,6 +428,52 @@ func (_c *RepositoriesMock_Label_Call) RunAndReturn(run func() label_repo.LabelR
 	return _c
 }
 
+// Notification provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Notification() notification_repo.NotificationRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Notification")
+	}
+
+	var r0 notification_repo.NotificationRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() notification_repo.NotificationRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(notification_repo.NotificationRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Notification_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Notification'
+type RepositoriesMock_Notification_Call struct {
+	*mock.Call
+}
+
+// Notification is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Notification() *RepositoriesMock_Notification_Call {
+	return &RepositoriesMock_Notification_Call{Call: _e.mock.On("Notification")}
+}
+
+func (_c *RepositoriesMock_Notification_Call) Run(run func()) *RepositoriesMock_Notification_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Notification_Call) Return(notificationRepositoryInterface notification_repo.NotificationRepositoryInterface) *RepositoriesMock_Notification_Call {
+	_c.Call.Return(notificationRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Notification_Call) RunAndReturn(run func() notification_repo.NotificationRepositoryInterface) *RepositoriesMock_Notification_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Now provides a mock function for the type RepositoriesMock
 func (_mock *RepositoriesMock) Now(ctx context.Context, tx repository.TxInterface) (time.Time, error) {
 	ret := _mock.Called(ctx, tx)
@@ -534,6 +582,52 @@ func (_c *RepositoriesMock_Resolve_Call) Return(resolveRepositoryInterface resol
 }
 
 func (_c *RepositoriesMock_Resolve_Call) RunAndReturn(run func() resolve_repo.ResolveRepositoryInterface) *RepositoriesMock_Resolve_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Search provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Search() search_repo.SearchRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Search")
+	}
+
+	var r0 search_repo.SearchRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() search_repo.SearchRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(search_repo.SearchRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Search_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Search'
+type RepositoriesMock_Search_Call struct {
+	*mock.Call
+}
+
+// Search is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Search() *RepositoriesMock_Search_Call {
+	return &RepositoriesMock_Search_Call{Call: _e.mock.On("Search")}
+}
+
+func (_c *RepositoriesMock_Search_Call) Run(run func()) *RepositoriesMock_Search_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Search_Call) Return(searchRepositoryInterface search_repo.SearchRepositoryInterface) *RepositoriesMock_Search_Call {
+	_c.Call.Return(searchRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Search_Call) RunAndReturn(run func() search_repo.SearchRepositoryInterface) *RepositoriesMock_Search_Call {
 	_c.Call.Return(run)
 	return _c
 }

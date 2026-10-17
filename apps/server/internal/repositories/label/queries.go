@@ -97,7 +97,7 @@ func (self *LabelRepository) List(ctx context.Context, filter ListFilter) ([]uui
 				s.Where(entsql.IsNull(s.C(issuelabel.FieldRetiredAt)))
 			}
 			if filter.Pattern != nil {
-				s.Where(repository.Raw(s.C(issuelabel.FieldName)+" ILIKE ? OR "+parents.C(issuelabel.FieldName)+" ILIKE ?", *filter.Pattern, *filter.Pattern))
+				s.Where(repository.Raw("("+s.C(issuelabel.FieldName)+" ILIKE ? OR "+parents.C(issuelabel.FieldName)+" ILIKE ?)", *filter.Pattern, *filter.Pattern))
 			}
 			s.Select(s.C(issuelabel.FieldID))
 			s.OrderExpr(entsql.Expr("lower(coalesce(" + parents.C(issuelabel.FieldName) + ", " + s.C(issuelabel.FieldName) + "))"))

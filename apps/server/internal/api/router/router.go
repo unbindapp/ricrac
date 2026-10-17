@@ -13,7 +13,12 @@ import (
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 
+	attachments_handler "ricrac/internal/api/handlers/attachments"
+	comments_handler "ricrac/internal/api/handlers/comments"
+	files_handler "ricrac/internal/api/handlers/files"
 	labels_handler "ricrac/internal/api/handlers/labels"
+	notifications_handler "ricrac/internal/api/handlers/notifications"
+	search_handler "ricrac/internal/api/handlers/search"
 	"ricrac/internal/api/meta"
 	"ricrac/internal/api/middleware"
 	"ricrac/internal/api/oapi"
@@ -86,6 +91,7 @@ func New(srv *server.Server, fallback Fallback) (http.Handler, *oapi.Registry) {
 		errdefs.Write(w, errdefs.NotFound("No operation %s", chi.URLParam(req, "name")))
 	})
 	r.Handle("/mcp", authn.RequireBearer(mcpserver.New(srv.Cfg, reg, srv.AccessService).Handler()))
+	files_handler.Mount(r, srv, authn)
 	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) { _, _ = w.Write([]byte("ok")) })
 	if fallback != nil {
 		rest := fallback.Mux()
@@ -99,4 +105,8 @@ func New(srv *server.Server, fallback Fallback) (http.Handler, *oapi.Registry) {
 // are listed.
 func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	labels_handler.RegisterHandlers(srv, reg)
+	comments_handler.RegisterHandlers(srv, reg)
+	attachments_handler.RegisterHandlers(srv, reg)
+	notifications_handler.RegisterHandlers(srv, reg)
+	search_handler.RegisterHandlers(srv, reg)
 }
