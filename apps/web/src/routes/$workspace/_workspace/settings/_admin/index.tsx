@@ -6,6 +6,7 @@ import { SettingsSection } from "@/components/layout/settings-section";
 import { WorkspaceIcon } from "@/components/workspace/workspace-icon";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
+import { useUploadImage } from "@/lib/queries/uploads";
 import { useUpdateWorkspaceMutation, WorkspaceFormSchema } from "@/lib/queries/workspaces";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/_admin/")({
@@ -13,13 +14,14 @@ export const Route = createFileRoute("/$workspace/_workspace/settings/_admin/")(
 });
 
 const formSchema = WorkspaceFormSchema.extend({
-  logoUrl: z.union([z.literal(""), z.string().trim().url("Enter an image URL.")]),
+  logoUrl: z.string(),
 });
 
 function WorkspaceGeneralSettingsPage() {
   const { workspace } = useWorkspace();
   const navigate = useNavigate();
   const { mutateAsync: update } = useUpdateWorkspaceMutation(workspace.id);
+  const uploadImage = useUploadImage(workspace.id);
 
   const form = useAppForm({
     defaultValues: {
@@ -72,21 +74,20 @@ function WorkspaceGeneralSettingsPage() {
         <form.AppField
           name="logoUrl"
           children={(field) => (
-            <field.TextField
-              label="Logo URL"
-              placeholder="https://example.com/logo.png"
-              description="A square image. Leave it empty to show the first letter of the name."
+            <field.ImageField
+              label="Logo"
+              description="A square image. Without one, the first letter of the name shows."
+              upload={uploadImage}
+              preview={(logoUrl) => (
+                <form.Subscribe selector={(state) => state.values.name}>
+                  {(name) => (
+                    <WorkspaceIcon name={name || workspace.name} logoUrl={logoUrl} size="lg" />
+                  )}
+                </form.Subscribe>
+              )}
             />
           )}
         />
-        <form.Subscribe selector={(state) => [state.values.name, state.values.logoUrl] as const}>
-          {([name, logoUrl]) => (
-            <div className="text-muted-foreground flex items-center gap-2 text-sm">
-              <WorkspaceIcon name={name || workspace.name} logoUrl={logoUrl || null} />
-              <span>Preview</span>
-            </div>
-          )}
-        </form.Subscribe>
       </SettingsSection>
     </SettingsPage>
   );
