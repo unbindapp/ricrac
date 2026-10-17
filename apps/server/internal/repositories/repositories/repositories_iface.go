@@ -8,6 +8,7 @@ import (
 	repository "ricrac/internal/repositories"
 	access_repo "ricrac/internal/repositories/access"
 	attachment_repo "ricrac/internal/repositories/attachment"
+	automation_repo "ricrac/internal/repositories/automation"
 	comment_repo "ricrac/internal/repositories/comment"
 	events_repo "ricrac/internal/repositories/events"
 	issue_repo "ricrac/internal/repositories/issue"
@@ -31,4 +32,5 @@ type RepositoriesInterface interface {
 	Seed() seed_repo.SeedRepositoryInterface
 	Comment() comment_repo.CommentRepositoryInterface
 	Attachment() attachment_repo.AttachmentRepositoryInterface
+	Automation() automation_repo.AutomationRepositoryInterface
 }

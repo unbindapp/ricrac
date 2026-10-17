@@ -8,6 +8,7 @@ import (
 	"ricrac/internal/repositories/repositories"
 	access_service "ricrac/internal/services/access"
 	attachment_service "ricrac/internal/services/attachment"
+	automation_service "ricrac/internal/services/automation"
 	comment_service "ricrac/internal/services/comment"
 	events_service "ricrac/internal/services/events"
 	issue_service "ricrac/internal/services/issue"
@@ -33,5 +34,6 @@ func New(cfg config.Config, db *ent.Client, waker events_service.Waker) *Server 
 	srv.IssueService = issue_service.NewIssueService(cfg, repo, srv.ResolveService, srv.EventsService)
 	srv.CommentService = comment_service.NewCommentService(cfg, repo, srv.ResolveService, srv.EventsService)
 	srv.AttachmentService = attachment_service.NewAttachmentService(cfg, repo, srv.ResolveService, srv.EventsService)
+	srv.AutomationService = automation_service.NewAutomationService(repo)
 	return srv
 }

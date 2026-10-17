@@ -8,6 +8,7 @@ import (
 	repository "ricrac/internal/repositories"
 	access_repo "ricrac/internal/repositories/access"
 	attachment_repo "ricrac/internal/repositories/attachment"
+	automation_repo "ricrac/internal/repositories/automation"
 	comment_repo "ricrac/internal/repositories/comment"
 	events_repo "ricrac/internal/repositories/events"
 	issue_repo "ricrac/internal/repositories/issue"
@@ -28,6 +29,7 @@ type Repositories struct {
 	seed       seed_repo.SeedRepositoryInterface
 	comment    comment_repo.CommentRepositoryInterface
 	attachment attachment_repo.AttachmentRepositoryInterface
+	automation automation_repo.AutomationRepositoryInterface
 }
 
 func NewRepositories(db *ent.Client) *Repositories {
@@ -42,6 +44,7 @@ func NewRepositories(db *ent.Client) *Repositories {
 		seed:       seed_repo.NewSeedRepository(db),
 		comment:    comment_repo.NewCommentRepository(db),
 		attachment: attachment_repo.NewAttachmentRepository(db),
+		automation: automation_repo.NewAutomationRepository(db),
 	}
 }
 
@@ -88,4 +91,8 @@ func (r *Repositories) Comment() comment_repo.CommentRepositoryInterface {
 
 func (r *Repositories) Attachment() attachment_repo.AttachmentRepositoryInterface {
 	return r.attachment
+}
+
+func (r *Repositories) Automation() automation_repo.AutomationRepositoryInterface {
+	return r.automation
 }

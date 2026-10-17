@@ -127,7 +127,7 @@ func (b *backend) OAuthDecide(ctx context.Context, user uuid.UUID, workspaces []
 }
 
 func (b *backend) Automations(ctx context.Context) error {
-	return server.Automations(ctx, b.state)
+	return b.server.AutomationService.Run(ctx)
 }
 
 func (b *backend) RunCycleAutomations(ctx context.Context) error {

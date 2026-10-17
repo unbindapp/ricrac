@@ -10,6 +10,7 @@ import (
 	"ricrac/internal/repositories"
 	"ricrac/internal/repositories/access"
 	"ricrac/internal/repositories/attachment"
+	"ricrac/internal/repositories/automation"
 	"ricrac/internal/repositories/comment"
 	"ricrac/internal/repositories/events"
 	"ricrac/internal/repositories/issue"
@@ -145,6 +146,52 @@ func (_c *RepositoriesMock_Attachment_Call) Return(attachmentRepositoryInterface
 }
 
 func (_c *RepositoriesMock_Attachment_Call) RunAndReturn(run func() attachment_repo.AttachmentRepositoryInterface) *RepositoriesMock_Attachment_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Automation provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Automation() automation_repo.AutomationRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Automation")
+	}
+
+	var r0 automation_repo.AutomationRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() automation_repo.AutomationRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(automation_repo.AutomationRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Automation_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Automation'
+type RepositoriesMock_Automation_Call struct {
+	*mock.Call
+}
+
+// Automation is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Automation() *RepositoriesMock_Automation_Call {
+	return &RepositoriesMock_Automation_Call{Call: _e.mock.On("Automation")}
+}
+
+func (_c *RepositoriesMock_Automation_Call) Run(run func()) *RepositoriesMock_Automation_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Automation_Call) Return(automationRepositoryInterface automation_repo.AutomationRepositoryInterface) *RepositoriesMock_Automation_Call {
+	_c.Call.Return(automationRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Automation_Call) RunAndReturn(run func() automation_repo.AutomationRepositoryInterface) *RepositoriesMock_Automation_Call {
 	_c.Call.Return(run)
 	return _c
 }
