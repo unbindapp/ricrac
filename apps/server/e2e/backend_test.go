@@ -8,7 +8,6 @@ import (
 
 	"github.com/google/uuid"
 
-	"ricrac/app"
 	"ricrac/config"
 	"ricrac/internal/api/oapi"
 	"ricrac/internal/api/router"
@@ -16,8 +15,8 @@ import (
 	"ricrac/internal/infrastructure/database"
 	"ricrac/internal/infrastructure/mail"
 	"ricrac/internal/integrations/github"
-	"ricrac/internal/legacy"
 	repository "ricrac/internal/repositories"
+	"ricrac/internal/scheduler"
 	oauth_service "ricrac/internal/services/oauth"
 )
 
@@ -25,12 +24,10 @@ import (
 // things tests set up that have no endpoint.
 type backend struct {
 	t        *testing.T
-	state    *app.State
 	tape     *tape
 	router   http.Handler
 	registry *oapi.Registry
 	server   *apiserver.Server
-	bridge   *legacy.Bridge
 }
 
 type mailMessage = mail.Message
@@ -52,29 +49,23 @@ func newBackend(t *testing.T, url string, tp *tape) *backend {
 		t.Fatalf("connect: %v", err)
 	}
 	t.Cleanup(func() { _ = client.Close() })
-	bridge, err := legacy.New(ctx, cfg)
-	if err != nil {
-		t.Fatalf("connect: %v", err)
-	}
-	t.Cleanup(bridge.Close)
-	return &backend{t: t, state: bridge.State, tape: tp, server: apiserver.New(cfg, client, bridge), bridge: bridge}
+	return &backend{t: t, tape: tp, server: apiserver.New(cfg, client, scheduler.NewWakeups())}
 }
 
 func (b *backend) Router() http.Handler {
 	if b.router == nil {
-		b.server.Cfg = config.Config(b.state.Config)
 		b.router, b.registry = router.New(b.server, nil)
 	}
 	return b.router
 }
 
 func (b *backend) SessionCookie(user uuid.UUID) string {
-	return b.state.Keys.SessionCookie + "=" + b.state.Keys.SessionToken(user)
+	return b.server.Keys.SessionCookie + "=" + b.server.Keys.SessionToken(user)
 }
 
 // Sign signs a payload with the server's secret, as its signed state parameters are.
 func (b *backend) Sign(payload string) string {
-	return b.state.Keys.Sign(payload)
+	return b.server.Keys.Sign(payload)
 }
 
 func (b *backend) ResultSchema(op string) M {
@@ -103,7 +94,6 @@ func (b *backend) CreateTeam(ctx context.Context, workspace, user uuid.UUID, nam
 }
 
 func (b *backend) SetMailer(sender mail.Sender) {
-	b.state.Mailer = sender
 	b.server.EmailService.SetMailer(sender)
 }
 
@@ -112,7 +102,7 @@ func (b *backend) ConfigureGitHub(apiURL string, client *http.Client, key *rsa.P
 		AppID: 1, Slug: "ricrac-test", PrivateKey: key, WebhookSecret: webhookSecret,
 		ClientID: "Iv1.test", ClientSecret: "client-secret", APIURL: apiURL, WebURL: apiURL,
 	}
-	b.state.Config.GitHub = &config
+	b.server.Cfg.GitHub = &config
 	b.server.GitHubService.SetApp(github.NewApp(config, client))
 	b.router = nil
 }

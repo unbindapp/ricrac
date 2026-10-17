@@ -19,7 +19,7 @@ import (
 	"ricrac/internal/api/server"
 	"ricrac/internal/auth"
 	"ricrac/internal/infrastructure/database"
-	"ricrac/internal/legacy"
+	"ricrac/internal/scheduler"
 )
 
 func main() {
@@ -53,14 +53,10 @@ func main() {
 		slog.Error("migrating failed", "err", err)
 		os.Exit(1)
 	}
-	bridge, err := legacy.New(ctx, cfg)
-	if err != nil {
-		slog.Error("connecting to Postgres failed", "err", err)
-		os.Exit(1)
-	}
-	defer bridge.Close()
-	bridge.StartJobs(ctx)
-	handler, _ := router.New(server.New(cfg, client, bridge), nil)
+	wakeups := scheduler.NewWakeups()
+	app := server.New(cfg, client, wakeups)
+	handler, _ := router.New(app, nil)
+	scheduler.Start(ctx, wakeups, jobs(app))
 	address := fmt.Sprintf("0.0.0.0:%d", cfg.Port)
 	srv := &http.Server{Addr: address, Handler: handler, ReadHeaderTimeout: 30 * time.Second}
 	failed := make(chan error, 1)
@@ -77,6 +73,24 @@ func main() {
 		defer cancel()
 		_ = srv.Shutdown(shutdown)
 	}
+}
+
+// jobs is the work the scheduler runs, in the order the previous server ran it.
+func jobs(app *server.Server) scheduler.Jobs {
+	jobs := scheduler.Jobs{
+		EveryMinute: []func(context.Context) error{
+			app.OAuthService.Cleanup,
+			app.CycleService.RunAutomations,
+			app.TemplateService.RunRecurring,
+			app.AutomationService.Run,
+			app.EmailService.SendEmails,
+		},
+		Deliveries: app.WebhookService.DeliverDue,
+	}
+	if app.Cfg.GitHub != nil {
+		jobs.GitHub = app.GitHubService.GitHubJobs
+	}
+	return jobs
 }
 
 // printSession prints a session cookie for the user with this email, creating them when there's
