@@ -97,11 +97,3 @@ func (self *CycleService) find(ctx context.Context, actor *auth.Actor, team *str
 	}
 	return self.resolve.Cycle(ctx, actor, teamID, value)
 }
-
-func (self *CycleService) teamOf(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*uuid.UUID, error) {
-	found, err := self.repo.Cycle().Get(ctx, tx, id)
-	if err != nil {
-		return nil, err
-	}
-	return &found.TeamID, nil
-}

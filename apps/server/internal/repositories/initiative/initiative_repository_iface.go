@@ -39,8 +39,6 @@ type InitiativeRepositoryInterface interface {
 	UnlinkProjects(ctx context.Context, tx repository.TxInterface, id uuid.UUID, projects []uuid.UUID) error
 	// KeepProjects takes the projects not in projects out of the initiative.
 	KeepProjects(ctx context.Context, tx repository.TxInterface, id uuid.UUID, projects []uuid.UUID) error
-	// PurgeTrash deletes the initiatives trashed more than 30 days ago.
-	PurgeTrash(ctx context.Context) (int, error)
 	// Trashed is the most recently trashed initiative of the workspace whose id or name is value, or
 	// whose slug id is slug.
 	Trashed(ctx context.Context, workspace uuid.UUID, value, slug string) (uuid.UUID, bool, error)

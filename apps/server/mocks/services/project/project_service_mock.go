@@ -348,66 +348,6 @@ func (_c *ProjectServiceMock_Documents_Call) RunAndReturn(run func(ctx context.C
 	return _c
 }
 
-// EmptyTrash provides a mock function for the type ProjectServiceMock
-func (_mock *ProjectServiceMock) EmptyTrash(ctx context.Context) (int, error) {
-	ret := _mock.Called(ctx)
-
-	if len(ret) == 0 {
-		panic("no return value specified for EmptyTrash")
-	}
-
-	var r0 int
-	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context) (int, error)); ok {
-		return returnFunc(ctx)
-	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context) int); ok {
-		r0 = returnFunc(ctx)
-	} else {
-		r0 = ret.Get(0).(int)
-	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = returnFunc(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-	return r0, r1
-}
-
-// ProjectServiceMock_EmptyTrash_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'EmptyTrash'
-type ProjectServiceMock_EmptyTrash_Call struct {
-	*mock.Call
-}
-
-// EmptyTrash is a helper method to define mock.On call
-//   - ctx context.Context
-func (_e *ProjectServiceMock_Expecter) EmptyTrash(ctx any) *ProjectServiceMock_EmptyTrash_Call {
-	return &ProjectServiceMock_EmptyTrash_Call{Call: _e.mock.On("EmptyTrash", ctx)}
-}
-
-func (_c *ProjectServiceMock_EmptyTrash_Call) Run(run func(ctx context.Context)) *ProjectServiceMock_EmptyTrash_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 context.Context
-		if args[0] != nil {
-			arg0 = args[0].(context.Context)
-		}
-		run(
-			arg0,
-		)
-	})
-	return _c
-}
-
-func (_c *ProjectServiceMock_EmptyTrash_Call) Return(n int, err error) *ProjectServiceMock_EmptyTrash_Call {
-	_c.Call.Return(n, err)
-	return _c
-}
-
-func (_c *ProjectServiceMock_EmptyTrash_Call) RunAndReturn(run func(ctx context.Context) (int, error)) *ProjectServiceMock_EmptyTrash_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // Get provides a mock function for the type ProjectServiceMock
 func (_mock *ProjectServiceMock) Get(ctx context.Context, actor *auth.Actor, input *project_service.IDInput) (models.ProjectDetail, error) {
 	ret := _mock.Called(ctx, actor, input)

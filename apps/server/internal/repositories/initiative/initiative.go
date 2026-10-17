@@ -218,13 +218,6 @@ func (self *InitiativeRepository) KeepProjects(ctx context.Context, tx repositor
 	return err
 }
 
-// PurgeTrash deletes the initiatives trashed more than 30 days ago.
-func (self *InitiativeRepository) PurgeTrash(ctx context.Context) (int, error) {
-	return self.base.DB.Initiative.Delete().Where(func(s *entsql.Selector) {
-		s.Where(repository.Raw(s.C(initiative.FieldTrashedAt) + " < now() - interval '30 days'"))
-	}).Exec(ctx)
-}
-
 // Trashed is the most recently trashed initiative of the workspace whose id or name is value, or
 // whose slug id is slug.
 func (self *InitiativeRepository) Trashed(ctx context.Context, workspace uuid.UUID, value, slug string) (uuid.UUID, bool, error) {

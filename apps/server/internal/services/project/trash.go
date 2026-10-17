@@ -109,11 +109,6 @@ func (self *ProjectService) Unarchive(ctx context.Context, actor *auth.Actor, in
 	})
 }
 
-// EmptyTrash deletes the projects trashed more than 30 days ago (one of the automations).
-func (self *ProjectService) EmptyTrash(ctx context.Context) (int, error) {
-	return self.repo.Project().PurgeTrash(ctx)
-}
-
 // TrashedSlugTail is the id a slug, link or path ends in: my-project-0a1b2c3d4e5f.
 func TrashedSlugTail(value string) string {
 	value = strings.TrimSpace(value)

@@ -41,11 +41,6 @@ func (self *InitiativeService) mark(ctx context.Context, actor *auth.Actor, id u
 	return value, err
 }
 
-// EmptyTrash deletes the initiatives trashed more than 30 days ago (one of the automations).
-func (self *InitiativeService) EmptyTrash(ctx context.Context) (int, error) {
-	return self.repo.Initiative().PurgeTrash(ctx)
-}
-
 func (self *InitiativeService) find(ctx context.Context, actor *auth.Actor, input *IDInput) (uuid.UUID, error) {
 	if err := actor.RequireMember(); err != nil {
 		return uuid.Nil, err

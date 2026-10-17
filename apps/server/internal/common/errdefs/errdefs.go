@@ -4,7 +4,6 @@ package errdefs
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -78,11 +77,6 @@ func As(err error) *Error {
 	}
 	slog.Error("unexpected error", "err", err)
 	return Errorf(http.StatusInternalServerError, "Something went wrong")
-}
-
-// NoRows says whether a query found nothing.
-func NoRows(err error) bool {
-	return errors.Is(err, sql.ErrNoRows)
 }
 
 func Write(w http.ResponseWriter, err error) {

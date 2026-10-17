@@ -4,58 +4,72 @@ Ricrac is an issue tracker for people and agents. Agents use it through the MCP 
 and the REST API (`/v1`); people sign in with Google to the web app, which runs on the same
 operations. README.md covers features and configuration.
 
-Two apps: `apps/server` is the Go server (net/http, pgx on Postgres) and `apps/web` the web app
+Two apps: `apps/server` is the Go server (Huma on Chi, Ent on Postgres, Goose migrations) and `apps/web` the web app
 (Vite, React, TanStack Router + Query, Tailwind, shadcn), embedded into the server binary at
 build time. Production is the `Ricrac` project on Unbind: the `ricrac` service (this repo's
 Dockerfile) and a `postgres` database service.
 
 ## Repo Structure:
 
-### apps/server (Go, module `ricrac`, pgx on Postgres)
+### apps/server (Go, module `ricrac`)
 
-- `ops/` holds every operation of the tracker, defined once with `op(name, access, routes,
-  description, handler)`. `ops.All()` feeds the MCP tools (`server/mcp.go`), the REST routes, the
-  generic `POST /v1/ops/{name}` and the OpenAPI document (`server/rest.go`). MCP lists the everyday
-  operations (`CORE` in `server/mcp.go`) as tools and reaches the rest through `find_operations`
-  and `call_operation`, so a session doesn't start with every definition; `/mcp?tools=all` lists
-  them all. A handler is `func(c *app.Ctx, args Args) (any, error)`; `Args` is a struct with
-  camelCase `json` tags, and its `doc` tags (and `enum`) are what agents read (`ops/schema.go`
-  turns it into a JSON Schema; unknown fields are refused, plain fields are required).
-- `ops/resolve.go` turns what agents pass (names, keys, identifiers like ENG-123, "me", links)
-  into ids and checks the caller may see the thing; errors list the valid options.
-  `ops/filter.go` is the issue filter language, used by `list_issues` and custom views.
-  `ops/events.go` writes issue history, notifications, webhook deliveries and the audit log inside
-  the change's transaction. `ops/util.go` has dates and durations, paging, slugs and Markdown
-  patches. `ops/seed.go` is what new workspaces and teams start with. `ops/email.go` queues emails
-  (invitations, notification digests) in the change's transaction and sends them.
-- `app/` is what everything shares: config from the environment, `State`, errors, signed keys, the
-  DB helpers (`app.One`, `Maybe`, `All`, `Rows`, `Row`, `Exec`, the `app.SQL` builder) and the
-  migrator (it keeps sqlx's `_sqlx_migrations` bookkeeping). `app/ctx.go` is the caller: `Caller`
-  is the user, token scopes and the workspaces the token reaches (one, several or all);
-  `Caller.Ctx` picks the one a call acts in (the `workspace` argument, links among the arguments,
-  or the only one) and gives a `Ctx`: user, workspace, role (owner, admin, member, guest), scopes
-  and the teams they can see (private teams only for their members; guests only their teams).
-  Operations defined with `accountOp` run with the `Caller` instead.
-- `migrations/0002_refs.sql` defines `user_ref`, `team_ref`, `state_ref`, `issue_ref`,
-  `project_ref`, ... SQL functions: every response shows a referenced thing in the same short JSON
-  form. Responses are built in SQL with `jsonb_build_object` (at most 100 arguments per call;
-  join two with `||`).
-- `server/oauth.go` is the OAuth 2.1 server (discovery, dynamic registration, client ID metadata
-  documents, dashboard apps, PKCE, rotating refresh tokens, revocation) and the bearer check for
-  `/v1` and `/mcp`, which also takes API keys (`rr_key_...`). Grants and keys reach the
-  workspaces chosen when they were made, or all of the user's (`workspace_ids` NULL).
-- `server/google.go` is sign-in with Google; `server/account.go` the dashboard's JSON API under
-  `/api` (workspaces, invitations, API keys, OAuth apps, connected apps, OAuth consent).
-- `server/jobs.go` runs the automations every minute (auto-archive, auto-close, trash, snoozes,
-  due dates, cycles, recurring issues from templates, emails) and delivers webhooks.
-- `server/files.go` serves uploads; `server/spa.go` serves the web build copied into
-  `server/dist` (the committed `index.html` is a placeholder).
-- `mail/` renders emails (`mail/templates`) and sends them over SMTP.
-- `github/` is the GitHub App client (app JWT, installation tokens, payloads, finding ENG-123 in
-  branches and messages); `ops/github*.go` connect installations, link pull requests, branches and
-  commits to issues, sync issues of chosen repositories both ways (`github_push.go` sends queued
-  changes back) and `server/github.go` has the webhook and the install / account-link callbacks.
-  `docs/github-app.md` is how to create the app.
+Built like Zigzag (https://github.com/zigzagapp-org/zigzag, `apps/api`): handlers call services,
+services call repositories, repositories use Ent.
+
+- `cmd/server` is the binary (`session <email>` prints a session cookie for development);
+  `config/` reads the environment.
+- `ent/schema` maps every table (generated code in `ent/`, `make ent`). Join tables with two keys
+  are edge schemas; columns with a database default are `Optional()`. `ent/migrate/migrations`
+  holds the Goose migrations (`make migrate NAME=what_changed`, then write the SQL), applied on
+  start by `internal/infrastructure/database`. Its first versions are the old sqlx migrations: a
+  database the previous server migrated is adopted (its `_sqlx_migrations` checked and recorded
+  for Goose, then left as it is).
+- `internal/api/oapi` registers operations: a handler group calls
+  `oapi.Register(reg, oapi.Operation{Name, Access, Routes, Description}, service.Method)` with
+  `Method(ctx, actor *auth.Actor, input *XInput) (Model, error)` (`RegisterAccount` for operations
+  that run with the `auth.Caller`). Each operation is `POST /v1/ops/{name}`, its REST routes on Huma,
+  and an MCP tool (`internal/mcpserver`: the everyday ones in `core`, the rest through
+  `find_operations` and `call_operation`, all with `/mcp?tools=all`). Input structs are the
+  arguments: camelCase `json` tags, `doc` and `enum` tags are what agents read
+  (`internal/common/args` turns them into JSON Schema; unknown fields are refused, plain fields
+  are required). Handler groups live in `internal/api/handlers/<area>` and are registered in
+  `router.RegisterHandlers`, in the order operations are listed.
+- `internal/api/router` puts everything on one Chi router: operations, `internal/api/meta`
+  (`/v1`, `/v1/openapi.json`, `/v1/ops`, `/llms.txt`), MCP, the dashboard API under `/api`
+  (`handlers/account`, on Huma), OAuth 2.1 (`handlers/oauthserver`: discovery, dynamic
+  registration, client ID metadata documents, PKCE, rotating refresh tokens, revocation), sign-in
+  with Google (`handlers/signin`), files and uploads (`handlers/files`), GitHub webhooks and
+  callbacks (`handlers/github`) and the web app (`internal/web`, the build copied into
+  `internal/web/dist`; the committed `index.html` is a placeholder). `internal/api/middleware`
+  has CORS, body limits, compression and the bearer check (OAuth access tokens and API keys,
+  `rr_key_...`; grants and keys reach the workspaces chosen, or all of the user's when
+  `workspace_ids` is NULL).
+- `internal/services/<area>` hold the logic, checks and transactions
+  (`repo.WithTx(ctx, func(tx) error)`); `internal/repositories/<area>` the Ent queries, taking the
+  transaction (`nil` reads from the pool). Raw SQL only where Ent can't say it, through
+  `repository.Raw`/`RawExpr` (`?` placeholders). `repo.Now(ctx, tx)` is Postgres' `now()` for
+  the transaction; stored times use it.
+- `internal/auth` is roles, scopes, signed keys and sessions; `auth.Actor` is the caller in one
+  workspace (user, role, scopes, the teams they can see), picked by `access_service.Pick` (the
+  `workspace` argument, links among the arguments, or the only one).
+- `internal/services/resolve` turns what agents pass (names, keys, identifiers like ENG-123,
+  "me", links) into ids and checks the caller may see the thing; errors list the valid options.
+  `internal/services/events` writes issue history, notifications, webhook deliveries, the audit
+  log and changes for GitHub inside the change's transaction. `internal/services/seed` is what new
+  workspaces and teams start with. The issue filter language is `internal/services/issue/filter.go`.
+- `internal/models` is what operations answer, built in Go from Ent entities (`XOf` functions,
+  short forms in `refs.go`). Times are written as Postgres wrote them (`models.Time`), since the
+  answers are a contract with agents and the web app.
+- `internal/scheduler` runs the jobs: automations every minute (auto-archive, auto-close, trash,
+  snoozes, due dates, cycles, recurring issues, emails, OAuth cleanup), webhook deliveries and the
+  GitHub sync.
+- `internal/infrastructure/mail` renders emails (`templates/`) and sends them over SMTP.
+  `internal/integrations/github` is the GitHub App client (app JWT, installation tokens, payloads,
+  finding ENG-123 in branches and messages); `internal/services/github` connects installations,
+  links pull requests, branches and commits to issues and syncs issues of chosen repositories both
+  ways. `docs/github-app.md` is how to create the app.
+- Interfaces come from ifacemaker and mocks from Mockery (`.mockery.yml`, `make interfaces`);
+  service unit tests use them through `internal/services/service_test_base.go`.
 
 ### apps/web (Vite, React, TanStack Router + Query + Form, Tailwind v4, shadcn on base-ui)
 
@@ -67,8 +81,8 @@ dnd-kit drags, cmdk is the command panel.
 - `src/lib/server/client.ts` is the only way to the server: `call(workspace, "op_name", args)`
   runs an operation (`POST /v1/ops/{name}` with the session and `x-ricrac-workspace`), typed by
   `src/api/ops.gen.ts`; `account.*` is the dashboard API under `/api` (me, workspaces, keys, apps),
-  typed by `src/api/account.gen.ts`. Both generated files come from `go test ./ops ./server` in
-  apps/server; never edit them, regenerate them. Use the generated shapes (`Issue`,
+  typed by `src/api/account.gen.ts`. Both generated files come from `go test ./internal/api/router`
+  in apps/server; never edit them, regenerate them. Use the generated shapes (`Issue`,
   `IssueDetail`, ...) and `OpResult<"name">` instead of declaring your own.
 - `src/lib/queries/*` wrap operations in TanStack Query options and mutations, one module per
   area; components never call the server directly. Queries and mutation hooks take the
@@ -97,20 +111,21 @@ dnd-kit drags, cmdk is the command panel.
   `null` clears them (`Nullable[T]` fields).
 - Lists take `limit` and `cursor` and answer `{ nodes, pageInfo: { hasNextPage, endCursor } }`
   through `Page`.
-- pgx can't type a bare `$n` that is only used in `CASE`, `coalesce` or `jsonb_build_object`:
-  cast it (`$2::uuid`, `$6::jsonb`).
 - Deleting issues, projects, initiatives and documents moves them to the trash (`trashed_at`);
   the trash is emptied after 30 days.
-- Every mutation runs in one transaction (`inTx`), records history (issues) and emits a webhook
-  event (`emit`) with the entity's JSON.
+- Every mutation runs in one transaction (`WithTx`), records history (issues) and emits a webhook
+  event (`events.Emit`) with the entity's answer.
+- Answers, errors (`{"error": message}`), webhook payloads and emails are a contract: agents and
+  the web app depend on them. Change them on purpose only.
 
 ## General Rules:
 
 - Keep it simple. Do not overcomplicate things.
 - Do not leave paragraphs of comments on top of the code. You should try to avoid them as much as possible with understandable function names and code. If they are necessary even then, make them concise. Remove such comments when you come by them in the codebase. Comments should always move with code, not be left behind.
 - Use guard statement patterns in any code you write.
-- Do not edit generated code: `go.sum`, `bun.lock`, `src/routeTree.gen.ts`, `src/api/*.gen.ts`.
-  Never edit an applied migration in `migrations/`, add a new one.
+- Do not edit generated code: `go.sum`, `bun.lock`, `src/routeTree.gen.ts`, `src/api/*.gen.ts`,
+  `apps/server/ent` (but `ent/schema`), `apps/server/mocks`, `*_iface.go`. Never edit an applied
+  migration in `ent/migrate/migrations`, add a new one.
 - Do not write useless tests; tests should cover input/output behaviour.
 - Reinvent the wheel but do not reinvent the car. If you are solving a simple problem do not
   introduce a library. If you are solving a complex but common problem, there is likely a
@@ -131,21 +146,24 @@ dnd-kit drags, cmdk is the command panel.
 Needs Go 1.26, Bun and Docker (for Postgres).
 
     docker compose up -d                       # Postgres on localhost:5436
-    cd apps/server && go run .                 # with the variables from .env.example exported
+    cd apps/server && go run ./cmd/server      # with the variables from .env.example exported
     cd apps/web && bun install && bun dev      # http://localhost:5173, proxies to the server
 
 Checks (`go test` needs the compose Postgres, or `DATABASE_URL` pointing at another one; each
 end-to-end test gets a throwaway database):
 
-    cd apps/server && gofmt -l . && go vet ./... && go test ./...
+    cd apps/server && make check
     cd apps/web && bun run lint && bun run build && bun run test
 
 The end-to-end tests live in `apps/server/e2e/`: each starts from `world(t)` (a workspace
-"acme" owned by Ann with the team ENG) and calls operations with `call`, `fails` and
-`tryCall`; `http_test.go` goes through the real router (REST, OAuth, MCP). Behaviour changes need
-a test there.
+"acme" owned by Ann with the team ENG) and talks to the server only through its router, with
+`call`, `fails` and `tryCall` for operations; `backend_test.go` is the one file that knows the
+server's packages. Behaviour changes need a test there. Every test records what crosses the
+server's edges (answers, webhooks, GitHub calls, emails) in `e2e/testdata/compat` and must match
+it; `RICRAC_RECORD=1` rewrites the recordings, for intended changes only. `TestCutover`
+(`RICRAC_CUTOVER_FROM=<commit>`) rehearses deploying over the server at that commit.
 
-Signing in needs Google; in development `go run . session ann@acme.test` (in apps/server, with the
+Signing in needs Google; in development `go run ./cmd/server session ann@acme.test` (in apps/server, with the
 variables exported) prints a session cookie for that user instead, and
 `node scripts/seed.mjs "<cookie>"` (in apps/web) fills the server with a workspace "acme" to
 click through.

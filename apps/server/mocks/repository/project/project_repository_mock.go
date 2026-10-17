@@ -2716,66 +2716,6 @@ func (_c *ProjectRepositoryMock_ProjectsInStatus_Call) RunAndReturn(run func(ctx
 	return _c
 }
 
-// PurgeTrash provides a mock function for the type ProjectRepositoryMock
-func (_mock *ProjectRepositoryMock) PurgeTrash(ctx context.Context) (int, error) {
-	ret := _mock.Called(ctx)
-
-	if len(ret) == 0 {
-		panic("no return value specified for PurgeTrash")
-	}
-
-	var r0 int
-	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context) (int, error)); ok {
-		return returnFunc(ctx)
-	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context) int); ok {
-		r0 = returnFunc(ctx)
-	} else {
-		r0 = ret.Get(0).(int)
-	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = returnFunc(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-	return r0, r1
-}
-
-// ProjectRepositoryMock_PurgeTrash_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PurgeTrash'
-type ProjectRepositoryMock_PurgeTrash_Call struct {
-	*mock.Call
-}
-
-// PurgeTrash is a helper method to define mock.On call
-//   - ctx context.Context
-func (_e *ProjectRepositoryMock_Expecter) PurgeTrash(ctx any) *ProjectRepositoryMock_PurgeTrash_Call {
-	return &ProjectRepositoryMock_PurgeTrash_Call{Call: _e.mock.On("PurgeTrash", ctx)}
-}
-
-func (_c *ProjectRepositoryMock_PurgeTrash_Call) Run(run func(ctx context.Context)) *ProjectRepositoryMock_PurgeTrash_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 context.Context
-		if args[0] != nil {
-			arg0 = args[0].(context.Context)
-		}
-		run(
-			arg0,
-		)
-	})
-	return _c
-}
-
-func (_c *ProjectRepositoryMock_PurgeTrash_Call) Return(n int, err error) *ProjectRepositoryMock_PurgeTrash_Call {
-	_c.Call.Return(n, err)
-	return _c
-}
-
-func (_c *ProjectRepositoryMock_PurgeTrash_Call) RunAndReturn(run func(ctx context.Context) (int, error)) *ProjectRepositoryMock_PurgeTrash_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // Relabel provides a mock function for the type ProjectRepositoryMock
 func (_mock *ProjectRepositoryMock) Relabel(ctx context.Context, tx repository.TxInterface, column string, id uuid.UUID, url string, label string) (bool, error) {
 	ret := _mock.Called(ctx, tx, column, id, url, label)

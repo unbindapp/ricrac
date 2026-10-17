@@ -115,8 +115,6 @@ type ProjectRepositoryInterface interface {
 	Relabel(ctx context.Context, tx repository.TxInterface, column string, id uuid.UUID, url, label string) (bool, error)
 	// AddLink adds a link to the project or initiative whose id is in column, after its others.
 	AddLink(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, column string, id uuid.UUID, url, label string, creator uuid.UUID) error
-	// PurgeTrash deletes the projects trashed more than 30 days ago.
-	PurgeTrash(ctx context.Context) (int, error)
 	// RemoveLinks removes the links with these URLs from the project or initiative whose id is in
 	// column.
 	RemoveLinks(ctx context.Context, tx repository.TxInterface, column string, id uuid.UUID, urls []string) error

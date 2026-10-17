@@ -131,15 +131,6 @@ func (reg *Registry) Add(op *Op) {
 	reg.byName[op.Name] = op
 }
 
-// NewOp is an operation run by functions of its own, for operations that don't come from a
-// handler group.
-func NewOp(op Op, inWorkspace func(ctx context.Context, actor *auth.Actor, raw M) (any, error), forAccount func(ctx context.Context, caller *auth.Caller, raw M) (any, error)) *Op {
-	op.inWorkspace = inWorkspace
-	op.forAccount = forAccount
-	op.Account = forAccount != nil
-	return &op
-}
-
 // Order sorts the operations as names lists them; the others go last.
 func (reg *Registry) Order(names []string) {
 	index := func(op *Op) int {

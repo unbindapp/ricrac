@@ -14,8 +14,6 @@ type InitiativeServiceInterface interface {
 	List(ctx context.Context, actor *auth.Actor, input *ListInput) (args.PageOf[models.Initiative], error)
 	Get(ctx context.Context, actor *auth.Actor, input *IDInput) (models.InitiativeDetail, error)
 	Save(ctx context.Context, actor *auth.Actor, input *SaveInput) (models.Initiative, error)
-	// EmptyTrash deletes the initiatives trashed more than 30 days ago (one of the automations).
-	EmptyTrash(ctx context.Context) (int, error)
 	Trash(ctx context.Context, actor *auth.Actor, input *IDInput) (models.Initiative, error)
 	Restore(ctx context.Context, actor *auth.Actor, input *IDInput) (models.Initiative, error)
 	Archive(ctx context.Context, actor *auth.Actor, input *IDInput) (models.Initiative, error)

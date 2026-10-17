@@ -250,13 +250,6 @@ func (self *ProjectRepository) AddLink(ctx context.Context, tx repository.TxInte
 	return create.Exec(ctx)
 }
 
-// PurgeTrash deletes the projects trashed more than 30 days ago.
-func (self *ProjectRepository) PurgeTrash(ctx context.Context) (int, error) {
-	return self.base.DB.Project.Delete().Where(func(s *entsql.Selector) {
-		s.Where(repository.Raw(s.C(project.FieldTrashedAt) + " < now() - interval '30 days'"))
-	}).Exec(ctx)
-}
-
 // RemoveLinks removes the links with these URLs from the project or initiative whose id is in
 // column.
 func (self *ProjectRepository) RemoveLinks(ctx context.Context, tx repository.TxInterface, column string, id uuid.UUID, urls []string) error {

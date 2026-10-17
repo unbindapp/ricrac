@@ -39,6 +39,4 @@ type ProjectServiceInterface interface {
 	Restore(ctx context.Context, actor *auth.Actor, input *IDInput) (models.Project, error)
 	Archive(ctx context.Context, actor *auth.Actor, input *IDInput) (models.Project, error)
 	Unarchive(ctx context.Context, actor *auth.Actor, input *IDInput) (models.Project, error)
-	// EmptyTrash deletes the projects trashed more than 30 days ago (one of the automations).
-	EmptyTrash(ctx context.Context) (int, error)
 }
