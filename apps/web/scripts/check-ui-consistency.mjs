@@ -20,7 +20,11 @@ const rules = [
   {
     name: "page-title text size",
     pattern: /\btext-[2-9]xl\b/g,
-    allowedIn: ["src/components/layout/", "src/components/shared/inline-text.tsx"],
+    allowedIn: [
+      "src/components/layout/",
+      "src/components/shared/inline-text.tsx",
+      "src/components/landing/",
+    ],
   },
   {
     name: "alert()",

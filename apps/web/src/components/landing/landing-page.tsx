@@ -58,13 +58,14 @@ export function LandingPage() {
         </LinkButton>
       </header>
 
-      <section className="flex w-full flex-col items-center gap-6 px-6 pt-16 pb-12 text-center">
-        <div className="flex max-w-2xl flex-col gap-4">
-          <h1 className="text-xl font-semibold">The issue tracker for people and agents</h1>
-          <p className="text-muted-foreground text-sm">
-            Ricrac keeps the work of your teams in one place. People plan and track it in the web
-            app; agents plan, file, update and close it through the MCP server and the REST API,
-            with the same workspaces and permissions. Sign in with Google to start.
+      <section className="flex w-full flex-col items-center gap-6 px-6 pt-24 pb-16 text-center">
+        <div className="flex max-w-3xl flex-col items-center gap-4">
+          <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
+            The issue tracker for people and agents
+          </h1>
+          <p className="text-muted-foreground max-w-xl text-base text-balance">
+            Your team works in the web app. Your agents work through MCP and the API. Same issues,
+            same permissions.
           </p>
         </div>
         <div className="w-full max-w-sm">
@@ -88,15 +89,6 @@ export function LandingPage() {
             <p className="text-muted-foreground text-sm">{feature.body}</p>
           </div>
         ))}
-      </section>
-
-      <section className="mx-auto flex w-full max-w-2xl flex-col gap-2 px-6 pb-16 text-center">
-        <h2 className="text-base font-semibold">About signing in with Google</h2>
-        <p className="text-muted-foreground text-sm">
-          Ricrac only asks Google for your name, email address and profile picture, to create your
-          account and show who you are to the people you work with. It never reads your mail,
-          contacts or files.
-        </p>
       </section>
 
       <PublicFooter />
