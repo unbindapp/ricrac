@@ -9,11 +9,15 @@ import (
 	access_repo "ricrac/internal/repositories/access"
 	attachment_repo "ricrac/internal/repositories/attachment"
 	comment_repo "ricrac/internal/repositories/comment"
+	cycle_repo "ricrac/internal/repositories/cycle"
+	document_repo "ricrac/internal/repositories/document"
 	events_repo "ricrac/internal/repositories/events"
+	favorite_repo "ricrac/internal/repositories/favorite"
 	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
 	resolve_repo "ricrac/internal/repositories/resolve"
 	seed_repo "ricrac/internal/repositories/seed"
+	template_repo "ricrac/internal/repositories/template"
 )
 
 //go:generate go run -mod=mod github.com/vburenin/ifacemaker -f "*.go" -i RepositoriesInterface -p repositories -s Repositories -o repositories_iface.go
@@ -28,6 +32,10 @@ type Repositories struct {
 	seed       seed_repo.SeedRepositoryInterface
 	comment    comment_repo.CommentRepositoryInterface
 	attachment attachment_repo.AttachmentRepositoryInterface
+	cycle      cycle_repo.CycleRepositoryInterface
+	document   document_repo.DocumentRepositoryInterface
+	favorite   favorite_repo.FavoriteRepositoryInterface
+	template   template_repo.TemplateRepositoryInterface
 }
 
 func NewRepositories(db *ent.Client) *Repositories {
@@ -42,6 +50,10 @@ func NewRepositories(db *ent.Client) *Repositories {
 		seed:       seed_repo.NewSeedRepository(db),
 		comment:    comment_repo.NewCommentRepository(db),
 		attachment: attachment_repo.NewAttachmentRepository(db),
+		cycle:      cycle_repo.NewCycleRepository(db),
+		document:   document_repo.NewDocumentRepository(db),
+		favorite:   favorite_repo.NewFavoriteRepository(db),
+		template:   template_repo.NewTemplateRepository(db),
 	}
 }
 
@@ -88,4 +100,20 @@ func (r *Repositories) Comment() comment_repo.CommentRepositoryInterface {
 
 func (r *Repositories) Attachment() attachment_repo.AttachmentRepositoryInterface {
 	return r.attachment
+}
+
+func (r *Repositories) Cycle() cycle_repo.CycleRepositoryInterface {
+	return r.cycle
+}
+
+func (r *Repositories) Document() document_repo.DocumentRepositoryInterface {
+	return r.document
+}
+
+func (r *Repositories) Favorite() favorite_repo.FavoriteRepositoryInterface {
+	return r.favorite
+}
+
+func (r *Repositories) Template() template_repo.TemplateRepositoryInterface {
+	return r.template
 }

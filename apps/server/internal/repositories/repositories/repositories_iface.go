@@ -9,11 +9,15 @@ import (
 	access_repo "ricrac/internal/repositories/access"
 	attachment_repo "ricrac/internal/repositories/attachment"
 	comment_repo "ricrac/internal/repositories/comment"
+	cycle_repo "ricrac/internal/repositories/cycle"
+	document_repo "ricrac/internal/repositories/document"
 	events_repo "ricrac/internal/repositories/events"
+	favorite_repo "ricrac/internal/repositories/favorite"
 	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
 	resolve_repo "ricrac/internal/repositories/resolve"
 	seed_repo "ricrac/internal/repositories/seed"
+	template_repo "ricrac/internal/repositories/template"
 	"time"
 )
 
@@ -31,4 +35,8 @@ type RepositoriesInterface interface {
 	Seed() seed_repo.SeedRepositoryInterface
 	Comment() comment_repo.CommentRepositoryInterface
 	Attachment() attachment_repo.AttachmentRepositoryInterface
+	Cycle() cycle_repo.CycleRepositoryInterface
+	Document() document_repo.DocumentRepositoryInterface
+	Favorite() favorite_repo.FavoriteRepositoryInterface
+	Template() template_repo.TemplateRepositoryInterface
 }

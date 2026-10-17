@@ -148,3 +148,75 @@ packages:
           filename: seed_service_mock.go
           structname: SeedServiceMock
           pkgname: mocks_services_seed
+  ricrac/internal/repositories/cycle:
+    config:
+      dir: ./mocks/repository/cycle
+    interfaces:
+      CycleRepositoryInterface:
+        config:
+          filename: cycle_repository_mock.go
+          structname: CycleRepositoryMock
+          pkgname: mocks_repository_cycle
+  ricrac/internal/repositories/document:
+    config:
+      dir: ./mocks/repository/document
+    interfaces:
+      DocumentRepositoryInterface:
+        config:
+          filename: document_repository_mock.go
+          structname: DocumentRepositoryMock
+          pkgname: mocks_repository_document
+  ricrac/internal/repositories/favorite:
+    config:
+      dir: ./mocks/repository/favorite
+    interfaces:
+      FavoriteRepositoryInterface:
+        config:
+          filename: favorite_repository_mock.go
+          structname: FavoriteRepositoryMock
+          pkgname: mocks_repository_favorite
+  ricrac/internal/repositories/template:
+    config:
+      dir: ./mocks/repository/template
+    interfaces:
+      TemplateRepositoryInterface:
+        config:
+          filename: template_repository_mock.go
+          structname: TemplateRepositoryMock
+          pkgname: mocks_repository_template
+  ricrac/internal/services/cycle:
+    config:
+      dir: ./mocks/services/cycle
+    interfaces:
+      CycleServiceInterface:
+        config:
+          filename: cycle_service_mock.go
+          structname: CycleServiceMock
+          pkgname: mocks_services_cycle
+  ricrac/internal/services/document:
+    config:
+      dir: ./mocks/services/document
+    interfaces:
+      DocumentServiceInterface:
+        config:
+          filename: document_service_mock.go
+          structname: DocumentServiceMock
+          pkgname: mocks_services_document
+  ricrac/internal/services/favorite:
+    config:
+      dir: ./mocks/services/favorite
+    interfaces:
+      FavoriteServiceInterface:
+        config:
+          filename: favorite_service_mock.go
+          structname: FavoriteServiceMock
+          pkgname: mocks_services_favorite
+  ricrac/internal/services/template:
+    config:
+      dir: ./mocks/services/template
+    interfaces:
+      TemplateServiceInterface:
+        config:
+          filename: template_service_mock.go
+          structname: TemplateServiceMock
+          pkgname: mocks_services_template

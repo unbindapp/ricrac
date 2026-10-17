@@ -13,7 +13,11 @@ import (
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 
+	cycles_handler "ricrac/internal/api/handlers/cycles"
+	documents_handler "ricrac/internal/api/handlers/documents"
+	favorites_handler "ricrac/internal/api/handlers/favorites"
 	labels_handler "ricrac/internal/api/handlers/labels"
+	templates_handler "ricrac/internal/api/handlers/templates"
 	"ricrac/internal/api/meta"
 	"ricrac/internal/api/middleware"
 	"ricrac/internal/api/oapi"
@@ -99,4 +103,8 @@ func New(srv *server.Server, fallback Fallback) (http.Handler, *oapi.Registry) {
 // are listed.
 func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	labels_handler.RegisterHandlers(srv, reg)
+	cycles_handler.RegisterHandlers(srv, reg)
+	documents_handler.RegisterHandlers(srv, reg)
+	favorites_handler.RegisterHandlers(srv, reg)
+	templates_handler.RegisterHandlers(srv, reg)
 }
