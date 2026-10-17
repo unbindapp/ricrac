@@ -2,6 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 
 import type { ProjectDetail } from "@/api/ops.gen";
 import { FavoriteButton } from "@/components/favorites/favorite-button";
+import { PageBar } from "@/components/layout/page-header";
 import { Breadcrumb, type TBreadcrumbItem } from "@/components/layout/breadcrumb";
 import { EntityMenu, toastTrashed } from "@/components/projects/entity-menu";
 import { CopyLinkAction, HeaderActions } from "@/components/shared/detail-actions";
@@ -108,12 +109,12 @@ export function ProjectHeaderBar({ project, tab }: { project: ProjectDetail; tab
   const { workspace } = useWorkspace();
   return (
     <div className="flex w-full flex-col gap-2">
-      <div className="flex w-full min-w-0 items-center gap-2">
+      <PageBar>
         <div className="min-w-0 flex-1">
           <Breadcrumb items={projectBreadcrumb(workspace.urlKey, project)} />
         </div>
         <ProjectActions project={project} />
-      </div>
+      </PageBar>
       <ProjectTabs project={project} tab={tab} />
     </div>
   );

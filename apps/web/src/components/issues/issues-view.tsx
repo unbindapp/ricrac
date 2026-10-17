@@ -101,6 +101,7 @@ export function IssuesView({
         </>
       }
     >
+      {tabs}
       <IssueFilters
         filters={filters}
         onChange={onFiltersChange}
@@ -125,18 +126,13 @@ export function IssuesView({
             breadcrumb={breadcrumb}
             actions={
               canEdit && (
-                <Button onClick={() => openNewIssue(teamDefaults)}>
+                <Button size="sm" onClick={() => openNewIssue(teamDefaults)}>
                   <PlusIcon className="size-4" />
                   New issue
                 </Button>
               )
             }
-            toolbar={
-              <div className="flex w-full flex-col gap-2">
-                {tabs}
-                {toolbar}
-              </div>
-            }
+            toolbar={toolbar}
           />
         )}
         {display.layout === "board" ? (

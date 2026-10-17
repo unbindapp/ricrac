@@ -20,6 +20,7 @@ import {
   CustomerStatusPicker,
   CustomerTierPicker,
 } from "@/components/customers/customer-pickers";
+import { PageBar } from "@/components/layout/page-header";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
@@ -87,7 +88,7 @@ function CustomerPage({ customer }: { customer: TCustomerDetail }) {
 
   return (
     <PageContainer>
-      <div className="flex min-h-9 w-full items-center gap-2">
+      <PageBar>
         <div className="min-w-0 flex-1">
           <Breadcrumb
             items={[
@@ -101,7 +102,7 @@ function CustomerPage({ customer }: { customer: TCustomerDetail }) {
           />
         </div>
         {canEdit && <CustomerActions customer={customer} />}
-      </div>
+      </PageBar>
       <div className="flex w-full flex-col gap-6 lg:flex-row">
         <div className="flex min-w-0 flex-1 flex-col gap-6">
           <div className="flex items-center gap-3">

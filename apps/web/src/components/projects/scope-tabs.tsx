@@ -18,7 +18,7 @@ export function ScopeTabs({
         onChange(value === "archived" || value === "trash" ? value : "active")
       }
     >
-      <TabsList className="border-b-0">
+      <TabsList>
         <TabsTab value="active">Active</TabsTab>
         <TabsTab value="archived">
           <ArchiveIcon />

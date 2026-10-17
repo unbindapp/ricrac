@@ -16,7 +16,7 @@ export function IssueGroupHeader({ group, isCollapsed, onToggle, onCreate }: TPr
     <div
       role="listitem"
       aria-label={`${group.label}, ${group.issues.length} issues`}
-      className="bg-muted flex h-9 w-full items-center gap-2 border-b px-1.5 text-sm"
+      className="bg-muted flex h-9 w-full items-center gap-2 pr-4 pl-4 text-sm"
     >
       <Button
         variant="ghost"
@@ -24,7 +24,7 @@ export function IssueGroupHeader({ group, isCollapsed, onToggle, onCreate }: TPr
         forceMinSize={false}
         aria-expanded={!isCollapsed}
         onClick={onToggle}
-        className="min-w-0 justify-start"
+        className="min-w-0 justify-start px-2"
       >
         <ChevronRightIcon
           data-open={!isCollapsed || undefined}
@@ -32,7 +32,7 @@ export function IssueGroupHeader({ group, isCollapsed, onToggle, onCreate }: TPr
         />
         <GroupIcon meta={group.meta} />
         <span className="truncate">{group.label}</span>
-        <span className="text-muted-foreground text-xs font-normal">{group.issues.length}</span>
+        <span className="text-muted-foreground text-sm font-normal">{group.issues.length}</span>
       </Button>
       <span className="flex-1" />
       {onCreate && (
@@ -41,6 +41,7 @@ export function IssueGroupHeader({ group, isCollapsed, onToggle, onCreate }: TPr
           size="icon"
           aria-label={`New issue in ${group.label}`}
           onClick={onCreate}
+          className="text-muted-foreground"
         >
           <PlusIcon className="size-4" />
         </Button>

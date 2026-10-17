@@ -60,7 +60,7 @@ export function InlineText({
         }
       }}
       data-variant={variant}
-      className="text-muted-foreground data-[variant=title]:text-foreground field-sizing-content min-h-0 resize-none border-transparent bg-transparent px-0 py-0 text-sm focus-visible:ring-0 has-hover:hover:ring-0 data-[variant=title]:text-xl data-[variant=title]:leading-tight data-[variant=title]:font-semibold"
+      className="text-muted-foreground data-[variant=title]:text-foreground field-sizing-content min-h-0 resize-none border-transparent bg-transparent px-0 py-0 text-sm focus-visible:ring-0 has-hover:hover:ring-0 data-[variant=title]:text-2xl data-[variant=title]:leading-tight data-[variant=title]:font-semibold"
     />
   );
 }

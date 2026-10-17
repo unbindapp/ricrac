@@ -163,7 +163,7 @@ function IssueDetailContent({
   );
 
   const main = (
-    <div className="flex min-w-0 flex-1 flex-col gap-6">
+    <div className="flex min-w-0 flex-1 flex-col gap-8">
       <LifecycleBanner issue={issue} />
       <TriageBanner issue={issue} />
       <div className="flex flex-col gap-2">
@@ -234,15 +234,23 @@ function IssueDetailContent({
   }
 
   return (
-    <div className="flex w-full flex-col gap-6">
+    <>
       <IssueDetailHeader issue={issue} variant="page" onSetSla={() => setIsSettingSla(true)} />
-      <div className="flex w-full flex-col gap-6 lg:flex-row lg:items-start">
-        {main}
-        <aside aria-label="Properties" className="w-full shrink-0 lg:sticky lg:top-0 lg:w-72">
-          <div className="rounded-lg border p-2">{properties}</div>
+      <div className="-mx-4 -mt-4 -mb-8 flex flex-1 flex-col-reverse lg:flex-row">
+        <div className="flex min-w-0 flex-1 justify-center px-4 py-8 sm:px-10">
+          <div className="flex w-full max-w-3xl">{main}</div>
+        </div>
+        <aside
+          aria-label="Properties"
+          className="flex w-full shrink-0 flex-col gap-2 border-b px-4 py-4 lg:w-80 lg:border-b-0 lg:border-l lg:px-5"
+        >
+          <h2 className="text-muted-foreground flex h-7 items-center text-xs font-medium">
+            Properties
+          </h2>
+          {properties}
         </aside>
       </div>
-    </div>
+    </>
   );
 }
 

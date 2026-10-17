@@ -26,6 +26,23 @@
   -ms-overflow-style: none;
 }
 
+/* Space between neighbouring items that still belongs to them: a transparent border the
+   background isn't painted under, so there is no dead zone between tabs or rows. */
+@utility hit-gap-x {
+  border-inline: 0.25rem solid transparent;
+  background-clip: padding-box;
+}
+
+@utility hit-gap-y {
+  border-block: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+@utility hit-gap {
+  border: 0.1875rem solid transparent;
+  background-clip: padding-box;
+}
+
 @utility line-icon {
   display: flex;
   height: 1lh;
@@ -312,7 +329,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
   }
   #root {
     @apply bg-background text-foreground flex min-h-svh flex-col;

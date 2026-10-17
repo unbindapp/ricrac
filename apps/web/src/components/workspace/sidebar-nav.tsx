@@ -1,5 +1,5 @@
 import { type LinkProps } from "@tanstack/react-router";
-import { ChevronRightIcon, type LucideIcon } from "lucide-react";
+import { type LucideIcon } from "lucide-react";
 import { ReactNode, useState } from "react";
 
 import { Button, LinkButton } from "@/components/ui/button";
@@ -12,6 +12,9 @@ type TNavItemProps = {
   exact?: boolean;
   onNavigate?: () => void;
 };
+
+export const sidebarItemClassName =
+  "hit-gap-y h-7.5 w-full justify-start px-2 font-normal [&_svg]:text-muted-foreground";
 
 export function SidebarNavItem({
   label,
@@ -29,12 +32,25 @@ export function SidebarNavItem({
       size="sm"
       forceMinSize={false}
       onClick={onNavigate}
-      className="text-muted-foreground data-[status=active]:bg-accent data-[status=active]:text-foreground w-full justify-start font-normal"
+      className={`${sidebarItemClassName} data-[status=active]:bg-accent`}
     >
       <Icon className="size-4" />
       <span className="min-w-0 flex-1 truncate text-left">{label}</span>
       {badge}
     </LinkButton>
+  );
+}
+
+function Caret({ isOpen }: { isOpen: boolean }) {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 8 8"
+      data-open={isOpen || undefined}
+      className="size-2 shrink-0 -rotate-90 fill-current transition-transform data-open:rotate-0"
+    >
+      <path d="M1 2.5h6L4 6z" />
+    </svg>
   );
 }
 
@@ -51,25 +67,23 @@ export function SidebarSection({
 }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   return (
-    <div className="flex flex-col gap-0.5">
-      <div className="flex items-center gap-0.5">
+    <div className="group/section flex flex-col">
+      <div className="flex items-center gap-1 pr-1">
         <Button
           variant="ghost"
           size="sm"
           forceMinSize={false}
           aria-expanded={isOpen}
           onClick={() => setIsOpen((open) => !open)}
-          className="text-muted-foreground min-w-0 flex-1 justify-start text-xs"
+          className="text-muted-foreground h-7 min-w-0 justify-start gap-1 px-2 text-xs"
         >
           <span className="truncate">{title}</span>
-          <ChevronRightIcon
-            data-open={isOpen || undefined}
-            className="size-3.5 transition-transform data-open:rotate-90"
-          />
+          <Caret isOpen={isOpen} />
         </Button>
+        <span className="flex-1" />
         {action}
       </div>
-      {isOpen && <div className="flex flex-col gap-0.5">{children}</div>}
+      {isOpen && <div className="flex flex-col">{children}</div>}
     </div>
   );
 }
@@ -87,23 +101,22 @@ export function SidebarCollapsible({
 }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   return (
-    <div className="flex flex-col gap-0.5">
+    <div className="flex flex-col">
       <Button
         variant="ghost"
         size="sm"
         forceMinSize={false}
         aria-expanded={isOpen}
         onClick={() => setIsOpen((open) => !open)}
-        className="w-full justify-start font-normal"
+        className={sidebarItemClassName}
       >
         {icon}
-        <span className="min-w-0 flex-1 truncate text-left">{label}</span>
-        <ChevronRightIcon
-          data-open={isOpen || undefined}
-          className="text-muted-foreground size-3.5 transition-transform data-open:rotate-90"
-        />
+        <span className="min-w-0 truncate text-left">{label}</span>
+        <span className="text-muted-foreground flex">
+          <Caret isOpen={isOpen} />
+        </span>
       </Button>
-      {isOpen && <div className="flex flex-col gap-0.5 pl-4">{children}</div>}
+      {isOpen && <div className="flex flex-col pl-5">{children}</div>}
     </div>
   );
 }

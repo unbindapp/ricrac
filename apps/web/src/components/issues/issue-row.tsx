@@ -66,7 +66,7 @@ export function IssueRow({
       }}
       onMouseEnter={() => onFocus(issue)}
       onFocus={() => onFocus(issue)}
-      className="group/row has-hover:hover:bg-accent data-selected:bg-primary/2-10 data-selected:has-hover:hover:bg-primary/3-10 data-active:bg-accent data-focused:bg-accent focus-visible:ring-primary/8-10 flex h-9 w-full cursor-default items-center gap-2 border-b px-3 text-sm outline-hidden focus-visible:ring-1 focus-visible:ring-inset"
+      className="group/row has-hover:hover:bg-muted data-focused:bg-muted data-active:bg-accent data-selected:bg-primary/2-10 data-selected:has-hover:hover:bg-primary/3-10 focus-visible:ring-primary/8-10 flex h-11 w-full cursor-default items-center gap-2 px-6 text-sm outline-hidden focus-visible:ring-1 focus-visible:ring-inset"
     >
       {show("priority") && (
         <PriorityPicker
@@ -93,7 +93,7 @@ export function IssueRow({
       )}
       <span
         data-nested={depth > 0 || undefined}
-        className="min-w-0 flex-1 truncate data-nested:pl-4"
+        className="min-w-0 flex-1 truncate font-medium data-nested:pl-4"
       >
         {issue.title}
       </span>

@@ -23,9 +23,9 @@ export function SettingsLayout({ title, tabs, children }: TProps) {
     <div className="flex min-h-0 w-full flex-1 flex-col lg:flex-row">
       <nav
         aria-label={title}
-        className="scrollbar-hidden flex shrink-0 items-center gap-1 overflow-x-auto border-b px-4 py-2 lg:w-56 lg:flex-col lg:items-stretch lg:overflow-y-auto lg:border-r lg:border-b-0 lg:px-3 lg:py-5"
+        className="scrollbar-hidden flex shrink-0 items-center overflow-x-auto border-b px-3 py-2 lg:w-56 lg:flex-col lg:items-stretch lg:overflow-y-auto lg:border-r lg:border-b-0 lg:px-2 lg:py-4"
       >
-        <p className="text-muted-foreground hidden px-2 pb-1 text-xs font-medium lg:block">
+        <p className="text-muted-foreground hidden h-7 items-center px-2 text-xs font-medium lg:flex">
           {title}
         </p>
         {tabs.map((tab) => (
@@ -36,7 +36,7 @@ export function SettingsLayout({ title, tabs, children }: TProps) {
             variant="ghost"
             size="sm"
             forceMinSize={false}
-            className="text-muted-foreground data-[status=active]:bg-accent data-[status=active]:text-foreground shrink-0 justify-start"
+            className="hit-gap-x lg:hit-gap-y data-[status=active]:bg-accent [&_svg]:text-muted-foreground h-7.5 shrink-0 justify-start px-2 font-normal lg:border-x-0"
           >
             <tab.icon className="size-4" />
             <span className="truncate">{tab.label}</span>
