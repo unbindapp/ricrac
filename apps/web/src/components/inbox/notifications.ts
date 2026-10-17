@@ -140,6 +140,7 @@ export function commentExcerpt(body: string) {
   return body
     .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
     .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/^\s*(?:[-*+]|\d+\.)\s+\[[ xX]\]\s+/gm, "")
     .replace(/^\s*(?:#+|>|[-*+]|\d+\.)\s+/gm, "")
     .replace(/[*_`~]/g, "")
     .replace(/\s+/g, " ")

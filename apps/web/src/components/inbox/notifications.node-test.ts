@@ -135,4 +135,8 @@ test("comment excerpts are plain text on one line", () => {
     commentExcerpt("## Plan\n\n- **Ship** [the fix](https://x.test)\n> quoted ![img](a.png)"),
     "Plan Ship the fix quoted",
   );
+  assert.equal(
+    commentExcerpt("Plan:\n\n- [x] Safari 17\n- [ ] Safari 18"),
+    "Plan: Safari 17 Safari 18",
+  );
 });
