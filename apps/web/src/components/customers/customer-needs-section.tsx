@@ -14,7 +14,7 @@ type TProps = { issue: string; project?: never } | { project: string; issue?: ne
 
 /**
  * The customer requests of an issue (identifier or id) or a project (slug or id), for their
- * detail pages: <CustomerNeedsSection issue={issue.identifier} />.
+ * detail pages: <CustomerNeedsSection issue={issue.identifier} />. Guests can't see customers.
  */
 export function CustomerNeedsSection(props: TProps) {
   const { workspace, canEdit } = useWorkspace();
@@ -24,13 +24,13 @@ export function CustomerNeedsSection(props: TProps) {
     isPending,
     error,
     refetch,
-  } = useQuery(customerNeedsQuery(workspace.id, scope));
+  } = useQuery({ ...customerNeedsQuery(workspace.id, scope), enabled: canEdit });
   const important = needs.filter((need) => need.priority === 1).length;
   const summary =
     needs.length === 0
       ? undefined
       : `${needs.length} ${needs.length === 1 ? "request" : "requests"}${important ? `, ${important} important` : ""}`;
-  if (!canEdit && !error && needs.length === 0) return null;
+  if (!canEdit) return null;
 
   return (
     <section aria-label="Customer requests" className="flex w-full flex-col gap-3">
@@ -38,17 +38,15 @@ export function CustomerNeedsSection(props: TProps) {
         title="Customer requests"
         description={summary}
         actions={
-          canEdit && (
-            <CustomerNeedDialog
-              scope={scope}
-              trigger={
-                <Button variant="ghost" size="sm">
-                  <PlusIcon className="size-4" />
-                  Add request
-                </Button>
-              }
-            />
-          )
+          <CustomerNeedDialog
+            scope={scope}
+            trigger={
+              <Button variant="ghost" size="sm">
+                <PlusIcon className="size-4" />
+                Add request
+              </Button>
+            }
+          />
         }
       />
       {isPending && <ListSkeleton rows={2} />}

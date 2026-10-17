@@ -113,24 +113,28 @@ export function Sidebar({ onNavigate }: TProps) {
               link={{ to: "/$workspace/views", params }}
               onNavigate={onNavigate}
             />
-            <SidebarNavItem
-              label="Initiatives"
-              icon={TargetIcon}
-              link={{ to: "/$workspace/initiatives", params }}
-              onNavigate={onNavigate}
-            />
+            {canEdit && (
+              <SidebarNavItem
+                label="Initiatives"
+                icon={TargetIcon}
+                link={{ to: "/$workspace/initiatives", params }}
+                onNavigate={onNavigate}
+              />
+            )}
             <SidebarNavItem
               label="Documents"
               icon={FileTextIcon}
               link={{ to: "/$workspace/documents", params }}
               onNavigate={onNavigate}
             />
-            <SidebarNavItem
-              label="Customers"
-              icon={BuildingIcon}
-              link={{ to: "/$workspace/customers", params }}
-              onNavigate={onNavigate}
-            />
+            {canEdit && (
+              <SidebarNavItem
+                label="Customers"
+                icon={BuildingIcon}
+                link={{ to: "/$workspace/customers", params }}
+                onNavigate={onNavigate}
+              />
+            )}
             <SidebarNavItem
               label="Releases"
               icon={RocketIcon}

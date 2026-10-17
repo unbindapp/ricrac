@@ -125,9 +125,10 @@ function IssueDetailContent({
   const [isSettingSla, setIsSettingSla] = useState(false);
 
   const isPeek = variant === "peek";
-  const { data: customerNeeds } = useQuery(
-    customerNeedsQuery(workspace.id, { issue: issue.identifier }),
-  );
+  const { data: customerNeeds } = useQuery({
+    ...customerNeedsQuery(workspace.id, { issue: issue.identifier }),
+    enabled: canEdit,
+  });
   const hasCustomerNeeds = (customerNeeds?.length ?? 0) > 0;
   const reactions = groupReactions(issue.reactions, me?.id);
   const react = (emoji: string, reacted: boolean) =>

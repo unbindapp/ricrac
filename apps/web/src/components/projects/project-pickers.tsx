@@ -277,7 +277,7 @@ export function InitiativesPicker({
   disabled,
 }: TControl & { initiatives: InitiativeRef[]; onChange: (ids: string[]) => void }) {
   const { workspace } = useWorkspace();
-  const { data, isPending } = useQuery(initiativesQuery(workspace.id));
+  const { data, isPending } = useQuery({ ...initiativesQuery(workspace.id), enabled: !disabled });
   const options: TPickerOption[] = (data ?? []).map((initiative) => ({
     value: initiative.id,
     label: initiative.name,

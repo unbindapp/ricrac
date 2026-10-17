@@ -214,17 +214,19 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
       ]
     : [];
 
-  const goTo: TAction[] = (Object.keys(GO_TO_KEYS) as TDestination[]).map((destination) => {
-    const { label, icon, link } = destinations[destination];
-    return {
-      id: `go-${destination}`,
-      label: `Go to ${label.toLowerCase()}`,
-      icon,
-      keywords: ["navigate", "open"],
-      shortcut: { keys: ["G", GO_TO_KEYS[destination]], then: true },
-      run: () => go(link),
-    };
-  });
+  const goTo: TAction[] = (Object.keys(GO_TO_KEYS) as TDestination[])
+    .filter((destination) => canEdit || destination !== "initiatives")
+    .map((destination) => {
+      const { label, icon, link } = destinations[destination];
+      return {
+        id: `go-${destination}`,
+        label: `Go to ${label.toLowerCase()}`,
+        icon,
+        keywords: ["navigate", "open"],
+        shortcut: { keys: ["G", GO_TO_KEYS[destination]], then: true },
+        run: () => go(link),
+      };
+    });
 
   const teams: TAction[] = myTeams.map((team) => ({
     id: `team-${team.id}`,
