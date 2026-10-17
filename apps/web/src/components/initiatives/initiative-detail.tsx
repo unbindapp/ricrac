@@ -125,8 +125,8 @@ function InitiativeDetailContent({ initiative }: { initiative: TInitiativeDetail
           )}
         </HeaderActions>
       </div>
-      <div className="flex w-full flex-col gap-6 lg:flex-row lg:items-start">
-        <div className="mx-auto flex w-full max-w-3xl min-w-0 flex-1 flex-col gap-6">
+      <div className="flex w-full flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex w-full max-w-3xl min-w-0 flex-1 flex-col gap-6">
           {initiative.archivedAt && (
             <ArchivedBanner
               noun="initiative"
