@@ -7,7 +7,7 @@ COPY apps/web ./
 RUN bun run build
 
 # ---------- server (embeds the web build) ----------
-FROM golang:1.26-alpine AS server
+FROM golang:1.27-alpine AS server
 ENV CGO_ENABLED=0 GOFLAGS="-trimpath -buildvcs=false"
 WORKDIR /app/apps/server
 COPY apps/server/go.mod apps/server/go.sum ./

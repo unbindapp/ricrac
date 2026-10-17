@@ -143,7 +143,7 @@ dnd-kit drags, cmdk is the command panel.
 
 ## Development
 
-Needs Go 1.26, Bun and Docker (for Postgres).
+Needs Go 1.27, Bun and Docker (for Postgres).
 
     docker compose up -d                       # Postgres on localhost:5436
     cd apps/server && go run ./cmd/server      # with the variables from .env.example exported
