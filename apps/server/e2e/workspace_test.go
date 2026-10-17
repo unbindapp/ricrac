@@ -1,10 +1,7 @@
 package e2e
 
 import (
-	"context"
 	"testing"
-
-	"ricrac/app"
 )
 
 func TestReadsAndUpdatesTheWorkspace(t *testing.T) {
@@ -110,8 +107,8 @@ func TestRemovesMembersButNotTheLastOwner(t *testing.T) {
 	removed := call(t, ada, "remove_user", M{"id": "bob@acme.test"})
 	eq(t, removed.At("removed").Str(), bob.User.String())
 
-	gone, err := app.LoadCtx(context.Background(), w.State, bob.User, w.Workspace, []app.Access{app.Read})
-	check(t, err == nil && gone == nil, "removed members can't act in the workspace")
+	active := scalar[bool](w, "SELECT active FROM workspace_members WHERE workspace_id = $1 AND user_id = $2", w.Workspace, bob.User)
+	check(t, !active, "removed members can't act in the workspace")
 	eq(t, call(t, w.Ann, "list_users", M{}).At("nodes").Len(), 2)
 	eq(t, call(t, w.Ann, "list_users", M{"includeInactive": true}).At("nodes").Len(), 3)
 	read := call(t, w.Ann, "get_user", M{"id": bob.User.String()})

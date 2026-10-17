@@ -10,6 +10,6 @@ node_modules/
 .DS_Store
 
 # The web build the Go server embeds; the committed index.html is a placeholder.
-!apps/server/server/dist/
-apps/server/server/dist/*
-!apps/server/server/dist/index.html
+!apps/server/internal/web/dist/
+apps/server/internal/web/dist/*
+!apps/server/internal/web/dist/index.html

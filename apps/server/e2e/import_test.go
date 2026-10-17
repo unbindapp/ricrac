@@ -4,8 +4,6 @@ import (
 	"encoding/base64"
 	"strings"
 	"testing"
-
-	"ricrac/app"
 )
 
 func TestImportsIssuesWithTheirNumbersDatesPeopleAndComments(t *testing.T) {
@@ -87,7 +85,7 @@ func TestRefusesTakenNumbersAndImportsNothingOnError(t *testing.T) {
 
 func TestImportsIssuesFromAnUploadedFile(t *testing.T) {
 	w := world(t)
-	file := app.Marshal(M{"issues": []any{M{"number": 42, "title": "From a file", "description": "Long text"}}})
+	file := marshal(M{"issues": []any{M{"number": 42, "title": "From a file", "description": "Long text"}}})
 	upload := call(t, w.Ann, "upload_file", M{
 		"name":        "issues.json",
 		"contentType": "application/json",
