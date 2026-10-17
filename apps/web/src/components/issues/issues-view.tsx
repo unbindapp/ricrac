@@ -90,7 +90,7 @@ export function IssuesView({
           {canEdit && (
             <Button variant="ghost" size="sm" onClick={openSaveView}>
               <BookmarkPlusIcon className="size-4" />
-              Save view
+              <span className="max-sm:sr-only">Save view</span>
             </Button>
           )}
           <DisplayOptions

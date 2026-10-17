@@ -10,17 +10,25 @@ export type TBreadcrumbItem = {
 
 export function Breadcrumb({ items }: { items: TBreadcrumbItem[] }) {
   if (items.length === 0) return null;
+  const isCollapsedOnPhones = (index: number) => index < items.length - 2;
   return (
     <nav aria-label="Breadcrumb" className="min-w-0">
       <ol className="text-muted-foreground flex min-w-0 items-center gap-1.5 text-sm">
         {items.map((item, index) => (
           <Fragment key={`${item.label}-${index}`}>
             {index > 0 && (
-              <li aria-hidden className="flex shrink-0 items-center">
+              <li
+                aria-hidden
+                data-collapsed={isCollapsedOnPhones(index - 1) || undefined}
+                className="flex shrink-0 items-center max-sm:data-collapsed:hidden"
+              >
                 <ChevronRightIcon className="size-3.5" />
               </li>
             )}
-            <li className="flex min-w-0 items-center">
+            <li
+              data-collapsed={isCollapsedOnPhones(index) || undefined}
+              className="flex min-w-0 items-center max-sm:data-collapsed:hidden"
+            >
               <BreadcrumbEntry item={item} isLast={index === items.length - 1} />
             </li>
           </Fragment>

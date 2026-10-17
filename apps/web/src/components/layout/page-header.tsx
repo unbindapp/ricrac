@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 
 import { Breadcrumb, TBreadcrumbItem } from "@/components/layout/breadcrumb";
+import { MobileNavButton } from "@/components/layout/mobile-nav-button";
 
 type TProps = {
   title: string;
@@ -42,8 +43,10 @@ export function PageBar({ children }: { children: ReactNode }) {
   return (
     <div
       data-slot="page-bar"
+      data-mobile-bar
       className="bg-background sticky top-0 z-10 -mx-4 -mt-4 flex h-11 shrink-0 items-center gap-2 border-b px-4 text-sm font-medium group-data-[width=narrow]/page:static group-data-[width=narrow]/page:m-0 group-data-[width=narrow]/page:h-auto group-data-[width=narrow]/page:min-h-8 group-data-[width=narrow]/page:border-0 group-data-[width=narrow]/page:p-0"
     >
+      <MobileNavButton />
       {children}
     </div>
   );

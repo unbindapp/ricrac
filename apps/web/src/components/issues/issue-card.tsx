@@ -23,7 +23,7 @@ type TProps = {
 };
 
 const hiddenUntilHover =
-  "opacity-0 group-hover/card:opacity-100 focus-visible:opacity-100 data-popup-open:opacity-100";
+  "opacity-0 touch:opacity-100 group-hover/card:opacity-100 focus-visible:opacity-100 data-popup-open:opacity-100";
 
 export function IssueCard({
   issue,

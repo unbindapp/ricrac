@@ -17,7 +17,7 @@ export function PageContainer({ width = "full", children }: TProps) {
       <div
         className={cn(
           "mx-auto flex w-full flex-1 flex-col gap-4 px-4 pt-4 pb-8",
-          width === "narrow" ? "max-w-3xl pt-10 sm:px-6" : "max-w-none",
+          width === "narrow" ? "max-w-3xl sm:px-6 sm:pt-10" : "max-w-none",
         )}
       >
         {children}

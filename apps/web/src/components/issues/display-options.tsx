@@ -107,7 +107,7 @@ export function DisplayOptions({ value, onChange, onReset }: TProps) {
         render={
           <Button variant="outline" size="sm">
             <SlidersHorizontalIcon className="size-4" />
-            Display
+            <span className="max-sm:sr-only">Display</span>
           </Button>
         }
       />

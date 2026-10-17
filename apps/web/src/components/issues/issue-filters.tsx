@@ -119,7 +119,7 @@ export function IssueFilters({ filters, onChange, teamId, hiddenFields = [] }: T
   });
 
   return (
-    <div className="scrollbar-hidden flex min-w-0 items-center gap-2 overflow-x-auto">
+    <div className="scrollbar-hidden flex min-w-0 items-center gap-2 overflow-x-auto max-sm:shrink-0">
       {shown.map((field) => (
         <FilterChip
           key={field}
@@ -140,7 +140,7 @@ export function IssueFilters({ filters, onChange, teamId, hiddenFields = [] }: T
           trigger={
             <Button variant="ghost" size="sm" className="text-muted-foreground">
               <ListFilterIcon className="size-4" />
-              Filter
+              <span className="max-sm:sr-only">Filter</span>
             </Button>
           }
         />
