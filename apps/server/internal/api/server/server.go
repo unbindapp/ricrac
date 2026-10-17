@@ -12,7 +12,9 @@ import (
 	events_service "ricrac/internal/services/events"
 	issue_service "ricrac/internal/services/issue"
 	label_service "ricrac/internal/services/label"
+	notification_service "ricrac/internal/services/notification"
 	resolve_service "ricrac/internal/services/resolve"
+	search_service "ricrac/internal/services/search"
 	seed_service "ricrac/internal/services/seed"
 )
 
@@ -23,12 +25,14 @@ type Server struct {
 	// Runs operations by name, once the router registered them.
 	Ops *opcall.Late
 
-	AccessService     *access_service.AccessService
-	ResolveService    *resolve_service.ResolveService
-	EventsService     *events_service.EventsService
-	SeedService       *seed_service.SeedService
-	LabelService      *label_service.LabelService
-	IssueService      *issue_service.IssueService
-	CommentService    *comment_service.CommentService
-	AttachmentService *attachment_service.AttachmentService
+	AccessService       *access_service.AccessService
+	ResolveService      *resolve_service.ResolveService
+	EventsService       *events_service.EventsService
+	SeedService         *seed_service.SeedService
+	LabelService        *label_service.LabelService
+	IssueService        *issue_service.IssueService
+	CommentService      *comment_service.CommentService
+	AttachmentService   *attachment_service.AttachmentService
+	NotificationService *notification_service.NotificationService
+	SearchService       *search_service.SearchService
 }

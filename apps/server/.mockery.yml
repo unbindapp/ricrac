@@ -148,3 +148,39 @@ packages:
           filename: seed_service_mock.go
           structname: SeedServiceMock
           pkgname: mocks_services_seed
+  ricrac/internal/repositories/notification:
+    config:
+      dir: ./mocks/repository/notification
+    interfaces:
+      NotificationRepositoryInterface:
+        config:
+          filename: notification_repository_mock.go
+          structname: NotificationRepositoryMock
+          pkgname: mocks_repository_notification
+  ricrac/internal/repositories/search:
+    config:
+      dir: ./mocks/repository/search
+    interfaces:
+      SearchRepositoryInterface:
+        config:
+          filename: search_repository_mock.go
+          structname: SearchRepositoryMock
+          pkgname: mocks_repository_search
+  ricrac/internal/services/notification:
+    config:
+      dir: ./mocks/services/notification
+    interfaces:
+      NotificationServiceInterface:
+        config:
+          filename: notification_service_mock.go
+          structname: NotificationServiceMock
+          pkgname: mocks_services_notification
+  ricrac/internal/services/search:
+    config:
+      dir: ./mocks/services/search
+    interfaces:
+      SearchServiceInterface:
+        config:
+          filename: search_service_mock.go
+          structname: SearchServiceMock
+          pkgname: mocks_services_search

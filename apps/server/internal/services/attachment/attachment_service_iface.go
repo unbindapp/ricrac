@@ -4,7 +4,9 @@ package attachment_service
 
 import (
 	"context"
+	"ricrac/ent"
 	"ricrac/internal/auth"
+	"ricrac/internal/common/args"
 	"ricrac/internal/models"
 	repository "ricrac/internal/repositories"
 
@@ -18,4 +20,15 @@ type AttachmentServiceInterface interface {
 	// Upsert attaches a link to an issue, or updates the attachment with the same URL. metadata is
 	// nil or a JSON object.
 	Upsert(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, issue uuid.UUID, url, title string, subtitle *string, metadata any, iconURL *string) (uuid.UUID, error)
+	Create(ctx context.Context, actor *auth.Actor, input *CreateInput) (models.Attachment, error)
+	Get(ctx context.Context, actor *auth.Actor, input *IDInput) (models.Attachment, error)
+	List(ctx context.Context, actor *auth.Actor, input *ListInput) (args.PageOf[models.Attachment], error)
+	Delete(ctx context.Context, actor *auth.Actor, input *IDInput) (models.Deleted, error)
+	PrepareFileUpload(ctx context.Context, actor *auth.Actor, input *PrepareUploadInput) (models.PreparedUpload, error)
+	UploadFile(ctx context.Context, actor *auth.Actor, input *UploadInput) (models.UploadedFile, error)
+	CreateFromUpload(ctx context.Context, actor *auth.Actor, input *FromUploadInput) (models.Attachment, error)
+	// ReceiveUpload stores the bytes PUT to a one-time upload URL.
+	ReceiveUpload(ctx context.Context, token string, data []byte) (models.ReceivedUpload, error)
+	// File is an uploaded file with its bytes, nil when there's none.
+	File(ctx context.Context, id uuid.UUID) (*ent.File, error)
 }

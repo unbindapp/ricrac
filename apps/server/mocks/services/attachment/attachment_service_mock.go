@@ -6,9 +6,12 @@ package mocks_services_attachment
 
 import (
 	"context"
+	"ricrac/ent"
 	"ricrac/internal/auth"
+	"ricrac/internal/common/args"
 	"ricrac/internal/models"
 	"ricrac/internal/repositories"
+	"ricrac/internal/services/attachment"
 
 	"github.com/google/uuid"
 	mock "github.com/stretchr/testify/mock"
@@ -48,6 +51,650 @@ type AttachmentServiceMock_Expecter struct {
 
 func (_m *AttachmentServiceMock) EXPECT() *AttachmentServiceMock_Expecter {
 	return &AttachmentServiceMock_Expecter{mock: &_m.Mock}
+}
+
+// Create provides a mock function for the type AttachmentServiceMock
+func (_mock *AttachmentServiceMock) Create(ctx context.Context, actor *auth.Actor, input *attachment_service.CreateInput) (models.Attachment, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Create")
+	}
+
+	var r0 models.Attachment
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *attachment_service.CreateInput) (models.Attachment, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *attachment_service.CreateInput) models.Attachment); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.Attachment)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *attachment_service.CreateInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// AttachmentServiceMock_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+type AttachmentServiceMock_Create_Call struct {
+	*mock.Call
+}
+
+// Create is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *attachment_service.CreateInput
+func (_e *AttachmentServiceMock_Expecter) Create(ctx any, actor any, input any) *AttachmentServiceMock_Create_Call {
+	return &AttachmentServiceMock_Create_Call{Call: _e.mock.On("Create", ctx, actor, input)}
+}
+
+func (_c *AttachmentServiceMock_Create_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *attachment_service.CreateInput)) *AttachmentServiceMock_Create_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *attachment_service.CreateInput
+		if args[2] != nil {
+			arg2 = args[2].(*attachment_service.CreateInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *AttachmentServiceMock_Create_Call) Return(attachment models.Attachment, err error) *AttachmentServiceMock_Create_Call {
+	_c.Call.Return(attachment, err)
+	return _c
+}
+
+func (_c *AttachmentServiceMock_Create_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *attachment_service.CreateInput) (models.Attachment, error)) *AttachmentServiceMock_Create_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CreateFromUpload provides a mock function for the type AttachmentServiceMock
+func (_mock *AttachmentServiceMock) CreateFromUpload(ctx context.Context, actor *auth.Actor, input *attachment_service.FromUploadInput) (models.Attachment, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateFromUpload")
+	}
+
+	var r0 models.Attachment
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *attachment_service.FromUploadInput) (models.Attachment, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *attachment_service.FromUploadInput) models.Attachment); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.Attachment)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *attachment_service.FromUploadInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// AttachmentServiceMock_CreateFromUpload_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateFromUpload'
+type AttachmentServiceMock_CreateFromUpload_Call struct {
+	*mock.Call
+}
+
+// CreateFromUpload is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *attachment_service.FromUploadInput
+func (_e *AttachmentServiceMock_Expecter) CreateFromUpload(ctx any, actor any, input any) *AttachmentServiceMock_CreateFromUpload_Call {
+	return &AttachmentServiceMock_CreateFromUpload_Call{Call: _e.mock.On("CreateFromUpload", ctx, actor, input)}
+}
+
+func (_c *AttachmentServiceMock_CreateFromUpload_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *attachment_service.FromUploadInput)) *AttachmentServiceMock_CreateFromUpload_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *attachment_service.FromUploadInput
+		if args[2] != nil {
+			arg2 = args[2].(*attachment_service.FromUploadInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *AttachmentServiceMock_CreateFromUpload_Call) Return(attachment models.Attachment, err error) *AttachmentServiceMock_CreateFromUpload_Call {
+	_c.Call.Return(attachment, err)
+	return _c
+}
+
+func (_c *AttachmentServiceMock_CreateFromUpload_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *attachment_service.FromUploadInput) (models.Attachment, error)) *AttachmentServiceMock_CreateFromUpload_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Delete provides a mock function for the type AttachmentServiceMock
+func (_mock *AttachmentServiceMock) Delete(ctx context.Context, actor *auth.Actor, input *attachment_service.IDInput) (models.Deleted, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Delete")
+	}
+
+	var r0 models.Deleted
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *attachment_service.IDInput) (models.Deleted, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *attachment_service.IDInput) models.Deleted); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.Deleted)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *attachment_service.IDInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// AttachmentServiceMock_Delete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Delete'
+type AttachmentServiceMock_Delete_Call struct {
+	*mock.Call
+}
+
+// Delete is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *attachment_service.IDInput
+func (_e *AttachmentServiceMock_Expecter) Delete(ctx any, actor any, input any) *AttachmentServiceMock_Delete_Call {
+	return &AttachmentServiceMock_Delete_Call{Call: _e.mock.On("Delete", ctx, actor, input)}
+}
+
+func (_c *AttachmentServiceMock_Delete_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *attachment_service.IDInput)) *AttachmentServiceMock_Delete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *attachment_service.IDInput
+		if args[2] != nil {
+			arg2 = args[2].(*attachment_service.IDInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *AttachmentServiceMock_Delete_Call) Return(deleted models.Deleted, err error) *AttachmentServiceMock_Delete_Call {
+	_c.Call.Return(deleted, err)
+	return _c
+}
+
+func (_c *AttachmentServiceMock_Delete_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *attachment_service.IDInput) (models.Deleted, error)) *AttachmentServiceMock_Delete_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// File provides a mock function for the type AttachmentServiceMock
+func (_mock *AttachmentServiceMock) File(ctx context.Context, id uuid.UUID) (*ent.File, error) {
+	ret := _mock.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for File")
+	}
+
+	var r0 *ent.File
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*ent.File, error)); ok {
+		return returnFunc(ctx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) *ent.File); ok {
+		r0 = returnFunc(ctx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ent.File)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// AttachmentServiceMock_File_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'File'
+type AttachmentServiceMock_File_Call struct {
+	*mock.Call
+}
+
+// File is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+func (_e *AttachmentServiceMock_Expecter) File(ctx any, id any) *AttachmentServiceMock_File_Call {
+	return &AttachmentServiceMock_File_Call{Call: _e.mock.On("File", ctx, id)}
+}
+
+func (_c *AttachmentServiceMock_File_Call) Run(run func(ctx context.Context, id uuid.UUID)) *AttachmentServiceMock_File_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *AttachmentServiceMock_File_Call) Return(file *ent.File, err error) *AttachmentServiceMock_File_Call {
+	_c.Call.Return(file, err)
+	return _c
+}
+
+func (_c *AttachmentServiceMock_File_Call) RunAndReturn(run func(ctx context.Context, id uuid.UUID) (*ent.File, error)) *AttachmentServiceMock_File_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Get provides a mock function for the type AttachmentServiceMock
+func (_mock *AttachmentServiceMock) Get(ctx context.Context, actor *auth.Actor, input *attachment_service.IDInput) (models.Attachment, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Get")
+	}
+
+	var r0 models.Attachment
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *attachment_service.IDInput) (models.Attachment, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *attachment_service.IDInput) models.Attachment); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.Attachment)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *attachment_service.IDInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// AttachmentServiceMock_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Get'
+type AttachmentServiceMock_Get_Call struct {
+	*mock.Call
+}
+
+// Get is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *attachment_service.IDInput
+func (_e *AttachmentServiceMock_Expecter) Get(ctx any, actor any, input any) *AttachmentServiceMock_Get_Call {
+	return &AttachmentServiceMock_Get_Call{Call: _e.mock.On("Get", ctx, actor, input)}
+}
+
+func (_c *AttachmentServiceMock_Get_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *attachment_service.IDInput)) *AttachmentServiceMock_Get_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *attachment_service.IDInput
+		if args[2] != nil {
+			arg2 = args[2].(*attachment_service.IDInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *AttachmentServiceMock_Get_Call) Return(attachment models.Attachment, err error) *AttachmentServiceMock_Get_Call {
+	_c.Call.Return(attachment, err)
+	return _c
+}
+
+func (_c *AttachmentServiceMock_Get_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *attachment_service.IDInput) (models.Attachment, error)) *AttachmentServiceMock_Get_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// List provides a mock function for the type AttachmentServiceMock
+func (_mock *AttachmentServiceMock) List(ctx context.Context, actor *auth.Actor, input *attachment_service.ListInput) (args.PageOf[models.Attachment], error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for List")
+	}
+
+	var r0 args.PageOf[models.Attachment]
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *attachment_service.ListInput) (args.PageOf[models.Attachment], error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *attachment_service.ListInput) args.PageOf[models.Attachment]); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(args.PageOf[models.Attachment])
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *attachment_service.ListInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// AttachmentServiceMock_List_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'List'
+type AttachmentServiceMock_List_Call struct {
+	*mock.Call
+}
+
+// List is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *attachment_service.ListInput
+func (_e *AttachmentServiceMock_Expecter) List(ctx any, actor any, input any) *AttachmentServiceMock_List_Call {
+	return &AttachmentServiceMock_List_Call{Call: _e.mock.On("List", ctx, actor, input)}
+}
+
+func (_c *AttachmentServiceMock_List_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *attachment_service.ListInput)) *AttachmentServiceMock_List_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *attachment_service.ListInput
+		if args[2] != nil {
+			arg2 = args[2].(*attachment_service.ListInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *AttachmentServiceMock_List_Call) Return(pageOf args.PageOf[models.Attachment], err error) *AttachmentServiceMock_List_Call {
+	_c.Call.Return(pageOf, err)
+	return _c
+}
+
+func (_c *AttachmentServiceMock_List_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *attachment_service.ListInput) (args.PageOf[models.Attachment], error)) *AttachmentServiceMock_List_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// PrepareFileUpload provides a mock function for the type AttachmentServiceMock
+func (_mock *AttachmentServiceMock) PrepareFileUpload(ctx context.Context, actor *auth.Actor, input *attachment_service.PrepareUploadInput) (models.PreparedUpload, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PrepareFileUpload")
+	}
+
+	var r0 models.PreparedUpload
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *attachment_service.PrepareUploadInput) (models.PreparedUpload, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *attachment_service.PrepareUploadInput) models.PreparedUpload); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.PreparedUpload)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *attachment_service.PrepareUploadInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// AttachmentServiceMock_PrepareFileUpload_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PrepareFileUpload'
+type AttachmentServiceMock_PrepareFileUpload_Call struct {
+	*mock.Call
+}
+
+// PrepareFileUpload is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *attachment_service.PrepareUploadInput
+func (_e *AttachmentServiceMock_Expecter) PrepareFileUpload(ctx any, actor any, input any) *AttachmentServiceMock_PrepareFileUpload_Call {
+	return &AttachmentServiceMock_PrepareFileUpload_Call{Call: _e.mock.On("PrepareFileUpload", ctx, actor, input)}
+}
+
+func (_c *AttachmentServiceMock_PrepareFileUpload_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *attachment_service.PrepareUploadInput)) *AttachmentServiceMock_PrepareFileUpload_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *attachment_service.PrepareUploadInput
+		if args[2] != nil {
+			arg2 = args[2].(*attachment_service.PrepareUploadInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *AttachmentServiceMock_PrepareFileUpload_Call) Return(preparedUpload models.PreparedUpload, err error) *AttachmentServiceMock_PrepareFileUpload_Call {
+	_c.Call.Return(preparedUpload, err)
+	return _c
+}
+
+func (_c *AttachmentServiceMock_PrepareFileUpload_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *attachment_service.PrepareUploadInput) (models.PreparedUpload, error)) *AttachmentServiceMock_PrepareFileUpload_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ReceiveUpload provides a mock function for the type AttachmentServiceMock
+func (_mock *AttachmentServiceMock) ReceiveUpload(ctx context.Context, token string, data []byte) (models.ReceivedUpload, error) {
+	ret := _mock.Called(ctx, token, data)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ReceiveUpload")
+	}
+
+	var r0 models.ReceivedUpload
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, []byte) (models.ReceivedUpload, error)); ok {
+		return returnFunc(ctx, token, data)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, []byte) models.ReceivedUpload); ok {
+		r0 = returnFunc(ctx, token, data)
+	} else {
+		r0 = ret.Get(0).(models.ReceivedUpload)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, string, []byte) error); ok {
+		r1 = returnFunc(ctx, token, data)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// AttachmentServiceMock_ReceiveUpload_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ReceiveUpload'
+type AttachmentServiceMock_ReceiveUpload_Call struct {
+	*mock.Call
+}
+
+// ReceiveUpload is a helper method to define mock.On call
+//   - ctx context.Context
+//   - token string
+//   - data []byte
+func (_e *AttachmentServiceMock_Expecter) ReceiveUpload(ctx any, token any, data any) *AttachmentServiceMock_ReceiveUpload_Call {
+	return &AttachmentServiceMock_ReceiveUpload_Call{Call: _e.mock.On("ReceiveUpload", ctx, token, data)}
+}
+
+func (_c *AttachmentServiceMock_ReceiveUpload_Call) Run(run func(ctx context.Context, token string, data []byte)) *AttachmentServiceMock_ReceiveUpload_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		var arg2 []byte
+		if args[2] != nil {
+			arg2 = args[2].([]byte)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *AttachmentServiceMock_ReceiveUpload_Call) Return(receivedUpload models.ReceivedUpload, err error) *AttachmentServiceMock_ReceiveUpload_Call {
+	_c.Call.Return(receivedUpload, err)
+	return _c
+}
+
+func (_c *AttachmentServiceMock_ReceiveUpload_Call) RunAndReturn(run func(ctx context.Context, token string, data []byte) (models.ReceivedUpload, error)) *AttachmentServiceMock_ReceiveUpload_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UploadFile provides a mock function for the type AttachmentServiceMock
+func (_mock *AttachmentServiceMock) UploadFile(ctx context.Context, actor *auth.Actor, input *attachment_service.UploadInput) (models.UploadedFile, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UploadFile")
+	}
+
+	var r0 models.UploadedFile
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *attachment_service.UploadInput) (models.UploadedFile, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *attachment_service.UploadInput) models.UploadedFile); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.UploadedFile)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *attachment_service.UploadInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// AttachmentServiceMock_UploadFile_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UploadFile'
+type AttachmentServiceMock_UploadFile_Call struct {
+	*mock.Call
+}
+
+// UploadFile is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *attachment_service.UploadInput
+func (_e *AttachmentServiceMock_Expecter) UploadFile(ctx any, actor any, input any) *AttachmentServiceMock_UploadFile_Call {
+	return &AttachmentServiceMock_UploadFile_Call{Call: _e.mock.On("UploadFile", ctx, actor, input)}
+}
+
+func (_c *AttachmentServiceMock_UploadFile_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *attachment_service.UploadInput)) *AttachmentServiceMock_UploadFile_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *attachment_service.UploadInput
+		if args[2] != nil {
+			arg2 = args[2].(*attachment_service.UploadInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *AttachmentServiceMock_UploadFile_Call) Return(uploadedFile models.UploadedFile, err error) *AttachmentServiceMock_UploadFile_Call {
+	_c.Call.Return(uploadedFile, err)
+	return _c
+}
+
+func (_c *AttachmentServiceMock_UploadFile_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *attachment_service.UploadInput) (models.UploadedFile, error)) *AttachmentServiceMock_UploadFile_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // Upsert provides a mock function for the type AttachmentServiceMock

@@ -6,6 +6,7 @@ import (
 	"context"
 	"ricrac/ent"
 	repository "ricrac/internal/repositories"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -17,4 +18,20 @@ type AttachmentRepositoryInterface interface {
 	// Upsert attaches a link to an issue, or updates the attachment with the same URL, saying
 	// whether it created one.
 	Upsert(ctx context.Context, tx repository.TxInterface, input UpsertInput) (uuid.UUID, bool, error)
+	// PrepareUpload creates a file waiting for its bytes, which come with the token whose hash is
+	// given until expiresAt.
+	PrepareUpload(ctx context.Context, input FileInput, hash string, expiresAt time.Time) (*ent.File, error)
+	CreateFile(ctx context.Context, input FileInput, data []byte) (uuid.UUID, error)
+	// Upload stores the bytes of the file waiting for them with the token whose hash is given, once
+	// and before it expires; false when there's no such file.
+	Upload(ctx context.Context, hash string, data []byte) (uuid.UUID, bool, error)
+	IssueOf(ctx context.Context, id uuid.UUID) (uuid.UUID, error)
+	// List is the issue's attachments with what their answer shows, oldest first.
+	List(ctx context.Context, issue uuid.UUID, limit, offset int64) ([]*ent.Attachment, error)
+	Delete(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error
+	// StoredFile is a file of the workspace without its bytes, nil when there's none, and whether it
+	// was uploaded.
+	StoredFile(ctx context.Context, workspace, id uuid.UUID) (*ent.File, bool, error)
+	// UploadedFile is a file with its bytes, nil when there's none or it wasn't uploaded yet.
+	UploadedFile(ctx context.Context, id uuid.UUID) (*ent.File, error)
 }

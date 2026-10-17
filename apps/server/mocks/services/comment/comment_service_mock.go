@@ -6,8 +6,12 @@ package mocks_services_comment
 
 import (
 	"context"
+	"ricrac/ent"
+	"ricrac/internal/auth"
+	"ricrac/internal/common/args"
 	"ricrac/internal/models"
 	"ricrac/internal/repositories"
+	"ricrac/internal/services/comment"
 
 	"github.com/google/uuid"
 	mock "github.com/stretchr/testify/mock"
@@ -47,6 +51,778 @@ type CommentServiceMock_Expecter struct {
 
 func (_m *CommentServiceMock) EXPECT() *CommentServiceMock_Expecter {
 	return &CommentServiceMock_Expecter{mock: &_m.Mock}
+}
+
+// AddReaction provides a mock function for the type CommentServiceMock
+func (_mock *CommentServiceMock) AddReaction(ctx context.Context, actor *auth.Actor, input *comment_service.ReactionInput) (models.Reaction, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AddReaction")
+	}
+
+	var r0 models.Reaction
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *comment_service.ReactionInput) (models.Reaction, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *comment_service.ReactionInput) models.Reaction); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.Reaction)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *comment_service.ReactionInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// CommentServiceMock_AddReaction_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddReaction'
+type CommentServiceMock_AddReaction_Call struct {
+	*mock.Call
+}
+
+// AddReaction is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *comment_service.ReactionInput
+func (_e *CommentServiceMock_Expecter) AddReaction(ctx any, actor any, input any) *CommentServiceMock_AddReaction_Call {
+	return &CommentServiceMock_AddReaction_Call{Call: _e.mock.On("AddReaction", ctx, actor, input)}
+}
+
+func (_c *CommentServiceMock_AddReaction_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *comment_service.ReactionInput)) *CommentServiceMock_AddReaction_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *comment_service.ReactionInput
+		if args[2] != nil {
+			arg2 = args[2].(*comment_service.ReactionInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *CommentServiceMock_AddReaction_Call) Return(reaction models.Reaction, err error) *CommentServiceMock_AddReaction_Call {
+	_c.Call.Return(reaction, err)
+	return _c
+}
+
+func (_c *CommentServiceMock_AddReaction_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *comment_service.ReactionInput) (models.Reaction, error)) *CommentServiceMock_AddReaction_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Change provides a mock function for the type CommentServiceMock
+func (_mock *CommentServiceMock) Change(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, row *ent.Comment, body string) (models.CommentDetail, error) {
+	ret := _mock.Called(ctx, tx, actor, row, body)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Change")
+	}
+
+	var r0 models.CommentDetail
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *auth.Actor, *ent.Comment, string) (models.CommentDetail, error)); ok {
+		return returnFunc(ctx, tx, actor, row, body)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *auth.Actor, *ent.Comment, string) models.CommentDetail); ok {
+		r0 = returnFunc(ctx, tx, actor, row, body)
+	} else {
+		r0 = ret.Get(0).(models.CommentDetail)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, *auth.Actor, *ent.Comment, string) error); ok {
+		r1 = returnFunc(ctx, tx, actor, row, body)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// CommentServiceMock_Change_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Change'
+type CommentServiceMock_Change_Call struct {
+	*mock.Call
+}
+
+// Change is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - actor *auth.Actor
+//   - row *ent.Comment
+//   - body string
+func (_e *CommentServiceMock_Expecter) Change(ctx any, tx any, actor any, row any, body any) *CommentServiceMock_Change_Call {
+	return &CommentServiceMock_Change_Call{Call: _e.mock.On("Change", ctx, tx, actor, row, body)}
+}
+
+func (_c *CommentServiceMock_Change_Call) Run(run func(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, row *ent.Comment, body string)) *CommentServiceMock_Change_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 *auth.Actor
+		if args[2] != nil {
+			arg2 = args[2].(*auth.Actor)
+		}
+		var arg3 *ent.Comment
+		if args[3] != nil {
+			arg3 = args[3].(*ent.Comment)
+		}
+		var arg4 string
+		if args[4] != nil {
+			arg4 = args[4].(string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+		)
+	})
+	return _c
+}
+
+func (_c *CommentServiceMock_Change_Call) Return(commentDetail models.CommentDetail, err error) *CommentServiceMock_Change_Call {
+	_c.Call.Return(commentDetail, err)
+	return _c
+}
+
+func (_c *CommentServiceMock_Change_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, row *ent.Comment, body string) (models.CommentDetail, error)) *CommentServiceMock_Change_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Create provides a mock function for the type CommentServiceMock
+func (_mock *CommentServiceMock) Create(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, target comment_service.Target, root *uuid.UUID, body string, quoted *string) (uuid.UUID, models.CommentDetail, error) {
+	ret := _mock.Called(ctx, tx, actor, target, root, body, quoted)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Create")
+	}
+
+	var r0 uuid.UUID
+	var r1 models.CommentDetail
+	var r2 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *auth.Actor, comment_service.Target, *uuid.UUID, string, *string) (uuid.UUID, models.CommentDetail, error)); ok {
+		return returnFunc(ctx, tx, actor, target, root, body, quoted)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *auth.Actor, comment_service.Target, *uuid.UUID, string, *string) uuid.UUID); ok {
+		r0 = returnFunc(ctx, tx, actor, target, root, body, quoted)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, *auth.Actor, comment_service.Target, *uuid.UUID, string, *string) models.CommentDetail); ok {
+		r1 = returnFunc(ctx, tx, actor, target, root, body, quoted)
+	} else {
+		r1 = ret.Get(1).(models.CommentDetail)
+	}
+	if returnFunc, ok := ret.Get(2).(func(context.Context, repository.TxInterface, *auth.Actor, comment_service.Target, *uuid.UUID, string, *string) error); ok {
+		r2 = returnFunc(ctx, tx, actor, target, root, body, quoted)
+	} else {
+		r2 = ret.Error(2)
+	}
+	return r0, r1, r2
+}
+
+// CommentServiceMock_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+type CommentServiceMock_Create_Call struct {
+	*mock.Call
+}
+
+// Create is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - actor *auth.Actor
+//   - target comment_service.Target
+//   - root *uuid.UUID
+//   - body string
+//   - quoted *string
+func (_e *CommentServiceMock_Expecter) Create(ctx any, tx any, actor any, target any, root any, body any, quoted any) *CommentServiceMock_Create_Call {
+	return &CommentServiceMock_Create_Call{Call: _e.mock.On("Create", ctx, tx, actor, target, root, body, quoted)}
+}
+
+func (_c *CommentServiceMock_Create_Call) Run(run func(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, target comment_service.Target, root *uuid.UUID, body string, quoted *string)) *CommentServiceMock_Create_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 *auth.Actor
+		if args[2] != nil {
+			arg2 = args[2].(*auth.Actor)
+		}
+		var arg3 comment_service.Target
+		if args[3] != nil {
+			arg3 = args[3].(comment_service.Target)
+		}
+		var arg4 *uuid.UUID
+		if args[4] != nil {
+			arg4 = args[4].(*uuid.UUID)
+		}
+		var arg5 string
+		if args[5] != nil {
+			arg5 = args[5].(string)
+		}
+		var arg6 *string
+		if args[6] != nil {
+			arg6 = args[6].(*string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+			arg5,
+			arg6,
+		)
+	})
+	return _c
+}
+
+func (_c *CommentServiceMock_Create_Call) Return(uUID uuid.UUID, commentDetail models.CommentDetail, err error) *CommentServiceMock_Create_Call {
+	_c.Call.Return(uUID, commentDetail, err)
+	return _c
+}
+
+func (_c *CommentServiceMock_Create_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, target comment_service.Target, root *uuid.UUID, body string, quoted *string) (uuid.UUID, models.CommentDetail, error)) *CommentServiceMock_Create_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Delete provides a mock function for the type CommentServiceMock
+func (_mock *CommentServiceMock) Delete(ctx context.Context, actor *auth.Actor, input *comment_service.IDInput) (models.DeletedComment, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Delete")
+	}
+
+	var r0 models.DeletedComment
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *comment_service.IDInput) (models.DeletedComment, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *comment_service.IDInput) models.DeletedComment); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.DeletedComment)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *comment_service.IDInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// CommentServiceMock_Delete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Delete'
+type CommentServiceMock_Delete_Call struct {
+	*mock.Call
+}
+
+// Delete is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *comment_service.IDInput
+func (_e *CommentServiceMock_Expecter) Delete(ctx any, actor any, input any) *CommentServiceMock_Delete_Call {
+	return &CommentServiceMock_Delete_Call{Call: _e.mock.On("Delete", ctx, actor, input)}
+}
+
+func (_c *CommentServiceMock_Delete_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *comment_service.IDInput)) *CommentServiceMock_Delete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *comment_service.IDInput
+		if args[2] != nil {
+			arg2 = args[2].(*comment_service.IDInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *CommentServiceMock_Delete_Call) Return(deletedComment models.DeletedComment, err error) *CommentServiceMock_Delete_Call {
+	_c.Call.Return(deletedComment, err)
+	return _c
+}
+
+func (_c *CommentServiceMock_Delete_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *comment_service.IDInput) (models.DeletedComment, error)) *CommentServiceMock_Delete_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// List provides a mock function for the type CommentServiceMock
+func (_mock *CommentServiceMock) List(ctx context.Context, actor *auth.Actor, input *comment_service.ListInput) (args.PageOf[models.CommentThread], error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for List")
+	}
+
+	var r0 args.PageOf[models.CommentThread]
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *comment_service.ListInput) (args.PageOf[models.CommentThread], error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *comment_service.ListInput) args.PageOf[models.CommentThread]); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(args.PageOf[models.CommentThread])
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *comment_service.ListInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// CommentServiceMock_List_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'List'
+type CommentServiceMock_List_Call struct {
+	*mock.Call
+}
+
+// List is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *comment_service.ListInput
+func (_e *CommentServiceMock_Expecter) List(ctx any, actor any, input any) *CommentServiceMock_List_Call {
+	return &CommentServiceMock_List_Call{Call: _e.mock.On("List", ctx, actor, input)}
+}
+
+func (_c *CommentServiceMock_List_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *comment_service.ListInput)) *CommentServiceMock_List_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *comment_service.ListInput
+		if args[2] != nil {
+			arg2 = args[2].(*comment_service.ListInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *CommentServiceMock_List_Call) Return(pageOf args.PageOf[models.CommentThread], err error) *CommentServiceMock_List_Call {
+	_c.Call.Return(pageOf, err)
+	return _c
+}
+
+func (_c *CommentServiceMock_List_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *comment_service.ListInput) (args.PageOf[models.CommentThread], error)) *CommentServiceMock_List_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Load provides a mock function for the type CommentServiceMock
+func (_mock *CommentServiceMock) Load(ctx context.Context, actor *auth.Actor, value string) (*ent.Comment, error) {
+	ret := _mock.Called(ctx, actor, value)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Load")
+	}
+
+	var r0 *ent.Comment
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, string) (*ent.Comment, error)); ok {
+		return returnFunc(ctx, actor, value)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, string) *ent.Comment); ok {
+		r0 = returnFunc(ctx, actor, value)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ent.Comment)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, string) error); ok {
+		r1 = returnFunc(ctx, actor, value)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// CommentServiceMock_Load_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Load'
+type CommentServiceMock_Load_Call struct {
+	*mock.Call
+}
+
+// Load is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - value string
+func (_e *CommentServiceMock_Expecter) Load(ctx any, actor any, value any) *CommentServiceMock_Load_Call {
+	return &CommentServiceMock_Load_Call{Call: _e.mock.On("Load", ctx, actor, value)}
+}
+
+func (_c *CommentServiceMock_Load_Call) Run(run func(ctx context.Context, actor *auth.Actor, value string)) *CommentServiceMock_Load_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 string
+		if args[2] != nil {
+			arg2 = args[2].(string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *CommentServiceMock_Load_Call) Return(comment *ent.Comment, err error) *CommentServiceMock_Load_Call {
+	_c.Call.Return(comment, err)
+	return _c
+}
+
+func (_c *CommentServiceMock_Load_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, value string) (*ent.Comment, error)) *CommentServiceMock_Load_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Remove provides a mock function for the type CommentServiceMock
+func (_mock *CommentServiceMock) Remove(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, row *ent.Comment) (int, error) {
+	ret := _mock.Called(ctx, tx, actor, row)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Remove")
+	}
+
+	var r0 int
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *auth.Actor, *ent.Comment) (int, error)); ok {
+		return returnFunc(ctx, tx, actor, row)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *auth.Actor, *ent.Comment) int); ok {
+		r0 = returnFunc(ctx, tx, actor, row)
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, *auth.Actor, *ent.Comment) error); ok {
+		r1 = returnFunc(ctx, tx, actor, row)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// CommentServiceMock_Remove_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Remove'
+type CommentServiceMock_Remove_Call struct {
+	*mock.Call
+}
+
+// Remove is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - actor *auth.Actor
+//   - row *ent.Comment
+func (_e *CommentServiceMock_Expecter) Remove(ctx any, tx any, actor any, row any) *CommentServiceMock_Remove_Call {
+	return &CommentServiceMock_Remove_Call{Call: _e.mock.On("Remove", ctx, tx, actor, row)}
+}
+
+func (_c *CommentServiceMock_Remove_Call) Run(run func(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, row *ent.Comment)) *CommentServiceMock_Remove_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 *auth.Actor
+		if args[2] != nil {
+			arg2 = args[2].(*auth.Actor)
+		}
+		var arg3 *ent.Comment
+		if args[3] != nil {
+			arg3 = args[3].(*ent.Comment)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *CommentServiceMock_Remove_Call) Return(n int, err error) *CommentServiceMock_Remove_Call {
+	_c.Call.Return(n, err)
+	return _c
+}
+
+func (_c *CommentServiceMock_Remove_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, row *ent.Comment) (int, error)) *CommentServiceMock_Remove_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// RemoveReaction provides a mock function for the type CommentServiceMock
+func (_mock *CommentServiceMock) RemoveReaction(ctx context.Context, actor *auth.Actor, input *comment_service.RemoveReactionInput) (models.RemovedReaction, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RemoveReaction")
+	}
+
+	var r0 models.RemovedReaction
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *comment_service.RemoveReactionInput) (models.RemovedReaction, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *comment_service.RemoveReactionInput) models.RemovedReaction); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.RemovedReaction)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *comment_service.RemoveReactionInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// CommentServiceMock_RemoveReaction_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RemoveReaction'
+type CommentServiceMock_RemoveReaction_Call struct {
+	*mock.Call
+}
+
+// RemoveReaction is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *comment_service.RemoveReactionInput
+func (_e *CommentServiceMock_Expecter) RemoveReaction(ctx any, actor any, input any) *CommentServiceMock_RemoveReaction_Call {
+	return &CommentServiceMock_RemoveReaction_Call{Call: _e.mock.On("RemoveReaction", ctx, actor, input)}
+}
+
+func (_c *CommentServiceMock_RemoveReaction_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *comment_service.RemoveReactionInput)) *CommentServiceMock_RemoveReaction_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *comment_service.RemoveReactionInput
+		if args[2] != nil {
+			arg2 = args[2].(*comment_service.RemoveReactionInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *CommentServiceMock_RemoveReaction_Call) Return(removedReaction models.RemovedReaction, err error) *CommentServiceMock_RemoveReaction_Call {
+	_c.Call.Return(removedReaction, err)
+	return _c
+}
+
+func (_c *CommentServiceMock_RemoveReaction_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *comment_service.RemoveReactionInput) (models.RemovedReaction, error)) *CommentServiceMock_RemoveReaction_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Resolve provides a mock function for the type CommentServiceMock
+func (_mock *CommentServiceMock) Resolve(ctx context.Context, actor *auth.Actor, input *comment_service.IDInput) (models.CommentDetail, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Resolve")
+	}
+
+	var r0 models.CommentDetail
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *comment_service.IDInput) (models.CommentDetail, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *comment_service.IDInput) models.CommentDetail); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.CommentDetail)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *comment_service.IDInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// CommentServiceMock_Resolve_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Resolve'
+type CommentServiceMock_Resolve_Call struct {
+	*mock.Call
+}
+
+// Resolve is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *comment_service.IDInput
+func (_e *CommentServiceMock_Expecter) Resolve(ctx any, actor any, input any) *CommentServiceMock_Resolve_Call {
+	return &CommentServiceMock_Resolve_Call{Call: _e.mock.On("Resolve", ctx, actor, input)}
+}
+
+func (_c *CommentServiceMock_Resolve_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *comment_service.IDInput)) *CommentServiceMock_Resolve_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *comment_service.IDInput
+		if args[2] != nil {
+			arg2 = args[2].(*comment_service.IDInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *CommentServiceMock_Resolve_Call) Return(commentDetail models.CommentDetail, err error) *CommentServiceMock_Resolve_Call {
+	_c.Call.Return(commentDetail, err)
+	return _c
+}
+
+func (_c *CommentServiceMock_Resolve_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *comment_service.IDInput) (models.CommentDetail, error)) *CommentServiceMock_Resolve_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Save provides a mock function for the type CommentServiceMock
+func (_mock *CommentServiceMock) Save(ctx context.Context, actor *auth.Actor, input *comment_service.SaveInput) (models.CommentDetail, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Save")
+	}
+
+	var r0 models.CommentDetail
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *comment_service.SaveInput) (models.CommentDetail, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *comment_service.SaveInput) models.CommentDetail); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.CommentDetail)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *comment_service.SaveInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// CommentServiceMock_Save_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Save'
+type CommentServiceMock_Save_Call struct {
+	*mock.Call
+}
+
+// Save is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *comment_service.SaveInput
+func (_e *CommentServiceMock_Expecter) Save(ctx any, actor any, input any) *CommentServiceMock_Save_Call {
+	return &CommentServiceMock_Save_Call{Call: _e.mock.On("Save", ctx, actor, input)}
+}
+
+func (_c *CommentServiceMock_Save_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *comment_service.SaveInput)) *CommentServiceMock_Save_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *comment_service.SaveInput
+		if args[2] != nil {
+			arg2 = args[2].(*comment_service.SaveInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *CommentServiceMock_Save_Call) Return(commentDetail models.CommentDetail, err error) *CommentServiceMock_Save_Call {
+	_c.Call.Return(commentDetail, err)
+	return _c
+}
+
+func (_c *CommentServiceMock_Save_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *comment_service.SaveInput) (models.CommentDetail, error)) *CommentServiceMock_Save_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // Threads provides a mock function for the type CommentServiceMock
@@ -125,6 +901,78 @@ func (_c *CommentServiceMock_Threads_Call) Return(commentThreads []models.Commen
 }
 
 func (_c *CommentServiceMock_Threads_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, column string, id uuid.UUID) ([]models.CommentThread, error)) *CommentServiceMock_Threads_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Unresolve provides a mock function for the type CommentServiceMock
+func (_mock *CommentServiceMock) Unresolve(ctx context.Context, actor *auth.Actor, input *comment_service.IDInput) (models.CommentDetail, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Unresolve")
+	}
+
+	var r0 models.CommentDetail
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *comment_service.IDInput) (models.CommentDetail, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *comment_service.IDInput) models.CommentDetail); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.CommentDetail)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *comment_service.IDInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// CommentServiceMock_Unresolve_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Unresolve'
+type CommentServiceMock_Unresolve_Call struct {
+	*mock.Call
+}
+
+// Unresolve is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *comment_service.IDInput
+func (_e *CommentServiceMock_Expecter) Unresolve(ctx any, actor any, input any) *CommentServiceMock_Unresolve_Call {
+	return &CommentServiceMock_Unresolve_Call{Call: _e.mock.On("Unresolve", ctx, actor, input)}
+}
+
+func (_c *CommentServiceMock_Unresolve_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *comment_service.IDInput)) *CommentServiceMock_Unresolve_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *comment_service.IDInput
+		if args[2] != nil {
+			arg2 = args[2].(*comment_service.IDInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *CommentServiceMock_Unresolve_Call) Return(commentDetail models.CommentDetail, err error) *CommentServiceMock_Unresolve_Call {
+	_c.Call.Return(commentDetail, err)
+	return _c
+}
+
+func (_c *CommentServiceMock_Unresolve_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *comment_service.IDInput) (models.CommentDetail, error)) *CommentServiceMock_Unresolve_Call {
 	_c.Call.Return(run)
 	return _c
 }

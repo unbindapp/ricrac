@@ -12,36 +12,42 @@ import (
 	events_repo "ricrac/internal/repositories/events"
 	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
+	notification_repo "ricrac/internal/repositories/notification"
 	resolve_repo "ricrac/internal/repositories/resolve"
+	search_repo "ricrac/internal/repositories/search"
 	seed_repo "ricrac/internal/repositories/seed"
 )
 
 //go:generate go run -mod=mod github.com/vburenin/ifacemaker -f "*.go" -i RepositoriesInterface -p repositories -s Repositories -o repositories_iface.go
 type Repositories struct {
-	db         *ent.Client
-	base       *repository.BaseRepository
-	access     access_repo.AccessRepositoryInterface
-	resolve    resolve_repo.ResolveRepositoryInterface
-	events     events_repo.EventsRepositoryInterface
-	label      label_repo.LabelRepositoryInterface
-	issue      issue_repo.IssueRepositoryInterface
-	seed       seed_repo.SeedRepositoryInterface
-	comment    comment_repo.CommentRepositoryInterface
-	attachment attachment_repo.AttachmentRepositoryInterface
+	db           *ent.Client
+	base         *repository.BaseRepository
+	access       access_repo.AccessRepositoryInterface
+	resolve      resolve_repo.ResolveRepositoryInterface
+	events       events_repo.EventsRepositoryInterface
+	label        label_repo.LabelRepositoryInterface
+	issue        issue_repo.IssueRepositoryInterface
+	seed         seed_repo.SeedRepositoryInterface
+	comment      comment_repo.CommentRepositoryInterface
+	attachment   attachment_repo.AttachmentRepositoryInterface
+	notification notification_repo.NotificationRepositoryInterface
+	search       search_repo.SearchRepositoryInterface
 }
 
 func NewRepositories(db *ent.Client) *Repositories {
 	return &Repositories{
-		db:         db,
-		base:       repository.NewBaseRepository(db),
-		access:     access_repo.NewAccessRepository(db),
-		resolve:    resolve_repo.NewResolveRepository(db),
-		events:     events_repo.NewEventsRepository(db),
-		label:      label_repo.NewLabelRepository(db),
-		issue:      issue_repo.NewIssueRepository(db),
-		seed:       seed_repo.NewSeedRepository(db),
-		comment:    comment_repo.NewCommentRepository(db),
-		attachment: attachment_repo.NewAttachmentRepository(db),
+		db:           db,
+		base:         repository.NewBaseRepository(db),
+		access:       access_repo.NewAccessRepository(db),
+		resolve:      resolve_repo.NewResolveRepository(db),
+		events:       events_repo.NewEventsRepository(db),
+		label:        label_repo.NewLabelRepository(db),
+		issue:        issue_repo.NewIssueRepository(db),
+		seed:         seed_repo.NewSeedRepository(db),
+		comment:      comment_repo.NewCommentRepository(db),
+		attachment:   attachment_repo.NewAttachmentRepository(db),
+		notification: notification_repo.NewNotificationRepository(db),
+		search:       search_repo.NewSearchRepository(db),
 	}
 }
 
@@ -88,4 +94,12 @@ func (r *Repositories) Comment() comment_repo.CommentRepositoryInterface {
 
 func (r *Repositories) Attachment() attachment_repo.AttachmentRepositoryInterface {
 	return r.attachment
+}
+
+func (r *Repositories) Notification() notification_repo.NotificationRepositoryInterface {
+	return r.notification
+}
+
+func (r *Repositories) Search() search_repo.SearchRepositoryInterface {
+	return r.search
 }
