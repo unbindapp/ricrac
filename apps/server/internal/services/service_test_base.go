@@ -19,15 +19,19 @@ import (
 	mocks_repository_email "ricrac/mocks/repository/email"
 	mocks_repository_events "ricrac/mocks/repository/events"
 	mocks_repository_favorite "ricrac/mocks/repository/favorite"
+	mocks_repository_initiative "ricrac/mocks/repository/initiative"
 	mocks_repository_issue "ricrac/mocks/repository/issue"
 	mocks_repository_label "ricrac/mocks/repository/label"
+	mocks_repository_milestone "ricrac/mocks/repository/milestone"
 	mocks_repository_notification "ricrac/mocks/repository/notification"
 	mocks_repository_oauth "ricrac/mocks/repository/oauth"
+	mocks_repository_project "ricrac/mocks/repository/project"
 	mocks_repository_release "ricrac/mocks/repository/release"
 	mocks_repository_resolve "ricrac/mocks/repository/resolve"
 	mocks_repository_search "ricrac/mocks/repository/search"
 	mocks_repository_seed "ricrac/mocks/repository/seed"
 	mocks_repository_state "ricrac/mocks/repository/state"
+	mocks_repository_statusupdate "ricrac/mocks/repository/statusupdate"
 	mocks_repository_team "ricrac/mocks/repository/team"
 	mocks_repository_template "ricrac/mocks/repository/template"
 	mocks_repository_tx "ricrac/mocks/repository/tx"
@@ -63,6 +67,10 @@ type ServiceTestSuite struct {
 	MockCustomerRepo     *mocks_repository_customer.CustomerRepositoryMock
 	MockReleaseRepo      *mocks_repository_release.ReleaseRepositoryMock
 	MockWebhookRepo      *mocks_repository_webhook.WebhookRepositoryMock
+	MockProjectRepo      *mocks_repository_project.ProjectRepositoryMock
+	MockMilestoneRepo    *mocks_repository_milestone.MilestoneRepositoryMock
+	MockStatusUpdateRepo *mocks_repository_statusupdate.StatusUpdateRepositoryMock
+	MockInitiativeRepo   *mocks_repository_initiative.InitiativeRepositoryMock
 }
 
 func (suite *ServiceTestSuite) SetupTest() {
@@ -91,6 +99,10 @@ func (suite *ServiceTestSuite) SetupTest() {
 	suite.MockCustomerRepo = mocks_repository_customer.NewCustomerRepositoryMock(suite.T())
 	suite.MockReleaseRepo = mocks_repository_release.NewReleaseRepositoryMock(suite.T())
 	suite.MockWebhookRepo = mocks_repository_webhook.NewWebhookRepositoryMock(suite.T())
+	suite.MockProjectRepo = mocks_repository_project.NewProjectRepositoryMock(suite.T())
+	suite.MockMilestoneRepo = mocks_repository_milestone.NewMilestoneRepositoryMock(suite.T())
+	suite.MockStatusUpdateRepo = mocks_repository_statusupdate.NewStatusUpdateRepositoryMock(suite.T())
+	suite.MockInitiativeRepo = mocks_repository_initiative.NewInitiativeRepositoryMock(suite.T())
 
 	suite.MockRepo.EXPECT().Access().Return(suite.MockAccessRepo).Maybe()
 	suite.MockRepo.EXPECT().Resolve().Return(suite.MockResolveRepo).Maybe()
@@ -115,6 +127,10 @@ func (suite *ServiceTestSuite) SetupTest() {
 	suite.MockRepo.EXPECT().Customer().Return(suite.MockCustomerRepo).Maybe()
 	suite.MockRepo.EXPECT().Release().Return(suite.MockReleaseRepo).Maybe()
 	suite.MockRepo.EXPECT().Webhook().Return(suite.MockWebhookRepo).Maybe()
+	suite.MockRepo.EXPECT().Project().Return(suite.MockProjectRepo).Maybe()
+	suite.MockRepo.EXPECT().Milestone().Return(suite.MockMilestoneRepo).Maybe()
+	suite.MockRepo.EXPECT().StatusUpdate().Return(suite.MockStatusUpdateRepo).Maybe()
+	suite.MockRepo.EXPECT().Initiative().Return(suite.MockInitiativeRepo).Maybe()
 }
 
 // ExpectTx runs WithTx bodies directly; repository mocks match the tx argument with mock.Anything.

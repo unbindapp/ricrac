@@ -17,15 +17,19 @@ import (
 	email_repo "ricrac/internal/repositories/email"
 	events_repo "ricrac/internal/repositories/events"
 	favorite_repo "ricrac/internal/repositories/favorite"
+	initiative_repo "ricrac/internal/repositories/initiative"
 	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
+	milestone_repo "ricrac/internal/repositories/milestone"
 	notification_repo "ricrac/internal/repositories/notification"
 	oauth_repo "ricrac/internal/repositories/oauth"
+	project_repo "ricrac/internal/repositories/project"
 	release_repo "ricrac/internal/repositories/release"
 	resolve_repo "ricrac/internal/repositories/resolve"
 	search_repo "ricrac/internal/repositories/search"
 	seed_repo "ricrac/internal/repositories/seed"
 	state_repo "ricrac/internal/repositories/state"
+	statusupdate_repo "ricrac/internal/repositories/statusupdate"
 	team_repo "ricrac/internal/repositories/team"
 	template_repo "ricrac/internal/repositories/template"
 	webhook_repo "ricrac/internal/repositories/webhook"
@@ -60,6 +64,10 @@ type Repositories struct {
 	customer     customer_repo.CustomerRepositoryInterface
 	release      release_repo.ReleaseRepositoryInterface
 	webhook      webhook_repo.WebhookRepositoryInterface
+	project      project_repo.ProjectRepositoryInterface
+	milestone    milestone_repo.MilestoneRepositoryInterface
+	statusUpdate statusupdate_repo.StatusUpdateRepositoryInterface
+	initiative   initiative_repo.InitiativeRepositoryInterface
 }
 
 func NewRepositories(db *ent.Client) *Repositories {
@@ -90,6 +98,10 @@ func NewRepositories(db *ent.Client) *Repositories {
 		customer:     customer_repo.NewCustomerRepository(db),
 		release:      release_repo.NewReleaseRepository(db),
 		webhook:      webhook_repo.NewWebhookRepository(db),
+		project:      project_repo.NewProjectRepository(db),
+		milestone:    milestone_repo.NewMilestoneRepository(db),
+		statusUpdate: statusupdate_repo.NewStatusUpdateRepository(db),
+		initiative:   initiative_repo.NewInitiativeRepository(db),
 	}
 }
 
@@ -200,4 +212,20 @@ func (r *Repositories) Release() release_repo.ReleaseRepositoryInterface {
 
 func (r *Repositories) Webhook() webhook_repo.WebhookRepositoryInterface {
 	return r.webhook
+}
+
+func (r *Repositories) Project() project_repo.ProjectRepositoryInterface {
+	return r.project
+}
+
+func (r *Repositories) Milestone() milestone_repo.MilestoneRepositoryInterface {
+	return r.milestone
+}
+
+func (r *Repositories) StatusUpdate() statusupdate_repo.StatusUpdateRepositoryInterface {
+	return r.statusUpdate
+}
+
+func (r *Repositories) Initiative() initiative_repo.InitiativeRepositoryInterface {
+	return r.initiative
 }

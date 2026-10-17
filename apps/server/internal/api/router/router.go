@@ -22,13 +22,17 @@ import (
 	documents_handler "ricrac/internal/api/handlers/documents"
 	favorites_handler "ricrac/internal/api/handlers/favorites"
 	files_handler "ricrac/internal/api/handlers/files"
+	initiatives_handler "ricrac/internal/api/handlers/initiatives"
 	labels_handler "ricrac/internal/api/handlers/labels"
+	milestones_handler "ricrac/internal/api/handlers/milestones"
 	notifications_handler "ricrac/internal/api/handlers/notifications"
 	oauthserver_handler "ricrac/internal/api/handlers/oauthserver"
+	projects_handler "ricrac/internal/api/handlers/projects"
 	releases_handler "ricrac/internal/api/handlers/releases"
 	search_handler "ricrac/internal/api/handlers/search"
 	signin_handler "ricrac/internal/api/handlers/signin"
 	states_handler "ricrac/internal/api/handlers/states"
+	statusupdates_handler "ricrac/internal/api/handlers/statusupdates"
 	teams_handler "ricrac/internal/api/handlers/teams"
 	templates_handler "ricrac/internal/api/handlers/templates"
 	webhooks_handler "ricrac/internal/api/handlers/webhooks"
@@ -161,4 +165,8 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	customers_handler.RegisterHandlers(srv, reg)
 	releases_handler.RegisterHandlers(srv, reg)
 	webhooks_handler.RegisterHandlers(srv, reg)
+	projects_handler.RegisterHandlers(srv, reg)
+	milestones_handler.RegisterHandlers(srv, reg)
+	statusupdates_handler.RegisterHandlers(srv, reg)
+	initiatives_handler.RegisterHandlers(srv, reg)
 }

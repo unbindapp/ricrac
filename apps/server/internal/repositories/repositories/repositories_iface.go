@@ -17,15 +17,19 @@ import (
 	email_repo "ricrac/internal/repositories/email"
 	events_repo "ricrac/internal/repositories/events"
 	favorite_repo "ricrac/internal/repositories/favorite"
+	initiative_repo "ricrac/internal/repositories/initiative"
 	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
+	milestone_repo "ricrac/internal/repositories/milestone"
 	notification_repo "ricrac/internal/repositories/notification"
 	oauth_repo "ricrac/internal/repositories/oauth"
+	project_repo "ricrac/internal/repositories/project"
 	release_repo "ricrac/internal/repositories/release"
 	resolve_repo "ricrac/internal/repositories/resolve"
 	search_repo "ricrac/internal/repositories/search"
 	seed_repo "ricrac/internal/repositories/seed"
 	state_repo "ricrac/internal/repositories/state"
+	statusupdate_repo "ricrac/internal/repositories/statusupdate"
 	team_repo "ricrac/internal/repositories/team"
 	template_repo "ricrac/internal/repositories/template"
 	webhook_repo "ricrac/internal/repositories/webhook"
@@ -63,4 +67,8 @@ type RepositoriesInterface interface {
 	Customer() customer_repo.CustomerRepositoryInterface
 	Release() release_repo.ReleaseRepositoryInterface
 	Webhook() webhook_repo.WebhookRepositoryInterface
+	Project() project_repo.ProjectRepositoryInterface
+	Milestone() milestone_repo.MilestoneRepositoryInterface
+	StatusUpdate() statusupdate_repo.StatusUpdateRepositoryInterface
+	Initiative() initiative_repo.InitiativeRepositoryInterface
 }

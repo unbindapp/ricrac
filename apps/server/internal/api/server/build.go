@@ -17,16 +17,20 @@ import (
 	email_service "ricrac/internal/services/email"
 	events_service "ricrac/internal/services/events"
 	favorite_service "ricrac/internal/services/favorite"
+	initiative_service "ricrac/internal/services/initiative"
 	issue_service "ricrac/internal/services/issue"
 	label_service "ricrac/internal/services/label"
+	milestone_service "ricrac/internal/services/milestone"
 	notification_service "ricrac/internal/services/notification"
 	oauth_service "ricrac/internal/services/oauth"
+	project_service "ricrac/internal/services/project"
 	release_service "ricrac/internal/services/release"
 	resolve_service "ricrac/internal/services/resolve"
 	search_service "ricrac/internal/services/search"
 	seed_service "ricrac/internal/services/seed"
 	signin_service "ricrac/internal/services/signin"
 	state_service "ricrac/internal/services/state"
+	statusupdate_service "ricrac/internal/services/statusupdate"
 	team_service "ricrac/internal/services/team"
 	template_service "ricrac/internal/services/template"
 	webhook_service "ricrac/internal/services/webhook"
@@ -67,5 +71,9 @@ func New(cfg config.Config, db *ent.Client, waker events_service.Waker) *Server 
 	srv.CustomerService = customer_service.NewCustomerService(repo, srv.ResolveService, srv.EventsService)
 	srv.ReleaseService = release_service.NewReleaseService(repo, srv.ResolveService, srv.EventsService)
 	srv.WebhookService = webhook_service.NewWebhookService(repo, srv.ResolveService, srv.EventsService)
+	srv.MilestoneService = milestone_service.NewMilestoneService(repo, srv.ResolveService, srv.EventsService)
+	srv.StatusUpdateService = statusupdate_service.NewStatusUpdateService(repo, srv.ResolveService, srv.EventsService)
+	srv.ProjectService = project_service.NewProjectService(cfg, repo, srv.ResolveService, srv.EventsService, srv.MilestoneService, srv.StatusUpdateService, srv.Ops)
+	srv.InitiativeService = initiative_service.NewInitiativeService(cfg, repo, srv.ResolveService, srv.EventsService, srv.ProjectService, srv.StatusUpdateService)
 	return srv
 }
