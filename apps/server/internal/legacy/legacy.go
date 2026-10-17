@@ -98,3 +98,11 @@ func converted(value any, err error) (any, error) {
 	legacy := app.AsError(err)
 	return nil, &errdefs.Error{Status: legacy.Status, Message: legacy.Message}
 }
+
+func (b *Bridge) WakeDeliveries() {
+	b.State.QueueDeliveries()
+}
+
+func (b *Bridge) WakeGitHub() {
+	b.State.QueueGitHub()
+}

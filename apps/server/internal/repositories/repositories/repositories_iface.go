@@ -7,12 +7,20 @@ import (
 	"ricrac/ent"
 	repository "ricrac/internal/repositories"
 	access_repo "ricrac/internal/repositories/access"
+	events_repo "ricrac/internal/repositories/events"
+	label_repo "ricrac/internal/repositories/label"
+	resolve_repo "ricrac/internal/repositories/resolve"
+	"time"
 )
 
 // RepositoriesInterface ...
 type RepositoriesInterface interface {
 	Ent() *ent.Client
 	WithTx(ctx context.Context, fn func(tx repository.TxInterface) error) error
-	Base() *repository.BaseRepository
+	// Now is Postgres' now() in tx: the transaction's start, so what it writes shares one time.
+	Now(ctx context.Context, tx repository.TxInterface) (time.Time, error)
 	Access() access_repo.AccessRepositoryInterface
+	Resolve() resolve_repo.ResolveRepositoryInterface
+	Events() events_repo.EventsRepositoryInterface
+	Label() label_repo.LabelRepositoryInterface
 }

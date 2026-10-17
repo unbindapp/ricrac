@@ -15,9 +15,9 @@ import (
 	"ricrac/internal/api/router"
 	apiserver "ricrac/internal/api/server"
 	"ricrac/internal/infrastructure/database"
-	"ricrac/internal/legacy"
 	"ricrac/internal/infrastructure/mail"
 	"ricrac/internal/integrations/github"
+	"ricrac/internal/legacy"
 	"ricrac/ops"
 	"ricrac/server"
 )
@@ -58,7 +58,7 @@ func newBackend(t *testing.T, url string, tp *tape) *backend {
 		t.Fatalf("connect: %v", err)
 	}
 	t.Cleanup(bridge.Close)
-	return &backend{t: t, state: bridge.State, tape: tp, server: apiserver.New(cfg, client), bridge: bridge}
+	return &backend{t: t, state: bridge.State, tape: tp, server: apiserver.New(cfg, client, bridge), bridge: bridge}
 }
 
 func (b *backend) Router() http.Handler {

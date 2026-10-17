@@ -1,0 +1,78 @@
+template: testify
+template-data:
+  unroll-variadic: true
+include-auto-generated: true
+packages:
+  ricrac/internal/repositories:
+    config:
+      dir: ./mocks/repository
+    interfaces:
+      TxInterface:
+        config:
+          dir: ./mocks/repository/tx
+          filename: tx_mock.go
+          structname: TxMock
+          pkgname: mocks_repository_tx
+  ricrac/internal/repositories/repositories:
+    config:
+      dir: ./mocks/repositories
+    interfaces:
+      RepositoriesInterface:
+        config:
+          filename: repositories_mock.go
+          structname: RepositoriesMock
+          pkgname: mocks_repositories
+  ricrac/internal/repositories/access:
+    config:
+      dir: ./mocks/repository/access
+    interfaces:
+      AccessRepositoryInterface:
+        config:
+          filename: access_repository_mock.go
+          structname: AccessRepositoryMock
+          pkgname: mocks_repository_access
+  ricrac/internal/repositories/resolve:
+    config:
+      dir: ./mocks/repository/resolve
+    interfaces:
+      ResolveRepositoryInterface:
+        config:
+          filename: resolve_repository_mock.go
+          structname: ResolveRepositoryMock
+          pkgname: mocks_repository_resolve
+  ricrac/internal/repositories/events:
+    config:
+      dir: ./mocks/repository/events
+    interfaces:
+      EventsRepositoryInterface:
+        config:
+          filename: events_repository_mock.go
+          structname: EventsRepositoryMock
+          pkgname: mocks_repository_events
+  ricrac/internal/repositories/label:
+    config:
+      dir: ./mocks/repository/label
+    interfaces:
+      LabelRepositoryInterface:
+        config:
+          filename: label_repository_mock.go
+          structname: LabelRepositoryMock
+          pkgname: mocks_repository_label
+  ricrac/internal/services/resolve:
+    config:
+      dir: ./mocks/services/resolve
+    interfaces:
+      ResolveServiceInterface:
+        config:
+          filename: resolve_service_mock.go
+          structname: ResolveServiceMock
+          pkgname: mocks_services_resolve
+  ricrac/internal/services/events:
+    config:
+      dir: ./mocks/services/events
+    interfaces:
+      EventsServiceInterface:
+        config:
+          filename: events_service_mock.go
+          structname: EventsServiceMock
+          pkgname: mocks_services_events

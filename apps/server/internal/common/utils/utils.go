@@ -304,3 +304,25 @@ func MentionHandles(text string) []string {
 	}
 	return handles
 }
+
+// LikePattern is an ILIKE pattern finding the query anywhere, or nil for an empty one.
+func LikePattern(query *string) *string {
+	trimmed := strings.TrimSpace(OrEmpty(query))
+	if trimmed == "" {
+		return nil
+	}
+	return new("%" + trimmed + "%")
+}
+
+// Trimmed is the value without surrounding space, or nil when that leaves nothing.
+func Trimmed(value *string) *string {
+	if value == nil || strings.TrimSpace(*value) == "" {
+		return nil
+	}
+	return new(strings.TrimSpace(*value))
+}
+
+// EscapeLike escapes LIKE's wildcards.
+func EscapeLike(value string) string {
+	return strings.NewReplacer(`\`, `\\`, "%", `\%`, "_", `\_`).Replace(value)
+}

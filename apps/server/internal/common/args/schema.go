@@ -98,6 +98,11 @@ func ResultOfType(t reflect.Type) M {
 	return cloneJSON(schema)
 }
 
+// SchemaOfType is the argument schema of a type known at run time, without caching.
+func SchemaOfType(t reflect.Type) M {
+	return schemas{}.of(t)
+}
+
 func schemaFor(t reflect.Type) M {
 	return schemas{}.of(t)
 }
