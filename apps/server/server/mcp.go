@@ -95,7 +95,13 @@ Saving: save_* tools create when you omit ` + "`id`" + ` and update when you pas
 More operations: the tools listed cover everyday work. Everything else (webhooks, customers, releases, favorites, templates and views management, team and member administration, archiving, sharing, ...) is found with find_operations and run with call_operation.`
 
 // protocolVersions are the MCP versions spoken, oldest first.
-var protocolVersions = []string{"2024-11-05", "2025-03-26", "2025-06-18", "2025-11-25"}
+var protocolVersions = []string{"2024-11-05", "2025-03-26", "2025-06-18", "2025-11-25", "2026-07-28"}
+
+// statelessVersion is the first version where every result says its resultType and clients name
+// the version on each request (MCP-Protocol-Version, or _meta) instead of a session.
+const statelessVersion = "2026-07-28"
+
+const versionMetaKey = "io.modelcontextprotocol/protocolVersion"
 
 type callerKey struct{}
 
@@ -142,7 +148,11 @@ func mcpHandler(state *app.State) http.Handler {
 			return
 		}
 		body = bytes.TrimSpace(body)
-		call := &mcpCall{caller: r.Context().Value(callerKey{}).(*app.Caller), all: r.URL.Query().Get("tools") == "all"}
+		call := &mcpCall{
+			caller:  r.Context().Value(callerKey{}).(*app.Caller),
+			all:     r.URL.Query().Get("tools") == "all",
+			version: r.Header.Get("MCP-Protocol-Version"),
+		}
 		if len(body) > 0 && body[0] == '[' {
 			var batch []json.RawMessage
 			if err := json.Unmarshal(body, &batch); err != nil || len(batch) == 0 {
@@ -197,6 +207,8 @@ func parseError() rpcResponse {
 type mcpCall struct {
 	caller *app.Caller
 	all    bool
+	// The version the client named in the MCP-Protocol-Version header, if any.
+	version string
 }
 
 // handle answers one message; nil for notifications and responses, which get no answer.
@@ -219,8 +231,43 @@ func (m *mcpCall) handle(message json.RawMessage) *rpcResponse {
 		response.Error = err
 		return response
 	}
+	if object, ok := result.(M); ok && m.requestVersion(request.Method, request.Params) >= statelessVersion {
+		object["resultType"] = "complete"
+		if request.Method == "tools/list" {
+			object["ttlMs"] = 0
+			object["cacheScope"] = "private"
+		}
+	}
 	response.Result = result
 	return response
+}
+
+// requestVersion is the protocol version a request is made in: the one initialize negotiates,
+// else the one named in its _meta or the request's header.
+func (m *mcpCall) requestVersion(method string, params json.RawMessage) string {
+	var named struct {
+		ProtocolVersion string         `json:"protocolVersion"`
+		Meta            map[string]any `json:"_meta"`
+	}
+	_ = json.Unmarshal(params, &named)
+	if method == "initialize" {
+		return negotiate(named.ProtocolVersion)
+	}
+	if method == "server/discover" {
+		return statelessVersion
+	}
+	if version, ok := named.Meta[versionMetaKey].(string); ok {
+		return version
+	}
+	return m.version
+}
+
+// negotiate is the requested version when it's spoken, else the newest one spoken.
+func negotiate(requested string) string {
+	if slices.Contains(protocolVersions, requested) {
+		return requested
+	}
+	return protocolVersions[len(protocolVersions)-1]
 }
 
 func (m *mcpCall) dispatch(method string, params json.RawMessage) (any, *rpcError) {
@@ -230,18 +277,23 @@ func (m *mcpCall) dispatch(method string, params json.RawMessage) (any, *rpcErro
 			ProtocolVersion string `json:"protocolVersion"`
 		}
 		_ = json.Unmarshal(params, &init)
-		version := protocolVersions[len(protocolVersions)-1]
-		if slices.Contains(protocolVersions, init.ProtocolVersion) {
-			version = init.ProtocolVersion
-		}
 		return M{
-			"protocolVersion": version,
+			"protocolVersion": negotiate(init.ProtocolVersion),
 			"capabilities":    M{"tools": M{}},
 			"serverInfo":      M{"name": "ricrac", "version": Version},
 			"instructions":    Instructions,
 		}, nil
 	case "ping":
 		return M{}, nil
+	case "server/discover":
+		return M{
+			"supportedVersions": protocolVersions,
+			"capabilities":      M{"tools": M{}},
+			"instructions":      Instructions,
+			"ttlMs":             0,
+			"cacheScope":        "private",
+			"_meta":             M{"io.modelcontextprotocol/serverInfo": M{"name": "ricrac", "version": Version}},
+		}, nil
 	case "tools/list":
 		reach, err := reachOf(m.caller)
 		if err != nil {

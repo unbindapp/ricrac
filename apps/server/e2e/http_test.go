@@ -220,7 +220,7 @@ func TestMCPAnswersBatchesNotificationsAndChecksTheHost(t *testing.T) {
 	status, _ = send(router, rpc("/mcp", key, M{"jsonrpc": "2.0", "method": "notifications/initialized"}))
 	eq(t, status, http.StatusAccepted)
 	_, init := send(router, rpc("/mcp", key, M{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": M{"protocolVersion": "1999-01-01"}}))
-	eq(t, init.At("result", "protocolVersion").Str(), "2025-11-25")
+	eq(t, init.At("result", "protocolVersion").Str(), "2026-07-28")
 	rebound := rpc("/mcp", key, M{"jsonrpc": "2.0", "id": 1, "method": "ping"})
 	rebound.Host = "evil.example"
 	status, _ = send(router, rebound)
@@ -239,6 +239,38 @@ func TestMCPAnswersBatchesNotificationsAndChecksTheHost(t *testing.T) {
 	_, called := send(router, rpc("/mcp", key, M{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": M{
 		"name": "call_operation", "arguments": M{"name": "list_issues", "arguments": M{}}}}))
 	eq(t, called.At("result", "isError").V, any(false), called.JSON())
+}
+
+func TestMCPSpeaksTheStatelessRevision(t *testing.T) {
+	w := world(t)
+	router := server.Router(w.State)
+	key := apiKey(w, "read", "write")
+	modern := func(body any) J {
+		req := rpc("/mcp", key, body)
+		req.Header.Set("Mcp-Protocol-Version", "2026-07-28")
+		_, response := send(router, req)
+		return response
+	}
+	discover := modern(M{"jsonrpc": "2.0", "id": 1, "method": "server/discover"})
+	eq(t, discover.At("result", "resultType").Str(), "complete", discover.JSON())
+	check(t, slices.Contains(discover.At("result", "supportedVersions").Strings(), "2026-07-28"), discover.JSON())
+	eq(t, discover.At("result", "_meta", "io.modelcontextprotocol/serverInfo", "name").Str(), "ricrac")
+	init := modern(M{"jsonrpc": "2.0", "id": 2, "method": "initialize", "params": M{"protocolVersion": "2026-07-28"}})
+	eq(t, init.At("result", "protocolVersion").Str(), "2026-07-28")
+	eq(t, init.At("result", "resultType").Str(), "complete")
+	tools := modern(M{"jsonrpc": "2.0", "id": 3, "method": "tools/list"})
+	eq(t, tools.At("result", "resultType").Str(), "complete")
+	eq(t, tools.At("result", "cacheScope").Str(), "private")
+	called := modern(M{"jsonrpc": "2.0", "id": 4, "method": "tools/call", "params": M{"name": "list_workspaces", "arguments": M{}}})
+	eq(t, called.At("result", "resultType").Str(), "complete", called.JSON())
+	failed := modern(M{"jsonrpc": "2.0", "id": 5, "method": "tools/call", "params": M{"name": "get_issue", "arguments": M{"id": "ENG-99"}}})
+	eq(t, failed.At("result", "resultType").Str(), "complete", failed.JSON())
+	eq(t, failed.At("result", "isError").V, any(true))
+	_, inMeta := send(router, rpc("/mcp", key, M{"jsonrpc": "2.0", "id": 6, "method": "tools/call", "params": M{
+		"name": "list_workspaces", "arguments": M{}, "_meta": M{"io.modelcontextprotocol/protocolVersion": "2026-07-28"}}}))
+	eq(t, inMeta.At("result", "resultType").Str(), "complete", "the version can come in _meta")
+	_, legacy := send(router, rpc("/mcp", key, M{"jsonrpc": "2.0", "id": 7, "method": "tools/call", "params": M{"name": "list_workspaces", "arguments": M{}}}))
+	check(t, legacy.At("result", "resultType").IsNull(), "older revisions keep their shape: ", legacy.JSON())
 }
 
 func TestTokensForSeveralWorkspacesNameOnePerCall(t *testing.T) {
