@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { FileTextIcon, PlusIcon, RocketIcon, Trash2Icon } from "lucide-react";
-import { useState } from "react";
 
 import type { ReleaseNote } from "@/api/ops.gen";
 import { PropertyPicker } from "@/components/issues/property-picker";
@@ -59,7 +58,7 @@ export function ReleaseNoteDetail({ slug }: { slug: string }) {
 function NotePage({ note }: { note: ReleaseNote }) {
   const { workspace, canEdit } = useWorkspace();
   const { mutate: save, mutateAsync: saveAsync } = useSaveReleaseNoteMutation(workspace.id);
-  const [content] = useState(note.content ?? "");
+  const content = note.content ?? "";
   const params = { workspace: workspace.urlKey };
 
   return (
@@ -109,7 +108,10 @@ function NotePage({ note }: { note: ReleaseNote }) {
           canEdit ? "What shipped, and why it matters to people…" : "Nothing written yet."
         }
         readOnly={!canEdit}
-        autosave={{ onSave: (markdown) => saveAsync({ id: note.id, content: markdown }) }}
+        autosave={{
+          onSave: async (markdown) =>
+            (await saveAsync({ id: note.id, content: markdown })).content ?? "",
+        }}
       />
     </PageContainer>
   );

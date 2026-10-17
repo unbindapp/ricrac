@@ -3,6 +3,8 @@ import { z } from "zod";
 
 import type { ProjectDetail, ProjectStatus, StatusUpdate } from "@/api/ops.gen";
 import { slugIdFromParam } from "@/lib/helpers/entity-slug";
+import { DETAIL_REFETCH_INTERVAL_MS } from "@/lib/queries/issues";
+import { savePatchOrText, type TTextEdit } from "@/lib/queries/text-edits";
 import { call, callAll, type OpArgs } from "@/lib/server/client";
 import { isApiError } from "@/lib/server/errors";
 
@@ -42,6 +44,7 @@ export const projectQuery = (workspaceId: string, project: string) => {
   return queryOptions({
     queryKey: queryKeyProjects.detail(workspaceId, slugId),
     queryFn: () => call(workspaceId, "get_project", { id: slugId }),
+    refetchInterval: DETAIL_REFETCH_INTERVAL_MS,
   });
 };
 
@@ -96,7 +99,16 @@ export function useSaveProjectMutation(workspaceId: string) {
   const queryClient = useQueryClient();
   const invalidate = useInvalidateProjects(workspaceId);
   return useMutation({
-    mutationFn: (args: OpArgs<"save_project">) => call(workspaceId, "save_project", args),
+    mutationFn: ({ edit, ...args }: OpArgs<"save_project"> & { edit?: TTextEdit }) => {
+      if (!edit) return call(workspaceId, "save_project", args);
+      return savePatchOrText(edit, (patch) =>
+        call(
+          workspaceId,
+          "save_project",
+          patch ? { ...args, patch } : { ...args, description: edit.after },
+        ),
+      );
+    },
     meta: { errorTitle: "Could not save project" },
     onSuccess: (project) => {
       queryClient.setQueryData(queryKeyProjects.detail(workspaceId, project.slugId), project);

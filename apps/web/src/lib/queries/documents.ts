@@ -1,6 +1,8 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { slugIdFromParam } from "@/lib/helpers/entity-slug";
+import { DETAIL_REFETCH_INTERVAL_MS } from "@/lib/queries/issues";
+import { savePatchOrText, type TTextEdit } from "@/lib/queries/text-edits";
 import { call, callAll, type OpArgs } from "@/lib/server/client";
 
 export type TDocumentListArgs = Omit<OpArgs<"list_documents">, "cursor" | "limit">;
@@ -32,6 +34,7 @@ export const documentQuery = (workspaceId: string, document: string) => {
   return queryOptions({
     queryKey: queryKeyDocuments.detail(workspaceId, slugId),
     queryFn: () => call(workspaceId, "get_document", { id: slugId }),
+    refetchInterval: DETAIL_REFETCH_INTERVAL_MS,
   });
 };
 
@@ -64,7 +67,16 @@ export function useSaveDocumentMutation(workspaceId: string) {
   const queryClient = useQueryClient();
   const invalidate = useInvalidateDocuments(workspaceId);
   return useMutation({
-    mutationFn: (args: OpArgs<"save_document">) => call(workspaceId, "save_document", args),
+    mutationFn: ({ edit, ...args }: OpArgs<"save_document"> & { edit?: TTextEdit }) => {
+      if (!edit) return call(workspaceId, "save_document", args);
+      return savePatchOrText(edit, (patch) =>
+        call(
+          workspaceId,
+          "save_document",
+          patch ? { ...args, patch } : { ...args, content: edit.after },
+        ),
+      );
+    },
     meta: { errorTitle: "Could not save document" },
     onSuccess: (document) => {
       queryClient.setQueryData(queryKeyDocuments.detail(workspaceId, document.slugId), document);

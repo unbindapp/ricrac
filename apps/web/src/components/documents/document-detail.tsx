@@ -7,7 +7,7 @@ import type { DocumentDetail as TDocumentDetail } from "@/api/ops.gen";
 import { FavoriteButton } from "@/components/favorites/favorite-button";
 import { useDocumentParent } from "@/components/documents/document-parent";
 import { DocumentParentPicker } from "@/components/documents/document-parent-picker";
-import { MarkdownBody } from "@/components/documents/markdown-body";
+import { AutosaveMarkdown } from "@/components/shared/autosave-markdown";
 import { VersionHistoryDialog } from "@/components/documents/version-history";
 import { Breadcrumb, type TBreadcrumbItem } from "@/components/layout/breadcrumb";
 import { ErrorCard } from "@/components/layout/error-card";
@@ -159,13 +159,16 @@ function DocumentDetailContent({ document }: { document: TDocumentDetail }) {
           )}
         </div>
       </div>
-      <MarkdownBody
+      <AutosaveMarkdown
         key={`${document.id}:${revision}`}
         label="Document content"
         placeholder="Start writing…"
-        initialValue={document.content ?? ""}
+        value={document.content ?? ""}
         readOnly={!canEdit}
-        onSave={(content) => saveAsync({ id: document.id, content })}
+        onSave={async (after, before) => {
+          const saved = await saveAsync({ id: document.id, edit: { before, after } });
+          return saved.content ?? "";
+        }}
       />
       <VersionHistoryDialog
         document={document}

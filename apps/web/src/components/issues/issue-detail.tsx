@@ -11,12 +11,11 @@ import {
   UserPlusIcon,
   XIcon,
 } from "lucide-react";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import type { IssueDetail as TIssueDetail } from "@/api/ops.gen";
 import { CustomerNeedDialog } from "@/components/customers/customer-need-dialog";
 import { CustomerNeedsSection } from "@/components/customers/customer-needs-section";
-import { descriptionChange } from "@/components/issues/description-patch";
 import { IssueActivity } from "@/components/issues/issue-activity";
 import { AttachMenu, IssueAttachments } from "@/components/issues/issue-attachments";
 import { IssueDetailHeader } from "@/components/issues/issue-detail-header";
@@ -124,7 +123,6 @@ function IssueDetailContent({
   const { mutate: setSubscribed } = useIssueSubscriptionMutation(workspace.id);
   const { mutate: toggleReaction } = useIssueReactionMutation(workspace.id);
   const [isSettingSla, setIsSettingSla] = useState(false);
-  const savedDescription = useRef(issue.description ?? "");
 
   const isPeek = variant === "peek";
   const { data: customerNeeds } = useQuery(
@@ -180,12 +178,11 @@ function IssueDetailContent({
           key={issue.id}
           label="Description"
           placeholder="Add a description…"
-          initialValue={issue.description ?? ""}
+          value={issue.description ?? ""}
           readOnly={!canEdit}
-          onSave={async (description) => {
-            const change = descriptionChange(savedDescription.current, description);
-            await saveDescription({ id: issue.id, change, description });
-            savedDescription.current = description;
+          onSave={async (after, before) => {
+            const saved = await saveDescription({ id: issue.id, edit: { before, after } });
+            return saved.description ?? "";
           }}
         />
         {reactions.length > 0 && (

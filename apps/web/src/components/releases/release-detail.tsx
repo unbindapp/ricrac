@@ -90,7 +90,7 @@ function ReleasePage({
 }) {
   const { workspace, canEdit } = useWorkspace();
   const { mutate: save, mutateAsync: saveAsync } = useSaveReleaseMutation(workspace.id);
-  const [description] = useState(release.description ?? "");
+  const description = release.description ?? "";
   const params = { workspace: workspace.urlKey };
 
   return (
@@ -139,8 +139,13 @@ function ReleasePage({
               placeholder={canEdit ? "Add a description…" : "No description."}
               readOnly={!canEdit}
               autosave={{
-                onSave: (markdown) =>
-                  saveAsync({ id: release.id, description: markdown.trim() || null }),
+                onSave: async (markdown) => {
+                  const saved = await saveAsync({
+                    id: release.id,
+                    description: markdown.trim() || null,
+                  });
+                  return saved.description ?? "";
+                },
               }}
             />
           </div>

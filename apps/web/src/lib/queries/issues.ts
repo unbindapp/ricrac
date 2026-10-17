@@ -8,10 +8,13 @@ import {
 } from "@tanstack/react-query";
 
 import type { Issue, IssueDetail, ListIssuesArgs, PageInfo, SaveIssueArgs } from "@/api/ops.gen";
-import { ApiError, call, type OpArgs } from "@/lib/server/client";
+import { savePatchOrText, type TTextEdit } from "@/lib/queries/text-edits";
+import { call, type OpArgs } from "@/lib/server/client";
 
 export const ISSUE_TITLE_MAX_LENGTH = 255;
 export const LIST_REFETCH_INTERVAL_MS = 15 * 1000;
+/** Agents change things constantly, so open pages refresh too (and on focus). */
+export const DETAIL_REFETCH_INTERVAL_MS = 15 * 1000;
 
 const LIST_PAGE_SIZE = 250;
 /** Lists stop loading pages here; grouping and counts are of what is loaded. */
@@ -49,17 +52,19 @@ export const issuesListQuery = (workspaceId: string, args: ListIssuesArgs) =>
     refetchInterval: LIST_REFETCH_INTERVAL_MS,
   });
 
-/** An issue by identifier (ENG-123) or id. */
+/** An issue by identifier (ENG-123) or id; open ones follow others' changes. */
 export const issueQuery = (workspaceId: string, identifier: string) =>
   queryOptions({
     queryKey: queryKeyIssues.detail(workspaceId, identifier),
     queryFn: () => call(workspaceId, "get_issue", { id: identifier }),
+    refetchInterval: DETAIL_REFETCH_INTERVAL_MS,
   });
 
 export const issueHistoryQuery = (workspaceId: string, issueId: string) =>
   queryOptions({
     queryKey: queryKeyIssues.history(workspaceId, issueId),
     queryFn: () => call(workspaceId, "get_issue_history", { id: issueId }),
+    refetchInterval: DETAIL_REFETCH_INTERVAL_MS,
   });
 
 /** Issues matching words or an identifier, for pickers. */
@@ -179,32 +184,17 @@ export function useUpdateIssueMutation(workspaceId: string) {
   });
 }
 
-/**
- * Saves a description edit as a patch, so edits others made elsewhere in it meanwhile stay;
- * when the patch no longer applies, the whole text is saved instead.
- */
 export function useSaveDescriptionMutation(workspaceId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, change, description }: TSaveDescriptionVariables) => {
-      if (!change.patch) return call(workspaceId, "save_issue", { id, description });
-      try {
-        return await call(workspaceId, "save_issue", { id, patch: change.patch });
-      } catch (error) {
-        if (!(error instanceof ApiError) || error.status !== 400) throw error;
-        return call(workspaceId, "save_issue", { id, description });
-      }
-    },
+    mutationFn: ({ id, edit }: { id: string; edit: TTextEdit }) =>
+      savePatchOrText(edit, (patch) =>
+        call(workspaceId, "save_issue", patch ? { id, patch } : { id, description: edit.after }),
+      ),
     meta: { errorTitle: "Could not save the description" },
     onSettled: () => invalidateIssues(queryClient, workspaceId),
   });
 }
-
-type TSaveDescriptionVariables = {
-  id: string;
-  change: Pick<SaveIssueArgs, "patch">;
-  description: string;
-};
 
 export type TUpdateIssuesVariables = {
   ids: string[];

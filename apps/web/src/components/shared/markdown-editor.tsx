@@ -8,9 +8,11 @@ import { Markdown } from "@tiptap/markdown";
 import { type Editor, EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { common, createLowlight } from "lowlight";
+import { XIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Avatar } from "@/components/shared/avatar";
+import { Button } from "@/components/ui/button";
 import { MarkdownMention } from "@/components/shared/markdown-mention";
 import { SuggestionMenu, type TSuggestionItem } from "@/components/ui/suggestion-menu";
 import { toast } from "@/components/ui/toast";
@@ -44,8 +46,13 @@ type TProps = {
   users?: TMentionUser[];
   onUploadImage?: (file: File) => Promise<string>;
   readOnly?: boolean;
+  /**
+   * Saves a moment after you stop writing. `value` is then the server's text: a new one replaces
+   * the content when you have no unsaved edits, and is offered otherwise.
+   */
   autosave?: {
-    onSave: (markdown: string) => Promise<unknown>;
+    /** `base` is the server's text the edit started from; resolves to the server's text after. */
+    onSave: (markdown: string, base: string) => Promise<string>;
     delayMs?: number;
   };
   onSubmit?: () => void;
@@ -74,7 +81,9 @@ export function MarkdownEditor({
   const editorRef = useRef<Editor | null>(null);
   const lastMarkdownRef = useRef(value);
   const savedMarkdownRef = useRef<string | null>(null);
+  const baseRef = useRef(value);
   const isSavingRef = useRef(false);
+  const [incoming, setIncoming] = useState<string | null>(null);
   const [mention, setMention] = useState<TMentionState | null>(null);
   const mentionRef = useRef<TMentionState | null>(null);
   const [saveStatus, setSaveStatus] = useState<TSaveStatus>("idle");
@@ -96,9 +105,13 @@ export function MarkdownEditor({
     setSaveStatus("saving");
     isSavingRef.current = true;
     try {
-      await autosave.onSave(markdown);
+      const serverText = await autosave.onSave(markdown, baseRef.current);
+      baseRef.current = markdown;
       savedMarkdownRef.current = markdown;
+      isSavingRef.current = false;
       setSaveStatus("saved");
+      setIncoming((current) => (current === markdown || current === serverText ? null : current));
+      adoptServerText(serverText);
     } catch (error) {
       setSaveStatus("error");
       toast.add({
@@ -237,12 +250,52 @@ export function MarkdownEditor({
   }, [editor, readOnly]);
 
   useEffect(() => {
-    if (!editor || editor.isDestroyed) return;
+    if (!editor || editor.isDestroyed || hasAutosave) return;
     if (value === lastMarkdownRef.current) return;
     lastMarkdownRef.current = value;
     editor.commands.setContent(value, { contentType: "markdown", emitUpdate: false });
     savedMarkdownRef.current = editor.getMarkdown();
-  }, [editor, value]);
+  }, [editor, value, hasAutosave]);
+
+  /** Takes the server's text when you have no unsaved edits, and offers it otherwise. */
+  function adoptServerText(text: string) {
+    const current = editorRef.current;
+    if (!current || current.isDestroyed || text === baseRef.current) return;
+    const markdown = current.getMarkdown();
+    const hasUnsavedEdits =
+      save.isPending() || isSavingRef.current || markdown !== savedMarkdownRef.current;
+    if (hasUnsavedEdits && text !== markdown) {
+      setIncoming(text);
+      return;
+    }
+    takeServerText(current, text);
+  }
+  function takeServerText(current: Editor, text: string) {
+    if (text !== current.getMarkdown()) replaceContent(current, text);
+    baseRef.current = text;
+    savedMarkdownRef.current = current.getMarkdown();
+    lastMarkdownRef.current = savedMarkdownRef.current;
+    setIncoming(null);
+  }
+  const adoptRef = useRef(adoptServerText);
+  useEffect(() => {
+    adoptRef.current = adoptServerText;
+  });
+  useEffect(() => {
+    if (!editor || !hasAutosave) return;
+    adoptRef.current(value);
+  }, [editor, value, hasAutosave]);
+
+  const showIncoming = () => {
+    if (!editor || incoming === null) return;
+    setIncoming(null);
+    if (save.isPending()) {
+      save.cancel();
+      takeServerText(editor, incoming);
+      return;
+    }
+    editor.commands.setContent(incoming, { contentType: "markdown" });
+  };
 
   return (
     <div data-slot="markdown-editor" className="flex w-full flex-col gap-1.5">
@@ -260,7 +313,50 @@ export function MarkdownEditor({
           emptyText="No matching people"
         />
       )}
-      {autosave && <SaveIndicator status={saveStatus} />}
+      {autosave && (
+        <div className="flex min-h-4 items-center gap-2">
+          {incoming !== null && (
+            <IncomingNotice onShow={showIncoming} onDismiss={() => setIncoming(null)} />
+          )}
+          <SaveIndicator status={saveStatus} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Keeps the cursor about where it was when the server's text replaces the content. */
+function replaceContent(editor: Editor, markdown: string) {
+  const { from, to } = editor.state.selection;
+  editor.commands.setContent(markdown, { contentType: "markdown", emitUpdate: false });
+  if (!editor.isFocused) return;
+  const end = editor.state.doc.content.size;
+  editor.commands.setTextSelection({ from: Math.min(from, end), to: Math.min(to, end) });
+}
+
+function IncomingNotice({ onShow, onDismiss }: { onShow: () => void; onDismiss: () => void }) {
+  return (
+    <div role="status" className="text-muted-foreground flex items-center gap-1.5 text-xs">
+      <span>Updated by someone else.</span>
+      <Button
+        variant="link"
+        size="sm"
+        forceMinSize={false}
+        className="h-auto px-0 text-xs"
+        onClick={onShow}
+      >
+        Show their version
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        forceMinSize={false}
+        aria-label="Keep your version"
+        className="size-5"
+        onClick={onDismiss}
+      >
+        <XIcon className="size-3.5" />
+      </Button>
     </div>
   );
 }
@@ -280,7 +376,7 @@ export function MarkdownField({
 function SaveIndicator({ status }: { status: TSaveStatus }) {
   const text = saveStatusText[status];
   return (
-    <p aria-live="polite" className="text-muted-foreground h-4 self-end text-xs">
+    <p aria-live="polite" className="text-muted-foreground ml-auto h-4 text-xs">
       {text}
     </p>
   );

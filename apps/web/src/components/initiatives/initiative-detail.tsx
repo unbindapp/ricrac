@@ -5,7 +5,7 @@ import { TargetIcon } from "lucide-react";
 import type { InitiativeDetail as TInitiativeDetail } from "@/api/ops.gen";
 import { FavoriteButton } from "@/components/favorites/favorite-button";
 import { ParentDocuments } from "@/components/documents/document-list";
-import { MarkdownBody } from "@/components/documents/markdown-body";
+import { AutosaveMarkdown } from "@/components/shared/autosave-markdown";
 import { InitiativeProjects, SubInitiatives } from "@/components/initiatives/initiative-projects";
 import { InitiativeProperties } from "@/components/initiatives/initiative-properties";
 import { InitiativeIcon } from "@/components/initiatives/initiative-status";
@@ -182,13 +182,16 @@ function InitiativeDetailContent({ initiative }: { initiative: TInitiativeDetail
               />
             </div>
           )}
-          <MarkdownBody
+          <AutosaveMarkdown
             key={initiative.id}
             label="Description"
             placeholder="Why it matters and how you'll know it's done…"
-            initialValue={initiative.description ?? ""}
+            value={initiative.description ?? ""}
             readOnly={!canEdit}
-            onSave={(description) => saveAsync({ id: initiative.id, description })}
+            onSave={async (after, before) => {
+              const saved = await saveAsync({ id: initiative.id, edit: { before, after } });
+              return saved.description ?? "";
+            }}
           />
           <InitiativeProjects initiative={initiative} />
           <SubInitiatives initiative={initiative} />

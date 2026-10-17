@@ -1,7 +1,7 @@
 import type { ProjectDetail } from "@/api/ops.gen";
 import { CustomerNeedsSection } from "@/components/customers/customer-needs-section";
 import { ParentDocuments } from "@/components/documents/document-list";
-import { MarkdownBody } from "@/components/documents/markdown-body";
+import { AutosaveMarkdown } from "@/components/shared/autosave-markdown";
 import { ArchivedBanner } from "@/components/projects/archived-banner";
 import { MilestonesSection } from "@/components/projects/milestones-section";
 import { ProjectHeaderBar, useProjectLifecycle } from "@/components/projects/project-header";
@@ -63,13 +63,16 @@ export function ProjectOverview({ project }: { project: ProjectDetail }) {
             )}
           </div>
           <ProjectProgress project={project} />
-          <MarkdownBody
+          <AutosaveMarkdown
             key={project.id}
             label="Description"
             placeholder="Describe the plan: goals, scope, links…"
-            initialValue={project.description ?? ""}
+            value={project.description ?? ""}
             readOnly={!canEdit}
-            onSave={(description) => saveProjectAsync({ id: project.id, description })}
+            onSave={async (after, before) => {
+              const saved = await saveProjectAsync({ id: project.id, edit: { before, after } });
+              return saved.description ?? "";
+            }}
           />
           <MilestonesSection project={project} />
           <StatusUpdatesSection

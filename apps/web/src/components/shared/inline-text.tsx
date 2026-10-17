@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Textarea } from "@/components/ui/textarea";
 
@@ -24,7 +24,11 @@ export function InlineText({
   variant = "title",
 }: TProps) {
   const [draft, setDraft] = useState(value);
-  useEffect(() => setDraft(value), [value]);
+  const [shownValue, setShownValue] = useState(value);
+  if (value !== shownValue) {
+    setShownValue(value);
+    if (draft === shownValue) setDraft(value);
+  }
 
   const commit = () => {
     const next = draft.replace(/\s+/g, " ").trim();

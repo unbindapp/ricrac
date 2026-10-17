@@ -1,6 +1,6 @@
 import { infiniteQueryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { queryKeyIssues } from "@/lib/queries/issues";
+import { DETAIL_REFETCH_INTERVAL_MS, queryKeyIssues } from "@/lib/queries/issues";
 import { call, type OpArgs } from "@/lib/server/client";
 
 const COMMENTS_PAGE_SIZE = 100;
@@ -24,6 +24,7 @@ export const issueCommentsQuery = (workspaceId: string, issueId: string) =>
     initialPageParam: null as string | null,
     getNextPageParam: (last) =>
       last.pageInfo.hasNextPage ? (last.pageInfo.endCursor ?? undefined) : undefined,
+    refetchInterval: DETAIL_REFETCH_INTERVAL_MS,
   });
 
 /** Comments change the issue's comment count and subscribers too. */

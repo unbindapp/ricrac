@@ -3,6 +3,8 @@ import { z } from "zod";
 
 import type { Initiative } from "@/api/ops.gen";
 import { slugIdFromParam } from "@/lib/helpers/entity-slug";
+import { DETAIL_REFETCH_INTERVAL_MS } from "@/lib/queries/issues";
+import { savePatchOrText, type TTextEdit } from "@/lib/queries/text-edits";
 import { call, callAll, type OpArgs } from "@/lib/server/client";
 
 export type TInitiativeStatus = Initiative["status"];
@@ -31,6 +33,7 @@ export const initiativeQuery = (workspaceId: string, initiative: string) => {
   return queryOptions({
     queryKey: queryKeyInitiatives.detail(workspaceId, slugId),
     queryFn: () => call(workspaceId, "get_initiative", { id: slugId }),
+    refetchInterval: DETAIL_REFETCH_INTERVAL_MS,
   });
 };
 
@@ -48,7 +51,16 @@ function useInvalidateInitiatives(workspaceId: string) {
 export function useSaveInitiativeMutation(workspaceId: string) {
   const invalidate = useInvalidateInitiatives(workspaceId);
   return useMutation({
-    mutationFn: (args: OpArgs<"save_initiative">) => call(workspaceId, "save_initiative", args),
+    mutationFn: ({ edit, ...args }: OpArgs<"save_initiative"> & { edit?: TTextEdit }) => {
+      if (!edit) return call(workspaceId, "save_initiative", args);
+      return savePatchOrText(edit, (patch) =>
+        call(
+          workspaceId,
+          "save_initiative",
+          patch ? { ...args, patch } : { ...args, description: edit.after },
+        ),
+      );
+    },
     meta: { errorTitle: "Could not save initiative" },
     onSuccess: invalidate,
   });

@@ -1,22 +1,21 @@
-import { useState } from "react";
-
 import { useWorkspaceUsers } from "@/components/issues/picker-sources";
 import { MarkdownEditor } from "@/components/shared/markdown-editor";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { useUploadImage } from "@/lib/queries/uploads";
 
 type TProps = {
-  initialValue: string;
+  /** The server's text; it shows others' changes as they come in. */
+  value: string;
   label: string;
   placeholder: string;
   readOnly: boolean;
-  onSave: (markdown: string) => Promise<unknown>;
+  /** Saves the edit from `base` and resolves to the server's text after it. */
+  onSave: (markdown: string, base: string) => Promise<string>;
 };
 
-/** Saves as you type, a moment after you stop; text that didn't change isn't saved. */
-export function AutosaveMarkdown({ initialValue, label, placeholder, readOnly, onSave }: TProps) {
+/** A description or document body that saves as you type, a moment after you stop. */
+export function AutosaveMarkdown({ value, label, placeholder, readOnly, onSave }: TProps) {
   const { workspace } = useWorkspace();
-  const [value] = useState(initialValue);
   const { users } = useWorkspaceUsers();
   const uploadImage = useUploadImage(workspace.id);
   return (
