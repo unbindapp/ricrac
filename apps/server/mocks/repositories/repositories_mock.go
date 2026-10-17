@@ -13,8 +13,11 @@ import (
 	"ricrac/internal/repositories/attachment"
 	"ricrac/internal/repositories/automation"
 	"ricrac/internal/repositories/comment"
+	"ricrac/internal/repositories/cycle"
+	"ricrac/internal/repositories/document"
 	"ricrac/internal/repositories/email"
 	"ricrac/internal/repositories/events"
+	"ricrac/internal/repositories/favorite"
 	"ricrac/internal/repositories/issue"
 	"ricrac/internal/repositories/label"
 	"ricrac/internal/repositories/notification"
@@ -24,6 +27,7 @@ import (
 	"ricrac/internal/repositories/seed"
 	"ricrac/internal/repositories/state"
 	"ricrac/internal/repositories/team"
+	"ricrac/internal/repositories/template"
 	"ricrac/internal/repositories/workspace"
 	"time"
 
@@ -296,6 +300,98 @@ func (_c *RepositoriesMock_Comment_Call) RunAndReturn(run func() comment_repo.Co
 	return _c
 }
 
+// Cycle provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Cycle() cycle_repo.CycleRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Cycle")
+	}
+
+	var r0 cycle_repo.CycleRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() cycle_repo.CycleRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(cycle_repo.CycleRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Cycle_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Cycle'
+type RepositoriesMock_Cycle_Call struct {
+	*mock.Call
+}
+
+// Cycle is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Cycle() *RepositoriesMock_Cycle_Call {
+	return &RepositoriesMock_Cycle_Call{Call: _e.mock.On("Cycle")}
+}
+
+func (_c *RepositoriesMock_Cycle_Call) Run(run func()) *RepositoriesMock_Cycle_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Cycle_Call) Return(cycleRepositoryInterface cycle_repo.CycleRepositoryInterface) *RepositoriesMock_Cycle_Call {
+	_c.Call.Return(cycleRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Cycle_Call) RunAndReturn(run func() cycle_repo.CycleRepositoryInterface) *RepositoriesMock_Cycle_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Document provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Document() document_repo.DocumentRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Document")
+	}
+
+	var r0 document_repo.DocumentRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() document_repo.DocumentRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(document_repo.DocumentRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Document_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Document'
+type RepositoriesMock_Document_Call struct {
+	*mock.Call
+}
+
+// Document is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Document() *RepositoriesMock_Document_Call {
+	return &RepositoriesMock_Document_Call{Call: _e.mock.On("Document")}
+}
+
+func (_c *RepositoriesMock_Document_Call) Run(run func()) *RepositoriesMock_Document_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Document_Call) Return(documentRepositoryInterface document_repo.DocumentRepositoryInterface) *RepositoriesMock_Document_Call {
+	_c.Call.Return(documentRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Document_Call) RunAndReturn(run func() document_repo.DocumentRepositoryInterface) *RepositoriesMock_Document_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Email provides a mock function for the type RepositoriesMock
 func (_mock *RepositoriesMock) Email() email_repo.EmailRepositoryInterface {
 	ret := _mock.Called()
@@ -430,6 +526,52 @@ func (_c *RepositoriesMock_Events_Call) Return(eventsRepositoryInterface events_
 }
 
 func (_c *RepositoriesMock_Events_Call) RunAndReturn(run func() events_repo.EventsRepositoryInterface) *RepositoriesMock_Events_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Favorite provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Favorite() favorite_repo.FavoriteRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Favorite")
+	}
+
+	var r0 favorite_repo.FavoriteRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() favorite_repo.FavoriteRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(favorite_repo.FavoriteRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Favorite_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Favorite'
+type RepositoriesMock_Favorite_Call struct {
+	*mock.Call
+}
+
+// Favorite is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Favorite() *RepositoriesMock_Favorite_Call {
+	return &RepositoriesMock_Favorite_Call{Call: _e.mock.On("Favorite")}
+}
+
+func (_c *RepositoriesMock_Favorite_Call) Run(run func()) *RepositoriesMock_Favorite_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Favorite_Call) Return(favoriteRepositoryInterface favorite_repo.FavoriteRepositoryInterface) *RepositoriesMock_Favorite_Call {
+	_c.Call.Return(favoriteRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Favorite_Call) RunAndReturn(run func() favorite_repo.FavoriteRepositoryInterface) *RepositoriesMock_Favorite_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -910,6 +1052,52 @@ func (_c *RepositoriesMock_Team_Call) Return(teamRepositoryInterface team_repo.T
 }
 
 func (_c *RepositoriesMock_Team_Call) RunAndReturn(run func() team_repo.TeamRepositoryInterface) *RepositoriesMock_Team_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Template provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Template() template_repo.TemplateRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Template")
+	}
+
+	var r0 template_repo.TemplateRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() template_repo.TemplateRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(template_repo.TemplateRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Template_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Template'
+type RepositoriesMock_Template_Call struct {
+	*mock.Call
+}
+
+// Template is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Template() *RepositoriesMock_Template_Call {
+	return &RepositoriesMock_Template_Call{Call: _e.mock.On("Template")}
+}
+
+func (_c *RepositoriesMock_Template_Call) Run(run func()) *RepositoriesMock_Template_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Template_Call) Return(templateRepositoryInterface template_repo.TemplateRepositoryInterface) *RepositoriesMock_Template_Call {
+	_c.Call.Return(templateRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Template_Call) RunAndReturn(run func() template_repo.TemplateRepositoryInterface) *RepositoriesMock_Template_Call {
 	_c.Call.Return(run)
 	return _c
 }

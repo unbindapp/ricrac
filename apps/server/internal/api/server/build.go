@@ -11,8 +11,11 @@ import (
 	attachment_service "ricrac/internal/services/attachment"
 	automation_service "ricrac/internal/services/automation"
 	comment_service "ricrac/internal/services/comment"
+	cycle_service "ricrac/internal/services/cycle"
+	document_service "ricrac/internal/services/document"
 	email_service "ricrac/internal/services/email"
 	events_service "ricrac/internal/services/events"
+	favorite_service "ricrac/internal/services/favorite"
 	issue_service "ricrac/internal/services/issue"
 	label_service "ricrac/internal/services/label"
 	notification_service "ricrac/internal/services/notification"
@@ -23,6 +26,7 @@ import (
 	signin_service "ricrac/internal/services/signin"
 	state_service "ricrac/internal/services/state"
 	team_service "ricrac/internal/services/team"
+	template_service "ricrac/internal/services/template"
 	workspace_service "ricrac/internal/services/workspace"
 )
 
@@ -53,5 +57,9 @@ func New(cfg config.Config, db *ent.Client, waker events_service.Waker) *Server 
 	srv.WorkspaceService = workspace_service.NewWorkspaceService(cfg, repo, srv.ResolveService, srv.EventsService, srv.EmailService)
 	srv.TeamService = team_service.NewTeamService(cfg, repo, srv.ResolveService, srv.EventsService, srv.IssueService, srv.SeedService, srv.WorkspaceService)
 	srv.StateService = state_service.NewStateService(repo, srv.ResolveService, srv.EventsService, srv.IssueService, srv.TeamService)
+	srv.CycleService = cycle_service.NewCycleService(cfg, repo, srv.ResolveService, srv.EventsService)
+	srv.DocumentService = document_service.NewDocumentService(cfg, repo, srv.ResolveService, srv.EventsService)
+	srv.FavoriteService = favorite_service.NewFavoriteService(repo, srv.ResolveService)
+	srv.TemplateService = template_service.NewTemplateService(repo, srv.ResolveService, srv.EventsService, srv.AccessService, srv.Ops)
 	return srv
 }

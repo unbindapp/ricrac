@@ -13,8 +13,11 @@ import (
 	mocks_repository_account "ricrac/mocks/repository/account"
 	mocks_repository_attachment "ricrac/mocks/repository/attachment"
 	mocks_repository_comment "ricrac/mocks/repository/comment"
+	mocks_repository_cycle "ricrac/mocks/repository/cycle"
+	mocks_repository_document "ricrac/mocks/repository/document"
 	mocks_repository_email "ricrac/mocks/repository/email"
 	mocks_repository_events "ricrac/mocks/repository/events"
+	mocks_repository_favorite "ricrac/mocks/repository/favorite"
 	mocks_repository_issue "ricrac/mocks/repository/issue"
 	mocks_repository_label "ricrac/mocks/repository/label"
 	mocks_repository_notification "ricrac/mocks/repository/notification"
@@ -24,6 +27,7 @@ import (
 	mocks_repository_seed "ricrac/mocks/repository/seed"
 	mocks_repository_state "ricrac/mocks/repository/state"
 	mocks_repository_team "ricrac/mocks/repository/team"
+	mocks_repository_template "ricrac/mocks/repository/template"
 	mocks_repository_tx "ricrac/mocks/repository/tx"
 	mocks_repository_workspace "ricrac/mocks/repository/workspace"
 )
@@ -49,6 +53,10 @@ type ServiceTestSuite struct {
 	MockTeamRepo         *mocks_repository_team.TeamRepositoryMock
 	MockStateRepo        *mocks_repository_state.StateRepositoryMock
 	MockEmailRepo        *mocks_repository_email.EmailRepositoryMock
+	MockCycleRepo        *mocks_repository_cycle.CycleRepositoryMock
+	MockDocumentRepo     *mocks_repository_document.DocumentRepositoryMock
+	MockFavoriteRepo     *mocks_repository_favorite.FavoriteRepositoryMock
+	MockTemplateRepo     *mocks_repository_template.TemplateRepositoryMock
 }
 
 func (suite *ServiceTestSuite) SetupTest() {
@@ -70,6 +78,10 @@ func (suite *ServiceTestSuite) SetupTest() {
 	suite.MockTeamRepo = mocks_repository_team.NewTeamRepositoryMock(suite.T())
 	suite.MockStateRepo = mocks_repository_state.NewStateRepositoryMock(suite.T())
 	suite.MockEmailRepo = mocks_repository_email.NewEmailRepositoryMock(suite.T())
+	suite.MockCycleRepo = mocks_repository_cycle.NewCycleRepositoryMock(suite.T())
+	suite.MockDocumentRepo = mocks_repository_document.NewDocumentRepositoryMock(suite.T())
+	suite.MockFavoriteRepo = mocks_repository_favorite.NewFavoriteRepositoryMock(suite.T())
+	suite.MockTemplateRepo = mocks_repository_template.NewTemplateRepositoryMock(suite.T())
 
 	suite.MockRepo.EXPECT().Access().Return(suite.MockAccessRepo).Maybe()
 	suite.MockRepo.EXPECT().Resolve().Return(suite.MockResolveRepo).Maybe()
@@ -87,6 +99,10 @@ func (suite *ServiceTestSuite) SetupTest() {
 	suite.MockRepo.EXPECT().Team().Return(suite.MockTeamRepo).Maybe()
 	suite.MockRepo.EXPECT().State().Return(suite.MockStateRepo).Maybe()
 	suite.MockRepo.EXPECT().Email().Return(suite.MockEmailRepo).Maybe()
+	suite.MockRepo.EXPECT().Cycle().Return(suite.MockCycleRepo).Maybe()
+	suite.MockRepo.EXPECT().Document().Return(suite.MockDocumentRepo).Maybe()
+	suite.MockRepo.EXPECT().Favorite().Return(suite.MockFavoriteRepo).Maybe()
+	suite.MockRepo.EXPECT().Template().Return(suite.MockTemplateRepo).Maybe()
 }
 
 // ExpectTx runs WithTx bodies directly; repository mocks match the tx argument with mock.Anything.

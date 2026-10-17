@@ -11,8 +11,11 @@ import (
 	attachment_repo "ricrac/internal/repositories/attachment"
 	automation_repo "ricrac/internal/repositories/automation"
 	comment_repo "ricrac/internal/repositories/comment"
+	cycle_repo "ricrac/internal/repositories/cycle"
+	document_repo "ricrac/internal/repositories/document"
 	email_repo "ricrac/internal/repositories/email"
 	events_repo "ricrac/internal/repositories/events"
+	favorite_repo "ricrac/internal/repositories/favorite"
 	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
 	notification_repo "ricrac/internal/repositories/notification"
@@ -22,6 +25,7 @@ import (
 	seed_repo "ricrac/internal/repositories/seed"
 	state_repo "ricrac/internal/repositories/state"
 	team_repo "ricrac/internal/repositories/team"
+	template_repo "ricrac/internal/repositories/template"
 	workspace_repo "ricrac/internal/repositories/workspace"
 )
 
@@ -46,6 +50,10 @@ type Repositories struct {
 	team         team_repo.TeamRepositoryInterface
 	state        state_repo.StateRepositoryInterface
 	email        email_repo.EmailRepositoryInterface
+	cycle        cycle_repo.CycleRepositoryInterface
+	document     document_repo.DocumentRepositoryInterface
+	favorite     favorite_repo.FavoriteRepositoryInterface
+	template     template_repo.TemplateRepositoryInterface
 }
 
 func NewRepositories(db *ent.Client) *Repositories {
@@ -69,6 +77,10 @@ func NewRepositories(db *ent.Client) *Repositories {
 		team:         team_repo.NewTeamRepository(db),
 		state:        state_repo.NewStateRepository(db),
 		email:        email_repo.NewEmailRepository(db),
+		cycle:        cycle_repo.NewCycleRepository(db),
+		document:     document_repo.NewDocumentRepository(db),
+		favorite:     favorite_repo.NewFavoriteRepository(db),
+		template:     template_repo.NewTemplateRepository(db),
 	}
 }
 
@@ -151,4 +163,20 @@ func (r *Repositories) State() state_repo.StateRepositoryInterface {
 
 func (r *Repositories) Email() email_repo.EmailRepositoryInterface {
 	return r.email
+}
+
+func (r *Repositories) Cycle() cycle_repo.CycleRepositoryInterface {
+	return r.cycle
+}
+
+func (r *Repositories) Document() document_repo.DocumentRepositoryInterface {
+	return r.document
+}
+
+func (r *Repositories) Favorite() favorite_repo.FavoriteRepositoryInterface {
+	return r.favorite
+}
+
+func (r *Repositories) Template() template_repo.TemplateRepositoryInterface {
+	return r.template
 }

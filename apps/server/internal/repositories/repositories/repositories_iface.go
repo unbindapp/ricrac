@@ -11,8 +11,11 @@ import (
 	attachment_repo "ricrac/internal/repositories/attachment"
 	automation_repo "ricrac/internal/repositories/automation"
 	comment_repo "ricrac/internal/repositories/comment"
+	cycle_repo "ricrac/internal/repositories/cycle"
+	document_repo "ricrac/internal/repositories/document"
 	email_repo "ricrac/internal/repositories/email"
 	events_repo "ricrac/internal/repositories/events"
+	favorite_repo "ricrac/internal/repositories/favorite"
 	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
 	notification_repo "ricrac/internal/repositories/notification"
@@ -22,6 +25,7 @@ import (
 	seed_repo "ricrac/internal/repositories/seed"
 	state_repo "ricrac/internal/repositories/state"
 	team_repo "ricrac/internal/repositories/team"
+	template_repo "ricrac/internal/repositories/template"
 	workspace_repo "ricrac/internal/repositories/workspace"
 	"time"
 )
@@ -49,4 +53,8 @@ type RepositoriesInterface interface {
 	Team() team_repo.TeamRepositoryInterface
 	State() state_repo.StateRepositoryInterface
 	Email() email_repo.EmailRepositoryInterface
+	Cycle() cycle_repo.CycleRepositoryInterface
+	Document() document_repo.DocumentRepositoryInterface
+	Favorite() favorite_repo.FavoriteRepositoryInterface
+	Template() template_repo.TemplateRepositoryInterface
 }

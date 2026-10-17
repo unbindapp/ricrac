@@ -11,8 +11,11 @@ import (
 	attachment_service "ricrac/internal/services/attachment"
 	automation_service "ricrac/internal/services/automation"
 	comment_service "ricrac/internal/services/comment"
+	cycle_service "ricrac/internal/services/cycle"
+	document_service "ricrac/internal/services/document"
 	email_service "ricrac/internal/services/email"
 	events_service "ricrac/internal/services/events"
+	favorite_service "ricrac/internal/services/favorite"
 	issue_service "ricrac/internal/services/issue"
 	label_service "ricrac/internal/services/label"
 	notification_service "ricrac/internal/services/notification"
@@ -23,6 +26,7 @@ import (
 	signin_service "ricrac/internal/services/signin"
 	state_service "ricrac/internal/services/state"
 	team_service "ricrac/internal/services/team"
+	template_service "ricrac/internal/services/template"
 	workspace_service "ricrac/internal/services/workspace"
 )
 
@@ -51,4 +55,8 @@ type Server struct {
 	WorkspaceService    *workspace_service.WorkspaceService
 	TeamService         *team_service.TeamService
 	StateService        *state_service.StateService
+	CycleService        *cycle_service.CycleService
+	DocumentService     *document_service.DocumentService
+	FavoriteService     *favorite_service.FavoriteService
+	TemplateService     *template_service.TemplateService
 }

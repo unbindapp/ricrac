@@ -133,11 +133,12 @@ func (b *backend) Automations(ctx context.Context) error {
 }
 
 func (b *backend) RunCycleAutomations(ctx context.Context) error {
-	return ops.RunCycleAutomations(ctx, b.state)
+	return b.server.CycleService.RunAutomations(ctx)
 }
 
 func (b *backend) RunRecurringTemplates(ctx context.Context) error {
-	return ops.RunRecurringTemplates(ctx, b.state)
+	b.Router()
+	return b.server.TemplateService.RunRecurring(ctx)
 }
 
 func (b *backend) SendEmails(ctx context.Context) error {
