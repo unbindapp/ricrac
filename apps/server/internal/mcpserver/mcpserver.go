@@ -380,6 +380,15 @@ func sortedJSON(value any) string {
 	return string(errdefs.Marshal(plain))
 }
 
+// sortedJSON is the value as JSON with the keys of every object sorted, as tools have always
+// written it.
+	var generic any
+	if err := json.Unmarshal(errdefs.Marshal(value), &generic); err != nil {
+		return string(errdefs.Marshal(value))
+	}
+	return string(errdefs.Marshal(generic))
+}
+
 // reach is what the caller's token reaches, which decides the tools they see and their
 // arguments.
 type reach struct {

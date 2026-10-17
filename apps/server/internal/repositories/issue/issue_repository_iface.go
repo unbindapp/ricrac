@@ -4,14 +4,58 @@ package issue_repo
 
 import (
 	"context"
+	"encoding/json"
 	"ricrac/ent"
 	repository "ricrac/internal/repositories"
+	"time"
 
 	"github.com/google/uuid"
 )
 
 // IssueRepositoryInterface ...
 type IssueRepositoryInterface interface {
+	// Children is the sub-issues not in the trash of the teams given, in their order.
+	Children(ctx context.Context, tx repository.TxInterface, parent uuid.UUID, teams []uuid.UUID) ([]*ent.Issue, error)
+	// Relations is the relations from and to the issue, oldest first, with both issues' teams and
+	// states.
+	Relations(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueRelation, error)
+	// Attachments is the issue's attachments, oldest first, with their creators.
+	Attachments(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.Attachment, error)
+	Subscribers(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueSubscriber, error)
+	Releases(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueRelease, error)
+	// Documents is the issue's documents not in the trash.
+	Documents(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.Document, error)
+	Shares(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueShare, error)
+	Reactions(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.Reaction, error)
+	// CommentCount is how many comments and replies the issue has.
+	CommentCount(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (int, error)
+	// History is the issue's history, oldest first, with the actors.
+	History(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueHistory, error)
+	// File is an uploaded file of the workspace.
+	File(ctx context.Context, workspace, id uuid.UUID) (*ent.File, error)
+	// LockTeam is the team, locked until the transaction ends.
+	LockTeam(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.Team, error)
+	// TakenNumbers is which of the numbers the team's issues have, in order.
+	TakenNumbers(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID, numbers []int) ([]int, error)
+	// RaiseIssueCount makes the team's count of issues at least count, and is the count.
+	RaiseIssueCount(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID, count int) (int, error)
+	InsertImported(ctx context.Context, tx repository.TxInterface, input ImportedIssue) (uuid.UUID, error)
+	InsertComment(ctx context.Context, tx repository.TxInterface, workspace, id, author uuid.UUID, body string, at time.Time) error
+	// ImportedHistory records the issue's creation by its creator, at the time it was created.
+	ImportedHistory(ctx context.Context, tx repository.TxInterface, id, creator uuid.UUID, changes json.RawMessage, at time.Time) error
+	// RelateImported adds a relation unless it (or a related one the other way) exists, saying
+	// whether it did.
+	RelateImported(ctx context.Context, tx repository.TxInterface, from, to uuid.UUID, kind string, creator uuid.UUID) (bool, error)
+	// TryFilter runs the condition on no issues, so that mistakes in its SQL surface.
+	TryFilter(ctx context.Context, tx repository.TxInterface, condition *Condition) error
+	// List is the ids of the issues the query finds, in its order.
+	List(ctx context.Context, query ListQuery) ([]uuid.UUID, error)
+	// SubTeams is the team and the teams under it, at any depth.
+	SubTeams(ctx context.Context, teamID uuid.UUID) ([]uuid.UUID, error)
+	// TeamsByKey is the unarchived teams among ids, by key.
+	TeamsByKey(ctx context.Context, ids []uuid.UUID) ([]*ent.Team, error)
+	// View is a custom view's model, filter and team.
+	View(ctx context.Context, id uuid.UUID) (*ent.CustomView, error)
 	// Load is the issues with what their answer shows, in the order of ids.
 	Load(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) ([]*ent.Issue, error)
 	// SubIssueCounts is how many sub-issues not in the trash each issue has.
@@ -21,6 +65,69 @@ type IssueRepositoryInterface interface {
 	GetForUpdate(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.Issue, error)
 	// Identifier is the issue's identifier, like ENG-123.
 	Identifier(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (string, error)
+	// NextNumber counts a new issue in the team and is its number.
+	NextNumber(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID) (int, error)
+	// TopSortOrder puts a new issue above the team's others on the board.
+	TopSortOrder(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID) (float64, error)
+	Insert(ctx context.Context, tx repository.TxInterface, input NewIssue) (uuid.UUID, error)
+	// StampCreated sets the times a new issue in a state of this type starts with.
+	StampCreated(ctx context.Context, tx repository.TxInterface, id uuid.UUID, kind string, now time.Time) error
+	Template(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.Template, error)
+	// AssignIfUnassigned gives the issue an assignee unless it has one.
+	AssignIfUnassigned(ctx context.Context, tx repository.TxInterface, id, assignee uuid.UUID) error
+	// Update applies changes to the issue.
+	Update(ctx context.Context, tx repository.TxInterface, id uuid.UUID, changes ...Change) error
+	// NextSubIssueSortOrder puts a new sub-issue below the parent's others.
+	NextSubIssueSortOrder(ctx context.Context, tx repository.TxInterface, parent uuid.UUID) (float64, error)
+	// InOwnTree says whether issue is parent or one of its ancestors.
+	InOwnTree(ctx context.Context, tx repository.TxInterface, parent, issue uuid.UUID) (bool, error)
+	// CanBeAssigned says whether the user sees the team's issues, or this one shared with them.
+	CanBeAssigned(ctx context.Context, tx repository.TxInterface, user, teamID, id uuid.UUID) (bool, error)
+	User(ctx context.Context, tx repository.TxInterface, id *uuid.UUID) (*ent.User, error)
+	Project(ctx context.Context, tx repository.TxInterface, id *uuid.UUID) (*ent.Project, error)
+	Milestone(ctx context.Context, tx repository.TxInterface, id *uuid.UUID) (*ent.ProjectMilestone, error)
+	Cycle(ctx context.Context, tx repository.TxInterface, id *uuid.UUID) (*ent.Cycle, error)
+	// Ref is the issue with its team and state, for its short form; nil for none.
+	Ref(ctx context.Context, tx repository.TxInterface, id *uuid.UUID) (*ent.Issue, error)
+	// AddProjectTeam makes the team one of the project's.
+	AddProjectTeam(ctx context.Context, tx repository.TxInterface, project, teamID uuid.UUID) error
+	// LabelIDs is the labels on the issue.
+	LabelIDs(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]uuid.UUID, error)
+	// LabelsWithGroups is the labels with their groups.
+	LabelsWithGroups(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) ([]*ent.IssueLabel, error)
+	// Siblings is the other labels of the group.
+	Siblings(ctx context.Context, tx repository.TxInterface, group, label uuid.UUID) ([]uuid.UUID, error)
+	// SingleSelectClashes is the single-select groups more than one of the labels belong to.
+	SingleSelectClashes(ctx context.Context, tx repository.TxInterface, labels []uuid.UUID) ([]string, error)
+	// SetLabels makes the labels the issue's.
+	SetLabels(ctx context.Context, tx repository.TxInterface, id uuid.UUID, labels []uuid.UUID) error
+	AddLabels(ctx context.Context, tx repository.TxInterface, id uuid.UUID, labels []uuid.UUID) error
+	// LabelNames is the labels' names, sorted.
+	LabelNames(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) ([]string, error)
+	// RelatedExists says whether the issues are related, either way.
+	RelatedExists(ctx context.Context, tx repository.TxInterface, a, b uuid.UUID) (bool, error)
+	// Relate adds a relation from one issue to another unless it exists, saying whether it did.
+	Relate(ctx context.Context, tx repository.TxInterface, from, to uuid.UUID, kind string, creator uuid.UUID) (bool, error)
+	// Unrelate removes a relation; related ones either way.
+	Unrelate(ctx context.Context, tx repository.TxInterface, from, to uuid.UUID, kind string) error
+	RemoveDuplicateOf(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error
+	MarkDuplicate(ctx context.Context, tx repository.TxInterface, id, of, creator uuid.UUID) error
+	Unsubscribe(ctx context.Context, tx repository.TxInterface, id uuid.UUID, users []uuid.UUID) error
+	ClearReleases(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error
+	AddReleases(ctx context.Context, tx repository.TxInterface, id uuid.UUID, releases []uuid.UUID) error
+	RemoveReleases(ctx context.Context, tx repository.TxInterface, id uuid.UUID, releases []uuid.UUID) error
+	// SameState is the team's unarchived state named like this one.
+	SameState(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID, name string) (*uuid.UUID, error)
+	// MoveTeam gives the issue its number in another team and a state there, out of its cycle,
+	// keeping its identifier among the previous ones, and takes off the labels of other teams.
+	MoveTeam(ctx context.Context, tx repository.TxInterface, id, teamID uuid.UUID, number int, state uuid.UUID, previous string) error
+	// TeamChildren is the sub-issues not in the trash still in the team.
+	TeamChildren(ctx context.Context, tx repository.TxInterface, parent, teamID uuid.UUID) ([]uuid.UUID, error)
+	// Mark runs a trash, restore, archive or unarchive update, answering the issues it changed.
+	Mark(ctx context.Context, tx repository.TxInterface, sql string, id uuid.UUID) ([]uuid.UUID, error)
+	// Share lets the user see the issue.
+	Share(ctx context.Context, tx repository.TxInterface, id, with, sharer uuid.UUID) error
+	Unshare(ctx context.Context, tx repository.TxInterface, id, with uuid.UUID) error
 	State(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.WorkflowState, error)
 	// DefaultState is the state new issues of the team start in: its default, else the first
 	// backlog, unstarted, started, triage, completed or canceled state.

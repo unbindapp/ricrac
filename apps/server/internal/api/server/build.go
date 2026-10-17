@@ -33,6 +33,7 @@ import (
 	statusupdate_service "ricrac/internal/services/statusupdate"
 	team_service "ricrac/internal/services/team"
 	template_service "ricrac/internal/services/template"
+	view_service "ricrac/internal/services/view"
 	webhook_service "ricrac/internal/services/webhook"
 	workspace_service "ricrac/internal/services/workspace"
 )
@@ -75,5 +76,7 @@ func New(cfg config.Config, db *ent.Client, waker events_service.Waker) *Server 
 	srv.StatusUpdateService = statusupdate_service.NewStatusUpdateService(repo, srv.ResolveService, srv.EventsService)
 	srv.ProjectService = project_service.NewProjectService(cfg, repo, srv.ResolveService, srv.EventsService, srv.MilestoneService, srv.StatusUpdateService, srv.Ops)
 	srv.InitiativeService = initiative_service.NewInitiativeService(cfg, repo, srv.ResolveService, srv.EventsService, srv.ProjectService, srv.StatusUpdateService)
+	srv.IssueService.Uses(srv.AttachmentService, srv.CommentService)
+	srv.ViewService = view_service.NewViewService(cfg, repo, srv.ResolveService, srv.EventsService, srv.IssueService)
 	return srv
 }

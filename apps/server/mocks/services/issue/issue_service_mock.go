@@ -7,8 +7,12 @@ package mocks_services_issue
 import (
 	"context"
 	"ricrac/internal/auth"
+	"ricrac/internal/common/args"
 	"ricrac/internal/models"
 	"ricrac/internal/repositories"
+	"ricrac/internal/services/attachment"
+	"ricrac/internal/services/comment"
+	"ricrac/internal/services/issue"
 
 	"github.com/google/uuid"
 	mock "github.com/stretchr/testify/mock"
@@ -48,6 +52,227 @@ type IssueServiceMock_Expecter struct {
 
 func (_m *IssueServiceMock) EXPECT() *IssueServiceMock_Expecter {
 	return &IssueServiceMock_Expecter{mock: &_m.Mock}
+}
+
+// Archive provides a mock function for the type IssueServiceMock
+func (_mock *IssueServiceMock) Archive(ctx context.Context, actor *auth.Actor, input *issue_service.IDInput) (models.Issue, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Archive")
+	}
+
+	var r0 models.Issue
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.IDInput) (models.Issue, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.IDInput) models.Issue); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.Issue)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *issue_service.IDInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueServiceMock_Archive_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Archive'
+type IssueServiceMock_Archive_Call struct {
+	*mock.Call
+}
+
+// Archive is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *issue_service.IDInput
+func (_e *IssueServiceMock_Expecter) Archive(ctx any, actor any, input any) *IssueServiceMock_Archive_Call {
+	return &IssueServiceMock_Archive_Call{Call: _e.mock.On("Archive", ctx, actor, input)}
+}
+
+func (_c *IssueServiceMock_Archive_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *issue_service.IDInput)) *IssueServiceMock_Archive_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *issue_service.IDInput
+		if args[2] != nil {
+			arg2 = args[2].(*issue_service.IDInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueServiceMock_Archive_Call) Return(issue models.Issue, err error) *IssueServiceMock_Archive_Call {
+	_c.Call.Return(issue, err)
+	return _c
+}
+
+func (_c *IssueServiceMock_Archive_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *issue_service.IDInput) (models.Issue, error)) *IssueServiceMock_Archive_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CheckFilter provides a mock function for the type IssueServiceMock
+func (_mock *IssueServiceMock) CheckFilter(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, filter any) error {
+	ret := _mock.Called(ctx, tx, actor, filter)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CheckFilter")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *auth.Actor, any) error); ok {
+		r0 = returnFunc(ctx, tx, actor, filter)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueServiceMock_CheckFilter_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CheckFilter'
+type IssueServiceMock_CheckFilter_Call struct {
+	*mock.Call
+}
+
+// CheckFilter is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - actor *auth.Actor
+//   - filter any
+func (_e *IssueServiceMock_Expecter) CheckFilter(ctx any, tx any, actor any, filter any) *IssueServiceMock_CheckFilter_Call {
+	return &IssueServiceMock_CheckFilter_Call{Call: _e.mock.On("CheckFilter", ctx, tx, actor, filter)}
+}
+
+func (_c *IssueServiceMock_CheckFilter_Call) Run(run func(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, filter any)) *IssueServiceMock_CheckFilter_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 *auth.Actor
+		if args[2] != nil {
+			arg2 = args[2].(*auth.Actor)
+		}
+		var arg3 any
+		if args[3] != nil {
+			arg3 = args[3].(any)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueServiceMock_CheckFilter_Call) Return(err error) *IssueServiceMock_CheckFilter_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueServiceMock_CheckFilter_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, filter any) error) *IssueServiceMock_CheckFilter_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Create provides a mock function for the type IssueServiceMock
+func (_mock *IssueServiceMock) Create(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, input issue_service.SaveInput) (uuid.UUID, error) {
+	ret := _mock.Called(ctx, tx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Create")
+	}
+
+	var r0 uuid.UUID
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *auth.Actor, issue_service.SaveInput) (uuid.UUID, error)); ok {
+		return returnFunc(ctx, tx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *auth.Actor, issue_service.SaveInput) uuid.UUID); ok {
+		r0 = returnFunc(ctx, tx, actor, input)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, *auth.Actor, issue_service.SaveInput) error); ok {
+		r1 = returnFunc(ctx, tx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueServiceMock_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+type IssueServiceMock_Create_Call struct {
+	*mock.Call
+}
+
+// Create is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - actor *auth.Actor
+//   - input issue_service.SaveInput
+func (_e *IssueServiceMock_Expecter) Create(ctx any, tx any, actor any, input any) *IssueServiceMock_Create_Call {
+	return &IssueServiceMock_Create_Call{Call: _e.mock.On("Create", ctx, tx, actor, input)}
+}
+
+func (_c *IssueServiceMock_Create_Call) Run(run func(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, input issue_service.SaveInput)) *IssueServiceMock_Create_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 *auth.Actor
+		if args[2] != nil {
+			arg2 = args[2].(*auth.Actor)
+		}
+		var arg3 issue_service.SaveInput
+		if args[3] != nil {
+			arg3 = args[3].(issue_service.SaveInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueServiceMock_Create_Call) Return(uUID uuid.UUID, err error) *IssueServiceMock_Create_Call {
+	_c.Call.Return(uUID, err)
+	return _c
+}
+
+func (_c *IssueServiceMock_Create_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, input issue_service.SaveInput) (uuid.UUID, error)) *IssueServiceMock_Create_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // DefaultState provides a mock function for the type IssueServiceMock
@@ -120,6 +345,90 @@ func (_c *IssueServiceMock_DefaultState_Call) Return(uUID uuid.UUID, err error) 
 }
 
 func (_c *IssueServiceMock_DefaultState_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, team uuid.UUID) (uuid.UUID, error)) *IssueServiceMock_DefaultState_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Detail provides a mock function for the type IssueServiceMock
+func (_mock *IssueServiceMock) Detail(ctx context.Context, actor *auth.Actor, id uuid.UUID, withComments bool, withHistory bool) (models.IssueDetail, error) {
+	ret := _mock.Called(ctx, actor, id, withComments, withHistory)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Detail")
+	}
+
+	var r0 models.IssueDetail
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, uuid.UUID, bool, bool) (models.IssueDetail, error)); ok {
+		return returnFunc(ctx, actor, id, withComments, withHistory)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, uuid.UUID, bool, bool) models.IssueDetail); ok {
+		r0 = returnFunc(ctx, actor, id, withComments, withHistory)
+	} else {
+		r0 = ret.Get(0).(models.IssueDetail)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, uuid.UUID, bool, bool) error); ok {
+		r1 = returnFunc(ctx, actor, id, withComments, withHistory)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueServiceMock_Detail_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Detail'
+type IssueServiceMock_Detail_Call struct {
+	*mock.Call
+}
+
+// Detail is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - id uuid.UUID
+//   - withComments bool
+//   - withHistory bool
+func (_e *IssueServiceMock_Expecter) Detail(ctx any, actor any, id any, withComments any, withHistory any) *IssueServiceMock_Detail_Call {
+	return &IssueServiceMock_Detail_Call{Call: _e.mock.On("Detail", ctx, actor, id, withComments, withHistory)}
+}
+
+func (_c *IssueServiceMock_Detail_Call) Run(run func(ctx context.Context, actor *auth.Actor, id uuid.UUID, withComments bool, withHistory bool)) *IssueServiceMock_Detail_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 bool
+		if args[3] != nil {
+			arg3 = args[3].(bool)
+		}
+		var arg4 bool
+		if args[4] != nil {
+			arg4 = args[4].(bool)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueServiceMock_Detail_Call) Return(issueDetail models.IssueDetail, err error) *IssueServiceMock_Detail_Call {
+	_c.Call.Return(issueDetail, err)
+	return _c
+}
+
+func (_c *IssueServiceMock_Detail_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, id uuid.UUID, withComments bool, withHistory bool) (models.IssueDetail, error)) *IssueServiceMock_Detail_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -200,6 +509,438 @@ func (_c *IssueServiceMock_FirstStateOfType_Call) Return(uUID *uuid.UUID, err er
 }
 
 func (_c *IssueServiceMock_FirstStateOfType_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, team uuid.UUID, kind string) (*uuid.UUID, error)) *IssueServiceMock_FirstStateOfType_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Get provides a mock function for the type IssueServiceMock
+func (_mock *IssueServiceMock) Get(ctx context.Context, actor *auth.Actor, input *issue_service.GetInput) (models.IssueDetail, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Get")
+	}
+
+	var r0 models.IssueDetail
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.GetInput) (models.IssueDetail, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.GetInput) models.IssueDetail); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.IssueDetail)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *issue_service.GetInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueServiceMock_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Get'
+type IssueServiceMock_Get_Call struct {
+	*mock.Call
+}
+
+// Get is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *issue_service.GetInput
+func (_e *IssueServiceMock_Expecter) Get(ctx any, actor any, input any) *IssueServiceMock_Get_Call {
+	return &IssueServiceMock_Get_Call{Call: _e.mock.On("Get", ctx, actor, input)}
+}
+
+func (_c *IssueServiceMock_Get_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *issue_service.GetInput)) *IssueServiceMock_Get_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *issue_service.GetInput
+		if args[2] != nil {
+			arg2 = args[2].(*issue_service.GetInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueServiceMock_Get_Call) Return(issueDetail models.IssueDetail, err error) *IssueServiceMock_Get_Call {
+	_c.Call.Return(issueDetail, err)
+	return _c
+}
+
+func (_c *IssueServiceMock_Get_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *issue_service.GetInput) (models.IssueDetail, error)) *IssueServiceMock_Get_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// History provides a mock function for the type IssueServiceMock
+func (_mock *IssueServiceMock) History(ctx context.Context, actor *auth.Actor, input *issue_service.IDInput) (models.IssueHistory, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for History")
+	}
+
+	var r0 models.IssueHistory
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.IDInput) (models.IssueHistory, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.IDInput) models.IssueHistory); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.IssueHistory)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *issue_service.IDInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueServiceMock_History_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'History'
+type IssueServiceMock_History_Call struct {
+	*mock.Call
+}
+
+// History is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *issue_service.IDInput
+func (_e *IssueServiceMock_Expecter) History(ctx any, actor any, input any) *IssueServiceMock_History_Call {
+	return &IssueServiceMock_History_Call{Call: _e.mock.On("History", ctx, actor, input)}
+}
+
+func (_c *IssueServiceMock_History_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *issue_service.IDInput)) *IssueServiceMock_History_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *issue_service.IDInput
+		if args[2] != nil {
+			arg2 = args[2].(*issue_service.IDInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueServiceMock_History_Call) Return(issueHistory models.IssueHistory, err error) *IssueServiceMock_History_Call {
+	_c.Call.Return(issueHistory, err)
+	return _c
+}
+
+func (_c *IssueServiceMock_History_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *issue_service.IDInput) (models.IssueHistory, error)) *IssueServiceMock_History_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Import provides a mock function for the type IssueServiceMock
+func (_mock *IssueServiceMock) Import(ctx context.Context, actor *auth.Actor, input *issue_service.ImportInput) (models.ImportedIssues, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Import")
+	}
+
+	var r0 models.ImportedIssues
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.ImportInput) (models.ImportedIssues, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.ImportInput) models.ImportedIssues); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.ImportedIssues)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *issue_service.ImportInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueServiceMock_Import_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Import'
+type IssueServiceMock_Import_Call struct {
+	*mock.Call
+}
+
+// Import is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *issue_service.ImportInput
+func (_e *IssueServiceMock_Expecter) Import(ctx any, actor any, input any) *IssueServiceMock_Import_Call {
+	return &IssueServiceMock_Import_Call{Call: _e.mock.On("Import", ctx, actor, input)}
+}
+
+func (_c *IssueServiceMock_Import_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *issue_service.ImportInput)) *IssueServiceMock_Import_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *issue_service.ImportInput
+		if args[2] != nil {
+			arg2 = args[2].(*issue_service.ImportInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueServiceMock_Import_Call) Return(importedIssues models.ImportedIssues, err error) *IssueServiceMock_Import_Call {
+	_c.Call.Return(importedIssues, err)
+	return _c
+}
+
+func (_c *IssueServiceMock_Import_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *issue_service.ImportInput) (models.ImportedIssues, error)) *IssueServiceMock_Import_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// List provides a mock function for the type IssueServiceMock
+func (_mock *IssueServiceMock) List(ctx context.Context, actor *auth.Actor, input *issue_service.ListInput) (args.PageOf[models.Issue], error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for List")
+	}
+
+	var r0 args.PageOf[models.Issue]
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.ListInput) (args.PageOf[models.Issue], error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.ListInput) args.PageOf[models.Issue]); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(args.PageOf[models.Issue])
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *issue_service.ListInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueServiceMock_List_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'List'
+type IssueServiceMock_List_Call struct {
+	*mock.Call
+}
+
+// List is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *issue_service.ListInput
+func (_e *IssueServiceMock_Expecter) List(ctx any, actor any, input any) *IssueServiceMock_List_Call {
+	return &IssueServiceMock_List_Call{Call: _e.mock.On("List", ctx, actor, input)}
+}
+
+func (_c *IssueServiceMock_List_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *issue_service.ListInput)) *IssueServiceMock_List_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *issue_service.ListInput
+		if args[2] != nil {
+			arg2 = args[2].(*issue_service.ListInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueServiceMock_List_Call) Return(pageOf args.PageOf[models.Issue], err error) *IssueServiceMock_List_Call {
+	_c.Call.Return(pageOf, err)
+	return _c
+}
+
+func (_c *IssueServiceMock_List_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *issue_service.ListInput) (args.PageOf[models.Issue], error)) *IssueServiceMock_List_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Restore provides a mock function for the type IssueServiceMock
+func (_mock *IssueServiceMock) Restore(ctx context.Context, actor *auth.Actor, input *issue_service.IDInput) (models.Issue, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Restore")
+	}
+
+	var r0 models.Issue
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.IDInput) (models.Issue, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.IDInput) models.Issue); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.Issue)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *issue_service.IDInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueServiceMock_Restore_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Restore'
+type IssueServiceMock_Restore_Call struct {
+	*mock.Call
+}
+
+// Restore is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *issue_service.IDInput
+func (_e *IssueServiceMock_Expecter) Restore(ctx any, actor any, input any) *IssueServiceMock_Restore_Call {
+	return &IssueServiceMock_Restore_Call{Call: _e.mock.On("Restore", ctx, actor, input)}
+}
+
+func (_c *IssueServiceMock_Restore_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *issue_service.IDInput)) *IssueServiceMock_Restore_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *issue_service.IDInput
+		if args[2] != nil {
+			arg2 = args[2].(*issue_service.IDInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueServiceMock_Restore_Call) Return(issue models.Issue, err error) *IssueServiceMock_Restore_Call {
+	_c.Call.Return(issue, err)
+	return _c
+}
+
+func (_c *IssueServiceMock_Restore_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *issue_service.IDInput) (models.Issue, error)) *IssueServiceMock_Restore_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Save provides a mock function for the type IssueServiceMock
+func (_mock *IssueServiceMock) Save(ctx context.Context, actor *auth.Actor, input *issue_service.SaveInput) (models.IssueDetail, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Save")
+	}
+
+	var r0 models.IssueDetail
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.SaveInput) (models.IssueDetail, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.SaveInput) models.IssueDetail); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.IssueDetail)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *issue_service.SaveInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueServiceMock_Save_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Save'
+type IssueServiceMock_Save_Call struct {
+	*mock.Call
+}
+
+// Save is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *issue_service.SaveInput
+func (_e *IssueServiceMock_Expecter) Save(ctx any, actor any, input any) *IssueServiceMock_Save_Call {
+	return &IssueServiceMock_Save_Call{Call: _e.mock.On("Save", ctx, actor, input)}
+}
+
+func (_c *IssueServiceMock_Save_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *issue_service.SaveInput)) *IssueServiceMock_Save_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *issue_service.SaveInput
+		if args[2] != nil {
+			arg2 = args[2].(*issue_service.SaveInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueServiceMock_Save_Call) Return(issueDetail models.IssueDetail, err error) *IssueServiceMock_Save_Call {
+	_c.Call.Return(issueDetail, err)
+	return _c
+}
+
+func (_c *IssueServiceMock_Save_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *issue_service.SaveInput) (models.IssueDetail, error)) *IssueServiceMock_Save_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -285,6 +1026,78 @@ func (_c *IssueServiceMock_SetState_Call) RunAndReturn(run func(ctx context.Cont
 	return _c
 }
 
+// Share provides a mock function for the type IssueServiceMock
+func (_mock *IssueServiceMock) Share(ctx context.Context, actor *auth.Actor, input *issue_service.ShareInput) (models.IssueShare, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Share")
+	}
+
+	var r0 models.IssueShare
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.ShareInput) (models.IssueShare, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.ShareInput) models.IssueShare); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.IssueShare)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *issue_service.ShareInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueServiceMock_Share_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Share'
+type IssueServiceMock_Share_Call struct {
+	*mock.Call
+}
+
+// Share is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *issue_service.ShareInput
+func (_e *IssueServiceMock_Expecter) Share(ctx any, actor any, input any) *IssueServiceMock_Share_Call {
+	return &IssueServiceMock_Share_Call{Call: _e.mock.On("Share", ctx, actor, input)}
+}
+
+func (_c *IssueServiceMock_Share_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *issue_service.ShareInput)) *IssueServiceMock_Share_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *issue_service.ShareInput
+		if args[2] != nil {
+			arg2 = args[2].(*issue_service.ShareInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueServiceMock_Share_Call) Return(issueShare models.IssueShare, err error) *IssueServiceMock_Share_Call {
+	_c.Call.Return(issueShare, err)
+	return _c
+}
+
+func (_c *IssueServiceMock_Share_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *issue_service.ShareInput) (models.IssueShare, error)) *IssueServiceMock_Share_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // StateType provides a mock function for the type IssueServiceMock
 func (_mock *IssueServiceMock) StateType(ctx context.Context, tx repository.TxInterface, state uuid.UUID) (string, error) {
 	ret := _mock.Called(ctx, tx, state)
@@ -353,6 +1166,78 @@ func (_c *IssueServiceMock_StateType_Call) Return(s string, err error) *IssueSer
 }
 
 func (_c *IssueServiceMock_StateType_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, state uuid.UUID) (string, error)) *IssueServiceMock_StateType_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Trash provides a mock function for the type IssueServiceMock
+func (_mock *IssueServiceMock) Trash(ctx context.Context, actor *auth.Actor, input *issue_service.IDInput) (models.Issue, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Trash")
+	}
+
+	var r0 models.Issue
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.IDInput) (models.Issue, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.IDInput) models.Issue); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.Issue)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *issue_service.IDInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueServiceMock_Trash_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Trash'
+type IssueServiceMock_Trash_Call struct {
+	*mock.Call
+}
+
+// Trash is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *issue_service.IDInput
+func (_e *IssueServiceMock_Expecter) Trash(ctx any, actor any, input any) *IssueServiceMock_Trash_Call {
+	return &IssueServiceMock_Trash_Call{Call: _e.mock.On("Trash", ctx, actor, input)}
+}
+
+func (_c *IssueServiceMock_Trash_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *issue_service.IDInput)) *IssueServiceMock_Trash_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *issue_service.IDInput
+		if args[2] != nil {
+			arg2 = args[2].(*issue_service.IDInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueServiceMock_Trash_Call) Return(issue models.Issue, err error) *IssueServiceMock_Trash_Call {
+	_c.Call.Return(issue, err)
+	return _c
+}
+
+func (_c *IssueServiceMock_Trash_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *issue_service.IDInput) (models.Issue, error)) *IssueServiceMock_Trash_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -434,6 +1319,343 @@ func (_c *IssueServiceMock_TriageResponsible_Call) Return(s string, uUIDs []uuid
 
 func (_c *IssueServiceMock_TriageResponsible_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, team uuid.UUID) (string, []uuid.UUID, error)) *IssueServiceMock_TriageResponsible_Call {
 	_c.Call.Return(run)
+	return _c
+}
+
+// Unarchive provides a mock function for the type IssueServiceMock
+func (_mock *IssueServiceMock) Unarchive(ctx context.Context, actor *auth.Actor, input *issue_service.IDInput) (models.Issue, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Unarchive")
+	}
+
+	var r0 models.Issue
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.IDInput) (models.Issue, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.IDInput) models.Issue); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.Issue)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *issue_service.IDInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueServiceMock_Unarchive_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Unarchive'
+type IssueServiceMock_Unarchive_Call struct {
+	*mock.Call
+}
+
+// Unarchive is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *issue_service.IDInput
+func (_e *IssueServiceMock_Expecter) Unarchive(ctx any, actor any, input any) *IssueServiceMock_Unarchive_Call {
+	return &IssueServiceMock_Unarchive_Call{Call: _e.mock.On("Unarchive", ctx, actor, input)}
+}
+
+func (_c *IssueServiceMock_Unarchive_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *issue_service.IDInput)) *IssueServiceMock_Unarchive_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *issue_service.IDInput
+		if args[2] != nil {
+			arg2 = args[2].(*issue_service.IDInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueServiceMock_Unarchive_Call) Return(issue models.Issue, err error) *IssueServiceMock_Unarchive_Call {
+	_c.Call.Return(issue, err)
+	return _c
+}
+
+func (_c *IssueServiceMock_Unarchive_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *issue_service.IDInput) (models.Issue, error)) *IssueServiceMock_Unarchive_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Unshare provides a mock function for the type IssueServiceMock
+func (_mock *IssueServiceMock) Unshare(ctx context.Context, actor *auth.Actor, input *issue_service.ShareInput) (models.IssueUnshare, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Unshare")
+	}
+
+	var r0 models.IssueUnshare
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.ShareInput) (models.IssueUnshare, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.ShareInput) models.IssueUnshare); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.IssueUnshare)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *issue_service.ShareInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueServiceMock_Unshare_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Unshare'
+type IssueServiceMock_Unshare_Call struct {
+	*mock.Call
+}
+
+// Unshare is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *issue_service.ShareInput
+func (_e *IssueServiceMock_Expecter) Unshare(ctx any, actor any, input any) *IssueServiceMock_Unshare_Call {
+	return &IssueServiceMock_Unshare_Call{Call: _e.mock.On("Unshare", ctx, actor, input)}
+}
+
+func (_c *IssueServiceMock_Unshare_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *issue_service.ShareInput)) *IssueServiceMock_Unshare_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *issue_service.ShareInput
+		if args[2] != nil {
+			arg2 = args[2].(*issue_service.ShareInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueServiceMock_Unshare_Call) Return(issueUnshare models.IssueUnshare, err error) *IssueServiceMock_Unshare_Call {
+	_c.Call.Return(issueUnshare, err)
+	return _c
+}
+
+func (_c *IssueServiceMock_Unshare_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *issue_service.ShareInput) (models.IssueUnshare, error)) *IssueServiceMock_Unshare_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Update provides a mock function for the type IssueServiceMock
+func (_mock *IssueServiceMock) Update(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, id uuid.UUID, input issue_service.SaveInput) error {
+	ret := _mock.Called(ctx, tx, actor, id, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Update")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *auth.Actor, uuid.UUID, issue_service.SaveInput) error); ok {
+		r0 = returnFunc(ctx, tx, actor, id, input)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueServiceMock_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type IssueServiceMock_Update_Call struct {
+	*mock.Call
+}
+
+// Update is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - actor *auth.Actor
+//   - id uuid.UUID
+//   - input issue_service.SaveInput
+func (_e *IssueServiceMock_Expecter) Update(ctx any, tx any, actor any, id any, input any) *IssueServiceMock_Update_Call {
+	return &IssueServiceMock_Update_Call{Call: _e.mock.On("Update", ctx, tx, actor, id, input)}
+}
+
+func (_c *IssueServiceMock_Update_Call) Run(run func(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, id uuid.UUID, input issue_service.SaveInput)) *IssueServiceMock_Update_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 *auth.Actor
+		if args[2] != nil {
+			arg2 = args[2].(*auth.Actor)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		var arg4 issue_service.SaveInput
+		if args[4] != nil {
+			arg4 = args[4].(issue_service.SaveInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueServiceMock_Update_Call) Return(err error) *IssueServiceMock_Update_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueServiceMock_Update_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, id uuid.UUID, input issue_service.SaveInput) error) *IssueServiceMock_Update_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateMany provides a mock function for the type IssueServiceMock
+func (_mock *IssueServiceMock) UpdateMany(ctx context.Context, actor *auth.Actor, input *issue_service.UpdateManyInput) (models.UpdatedIssues, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateMany")
+	}
+
+	var r0 models.UpdatedIssues
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.UpdateManyInput) (models.UpdatedIssues, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *issue_service.UpdateManyInput) models.UpdatedIssues); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.UpdatedIssues)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *issue_service.UpdateManyInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueServiceMock_UpdateMany_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateMany'
+type IssueServiceMock_UpdateMany_Call struct {
+	*mock.Call
+}
+
+// UpdateMany is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *issue_service.UpdateManyInput
+func (_e *IssueServiceMock_Expecter) UpdateMany(ctx any, actor any, input any) *IssueServiceMock_UpdateMany_Call {
+	return &IssueServiceMock_UpdateMany_Call{Call: _e.mock.On("UpdateMany", ctx, actor, input)}
+}
+
+func (_c *IssueServiceMock_UpdateMany_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *issue_service.UpdateManyInput)) *IssueServiceMock_UpdateMany_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *issue_service.UpdateManyInput
+		if args[2] != nil {
+			arg2 = args[2].(*issue_service.UpdateManyInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueServiceMock_UpdateMany_Call) Return(updatedIssues models.UpdatedIssues, err error) *IssueServiceMock_UpdateMany_Call {
+	_c.Call.Return(updatedIssues, err)
+	return _c
+}
+
+func (_c *IssueServiceMock_UpdateMany_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *issue_service.UpdateManyInput) (models.UpdatedIssues, error)) *IssueServiceMock_UpdateMany_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Uses provides a mock function for the type IssueServiceMock
+func (_mock *IssueServiceMock) Uses(attachments attachment_service.AttachmentServiceInterface, comments comment_service.CommentServiceInterface) {
+	_mock.Called(attachments, comments)
+	return
+}
+
+// IssueServiceMock_Uses_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Uses'
+type IssueServiceMock_Uses_Call struct {
+	*mock.Call
+}
+
+// Uses is a helper method to define mock.On call
+//   - attachments attachment_service.AttachmentServiceInterface
+//   - comments comment_service.CommentServiceInterface
+func (_e *IssueServiceMock_Expecter) Uses(attachments any, comments any) *IssueServiceMock_Uses_Call {
+	return &IssueServiceMock_Uses_Call{Call: _e.mock.On("Uses", attachments, comments)}
+}
+
+func (_c *IssueServiceMock_Uses_Call) Run(run func(attachments attachment_service.AttachmentServiceInterface, comments comment_service.CommentServiceInterface)) *IssueServiceMock_Uses_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 attachment_service.AttachmentServiceInterface
+		if args[0] != nil {
+			arg0 = args[0].(attachment_service.AttachmentServiceInterface)
+		}
+		var arg1 comment_service.CommentServiceInterface
+		if args[1] != nil {
+			arg1 = args[1].(comment_service.CommentServiceInterface)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueServiceMock_Uses_Call) Return() *IssueServiceMock_Uses_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *IssueServiceMock_Uses_Call) RunAndReturn(run func(attachments attachment_service.AttachmentServiceInterface, comments comment_service.CommentServiceInterface)) *IssueServiceMock_Uses_Call {
+	_c.Run(run)
 	return _c
 }
 

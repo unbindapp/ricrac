@@ -188,8 +188,8 @@ type IssueDetail struct {
 	SharedWith   []UserRef         `json:"sharedWith"`
 	Reactions    []IssueReaction   `json:"reactions"`
 	CommentCount int               `json:"commentCount"`
-	Comments     []CommentThread   `json:"comments,omitempty" doc:"With includeComments."`
-	History      []HistoryEntry    `json:"history,omitempty" doc:"With includeHistory."`
+	Comments     CommentThreads    `json:"comments,omitzero" doc:"With includeComments."`
+	History      HistoryEntries    `json:"history,omitzero" doc:"With includeHistory."`
 }
 
 type IssueChild struct {

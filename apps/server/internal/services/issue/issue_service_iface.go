@@ -5,18 +5,48 @@ package issue_service
 import (
 	"context"
 	"ricrac/internal/auth"
+	"ricrac/internal/common/args"
 	"ricrac/internal/models"
 	repository "ricrac/internal/repositories"
+	attachment_service "ricrac/internal/services/attachment"
+	comment_service "ricrac/internal/services/comment"
 
 	"github.com/google/uuid"
 )
 
 // IssueServiceInterface ...
 type IssueServiceInterface interface {
+	Get(ctx context.Context, actor *auth.Actor, input *GetInput) (models.IssueDetail, error)
+	// Detail is the issue as get_issue answers it, read from the pool.
+	Detail(ctx context.Context, actor *auth.Actor, id uuid.UUID, withComments, withHistory bool) (models.IssueDetail, error)
+	History(ctx context.Context, actor *auth.Actor, input *IDInput) (models.IssueHistory, error)
+	// CheckFilter compiles and runs the filter in tx, so that mistakes in it surface now rather
+	// than when it is used.
+	CheckFilter(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, filter any) error
+	// Import imports issues from another tracker in one transaction, keeping their numbers, dates,
+	// people and comments.
+	Import(ctx context.Context, actor *auth.Actor, input *ImportInput) (models.ImportedIssues, error)
 	// Values is the issues as lists show them, in the order of ids, read in tx.
 	Values(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID, withDescription bool) ([]models.Issue, error)
 	// Value is one issue with its description, read in tx.
 	Value(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (models.Issue, error)
+	// Uses gives the service the attachments and comments that issues show and save.
+	Uses(attachments attachment_service.AttachmentServiceInterface, comments comment_service.CommentServiceInterface)
+	List(ctx context.Context, actor *auth.Actor, input *ListInput) (args.PageOf[models.Issue], error)
+	Trash(ctx context.Context, actor *auth.Actor, input *IDInput) (models.Issue, error)
+	Restore(ctx context.Context, actor *auth.Actor, input *IDInput) (models.Issue, error)
+	Archive(ctx context.Context, actor *auth.Actor, input *IDInput) (models.Issue, error)
+	Unarchive(ctx context.Context, actor *auth.Actor, input *IDInput) (models.Issue, error)
+	Share(ctx context.Context, actor *auth.Actor, input *ShareInput) (models.IssueShare, error)
+	Unshare(ctx context.Context, actor *auth.Actor, input *ShareInput) (models.IssueUnshare, error)
+	Save(ctx context.Context, actor *auth.Actor, input *SaveInput) (models.IssueDetail, error)
+	UpdateMany(ctx context.Context, actor *auth.Actor, input *UpdateManyInput) (models.UpdatedIssues, error)
+	// Create creates an issue in tx, with what follows: subscriptions, history, triage, the
+	// template's sub-issues and the webhook.
+	Create(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, input SaveInput) (uuid.UUID, error)
+	// Update changes an issue in tx, with what follows: history, notifications, automations and
+	// the webhook.
+	Update(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, id uuid.UUID, input SaveInput) error
 	// DefaultState is the state new issues of the team start in.
 	DefaultState(ctx context.Context, tx repository.TxInterface, team uuid.UUID) (uuid.UUID, error)
 	// FirstStateOfType is the team's first unarchived state of a type, nil when there's none.

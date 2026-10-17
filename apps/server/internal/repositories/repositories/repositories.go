@@ -28,16 +28,21 @@ import (
 	resolve_repo "ricrac/internal/repositories/resolve"
 	search_repo "ricrac/internal/repositories/search"
 	seed_repo "ricrac/internal/repositories/seed"
+<<<<<<< HEAD
 	state_repo "ricrac/internal/repositories/state"
 	statusupdate_repo "ricrac/internal/repositories/statusupdate"
 	team_repo "ricrac/internal/repositories/team"
 	template_repo "ricrac/internal/repositories/template"
 	webhook_repo "ricrac/internal/repositories/webhook"
 	workspace_repo "ricrac/internal/repositories/workspace"
+=======
+	view_repo "ricrac/internal/repositories/view"
+>>>>>>> port/issues
 )
 
 //go:generate go run -mod=mod github.com/vburenin/ifacemaker -f "*.go" -i RepositoriesInterface -p repositories -s Repositories -o repositories_iface.go
 type Repositories struct {
+<<<<<<< HEAD
 	db           *ent.Client
 	base         *repository.BaseRepository
 	access       access_repo.AccessRepositoryInterface
@@ -68,10 +73,24 @@ type Repositories struct {
 	milestone    milestone_repo.MilestoneRepositoryInterface
 	statusUpdate statusupdate_repo.StatusUpdateRepositoryInterface
 	initiative   initiative_repo.InitiativeRepositoryInterface
+=======
+	db         *ent.Client
+	base       *repository.BaseRepository
+	access     access_repo.AccessRepositoryInterface
+	resolve    resolve_repo.ResolveRepositoryInterface
+	events     events_repo.EventsRepositoryInterface
+	label      label_repo.LabelRepositoryInterface
+	issue      issue_repo.IssueRepositoryInterface
+	seed       seed_repo.SeedRepositoryInterface
+	comment    comment_repo.CommentRepositoryInterface
+	attachment attachment_repo.AttachmentRepositoryInterface
+	view       view_repo.ViewRepositoryInterface
+>>>>>>> port/issues
 }
 
 func NewRepositories(db *ent.Client) *Repositories {
 	return &Repositories{
+<<<<<<< HEAD
 		db:           db,
 		base:         repository.NewBaseRepository(db),
 		access:       access_repo.NewAccessRepository(db),
@@ -102,6 +121,19 @@ func NewRepositories(db *ent.Client) *Repositories {
 		milestone:    milestone_repo.NewMilestoneRepository(db),
 		statusUpdate: statusupdate_repo.NewStatusUpdateRepository(db),
 		initiative:   initiative_repo.NewInitiativeRepository(db),
+=======
+		db:         db,
+		base:       repository.NewBaseRepository(db),
+		access:     access_repo.NewAccessRepository(db),
+		resolve:    resolve_repo.NewResolveRepository(db),
+		events:     events_repo.NewEventsRepository(db),
+		label:      label_repo.NewLabelRepository(db),
+		issue:      issue_repo.NewIssueRepository(db),
+		seed:       seed_repo.NewSeedRepository(db),
+		comment:    comment_repo.NewCommentRepository(db),
+		attachment: attachment_repo.NewAttachmentRepository(db),
+		view:       view_repo.NewViewRepository(db),
+>>>>>>> port/issues
 	}
 }
 
@@ -150,6 +182,7 @@ func (r *Repositories) Attachment() attachment_repo.AttachmentRepositoryInterfac
 	return r.attachment
 }
 
+<<<<<<< HEAD
 func (r *Repositories) Automation() automation_repo.AutomationRepositoryInterface {
 	return r.automation
 }
@@ -228,4 +261,8 @@ func (r *Repositories) StatusUpdate() statusupdate_repo.StatusUpdateRepositoryIn
 
 func (r *Repositories) Initiative() initiative_repo.InitiativeRepositoryInterface {
 	return r.initiative
+=======
+func (r *Repositories) View() view_repo.ViewRepositoryInterface {
+	return r.view
+>>>>>>> port/issues
 }

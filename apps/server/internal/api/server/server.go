@@ -33,6 +33,7 @@ import (
 	statusupdate_service "ricrac/internal/services/statusupdate"
 	team_service "ricrac/internal/services/team"
 	template_service "ricrac/internal/services/template"
+	view_service "ricrac/internal/services/view"
 	webhook_service "ricrac/internal/services/webhook"
 	workspace_service "ricrac/internal/services/workspace"
 )
@@ -73,4 +74,5 @@ type Server struct {
 	MilestoneService    *milestone_service.MilestoneService
 	StatusUpdateService *statusupdate_service.StatusUpdateService
 	InitiativeService   *initiative_service.InitiativeService
+	ViewService         *view_service.ViewService
 }

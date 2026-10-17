@@ -28,12 +28,16 @@ import (
 	resolve_repo "ricrac/internal/repositories/resolve"
 	search_repo "ricrac/internal/repositories/search"
 	seed_repo "ricrac/internal/repositories/seed"
+<<<<<<< HEAD
 	state_repo "ricrac/internal/repositories/state"
 	statusupdate_repo "ricrac/internal/repositories/statusupdate"
 	team_repo "ricrac/internal/repositories/team"
 	template_repo "ricrac/internal/repositories/template"
 	webhook_repo "ricrac/internal/repositories/webhook"
 	workspace_repo "ricrac/internal/repositories/workspace"
+=======
+	view_repo "ricrac/internal/repositories/view"
+>>>>>>> port/issues
 	"time"
 )
 
@@ -51,6 +55,7 @@ type RepositoriesInterface interface {
 	Seed() seed_repo.SeedRepositoryInterface
 	Comment() comment_repo.CommentRepositoryInterface
 	Attachment() attachment_repo.AttachmentRepositoryInterface
+<<<<<<< HEAD
 	Automation() automation_repo.AutomationRepositoryInterface
 	Notification() notification_repo.NotificationRepositoryInterface
 	Search() search_repo.SearchRepositoryInterface
@@ -71,4 +76,7 @@ type RepositoriesInterface interface {
 	Milestone() milestone_repo.MilestoneRepositoryInterface
 	StatusUpdate() statusupdate_repo.StatusUpdateRepositoryInterface
 	Initiative() initiative_repo.InitiativeRepositoryInterface
+=======
+	View() view_repo.ViewRepositoryInterface
+>>>>>>> port/issues
 }

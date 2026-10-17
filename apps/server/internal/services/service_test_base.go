@@ -35,14 +35,19 @@ import (
 	mocks_repository_team "ricrac/mocks/repository/team"
 	mocks_repository_template "ricrac/mocks/repository/template"
 	mocks_repository_tx "ricrac/mocks/repository/tx"
+<<<<<<< HEAD
 	mocks_repository_webhook "ricrac/mocks/repository/webhook"
 	mocks_repository_workspace "ricrac/mocks/repository/workspace"
+=======
+	mocks_repository_view "ricrac/mocks/repository/view"
+>>>>>>> port/issues
 )
 
 type ServiceTestSuite struct {
 	suite.Suite
 	Ctx context.Context
 
+<<<<<<< HEAD
 	MockRepo             *mocks_repositories.RepositoriesMock
 	MockAccessRepo       *mocks_repository_access.AccessRepositoryMock
 	MockResolveRepo      *mocks_repository_resolve.ResolveRepositoryMock
@@ -71,6 +76,18 @@ type ServiceTestSuite struct {
 	MockMilestoneRepo    *mocks_repository_milestone.MilestoneRepositoryMock
 	MockStatusUpdateRepo *mocks_repository_statusupdate.StatusUpdateRepositoryMock
 	MockInitiativeRepo   *mocks_repository_initiative.InitiativeRepositoryMock
+=======
+	MockRepo           *mocks_repositories.RepositoriesMock
+	MockAccessRepo     *mocks_repository_access.AccessRepositoryMock
+	MockResolveRepo    *mocks_repository_resolve.ResolveRepositoryMock
+	MockEventsRepo     *mocks_repository_events.EventsRepositoryMock
+	MockLabelRepo      *mocks_repository_label.LabelRepositoryMock
+	MockSeedRepo       *mocks_repository_seed.SeedRepositoryMock
+	MockAttachmentRepo *mocks_repository_attachment.AttachmentRepositoryMock
+	MockCommentRepo    *mocks_repository_comment.CommentRepositoryMock
+	MockIssueRepo      *mocks_repository_issue.IssueRepositoryMock
+	MockViewRepo       *mocks_repository_view.ViewRepositoryMock
+>>>>>>> port/issues
 }
 
 func (suite *ServiceTestSuite) SetupTest() {
@@ -84,6 +101,7 @@ func (suite *ServiceTestSuite) SetupTest() {
 	suite.MockAttachmentRepo = mocks_repository_attachment.NewAttachmentRepositoryMock(suite.T())
 	suite.MockCommentRepo = mocks_repository_comment.NewCommentRepositoryMock(suite.T())
 	suite.MockIssueRepo = mocks_repository_issue.NewIssueRepositoryMock(suite.T())
+<<<<<<< HEAD
 	suite.MockNotificationRepo = mocks_repository_notification.NewNotificationRepositoryMock(suite.T())
 	suite.MockSearchRepo = mocks_repository_search.NewSearchRepositoryMock(suite.T())
 	suite.MockAccountRepo = mocks_repository_account.NewAccountRepositoryMock(suite.T())
@@ -103,6 +121,9 @@ func (suite *ServiceTestSuite) SetupTest() {
 	suite.MockMilestoneRepo = mocks_repository_milestone.NewMilestoneRepositoryMock(suite.T())
 	suite.MockStatusUpdateRepo = mocks_repository_statusupdate.NewStatusUpdateRepositoryMock(suite.T())
 	suite.MockInitiativeRepo = mocks_repository_initiative.NewInitiativeRepositoryMock(suite.T())
+=======
+	suite.MockViewRepo = mocks_repository_view.NewViewRepositoryMock(suite.T())
+>>>>>>> port/issues
 
 	suite.MockRepo.EXPECT().Access().Return(suite.MockAccessRepo).Maybe()
 	suite.MockRepo.EXPECT().Resolve().Return(suite.MockResolveRepo).Maybe()
@@ -112,6 +133,7 @@ func (suite *ServiceTestSuite) SetupTest() {
 	suite.MockRepo.EXPECT().Attachment().Return(suite.MockAttachmentRepo).Maybe()
 	suite.MockRepo.EXPECT().Comment().Return(suite.MockCommentRepo).Maybe()
 	suite.MockRepo.EXPECT().Issue().Return(suite.MockIssueRepo).Maybe()
+<<<<<<< HEAD
 	suite.MockRepo.EXPECT().Notification().Return(suite.MockNotificationRepo).Maybe()
 	suite.MockRepo.EXPECT().Search().Return(suite.MockSearchRepo).Maybe()
 	suite.MockRepo.EXPECT().Account().Return(suite.MockAccountRepo).Maybe()
@@ -131,6 +153,9 @@ func (suite *ServiceTestSuite) SetupTest() {
 	suite.MockRepo.EXPECT().Milestone().Return(suite.MockMilestoneRepo).Maybe()
 	suite.MockRepo.EXPECT().StatusUpdate().Return(suite.MockStatusUpdateRepo).Maybe()
 	suite.MockRepo.EXPECT().Initiative().Return(suite.MockInitiativeRepo).Maybe()
+=======
+	suite.MockRepo.EXPECT().View().Return(suite.MockViewRepo).Maybe()
+>>>>>>> port/issues
 }
 
 // ExpectTx runs WithTx bodies directly; repository mocks match the tx argument with mock.Anything.

@@ -12,6 +12,8 @@ import (
 	"ricrac/internal/models"
 	repository "ricrac/internal/repositories"
 	"ricrac/internal/repositories/repositories"
+	attachment_service "ricrac/internal/services/attachment"
+	comment_service "ricrac/internal/services/comment"
 	events_service "ricrac/internal/services/events"
 	resolve_service "ricrac/internal/services/resolve"
 )
@@ -22,6 +24,9 @@ type IssueService struct {
 	repo    repositories.RepositoriesInterface
 	resolve resolve_service.ResolveServiceInterface
 	events  events_service.EventsServiceInterface
+
+	attachments attachment_service.AttachmentServiceInterface
+	comments    comment_service.CommentServiceInterface
 }
 
 func NewIssueService(cfg config.Config, repo repositories.RepositoriesInterface, resolve resolve_service.ResolveServiceInterface, events events_service.EventsServiceInterface) *IssueService {
@@ -55,4 +60,9 @@ func (self *IssueService) Value(ctx context.Context, tx repository.TxInterface, 
 		return models.Issue{}, errdefs.NotFound("No such issue")
 	}
 	return values[0], nil
+}
+
+// Uses gives the service the attachments and comments that issues show and save.
+func (self *IssueService) Uses(attachments attachment_service.AttachmentServiceInterface, comments comment_service.CommentServiceInterface) {
+	self.attachments, self.comments = attachments, comments
 }

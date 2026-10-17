@@ -481,3 +481,21 @@ packages:
           filename: statusupdate_service_mock.go
           structname: StatusUpdateServiceMock
           pkgname: mocks_services_statusupdate
+  ricrac/internal/repositories/view:
+    config:
+      dir: ./mocks/repository/view
+    interfaces:
+      ViewRepositoryInterface:
+        config:
+          filename: view_repository_mock.go
+          structname: ViewRepositoryMock
+          pkgname: mocks_repository_view
+  ricrac/internal/services/view:
+    config:
+      dir: ./mocks/services/view
+    interfaces:
+      ViewServiceInterface:
+        config:
+          filename: view_service_mock.go
+          structname: ViewServiceMock
+          pkgname: mocks_services_view
