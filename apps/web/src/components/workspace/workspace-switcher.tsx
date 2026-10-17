@@ -72,7 +72,7 @@ export function WorkspaceSwitcher({ onNavigate }: { onNavigate?: () => void }) {
               >
                 <WorkspaceIcon
                   name={item.name}
-                  logoUrl={item.id === workspace.id ? workspace.logoUrl : null}
+                  logoUrl={item.id === workspace.id ? workspace.logoUrl : item.logoUrl}
                 />
                 <span className="min-w-0 flex-1 truncate">{item.name}</span>
                 {item.id === workspace.id && <CheckIcon className="size-4" />}

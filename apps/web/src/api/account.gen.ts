@@ -122,6 +122,7 @@ export type UpdateMe = {
 
 export type WorkspaceSummary = {
   id: string
+  logoUrl: string | null
   name: string
   role: string
   urlKey: string

@@ -168,10 +168,11 @@ func (a *account) config(w http.ResponseWriter, r *http.Request) {
 }
 
 type WorkspaceSummary struct {
-	ID     uuid.UUID `json:"id"`
-	Name   string    `json:"name"`
-	URLKey string    `json:"urlKey"`
-	Role   string    `json:"role"`
+	ID      uuid.UUID `json:"id"`
+	Name    string    `json:"name"`
+	URLKey  string    `json:"urlKey"`
+	Role    string    `json:"role"`
+	LogoURL *string   `json:"logoUrl"`
 }
 
 type PendingInvitation struct {
@@ -216,7 +217,7 @@ func (a *account) loadMe(r *http.Request) (*Me, error) {
 		return nil, err
 	}
 	workspaces, err := app.Rows[WorkspaceSummary](ctx, a.state.DB,
-		`SELECT w.id, w.name, w.url_key, m.role FROM workspaces w JOIN workspace_members m ON m.workspace_id = w.id
+		`SELECT w.id, w.name, w.url_key, m.role, w.logo_url FROM workspaces w JOIN workspace_members m ON m.workspace_id = w.id
 		 WHERE m.user_id = $1 AND m.active ORDER BY w.name`, id)
 	if err != nil {
 		return nil, err
@@ -482,7 +483,7 @@ func (a *account) acceptInvitation(w http.ResponseWriter, r *http.Request, user 
 			return err
 		}
 		summary, _, err = app.Row[WorkspaceSummary](ctx, tx,
-			`SELECT w.id, w.name, w.url_key, m.role FROM workspaces w JOIN workspace_members m ON m.workspace_id = w.id
+			`SELECT w.id, w.name, w.url_key, m.role, w.logo_url FROM workspaces w JOIN workspace_members m ON m.workspace_id = w.id
 			 WHERE w.id = $1 AND m.user_id = $2`, invitation.Workspace, user)
 		return err
 	})

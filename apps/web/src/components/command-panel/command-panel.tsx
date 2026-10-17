@@ -246,7 +246,7 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
       id: `workspace-${item.id}`,
       label: `Switch to ${item.name}`,
       keywords: [item.urlKey, "workspace"],
-      icon: <WorkspaceIcon name={item.name} />,
+      icon: <WorkspaceIcon name={item.name} logoUrl={item.logoUrl} />,
       run: () => go({ to: "/$workspace", params: { workspace: item.urlKey } }),
     }));
 

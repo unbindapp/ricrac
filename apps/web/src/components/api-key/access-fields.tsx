@@ -19,7 +19,7 @@ export function WorkspaceAccessList({ field, access }: { field: AnyFieldApi; acc
         items={(me?.workspaces ?? []).map((workspace) => ({
           value: workspace.id,
           label: workspace.name,
-          icon: <WorkspaceIcon name={workspace.name} />,
+          icon: <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} />,
         }))}
         value={field.state.value as string[]}
         onChange={(value) => {
