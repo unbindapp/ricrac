@@ -14,6 +14,9 @@ import (
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 
 	labels_handler "ricrac/internal/api/handlers/labels"
+	states_handler "ricrac/internal/api/handlers/states"
+	teams_handler "ricrac/internal/api/handlers/teams"
+	workspace_handler "ricrac/internal/api/handlers/workspace"
 	"ricrac/internal/api/meta"
 	"ricrac/internal/api/middleware"
 	"ricrac/internal/api/oapi"
@@ -98,5 +101,8 @@ func New(srv *server.Server, fallback Fallback) (http.Handler, *oapi.Registry) {
 // RegisterHandlers puts every handler group's operations on the registry, in the order they
 // are listed.
 func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
+	workspace_handler.RegisterHandlers(srv, reg)
+	teams_handler.RegisterHandlers(srv, reg)
+	states_handler.RegisterHandlers(srv, reg)
 	labels_handler.RegisterHandlers(srv, reg)
 }

@@ -9,11 +9,15 @@ import (
 	access_repo "ricrac/internal/repositories/access"
 	attachment_repo "ricrac/internal/repositories/attachment"
 	comment_repo "ricrac/internal/repositories/comment"
+	email_repo "ricrac/internal/repositories/email"
 	events_repo "ricrac/internal/repositories/events"
 	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
 	resolve_repo "ricrac/internal/repositories/resolve"
 	seed_repo "ricrac/internal/repositories/seed"
+	state_repo "ricrac/internal/repositories/state"
+	team_repo "ricrac/internal/repositories/team"
+	workspace_repo "ricrac/internal/repositories/workspace"
 )
 
 //go:generate go run -mod=mod github.com/vburenin/ifacemaker -f "*.go" -i RepositoriesInterface -p repositories -s Repositories -o repositories_iface.go
@@ -28,6 +32,10 @@ type Repositories struct {
 	seed       seed_repo.SeedRepositoryInterface
 	comment    comment_repo.CommentRepositoryInterface
 	attachment attachment_repo.AttachmentRepositoryInterface
+	workspace  workspace_repo.WorkspaceRepositoryInterface
+	team       team_repo.TeamRepositoryInterface
+	state      state_repo.StateRepositoryInterface
+	email      email_repo.EmailRepositoryInterface
 }
 
 func NewRepositories(db *ent.Client) *Repositories {
@@ -42,6 +50,10 @@ func NewRepositories(db *ent.Client) *Repositories {
 		seed:       seed_repo.NewSeedRepository(db),
 		comment:    comment_repo.NewCommentRepository(db),
 		attachment: attachment_repo.NewAttachmentRepository(db),
+		workspace:  workspace_repo.NewWorkspaceRepository(db),
+		team:       team_repo.NewTeamRepository(db),
+		state:      state_repo.NewStateRepository(db),
+		email:      email_repo.NewEmailRepository(db),
 	}
 }
 
@@ -88,4 +100,20 @@ func (r *Repositories) Comment() comment_repo.CommentRepositoryInterface {
 
 func (r *Repositories) Attachment() attachment_repo.AttachmentRepositoryInterface {
 	return r.attachment
+}
+
+func (r *Repositories) Workspace() workspace_repo.WorkspaceRepositoryInterface {
+	return r.workspace
+}
+
+func (r *Repositories) Team() team_repo.TeamRepositoryInterface {
+	return r.team
+}
+
+func (r *Repositories) State() state_repo.StateRepositoryInterface {
+	return r.state
+}
+
+func (r *Repositories) Email() email_repo.EmailRepositoryInterface {
+	return r.email
 }

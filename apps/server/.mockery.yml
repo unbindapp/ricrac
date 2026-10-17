@@ -148,3 +148,75 @@ packages:
           filename: seed_service_mock.go
           structname: SeedServiceMock
           pkgname: mocks_services_seed
+  ricrac/internal/repositories/workspace:
+    config:
+      dir: ./mocks/repository/workspace
+    interfaces:
+      WorkspaceRepositoryInterface:
+        config:
+          filename: workspace_repository_mock.go
+          structname: WorkspaceRepositoryMock
+          pkgname: mocks_repository_workspace
+  ricrac/internal/repositories/team:
+    config:
+      dir: ./mocks/repository/team
+    interfaces:
+      TeamRepositoryInterface:
+        config:
+          filename: team_repository_mock.go
+          structname: TeamRepositoryMock
+          pkgname: mocks_repository_team
+  ricrac/internal/repositories/state:
+    config:
+      dir: ./mocks/repository/state
+    interfaces:
+      StateRepositoryInterface:
+        config:
+          filename: state_repository_mock.go
+          structname: StateRepositoryMock
+          pkgname: mocks_repository_state
+  ricrac/internal/repositories/email:
+    config:
+      dir: ./mocks/repository/email
+    interfaces:
+      EmailRepositoryInterface:
+        config:
+          filename: email_repository_mock.go
+          structname: EmailRepositoryMock
+          pkgname: mocks_repository_email
+  ricrac/internal/services/workspace:
+    config:
+      dir: ./mocks/services/workspace
+    interfaces:
+      WorkspaceServiceInterface:
+        config:
+          filename: workspace_service_mock.go
+          structname: WorkspaceServiceMock
+          pkgname: mocks_services_workspace
+  ricrac/internal/services/team:
+    config:
+      dir: ./mocks/services/team
+    interfaces:
+      TeamServiceInterface:
+        config:
+          filename: team_service_mock.go
+          structname: TeamServiceMock
+          pkgname: mocks_services_team
+  ricrac/internal/services/state:
+    config:
+      dir: ./mocks/services/state
+    interfaces:
+      StateServiceInterface:
+        config:
+          filename: state_service_mock.go
+          structname: StateServiceMock
+          pkgname: mocks_services_state
+  ricrac/internal/services/email:
+    config:
+      dir: ./mocks/services/email
+    interfaces:
+      EmailServiceInterface:
+        config:
+          filename: email_service_mock.go
+          structname: EmailServiceMock
+          pkgname: mocks_services_email
