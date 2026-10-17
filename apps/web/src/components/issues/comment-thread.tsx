@@ -325,7 +325,12 @@ function CommentItem({
           </div>
         </div>
       ) : (
-        <MarkdownView markdown={comment.body} />
+        <MarkdownView
+          markdown={comment.body}
+          onChange={
+            canEdit && isAuthor ? (body) => saveComment({ id: comment.id, body }) : undefined
+          }
+        />
       )}
       {reactions.length > 0 && (
         <ReactionBar reactions={reactions} disabled={!canEdit} onToggle={react} />

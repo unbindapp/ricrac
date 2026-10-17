@@ -179,7 +179,10 @@ function StatusUpdateCard({ update, isLinked }: { update: StatusUpdate; isLinked
           />
         )}
       </div>
-      <MarkdownView markdown={update.body} />
+      <MarkdownView
+        markdown={update.body}
+        onChange={canEdit && isAuthor ? (body) => saveUpdate({ id: update.id, body }) : undefined}
+      />
       <div className="flex flex-wrap items-center gap-2">
         <UpdateReactions
           reactions={update.reactions}
