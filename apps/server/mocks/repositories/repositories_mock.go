@@ -30,16 +30,13 @@ import (
 	"ricrac/internal/repositories/resolve"
 	"ricrac/internal/repositories/search"
 	"ricrac/internal/repositories/seed"
-<<<<<<< HEAD
 	"ricrac/internal/repositories/state"
 	"ricrac/internal/repositories/statusupdate"
 	"ricrac/internal/repositories/team"
 	"ricrac/internal/repositories/template"
+	"ricrac/internal/repositories/view"
 	"ricrac/internal/repositories/webhook"
 	"ricrac/internal/repositories/workspace"
-=======
-	"ricrac/internal/repositories/view"
->>>>>>> port/issues
 	"time"
 
 	mock "github.com/stretchr/testify/mock"
@@ -1205,7 +1202,6 @@ func (_c *RepositoriesMock_Seed_Call) RunAndReturn(run func() seed_repo.SeedRepo
 	return _c
 }
 
-<<<<<<< HEAD
 // State provides a mock function for the type RepositoriesMock
 func (_mock *RepositoriesMock) State() state_repo.StateRepositoryInterface {
 	ret := _mock.Called()
@@ -1220,28 +1216,11 @@ func (_mock *RepositoriesMock) State() state_repo.StateRepositoryInterface {
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(state_repo.StateRepositoryInterface)
-=======
-// View provides a mock function for the type RepositoriesMock
-func (_mock *RepositoriesMock) View() view_repo.ViewRepositoryInterface {
-	ret := _mock.Called()
-
-	if len(ret) == 0 {
-		panic("no return value specified for View")
-	}
-
-	var r0 view_repo.ViewRepositoryInterface
-	if returnFunc, ok := ret.Get(0).(func() view_repo.ViewRepositoryInterface); ok {
-		r0 = returnFunc()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(view_repo.ViewRepositoryInterface)
->>>>>>> port/issues
 		}
 	}
 	return r0
 }
 
-<<<<<<< HEAD
 // RepositoriesMock_State_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'State'
 type RepositoriesMock_State_Call struct {
 	*mock.Call
@@ -1253,26 +1232,12 @@ func (_e *RepositoriesMock_Expecter) State() *RepositoriesMock_State_Call {
 }
 
 func (_c *RepositoriesMock_State_Call) Run(run func()) *RepositoriesMock_State_Call {
-=======
-// RepositoriesMock_View_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'View'
-type RepositoriesMock_View_Call struct {
-	*mock.Call
-}
-
-// View is a helper method to define mock.On call
-func (_e *RepositoriesMock_Expecter) View() *RepositoriesMock_View_Call {
-	return &RepositoriesMock_View_Call{Call: _e.mock.On("View")}
-}
-
-func (_c *RepositoriesMock_View_Call) Run(run func()) *RepositoriesMock_View_Call {
->>>>>>> port/issues
 	_c.Call.Run(func(args mock.Arguments) {
 		run()
 	})
 	return _c
 }
 
-<<<<<<< HEAD
 func (_c *RepositoriesMock_State_Call) Return(stateRepositoryInterface state_repo.StateRepositoryInterface) *RepositoriesMock_State_Call {
 	_c.Call.Return(stateRepositoryInterface)
 	return _c
@@ -1421,6 +1386,52 @@ func (_c *RepositoriesMock_Template_Call) RunAndReturn(run func() template_repo.
 	return _c
 }
 
+// View provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) View() view_repo.ViewRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for View")
+	}
+
+	var r0 view_repo.ViewRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() view_repo.ViewRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(view_repo.ViewRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_View_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'View'
+type RepositoriesMock_View_Call struct {
+	*mock.Call
+}
+
+// View is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) View() *RepositoriesMock_View_Call {
+	return &RepositoriesMock_View_Call{Call: _e.mock.On("View")}
+}
+
+func (_c *RepositoriesMock_View_Call) Run(run func()) *RepositoriesMock_View_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_View_Call) Return(viewRepositoryInterface view_repo.ViewRepositoryInterface) *RepositoriesMock_View_Call {
+	_c.Call.Return(viewRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_View_Call) RunAndReturn(run func() view_repo.ViewRepositoryInterface) *RepositoriesMock_View_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Webhook provides a mock function for the type RepositoriesMock
 func (_mock *RepositoriesMock) Webhook() webhook_repo.WebhookRepositoryInterface {
 	ret := _mock.Called()
@@ -1463,14 +1474,6 @@ func (_c *RepositoriesMock_Webhook_Call) Return(webhookRepositoryInterface webho
 }
 
 func (_c *RepositoriesMock_Webhook_Call) RunAndReturn(run func() webhook_repo.WebhookRepositoryInterface) *RepositoriesMock_Webhook_Call {
-=======
-func (_c *RepositoriesMock_View_Call) Return(viewRepositoryInterface view_repo.ViewRepositoryInterface) *RepositoriesMock_View_Call {
-	_c.Call.Return(viewRepositoryInterface)
-	return _c
-}
-
-func (_c *RepositoriesMock_View_Call) RunAndReturn(run func() view_repo.ViewRepositoryInterface) *RepositoriesMock_View_Call {
->>>>>>> port/issues
 	_c.Call.Return(run)
 	return _c
 }
