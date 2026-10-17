@@ -16,30 +16,11 @@
       html {
         background-color: #09090a;
       }
-      html:not(.dark) {
+      html.light {
         background-color: #f4f4f5;
       }
     </style>
-    <script>
-      (function () {
-        try {
-          var stored = localStorage.getItem("theme");
-          var resolved =
-            stored === "light" || stored === "dark"
-              ? stored
-              : !stored || stored === "system"
-                ? window.matchMedia("(prefers-color-scheme: light)").matches
-                  ? "light"
-                  : "dark"
-                : "dark";
-          document.documentElement.classList.add(resolved);
-          document.documentElement.style.colorScheme = resolved;
-        } catch (e) {
-          document.documentElement.classList.add("dark");
-          document.documentElement.style.colorScheme = "dark";
-        }
-      })();
-    </script>
+    <script src="/theme.js"></script>
   </head>
   <body>
     <div id="root"></div>
