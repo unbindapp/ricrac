@@ -13,8 +13,8 @@ export function LogoMark({ className }: { className?: string }) {
 
 export function Logo() {
   return (
-    <span className="inline-flex items-center gap-2">
-      <LogoMark className="size-5 -translate-y-px" />
+    <span className="inline-flex items-baseline gap-2">
+      <LogoMark className="relative top-px size-4" />
       <span className="text-xl leading-tight font-semibold">Ricrac</span>
     </span>
   );
