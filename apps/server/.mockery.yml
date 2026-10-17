@@ -148,3 +148,39 @@ packages:
           filename: seed_service_mock.go
           structname: SeedServiceMock
           pkgname: mocks_services_seed
+  ricrac/internal/repositories/account:
+    config:
+      dir: ./mocks/repository/account
+    interfaces:
+      AccountRepositoryInterface:
+        config:
+          filename: account_repository_mock.go
+          structname: AccountRepositoryMock
+          pkgname: mocks_repository_account
+  ricrac/internal/repositories/oauth:
+    config:
+      dir: ./mocks/repository/oauth
+    interfaces:
+      OAuthRepositoryInterface:
+        config:
+          filename: oauth_repository_mock.go
+          structname: OAuthRepositoryMock
+          pkgname: mocks_repository_oauth
+  ricrac/internal/services/access:
+    config:
+      dir: ./mocks/services/access
+    interfaces:
+      AccessServiceInterface:
+        config:
+          filename: access_service_mock.go
+          structname: AccessServiceMock
+          pkgname: mocks_services_access
+  ricrac/internal/services/account:
+    config:
+      dir: ./mocks/services/account
+    interfaces:
+      AccountServiceInterface:
+        config:
+          filename: account_service_mock.go
+          structname: AccountServiceMock
+          pkgname: mocks_services_account

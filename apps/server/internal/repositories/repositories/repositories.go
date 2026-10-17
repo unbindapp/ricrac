@@ -7,11 +7,13 @@ import (
 	"ricrac/ent"
 	repository "ricrac/internal/repositories"
 	access_repo "ricrac/internal/repositories/access"
+	account_repo "ricrac/internal/repositories/account"
 	attachment_repo "ricrac/internal/repositories/attachment"
 	comment_repo "ricrac/internal/repositories/comment"
 	events_repo "ricrac/internal/repositories/events"
 	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
+	oauth_repo "ricrac/internal/repositories/oauth"
 	resolve_repo "ricrac/internal/repositories/resolve"
 	seed_repo "ricrac/internal/repositories/seed"
 )
@@ -28,6 +30,8 @@ type Repositories struct {
 	seed       seed_repo.SeedRepositoryInterface
 	comment    comment_repo.CommentRepositoryInterface
 	attachment attachment_repo.AttachmentRepositoryInterface
+	account    account_repo.AccountRepositoryInterface
+	oauth      oauth_repo.OAuthRepositoryInterface
 }
 
 func NewRepositories(db *ent.Client) *Repositories {
@@ -42,6 +46,8 @@ func NewRepositories(db *ent.Client) *Repositories {
 		seed:       seed_repo.NewSeedRepository(db),
 		comment:    comment_repo.NewCommentRepository(db),
 		attachment: attachment_repo.NewAttachmentRepository(db),
+		account:    account_repo.NewAccountRepository(db),
+		oauth:      oauth_repo.NewOAuthRepository(db),
 	}
 }
 
@@ -88,4 +94,12 @@ func (r *Repositories) Comment() comment_repo.CommentRepositoryInterface {
 
 func (r *Repositories) Attachment() attachment_repo.AttachmentRepositoryInterface {
 	return r.attachment
+}
+
+func (r *Repositories) Account() account_repo.AccountRepositoryInterface {
+	return r.account
+}
+
+func (r *Repositories) OAuth() oauth_repo.OAuthRepositoryInterface {
+	return r.oauth
 }

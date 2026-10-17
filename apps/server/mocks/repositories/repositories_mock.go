@@ -9,11 +9,13 @@ import (
 	"ricrac/ent"
 	"ricrac/internal/repositories"
 	"ricrac/internal/repositories/access"
+	"ricrac/internal/repositories/account"
 	"ricrac/internal/repositories/attachment"
 	"ricrac/internal/repositories/comment"
 	"ricrac/internal/repositories/events"
 	"ricrac/internal/repositories/issue"
 	"ricrac/internal/repositories/label"
+	"ricrac/internal/repositories/oauth"
 	"ricrac/internal/repositories/resolve"
 	"ricrac/internal/repositories/seed"
 	"time"
@@ -99,6 +101,52 @@ func (_c *RepositoriesMock_Access_Call) Return(accessRepositoryInterface access_
 }
 
 func (_c *RepositoriesMock_Access_Call) RunAndReturn(run func() access_repo.AccessRepositoryInterface) *RepositoriesMock_Access_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Account provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Account() account_repo.AccountRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Account")
+	}
+
+	var r0 account_repo.AccountRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() account_repo.AccountRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(account_repo.AccountRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Account_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Account'
+type RepositoriesMock_Account_Call struct {
+	*mock.Call
+}
+
+// Account is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Account() *RepositoriesMock_Account_Call {
+	return &RepositoriesMock_Account_Call{Call: _e.mock.On("Account")}
+}
+
+func (_c *RepositoriesMock_Account_Call) Run(run func()) *RepositoriesMock_Account_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Account_Call) Return(accountRepositoryInterface account_repo.AccountRepositoryInterface) *RepositoriesMock_Account_Call {
+	_c.Call.Return(accountRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Account_Call) RunAndReturn(run func() account_repo.AccountRepositoryInterface) *RepositoriesMock_Account_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -441,6 +489,52 @@ func (_c *RepositoriesMock_Now_Call) Return(time1 time.Time, err error) *Reposit
 }
 
 func (_c *RepositoriesMock_Now_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface) (time.Time, error)) *RepositoriesMock_Now_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// OAuth provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) OAuth() oauth_repo.OAuthRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for OAuth")
+	}
+
+	var r0 oauth_repo.OAuthRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() oauth_repo.OAuthRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(oauth_repo.OAuthRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_OAuth_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'OAuth'
+type RepositoriesMock_OAuth_Call struct {
+	*mock.Call
+}
+
+// OAuth is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) OAuth() *RepositoriesMock_OAuth_Call {
+	return &RepositoriesMock_OAuth_Call{Call: _e.mock.On("OAuth")}
+}
+
+func (_c *RepositoriesMock_OAuth_Call) Run(run func()) *RepositoriesMock_OAuth_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_OAuth_Call) Return(oAuthRepositoryInterface oauth_repo.OAuthRepositoryInterface) *RepositoriesMock_OAuth_Call {
+	_c.Call.Return(oAuthRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_OAuth_Call) RunAndReturn(run func() oauth_repo.OAuthRepositoryInterface) *RepositoriesMock_OAuth_Call {
 	_c.Call.Return(run)
 	return _c
 }
