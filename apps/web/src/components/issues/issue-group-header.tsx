@@ -16,7 +16,7 @@ export function IssueGroupHeader({ group, isCollapsed, onToggle, onCreate }: TPr
     <div
       role="listitem"
       aria-label={`${group.label}, ${group.issues.length} issues`}
-      className="bg-muted flex h-9 w-full items-center gap-2 pr-4 pl-4 text-sm"
+      className="bg-muted flex h-9 w-full items-center gap-2 px-2 text-sm sm:px-4"
     >
       <Button
         variant="ghost"

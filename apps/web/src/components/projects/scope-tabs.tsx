@@ -22,11 +22,11 @@ export function ScopeTabs({
         <TabsTab value="active">Active</TabsTab>
         <TabsTab value="archived">
           <ArchiveIcon />
-          Archived
+          <span className="max-sm:sr-only">Archived</span>
         </TabsTab>
         <TabsTab value="trash">
           <Trash2Icon />
-          Trash
+          <span className="max-sm:sr-only">Trash</span>
         </TabsTab>
       </TabsList>
     </Tabs>
