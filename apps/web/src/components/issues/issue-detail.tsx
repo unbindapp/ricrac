@@ -138,6 +138,7 @@ function IssueDetailContent({
       teamId={issue.team.id}
       issueId={issue.id}
       layout={isPeek ? "inline" : "column"}
+      hideEmpty={isPeek}
       value={draftFromIssue(issue)}
       onChange={(next) => patch(issue, next)}
       disabled={!canEdit}

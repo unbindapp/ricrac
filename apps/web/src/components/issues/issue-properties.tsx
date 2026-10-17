@@ -1,3 +1,4 @@
+import { PlusIcon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
 import type { UserRef } from "@/api/ops.gen";
@@ -18,6 +19,13 @@ import {
   type TPickerAppearance,
 } from "@/components/issues/pickers";
 import { PropertyRow } from "@/components/layout/property-row";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 
 export type TPropertyKey =
@@ -47,6 +55,8 @@ type TProps = {
   subscribers?: TSubscribers;
   disabled?: boolean;
   omit?: TPropertyKey[];
+  /** Inline, show only the properties that are set, and the others behind one "+" menu. */
+  hideEmpty?: boolean;
   /** More rows at the end of the panel (sharing, SLA, snooze). */
   children?: ReactNode;
 };
@@ -72,6 +82,7 @@ export function IssueProperties({
   subscribers,
   disabled,
   omit = [],
+  hideEmpty = false,
   children,
 }: TProps) {
   const [openProperty, setOpenProperty] = useState<TPropertyKey | null>(null);
@@ -219,13 +230,45 @@ export function IssueProperties({
   const visible = fields.filter((field) => !field.hidden && !omit.includes(field.property));
 
   if (layout === "inline") {
+    const isShown = (property: TPropertyKey) =>
+      !hideEmpty || openProperty === property || isSet(draft, property);
+    const unset = visible.filter((field) => !isShown(field.property));
     return (
       <div className="flex flex-wrap items-center gap-2">
-        {visible.map((field) => (
-          <span key={field.property} className="contents">
-            {field.node}
-          </span>
-        ))}
+        {visible
+          .filter((field) => isShown(field.property))
+          .map((field) => (
+            <span key={field.property} className="contents">
+              {field.node}
+            </span>
+          ))}
+        {!disabled && unset.length > 0 && (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  variant="outline"
+                  size="sm"
+                  forceMinSize={false}
+                  aria-label="Add property"
+                  className="text-muted-foreground px-2"
+                >
+                  <PlusIcon className="size-4" />
+                </Button>
+              }
+            />
+            <DropdownMenuContent align="start" className="w-44">
+              {unset.map((field) => (
+                <DropdownMenuItem
+                  key={field.property}
+                  onClick={() => setOpenProperty(field.property)}
+                >
+                  {field.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
     );
   }
@@ -250,6 +293,31 @@ export function IssueProperties({
       {children}
     </div>
   );
+}
+
+function isSet(draft: TIssueDraft, property: TPropertyKey) {
+  switch (property) {
+    case "state":
+      return true;
+    case "priority":
+      return draft.priority !== 0;
+    case "assignee":
+      return Boolean(draft.assignee);
+    case "labels":
+      return draft.labels.length > 0;
+    case "project":
+      return Boolean(draft.project);
+    case "milestone":
+      return Boolean(draft.projectMilestone);
+    case "cycle":
+      return Boolean(draft.cycle);
+    case "estimate":
+      return draft.estimate !== null;
+    case "due_date":
+      return Boolean(draft.dueDate);
+    case "parent":
+      return Boolean(draft.parent);
+  }
 }
 
 /** Changing the project drops a milestone of the old one. */
