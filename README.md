@@ -1,15 +1,16 @@
 # Ricrac
 
-An issue tracker for agents. Ricrac has teams, issues, workflows, projects, initiatives, cycles
-and the rest, but no interface for working in it: agents use it
-through an MCP server and a REST API. People sign in with Google to a small dashboard to manage
-workspaces, members, API keys and OAuth apps, approve connections, and open read-only pages for the
-links agents share.
+The issue tracker for people and agents. Ricrac has teams, issues, workflows, projects,
+initiatives, cycles and the rest. People work in it through the web app (sign in with Google):
+lists and boards, an inbox, a command panel and keyboard shortcuts. Agents work in it through an
+MCP server and a REST API, with the same workspaces, operations and permissions.
 
 ## Features
 
 - **Workspaces** with members and roles (owner, admin, member, guest), email invitations and an
   audit log.
+- **Email**: invitations, and digests of notifications still unread after a couple of minutes
+  (each person can turn them off).
 - **Teams** with keys (ENG), private teams, sub-teams, members, and settings: estimates
   (exponential, Fibonacci, linear, t-shirt), cycles, triage with responsibility rotations,
   auto-archive, auto-close, and auto-closing parents and sub-issues.
@@ -36,6 +37,11 @@ links agents share.
   issues on a schedule, project templates with milestones and issues, document templates), an **inbox** of notifications
   (read, archive, snooze), **customers** and customer requests, **releases** with pipelines,
   stages and release notes, and **webhooks** signed with HMAC-SHA256.
+- **GitHub**, as a GitHub App admins install on their repositories: pull requests, branches and
+  commits that mention ENG-123 are attached to the issue and move it (opened, then done when a
+  pull request that fixes it merges or a fixing commit lands on the default branch), and
+  repositories synced with a team keep their issues and comments in step both ways. See
+  [docs/github-app.md](docs/github-app.md).
 
 ## Connecting agents
 
@@ -47,10 +53,10 @@ links agents share.
   with `find_operations` and run with `call_operation` (`/mcp?tools=all` lists every operation as
   a tool instead).
 - **REST**: `https://<host>/v1`, with `Authorization: Bearer <token>`. The token is an OAuth
-  access token or an API key (`rr_key_...`) made in the dashboard. The OpenAPI document is at
+  access token or an API key (`rr_key_...`) made in the web app (Settings → API keys). The OpenAPI document is at
   `/v1/openapi.json` and an overview for agents at `/llms.txt`. Every operation is also
   `POST /v1/ops/<name>`.
-- **OAuth apps** (for integrations such as Motile) are registered in the dashboard: authorize at
+- **OAuth apps** (for integrations such as Motile) are registered in the web app (Settings → OAuth apps): authorize at
   `/oauth/authorize`, exchange codes at `/oauth/token` (with the client secret, or PKCE without
   it), revoke at `/oauth/revoke`. Scopes are `read`, `write` and `admin`.
 - **Webhooks** POST `{action, type, data, updatedFrom, url, ...}` with a `Ricrac-Signature`
@@ -64,10 +70,13 @@ links agents share.
 | `PUBLIC_URL` | External base URL, e.g. `https://ricrac.example.com`. |
 | `SECRET_KEY` | At least 32 characters; signs session cookies. |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Sign-in with Google. The OAuth client's redirect URI is `<PUBLIC_URL>/api/auth/callback/google`. |
+| `SMTP_URL`, `EMAIL_FROM` | Email for invitations and notification digests, e.g. `smtps://resend:<API key>@smtp.resend.com:465` and `Ricrac <notifications@example.com>`. Without them no emails are sent. |
+| `GITHUB_APP_ID`, `GITHUB_APP_SLUG`, `GITHUB_APP_PRIVATE_KEY`, `GITHUB_WEBHOOK_SECRET`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | The GitHub App (see [docs/github-app.md](docs/github-app.md)): its id, its URL name (`github.com/apps/<slug>`), its private key (PEM; `\n` for line breaks works), the webhook secret, and its OAuth client id and secret. All or none; without them GitHub is off. |
+| `GITHUB_API_URL`, `GITHUB_WEB_URL` | GitHub's API and web addresses, `https://api.github.com` and `https://github.com` by default (for GitHub Enterprise or tests). |
 | `MAX_UPLOAD_MB` | Largest uploaded file, 25 by default. |
 | `PORT` | 3000 by default. |
 
 ## Development
 
-See AGENTS.md. In short: `docker compose up -d`, then `cargo run` in `apps/server` and
+See AGENTS.md. In short: `docker compose up -d`, then `go run .` in `apps/server` and
 `bun dev` in `apps/web`.

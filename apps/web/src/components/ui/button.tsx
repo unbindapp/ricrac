@@ -1,66 +1,243 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "cn"
-import { Slot } from "radix-ui"
+import { useRender } from "@base-ui/react/use-render";
+import { createLink, type LinkComponent } from "@tanstack/react-router";
+import { cva, type VariantProps } from "class-variance-authority";
+import * as React from "react";
+
+import { cn } from "@/components/ui/utils";
+import { LoaderIcon } from "lucide-react";
+
+export const minButtonSizeEnforcerClassName =
+  "before:w-full before:h-full before:min-w-[44px] before:min-h-[44px] before:z-[-1] before:bg-transparent before:absolute before:-translate-y-1/2 before:top-1/2 before:-translate-x-1/2 before:left-1/2";
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-md border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "relative group/button focus-visible:z-[1] text-center leading-tight max-w-full select-none z-0 touch-manipulation gap-1.5 rounded-md text-sm font-medium focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-primary/8-10 disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 data-pending:[&>*:not([data-slot=button-spinner])]:opacity-0",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/80",
-        outline:
-          "border-border bg-background shadow-xs hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
-        ghost:
-          "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
+        default:
+          "bg-primary text-primary-foreground has-hover:hover:bg-primary/85 active:bg-primary/85",
         destructive:
-          "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-destructive text-destructive-foreground has-hover:hover:bg-destructive/85 active:bg-destructive/85",
+        warning:
+          "bg-warning text-warning-foreground has-hover:hover:bg-warning/85 active:bg-warning/85",
+        success:
+          "bg-success text-success-foreground has-hover:hover:bg-success/85 active:bg-success/85",
+        process:
+          "bg-process text-process-foreground has-hover:hover:bg-process/85 active:bg-process/85",
+        change: "bg-change text-change-foreground has-hover:hover:bg-change/85 active:bg-change/85",
+        outline:
+          "border border-border bg-background has-hover:hover:bg-border active:bg-border has-hover:hover:text-foreground active:text-foreground",
+        "outline-muted":
+          "border border-border bg-background has-hover:hover:bg-card active:bg-card has-hover:hover:text-foreground active:text-foreground",
+        "outline-foreground":
+          "border border-foreground bg-background has-hover:hover:bg-foreground/3-10 active:bg-foreground/3-10 has-hover:hover:text-foreground active:text-foreground",
+        "outline-process":
+          "border text-process border-process/6-10 bg-background has-hover:hover:bg-process/3-10 active:bg-process/3-10 has-hover:hover:text-process active:text-process",
+        "outline-change":
+          "border text-change border-change/6-10 bg-background has-hover:hover:bg-change/3-10 active:bg-change/3-10 has-hover:hover:text-change active:text-change",
+        "warning-outline":
+          "border border-warning/6-10 bg-background has-hover:hover:bg-warning/3-10 active:bg-warning/3-10 has-hover:hover:border-warning/0 active:border-warning/0 text-warning has-hover:hover:text-warning active:text-warning",
+        secondary:
+          "bg-secondary text-secondary-foreground has-hover:hover:bg-secondary active:bg-secondary",
+        ghost:
+          "has-hover:hover:bg-border has-hover:hover:text-foreground active:bg-border active:text-foreground",
+        "ghost-destructive":
+          "text-destructive has-hover:hover:bg-destructive/4-10 has-hover:hover:text-destructive active:bg-destructive/4-10 active:text-destructive",
+        "ghost-success":
+          "text-success has-hover:hover:bg-success/4-10 has-hover:hover:text-success active:bg-success/4-10 active:text-success",
+        "ghost-warning":
+          "text-warning has-hover:hover:bg-warning/4-10 has-hover:hover:text-warning active:bg-warning/4-10 active:text-warning",
+        "ghost-warning-foreground":
+          "text-foreground has-hover:hover:bg-warning/4-10 has-hover:hover:text-foreground active:bg-warning/4-10 active:text-foreground",
+        "ghost-process":
+          "text-process has-hover:hover:bg-process/4-10 has-hover:hover:text-process active:bg-process/4-10 active:text-process",
+        "ghost-change":
+          "text-change has-hover:hover:bg-change/4-10 has-hover:hover:text-change active:bg-change/4-10 active:text-change",
+        "ghost-change-foreground":
+          "text-foreground has-hover:hover:bg-change/4-10 has-hover:hover:text-foreground active:bg-change/4-10 active:text-foreground",
+        "ghost-foreground":
+          "text-foreground has-hover:hover:bg-foreground/3-10 has-hover:hover:text-foreground active:bg-foreground/3-10 active:text-foreground",
+        card: "bg-card text-foreground has-hover:hover:bg-card-hover active:bg-card-hover",
+        link: "text-primary underline-offset-4 has-hover:hover:underline active:underline",
       },
       size: {
-        default:
-          "h-9 gap-1.5 px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-        xs: "h-6 gap-1 rounded-[min(var(--radius-md),8px)] px-2 text-xs in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-8 gap-1 rounded-[min(var(--radius-md),10px)] px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5",
-        lg: "h-10 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-        icon: "size-9",
-        "icon-xs":
-          "size-6 rounded-[min(var(--radius-md),8px)] in-data-[slot=button-group]:rounded-md [&_svg:not([class*='size-'])]:size-3",
-        "icon-sm":
-          "size-8 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-md",
-        "icon-lg": "size-10",
+        default: "h-9 px-4",
+        sm: "h-7 px-2.5",
+        icon: "size-8 shrink-0 flex items-center justify-center",
+      },
+      loadingState: {
+        default: "",
+        loading: "opacity-75 disabled:opacity-75",
+      },
+      fadeOnDisabled: {
+        default: "disabled:not-data-pending:opacity-50",
+        false: "",
+      },
+      forceMinSize: {
+        default: minButtonSizeEnforcerClassName,
+        medium:
+          "before:w-full before:h-full before:min-w-[36px] before:min-h-[36px] before:z-[-1] before:bg-transparent before:absolute before:-translate-y-1/2 before:top-1/2 before:-translate-x-1/2 before:left-1/2",
+        false: "",
+      },
+      focusVariant: {
+        default: "focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "input-like": "",
+      },
+      layout: {
+        default: "",
+        flex: "inline-flex items-center justify-center",
       },
     },
+    compoundVariants: [
+      {
+        variant: ["default", "destructive", "warning", "success", "process", "change"],
+        fadeOnDisabled: "default",
+        className:
+          "disabled:not-data-pending:bg-muted disabled:not-data-pending:text-muted-foreground disabled:not-data-pending:opacity-100",
+      },
+    ],
     defaultVariants: {
       variant: "default",
       size: "default",
+      loadingState: "default",
+      fadeOnDisabled: "default",
+      focusVariant: "default",
+      forceMinSize: "default",
+      layout: "default",
     },
-  }
-)
+  },
+);
+
+const spinnerVariants = cva(
+  "pointer-events-none opacity-0 group-data-pending/button:opacity-100 absolute top-1/2 left-1/2 -translate-1/2 animate-spin group-data-submitting/button:opacity-100",
+  {
+    variants: {
+      size: {
+        default: "size-4",
+        sm: "size-4",
+        icon: "size-4",
+      },
+    },
+    defaultVariants: {
+      size: "default",
+    },
+  },
+);
+
+export type TButtonProps = React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    spinnerVariants?: VariantProps<typeof spinnerVariants>;
+  } & {
+    render?: useRender.RenderProp;
+    isPending?: boolean;
+  };
+
+export type TButtonVariants = VariantProps<typeof buttonVariants>;
 
 function Button({
   className,
-  variant = "default",
-  size = "default",
-  asChild = false,
+  variant,
+  size,
+  disabled,
+  fadeOnDisabled,
+  focusVariant,
+  forceMinSize,
+  loadingState,
+  isPending,
+  render,
+  spinnerVariants: spinnerVariantProps,
+  children,
   ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
-  }) {
-  const Comp = asChild ? Slot.Root : "button"
-
-  return (
-    <Comp
-      data-slot="button"
-      data-variant={variant}
-      data-size={size}
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
-    />
-  )
+}: TButtonProps) {
+  const isText = React.Children.toArray(children).every(
+    (c) => typeof c === "string" || typeof c === "number",
+  );
+  return useRender({
+    render: render ?? <button />,
+    props: {
+      "data-pending": isPending || undefined,
+      className: cn(
+        buttonVariants({
+          variant,
+          size,
+          loadingState,
+          fadeOnDisabled,
+          focusVariant,
+          forceMinSize,
+          layout: isText && !render ? undefined : "flex",
+          className,
+        }),
+      ),
+      disabled: loadingState === "loading" || isPending ? true : disabled,
+      children: isPending ? (
+        <>
+          <LoaderIcon
+            data-slot="button-spinner"
+            className={cn(spinnerVariants(spinnerVariantProps))}
+          />
+          {isText ? <p className="min-w-0 shrink">{children}</p> : children}
+        </>
+      ) : isText ? (
+        <p className="min-w-0 shrink">{children}</p>
+      ) : (
+        children
+      ),
+      ...props,
+    },
+  });
 }
 
-export { Button, buttonVariants }
+export type TLinkButtonBaseProps = Omit<React.ComponentPropsWithoutRef<"a">, "color"> &
+  VariantProps<typeof buttonVariants>;
+
+const LinkButtonBase = React.forwardRef<HTMLAnchorElement, TLinkButtonBaseProps>(
+  (
+    {
+      className,
+      variant,
+      size,
+      loadingState,
+      fadeOnDisabled,
+      focusVariant,
+      forceMinSize,
+      children,
+      ...props
+    },
+    ref,
+  ) => {
+    const isText = React.Children.toArray(children).every(
+      (c) => typeof c === "string" || typeof c === "number",
+    );
+    return (
+      <a
+        ref={ref}
+        className={cn(
+          buttonVariants({
+            variant,
+            size,
+            loadingState,
+            fadeOnDisabled,
+            focusVariant,
+            forceMinSize,
+            layout: "flex",
+            className,
+          }),
+        )}
+        {...props}
+      >
+        {isText ? <p className="min-w-0 shrink">{children}</p> : children}
+      </a>
+    );
+  },
+);
+LinkButtonBase.displayName = "LinkButtonBase";
+
+const CreatedLinkButton = createLink(LinkButtonBase);
+
+const LinkButton: LinkComponent<typeof LinkButtonBase> = (props) => (
+  <CreatedLinkButton {...props} />
+);
+
+export type TLinkButtonProps = React.ComponentProps<typeof LinkButton>;
+
+export { Button, buttonVariants, LinkButton };

@@ -1,0 +1,42 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { githubErrorMessage, githubEventLabel, importSummary, isImporting } from "./github-sync.ts";
+
+const backfill = {
+  status: "completed" as const,
+  issuesCreated: 12,
+  issuesUpdated: 3,
+  commentsCreated: 1,
+  skipped: 0,
+};
+
+test("a pending or running import is importing", () => {
+  assert.equal(isImporting({ backfill: { ...backfill, status: "pending" } }), true);
+  assert.equal(isImporting({ backfill: { ...backfill, status: "running" } }), true);
+  assert.equal(isImporting({ backfill }), false);
+  assert.equal(isImporting({ backfill: null }), false);
+});
+
+test("the import summary counts what was created and updated", () => {
+  assert.equal(importSummary(backfill), "12 issues created, 3 updated, 1 comment");
+  assert.equal(
+    importSummary({ ...backfill, issuesCreated: 1, skipped: 2 }),
+    "1 issue created, 3 updated, 1 comment, 2 skipped",
+  );
+});
+
+test("a pending import or none has no summary", () => {
+  assert.equal(importSummary(null), null);
+  assert.equal(importSummary({ ...backfill, status: "pending" }), null);
+});
+
+test("known errors explain themselves and unknown ones fall back", () => {
+  assert.match(githubErrorMessage("connected_elsewhere"), /another workspace/);
+  assert.equal(githubErrorMessage("nonsense"), githubErrorMessage("failed"));
+});
+
+test("webhook events read as sentences", () => {
+  assert.equal(githubEventLabel("pull_request.opened"), "Pull request opened");
+  assert.equal(githubEventLabel("push"), "Push");
+});

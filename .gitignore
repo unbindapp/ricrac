@@ -8,3 +8,8 @@ node_modules/
 .vscode/
 *.swp
 .DS_Store
+
+# The web build the Go server embeds; the committed index.html is a placeholder.
+!apps/server/server/dist/
+apps/server/server/dist/*
+!apps/server/server/dist/index.html

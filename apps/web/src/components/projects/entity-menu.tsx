@@ -1,0 +1,129 @@
+import {
+  ArchiveIcon,
+  ArchiveRestoreIcon,
+  EllipsisIcon,
+  HistoryIcon,
+  Trash2Icon,
+  UndoIcon,
+} from "lucide-react";
+
+import { type ReactNode } from "react";
+
+import { RelativeTime } from "@/components/shared/relative-time";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "@/components/ui/toast";
+
+type TProps = {
+  /** project, initiative, document */
+  noun: string;
+  isArchived?: boolean;
+  onArchive?: (archive: boolean) => void;
+  onTrash: () => void;
+  onShowHistory?: () => void;
+};
+
+/** Trashed things can't be opened, so their page is left with a toast that brings them back. */
+export function toastTrashed(title: string, onUndo: () => void) {
+  const id = toast.add({
+    type: "success",
+    title,
+    data: {
+      action: (
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            toast.close(id);
+            onUndo();
+          }}
+        >
+          <UndoIcon className="size-4" />
+          Undo
+        </Button>
+      ),
+    },
+  });
+}
+
+/** A row in the trash: it can't be opened, only restored. */
+export function TrashedRow({
+  icon,
+  name,
+  trashedAt,
+  isPending,
+  onRestore,
+}: {
+  icon: ReactNode;
+  name: string;
+  trashedAt: string | null;
+  isPending?: boolean;
+  onRestore?: () => void;
+}) {
+  return (
+    <div
+      role="listitem"
+      className="text-muted-foreground flex h-9 w-full items-center gap-3 border-b px-3 text-sm last:border-b-0"
+    >
+      {icon}
+      <span className="min-w-0 flex-1 truncate">{name}</span>
+      {trashedAt && (
+        <span className="shrink-0 text-xs">
+          Trashed <RelativeTime value={trashedAt} />
+        </span>
+      )}
+      {onRestore && (
+        <Button variant="outline" size="sm" isPending={isPending} onClick={onRestore}>
+          <UndoIcon className="size-4" />
+          Restore
+        </Button>
+      )}
+    </div>
+  );
+}
+
+/** The ⋯ menu of a project, initiative or document page. */
+export function EntityMenu({ noun, isArchived, onArchive, onTrash, onShowHistory }: TProps) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        render={
+          <Button variant="ghost" size="icon" aria-label={`More ${noun} actions`}>
+            <EllipsisIcon className="size-4" />
+          </Button>
+        }
+      />
+      <DropdownMenuContent align="end" className="w-52">
+        {onShowHistory && (
+          <>
+            <DropdownMenuItem onClick={onShowHistory}>
+              <HistoryIcon className="size-4" />
+              Version history
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
+        {onArchive && (
+          <DropdownMenuItem onClick={() => onArchive(!isArchived)}>
+            {isArchived ? (
+              <ArchiveRestoreIcon className="size-4" />
+            ) : (
+              <ArchiveIcon className="size-4" />
+            )}
+            {isArchived ? "Unarchive" : "Archive"}
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuItem className="text-destructive" onClick={onTrash}>
+          <Trash2Icon className="size-4" />
+          Move {noun} to trash
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
