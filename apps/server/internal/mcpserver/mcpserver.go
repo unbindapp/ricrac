@@ -365,7 +365,7 @@ func (m *mcpCall) callTool(name string, arguments M) (any, *rpcError) {
 	if err != nil {
 		return M{"content": []any{M{"type": "text", "text": errdefs.As(err).Message}}, "isError": true}, nil
 	}
-	return M{"content": []any{M{"type": "text", "text": string(errdefs.Marshal(value))}}, "isError": false}, nil
+	return M{"content": []any{M{"type": "text", "text": resultText(value)}}, "isError": false}, nil
 }
 
 // reach is what the caller's token reaches, which decides the tools they see and their

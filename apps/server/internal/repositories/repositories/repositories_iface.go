@@ -9,11 +9,14 @@ import (
 	access_repo "ricrac/internal/repositories/access"
 	attachment_repo "ricrac/internal/repositories/attachment"
 	comment_repo "ricrac/internal/repositories/comment"
+	customer_repo "ricrac/internal/repositories/customer"
 	events_repo "ricrac/internal/repositories/events"
 	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
+	release_repo "ricrac/internal/repositories/release"
 	resolve_repo "ricrac/internal/repositories/resolve"
 	seed_repo "ricrac/internal/repositories/seed"
+	webhook_repo "ricrac/internal/repositories/webhook"
 	"time"
 )
 
@@ -31,4 +34,7 @@ type RepositoriesInterface interface {
 	Seed() seed_repo.SeedRepositoryInterface
 	Comment() comment_repo.CommentRepositoryInterface
 	Attachment() attachment_repo.AttachmentRepositoryInterface
+	Customer() customer_repo.CustomerRepositoryInterface
+	Release() release_repo.ReleaseRepositoryInterface
+	Webhook() webhook_repo.WebhookRepositoryInterface
 }

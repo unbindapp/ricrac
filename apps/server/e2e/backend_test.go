@@ -143,7 +143,7 @@ func (b *backend) SendEmails(ctx context.Context) error {
 }
 
 func (b *backend) DeliverDueWebhooks(ctx context.Context) (int, error) {
-	return ops.DeliverDueWebhooks(ctx, b.state)
+	return b.server.WebhookService.DeliverDue(ctx)
 }
 
 func (b *backend) GitHubJobs(ctx context.Context) (bool, error) {

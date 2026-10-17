@@ -11,11 +11,14 @@ import (
 	"ricrac/internal/repositories/access"
 	"ricrac/internal/repositories/attachment"
 	"ricrac/internal/repositories/comment"
+	"ricrac/internal/repositories/customer"
 	"ricrac/internal/repositories/events"
 	"ricrac/internal/repositories/issue"
 	"ricrac/internal/repositories/label"
+	"ricrac/internal/repositories/release"
 	"ricrac/internal/repositories/resolve"
 	"ricrac/internal/repositories/seed"
+	"ricrac/internal/repositories/webhook"
 	"time"
 
 	mock "github.com/stretchr/testify/mock"
@@ -191,6 +194,52 @@ func (_c *RepositoriesMock_Comment_Call) Return(commentRepositoryInterface comme
 }
 
 func (_c *RepositoriesMock_Comment_Call) RunAndReturn(run func() comment_repo.CommentRepositoryInterface) *RepositoriesMock_Comment_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Customer provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Customer() customer_repo.CustomerRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Customer")
+	}
+
+	var r0 customer_repo.CustomerRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() customer_repo.CustomerRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(customer_repo.CustomerRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Customer_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Customer'
+type RepositoriesMock_Customer_Call struct {
+	*mock.Call
+}
+
+// Customer is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Customer() *RepositoriesMock_Customer_Call {
+	return &RepositoriesMock_Customer_Call{Call: _e.mock.On("Customer")}
+}
+
+func (_c *RepositoriesMock_Customer_Call) Run(run func()) *RepositoriesMock_Customer_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Customer_Call) Return(customerRepositoryInterface customer_repo.CustomerRepositoryInterface) *RepositoriesMock_Customer_Call {
+	_c.Call.Return(customerRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Customer_Call) RunAndReturn(run func() customer_repo.CustomerRepositoryInterface) *RepositoriesMock_Customer_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -445,6 +494,52 @@ func (_c *RepositoriesMock_Now_Call) RunAndReturn(run func(ctx context.Context, 
 	return _c
 }
 
+// Release provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Release() release_repo.ReleaseRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Release")
+	}
+
+	var r0 release_repo.ReleaseRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() release_repo.ReleaseRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(release_repo.ReleaseRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Release_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Release'
+type RepositoriesMock_Release_Call struct {
+	*mock.Call
+}
+
+// Release is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Release() *RepositoriesMock_Release_Call {
+	return &RepositoriesMock_Release_Call{Call: _e.mock.On("Release")}
+}
+
+func (_c *RepositoriesMock_Release_Call) Run(run func()) *RepositoriesMock_Release_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Release_Call) Return(releaseRepositoryInterface release_repo.ReleaseRepositoryInterface) *RepositoriesMock_Release_Call {
+	_c.Call.Return(releaseRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Release_Call) RunAndReturn(run func() release_repo.ReleaseRepositoryInterface) *RepositoriesMock_Release_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Resolve provides a mock function for the type RepositoriesMock
 func (_mock *RepositoriesMock) Resolve() resolve_repo.ResolveRepositoryInterface {
 	ret := _mock.Called()
@@ -533,6 +628,52 @@ func (_c *RepositoriesMock_Seed_Call) Return(seedRepositoryInterface seed_repo.S
 }
 
 func (_c *RepositoriesMock_Seed_Call) RunAndReturn(run func() seed_repo.SeedRepositoryInterface) *RepositoriesMock_Seed_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Webhook provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Webhook() webhook_repo.WebhookRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Webhook")
+	}
+
+	var r0 webhook_repo.WebhookRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() webhook_repo.WebhookRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(webhook_repo.WebhookRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Webhook_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Webhook'
+type RepositoriesMock_Webhook_Call struct {
+	*mock.Call
+}
+
+// Webhook is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Webhook() *RepositoriesMock_Webhook_Call {
+	return &RepositoriesMock_Webhook_Call{Call: _e.mock.On("Webhook")}
+}
+
+func (_c *RepositoriesMock_Webhook_Call) Run(run func()) *RepositoriesMock_Webhook_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Webhook_Call) Return(webhookRepositoryInterface webhook_repo.WebhookRepositoryInterface) *RepositoriesMock_Webhook_Call {
+	_c.Call.Return(webhookRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Webhook_Call) RunAndReturn(run func() webhook_repo.WebhookRepositoryInterface) *RepositoriesMock_Webhook_Call {
 	_c.Call.Return(run)
 	return _c
 }

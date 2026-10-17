@@ -9,11 +9,14 @@ import (
 	access_repo "ricrac/internal/repositories/access"
 	attachment_repo "ricrac/internal/repositories/attachment"
 	comment_repo "ricrac/internal/repositories/comment"
+	customer_repo "ricrac/internal/repositories/customer"
 	events_repo "ricrac/internal/repositories/events"
 	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
+	release_repo "ricrac/internal/repositories/release"
 	resolve_repo "ricrac/internal/repositories/resolve"
 	seed_repo "ricrac/internal/repositories/seed"
+	webhook_repo "ricrac/internal/repositories/webhook"
 )
 
 //go:generate go run -mod=mod github.com/vburenin/ifacemaker -f "*.go" -i RepositoriesInterface -p repositories -s Repositories -o repositories_iface.go
@@ -28,6 +31,9 @@ type Repositories struct {
 	seed       seed_repo.SeedRepositoryInterface
 	comment    comment_repo.CommentRepositoryInterface
 	attachment attachment_repo.AttachmentRepositoryInterface
+	customer   customer_repo.CustomerRepositoryInterface
+	release    release_repo.ReleaseRepositoryInterface
+	webhook    webhook_repo.WebhookRepositoryInterface
 }
 
 func NewRepositories(db *ent.Client) *Repositories {
@@ -42,6 +48,9 @@ func NewRepositories(db *ent.Client) *Repositories {
 		seed:       seed_repo.NewSeedRepository(db),
 		comment:    comment_repo.NewCommentRepository(db),
 		attachment: attachment_repo.NewAttachmentRepository(db),
+		customer:   customer_repo.NewCustomerRepository(db),
+		release:    release_repo.NewReleaseRepository(db),
+		webhook:    webhook_repo.NewWebhookRepository(db),
 	}
 }
 
@@ -88,4 +97,16 @@ func (r *Repositories) Comment() comment_repo.CommentRepositoryInterface {
 
 func (r *Repositories) Attachment() attachment_repo.AttachmentRepositoryInterface {
 	return r.attachment
+}
+
+func (r *Repositories) Customer() customer_repo.CustomerRepositoryInterface {
+	return r.customer
+}
+
+func (r *Repositories) Release() release_repo.ReleaseRepositoryInterface {
+	return r.release
+}
+
+func (r *Repositories) Webhook() webhook_repo.WebhookRepositoryInterface {
+	return r.webhook
 }

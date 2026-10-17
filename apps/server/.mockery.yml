@@ -148,3 +148,57 @@ packages:
           filename: seed_service_mock.go
           structname: SeedServiceMock
           pkgname: mocks_services_seed
+  ricrac/internal/repositories/customer:
+    config:
+      dir: ./mocks/repository/customer
+    interfaces:
+      CustomerRepositoryInterface:
+        config:
+          filename: customer_repository_mock.go
+          structname: CustomerRepositoryMock
+          pkgname: mocks_repository_customer
+  ricrac/internal/repositories/release:
+    config:
+      dir: ./mocks/repository/release
+    interfaces:
+      ReleaseRepositoryInterface:
+        config:
+          filename: release_repository_mock.go
+          structname: ReleaseRepositoryMock
+          pkgname: mocks_repository_release
+  ricrac/internal/repositories/webhook:
+    config:
+      dir: ./mocks/repository/webhook
+    interfaces:
+      WebhookRepositoryInterface:
+        config:
+          filename: webhook_repository_mock.go
+          structname: WebhookRepositoryMock
+          pkgname: mocks_repository_webhook
+  ricrac/internal/services/customer:
+    config:
+      dir: ./mocks/services/customer
+    interfaces:
+      CustomerServiceInterface:
+        config:
+          filename: customer_service_mock.go
+          structname: CustomerServiceMock
+          pkgname: mocks_services_customer
+  ricrac/internal/services/release:
+    config:
+      dir: ./mocks/services/release
+    interfaces:
+      ReleaseServiceInterface:
+        config:
+          filename: release_service_mock.go
+          structname: ReleaseServiceMock
+          pkgname: mocks_services_release
+  ricrac/internal/services/webhook:
+    config:
+      dir: ./mocks/services/webhook
+    interfaces:
+      WebhookServiceInterface:
+        config:
+          filename: webhook_service_mock.go
+          structname: WebhookServiceMock
+          pkgname: mocks_services_webhook
