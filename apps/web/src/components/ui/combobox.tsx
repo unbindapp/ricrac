@@ -9,7 +9,7 @@ function ComboboxInput({ className, ...props }: ComboboxPrimitive.Input.Props) {
   return (
     <ComboboxPrimitive.Input
       className={cn(
-        "bg-input placeholder:text-muted-foreground focus-visible:ring-primary/8-10 has-hover:hover:ring-primary/6-10 has-hover:hover:focus-visible:ring-primary/8-10 data-staged:focus-visible:ring-change/8-10 data-staged:has-hover:hover:ring-change/7-10 data-staged:has-hover:hover:focus-visible:ring-change/8-10 flex h-9 w-full rounded-md border px-3 py-1.5 text-sm leading-tight focus-visible:ring-1 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50 has-hover:hover:ring-1 disabled:has-hover:hover:ring-0",
+        "bg-input placeholder:text-muted-foreground focus-visible:ring-primary/8-10 has-hover:hover:ring-border has-hover:hover:focus-visible:ring-primary/8-10 data-staged:focus-visible:ring-change/8-10 data-staged:has-hover:hover:ring-change/7-10 data-staged:has-hover:hover:focus-visible:ring-change/8-10 flex h-8 w-full rounded-md border px-2.5 py-1.5 text-sm leading-tight focus-visible:ring-1 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50 has-hover:hover:ring-1 disabled:has-hover:hover:ring-0",
         className,
       )}
       {...props}

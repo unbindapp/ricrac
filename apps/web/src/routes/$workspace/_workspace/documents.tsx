@@ -74,7 +74,7 @@ function DocumentsPage() {
                   void navigate({ search: { view: value === "trash" ? "trash" : undefined } })
                 }
               >
-                <TabsList className="border-b-0">
+                <TabsList>
                   <TabsTab value="all">All</TabsTab>
                   <TabsTab value="trash">
                     <Trash2Icon />
@@ -110,7 +110,7 @@ function DocumentsPage() {
         />
       )}
       {documents.length > 0 && (
-        <List>
+        <List flush>
           {documents.map((document) =>
             isTrash ? (
               <TrashedDocumentRow key={document.id} document={document} />

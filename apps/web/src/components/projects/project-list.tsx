@@ -92,7 +92,7 @@ export function ProjectList({
     );
 
   return (
-    <List>
+    <List flush>
       <ProjectListHeader />
       {groups
         .filter((group) => group.projects.length > 0)
@@ -128,7 +128,7 @@ function TrashedProjects({ projects }: { projects: Project[] }) {
     (b.trashedAt ?? "").localeCompare(a.trashedAt ?? ""),
   );
   return (
-    <List>
+    <List flush>
       {newestFirst.map((project) => (
         <TrashedRow
           key={project.id}

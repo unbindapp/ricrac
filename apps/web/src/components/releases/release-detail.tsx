@@ -11,6 +11,7 @@ import {
 import { type ReactNode, useState } from "react";
 
 import type { ReleaseDetail as TReleaseDetail, ReleasePipeline } from "@/api/ops.gen";
+import { PageBar } from "@/components/layout/page-header";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
@@ -95,7 +96,7 @@ function ReleasePage({
 
   return (
     <PageContainer>
-      <div className="flex min-h-9 w-full items-center gap-2">
+      <PageBar>
         <div className="min-w-0 flex-1">
           <Breadcrumb
             items={[
@@ -113,7 +114,7 @@ function ReleasePage({
           />
         </div>
         {canEdit && <ReleaseActions release={release} pipeline={pipeline} />}
-      </div>
+      </PageBar>
       <div className="flex w-full flex-col gap-6 lg:flex-row">
         <div className="flex min-w-0 flex-1 flex-col gap-6">
           <div className="flex flex-col gap-2">

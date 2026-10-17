@@ -1,7 +1,7 @@
 @font-face {
-  font-family: "DM Sans";
-  src: url("/fonts/DMSansVF.woff2") format("woff2");
-  font-weight: 100 1000;
+  font-family: "Inter";
+  src: url("/fonts/InterVariable.woff2") format("woff2");
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
@@ -15,65 +15,77 @@
 }
 
 :root {
-  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, monospace;
+}
+
+@theme {
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.8125rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 0.9375rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.0625rem;
+  --text-lg--line-height: 1.5rem;
 }
 
 :root {
   --radius: 0.5rem;
 
-  /* If you change --background, also update the anti-flash <style> in index.html */
-  --background: hsl(220 20% 98%);
-  --foreground: hsl(220 25% 8%);
-  --card: hsl(0 0% 100%);
-  --card-hover: hsl(220 16% 96%);
-  --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(220 25% 8%);
-  --logo: hsl(0 0% 0%);
-  --logo-foreground: hsl(0 0% 100%);
-  --primary: hsl(220 25% 10%);
-  --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(220 14% 94%);
-  --secondary-foreground: hsl(220 25% 8%);
-  --muted: hsl(220 14% 94%);
-  --muted-foreground: hsl(220 10% 42%);
-  --muted-more-foreground: hsl(220 9% 58%);
-  --muted-most-foreground: hsl(220 9% 74%);
-  --accent: hsl(220 14% 93%);
-  --accent-foreground: hsl(220 25% 8%);
-  --destructive: hsl(0 72% 45%);
-  --destructive-foreground: hsl(0 0% 100%);
-  --warning: hsl(28 90% 35%);
-  --warning-foreground: hsl(0 0% 100%);
-  --success: hsl(150 60% 30%);
-  --success-foreground: hsl(0 0% 100%);
-  --process: hsl(212 80% 45%);
-  --process-foreground: hsl(0 0% 100%);
-  --change: hsl(170 80% 28%);
-  --change-foreground: hsl(0 0% 100%);
-  --wait: hsl(28 90% 42%);
-  --wait-foreground: hsl(0 0% 100%);
-  --shadow-color: hsl(220 30% 10%);
-  --border: hsl(220 14% 90%);
-  --input: hsl(0 0% 100%);
-  --ring: hsl(220 25% 10%);
+  /* If you change --sidebar, also update the anti-flash <style> in index.html */
+  --sidebar: #f4f4f5;
+  --background: #fdfdfd;
+  --foreground: #1b1b1f;
+  --card: #ffffff;
+  --card-hover: #f4f4f5;
+  --popover: #ffffff;
+  --popover-foreground: #1b1b1f;
+  --logo: #5e6ad2;
+  --logo-foreground: #ffffff;
+  --primary: #5e6ad2;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f1f3;
+  --secondary-foreground: #1b1b1f;
+  --muted: #f1f1f3;
+  --muted-foreground: #6b6b73;
+  --muted-more-foreground: #8e8e96;
+  --muted-most-foreground: #b4b4bb;
+  --accent: #ebebee;
+  --accent-foreground: #1b1b1f;
+  --destructive: #d93b3b;
+  --destructive-foreground: #ffffff;
+  --warning: #c27b0a;
+  --warning-foreground: #ffffff;
+  --success: #2f9e6a;
+  --success-foreground: #ffffff;
+  --process: #3b7fe0;
+  --process-foreground: #ffffff;
+  --change: #1a9a8a;
+  --change-foreground: #ffffff;
+  --wait: #d9822b;
+  --wait-foreground: #ffffff;
+  --shadow-color: #1b1b1f;
+  --border: #e6e6e9;
+  --input: #ffffff;
+  --ring: #5e6ad2;
 
-  --chart-1: hsl(235 60% 55%);
-  --chart-2: hsl(212 80% 45%);
-  --chart-3: hsl(300 50% 45%);
-  --chart-4: hsl(35 90% 42%);
-  --chart-5: hsl(0 70% 45%);
-  --chart-6: hsl(190 80% 35%);
-  --chart-7: hsl(150 60% 32%);
-  --chart-8: hsl(330 70% 45%);
-  --chart-9: hsl(265 55% 45%);
-  --chart-10: hsl(20 85% 40%);
+  --chart-1: #5e6ad2;
+  --chart-2: #3b7fe0;
+  --chart-3: #b44fc4;
+  --chart-4: #d9922b;
+  --chart-5: #d93b3b;
+  --chart-6: #1f9bbf;
+  --chart-7: #2f9e6a;
+  --chart-8: #d6457f;
+  --chart-9: #7b5cd6;
+  --chart-10: #d9682b;
 
-  --top-loader: hsl(220 25% 10%);
+  --top-loader: #5e6ad2;
 
-  --barrier: hsl(220 30% 6%);
+  --barrier: #0b0b0d;
 
-  --opacity-barrier: 50%;
+  --opacity-barrier: 40%;
   --opacity-shadow: 8%;
   --opacity-shadow-stronger: 12%;
 
@@ -91,58 +103,59 @@
 }
 
 .dark {
-  --logo: hsl(0 0% 100%);
-  --logo-foreground: hsl(0 0% 0%);
-  /* If you change --background, also update the anti-flash <style> in index.html */
-  --background: hsl(222 16% 9%);
-  --foreground: hsl(220 15% 93%);
-  --card: hsl(222 14% 12%);
-  --card-hover: hsl(222 12% 16%);
-  --popover: hsl(222 14% 12%);
-  --popover-foreground: hsl(220 15% 93%);
-  --primary: hsl(220 15% 93%);
-  --primary-foreground: hsl(222 16% 9%);
-  --secondary: hsl(222 12% 17%);
-  --secondary-foreground: hsl(220 15% 93%);
-  --muted: hsl(222 12% 17%);
-  --muted-foreground: hsl(220 10% 64%);
-  --muted-more-foreground: hsl(220 8% 46%);
-  --muted-most-foreground: hsl(220 8% 32%);
-  --accent: hsl(222 12% 17%);
-  --accent-foreground: hsl(220 15% 93%);
-  --destructive: hsl(0 80% 68%);
-  --destructive-foreground: hsl(222 16% 9%);
-  --warning: hsl(32 85% 60%);
-  --warning-foreground: hsl(222 16% 9%);
-  --success: hsl(150 50% 58%);
-  --success-foreground: hsl(222 16% 9%);
-  --process: hsl(212 90% 70%);
-  --process-foreground: hsl(222 16% 9%);
-  --change: hsl(165 60% 60%);
-  --change-foreground: hsl(222 16% 9%);
-  --wait: hsl(32 85% 60%);
-  --wait-foreground: hsl(222 16% 9%);
-  --shadow-color: hsl(222 20% 3%);
-  --border: hsl(222 12% 20%);
-  --input: hsl(222 14% 11%);
-  --ring: hsl(220 15% 80%);
+  /* If you change --sidebar, also update the anti-flash <style> in index.html */
+  --sidebar: #09090a;
+  --background: #121213;
+  --foreground: #e8e8ea;
+  --card: #18181a;
+  --card-hover: #1e1e20;
+  --popover: #1b1b1d;
+  --popover-foreground: #e8e8ea;
+  --logo: #6b75db;
+  --logo-foreground: #ffffff;
+  --primary: #6b75db;
+  --primary-foreground: #ffffff;
+  --secondary: #1c1c1e;
+  --secondary-foreground: #e8e8ea;
+  --muted: #1a1a1c;
+  --muted-foreground: #959597;
+  --muted-more-foreground: #6c6c70;
+  --muted-most-foreground: #45454a;
+  --accent: #232325;
+  --accent-foreground: #e8e8ea;
+  --destructive: #eb5757;
+  --destructive-foreground: #ffffff;
+  --warning: #f2b84b;
+  --warning-foreground: #121213;
+  --success: #4cb782;
+  --success-foreground: #121213;
+  --process: #5b9cf5;
+  --process-foreground: #121213;
+  --change: #3fc1ad;
+  --change-foreground: #121213;
+  --wait: #f2994a;
+  --wait-foreground: #121213;
+  --shadow-color: #000000;
+  --border: #232326;
+  --input: #18181a;
+  --ring: #6b75db;
 
-  --chart-1: hsl(235 70% 68%);
-  --chart-2: hsl(212 90% 65%);
-  --chart-3: hsl(285 70% 72%);
-  --chart-4: hsl(32 80% 62%);
-  --chart-5: hsl(0 85% 68%);
-  --chart-6: hsl(195 75% 62%);
-  --chart-7: hsl(150 50% 58%);
-  --chart-8: hsl(325 60% 65%);
-  --chart-9: hsl(255 80% 75%);
-  --chart-10: hsl(40 80% 62%);
+  --chart-1: #7d86e3;
+  --chart-2: #5b9cf5;
+  --chart-3: #c77ad6;
+  --chart-4: #f2b84b;
+  --chart-5: #eb5757;
+  --chart-6: #4fc3e0;
+  --chart-7: #4cb782;
+  --chart-8: #e0679a;
+  --chart-9: #9b85f0;
+  --chart-10: #f2994a;
 
-  --top-loader: hsl(220 15% 93%);
+  --top-loader: #6b75db;
 
-  --barrier: hsl(222 20% 3%);
+  --barrier: #000000;
 
-  --opacity-barrier: 70%;
+  --opacity-barrier: 60%;
   --opacity-shadow: 50%;
   --opacity-shadow-stronger: 75%;
 
@@ -160,6 +173,7 @@
 }
 
 @theme inline {
+  --color-sidebar: var(--sidebar);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 

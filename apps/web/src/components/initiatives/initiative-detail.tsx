@@ -9,6 +9,7 @@ import { AutosaveMarkdown } from "@/components/shared/autosave-markdown";
 import { InitiativeProjects, SubInitiatives } from "@/components/initiatives/initiative-projects";
 import { InitiativeProperties } from "@/components/initiatives/initiative-properties";
 import { InitiativeIcon } from "@/components/initiatives/initiative-status";
+import { PageBar } from "@/components/layout/page-header";
 import { Breadcrumb, type TBreadcrumbItem } from "@/components/layout/breadcrumb";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
@@ -108,7 +109,7 @@ function InitiativeDetailContent({ initiative }: { initiative: TInitiativeDetail
 
   return (
     <div className="flex w-full flex-col gap-6">
-      <div className="flex w-full min-w-0 items-center gap-2">
+      <PageBar>
         <div className="min-w-0 flex-1">
           <Breadcrumb items={initiativeBreadcrumb(workspace.urlKey, initiative)} />
         </div>
@@ -124,7 +125,7 @@ function InitiativeDetailContent({ initiative }: { initiative: TInitiativeDetail
             />
           )}
         </HeaderActions>
-      </div>
+      </PageBar>
       <div className="flex w-full flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex w-full max-w-3xl min-w-0 flex-1 flex-col gap-6">
           {initiative.archivedAt && (

@@ -302,7 +302,7 @@ export function MarkdownEditor({
       <EditorContent
         editor={editor}
         data-framed={framed || undefined}
-        className="rr-prose data-framed:bg-input data-framed:has-hover:hover:ring-primary/6-10 data-framed:focus-within:ring-primary/8-10 w-full data-framed:rounded-md data-framed:border data-framed:px-3 data-framed:py-2 data-framed:focus-within:ring-1 data-framed:has-hover:hover:ring-1"
+        className="rr-prose data-framed:bg-input data-framed:has-hover:hover:ring-border data-framed:focus-within:ring-primary/8-10 w-full data-framed:rounded-md data-framed:border data-framed:px-3 data-framed:py-2 data-framed:focus-within:ring-1 data-framed:has-hover:hover:ring-1"
       />
       {mention && (
         <SuggestionMenu

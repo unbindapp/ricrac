@@ -26,7 +26,7 @@ const buttonVariants = cva(
           "bg-process text-process-foreground has-hover:hover:bg-process/85 active:bg-process/85",
         change: "bg-change text-change-foreground has-hover:hover:bg-change/85 active:bg-change/85",
         outline:
-          "border border-border bg-background has-hover:hover:bg-border active:bg-border has-hover:hover:text-foreground active:text-foreground",
+          "border border-border bg-secondary shadow-xs shadow-shadow-color/shadow-opacity has-hover:hover:bg-accent active:bg-accent has-hover:hover:text-foreground active:text-foreground",
         "outline-muted":
           "border border-border bg-background has-hover:hover:bg-card active:bg-card has-hover:hover:text-foreground active:text-foreground",
         "outline-foreground":
@@ -40,7 +40,7 @@ const buttonVariants = cva(
         secondary:
           "bg-secondary text-secondary-foreground has-hover:hover:bg-secondary active:bg-secondary",
         ghost:
-          "has-hover:hover:bg-border has-hover:hover:text-foreground active:bg-border active:text-foreground",
+          "has-hover:hover:bg-accent has-hover:hover:text-foreground active:bg-accent active:text-foreground",
         "ghost-destructive":
           "text-destructive has-hover:hover:bg-destructive/4-10 has-hover:hover:text-destructive active:bg-destructive/4-10 active:text-destructive",
         "ghost-success":
@@ -61,9 +61,9 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 has-hover:hover:underline active:underline",
       },
       size: {
-        default: "h-9 px-4",
-        sm: "h-7 px-2.5",
-        icon: "size-8 shrink-0 flex items-center justify-center",
+        default: "h-8 px-3",
+        sm: "h-7 px-2",
+        icon: "size-7 shrink-0 flex items-center justify-center",
       },
       loadingState: {
         default: "",

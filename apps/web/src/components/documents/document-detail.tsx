@@ -9,6 +9,7 @@ import { useDocumentParent } from "@/components/documents/document-parent";
 import { DocumentParentPicker } from "@/components/documents/document-parent-picker";
 import { AutosaveMarkdown } from "@/components/shared/autosave-markdown";
 import { VersionHistoryDialog } from "@/components/documents/version-history";
+import { PageBar } from "@/components/layout/page-header";
 import { Breadcrumb, type TBreadcrumbItem } from "@/components/layout/breadcrumb";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
@@ -85,7 +86,7 @@ function DocumentDetailContent({ document }: { document: TDocumentDetail }) {
 
   return (
     <div className="flex w-full flex-col gap-6">
-      <div className="flex w-full min-w-0 items-center gap-2">
+      <PageBar>
         <div className="min-w-0 flex-1">
           <Breadcrumb items={breadcrumb} />
         </div>
@@ -100,7 +101,7 @@ function DocumentDetailContent({ document }: { document: TDocumentDetail }) {
             />
           )}
         </HeaderActions>
-      </div>
+      </PageBar>
       <div className="flex flex-col gap-2">
         <div className="flex min-w-0 items-center gap-2">
           <IconPicker

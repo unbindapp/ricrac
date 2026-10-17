@@ -18,6 +18,8 @@ import {
   XIcon,
 } from "lucide-react";
 
+import type { ReactNode } from "react";
+
 import type { IssueDetail } from "@/api/ops.gen";
 import { FavoriteButton } from "@/components/favorites/favorite-button";
 import {
@@ -26,6 +28,7 @@ import {
   useOpenIssuePage,
 } from "@/components/issues/use-issue-actions";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { PageBar } from "@/components/layout/page-header";
 import { useNow } from "@/components/providers/now-provider";
 import { HeaderAction, HeaderActions } from "@/components/shared/detail-actions";
 import { Button } from "@/components/ui/button";
@@ -86,8 +89,9 @@ export function IssueDetailHeader({ issue, variant, onClose, onSetSla }: TProps)
       optimistic: { snoozedUntil: until },
     });
 
+  const Bar = variant === "page" ? PageBar : PeekBar;
   return (
-    <div className="flex min-h-9 w-full min-w-0 items-center gap-2">
+    <Bar>
       <div className="flex min-w-0 flex-1 items-center gap-2">
         <Breadcrumb
           items={[
@@ -209,6 +213,10 @@ export function IssueDetailHeader({ issue, variant, onClose, onSetSla }: TProps)
           </HeaderAction>
         )}
       </HeaderActions>
-    </div>
+    </Bar>
   );
+}
+
+function PeekBar({ children }: { children: ReactNode }) {
+  return <div className="flex min-h-9 w-full min-w-0 items-center gap-2">{children}</div>;
 }

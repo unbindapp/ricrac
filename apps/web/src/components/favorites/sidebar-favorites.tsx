@@ -7,7 +7,11 @@ import { type MouseEvent, useRef } from "react";
 import { favoriteTarget } from "@/components/favorites/favorite-target";
 import { reorderedPosition, sortableStyle, useSortSensors } from "@/components/favorites/sortable";
 import { Button, LinkButton } from "@/components/ui/button";
-import { SidebarCollapsible, SidebarSection } from "@/components/workspace/sidebar-nav";
+import {
+  SidebarCollapsible,
+  sidebarItemClassName,
+  SidebarSection,
+} from "@/components/workspace/sidebar-nav";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import {
   favoritesQuery,
@@ -32,7 +36,7 @@ export function SidebarFavorites({ onNavigate }: TProps) {
           size="sm"
           forceMinSize={false}
           onClick={() => void refetch()}
-          className="text-muted-foreground justify-start font-normal"
+          className={`${sidebarItemClassName} text-muted-foreground`}
         >
           Couldn't load favorites. Retry
         </Button>
@@ -97,7 +101,7 @@ function FavoriteList({ favorites, onNavigate }: { favorites: TFavorite[] } & TP
         <div
           role="list"
           aria-label="Favorites"
-          className="flex flex-col gap-0.5"
+          className="flex flex-col"
           onClickCapture={swallowClickAfterDrag}
         >
           {favorites.map((favorite) => (
@@ -132,7 +136,7 @@ function FavoriteItem({ favorite, onNavigate }: { favorite: TFavorite } & TProps
         size="sm"
         forceMinSize={false}
         onClick={onNavigate}
-        className="text-muted-foreground data-[status=active]:bg-accent data-[status=active]:text-foreground w-full justify-start pr-8 font-normal"
+        className={`${sidebarItemClassName} data-[status=active]:bg-accent pr-8`}
       >
         <span className="text-muted-foreground flex size-4 shrink-0 items-center justify-center">
           {target.icon}

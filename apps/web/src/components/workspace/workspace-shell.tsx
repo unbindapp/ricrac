@@ -22,13 +22,15 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
   useHotkeyScope([{ hotkey: "C", callback: () => openNewIssue(), enabled: canEdit }]);
 
   return (
-    <div className="flex h-svh w-full overflow-hidden">
-      <aside className="hidden w-60 shrink-0 border-r md:flex">
+    <div className="bg-sidebar flex h-svh w-full overflow-hidden">
+      <aside className="hidden w-60 shrink-0 md:flex">
         <Sidebar />
       </aside>
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col md:py-2 md:pr-2">
         <MobileTopBar />
-        <main className="flex min-h-0 flex-1 flex-col">{children}</main>
+        <main className="bg-background flex min-h-0 flex-1 flex-col overflow-hidden md:rounded-lg md:border">
+          {children}
+        </main>
       </div>
       <CommandPanel />
       <NewIssueDialog />

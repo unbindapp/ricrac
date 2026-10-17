@@ -15,7 +15,7 @@ export function InitiativeListHeader() {
   return (
     <div
       aria-hidden
-      className="text-muted-foreground flex h-8 w-full items-center gap-3 border-b px-3 text-xs"
+      className="text-muted-foreground flex h-8 w-full items-center gap-3 border-b px-3 text-xs group-data-flush/list:px-6"
     >
       <span className="min-w-0 flex-1">Name</span>
       <span className="hidden w-24 shrink-0 md:block">Health</span>
@@ -42,7 +42,7 @@ export function InitiativeRow({ initiative, depth = 0, showParent }: TProps) {
       role="listitem"
       to="/$workspace/initiative/$slug"
       params={{ workspace: workspace.urlKey, slug: entitySlug(initiative) }}
-      className="has-hover:hover:bg-accent focus-visible:bg-accent flex h-9 w-full items-center gap-3 border-b px-3 text-sm outline-hidden last:border-b-0"
+      className="has-hover:hover:bg-muted focus-visible:bg-muted flex h-9 w-full items-center gap-3 border-b px-3 text-sm outline-hidden group-data-flush/list:h-11 group-data-flush/list:px-6 last:border-b-0"
     >
       <span
         data-depth={Math.min(depth, 3)}
