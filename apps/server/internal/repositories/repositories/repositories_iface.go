@@ -10,10 +10,14 @@ import (
 	attachment_repo "ricrac/internal/repositories/attachment"
 	comment_repo "ricrac/internal/repositories/comment"
 	events_repo "ricrac/internal/repositories/events"
+	initiative_repo "ricrac/internal/repositories/initiative"
 	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
+	milestone_repo "ricrac/internal/repositories/milestone"
+	project_repo "ricrac/internal/repositories/project"
 	resolve_repo "ricrac/internal/repositories/resolve"
 	seed_repo "ricrac/internal/repositories/seed"
+	statusupdate_repo "ricrac/internal/repositories/statusupdate"
 	"time"
 )
 
@@ -31,4 +35,8 @@ type RepositoriesInterface interface {
 	Seed() seed_repo.SeedRepositoryInterface
 	Comment() comment_repo.CommentRepositoryInterface
 	Attachment() attachment_repo.AttachmentRepositoryInterface
+	Project() project_repo.ProjectRepositoryInterface
+	Milestone() milestone_repo.MilestoneRepositoryInterface
+	StatusUpdate() statusupdate_repo.StatusUpdateRepositoryInterface
+	Initiative() initiative_repo.InitiativeRepositoryInterface
 }

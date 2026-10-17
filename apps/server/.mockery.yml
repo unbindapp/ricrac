@@ -148,3 +148,66 @@ packages:
           filename: seed_service_mock.go
           structname: SeedServiceMock
           pkgname: mocks_services_seed
+  ricrac/internal/repositories/project:
+    config:
+      dir: ./mocks/repository/project
+    interfaces:
+      ProjectRepositoryInterface:
+        config:
+          filename: project_repository_mock.go
+          structname: ProjectRepositoryMock
+          pkgname: mocks_repository_project
+  ricrac/internal/repositories/milestone:
+    config:
+      dir: ./mocks/repository/milestone
+    interfaces:
+      MilestoneRepositoryInterface:
+        config:
+          filename: milestone_repository_mock.go
+          structname: MilestoneRepositoryMock
+          pkgname: mocks_repository_milestone
+  ricrac/internal/repositories/statusupdate:
+    config:
+      dir: ./mocks/repository/statusupdate
+    interfaces:
+      StatusUpdateRepositoryInterface:
+        config:
+          filename: statusupdate_repository_mock.go
+          structname: StatusUpdateRepositoryMock
+          pkgname: mocks_repository_statusupdate
+  ricrac/internal/repositories/initiative:
+    config:
+      dir: ./mocks/repository/initiative
+    interfaces:
+      InitiativeRepositoryInterface:
+        config:
+          filename: initiative_repository_mock.go
+          structname: InitiativeRepositoryMock
+          pkgname: mocks_repository_initiative
+  ricrac/internal/services/project:
+    config:
+      dir: ./mocks/services/project
+    interfaces:
+      ProjectServiceInterface:
+        config:
+          filename: project_service_mock.go
+          structname: ProjectServiceMock
+          pkgname: mocks_services_project
+  ricrac/internal/services/milestone:
+    config:
+      dir: ./mocks/services/milestone
+    interfaces:
+      MilestoneServiceInterface:
+        config:
+          filename: milestone_service_mock.go
+          structname: MilestoneServiceMock
+          pkgname: mocks_services_milestone
+  ricrac/internal/services/statusupdate:
+    config:
+      dir: ./mocks/services/statusupdate
+    interfaces:
+      StatusUpdateServiceInterface:
+        config:
+          filename: statusupdate_service_mock.go
+          structname: StatusUpdateServiceMock
+          pkgname: mocks_services_statusupdate

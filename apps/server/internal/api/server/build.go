@@ -10,10 +10,14 @@ import (
 	attachment_service "ricrac/internal/services/attachment"
 	comment_service "ricrac/internal/services/comment"
 	events_service "ricrac/internal/services/events"
+	initiative_service "ricrac/internal/services/initiative"
 	issue_service "ricrac/internal/services/issue"
 	label_service "ricrac/internal/services/label"
+	milestone_service "ricrac/internal/services/milestone"
+	project_service "ricrac/internal/services/project"
 	resolve_service "ricrac/internal/services/resolve"
 	seed_service "ricrac/internal/services/seed"
+	statusupdate_service "ricrac/internal/services/statusupdate"
 )
 
 // New wires the services on the database. waker wakes the background senders.
@@ -33,5 +37,9 @@ func New(cfg config.Config, db *ent.Client, waker events_service.Waker) *Server 
 	srv.IssueService = issue_service.NewIssueService(cfg, repo, srv.ResolveService, srv.EventsService)
 	srv.CommentService = comment_service.NewCommentService(cfg, repo, srv.ResolveService, srv.EventsService)
 	srv.AttachmentService = attachment_service.NewAttachmentService(cfg, repo, srv.ResolveService, srv.EventsService)
+	srv.MilestoneService = milestone_service.NewMilestoneService(repo, srv.ResolveService, srv.EventsService)
+	srv.StatusUpdateService = statusupdate_service.NewStatusUpdateService(repo, srv.ResolveService, srv.EventsService)
+	srv.ProjectService = project_service.NewProjectService(cfg, repo, srv.ResolveService, srv.EventsService, srv.MilestoneService, srv.StatusUpdateService, srv.Ops)
+	srv.InitiativeService = initiative_service.NewInitiativeService(cfg, repo, srv.ResolveService, srv.EventsService, srv.ProjectService, srv.StatusUpdateService)
 	return srv
 }

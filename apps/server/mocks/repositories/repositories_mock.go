@@ -12,10 +12,14 @@ import (
 	"ricrac/internal/repositories/attachment"
 	"ricrac/internal/repositories/comment"
 	"ricrac/internal/repositories/events"
+	"ricrac/internal/repositories/initiative"
 	"ricrac/internal/repositories/issue"
 	"ricrac/internal/repositories/label"
+	"ricrac/internal/repositories/milestone"
+	"ricrac/internal/repositories/project"
 	"ricrac/internal/repositories/resolve"
 	"ricrac/internal/repositories/seed"
+	"ricrac/internal/repositories/statusupdate"
 	"time"
 
 	mock "github.com/stretchr/testify/mock"
@@ -287,6 +291,52 @@ func (_c *RepositoriesMock_Events_Call) RunAndReturn(run func() events_repo.Even
 	return _c
 }
 
+// Initiative provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Initiative() initiative_repo.InitiativeRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Initiative")
+	}
+
+	var r0 initiative_repo.InitiativeRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() initiative_repo.InitiativeRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(initiative_repo.InitiativeRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Initiative_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Initiative'
+type RepositoriesMock_Initiative_Call struct {
+	*mock.Call
+}
+
+// Initiative is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Initiative() *RepositoriesMock_Initiative_Call {
+	return &RepositoriesMock_Initiative_Call{Call: _e.mock.On("Initiative")}
+}
+
+func (_c *RepositoriesMock_Initiative_Call) Run(run func()) *RepositoriesMock_Initiative_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Initiative_Call) Return(initiativeRepositoryInterface initiative_repo.InitiativeRepositoryInterface) *RepositoriesMock_Initiative_Call {
+	_c.Call.Return(initiativeRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Initiative_Call) RunAndReturn(run func() initiative_repo.InitiativeRepositoryInterface) *RepositoriesMock_Initiative_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Issue provides a mock function for the type RepositoriesMock
 func (_mock *RepositoriesMock) Issue() issue_repo.IssueRepositoryInterface {
 	ret := _mock.Called()
@@ -379,6 +429,52 @@ func (_c *RepositoriesMock_Label_Call) RunAndReturn(run func() label_repo.LabelR
 	return _c
 }
 
+// Milestone provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Milestone() milestone_repo.MilestoneRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Milestone")
+	}
+
+	var r0 milestone_repo.MilestoneRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() milestone_repo.MilestoneRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(milestone_repo.MilestoneRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Milestone_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Milestone'
+type RepositoriesMock_Milestone_Call struct {
+	*mock.Call
+}
+
+// Milestone is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Milestone() *RepositoriesMock_Milestone_Call {
+	return &RepositoriesMock_Milestone_Call{Call: _e.mock.On("Milestone")}
+}
+
+func (_c *RepositoriesMock_Milestone_Call) Run(run func()) *RepositoriesMock_Milestone_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Milestone_Call) Return(milestoneRepositoryInterface milestone_repo.MilestoneRepositoryInterface) *RepositoriesMock_Milestone_Call {
+	_c.Call.Return(milestoneRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Milestone_Call) RunAndReturn(run func() milestone_repo.MilestoneRepositoryInterface) *RepositoriesMock_Milestone_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Now provides a mock function for the type RepositoriesMock
 func (_mock *RepositoriesMock) Now(ctx context.Context, tx repository.TxInterface) (time.Time, error) {
 	ret := _mock.Called(ctx, tx)
@@ -441,6 +537,52 @@ func (_c *RepositoriesMock_Now_Call) Return(time1 time.Time, err error) *Reposit
 }
 
 func (_c *RepositoriesMock_Now_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface) (time.Time, error)) *RepositoriesMock_Now_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Project provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Project() project_repo.ProjectRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Project")
+	}
+
+	var r0 project_repo.ProjectRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() project_repo.ProjectRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(project_repo.ProjectRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Project_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Project'
+type RepositoriesMock_Project_Call struct {
+	*mock.Call
+}
+
+// Project is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Project() *RepositoriesMock_Project_Call {
+	return &RepositoriesMock_Project_Call{Call: _e.mock.On("Project")}
+}
+
+func (_c *RepositoriesMock_Project_Call) Run(run func()) *RepositoriesMock_Project_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Project_Call) Return(projectRepositoryInterface project_repo.ProjectRepositoryInterface) *RepositoriesMock_Project_Call {
+	_c.Call.Return(projectRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Project_Call) RunAndReturn(run func() project_repo.ProjectRepositoryInterface) *RepositoriesMock_Project_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -533,6 +675,52 @@ func (_c *RepositoriesMock_Seed_Call) Return(seedRepositoryInterface seed_repo.S
 }
 
 func (_c *RepositoriesMock_Seed_Call) RunAndReturn(run func() seed_repo.SeedRepositoryInterface) *RepositoriesMock_Seed_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// StatusUpdate provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) StatusUpdate() statusupdate_repo.StatusUpdateRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for StatusUpdate")
+	}
+
+	var r0 statusupdate_repo.StatusUpdateRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() statusupdate_repo.StatusUpdateRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(statusupdate_repo.StatusUpdateRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_StatusUpdate_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'StatusUpdate'
+type RepositoriesMock_StatusUpdate_Call struct {
+	*mock.Call
+}
+
+// StatusUpdate is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) StatusUpdate() *RepositoriesMock_StatusUpdate_Call {
+	return &RepositoriesMock_StatusUpdate_Call{Call: _e.mock.On("StatusUpdate")}
+}
+
+func (_c *RepositoriesMock_StatusUpdate_Call) Run(run func()) *RepositoriesMock_StatusUpdate_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_StatusUpdate_Call) Return(statusUpdateRepositoryInterface statusupdate_repo.StatusUpdateRepositoryInterface) *RepositoriesMock_StatusUpdate_Call {
+	_c.Call.Return(statusUpdateRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_StatusUpdate_Call) RunAndReturn(run func() statusupdate_repo.StatusUpdateRepositoryInterface) *RepositoriesMock_StatusUpdate_Call {
 	_c.Call.Return(run)
 	return _c
 }
