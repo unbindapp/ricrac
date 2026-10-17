@@ -76,3 +76,75 @@ packages:
           filename: events_service_mock.go
           structname: EventsServiceMock
           pkgname: mocks_services_events
+  ricrac/internal/repositories/issue:
+    config:
+      dir: ./mocks/repository/issue
+    interfaces:
+      IssueRepositoryInterface:
+        config:
+          filename: issue_repository_mock.go
+          structname: IssueRepositoryMock
+          pkgname: mocks_repository_issue
+  ricrac/internal/repositories/comment:
+    config:
+      dir: ./mocks/repository/comment
+    interfaces:
+      CommentRepositoryInterface:
+        config:
+          filename: comment_repository_mock.go
+          structname: CommentRepositoryMock
+          pkgname: mocks_repository_comment
+  ricrac/internal/repositories/attachment:
+    config:
+      dir: ./mocks/repository/attachment
+    interfaces:
+      AttachmentRepositoryInterface:
+        config:
+          filename: attachment_repository_mock.go
+          structname: AttachmentRepositoryMock
+          pkgname: mocks_repository_attachment
+  ricrac/internal/repositories/seed:
+    config:
+      dir: ./mocks/repository/seed
+    interfaces:
+      SeedRepositoryInterface:
+        config:
+          filename: seed_repository_mock.go
+          structname: SeedRepositoryMock
+          pkgname: mocks_repository_seed
+  ricrac/internal/services/issue:
+    config:
+      dir: ./mocks/services/issue
+    interfaces:
+      IssueServiceInterface:
+        config:
+          filename: issue_service_mock.go
+          structname: IssueServiceMock
+          pkgname: mocks_services_issue
+  ricrac/internal/services/comment:
+    config:
+      dir: ./mocks/services/comment
+    interfaces:
+      CommentServiceInterface:
+        config:
+          filename: comment_service_mock.go
+          structname: CommentServiceMock
+          pkgname: mocks_services_comment
+  ricrac/internal/services/attachment:
+    config:
+      dir: ./mocks/services/attachment
+    interfaces:
+      AttachmentServiceInterface:
+        config:
+          filename: attachment_service_mock.go
+          structname: AttachmentServiceMock
+          pkgname: mocks_services_attachment
+  ricrac/internal/services/seed:
+    config:
+      dir: ./mocks/services/seed
+    interfaces:
+      SeedServiceInterface:
+        config:
+          filename: seed_service_mock.go
+          structname: SeedServiceMock
+          pkgname: mocks_services_seed

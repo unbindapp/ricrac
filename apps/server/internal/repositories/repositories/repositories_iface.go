@@ -7,9 +7,13 @@ import (
 	"ricrac/ent"
 	repository "ricrac/internal/repositories"
 	access_repo "ricrac/internal/repositories/access"
+	attachment_repo "ricrac/internal/repositories/attachment"
+	comment_repo "ricrac/internal/repositories/comment"
 	events_repo "ricrac/internal/repositories/events"
+	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
 	resolve_repo "ricrac/internal/repositories/resolve"
+	seed_repo "ricrac/internal/repositories/seed"
 	"time"
 )
 
@@ -23,4 +27,8 @@ type RepositoriesInterface interface {
 	Resolve() resolve_repo.ResolveRepositoryInterface
 	Events() events_repo.EventsRepositoryInterface
 	Label() label_repo.LabelRepositoryInterface
+	Issue() issue_repo.IssueRepositoryInterface
+	Seed() seed_repo.SeedRepositoryInterface
+	Comment() comment_repo.CommentRepositoryInterface
+	Attachment() attachment_repo.AttachmentRepositoryInterface
 }

@@ -164,7 +164,7 @@ func (s schemas) of(t reflect.Type) M {
 			}
 			properties[name] = property
 			_, options, _ := strings.Cut(field.Tag.Get("json"), ",")
-			if isRequired || s.result && !strings.Contains(options, "omitempty") {
+			if isRequired || s.result && !strings.Contains(options, "omitempty") && !strings.Contains(options, "omitzero") {
 				required = append(required, name)
 			}
 		})

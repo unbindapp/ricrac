@@ -9,9 +9,13 @@ import (
 	"ricrac/ent"
 	"ricrac/internal/repositories"
 	"ricrac/internal/repositories/access"
+	"ricrac/internal/repositories/attachment"
+	"ricrac/internal/repositories/comment"
 	"ricrac/internal/repositories/events"
+	"ricrac/internal/repositories/issue"
 	"ricrac/internal/repositories/label"
 	"ricrac/internal/repositories/resolve"
+	"ricrac/internal/repositories/seed"
 	"time"
 
 	mock "github.com/stretchr/testify/mock"
@@ -95,6 +99,98 @@ func (_c *RepositoriesMock_Access_Call) Return(accessRepositoryInterface access_
 }
 
 func (_c *RepositoriesMock_Access_Call) RunAndReturn(run func() access_repo.AccessRepositoryInterface) *RepositoriesMock_Access_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Attachment provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Attachment() attachment_repo.AttachmentRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Attachment")
+	}
+
+	var r0 attachment_repo.AttachmentRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() attachment_repo.AttachmentRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(attachment_repo.AttachmentRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Attachment_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Attachment'
+type RepositoriesMock_Attachment_Call struct {
+	*mock.Call
+}
+
+// Attachment is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Attachment() *RepositoriesMock_Attachment_Call {
+	return &RepositoriesMock_Attachment_Call{Call: _e.mock.On("Attachment")}
+}
+
+func (_c *RepositoriesMock_Attachment_Call) Run(run func()) *RepositoriesMock_Attachment_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Attachment_Call) Return(attachmentRepositoryInterface attachment_repo.AttachmentRepositoryInterface) *RepositoriesMock_Attachment_Call {
+	_c.Call.Return(attachmentRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Attachment_Call) RunAndReturn(run func() attachment_repo.AttachmentRepositoryInterface) *RepositoriesMock_Attachment_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Comment provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Comment() comment_repo.CommentRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Comment")
+	}
+
+	var r0 comment_repo.CommentRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() comment_repo.CommentRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(comment_repo.CommentRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Comment_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Comment'
+type RepositoriesMock_Comment_Call struct {
+	*mock.Call
+}
+
+// Comment is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Comment() *RepositoriesMock_Comment_Call {
+	return &RepositoriesMock_Comment_Call{Call: _e.mock.On("Comment")}
+}
+
+func (_c *RepositoriesMock_Comment_Call) Run(run func()) *RepositoriesMock_Comment_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Comment_Call) Return(commentRepositoryInterface comment_repo.CommentRepositoryInterface) *RepositoriesMock_Comment_Call {
+	_c.Call.Return(commentRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Comment_Call) RunAndReturn(run func() comment_repo.CommentRepositoryInterface) *RepositoriesMock_Comment_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -187,6 +283,52 @@ func (_c *RepositoriesMock_Events_Call) Return(eventsRepositoryInterface events_
 }
 
 func (_c *RepositoriesMock_Events_Call) RunAndReturn(run func() events_repo.EventsRepositoryInterface) *RepositoriesMock_Events_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Issue provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Issue() issue_repo.IssueRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Issue")
+	}
+
+	var r0 issue_repo.IssueRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() issue_repo.IssueRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(issue_repo.IssueRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Issue_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Issue'
+type RepositoriesMock_Issue_Call struct {
+	*mock.Call
+}
+
+// Issue is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Issue() *RepositoriesMock_Issue_Call {
+	return &RepositoriesMock_Issue_Call{Call: _e.mock.On("Issue")}
+}
+
+func (_c *RepositoriesMock_Issue_Call) Run(run func()) *RepositoriesMock_Issue_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Issue_Call) Return(issueRepositoryInterface issue_repo.IssueRepositoryInterface) *RepositoriesMock_Issue_Call {
+	_c.Call.Return(issueRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Issue_Call) RunAndReturn(run func() issue_repo.IssueRepositoryInterface) *RepositoriesMock_Issue_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -345,6 +487,52 @@ func (_c *RepositoriesMock_Resolve_Call) Return(resolveRepositoryInterface resol
 }
 
 func (_c *RepositoriesMock_Resolve_Call) RunAndReturn(run func() resolve_repo.ResolveRepositoryInterface) *RepositoriesMock_Resolve_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Seed provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Seed() seed_repo.SeedRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Seed")
+	}
+
+	var r0 seed_repo.SeedRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() seed_repo.SeedRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(seed_repo.SeedRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Seed_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Seed'
+type RepositoriesMock_Seed_Call struct {
+	*mock.Call
+}
+
+// Seed is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Seed() *RepositoriesMock_Seed_Call {
+	return &RepositoriesMock_Seed_Call{Call: _e.mock.On("Seed")}
+}
+
+func (_c *RepositoriesMock_Seed_Call) Run(run func()) *RepositoriesMock_Seed_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Seed_Call) Return(seedRepositoryInterface seed_repo.SeedRepositoryInterface) *RepositoriesMock_Seed_Call {
+	_c.Call.Return(seedRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Seed_Call) RunAndReturn(run func() seed_repo.SeedRepositoryInterface) *RepositoriesMock_Seed_Call {
 	_c.Call.Return(run)
 	return _c
 }

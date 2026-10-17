@@ -139,7 +139,7 @@ type Issue struct {
 	Identifier          string        `json:"identifier"`
 	Number              int           `json:"number"`
 	Title               string        `json:"title"`
-	Description         string        `json:"description,omitempty" doc:"Markdown; in lists only with includeDescription."`
+	Description         Text          `json:"description,omitzero" doc:"Markdown; in lists only with includeDescription."`
 	URL                 string        `json:"url"`
 	BranchName          string        `json:"branchName"`
 	Priority            int           `json:"priority" doc:"0 none, 1 urgent, 2 high, 3 medium, 4 low."`

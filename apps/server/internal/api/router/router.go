@@ -64,6 +64,7 @@ func New(srv *server.Server, fallback Fallback) (http.Handler, *oapi.Registry) {
 	r.Use(middleware.Compress, middleware.SecurityHeaders, middleware.LimitBody, middleware.CORS, chimiddleware.GetHead)
 	api := humachi.New(r, HumaConfig())
 	reg := oapi.NewRegistry(api, srv.AccessService)
+	srv.Ops.Set(reg)
 	RegisterHandlers(srv, reg)
 	if fallback != nil {
 		fallback.AddOps(reg)

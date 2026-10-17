@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5"
 
 	"ricrac/app"
 	"ricrac/config"
@@ -18,6 +17,7 @@ import (
 	"ricrac/internal/infrastructure/mail"
 	"ricrac/internal/integrations/github"
 	"ricrac/internal/legacy"
+	repository "ricrac/internal/repositories"
 	"ricrac/ops"
 	"ricrac/server"
 )
@@ -88,16 +88,16 @@ func (b *backend) ResultSchema(op string) M {
 }
 
 func (b *backend) WorkspaceDefaults(ctx context.Context, workspace uuid.UUID) error {
-	return pgx.BeginFunc(ctx, b.state.DB, func(tx pgx.Tx) error {
-		return ops.WorkspaceDefaults(ctx, tx, workspace)
+	return b.server.Repository.WithTx(ctx, func(tx repository.TxInterface) error {
+		return b.server.SeedService.WorkspaceDefaults(ctx, tx, workspace)
 	})
 }
 
 func (b *backend) CreateTeam(ctx context.Context, workspace, user uuid.UUID, name, key string) (uuid.UUID, error) {
 	var team uuid.UUID
-	err := pgx.BeginFunc(ctx, b.state.DB, func(tx pgx.Tx) error {
+	err := b.server.Repository.WithTx(ctx, func(tx repository.TxInterface) error {
 		var err error
-		team, err = ops.CreateTeam(ctx, tx, workspace, user, name, key)
+		team, err = b.server.SeedService.CreateTeam(ctx, tx, workspace, user, name, key)
 		return err
 	})
 	return team, err

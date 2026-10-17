@@ -248,3 +248,12 @@ func cloneJSON(value M) M {
 	_ = json.Unmarshal(errdefs.Marshal(value), &copied)
 	return copied
 }
+
+// Call runs the named operation as actor, as templates and other services do.
+func (reg *Registry) Call(ctx context.Context, actor *auth.Actor, name string, raw map[string]any) (any, error) {
+	op := reg.Find(name)
+	if op == nil {
+		return nil, errdefs.BadRequest("No operation %q", name)
+	}
+	return op.Call(ctx, actor, raw)
+}
