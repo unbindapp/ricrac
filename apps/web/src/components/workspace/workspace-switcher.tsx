@@ -9,9 +9,11 @@ import {
   PlusIcon,
   SettingsIcon,
   UserIcon,
+  UserPlusIcon,
 } from "lucide-react";
 import { useState } from "react";
 
+import { useInviteStore } from "@/components/settings/invite-store";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,7 +31,8 @@ import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { meQuery, signOut } from "@/lib/queries/me";
 
 export function WorkspaceSwitcher({ onNavigate }: { onNavigate?: () => void }) {
-  const { workspace, isAdmin } = useWorkspace();
+  const { workspace, isAdmin, canEdit } = useWorkspace();
+  const openInvite = useInviteStore((state) => state.setOpen);
   const { data: me } = useQuery(meQuery);
   const navigate = useNavigate();
   const [isLeaving, setIsLeaving] = useState(false);
@@ -78,6 +81,17 @@ export function WorkspaceSwitcher({ onNavigate }: { onNavigate?: () => void }) {
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
+            {canEdit && (
+              <DropdownMenuItem
+                onClick={() => {
+                  onNavigate?.();
+                  openInvite(true);
+                }}
+              >
+                <UserPlusIcon className="size-4" />
+                Invite people
+              </DropdownMenuItem>
+            )}
             {isAdmin && (
               <DropdownMenuItem onClick={() => go({ to: "/$workspace/settings", params })}>
                 <SettingsIcon className="size-4" />

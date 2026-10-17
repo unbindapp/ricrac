@@ -17,6 +17,7 @@ import {
   TargetIcon,
   TriangleAlertIcon,
   UserCircleIcon,
+  UserPlusIcon,
   UsersRoundIcon,
 } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -37,6 +38,7 @@ import {
 } from "@/components/search/search-hits";
 import { useSearch } from "@/components/search/use-search";
 import { useCreateTeamStore } from "@/components/settings/create-team-store";
+import { useInviteStore } from "@/components/settings/invite-store";
 import { TeamIcon } from "@/components/shared/team-icon";
 import {
   Command,
@@ -164,6 +166,7 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
   const openNewIssue = useNewIssueStore((state) => state.open);
   const openNewProject = useNewProjectStore((state) => state.open);
   const openCreateTeam = useCreateTeamStore((state) => state.setOpen);
+  const openInvite = useInviteStore((state) => state.setOpen);
   const setShortcutsOpen = useCommandPanelStore((state) => state.setShortcutsOpen);
   const destinations = useDestinations();
   const search = useSearch(query);
@@ -200,6 +203,13 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
           icon: <UsersRoundIcon />,
           keywords: ["create", "add"],
           run: run(() => openCreateTeam(true)),
+        },
+        {
+          id: "invite",
+          label: "Invite people",
+          icon: <UserPlusIcon />,
+          keywords: ["member", "teammate", "add", "email"],
+          run: run(() => openInvite(true)),
         },
       ]
     : [];

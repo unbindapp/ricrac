@@ -8,7 +8,7 @@ import { List, ListRow, ListRowText } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { SettingsPage } from "@/components/layout/settings-page";
 import { SettingsSection } from "@/components/layout/settings-section";
-import { InviteMemberDialog } from "@/components/settings/invite-member-dialog";
+import { useInviteStore } from "@/components/settings/invite-store";
 import { Avatar } from "@/components/shared/avatar";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { RelativeTime } from "@/components/shared/relative-time";
@@ -31,15 +31,12 @@ export const Route = createFileRoute("/$workspace/_workspace/settings/_admin/mem
 });
 
 function WorkspaceMembersSettingsPage() {
+  const openInvite = useInviteStore((state) => state.setOpen);
   const inviteButton = (
-    <InviteMemberDialog
-      trigger={
-        <Button size="sm">
-          <UserPlusIcon className="size-4" />
-          Invite
-        </Button>
-      }
-    />
+    <Button size="sm" onClick={() => openInvite(true)}>
+      <UserPlusIcon className="size-4" />
+      Invite people
+    </Button>
   );
   return (
     <SettingsPage title="Members" description="People in this workspace and their roles.">

@@ -7,6 +7,7 @@ import { NewIssueDialog } from "@/components/issues/new-issue-dialog";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
 import { NewProjectDialog } from "@/components/projects/new-project-dialog";
 import { CreateTeamDialog } from "@/components/settings/create-team-dialog";
+import { InviteMemberDialog } from "@/components/settings/invite-member-dialog";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import { Sidebar } from "@/components/workspace/sidebar";
@@ -33,6 +34,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
       <NewIssueDialog />
       <NewProjectDialog />
       {canEdit && <CreateTeamDialog />}
+      {canEdit && <InviteMemberDialog />}
     </div>
   );
 }

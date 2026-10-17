@@ -1,8 +1,8 @@
 import type { AnyFieldApi } from "@tanstack/react-form";
-import { ReactElement, useState } from "react";
 import { z } from "zod";
 
 import type { Invitation } from "@/api/ops.gen";
+import { useInviteStore } from "@/components/settings/invite-store";
 import { CheckboxList, type TCheckboxListItem } from "@/components/shared/checkbox-list";
 import { roleItems } from "@/components/shared/role-select";
 import { TeamIcon } from "@/components/shared/team-icon";
@@ -15,7 +15,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/toast";
 import { useTeams } from "@/components/workspace/teams-provider";
@@ -40,11 +39,11 @@ const formSchema = z
     path: ["teams"],
   });
 
-export function InviteMemberDialog({ trigger }: { trigger: ReactElement }) {
-  const [isOpen, setIsOpen] = useState(false);
+export function InviteMemberDialog() {
+  const isOpen = useInviteStore((state) => state.isOpen);
+  const setIsOpen = useInviteStore((state) => state.setOpen);
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger render={trigger} />
       <DialogContent className="w-lg max-w-full">
         <DialogHeader>
           <DialogTitle>Invite people</DialogTitle>
