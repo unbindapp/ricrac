@@ -17,7 +17,7 @@ import { teamStatusesQuery } from "@/lib/queries/teams";
 export type TTeamIssuesTab = "active" | "backlog" | "all";
 
 const STATE_TYPES: Record<TTeamIssuesTab, TStateType[]> = {
-  active: ["unstarted", "started", "completed", "canceled"],
+  active: ["unstarted", "started"],
   backlog: ["backlog"],
   all: ["backlog", "unstarted", "started", "completed", "canceled"],
 };
@@ -43,8 +43,7 @@ function useTabCounts(workspaceId: string, teamId: string) {
 }
 
 /**
- * A team's issues in three tabs: Active (todo and in progress, plus what was recently closed),
- * Backlog, and All. The backlog's count is always in sight so it isn't forgotten.
+ * A team's issues in three tabs: Active (todo and in progress), Backlog, and All. The backlog's count is always in sight so it isn't forgotten.
  */
 export function TeamIssues({
   team,

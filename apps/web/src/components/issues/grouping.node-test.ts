@@ -6,6 +6,8 @@ import type { Issue, StateRef } from "@/api/ops.gen";
 
 const todo: StateRef = { id: "s-todo", name: "Todo", type: "unstarted", color: "#e2e2e2" };
 const doing: StateRef = { id: "s-doing", name: "In Progress", type: "started", color: "#f2c94c" };
+const review: StateRef = { id: "s-review", name: "In Review", type: "started", color: "#4cb782" };
+const done: StateRef = { id: "s-done", name: "Done", type: "completed", color: "#5e6ad2" };
 const backlog: StateRef = { id: "s-backlog", name: "Backlog", type: "backlog", color: "#bec2c8" };
 const team = { id: "t", key: "ENG", name: "Engineering" };
 
@@ -54,20 +56,25 @@ function issue(id: string, overrides: Partial<Issue> = {}): Issue {
   };
 }
 
-test("state groups follow the workflow order and keep empty team states", () => {
+const teamStates = {
+  id: "t",
+  states: [
+    { ...backlog, position: 0 },
+    { ...todo, position: 1 },
+    { ...doing, position: 2 },
+    { ...review, position: 3 },
+    { ...done, position: 4 },
+  ],
+};
+
+test("board state groups follow the workflow order and keep empty team states", () => {
   const groups = groupIssues({
     issues: [issue("a", { state: doing }), issue("b")],
     groupBy: "state",
     orderBy: "manual",
     order: "asc",
-    team: {
-      id: "t",
-      states: [
-        { ...doing, position: 0 },
-        { ...todo, position: 0 },
-        { ...backlog, position: 0 },
-      ],
-    },
+    layout: "board",
+    team: teamStates,
   });
   assert.deepEqual(
     groups.map((group) => [group.label, group.issues.length]),
@@ -75,7 +82,24 @@ test("state groups follow the workflow order and keep empty team states", () => 
       ["Backlog", 0],
       ["Todo", 1],
       ["In Progress", 1],
+      ["In Review", 0],
+      ["Done", 0],
     ],
+  );
+});
+
+test("list state groups put the open work closest to done first", () => {
+  const groups = groupIssues({
+    issues: [issue("a", { state: doing }), issue("b")],
+    groupBy: "state",
+    orderBy: "manual",
+    order: "asc",
+    layout: "list",
+    team: teamStates,
+  });
+  assert.deepEqual(
+    groups.map((group) => group.label),
+    ["In Review", "In Progress", "Todo", "Backlog", "Done"],
   );
 });
 
@@ -86,12 +110,13 @@ test("across teams, statuses of the same name and type share a group", () => {
     groupBy: "state",
     orderBy: "manual",
     order: "asc",
+    layout: "list",
   });
   assert.deepEqual(
     groups.map((group) => [group.label, group.issues.length]),
     [
-      ["Todo", 2],
       ["In Progress", 1],
+      ["Todo", 2],
     ],
   );
 });
@@ -102,6 +127,7 @@ test("issues inside a group are ordered by the display ordering", () => {
     groupBy: "none",
     orderBy: "manual",
     order: "asc",
+    layout: "list",
   });
   assert.deepEqual(
     group.issues.map((item) => item.id),
@@ -115,6 +141,7 @@ test("priority groups put urgent first and no priority last", () => {
     groupBy: "priority",
     orderBy: "manual",
     order: "asc",
+    layout: "list",
   });
   assert.deepEqual(
     groups.map((group) => group.label),
@@ -136,6 +163,7 @@ test("an issue with two labels shows up under both", () => {
     groupBy: "label",
     orderBy: "manual",
     order: "asc",
+    layout: "list",
   });
   assert.deepEqual(
     groups.map((group) => [group.label, group.issues.map((item) => item.id)]),
@@ -156,6 +184,7 @@ test("unassigned issues group last", () => {
     groupBy: "assignee",
     orderBy: "manual",
     order: "asc",
+    layout: "list",
   });
   assert.deepEqual(
     groups.map((group) => group.label),

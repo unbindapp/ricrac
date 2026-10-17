@@ -8,7 +8,7 @@ import type {
   TeamRef,
   UserRef,
 } from "@/api/ops.gen";
-import type { TGroupBy, TOrderBy } from "./display.ts";
+import type { TGroupBy, TIssueLayout, TOrderBy } from "./display.ts";
 import type { TStateType } from "@/components/shared/state-icon";
 
 export const STATE_TYPE_ORDER: TStateType[] = [
@@ -16,6 +16,16 @@ export const STATE_TYPE_ORDER: TStateType[] = [
   "backlog",
   "unstarted",
   "started",
+  "completed",
+  "canceled",
+];
+
+/** Lists put the work closest to done on top; boards read left to right through the workflow. */
+const LIST_STATE_TYPE_ORDER: TStateType[] = [
+  "triage",
+  "started",
+  "unstarted",
+  "backlog",
   "completed",
   "canceled",
 ];
@@ -88,29 +98,45 @@ export const cycleName = (cycle: Pick<CycleRef, "name" | "number">) =>
 
 type TGroupSeed = { key: string; label: string; meta: TGroupMeta; rank: number | string };
 
-function stateRank(state: StateRef, positions: Map<string, number>) {
-  return STATE_TYPE_ORDER.indexOf(state.type) * 10000 + (positions.get(state.id) ?? 9999);
+function stateRank(state: StateRef, positions: Map<string, number>, layout: TIssueLayout) {
+  const position = positions.get(state.id) ?? 9999;
+  if (layout === "board") return STATE_TYPE_ORDER.indexOf(state.type) * 10000 + position;
+  const isClosed = state.type === "completed" || state.type === "canceled";
+  return LIST_STATE_TYPE_ORDER.indexOf(state.type) * 10000 + (isClosed ? position : -position);
 }
 
 /** States group by id within one team; across teams, same-named states of a type share a group. */
-function stateSeed(state: StateRef, teamId: string | undefined, positions: Map<string, number>) {
+function stateSeed(
+  state: StateRef,
+  teamId: string | undefined,
+  positions: Map<string, number>,
+  layout: TIssueLayout,
+) {
   const byId = positions.size > 0;
+  const typeOrder = layout === "board" ? STATE_TYPE_ORDER : LIST_STATE_TYPE_ORDER;
   return {
     key: byId ? state.id : `${state.type}:${state.name.toLowerCase()}`,
     label: state.name,
     meta: { kind: "state", state, teamId } as const,
     rank: byId
-      ? stateRank(state, positions)
-      : `${STATE_TYPE_ORDER.indexOf(state.type)}${state.name}`,
+      ? stateRank(state, positions, layout)
+      : `${typeOrder.indexOf(state.type)}${state.name}`,
   };
 }
 
-function seedsFor(issue: Issue, groupBy: TGroupBy, positions: Map<string, number>): TGroupSeed[] {
+function seedsFor(
+  issue: Issue,
+  groupBy: TGroupBy,
+  positions: Map<string, number>,
+  layout: TIssueLayout,
+): TGroupSeed[] {
   switch (groupBy) {
     case "none":
       return [{ key: "all", label: "All issues", meta: { kind: "none" }, rank: 0 }];
     case "state":
-      return [stateSeed(issue.state, positions.size > 0 ? issue.team.id : undefined, positions)];
+      return [
+        stateSeed(issue.state, positions.size > 0 ? issue.team.id : undefined, positions, layout),
+      ];
     case "priority":
       return [
         {
@@ -195,20 +221,22 @@ function compareRanks(a: number | string, b: number | string) {
 }
 
 /**
- * Groups and sorts loaded issues. With one team's states, status groups follow its board order
- * and empty statuses still get a (droppable) group.
+ * Groups and sorts loaded issues. With one team's states, status groups follow its workflow
+ * (open work closest to done first in lists) and empty statuses still get a (droppable) group.
  */
 export function groupIssues({
   issues,
   groupBy,
   orderBy,
   order,
+  layout,
   team,
 }: {
   issues: Issue[];
   groupBy: TGroupBy;
   orderBy: TOrderBy;
   order: "asc" | "desc";
+  layout: TIssueLayout;
   team?: { id: string; states: (StateRef & { position: number })[] };
 }): TIssueGroup[] {
   const positions = new Map((team?.states ?? []).map((state, index) => [state.id, index] as const));
@@ -221,7 +249,7 @@ export function groupIssues({
     return group;
   };
   if (groupBy === "state" && team) {
-    for (const state of team.states) ensure(stateSeed(state, team.id, positions));
+    for (const state of team.states) ensure(stateSeed(state, team.id, positions, layout));
   }
   if (groupBy === "priority") {
     for (const priority of PRIORITY_ORDER) {
@@ -234,7 +262,7 @@ export function groupIssues({
     }
   }
   for (const issue of issues) {
-    for (const seed of seedsFor(issue, groupBy, positions)) {
+    for (const seed of seedsFor(issue, groupBy, positions, layout)) {
       ensure(seed).issues.push(issue);
     }
   }
