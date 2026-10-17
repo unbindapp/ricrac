@@ -28,7 +28,9 @@ export function ColorPicker({ value, onChange, disabled, label = "Color" }: TPro
               className="data-empty:border-muted-foreground size-3.5 shrink-0 rounded-full data-empty:border data-empty:border-dashed"
               style={current ? { backgroundColor: current } : undefined}
             />
-            <span className="font-mono text-xs">{current ?? "Default"}</span>
+            <span className="text-xs data-hex:font-mono" data-hex={current ? true : undefined}>
+              {current ?? "Default"}
+            </span>
           </Button>
         }
       />

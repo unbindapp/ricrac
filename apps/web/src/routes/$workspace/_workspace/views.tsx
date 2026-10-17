@@ -21,13 +21,13 @@ function ViewsPage() {
   const create = canEdit ? () => setIsCreating(true) : undefined;
 
   return (
-    <PageContainer width="narrow">
+    <PageContainer>
       <PageHeader
         title="Views"
         icon={<LayersIcon />}
         actions={
           create && (
-            <Button size="sm" onClick={create}>
+            <Button onClick={create}>
               <PlusIcon className="size-4" />
               New view
             </Button>

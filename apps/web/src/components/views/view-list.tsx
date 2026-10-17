@@ -35,7 +35,7 @@ export function ViewList({ onCreate }: { onCreate?: () => void }) {
         description:
           "A view saves a filter of issues or projects, across teams if you like, and keeps it up to date.",
         action: onCreate && (
-          <Button size="sm" onClick={onCreate}>
+          <Button size="sm" variant="outline" onClick={onCreate}>
             <PlusIcon className="size-4" />
             New view
           </Button>
