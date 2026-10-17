@@ -30,6 +30,7 @@ export function CustomerNeedsSection(props: TProps) {
     needs.length === 0
       ? undefined
       : `${needs.length} ${needs.length === 1 ? "request" : "requests"}${important ? `, ${important} important` : ""}`;
+  if (!canEdit && !error && needs.length === 0) return null;
 
   return (
     <section aria-label="Customer requests" className="flex w-full flex-col gap-3">
