@@ -7,24 +7,29 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humachi"
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 
+	account_handler "ricrac/internal/api/handlers/account"
 	attachments_handler "ricrac/internal/api/handlers/attachments"
 	comments_handler "ricrac/internal/api/handlers/comments"
 	files_handler "ricrac/internal/api/handlers/files"
 	labels_handler "ricrac/internal/api/handlers/labels"
 	notifications_handler "ricrac/internal/api/handlers/notifications"
+	oauthserver_handler "ricrac/internal/api/handlers/oauthserver"
 	search_handler "ricrac/internal/api/handlers/search"
+	signin_handler "ricrac/internal/api/handlers/signin"
 	"ricrac/internal/api/meta"
 	"ricrac/internal/api/middleware"
 	"ricrac/internal/api/oapi"
 	"ricrac/internal/api/server"
 	"ricrac/internal/common/errdefs"
 	"ricrac/internal/mcpserver"
+	"ricrac/internal/web"
 )
 
 // Fallback serves what isn't ported to the new server yet.
@@ -77,6 +82,9 @@ func New(srv *server.Server, fallback Fallback) (http.Handler, *oapi.Registry) {
 	}
 	authn := middleware.NewAuth(srv.Cfg, srv.Keys, srv.AccessService)
 	reg.Mount(authn.RESTCaller)
+	account_handler.RegisterHandlers(srv, api)
+	oauthserver_handler.Mount(r, srv)
+	signin_handler.Mount(r, srv)
 
 	docs := meta.NewHandler(srv.Cfg, reg)
 	r.Get("/v1", docs.Index())
@@ -93,12 +101,36 @@ func New(srv *server.Server, fallback Fallback) (http.Handler, *oapi.Registry) {
 	r.Handle("/mcp", authn.RequireBearer(mcpserver.New(srv.Cfg, reg, srv.AccessService).Handler()))
 	files_handler.Mount(r, srv, authn)
 	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) { _, _ = w.Write([]byte("ok")) })
-	if fallback != nil {
-		rest := fallback.Mux()
-		r.NotFound(rest.ServeHTTP)
-		r.MethodNotAllowed(rest.ServeHTTP)
-	}
+	unmatched := unmatchedHandler(fallback)
+	r.NotFound(unmatched)
+	r.MethodNotAllowed(unmatched)
 	return r, reg
+}
+
+// unmatchedHandler serves what no route took: what the fallback still serves, else /api's not
+// found answer or the web app.
+func unmatchedHandler(fallback Fallback) http.HandlerFunc {
+	var rest http.Handler
+	if fallback != nil {
+		rest = fallback.Mux()
+	}
+	patterns, _ := rest.(interface {
+		Handler(r *http.Request) (http.Handler, string)
+	})
+	return func(w http.ResponseWriter, r *http.Request) {
+		pattern := ""
+		if patterns != nil {
+			_, pattern = patterns.Handler(r)
+		}
+		switch {
+		case pattern == "/api/" || pattern == "" && strings.HasPrefix(r.URL.Path, "/api/"):
+			account_handler.NotFound(w, r)
+		case pattern == "":
+			web.Serve(w, r)
+		default:
+			rest.ServeHTTP(w, r)
+		}
+	}
 }
 
 // RegisterHandlers puts every handler group's operations on the registry, in the order they

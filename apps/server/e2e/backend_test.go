@@ -18,6 +18,7 @@ import (
 	"ricrac/internal/integrations/github"
 	"ricrac/internal/legacy"
 	repository "ricrac/internal/repositories"
+	oauth_service "ricrac/internal/services/oauth"
 	"ricrac/ops"
 	"ricrac/server"
 )
@@ -119,7 +120,7 @@ func (b *backend) ConfigureGitHub(apiURL string, client *http.Client, key *rsa.P
 
 // OAuthDecide is the consent screen's answer: the redirect to the client, or why it failed.
 func (b *backend) OAuthDecide(ctx context.Context, user uuid.UUID, workspaces []uuid.UUID, request oauthRequest) (string, error) {
-	return server.Decide(ctx, b.state, user, workspaces, &server.OAuthRequest{
+	return b.server.OAuthService.Decide(ctx, user, workspaces, &oauth_service.OAuthRequest{
 		ClientID: request.ClientID, RedirectURI: request.RedirectURI, ResponseType: request.ResponseType,
 		CodeChallenge: request.CodeChallenge, CodeChallengeMethod: request.CodeChallengeMethod,
 		State: request.State, Resource: request.Resource,

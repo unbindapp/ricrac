@@ -7,6 +7,7 @@ import (
 	"ricrac/ent"
 	repository "ricrac/internal/repositories"
 	access_repo "ricrac/internal/repositories/access"
+	account_repo "ricrac/internal/repositories/account"
 	attachment_repo "ricrac/internal/repositories/attachment"
 	automation_repo "ricrac/internal/repositories/automation"
 	comment_repo "ricrac/internal/repositories/comment"
@@ -14,6 +15,7 @@ import (
 	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
 	notification_repo "ricrac/internal/repositories/notification"
+	oauth_repo "ricrac/internal/repositories/oauth"
 	resolve_repo "ricrac/internal/repositories/resolve"
 	search_repo "ricrac/internal/repositories/search"
 	seed_repo "ricrac/internal/repositories/seed"
@@ -37,4 +39,6 @@ type RepositoriesInterface interface {
 	Automation() automation_repo.AutomationRepositoryInterface
 	Notification() notification_repo.NotificationRepositoryInterface
 	Search() search_repo.SearchRepositoryInterface
+	Account() account_repo.AccountRepositoryInterface
+	OAuth() oauth_repo.OAuthRepositoryInterface
 }

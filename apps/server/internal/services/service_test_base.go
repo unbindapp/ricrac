@@ -10,12 +10,14 @@ import (
 	repository "ricrac/internal/repositories"
 	mocks_repositories "ricrac/mocks/repositories"
 	mocks_repository_access "ricrac/mocks/repository/access"
+	mocks_repository_account "ricrac/mocks/repository/account"
 	mocks_repository_attachment "ricrac/mocks/repository/attachment"
 	mocks_repository_comment "ricrac/mocks/repository/comment"
 	mocks_repository_events "ricrac/mocks/repository/events"
 	mocks_repository_issue "ricrac/mocks/repository/issue"
 	mocks_repository_label "ricrac/mocks/repository/label"
 	mocks_repository_notification "ricrac/mocks/repository/notification"
+	mocks_repository_oauth "ricrac/mocks/repository/oauth"
 	mocks_repository_resolve "ricrac/mocks/repository/resolve"
 	mocks_repository_search "ricrac/mocks/repository/search"
 	mocks_repository_seed "ricrac/mocks/repository/seed"
@@ -37,6 +39,8 @@ type ServiceTestSuite struct {
 	MockIssueRepo        *mocks_repository_issue.IssueRepositoryMock
 	MockNotificationRepo *mocks_repository_notification.NotificationRepositoryMock
 	MockSearchRepo       *mocks_repository_search.SearchRepositoryMock
+	MockAccountRepo      *mocks_repository_account.AccountRepositoryMock
+	MockOAuthRepo        *mocks_repository_oauth.OAuthRepositoryMock
 }
 
 func (suite *ServiceTestSuite) SetupTest() {
@@ -52,6 +56,8 @@ func (suite *ServiceTestSuite) SetupTest() {
 	suite.MockIssueRepo = mocks_repository_issue.NewIssueRepositoryMock(suite.T())
 	suite.MockNotificationRepo = mocks_repository_notification.NewNotificationRepositoryMock(suite.T())
 	suite.MockSearchRepo = mocks_repository_search.NewSearchRepositoryMock(suite.T())
+	suite.MockAccountRepo = mocks_repository_account.NewAccountRepositoryMock(suite.T())
+	suite.MockOAuthRepo = mocks_repository_oauth.NewOAuthRepositoryMock(suite.T())
 
 	suite.MockRepo.EXPECT().Access().Return(suite.MockAccessRepo).Maybe()
 	suite.MockRepo.EXPECT().Resolve().Return(suite.MockResolveRepo).Maybe()
@@ -63,6 +69,8 @@ func (suite *ServiceTestSuite) SetupTest() {
 	suite.MockRepo.EXPECT().Issue().Return(suite.MockIssueRepo).Maybe()
 	suite.MockRepo.EXPECT().Notification().Return(suite.MockNotificationRepo).Maybe()
 	suite.MockRepo.EXPECT().Search().Return(suite.MockSearchRepo).Maybe()
+	suite.MockRepo.EXPECT().Account().Return(suite.MockAccountRepo).Maybe()
+	suite.MockRepo.EXPECT().OAuth().Return(suite.MockOAuthRepo).Maybe()
 }
 
 // ExpectTx runs WithTx bodies directly; repository mocks match the tx argument with mock.Anything.

@@ -37,7 +37,6 @@ func Mux(state *app.State) *http.ServeMux {
 	githubRoutes(mux, state)
 	accountRoutes(mux, state)
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) { _, _ = w.Write([]byte("ok")) })
-	mux.HandleFunc("/", serveSPA)
 	return mux
 }
 

@@ -7,6 +7,7 @@ import (
 	"ricrac/internal/common/opcall"
 	"ricrac/internal/repositories/repositories"
 	access_service "ricrac/internal/services/access"
+	account_service "ricrac/internal/services/account"
 	attachment_service "ricrac/internal/services/attachment"
 	automation_service "ricrac/internal/services/automation"
 	comment_service "ricrac/internal/services/comment"
@@ -14,9 +15,11 @@ import (
 	issue_service "ricrac/internal/services/issue"
 	label_service "ricrac/internal/services/label"
 	notification_service "ricrac/internal/services/notification"
+	oauth_service "ricrac/internal/services/oauth"
 	resolve_service "ricrac/internal/services/resolve"
 	search_service "ricrac/internal/services/search"
 	seed_service "ricrac/internal/services/seed"
+	signin_service "ricrac/internal/services/signin"
 )
 
 type Server struct {
@@ -37,4 +40,7 @@ type Server struct {
 	AutomationService   *automation_service.AutomationService
 	NotificationService *notification_service.NotificationService
 	SearchService       *search_service.SearchService
+	AccountService      *account_service.AccountService
+	OAuthService        *oauth_service.OAuthService
+	SigninService       *signin_service.SigninService
 }

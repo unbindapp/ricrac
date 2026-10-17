@@ -1,4 +1,6 @@
-package server
+// Package web serves the web app's build (apps/web/dist), copied to internal/web/dist before
+// building the server.
+package web
 
 import (
 	"embed"
@@ -9,8 +11,6 @@ import (
 	"strings"
 )
 
-// dist is the web app's build (apps/web/dist), copied here before building the server.
-//
 //go:embed all:dist
 var dist embed.FS
 
@@ -20,8 +20,8 @@ const csp = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inl
 	"media-src 'self'; connect-src 'self'; font-src 'self'; frame-src 'none'; frame-ancestors 'none'; " +
 	"base-uri 'none'; form-action 'self'"
 
-// serveSPA serves the web app's files, and its index.html for every other path.
-func serveSPA(w http.ResponseWriter, r *http.Request) {
+// Serve serves the web app's files, and its index.html for every other path.
+func Serve(w http.ResponseWriter, r *http.Request) {
 	name := strings.TrimPrefix(r.URL.Path, "/")
 	if data, err := fs.ReadFile(assets, name); name != "" && err == nil {
 		contentType := mime.TypeByExtension(path.Ext(name))

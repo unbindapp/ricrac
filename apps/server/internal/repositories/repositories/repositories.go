@@ -7,6 +7,7 @@ import (
 	"ricrac/ent"
 	repository "ricrac/internal/repositories"
 	access_repo "ricrac/internal/repositories/access"
+	account_repo "ricrac/internal/repositories/account"
 	attachment_repo "ricrac/internal/repositories/attachment"
 	automation_repo "ricrac/internal/repositories/automation"
 	comment_repo "ricrac/internal/repositories/comment"
@@ -14,6 +15,7 @@ import (
 	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
 	notification_repo "ricrac/internal/repositories/notification"
+	oauth_repo "ricrac/internal/repositories/oauth"
 	resolve_repo "ricrac/internal/repositories/resolve"
 	search_repo "ricrac/internal/repositories/search"
 	seed_repo "ricrac/internal/repositories/seed"
@@ -34,6 +36,8 @@ type Repositories struct {
 	automation   automation_repo.AutomationRepositoryInterface
 	notification notification_repo.NotificationRepositoryInterface
 	search       search_repo.SearchRepositoryInterface
+	account      account_repo.AccountRepositoryInterface
+	oauth        oauth_repo.OAuthRepositoryInterface
 }
 
 func NewRepositories(db *ent.Client) *Repositories {
@@ -51,6 +55,8 @@ func NewRepositories(db *ent.Client) *Repositories {
 		automation:   automation_repo.NewAutomationRepository(db),
 		notification: notification_repo.NewNotificationRepository(db),
 		search:       search_repo.NewSearchRepository(db),
+		account:      account_repo.NewAccountRepository(db),
+		oauth:        oauth_repo.NewOAuthRepository(db),
 	}
 }
 
@@ -109,4 +115,12 @@ func (r *Repositories) Notification() notification_repo.NotificationRepositoryIn
 
 func (r *Repositories) Search() search_repo.SearchRepositoryInterface {
 	return r.search
+}
+
+func (r *Repositories) Account() account_repo.AccountRepositoryInterface {
+	return r.account
+}
+
+func (r *Repositories) OAuth() oauth_repo.OAuthRepositoryInterface {
+	return r.oauth
 }
