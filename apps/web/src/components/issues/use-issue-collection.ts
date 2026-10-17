@@ -71,9 +71,19 @@ export function useIssueCollection({
       groupBy: display.group_by,
       orderBy: display.order_by,
       order: display.order,
+      layout: display.layout,
       team: team && states ? { id: team.id, states } : undefined,
     });
-  }, [issues, display.group_by, display.order_by, display.order, team, stateTypes, showsClosed]);
+  }, [
+    issues,
+    display.group_by,
+    display.order_by,
+    display.order,
+    display.layout,
+    team,
+    stateTypes,
+    showsClosed,
+  ]);
 
   const lastPage = pages?.[pages.length - 1];
   const isCapped = Boolean(lastPage?.pageInfo.hasNextPage) && !hasNextPage;
