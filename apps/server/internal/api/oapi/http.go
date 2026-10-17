@@ -82,7 +82,7 @@ func (reg *Registry) serve(w http.ResponseWriter, r *http.Request, op *Op, path 
 		errdefs.Write(w, err)
 		return
 	}
-	errdefs.WriteJSON(w, http.StatusOK, value)
+	errdefs.WriteJSON(w, http.StatusOK, errdefs.Sorted(value))
 }
 
 // ReadBody reads a request body within its limit.

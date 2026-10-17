@@ -100,3 +100,16 @@ func Marshal(value any) []byte {
 	_ = encoder.Encode(value)
 	return bytes.TrimRight(buffer.Bytes(), "\n")
 }
+
+// Sorted is the value as plain JSON values, so it is written with every object's keys in order,
+// as operations always answered. Numbers stay as they were written.
+func Sorted(value any) any {
+	encoded := Marshal(value)
+	decoder := json.NewDecoder(bytes.NewReader(encoded))
+	decoder.UseNumber()
+	var plain any
+	if decoder.Decode(&plain) != nil {
+		return json.RawMessage(encoded)
+	}
+	return plain
+}

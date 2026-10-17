@@ -197,6 +197,17 @@ func (p *process) session(t *testing.T, email string) string {
 
 func (p *process) request(t *testing.T, method, path string, headers map[string]string, body any) (int, any) {
 	t.Helper()
+	status, data := p.raw(t, method, path, headers, body)
+	var value any
+	if json.Unmarshal(data, &value) != nil {
+		value = string(data)
+	}
+	return status, value
+}
+
+// raw is the status and the body exactly as the server wrote it.
+func (p *process) raw(t *testing.T, method, path string, headers map[string]string, body any) (int, []byte) {
+	t.Helper()
 	var reader io.Reader
 	if body != nil {
 		reader = bytes.NewReader(marshal(body))
@@ -218,11 +229,7 @@ func (p *process) request(t *testing.T, method, path string, headers map[string]
 	}
 	defer response.Body.Close()
 	data, _ := io.ReadAll(response.Body)
-	var value any
-	if json.Unmarshal(data, &value) != nil {
-		value = string(data)
-	}
-	return response.StatusCode, value
+	return response.StatusCode, data
 }
 
 func (p *process) op(t *testing.T, key, name string, args M) M {
@@ -338,8 +345,8 @@ func snapshot(t *testing.T, p *process, s seeded) []answer {
 	t.Helper()
 	var answers []answer
 	read := func(name, method, path string, headers map[string]string, body any) {
-		status, value := p.request(t, method, path, headers, body)
-		answers = append(answers, answer{name, M{"status": status, "body": value}})
+		status, data := p.raw(t, method, path, headers, body)
+		answers = append(answers, answer{name, M{"status": status, "body": string(data)}})
 	}
 	bearer := func(key string) map[string]string { return map[string]string{"Authorization": "Bearer " + key} }
 	_, listed := p.request(t, "GET", "/v1/ops", nil, nil)
