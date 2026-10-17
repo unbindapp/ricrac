@@ -11,6 +11,7 @@ import (
 	attachment_repo "ricrac/internal/repositories/attachment"
 	automation_repo "ricrac/internal/repositories/automation"
 	comment_repo "ricrac/internal/repositories/comment"
+	customer_repo "ricrac/internal/repositories/customer"
 	cycle_repo "ricrac/internal/repositories/cycle"
 	document_repo "ricrac/internal/repositories/document"
 	email_repo "ricrac/internal/repositories/email"
@@ -20,12 +21,14 @@ import (
 	label_repo "ricrac/internal/repositories/label"
 	notification_repo "ricrac/internal/repositories/notification"
 	oauth_repo "ricrac/internal/repositories/oauth"
+	release_repo "ricrac/internal/repositories/release"
 	resolve_repo "ricrac/internal/repositories/resolve"
 	search_repo "ricrac/internal/repositories/search"
 	seed_repo "ricrac/internal/repositories/seed"
 	state_repo "ricrac/internal/repositories/state"
 	team_repo "ricrac/internal/repositories/team"
 	template_repo "ricrac/internal/repositories/template"
+	webhook_repo "ricrac/internal/repositories/webhook"
 	workspace_repo "ricrac/internal/repositories/workspace"
 	"time"
 )
@@ -57,4 +60,7 @@ type RepositoriesInterface interface {
 	Document() document_repo.DocumentRepositoryInterface
 	Favorite() favorite_repo.FavoriteRepositoryInterface
 	Template() template_repo.TemplateRepositoryInterface
+	Customer() customer_repo.CustomerRepositoryInterface
+	Release() release_repo.ReleaseRepositoryInterface
+	Webhook() webhook_repo.WebhookRepositoryInterface
 }

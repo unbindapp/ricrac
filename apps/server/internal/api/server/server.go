@@ -11,6 +11,7 @@ import (
 	attachment_service "ricrac/internal/services/attachment"
 	automation_service "ricrac/internal/services/automation"
 	comment_service "ricrac/internal/services/comment"
+	customer_service "ricrac/internal/services/customer"
 	cycle_service "ricrac/internal/services/cycle"
 	document_service "ricrac/internal/services/document"
 	email_service "ricrac/internal/services/email"
@@ -20,6 +21,7 @@ import (
 	label_service "ricrac/internal/services/label"
 	notification_service "ricrac/internal/services/notification"
 	oauth_service "ricrac/internal/services/oauth"
+	release_service "ricrac/internal/services/release"
 	resolve_service "ricrac/internal/services/resolve"
 	search_service "ricrac/internal/services/search"
 	seed_service "ricrac/internal/services/seed"
@@ -27,6 +29,7 @@ import (
 	state_service "ricrac/internal/services/state"
 	team_service "ricrac/internal/services/team"
 	template_service "ricrac/internal/services/template"
+	webhook_service "ricrac/internal/services/webhook"
 	workspace_service "ricrac/internal/services/workspace"
 )
 
@@ -59,4 +62,7 @@ type Server struct {
 	DocumentService     *document_service.DocumentService
 	FavoriteService     *favorite_service.FavoriteService
 	TemplateService     *template_service.TemplateService
+	CustomerService     *customer_service.CustomerService
+	ReleaseService      *release_service.ReleaseService
+	WebhookService      *webhook_service.WebhookService
 }

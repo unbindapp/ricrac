@@ -13,6 +13,7 @@ import (
 	mocks_repository_account "ricrac/mocks/repository/account"
 	mocks_repository_attachment "ricrac/mocks/repository/attachment"
 	mocks_repository_comment "ricrac/mocks/repository/comment"
+	mocks_repository_customer "ricrac/mocks/repository/customer"
 	mocks_repository_cycle "ricrac/mocks/repository/cycle"
 	mocks_repository_document "ricrac/mocks/repository/document"
 	mocks_repository_email "ricrac/mocks/repository/email"
@@ -22,6 +23,7 @@ import (
 	mocks_repository_label "ricrac/mocks/repository/label"
 	mocks_repository_notification "ricrac/mocks/repository/notification"
 	mocks_repository_oauth "ricrac/mocks/repository/oauth"
+	mocks_repository_release "ricrac/mocks/repository/release"
 	mocks_repository_resolve "ricrac/mocks/repository/resolve"
 	mocks_repository_search "ricrac/mocks/repository/search"
 	mocks_repository_seed "ricrac/mocks/repository/seed"
@@ -29,6 +31,7 @@ import (
 	mocks_repository_team "ricrac/mocks/repository/team"
 	mocks_repository_template "ricrac/mocks/repository/template"
 	mocks_repository_tx "ricrac/mocks/repository/tx"
+	mocks_repository_webhook "ricrac/mocks/repository/webhook"
 	mocks_repository_workspace "ricrac/mocks/repository/workspace"
 )
 
@@ -57,6 +60,9 @@ type ServiceTestSuite struct {
 	MockDocumentRepo     *mocks_repository_document.DocumentRepositoryMock
 	MockFavoriteRepo     *mocks_repository_favorite.FavoriteRepositoryMock
 	MockTemplateRepo     *mocks_repository_template.TemplateRepositoryMock
+	MockCustomerRepo     *mocks_repository_customer.CustomerRepositoryMock
+	MockReleaseRepo      *mocks_repository_release.ReleaseRepositoryMock
+	MockWebhookRepo      *mocks_repository_webhook.WebhookRepositoryMock
 }
 
 func (suite *ServiceTestSuite) SetupTest() {
@@ -82,6 +88,9 @@ func (suite *ServiceTestSuite) SetupTest() {
 	suite.MockDocumentRepo = mocks_repository_document.NewDocumentRepositoryMock(suite.T())
 	suite.MockFavoriteRepo = mocks_repository_favorite.NewFavoriteRepositoryMock(suite.T())
 	suite.MockTemplateRepo = mocks_repository_template.NewTemplateRepositoryMock(suite.T())
+	suite.MockCustomerRepo = mocks_repository_customer.NewCustomerRepositoryMock(suite.T())
+	suite.MockReleaseRepo = mocks_repository_release.NewReleaseRepositoryMock(suite.T())
+	suite.MockWebhookRepo = mocks_repository_webhook.NewWebhookRepositoryMock(suite.T())
 
 	suite.MockRepo.EXPECT().Access().Return(suite.MockAccessRepo).Maybe()
 	suite.MockRepo.EXPECT().Resolve().Return(suite.MockResolveRepo).Maybe()
@@ -103,6 +112,9 @@ func (suite *ServiceTestSuite) SetupTest() {
 	suite.MockRepo.EXPECT().Document().Return(suite.MockDocumentRepo).Maybe()
 	suite.MockRepo.EXPECT().Favorite().Return(suite.MockFavoriteRepo).Maybe()
 	suite.MockRepo.EXPECT().Template().Return(suite.MockTemplateRepo).Maybe()
+	suite.MockRepo.EXPECT().Customer().Return(suite.MockCustomerRepo).Maybe()
+	suite.MockRepo.EXPECT().Release().Return(suite.MockReleaseRepo).Maybe()
+	suite.MockRepo.EXPECT().Webhook().Return(suite.MockWebhookRepo).Maybe()
 }
 
 // ExpectTx runs WithTx bodies directly; repository mocks match the tx argument with mock.Anything.

@@ -11,6 +11,7 @@ import (
 	attachment_repo "ricrac/internal/repositories/attachment"
 	automation_repo "ricrac/internal/repositories/automation"
 	comment_repo "ricrac/internal/repositories/comment"
+	customer_repo "ricrac/internal/repositories/customer"
 	cycle_repo "ricrac/internal/repositories/cycle"
 	document_repo "ricrac/internal/repositories/document"
 	email_repo "ricrac/internal/repositories/email"
@@ -20,12 +21,14 @@ import (
 	label_repo "ricrac/internal/repositories/label"
 	notification_repo "ricrac/internal/repositories/notification"
 	oauth_repo "ricrac/internal/repositories/oauth"
+	release_repo "ricrac/internal/repositories/release"
 	resolve_repo "ricrac/internal/repositories/resolve"
 	search_repo "ricrac/internal/repositories/search"
 	seed_repo "ricrac/internal/repositories/seed"
 	state_repo "ricrac/internal/repositories/state"
 	team_repo "ricrac/internal/repositories/team"
 	template_repo "ricrac/internal/repositories/template"
+	webhook_repo "ricrac/internal/repositories/webhook"
 	workspace_repo "ricrac/internal/repositories/workspace"
 )
 
@@ -54,6 +57,9 @@ type Repositories struct {
 	document     document_repo.DocumentRepositoryInterface
 	favorite     favorite_repo.FavoriteRepositoryInterface
 	template     template_repo.TemplateRepositoryInterface
+	customer     customer_repo.CustomerRepositoryInterface
+	release      release_repo.ReleaseRepositoryInterface
+	webhook      webhook_repo.WebhookRepositoryInterface
 }
 
 func NewRepositories(db *ent.Client) *Repositories {
@@ -81,6 +87,9 @@ func NewRepositories(db *ent.Client) *Repositories {
 		document:     document_repo.NewDocumentRepository(db),
 		favorite:     favorite_repo.NewFavoriteRepository(db),
 		template:     template_repo.NewTemplateRepository(db),
+		customer:     customer_repo.NewCustomerRepository(db),
+		release:      release_repo.NewReleaseRepository(db),
+		webhook:      webhook_repo.NewWebhookRepository(db),
 	}
 }
 
@@ -179,4 +188,16 @@ func (r *Repositories) Favorite() favorite_repo.FavoriteRepositoryInterface {
 
 func (r *Repositories) Template() template_repo.TemplateRepositoryInterface {
 	return r.template
+}
+
+func (r *Repositories) Customer() customer_repo.CustomerRepositoryInterface {
+	return r.customer
+}
+
+func (r *Repositories) Release() release_repo.ReleaseRepositoryInterface {
+	return r.release
+}
+
+func (r *Repositories) Webhook() webhook_repo.WebhookRepositoryInterface {
+	return r.webhook
 }

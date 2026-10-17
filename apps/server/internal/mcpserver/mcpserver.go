@@ -378,6 +378,7 @@ func sortedJSON(value any) string {
 		return string(encoded)
 	}
 	return string(errdefs.Marshal(plain))
+	return M{"content": []any{M{"type": "text", "text": resultText(value)}}, "isError": false}, nil
 }
 
 // reach is what the caller's token reaches, which decides the tools they see and their
