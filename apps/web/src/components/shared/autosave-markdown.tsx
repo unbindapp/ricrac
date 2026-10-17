@@ -18,6 +18,7 @@ export function AutosaveMarkdown({ value, label, placeholder, readOnly, onSave }
   const { workspace } = useWorkspace();
   const { users } = useWorkspaceUsers();
   const uploadImage = useUploadImage(workspace.id);
+  if (readOnly && !value.trim()) return null;
   return (
     <MarkdownEditor
       label={label}

@@ -124,6 +124,7 @@ export function PickerTrigger({
           variant="ghost"
           size="sm"
           forceMinSize={false}
+          fadeOnDisabled={false}
           aria-label={label}
           data-muted={muted || undefined}
           className={cn(

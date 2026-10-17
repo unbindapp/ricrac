@@ -10,13 +10,14 @@ type TProps = Omit<ComponentProps<typeof Button>, "children"> & {
   muted?: boolean;
 };
 
-/** The button a property picker opens from, in a properties panel. */
+/** The button a property picker opens from, in a properties panel; read-only ones look the same. */
 export function PropertyTrigger({ label, icon, text, muted, className, ...props }: TProps) {
   return (
     <Button
       variant="ghost"
       size="sm"
       forceMinSize={false}
+      fadeOnDisabled={false}
       aria-label={label}
       data-muted={muted || undefined}
       className={cn(
