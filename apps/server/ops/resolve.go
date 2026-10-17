@@ -47,6 +47,38 @@ func slugTail(value string) string {
 	return segment
 }
 
+// nameSlug is the words part of a link slug (launch-v2 for "Launch v2"), as the links are made.
+func nameSlug(name string) string {
+	var b strings.Builder
+	dash := false
+	for _, r := range strings.ToLower(name) {
+		if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') {
+			if dash && b.Len() > 0 {
+				b.WriteByte('-')
+			}
+			b.WriteRune(r)
+			dash = false
+			continue
+		}
+		dash = true
+	}
+	slug := b.String()
+	if len(slug) > 60 {
+		slug = slug[:60]
+	}
+	return strings.Trim(slug, "-")
+}
+
+// matchesName is whether value names the thing: its name in any case, or a link slug of it
+// without the slug id (/acme/project/launch-v2).
+func matchesName(name, value string) bool {
+	if strings.EqualFold(name, value) {
+		return true
+	}
+	slug := nameSlug(name)
+	return slug != "" && slug == strings.ToLower(lastSegment(value))
+}
+
 func isHex(value string) bool {
 	for _, c := range value {
 		if !strings.ContainsRune("0123456789abcdefABCDEF", c) {
@@ -448,7 +480,7 @@ func resolveProject(c *app.Ctx, value string) (uuid.UUID, error) {
 		return bySlug, nil
 	}
 	for _, r := range rows {
-		if strings.EqualFold(r.Name, value) {
+		if matchesName(r.Name, value) {
 			return r.ID, nil
 		}
 	}
@@ -570,7 +602,7 @@ func resolveNamed(c *app.Ctx, table, nameColumn, extra, what, value string) (uui
 	for _, test := range []func(slugged) bool{
 		func(r slugged) bool { return isID && r.ID == id },
 		func(r slugged) bool { return r.Slug == slug },
-		func(r slugged) bool { return strings.EqualFold(r.Name, value) },
+		func(r slugged) bool { return matchesName(r.Name, value) },
 	} {
 		for _, r := range rows {
 			if test(r) {

@@ -304,3 +304,16 @@ func TestDateResolutionsNeedADate(t *testing.T) {
 	initiative := call(t, w.Ann, "save_initiative", M{"id": "Grow", "targetDate": nil, "targetDateResolution": "year"})
 	check(t, initiative.At("targetDateResolution").IsNull(), initiative.JSON())
 }
+
+func TestLinksWithoutTheSlugIDFindThingsByName(t *testing.T) {
+	w := world(t)
+	project := call(t, w.Ann, "save_project", M{"name": "Launch v2!", "setTeams": []any{"ENG"}})
+	id := project.At("id").Str()
+	eq(t, call(t, w.Ann, "get_project", M{"id": "launch-v2"}).At("id").Str(), id)
+	eq(t, call(t, w.Ann, "get_project", M{"id": "http://localhost:3000/acme/project/launch-v2"}).At("id").Str(), id)
+	initiative := call(t, w.Ann, "save_initiative", M{"name": "Grow 2030"})
+	eq(t, call(t, w.Ann, "get_initiative", M{"id": "grow-2030"}).At("id").Str(), initiative.At("id").Str())
+	document := call(t, w.Ann, "save_document", M{"title": "Q3: Plan", "project": id})
+	eq(t, call(t, w.Ann, "get_document", M{"id": "q3-plan"}).At("id").Str(), document.At("id").Str())
+	contains(t, fails(t, w.Ann, "get_project", M{"id": "launch"}), "Launch v2!")
+}

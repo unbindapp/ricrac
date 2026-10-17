@@ -13,6 +13,7 @@ test("slugs match the links the server makes", () => {
 test("link slugs reduce to their slug id", () => {
   assert.equal(slugIdFromParam("launch-v2-12bc7006d1f5"), "12bc7006d1f5");
   assert.equal(slugIdFromParam("12bc7006d1f5"), "12bc7006d1f5");
+  assert.equal(slugIdFromParam("launch-v2"), "launch-v2");
   const id = "0181f3e3-366c-4162-9add-d6233f69bf6d";
   assert.equal(slugIdFromParam(id), id);
 });

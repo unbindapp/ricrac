@@ -10,9 +10,14 @@ export function entitySlug(entity: { slugId: string; name?: string; title?: stri
 }
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const slugIdPattern = /^[0-9a-f]{12}$/i;
 
-/** The slug id ending a link slug, so a renamed thing keeps one cache entry; ids pass as they are. */
+/**
+ * The slug id ending a link slug, so a renamed thing keeps one cache entry; ids, and slugs
+ * without a slug id (`launch-v2`, which the server matches by name), pass as they are.
+ */
 export function slugIdFromParam(param: string) {
   if (uuidPattern.test(param)) return param;
-  return param.split("-").at(-1) ?? param;
+  const tail = param.split("-").at(-1) ?? param;
+  return slugIdPattern.test(tail) ? tail : param;
 }
