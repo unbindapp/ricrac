@@ -2,6 +2,7 @@ package app
 
 import (
 	"errors"
+	"log/slog"
 	"os"
 	"strconv"
 	"strings"
@@ -66,13 +67,14 @@ func ConfigFromEnv() (Config, error) {
 		GoogleClientSecret: env("GOOGLE_CLIENT_SECRET"),
 		MaxUploadSize:      int64(uploadMB) * 1024 * 1024,
 	}
+	// Email and GitHub are optional: set wrong, they stay off rather than keeping Ricrac down.
 	if config.Mail, err = mail.ParseConfig(env("SMTP_URL"), env("EMAIL_FROM")); err != nil {
-		return Config{}, err
+		slog.Warn("email is off: " + err.Error())
 	}
 	config.GitHub, err = github.ParseConfig(env("GITHUB_APP_ID"), env("GITHUB_APP_SLUG"), env("GITHUB_APP_PRIVATE_KEY"),
 		env("GITHUB_WEBHOOK_SECRET"), env("GITHUB_CLIENT_ID"), env("GITHUB_CLIENT_SECRET"), env("GITHUB_API_URL"), env("GITHUB_WEB_URL"))
 	if err != nil {
-		return Config{}, err
+		slog.Warn("GitHub is off: " + err.Error())
 	}
 	switch env("SECURE_COOKIES") {
 	case "true", "1":
