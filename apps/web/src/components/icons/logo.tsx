@@ -5,9 +5,8 @@ const glyph =
 
 export function LogoMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="-8 -8 40 40" aria-hidden className={cn("size-5 shrink-0", className)}>
-      <rect x="-8" y="-8" width="40" height="40" rx="10" className="fill-logo" />
-      <path d={glyph} className="fill-logo-foreground" />
+    <svg viewBox="0 0 24 24" aria-hidden className={cn("size-5 shrink-0 fill-current", className)}>
+      <path d={glyph} />
     </svg>
   );
 }
@@ -15,7 +14,7 @@ export function LogoMark({ className }: { className?: string }) {
 export function Logo() {
   return (
     <span className="inline-flex items-center gap-2">
-      <LogoMark className="size-8" />
+      <LogoMark className="size-5 -translate-y-px" />
       <span className="text-xl leading-tight font-semibold">Ricrac</span>
     </span>
   );
