@@ -18,6 +18,7 @@ import (
 	mocks_repository_resolve "ricrac/mocks/repository/resolve"
 	mocks_repository_seed "ricrac/mocks/repository/seed"
 	mocks_repository_tx "ricrac/mocks/repository/tx"
+	mocks_repository_view "ricrac/mocks/repository/view"
 )
 
 type ServiceTestSuite struct {
@@ -33,6 +34,7 @@ type ServiceTestSuite struct {
 	MockAttachmentRepo *mocks_repository_attachment.AttachmentRepositoryMock
 	MockCommentRepo    *mocks_repository_comment.CommentRepositoryMock
 	MockIssueRepo      *mocks_repository_issue.IssueRepositoryMock
+	MockViewRepo       *mocks_repository_view.ViewRepositoryMock
 }
 
 func (suite *ServiceTestSuite) SetupTest() {
@@ -46,6 +48,7 @@ func (suite *ServiceTestSuite) SetupTest() {
 	suite.MockAttachmentRepo = mocks_repository_attachment.NewAttachmentRepositoryMock(suite.T())
 	suite.MockCommentRepo = mocks_repository_comment.NewCommentRepositoryMock(suite.T())
 	suite.MockIssueRepo = mocks_repository_issue.NewIssueRepositoryMock(suite.T())
+	suite.MockViewRepo = mocks_repository_view.NewViewRepositoryMock(suite.T())
 
 	suite.MockRepo.EXPECT().Access().Return(suite.MockAccessRepo).Maybe()
 	suite.MockRepo.EXPECT().Resolve().Return(suite.MockResolveRepo).Maybe()
@@ -55,6 +58,7 @@ func (suite *ServiceTestSuite) SetupTest() {
 	suite.MockRepo.EXPECT().Attachment().Return(suite.MockAttachmentRepo).Maybe()
 	suite.MockRepo.EXPECT().Comment().Return(suite.MockCommentRepo).Maybe()
 	suite.MockRepo.EXPECT().Issue().Return(suite.MockIssueRepo).Maybe()
+	suite.MockRepo.EXPECT().View().Return(suite.MockViewRepo).Maybe()
 }
 
 // ExpectTx runs WithTx bodies directly; repository mocks match the tx argument with mock.Anything.

@@ -14,6 +14,7 @@ import (
 	label_repo "ricrac/internal/repositories/label"
 	resolve_repo "ricrac/internal/repositories/resolve"
 	seed_repo "ricrac/internal/repositories/seed"
+	view_repo "ricrac/internal/repositories/view"
 )
 
 //go:generate go run -mod=mod github.com/vburenin/ifacemaker -f "*.go" -i RepositoriesInterface -p repositories -s Repositories -o repositories_iface.go
@@ -28,6 +29,7 @@ type Repositories struct {
 	seed       seed_repo.SeedRepositoryInterface
 	comment    comment_repo.CommentRepositoryInterface
 	attachment attachment_repo.AttachmentRepositoryInterface
+	view       view_repo.ViewRepositoryInterface
 }
 
 func NewRepositories(db *ent.Client) *Repositories {
@@ -42,6 +44,7 @@ func NewRepositories(db *ent.Client) *Repositories {
 		seed:       seed_repo.NewSeedRepository(db),
 		comment:    comment_repo.NewCommentRepository(db),
 		attachment: attachment_repo.NewAttachmentRepository(db),
+		view:       view_repo.NewViewRepository(db),
 	}
 }
 
@@ -88,4 +91,8 @@ func (r *Repositories) Comment() comment_repo.CommentRepositoryInterface {
 
 func (r *Repositories) Attachment() attachment_repo.AttachmentRepositoryInterface {
 	return r.attachment
+}
+
+func (r *Repositories) View() view_repo.ViewRepositoryInterface {
+	return r.view
 }

@@ -16,6 +16,7 @@ import (
 	"ricrac/internal/repositories/label"
 	"ricrac/internal/repositories/resolve"
 	"ricrac/internal/repositories/seed"
+	"ricrac/internal/repositories/view"
 	"time"
 
 	mock "github.com/stretchr/testify/mock"
@@ -533,6 +534,52 @@ func (_c *RepositoriesMock_Seed_Call) Return(seedRepositoryInterface seed_repo.S
 }
 
 func (_c *RepositoriesMock_Seed_Call) RunAndReturn(run func() seed_repo.SeedRepositoryInterface) *RepositoriesMock_Seed_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// View provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) View() view_repo.ViewRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for View")
+	}
+
+	var r0 view_repo.ViewRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() view_repo.ViewRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(view_repo.ViewRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_View_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'View'
+type RepositoriesMock_View_Call struct {
+	*mock.Call
+}
+
+// View is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) View() *RepositoriesMock_View_Call {
+	return &RepositoriesMock_View_Call{Call: _e.mock.On("View")}
+}
+
+func (_c *RepositoriesMock_View_Call) Run(run func()) *RepositoriesMock_View_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_View_Call) Return(viewRepositoryInterface view_repo.ViewRepositoryInterface) *RepositoriesMock_View_Call {
+	_c.Call.Return(viewRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_View_Call) RunAndReturn(run func() view_repo.ViewRepositoryInterface) *RepositoriesMock_View_Call {
 	_c.Call.Return(run)
 	return _c
 }

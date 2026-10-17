@@ -14,6 +14,7 @@ import (
 	label_service "ricrac/internal/services/label"
 	resolve_service "ricrac/internal/services/resolve"
 	seed_service "ricrac/internal/services/seed"
+	view_service "ricrac/internal/services/view"
 )
 
 // New wires the services on the database. waker wakes the background senders.
@@ -33,5 +34,7 @@ func New(cfg config.Config, db *ent.Client, waker events_service.Waker) *Server 
 	srv.IssueService = issue_service.NewIssueService(cfg, repo, srv.ResolveService, srv.EventsService)
 	srv.CommentService = comment_service.NewCommentService(cfg, repo, srv.ResolveService, srv.EventsService)
 	srv.AttachmentService = attachment_service.NewAttachmentService(cfg, repo, srv.ResolveService, srv.EventsService)
+	srv.IssueService.Uses(srv.AttachmentService, srv.CommentService)
+	srv.ViewService = view_service.NewViewService(cfg, repo, srv.ResolveService, srv.EventsService, srv.IssueService)
 	return srv
 }

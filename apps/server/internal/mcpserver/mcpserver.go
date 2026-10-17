@@ -365,7 +365,17 @@ func (m *mcpCall) callTool(name string, arguments M) (any, *rpcError) {
 	if err != nil {
 		return M{"content": []any{M{"type": "text", "text": errdefs.As(err).Message}}, "isError": true}, nil
 	}
-	return M{"content": []any{M{"type": "text", "text": string(errdefs.Marshal(value))}}, "isError": false}, nil
+	return M{"content": []any{M{"type": "text", "text": sortedJSON(value)}}, "isError": false}, nil
+}
+
+// sortedJSON is the value as JSON with the keys of every object sorted, as tools have always
+// written it.
+func sortedJSON(value any) string {
+	var generic any
+	if err := json.Unmarshal(errdefs.Marshal(value), &generic); err != nil {
+		return string(errdefs.Marshal(value))
+	}
+	return string(errdefs.Marshal(generic))
 }
 
 // reach is what the caller's token reaches, which decides the tools they see and their

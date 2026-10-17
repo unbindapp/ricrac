@@ -14,6 +14,7 @@ import (
 	label_service "ricrac/internal/services/label"
 	resolve_service "ricrac/internal/services/resolve"
 	seed_service "ricrac/internal/services/seed"
+	view_service "ricrac/internal/services/view"
 )
 
 type Server struct {
@@ -31,4 +32,5 @@ type Server struct {
 	IssueService      *issue_service.IssueService
 	CommentService    *comment_service.CommentService
 	AttachmentService *attachment_service.AttachmentService
+	ViewService       *view_service.ViewService
 }

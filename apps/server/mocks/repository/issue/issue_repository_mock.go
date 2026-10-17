@@ -6,9 +6,11 @@ package mocks_repository_issue
 
 import (
 	"context"
+	"encoding/json"
 	"ricrac/ent"
 	"ricrac/internal/repositories"
 	"ricrac/internal/repositories/issue"
+	"time"
 
 	"github.com/google/uuid"
 	mock "github.com/stretchr/testify/mock"
@@ -48,6 +50,213 @@ type IssueRepositoryMock_Expecter struct {
 
 func (_m *IssueRepositoryMock) EXPECT() *IssueRepositoryMock_Expecter {
 	return &IssueRepositoryMock_Expecter{mock: &_m.Mock}
+}
+
+// AddLabels provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) AddLabels(ctx context.Context, tx repository.TxInterface, id uuid.UUID, labels []uuid.UUID) error {
+	ret := _mock.Called(ctx, tx, id, labels)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AddLabels")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, []uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, tx, id, labels)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueRepositoryMock_AddLabels_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddLabels'
+type IssueRepositoryMock_AddLabels_Call struct {
+	*mock.Call
+}
+
+// AddLabels is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - labels []uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) AddLabels(ctx any, tx any, id any, labels any) *IssueRepositoryMock_AddLabels_Call {
+	return &IssueRepositoryMock_AddLabels_Call{Call: _e.mock.On("AddLabels", ctx, tx, id, labels)}
+}
+
+func (_c *IssueRepositoryMock_AddLabels_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, labels []uuid.UUID)) *IssueRepositoryMock_AddLabels_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 []uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].([]uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_AddLabels_Call) Return(err error) *IssueRepositoryMock_AddLabels_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_AddLabels_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, labels []uuid.UUID) error) *IssueRepositoryMock_AddLabels_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// AddProjectTeam provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) AddProjectTeam(ctx context.Context, tx repository.TxInterface, project uuid.UUID, teamID uuid.UUID) error {
+	ret := _mock.Called(ctx, tx, project, teamID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AddProjectTeam")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, tx, project, teamID)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueRepositoryMock_AddProjectTeam_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddProjectTeam'
+type IssueRepositoryMock_AddProjectTeam_Call struct {
+	*mock.Call
+}
+
+// AddProjectTeam is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - project uuid.UUID
+//   - teamID uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) AddProjectTeam(ctx any, tx any, project any, teamID any) *IssueRepositoryMock_AddProjectTeam_Call {
+	return &IssueRepositoryMock_AddProjectTeam_Call{Call: _e.mock.On("AddProjectTeam", ctx, tx, project, teamID)}
+}
+
+func (_c *IssueRepositoryMock_AddProjectTeam_Call) Run(run func(ctx context.Context, tx repository.TxInterface, project uuid.UUID, teamID uuid.UUID)) *IssueRepositoryMock_AddProjectTeam_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_AddProjectTeam_Call) Return(err error) *IssueRepositoryMock_AddProjectTeam_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_AddProjectTeam_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, project uuid.UUID, teamID uuid.UUID) error) *IssueRepositoryMock_AddProjectTeam_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// AddReleases provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) AddReleases(ctx context.Context, tx repository.TxInterface, id uuid.UUID, releases []uuid.UUID) error {
+	ret := _mock.Called(ctx, tx, id, releases)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AddReleases")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, []uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, tx, id, releases)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueRepositoryMock_AddReleases_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddReleases'
+type IssueRepositoryMock_AddReleases_Call struct {
+	*mock.Call
+}
+
+// AddReleases is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - releases []uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) AddReleases(ctx any, tx any, id any, releases any) *IssueRepositoryMock_AddReleases_Call {
+	return &IssueRepositoryMock_AddReleases_Call{Call: _e.mock.On("AddReleases", ctx, tx, id, releases)}
+}
+
+func (_c *IssueRepositoryMock_AddReleases_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, releases []uuid.UUID)) *IssueRepositoryMock_AddReleases_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 []uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].([]uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_AddReleases_Call) Return(err error) *IssueRepositoryMock_AddReleases_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_AddReleases_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, releases []uuid.UUID) error) *IssueRepositoryMock_AddReleases_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // AddToCurrentCycle provides a mock function for the type IssueRepositoryMock
@@ -121,6 +330,233 @@ func (_c *IssueRepositoryMock_AddToCurrentCycle_Call) Return(err error) *IssueRe
 }
 
 func (_c *IssueRepositoryMock_AddToCurrentCycle_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, teamID uuid.UUID, started bool) error) *IssueRepositoryMock_AddToCurrentCycle_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// AssignIfUnassigned provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) AssignIfUnassigned(ctx context.Context, tx repository.TxInterface, id uuid.UUID, assignee uuid.UUID) error {
+	ret := _mock.Called(ctx, tx, id, assignee)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AssignIfUnassigned")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, tx, id, assignee)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueRepositoryMock_AssignIfUnassigned_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AssignIfUnassigned'
+type IssueRepositoryMock_AssignIfUnassigned_Call struct {
+	*mock.Call
+}
+
+// AssignIfUnassigned is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - assignee uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) AssignIfUnassigned(ctx any, tx any, id any, assignee any) *IssueRepositoryMock_AssignIfUnassigned_Call {
+	return &IssueRepositoryMock_AssignIfUnassigned_Call{Call: _e.mock.On("AssignIfUnassigned", ctx, tx, id, assignee)}
+}
+
+func (_c *IssueRepositoryMock_AssignIfUnassigned_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, assignee uuid.UUID)) *IssueRepositoryMock_AssignIfUnassigned_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_AssignIfUnassigned_Call) Return(err error) *IssueRepositoryMock_AssignIfUnassigned_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_AssignIfUnassigned_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, assignee uuid.UUID) error) *IssueRepositoryMock_AssignIfUnassigned_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Attachments provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Attachments(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.Attachment, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Attachments")
+	}
+
+	var r0 []*ent.Attachment
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) ([]*ent.Attachment, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) []*ent.Attachment); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ent.Attachment)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_Attachments_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Attachments'
+type IssueRepositoryMock_Attachments_Call struct {
+	*mock.Call
+}
+
+// Attachments is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) Attachments(ctx any, tx any, id any) *IssueRepositoryMock_Attachments_Call {
+	return &IssueRepositoryMock_Attachments_Call{Call: _e.mock.On("Attachments", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_Attachments_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *IssueRepositoryMock_Attachments_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Attachments_Call) Return(attachments []*ent.Attachment, err error) *IssueRepositoryMock_Attachments_Call {
+	_c.Call.Return(attachments, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Attachments_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.Attachment, error)) *IssueRepositoryMock_Attachments_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CanBeAssigned provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) CanBeAssigned(ctx context.Context, tx repository.TxInterface, user uuid.UUID, teamID uuid.UUID, id uuid.UUID) (bool, error) {
+	ret := _mock.Called(ctx, tx, user, teamID, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CanBeAssigned")
+	}
+
+	var r0 bool
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, uuid.UUID) (bool, error)); ok {
+		return returnFunc(ctx, tx, user, teamID, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, uuid.UUID) bool); ok {
+		r0 = returnFunc(ctx, tx, user, teamID, id)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, user, teamID, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_CanBeAssigned_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CanBeAssigned'
+type IssueRepositoryMock_CanBeAssigned_Call struct {
+	*mock.Call
+}
+
+// CanBeAssigned is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - user uuid.UUID
+//   - teamID uuid.UUID
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) CanBeAssigned(ctx any, tx any, user any, teamID any, id any) *IssueRepositoryMock_CanBeAssigned_Call {
+	return &IssueRepositoryMock_CanBeAssigned_Call{Call: _e.mock.On("CanBeAssigned", ctx, tx, user, teamID, id)}
+}
+
+func (_c *IssueRepositoryMock_CanBeAssigned_Call) Run(run func(ctx context.Context, tx repository.TxInterface, user uuid.UUID, teamID uuid.UUID, id uuid.UUID)) *IssueRepositoryMock_CanBeAssigned_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		var arg4 uuid.UUID
+		if args[4] != nil {
+			arg4 = args[4].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_CanBeAssigned_Call) Return(b bool, err error) *IssueRepositoryMock_CanBeAssigned_Call {
+	_c.Call.Return(b, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_CanBeAssigned_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, user uuid.UUID, teamID uuid.UUID, id uuid.UUID) (bool, error)) *IssueRepositoryMock_CanBeAssigned_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -203,6 +639,295 @@ func (_c *IssueRepositoryMock_ChildCounts_Call) RunAndReturn(run func(ctx contex
 	return _c
 }
 
+// Children provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Children(ctx context.Context, tx repository.TxInterface, parent uuid.UUID, teams []uuid.UUID) ([]*ent.Issue, error) {
+	ret := _mock.Called(ctx, tx, parent, teams)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Children")
+	}
+
+	var r0 []*ent.Issue
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, []uuid.UUID) ([]*ent.Issue, error)); ok {
+		return returnFunc(ctx, tx, parent, teams)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, []uuid.UUID) []*ent.Issue); ok {
+		r0 = returnFunc(ctx, tx, parent, teams)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ent.Issue)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, []uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, parent, teams)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_Children_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Children'
+type IssueRepositoryMock_Children_Call struct {
+	*mock.Call
+}
+
+// Children is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - parent uuid.UUID
+//   - teams []uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) Children(ctx any, tx any, parent any, teams any) *IssueRepositoryMock_Children_Call {
+	return &IssueRepositoryMock_Children_Call{Call: _e.mock.On("Children", ctx, tx, parent, teams)}
+}
+
+func (_c *IssueRepositoryMock_Children_Call) Run(run func(ctx context.Context, tx repository.TxInterface, parent uuid.UUID, teams []uuid.UUID)) *IssueRepositoryMock_Children_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 []uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].([]uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Children_Call) Return(issues []*ent.Issue, err error) *IssueRepositoryMock_Children_Call {
+	_c.Call.Return(issues, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Children_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, parent uuid.UUID, teams []uuid.UUID) ([]*ent.Issue, error)) *IssueRepositoryMock_Children_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ClearReleases provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) ClearReleases(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ClearReleases")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueRepositoryMock_ClearReleases_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ClearReleases'
+type IssueRepositoryMock_ClearReleases_Call struct {
+	*mock.Call
+}
+
+// ClearReleases is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) ClearReleases(ctx any, tx any, id any) *IssueRepositoryMock_ClearReleases_Call {
+	return &IssueRepositoryMock_ClearReleases_Call{Call: _e.mock.On("ClearReleases", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_ClearReleases_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *IssueRepositoryMock_ClearReleases_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_ClearReleases_Call) Return(err error) *IssueRepositoryMock_ClearReleases_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_ClearReleases_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error) *IssueRepositoryMock_ClearReleases_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CommentCount provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) CommentCount(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (int, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CommentCount")
+	}
+
+	var r0 int
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) (int, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) int); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_CommentCount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CommentCount'
+type IssueRepositoryMock_CommentCount_Call struct {
+	*mock.Call
+}
+
+// CommentCount is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) CommentCount(ctx any, tx any, id any) *IssueRepositoryMock_CommentCount_Call {
+	return &IssueRepositoryMock_CommentCount_Call{Call: _e.mock.On("CommentCount", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_CommentCount_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *IssueRepositoryMock_CommentCount_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_CommentCount_Call) Return(n int, err error) *IssueRepositoryMock_CommentCount_Call {
+	_c.Call.Return(n, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_CommentCount_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (int, error)) *IssueRepositoryMock_CommentCount_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Cycle provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Cycle(ctx context.Context, tx repository.TxInterface, id *uuid.UUID) (*ent.Cycle, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Cycle")
+	}
+
+	var r0 *ent.Cycle
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *uuid.UUID) (*ent.Cycle, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *uuid.UUID) *ent.Cycle); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ent.Cycle)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, *uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_Cycle_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Cycle'
+type IssueRepositoryMock_Cycle_Call struct {
+	*mock.Call
+}
+
+// Cycle is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id *uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) Cycle(ctx any, tx any, id any) *IssueRepositoryMock_Cycle_Call {
+	return &IssueRepositoryMock_Cycle_Call{Call: _e.mock.On("Cycle", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_Cycle_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id *uuid.UUID)) *IssueRepositoryMock_Cycle_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 *uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(*uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Cycle_Call) Return(cycle *ent.Cycle, err error) *IssueRepositoryMock_Cycle_Call {
+	_c.Call.Return(cycle, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Cycle_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id *uuid.UUID) (*ent.Cycle, error)) *IssueRepositoryMock_Cycle_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // DefaultState provides a mock function for the type IssueRepositoryMock
 func (_mock *IssueRepositoryMock) DefaultState(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID) (uuid.UUID, bool, error) {
 	ret := _mock.Called(ctx, tx, teamID)
@@ -279,6 +1004,154 @@ func (_c *IssueRepositoryMock_DefaultState_Call) Return(uUID uuid.UUID, b bool, 
 }
 
 func (_c *IssueRepositoryMock_DefaultState_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID) (uuid.UUID, bool, error)) *IssueRepositoryMock_DefaultState_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Documents provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Documents(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.Document, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Documents")
+	}
+
+	var r0 []*ent.Document
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) ([]*ent.Document, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) []*ent.Document); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ent.Document)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_Documents_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Documents'
+type IssueRepositoryMock_Documents_Call struct {
+	*mock.Call
+}
+
+// Documents is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) Documents(ctx any, tx any, id any) *IssueRepositoryMock_Documents_Call {
+	return &IssueRepositoryMock_Documents_Call{Call: _e.mock.On("Documents", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_Documents_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *IssueRepositoryMock_Documents_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Documents_Call) Return(documents []*ent.Document, err error) *IssueRepositoryMock_Documents_Call {
+	_c.Call.Return(documents, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Documents_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.Document, error)) *IssueRepositoryMock_Documents_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// File provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) File(ctx context.Context, workspace uuid.UUID, id uuid.UUID) (*ent.File, error) {
+	ret := _mock.Called(ctx, workspace, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for File")
+	}
+
+	var r0 *ent.File
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) (*ent.File, error)); ok {
+		return returnFunc(ctx, workspace, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) *ent.File); ok {
+		r0 = returnFunc(ctx, workspace, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ent.File)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, workspace, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_File_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'File'
+type IssueRepositoryMock_File_Call struct {
+	*mock.Call
+}
+
+// File is a helper method to define mock.On call
+//   - ctx context.Context
+//   - workspace uuid.UUID
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) File(ctx any, workspace any, id any) *IssueRepositoryMock_File_Call {
+	return &IssueRepositoryMock_File_Call{Call: _e.mock.On("File", ctx, workspace, id)}
+}
+
+func (_c *IssueRepositoryMock_File_Call) Run(run func(ctx context.Context, workspace uuid.UUID, id uuid.UUID)) *IssueRepositoryMock_File_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_File_Call) Return(file *ent.File, err error) *IssueRepositoryMock_File_Call {
+	_c.Call.Return(file, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_File_Call) RunAndReturn(run func(ctx context.Context, workspace uuid.UUID, id uuid.UUID) (*ent.File, error)) *IssueRepositoryMock_File_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -511,6 +1384,80 @@ func (_c *IssueRepositoryMock_GetForUpdate_Call) RunAndReturn(run func(ctx conte
 	return _c
 }
 
+// History provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) History(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueHistory, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for History")
+	}
+
+	var r0 []*ent.IssueHistory
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) ([]*ent.IssueHistory, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) []*ent.IssueHistory); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ent.IssueHistory)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_History_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'History'
+type IssueRepositoryMock_History_Call struct {
+	*mock.Call
+}
+
+// History is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) History(ctx any, tx any, id any) *IssueRepositoryMock_History_Call {
+	return &IssueRepositoryMock_History_Call{Call: _e.mock.On("History", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_History_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *IssueRepositoryMock_History_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_History_Call) Return(issueHistorys []*ent.IssueHistory, err error) *IssueRepositoryMock_History_Call {
+	_c.Call.Return(issueHistorys, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_History_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueHistory, error)) *IssueRepositoryMock_History_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Identifier provides a mock function for the type IssueRepositoryMock
 func (_mock *IssueRepositoryMock) Identifier(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (string, error) {
 	ret := _mock.Called(ctx, tx, id)
@@ -579,6 +1526,690 @@ func (_c *IssueRepositoryMock_Identifier_Call) Return(s string, err error) *Issu
 }
 
 func (_c *IssueRepositoryMock_Identifier_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (string, error)) *IssueRepositoryMock_Identifier_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ImportedHistory provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) ImportedHistory(ctx context.Context, tx repository.TxInterface, id uuid.UUID, creator uuid.UUID, changes json.RawMessage, at time.Time) error {
+	ret := _mock.Called(ctx, tx, id, creator, changes, at)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ImportedHistory")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, json.RawMessage, time.Time) error); ok {
+		r0 = returnFunc(ctx, tx, id, creator, changes, at)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueRepositoryMock_ImportedHistory_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ImportedHistory'
+type IssueRepositoryMock_ImportedHistory_Call struct {
+	*mock.Call
+}
+
+// ImportedHistory is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - creator uuid.UUID
+//   - changes json.RawMessage
+//   - at time.Time
+func (_e *IssueRepositoryMock_Expecter) ImportedHistory(ctx any, tx any, id any, creator any, changes any, at any) *IssueRepositoryMock_ImportedHistory_Call {
+	return &IssueRepositoryMock_ImportedHistory_Call{Call: _e.mock.On("ImportedHistory", ctx, tx, id, creator, changes, at)}
+}
+
+func (_c *IssueRepositoryMock_ImportedHistory_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, creator uuid.UUID, changes json.RawMessage, at time.Time)) *IssueRepositoryMock_ImportedHistory_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		var arg4 json.RawMessage
+		if args[4] != nil {
+			arg4 = args[4].(json.RawMessage)
+		}
+		var arg5 time.Time
+		if args[5] != nil {
+			arg5 = args[5].(time.Time)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+			arg5,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_ImportedHistory_Call) Return(err error) *IssueRepositoryMock_ImportedHistory_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_ImportedHistory_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, creator uuid.UUID, changes json.RawMessage, at time.Time) error) *IssueRepositoryMock_ImportedHistory_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// InOwnTree provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) InOwnTree(ctx context.Context, tx repository.TxInterface, parent uuid.UUID, issue uuid.UUID) (bool, error) {
+	ret := _mock.Called(ctx, tx, parent, issue)
+
+	if len(ret) == 0 {
+		panic("no return value specified for InOwnTree")
+	}
+
+	var r0 bool
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) (bool, error)); ok {
+		return returnFunc(ctx, tx, parent, issue)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) bool); ok {
+		r0 = returnFunc(ctx, tx, parent, issue)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, parent, issue)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_InOwnTree_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'InOwnTree'
+type IssueRepositoryMock_InOwnTree_Call struct {
+	*mock.Call
+}
+
+// InOwnTree is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - parent uuid.UUID
+//   - issue uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) InOwnTree(ctx any, tx any, parent any, issue any) *IssueRepositoryMock_InOwnTree_Call {
+	return &IssueRepositoryMock_InOwnTree_Call{Call: _e.mock.On("InOwnTree", ctx, tx, parent, issue)}
+}
+
+func (_c *IssueRepositoryMock_InOwnTree_Call) Run(run func(ctx context.Context, tx repository.TxInterface, parent uuid.UUID, issue uuid.UUID)) *IssueRepositoryMock_InOwnTree_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_InOwnTree_Call) Return(b bool, err error) *IssueRepositoryMock_InOwnTree_Call {
+	_c.Call.Return(b, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_InOwnTree_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, parent uuid.UUID, issue uuid.UUID) (bool, error)) *IssueRepositoryMock_InOwnTree_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Insert provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Insert(ctx context.Context, tx repository.TxInterface, input issue_repo.NewIssue) (uuid.UUID, error) {
+	ret := _mock.Called(ctx, tx, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Insert")
+	}
+
+	var r0 uuid.UUID
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, issue_repo.NewIssue) (uuid.UUID, error)); ok {
+		return returnFunc(ctx, tx, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, issue_repo.NewIssue) uuid.UUID); ok {
+		r0 = returnFunc(ctx, tx, input)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, issue_repo.NewIssue) error); ok {
+		r1 = returnFunc(ctx, tx, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_Insert_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Insert'
+type IssueRepositoryMock_Insert_Call struct {
+	*mock.Call
+}
+
+// Insert is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - input issue_repo.NewIssue
+func (_e *IssueRepositoryMock_Expecter) Insert(ctx any, tx any, input any) *IssueRepositoryMock_Insert_Call {
+	return &IssueRepositoryMock_Insert_Call{Call: _e.mock.On("Insert", ctx, tx, input)}
+}
+
+func (_c *IssueRepositoryMock_Insert_Call) Run(run func(ctx context.Context, tx repository.TxInterface, input issue_repo.NewIssue)) *IssueRepositoryMock_Insert_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 issue_repo.NewIssue
+		if args[2] != nil {
+			arg2 = args[2].(issue_repo.NewIssue)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Insert_Call) Return(uUID uuid.UUID, err error) *IssueRepositoryMock_Insert_Call {
+	_c.Call.Return(uUID, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Insert_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, input issue_repo.NewIssue) (uuid.UUID, error)) *IssueRepositoryMock_Insert_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// InsertComment provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) InsertComment(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, id uuid.UUID, author uuid.UUID, body string, at time.Time) error {
+	ret := _mock.Called(ctx, tx, workspace, id, author, body, at)
+
+	if len(ret) == 0 {
+		panic("no return value specified for InsertComment")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, uuid.UUID, string, time.Time) error); ok {
+		r0 = returnFunc(ctx, tx, workspace, id, author, body, at)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueRepositoryMock_InsertComment_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'InsertComment'
+type IssueRepositoryMock_InsertComment_Call struct {
+	*mock.Call
+}
+
+// InsertComment is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - workspace uuid.UUID
+//   - id uuid.UUID
+//   - author uuid.UUID
+//   - body string
+//   - at time.Time
+func (_e *IssueRepositoryMock_Expecter) InsertComment(ctx any, tx any, workspace any, id any, author any, body any, at any) *IssueRepositoryMock_InsertComment_Call {
+	return &IssueRepositoryMock_InsertComment_Call{Call: _e.mock.On("InsertComment", ctx, tx, workspace, id, author, body, at)}
+}
+
+func (_c *IssueRepositoryMock_InsertComment_Call) Run(run func(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, id uuid.UUID, author uuid.UUID, body string, at time.Time)) *IssueRepositoryMock_InsertComment_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		var arg4 uuid.UUID
+		if args[4] != nil {
+			arg4 = args[4].(uuid.UUID)
+		}
+		var arg5 string
+		if args[5] != nil {
+			arg5 = args[5].(string)
+		}
+		var arg6 time.Time
+		if args[6] != nil {
+			arg6 = args[6].(time.Time)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+			arg5,
+			arg6,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_InsertComment_Call) Return(err error) *IssueRepositoryMock_InsertComment_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_InsertComment_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, id uuid.UUID, author uuid.UUID, body string, at time.Time) error) *IssueRepositoryMock_InsertComment_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// InsertImported provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) InsertImported(ctx context.Context, tx repository.TxInterface, input issue_repo.ImportedIssue) (uuid.UUID, error) {
+	ret := _mock.Called(ctx, tx, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for InsertImported")
+	}
+
+	var r0 uuid.UUID
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, issue_repo.ImportedIssue) (uuid.UUID, error)); ok {
+		return returnFunc(ctx, tx, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, issue_repo.ImportedIssue) uuid.UUID); ok {
+		r0 = returnFunc(ctx, tx, input)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, issue_repo.ImportedIssue) error); ok {
+		r1 = returnFunc(ctx, tx, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_InsertImported_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'InsertImported'
+type IssueRepositoryMock_InsertImported_Call struct {
+	*mock.Call
+}
+
+// InsertImported is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - input issue_repo.ImportedIssue
+func (_e *IssueRepositoryMock_Expecter) InsertImported(ctx any, tx any, input any) *IssueRepositoryMock_InsertImported_Call {
+	return &IssueRepositoryMock_InsertImported_Call{Call: _e.mock.On("InsertImported", ctx, tx, input)}
+}
+
+func (_c *IssueRepositoryMock_InsertImported_Call) Run(run func(ctx context.Context, tx repository.TxInterface, input issue_repo.ImportedIssue)) *IssueRepositoryMock_InsertImported_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 issue_repo.ImportedIssue
+		if args[2] != nil {
+			arg2 = args[2].(issue_repo.ImportedIssue)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_InsertImported_Call) Return(uUID uuid.UUID, err error) *IssueRepositoryMock_InsertImported_Call {
+	_c.Call.Return(uUID, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_InsertImported_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, input issue_repo.ImportedIssue) (uuid.UUID, error)) *IssueRepositoryMock_InsertImported_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// LabelIDs provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) LabelIDs(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]uuid.UUID, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for LabelIDs")
+	}
+
+	var r0 []uuid.UUID
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) ([]uuid.UUID, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) []uuid.UUID); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_LabelIDs_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LabelIDs'
+type IssueRepositoryMock_LabelIDs_Call struct {
+	*mock.Call
+}
+
+// LabelIDs is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) LabelIDs(ctx any, tx any, id any) *IssueRepositoryMock_LabelIDs_Call {
+	return &IssueRepositoryMock_LabelIDs_Call{Call: _e.mock.On("LabelIDs", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_LabelIDs_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *IssueRepositoryMock_LabelIDs_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_LabelIDs_Call) Return(uUIDs []uuid.UUID, err error) *IssueRepositoryMock_LabelIDs_Call {
+	_c.Call.Return(uUIDs, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_LabelIDs_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]uuid.UUID, error)) *IssueRepositoryMock_LabelIDs_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// LabelNames provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) LabelNames(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) ([]string, error) {
+	ret := _mock.Called(ctx, tx, ids)
+
+	if len(ret) == 0 {
+		panic("no return value specified for LabelNames")
+	}
+
+	var r0 []string
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, []uuid.UUID) ([]string, error)); ok {
+		return returnFunc(ctx, tx, ids)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, []uuid.UUID) []string); ok {
+		r0 = returnFunc(ctx, tx, ids)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]string)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, []uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, ids)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_LabelNames_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LabelNames'
+type IssueRepositoryMock_LabelNames_Call struct {
+	*mock.Call
+}
+
+// LabelNames is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - ids []uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) LabelNames(ctx any, tx any, ids any) *IssueRepositoryMock_LabelNames_Call {
+	return &IssueRepositoryMock_LabelNames_Call{Call: _e.mock.On("LabelNames", ctx, tx, ids)}
+}
+
+func (_c *IssueRepositoryMock_LabelNames_Call) Run(run func(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID)) *IssueRepositoryMock_LabelNames_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 []uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].([]uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_LabelNames_Call) Return(strings []string, err error) *IssueRepositoryMock_LabelNames_Call {
+	_c.Call.Return(strings, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_LabelNames_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) ([]string, error)) *IssueRepositoryMock_LabelNames_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// LabelsWithGroups provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) LabelsWithGroups(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) ([]*ent.IssueLabel, error) {
+	ret := _mock.Called(ctx, tx, ids)
+
+	if len(ret) == 0 {
+		panic("no return value specified for LabelsWithGroups")
+	}
+
+	var r0 []*ent.IssueLabel
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, []uuid.UUID) ([]*ent.IssueLabel, error)); ok {
+		return returnFunc(ctx, tx, ids)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, []uuid.UUID) []*ent.IssueLabel); ok {
+		r0 = returnFunc(ctx, tx, ids)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ent.IssueLabel)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, []uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, ids)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_LabelsWithGroups_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LabelsWithGroups'
+type IssueRepositoryMock_LabelsWithGroups_Call struct {
+	*mock.Call
+}
+
+// LabelsWithGroups is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - ids []uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) LabelsWithGroups(ctx any, tx any, ids any) *IssueRepositoryMock_LabelsWithGroups_Call {
+	return &IssueRepositoryMock_LabelsWithGroups_Call{Call: _e.mock.On("LabelsWithGroups", ctx, tx, ids)}
+}
+
+func (_c *IssueRepositoryMock_LabelsWithGroups_Call) Run(run func(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID)) *IssueRepositoryMock_LabelsWithGroups_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 []uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].([]uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_LabelsWithGroups_Call) Return(issueLabels []*ent.IssueLabel, err error) *IssueRepositoryMock_LabelsWithGroups_Call {
+	_c.Call.Return(issueLabels, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_LabelsWithGroups_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) ([]*ent.IssueLabel, error)) *IssueRepositoryMock_LabelsWithGroups_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// List provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) List(ctx context.Context, query issue_repo.ListQuery) ([]uuid.UUID, error) {
+	ret := _mock.Called(ctx, query)
+
+	if len(ret) == 0 {
+		panic("no return value specified for List")
+	}
+
+	var r0 []uuid.UUID
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, issue_repo.ListQuery) ([]uuid.UUID, error)); ok {
+		return returnFunc(ctx, query)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, issue_repo.ListQuery) []uuid.UUID); ok {
+		r0 = returnFunc(ctx, query)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, issue_repo.ListQuery) error); ok {
+		r1 = returnFunc(ctx, query)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_List_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'List'
+type IssueRepositoryMock_List_Call struct {
+	*mock.Call
+}
+
+// List is a helper method to define mock.On call
+//   - ctx context.Context
+//   - query issue_repo.ListQuery
+func (_e *IssueRepositoryMock_Expecter) List(ctx any, query any) *IssueRepositoryMock_List_Call {
+	return &IssueRepositoryMock_List_Call{Call: _e.mock.On("List", ctx, query)}
+}
+
+func (_c *IssueRepositoryMock_List_Call) Run(run func(ctx context.Context, query issue_repo.ListQuery)) *IssueRepositoryMock_List_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 issue_repo.ListQuery
+		if args[1] != nil {
+			arg1 = args[1].(issue_repo.ListQuery)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_List_Call) Return(uUIDs []uuid.UUID, err error) *IssueRepositoryMock_List_Call {
+	_c.Call.Return(uUIDs, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_List_Call) RunAndReturn(run func(ctx context.Context, query issue_repo.ListQuery) ([]uuid.UUID, error)) *IssueRepositoryMock_List_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -657,6 +2288,396 @@ func (_c *IssueRepositoryMock_Load_Call) RunAndReturn(run func(ctx context.Conte
 	return _c
 }
 
+// LockTeam provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) LockTeam(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.Team, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for LockTeam")
+	}
+
+	var r0 *ent.Team
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) (*ent.Team, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) *ent.Team); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ent.Team)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_LockTeam_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LockTeam'
+type IssueRepositoryMock_LockTeam_Call struct {
+	*mock.Call
+}
+
+// LockTeam is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) LockTeam(ctx any, tx any, id any) *IssueRepositoryMock_LockTeam_Call {
+	return &IssueRepositoryMock_LockTeam_Call{Call: _e.mock.On("LockTeam", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_LockTeam_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *IssueRepositoryMock_LockTeam_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_LockTeam_Call) Return(team *ent.Team, err error) *IssueRepositoryMock_LockTeam_Call {
+	_c.Call.Return(team, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_LockTeam_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.Team, error)) *IssueRepositoryMock_LockTeam_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Mark provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Mark(ctx context.Context, tx repository.TxInterface, sql string, id uuid.UUID) ([]uuid.UUID, error) {
+	ret := _mock.Called(ctx, tx, sql, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Mark")
+	}
+
+	var r0 []uuid.UUID
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, string, uuid.UUID) ([]uuid.UUID, error)); ok {
+		return returnFunc(ctx, tx, sql, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, string, uuid.UUID) []uuid.UUID); ok {
+		r0 = returnFunc(ctx, tx, sql, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, string, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, sql, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_Mark_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Mark'
+type IssueRepositoryMock_Mark_Call struct {
+	*mock.Call
+}
+
+// Mark is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - sql string
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) Mark(ctx any, tx any, sql any, id any) *IssueRepositoryMock_Mark_Call {
+	return &IssueRepositoryMock_Mark_Call{Call: _e.mock.On("Mark", ctx, tx, sql, id)}
+}
+
+func (_c *IssueRepositoryMock_Mark_Call) Run(run func(ctx context.Context, tx repository.TxInterface, sql string, id uuid.UUID)) *IssueRepositoryMock_Mark_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 string
+		if args[2] != nil {
+			arg2 = args[2].(string)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Mark_Call) Return(uUIDs []uuid.UUID, err error) *IssueRepositoryMock_Mark_Call {
+	_c.Call.Return(uUIDs, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Mark_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, sql string, id uuid.UUID) ([]uuid.UUID, error)) *IssueRepositoryMock_Mark_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// MarkDuplicate provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) MarkDuplicate(ctx context.Context, tx repository.TxInterface, id uuid.UUID, of uuid.UUID, creator uuid.UUID) error {
+	ret := _mock.Called(ctx, tx, id, of, creator)
+
+	if len(ret) == 0 {
+		panic("no return value specified for MarkDuplicate")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, tx, id, of, creator)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueRepositoryMock_MarkDuplicate_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'MarkDuplicate'
+type IssueRepositoryMock_MarkDuplicate_Call struct {
+	*mock.Call
+}
+
+// MarkDuplicate is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - of uuid.UUID
+//   - creator uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) MarkDuplicate(ctx any, tx any, id any, of any, creator any) *IssueRepositoryMock_MarkDuplicate_Call {
+	return &IssueRepositoryMock_MarkDuplicate_Call{Call: _e.mock.On("MarkDuplicate", ctx, tx, id, of, creator)}
+}
+
+func (_c *IssueRepositoryMock_MarkDuplicate_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, of uuid.UUID, creator uuid.UUID)) *IssueRepositoryMock_MarkDuplicate_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		var arg4 uuid.UUID
+		if args[4] != nil {
+			arg4 = args[4].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_MarkDuplicate_Call) Return(err error) *IssueRepositoryMock_MarkDuplicate_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_MarkDuplicate_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, of uuid.UUID, creator uuid.UUID) error) *IssueRepositoryMock_MarkDuplicate_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Milestone provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Milestone(ctx context.Context, tx repository.TxInterface, id *uuid.UUID) (*ent.ProjectMilestone, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Milestone")
+	}
+
+	var r0 *ent.ProjectMilestone
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *uuid.UUID) (*ent.ProjectMilestone, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *uuid.UUID) *ent.ProjectMilestone); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ent.ProjectMilestone)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, *uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_Milestone_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Milestone'
+type IssueRepositoryMock_Milestone_Call struct {
+	*mock.Call
+}
+
+// Milestone is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id *uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) Milestone(ctx any, tx any, id any) *IssueRepositoryMock_Milestone_Call {
+	return &IssueRepositoryMock_Milestone_Call{Call: _e.mock.On("Milestone", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_Milestone_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id *uuid.UUID)) *IssueRepositoryMock_Milestone_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 *uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(*uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Milestone_Call) Return(projectMilestone *ent.ProjectMilestone, err error) *IssueRepositoryMock_Milestone_Call {
+	_c.Call.Return(projectMilestone, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Milestone_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id *uuid.UUID) (*ent.ProjectMilestone, error)) *IssueRepositoryMock_Milestone_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// MoveTeam provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) MoveTeam(ctx context.Context, tx repository.TxInterface, id uuid.UUID, teamID uuid.UUID, number int, state uuid.UUID, previous string) error {
+	ret := _mock.Called(ctx, tx, id, teamID, number, state, previous)
+
+	if len(ret) == 0 {
+		panic("no return value specified for MoveTeam")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, int, uuid.UUID, string) error); ok {
+		r0 = returnFunc(ctx, tx, id, teamID, number, state, previous)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueRepositoryMock_MoveTeam_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'MoveTeam'
+type IssueRepositoryMock_MoveTeam_Call struct {
+	*mock.Call
+}
+
+// MoveTeam is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - teamID uuid.UUID
+//   - number int
+//   - state uuid.UUID
+//   - previous string
+func (_e *IssueRepositoryMock_Expecter) MoveTeam(ctx any, tx any, id any, teamID any, number any, state any, previous any) *IssueRepositoryMock_MoveTeam_Call {
+	return &IssueRepositoryMock_MoveTeam_Call{Call: _e.mock.On("MoveTeam", ctx, tx, id, teamID, number, state, previous)}
+}
+
+func (_c *IssueRepositoryMock_MoveTeam_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, teamID uuid.UUID, number int, state uuid.UUID, previous string)) *IssueRepositoryMock_MoveTeam_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		var arg4 int
+		if args[4] != nil {
+			arg4 = args[4].(int)
+		}
+		var arg5 uuid.UUID
+		if args[5] != nil {
+			arg5 = args[5].(uuid.UUID)
+		}
+		var arg6 string
+		if args[6] != nil {
+			arg6 = args[6].(string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+			arg5,
+			arg6,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_MoveTeam_Call) Return(err error) *IssueRepositoryMock_MoveTeam_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_MoveTeam_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, teamID uuid.UUID, number int, state uuid.UUID, previous string) error) *IssueRepositoryMock_MoveTeam_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // MoveToState provides a mock function for the type IssueRepositoryMock
 func (_mock *IssueRepositoryMock) MoveToState(ctx context.Context, tx repository.TxInterface, id uuid.UUID, stamps issue_repo.StateStamps) error {
 	ret := _mock.Called(ctx, tx, id, stamps)
@@ -722,6 +2743,150 @@ func (_c *IssueRepositoryMock_MoveToState_Call) Return(err error) *IssueReposito
 }
 
 func (_c *IssueRepositoryMock_MoveToState_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, stamps issue_repo.StateStamps) error) *IssueRepositoryMock_MoveToState_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// NextNumber provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) NextNumber(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID) (int, error) {
+	ret := _mock.Called(ctx, tx, teamID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for NextNumber")
+	}
+
+	var r0 int
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) (int, error)); ok {
+		return returnFunc(ctx, tx, teamID)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) int); ok {
+		r0 = returnFunc(ctx, tx, teamID)
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, teamID)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_NextNumber_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'NextNumber'
+type IssueRepositoryMock_NextNumber_Call struct {
+	*mock.Call
+}
+
+// NextNumber is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - teamID uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) NextNumber(ctx any, tx any, teamID any) *IssueRepositoryMock_NextNumber_Call {
+	return &IssueRepositoryMock_NextNumber_Call{Call: _e.mock.On("NextNumber", ctx, tx, teamID)}
+}
+
+func (_c *IssueRepositoryMock_NextNumber_Call) Run(run func(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID)) *IssueRepositoryMock_NextNumber_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_NextNumber_Call) Return(n int, err error) *IssueRepositoryMock_NextNumber_Call {
+	_c.Call.Return(n, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_NextNumber_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID) (int, error)) *IssueRepositoryMock_NextNumber_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// NextSubIssueSortOrder provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) NextSubIssueSortOrder(ctx context.Context, tx repository.TxInterface, parent uuid.UUID) (float64, error) {
+	ret := _mock.Called(ctx, tx, parent)
+
+	if len(ret) == 0 {
+		panic("no return value specified for NextSubIssueSortOrder")
+	}
+
+	var r0 float64
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) (float64, error)); ok {
+		return returnFunc(ctx, tx, parent)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) float64); ok {
+		r0 = returnFunc(ctx, tx, parent)
+	} else {
+		r0 = ret.Get(0).(float64)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, parent)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_NextSubIssueSortOrder_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'NextSubIssueSortOrder'
+type IssueRepositoryMock_NextSubIssueSortOrder_Call struct {
+	*mock.Call
+}
+
+// NextSubIssueSortOrder is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - parent uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) NextSubIssueSortOrder(ctx any, tx any, parent any) *IssueRepositoryMock_NextSubIssueSortOrder_Call {
+	return &IssueRepositoryMock_NextSubIssueSortOrder_Call{Call: _e.mock.On("NextSubIssueSortOrder", ctx, tx, parent)}
+}
+
+func (_c *IssueRepositoryMock_NextSubIssueSortOrder_Call) Run(run func(ctx context.Context, tx repository.TxInterface, parent uuid.UUID)) *IssueRepositoryMock_NextSubIssueSortOrder_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_NextSubIssueSortOrder_Call) Return(f float64, err error) *IssueRepositoryMock_NextSubIssueSortOrder_Call {
+	_c.Call.Return(f, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_NextSubIssueSortOrder_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, parent uuid.UUID) (float64, error)) *IssueRepositoryMock_NextSubIssueSortOrder_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -796,6 +2961,1371 @@ func (_c *IssueRepositoryMock_OpenChildren_Call) Return(issues []*ent.Issue, err
 }
 
 func (_c *IssueRepositoryMock_OpenChildren_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, parent uuid.UUID) ([]*ent.Issue, error)) *IssueRepositoryMock_OpenChildren_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Project provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Project(ctx context.Context, tx repository.TxInterface, id *uuid.UUID) (*ent.Project, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Project")
+	}
+
+	var r0 *ent.Project
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *uuid.UUID) (*ent.Project, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *uuid.UUID) *ent.Project); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ent.Project)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, *uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_Project_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Project'
+type IssueRepositoryMock_Project_Call struct {
+	*mock.Call
+}
+
+// Project is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id *uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) Project(ctx any, tx any, id any) *IssueRepositoryMock_Project_Call {
+	return &IssueRepositoryMock_Project_Call{Call: _e.mock.On("Project", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_Project_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id *uuid.UUID)) *IssueRepositoryMock_Project_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 *uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(*uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Project_Call) Return(project *ent.Project, err error) *IssueRepositoryMock_Project_Call {
+	_c.Call.Return(project, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Project_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id *uuid.UUID) (*ent.Project, error)) *IssueRepositoryMock_Project_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// RaiseIssueCount provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) RaiseIssueCount(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID, count int) (int, error) {
+	ret := _mock.Called(ctx, tx, teamID, count)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RaiseIssueCount")
+	}
+
+	var r0 int
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, int) (int, error)); ok {
+		return returnFunc(ctx, tx, teamID, count)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, int) int); ok {
+		r0 = returnFunc(ctx, tx, teamID, count)
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, int) error); ok {
+		r1 = returnFunc(ctx, tx, teamID, count)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_RaiseIssueCount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RaiseIssueCount'
+type IssueRepositoryMock_RaiseIssueCount_Call struct {
+	*mock.Call
+}
+
+// RaiseIssueCount is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - teamID uuid.UUID
+//   - count int
+func (_e *IssueRepositoryMock_Expecter) RaiseIssueCount(ctx any, tx any, teamID any, count any) *IssueRepositoryMock_RaiseIssueCount_Call {
+	return &IssueRepositoryMock_RaiseIssueCount_Call{Call: _e.mock.On("RaiseIssueCount", ctx, tx, teamID, count)}
+}
+
+func (_c *IssueRepositoryMock_RaiseIssueCount_Call) Run(run func(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID, count int)) *IssueRepositoryMock_RaiseIssueCount_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 int
+		if args[3] != nil {
+			arg3 = args[3].(int)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_RaiseIssueCount_Call) Return(n int, err error) *IssueRepositoryMock_RaiseIssueCount_Call {
+	_c.Call.Return(n, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_RaiseIssueCount_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID, count int) (int, error)) *IssueRepositoryMock_RaiseIssueCount_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Reactions provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Reactions(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.Reaction, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Reactions")
+	}
+
+	var r0 []*ent.Reaction
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) ([]*ent.Reaction, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) []*ent.Reaction); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ent.Reaction)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_Reactions_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Reactions'
+type IssueRepositoryMock_Reactions_Call struct {
+	*mock.Call
+}
+
+// Reactions is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) Reactions(ctx any, tx any, id any) *IssueRepositoryMock_Reactions_Call {
+	return &IssueRepositoryMock_Reactions_Call{Call: _e.mock.On("Reactions", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_Reactions_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *IssueRepositoryMock_Reactions_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Reactions_Call) Return(reactions []*ent.Reaction, err error) *IssueRepositoryMock_Reactions_Call {
+	_c.Call.Return(reactions, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Reactions_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.Reaction, error)) *IssueRepositoryMock_Reactions_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Ref provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Ref(ctx context.Context, tx repository.TxInterface, id *uuid.UUID) (*ent.Issue, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Ref")
+	}
+
+	var r0 *ent.Issue
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *uuid.UUID) (*ent.Issue, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *uuid.UUID) *ent.Issue); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ent.Issue)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, *uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_Ref_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Ref'
+type IssueRepositoryMock_Ref_Call struct {
+	*mock.Call
+}
+
+// Ref is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id *uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) Ref(ctx any, tx any, id any) *IssueRepositoryMock_Ref_Call {
+	return &IssueRepositoryMock_Ref_Call{Call: _e.mock.On("Ref", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_Ref_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id *uuid.UUID)) *IssueRepositoryMock_Ref_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 *uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(*uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Ref_Call) Return(issue *ent.Issue, err error) *IssueRepositoryMock_Ref_Call {
+	_c.Call.Return(issue, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Ref_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id *uuid.UUID) (*ent.Issue, error)) *IssueRepositoryMock_Ref_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Relate provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Relate(ctx context.Context, tx repository.TxInterface, from uuid.UUID, to uuid.UUID, kind string, creator uuid.UUID) (bool, error) {
+	ret := _mock.Called(ctx, tx, from, to, kind, creator)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Relate")
+	}
+
+	var r0 bool
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, string, uuid.UUID) (bool, error)); ok {
+		return returnFunc(ctx, tx, from, to, kind, creator)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, string, uuid.UUID) bool); ok {
+		r0 = returnFunc(ctx, tx, from, to, kind, creator)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, string, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, from, to, kind, creator)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_Relate_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Relate'
+type IssueRepositoryMock_Relate_Call struct {
+	*mock.Call
+}
+
+// Relate is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - from uuid.UUID
+//   - to uuid.UUID
+//   - kind string
+//   - creator uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) Relate(ctx any, tx any, from any, to any, kind any, creator any) *IssueRepositoryMock_Relate_Call {
+	return &IssueRepositoryMock_Relate_Call{Call: _e.mock.On("Relate", ctx, tx, from, to, kind, creator)}
+}
+
+func (_c *IssueRepositoryMock_Relate_Call) Run(run func(ctx context.Context, tx repository.TxInterface, from uuid.UUID, to uuid.UUID, kind string, creator uuid.UUID)) *IssueRepositoryMock_Relate_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		var arg4 string
+		if args[4] != nil {
+			arg4 = args[4].(string)
+		}
+		var arg5 uuid.UUID
+		if args[5] != nil {
+			arg5 = args[5].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+			arg5,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Relate_Call) Return(b bool, err error) *IssueRepositoryMock_Relate_Call {
+	_c.Call.Return(b, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Relate_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, from uuid.UUID, to uuid.UUID, kind string, creator uuid.UUID) (bool, error)) *IssueRepositoryMock_Relate_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// RelateImported provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) RelateImported(ctx context.Context, tx repository.TxInterface, from uuid.UUID, to uuid.UUID, kind string, creator uuid.UUID) (bool, error) {
+	ret := _mock.Called(ctx, tx, from, to, kind, creator)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RelateImported")
+	}
+
+	var r0 bool
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, string, uuid.UUID) (bool, error)); ok {
+		return returnFunc(ctx, tx, from, to, kind, creator)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, string, uuid.UUID) bool); ok {
+		r0 = returnFunc(ctx, tx, from, to, kind, creator)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, string, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, from, to, kind, creator)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_RelateImported_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RelateImported'
+type IssueRepositoryMock_RelateImported_Call struct {
+	*mock.Call
+}
+
+// RelateImported is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - from uuid.UUID
+//   - to uuid.UUID
+//   - kind string
+//   - creator uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) RelateImported(ctx any, tx any, from any, to any, kind any, creator any) *IssueRepositoryMock_RelateImported_Call {
+	return &IssueRepositoryMock_RelateImported_Call{Call: _e.mock.On("RelateImported", ctx, tx, from, to, kind, creator)}
+}
+
+func (_c *IssueRepositoryMock_RelateImported_Call) Run(run func(ctx context.Context, tx repository.TxInterface, from uuid.UUID, to uuid.UUID, kind string, creator uuid.UUID)) *IssueRepositoryMock_RelateImported_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		var arg4 string
+		if args[4] != nil {
+			arg4 = args[4].(string)
+		}
+		var arg5 uuid.UUID
+		if args[5] != nil {
+			arg5 = args[5].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+			arg5,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_RelateImported_Call) Return(b bool, err error) *IssueRepositoryMock_RelateImported_Call {
+	_c.Call.Return(b, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_RelateImported_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, from uuid.UUID, to uuid.UUID, kind string, creator uuid.UUID) (bool, error)) *IssueRepositoryMock_RelateImported_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// RelatedExists provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) RelatedExists(ctx context.Context, tx repository.TxInterface, a uuid.UUID, b uuid.UUID) (bool, error) {
+	ret := _mock.Called(ctx, tx, a, b)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RelatedExists")
+	}
+
+	var r0 bool
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) (bool, error)); ok {
+		return returnFunc(ctx, tx, a, b)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) bool); ok {
+		r0 = returnFunc(ctx, tx, a, b)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, a, b)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_RelatedExists_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RelatedExists'
+type IssueRepositoryMock_RelatedExists_Call struct {
+	*mock.Call
+}
+
+// RelatedExists is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - a uuid.UUID
+//   - b uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) RelatedExists(ctx any, tx any, a any, b any) *IssueRepositoryMock_RelatedExists_Call {
+	return &IssueRepositoryMock_RelatedExists_Call{Call: _e.mock.On("RelatedExists", ctx, tx, a, b)}
+}
+
+func (_c *IssueRepositoryMock_RelatedExists_Call) Run(run func(ctx context.Context, tx repository.TxInterface, a uuid.UUID, b uuid.UUID)) *IssueRepositoryMock_RelatedExists_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_RelatedExists_Call) Return(b1 bool, err error) *IssueRepositoryMock_RelatedExists_Call {
+	_c.Call.Return(b1, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_RelatedExists_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, a uuid.UUID, b uuid.UUID) (bool, error)) *IssueRepositoryMock_RelatedExists_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Relations provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Relations(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueRelation, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Relations")
+	}
+
+	var r0 []*ent.IssueRelation
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) ([]*ent.IssueRelation, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) []*ent.IssueRelation); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ent.IssueRelation)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_Relations_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Relations'
+type IssueRepositoryMock_Relations_Call struct {
+	*mock.Call
+}
+
+// Relations is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) Relations(ctx any, tx any, id any) *IssueRepositoryMock_Relations_Call {
+	return &IssueRepositoryMock_Relations_Call{Call: _e.mock.On("Relations", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_Relations_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *IssueRepositoryMock_Relations_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Relations_Call) Return(issueRelations []*ent.IssueRelation, err error) *IssueRepositoryMock_Relations_Call {
+	_c.Call.Return(issueRelations, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Relations_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueRelation, error)) *IssueRepositoryMock_Relations_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Releases provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Releases(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueRelease, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Releases")
+	}
+
+	var r0 []*ent.IssueRelease
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) ([]*ent.IssueRelease, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) []*ent.IssueRelease); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ent.IssueRelease)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_Releases_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Releases'
+type IssueRepositoryMock_Releases_Call struct {
+	*mock.Call
+}
+
+// Releases is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) Releases(ctx any, tx any, id any) *IssueRepositoryMock_Releases_Call {
+	return &IssueRepositoryMock_Releases_Call{Call: _e.mock.On("Releases", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_Releases_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *IssueRepositoryMock_Releases_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Releases_Call) Return(issueReleases []*ent.IssueRelease, err error) *IssueRepositoryMock_Releases_Call {
+	_c.Call.Return(issueReleases, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Releases_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueRelease, error)) *IssueRepositoryMock_Releases_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// RemoveDuplicateOf provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) RemoveDuplicateOf(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RemoveDuplicateOf")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueRepositoryMock_RemoveDuplicateOf_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RemoveDuplicateOf'
+type IssueRepositoryMock_RemoveDuplicateOf_Call struct {
+	*mock.Call
+}
+
+// RemoveDuplicateOf is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) RemoveDuplicateOf(ctx any, tx any, id any) *IssueRepositoryMock_RemoveDuplicateOf_Call {
+	return &IssueRepositoryMock_RemoveDuplicateOf_Call{Call: _e.mock.On("RemoveDuplicateOf", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_RemoveDuplicateOf_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *IssueRepositoryMock_RemoveDuplicateOf_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_RemoveDuplicateOf_Call) Return(err error) *IssueRepositoryMock_RemoveDuplicateOf_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_RemoveDuplicateOf_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error) *IssueRepositoryMock_RemoveDuplicateOf_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// RemoveReleases provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) RemoveReleases(ctx context.Context, tx repository.TxInterface, id uuid.UUID, releases []uuid.UUID) error {
+	ret := _mock.Called(ctx, tx, id, releases)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RemoveReleases")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, []uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, tx, id, releases)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueRepositoryMock_RemoveReleases_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RemoveReleases'
+type IssueRepositoryMock_RemoveReleases_Call struct {
+	*mock.Call
+}
+
+// RemoveReleases is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - releases []uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) RemoveReleases(ctx any, tx any, id any, releases any) *IssueRepositoryMock_RemoveReleases_Call {
+	return &IssueRepositoryMock_RemoveReleases_Call{Call: _e.mock.On("RemoveReleases", ctx, tx, id, releases)}
+}
+
+func (_c *IssueRepositoryMock_RemoveReleases_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, releases []uuid.UUID)) *IssueRepositoryMock_RemoveReleases_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 []uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].([]uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_RemoveReleases_Call) Return(err error) *IssueRepositoryMock_RemoveReleases_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_RemoveReleases_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, releases []uuid.UUID) error) *IssueRepositoryMock_RemoveReleases_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SameState provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) SameState(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID, name string) (*uuid.UUID, error) {
+	ret := _mock.Called(ctx, tx, teamID, name)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SameState")
+	}
+
+	var r0 *uuid.UUID
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, string) (*uuid.UUID, error)); ok {
+		return returnFunc(ctx, tx, teamID, name)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, string) *uuid.UUID); ok {
+		r0 = returnFunc(ctx, tx, teamID, name)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, string) error); ok {
+		r1 = returnFunc(ctx, tx, teamID, name)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_SameState_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SameState'
+type IssueRepositoryMock_SameState_Call struct {
+	*mock.Call
+}
+
+// SameState is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - teamID uuid.UUID
+//   - name string
+func (_e *IssueRepositoryMock_Expecter) SameState(ctx any, tx any, teamID any, name any) *IssueRepositoryMock_SameState_Call {
+	return &IssueRepositoryMock_SameState_Call{Call: _e.mock.On("SameState", ctx, tx, teamID, name)}
+}
+
+func (_c *IssueRepositoryMock_SameState_Call) Run(run func(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID, name string)) *IssueRepositoryMock_SameState_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 string
+		if args[3] != nil {
+			arg3 = args[3].(string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_SameState_Call) Return(uUID *uuid.UUID, err error) *IssueRepositoryMock_SameState_Call {
+	_c.Call.Return(uUID, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_SameState_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID, name string) (*uuid.UUID, error)) *IssueRepositoryMock_SameState_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SetLabels provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) SetLabels(ctx context.Context, tx repository.TxInterface, id uuid.UUID, labels []uuid.UUID) error {
+	ret := _mock.Called(ctx, tx, id, labels)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetLabels")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, []uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, tx, id, labels)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueRepositoryMock_SetLabels_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetLabels'
+type IssueRepositoryMock_SetLabels_Call struct {
+	*mock.Call
+}
+
+// SetLabels is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - labels []uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) SetLabels(ctx any, tx any, id any, labels any) *IssueRepositoryMock_SetLabels_Call {
+	return &IssueRepositoryMock_SetLabels_Call{Call: _e.mock.On("SetLabels", ctx, tx, id, labels)}
+}
+
+func (_c *IssueRepositoryMock_SetLabels_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, labels []uuid.UUID)) *IssueRepositoryMock_SetLabels_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 []uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].([]uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_SetLabels_Call) Return(err error) *IssueRepositoryMock_SetLabels_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_SetLabels_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, labels []uuid.UUID) error) *IssueRepositoryMock_SetLabels_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Share provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Share(ctx context.Context, tx repository.TxInterface, id uuid.UUID, with uuid.UUID, sharer uuid.UUID) error {
+	ret := _mock.Called(ctx, tx, id, with, sharer)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Share")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, tx, id, with, sharer)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueRepositoryMock_Share_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Share'
+type IssueRepositoryMock_Share_Call struct {
+	*mock.Call
+}
+
+// Share is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - with uuid.UUID
+//   - sharer uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) Share(ctx any, tx any, id any, with any, sharer any) *IssueRepositoryMock_Share_Call {
+	return &IssueRepositoryMock_Share_Call{Call: _e.mock.On("Share", ctx, tx, id, with, sharer)}
+}
+
+func (_c *IssueRepositoryMock_Share_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, with uuid.UUID, sharer uuid.UUID)) *IssueRepositoryMock_Share_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		var arg4 uuid.UUID
+		if args[4] != nil {
+			arg4 = args[4].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Share_Call) Return(err error) *IssueRepositoryMock_Share_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Share_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, with uuid.UUID, sharer uuid.UUID) error) *IssueRepositoryMock_Share_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Shares provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Shares(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueShare, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Shares")
+	}
+
+	var r0 []*ent.IssueShare
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) ([]*ent.IssueShare, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) []*ent.IssueShare); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ent.IssueShare)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_Shares_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Shares'
+type IssueRepositoryMock_Shares_Call struct {
+	*mock.Call
+}
+
+// Shares is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) Shares(ctx any, tx any, id any) *IssueRepositoryMock_Shares_Call {
+	return &IssueRepositoryMock_Shares_Call{Call: _e.mock.On("Shares", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_Shares_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *IssueRepositoryMock_Shares_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Shares_Call) Return(issueShares []*ent.IssueShare, err error) *IssueRepositoryMock_Shares_Call {
+	_c.Call.Return(issueShares, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Shares_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueShare, error)) *IssueRepositoryMock_Shares_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Siblings provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Siblings(ctx context.Context, tx repository.TxInterface, group uuid.UUID, label uuid.UUID) ([]uuid.UUID, error) {
+	ret := _mock.Called(ctx, tx, group, label)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Siblings")
+	}
+
+	var r0 []uuid.UUID
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) ([]uuid.UUID, error)); ok {
+		return returnFunc(ctx, tx, group, label)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) []uuid.UUID); ok {
+		r0 = returnFunc(ctx, tx, group, label)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, group, label)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_Siblings_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Siblings'
+type IssueRepositoryMock_Siblings_Call struct {
+	*mock.Call
+}
+
+// Siblings is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - group uuid.UUID
+//   - label uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) Siblings(ctx any, tx any, group any, label any) *IssueRepositoryMock_Siblings_Call {
+	return &IssueRepositoryMock_Siblings_Call{Call: _e.mock.On("Siblings", ctx, tx, group, label)}
+}
+
+func (_c *IssueRepositoryMock_Siblings_Call) Run(run func(ctx context.Context, tx repository.TxInterface, group uuid.UUID, label uuid.UUID)) *IssueRepositoryMock_Siblings_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Siblings_Call) Return(uUIDs []uuid.UUID, err error) *IssueRepositoryMock_Siblings_Call {
+	_c.Call.Return(uUIDs, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Siblings_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, group uuid.UUID, label uuid.UUID) ([]uuid.UUID, error)) *IssueRepositoryMock_Siblings_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SingleSelectClashes provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) SingleSelectClashes(ctx context.Context, tx repository.TxInterface, labels []uuid.UUID) ([]string, error) {
+	ret := _mock.Called(ctx, tx, labels)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SingleSelectClashes")
+	}
+
+	var r0 []string
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, []uuid.UUID) ([]string, error)); ok {
+		return returnFunc(ctx, tx, labels)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, []uuid.UUID) []string); ok {
+		r0 = returnFunc(ctx, tx, labels)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]string)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, []uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, labels)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_SingleSelectClashes_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SingleSelectClashes'
+type IssueRepositoryMock_SingleSelectClashes_Call struct {
+	*mock.Call
+}
+
+// SingleSelectClashes is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - labels []uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) SingleSelectClashes(ctx any, tx any, labels any) *IssueRepositoryMock_SingleSelectClashes_Call {
+	return &IssueRepositoryMock_SingleSelectClashes_Call{Call: _e.mock.On("SingleSelectClashes", ctx, tx, labels)}
+}
+
+func (_c *IssueRepositoryMock_SingleSelectClashes_Call) Run(run func(ctx context.Context, tx repository.TxInterface, labels []uuid.UUID)) *IssueRepositoryMock_SingleSelectClashes_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 []uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].([]uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_SingleSelectClashes_Call) Return(strings []string, err error) *IssueRepositoryMock_SingleSelectClashes_Call {
+	_c.Call.Return(strings, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_SingleSelectClashes_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, labels []uuid.UUID) ([]string, error)) *IssueRepositoryMock_SingleSelectClashes_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// StampCreated provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) StampCreated(ctx context.Context, tx repository.TxInterface, id uuid.UUID, kind string, now time.Time) error {
+	ret := _mock.Called(ctx, tx, id, kind, now)
+
+	if len(ret) == 0 {
+		panic("no return value specified for StampCreated")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, string, time.Time) error); ok {
+		r0 = returnFunc(ctx, tx, id, kind, now)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueRepositoryMock_StampCreated_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'StampCreated'
+type IssueRepositoryMock_StampCreated_Call struct {
+	*mock.Call
+}
+
+// StampCreated is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - kind string
+//   - now time.Time
+func (_e *IssueRepositoryMock_Expecter) StampCreated(ctx any, tx any, id any, kind any, now any) *IssueRepositoryMock_StampCreated_Call {
+	return &IssueRepositoryMock_StampCreated_Call{Call: _e.mock.On("StampCreated", ctx, tx, id, kind, now)}
+}
+
+func (_c *IssueRepositoryMock_StampCreated_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, kind string, now time.Time)) *IssueRepositoryMock_StampCreated_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 string
+		if args[3] != nil {
+			arg3 = args[3].(string)
+		}
+		var arg4 time.Time
+		if args[4] != nil {
+			arg4 = args[4].(time.Time)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_StampCreated_Call) Return(err error) *IssueRepositoryMock_StampCreated_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_StampCreated_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, kind string, now time.Time) error) *IssueRepositoryMock_StampCreated_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -948,6 +4478,228 @@ func (_c *IssueRepositoryMock_SubIssueCounts_Call) RunAndReturn(run func(ctx con
 	return _c
 }
 
+// SubTeams provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) SubTeams(ctx context.Context, teamID uuid.UUID) ([]uuid.UUID, error) {
+	ret := _mock.Called(ctx, teamID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SubTeams")
+	}
+
+	var r0 []uuid.UUID
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]uuid.UUID, error)); ok {
+		return returnFunc(ctx, teamID)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) []uuid.UUID); ok {
+		r0 = returnFunc(ctx, teamID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, teamID)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_SubTeams_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SubTeams'
+type IssueRepositoryMock_SubTeams_Call struct {
+	*mock.Call
+}
+
+// SubTeams is a helper method to define mock.On call
+//   - ctx context.Context
+//   - teamID uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) SubTeams(ctx any, teamID any) *IssueRepositoryMock_SubTeams_Call {
+	return &IssueRepositoryMock_SubTeams_Call{Call: _e.mock.On("SubTeams", ctx, teamID)}
+}
+
+func (_c *IssueRepositoryMock_SubTeams_Call) Run(run func(ctx context.Context, teamID uuid.UUID)) *IssueRepositoryMock_SubTeams_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_SubTeams_Call) Return(uUIDs []uuid.UUID, err error) *IssueRepositoryMock_SubTeams_Call {
+	_c.Call.Return(uUIDs, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_SubTeams_Call) RunAndReturn(run func(ctx context.Context, teamID uuid.UUID) ([]uuid.UUID, error)) *IssueRepositoryMock_SubTeams_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Subscribers provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Subscribers(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueSubscriber, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Subscribers")
+	}
+
+	var r0 []*ent.IssueSubscriber
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) ([]*ent.IssueSubscriber, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) []*ent.IssueSubscriber); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ent.IssueSubscriber)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_Subscribers_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Subscribers'
+type IssueRepositoryMock_Subscribers_Call struct {
+	*mock.Call
+}
+
+// Subscribers is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) Subscribers(ctx any, tx any, id any) *IssueRepositoryMock_Subscribers_Call {
+	return &IssueRepositoryMock_Subscribers_Call{Call: _e.mock.On("Subscribers", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_Subscribers_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *IssueRepositoryMock_Subscribers_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Subscribers_Call) Return(issueSubscribers []*ent.IssueSubscriber, err error) *IssueRepositoryMock_Subscribers_Call {
+	_c.Call.Return(issueSubscribers, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Subscribers_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueSubscriber, error)) *IssueRepositoryMock_Subscribers_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// TakenNumbers provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) TakenNumbers(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID, numbers []int) ([]int, error) {
+	ret := _mock.Called(ctx, tx, teamID, numbers)
+
+	if len(ret) == 0 {
+		panic("no return value specified for TakenNumbers")
+	}
+
+	var r0 []int
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, []int) ([]int, error)); ok {
+		return returnFunc(ctx, tx, teamID, numbers)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, []int) []int); ok {
+		r0 = returnFunc(ctx, tx, teamID, numbers)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]int)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, []int) error); ok {
+		r1 = returnFunc(ctx, tx, teamID, numbers)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_TakenNumbers_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TakenNumbers'
+type IssueRepositoryMock_TakenNumbers_Call struct {
+	*mock.Call
+}
+
+// TakenNumbers is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - teamID uuid.UUID
+//   - numbers []int
+func (_e *IssueRepositoryMock_Expecter) TakenNumbers(ctx any, tx any, teamID any, numbers any) *IssueRepositoryMock_TakenNumbers_Call {
+	return &IssueRepositoryMock_TakenNumbers_Call{Call: _e.mock.On("TakenNumbers", ctx, tx, teamID, numbers)}
+}
+
+func (_c *IssueRepositoryMock_TakenNumbers_Call) Run(run func(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID, numbers []int)) *IssueRepositoryMock_TakenNumbers_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 []int
+		if args[3] != nil {
+			arg3 = args[3].([]int)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_TakenNumbers_Call) Return(ints []int, err error) *IssueRepositoryMock_TakenNumbers_Call {
+	_c.Call.Return(ints, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_TakenNumbers_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID, numbers []int) ([]int, error)) *IssueRepositoryMock_TakenNumbers_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Team provides a mock function for the type IssueRepositoryMock
 func (_mock *IssueRepositoryMock) Team(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.Team, error) {
 	ret := _mock.Called(ctx, tx, id)
@@ -1022,6 +4774,363 @@ func (_c *IssueRepositoryMock_Team_Call) RunAndReturn(run func(ctx context.Conte
 	return _c
 }
 
+// TeamChildren provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) TeamChildren(ctx context.Context, tx repository.TxInterface, parent uuid.UUID, teamID uuid.UUID) ([]uuid.UUID, error) {
+	ret := _mock.Called(ctx, tx, parent, teamID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for TeamChildren")
+	}
+
+	var r0 []uuid.UUID
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) ([]uuid.UUID, error)); ok {
+		return returnFunc(ctx, tx, parent, teamID)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) []uuid.UUID); ok {
+		r0 = returnFunc(ctx, tx, parent, teamID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, parent, teamID)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_TeamChildren_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TeamChildren'
+type IssueRepositoryMock_TeamChildren_Call struct {
+	*mock.Call
+}
+
+// TeamChildren is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - parent uuid.UUID
+//   - teamID uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) TeamChildren(ctx any, tx any, parent any, teamID any) *IssueRepositoryMock_TeamChildren_Call {
+	return &IssueRepositoryMock_TeamChildren_Call{Call: _e.mock.On("TeamChildren", ctx, tx, parent, teamID)}
+}
+
+func (_c *IssueRepositoryMock_TeamChildren_Call) Run(run func(ctx context.Context, tx repository.TxInterface, parent uuid.UUID, teamID uuid.UUID)) *IssueRepositoryMock_TeamChildren_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_TeamChildren_Call) Return(uUIDs []uuid.UUID, err error) *IssueRepositoryMock_TeamChildren_Call {
+	_c.Call.Return(uUIDs, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_TeamChildren_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, parent uuid.UUID, teamID uuid.UUID) ([]uuid.UUID, error)) *IssueRepositoryMock_TeamChildren_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// TeamsByKey provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) TeamsByKey(ctx context.Context, ids []uuid.UUID) ([]*ent.Team, error) {
+	ret := _mock.Called(ctx, ids)
+
+	if len(ret) == 0 {
+		panic("no return value specified for TeamsByKey")
+	}
+
+	var r0 []*ent.Team
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, []uuid.UUID) ([]*ent.Team, error)); ok {
+		return returnFunc(ctx, ids)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, []uuid.UUID) []*ent.Team); ok {
+		r0 = returnFunc(ctx, ids)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ent.Team)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, []uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, ids)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_TeamsByKey_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TeamsByKey'
+type IssueRepositoryMock_TeamsByKey_Call struct {
+	*mock.Call
+}
+
+// TeamsByKey is a helper method to define mock.On call
+//   - ctx context.Context
+//   - ids []uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) TeamsByKey(ctx any, ids any) *IssueRepositoryMock_TeamsByKey_Call {
+	return &IssueRepositoryMock_TeamsByKey_Call{Call: _e.mock.On("TeamsByKey", ctx, ids)}
+}
+
+func (_c *IssueRepositoryMock_TeamsByKey_Call) Run(run func(ctx context.Context, ids []uuid.UUID)) *IssueRepositoryMock_TeamsByKey_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 []uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].([]uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_TeamsByKey_Call) Return(teams []*ent.Team, err error) *IssueRepositoryMock_TeamsByKey_Call {
+	_c.Call.Return(teams, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_TeamsByKey_Call) RunAndReturn(run func(ctx context.Context, ids []uuid.UUID) ([]*ent.Team, error)) *IssueRepositoryMock_TeamsByKey_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Template provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Template(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.Template, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Template")
+	}
+
+	var r0 *ent.Template
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) (*ent.Template, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) *ent.Template); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ent.Template)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_Template_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Template'
+type IssueRepositoryMock_Template_Call struct {
+	*mock.Call
+}
+
+// Template is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) Template(ctx any, tx any, id any) *IssueRepositoryMock_Template_Call {
+	return &IssueRepositoryMock_Template_Call{Call: _e.mock.On("Template", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_Template_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *IssueRepositoryMock_Template_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Template_Call) Return(template *ent.Template, err error) *IssueRepositoryMock_Template_Call {
+	_c.Call.Return(template, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Template_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.Template, error)) *IssueRepositoryMock_Template_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// TopSortOrder provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) TopSortOrder(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID) (float64, error) {
+	ret := _mock.Called(ctx, tx, teamID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for TopSortOrder")
+	}
+
+	var r0 float64
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) (float64, error)); ok {
+		return returnFunc(ctx, tx, teamID)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) float64); ok {
+		r0 = returnFunc(ctx, tx, teamID)
+	} else {
+		r0 = ret.Get(0).(float64)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, teamID)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_TopSortOrder_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TopSortOrder'
+type IssueRepositoryMock_TopSortOrder_Call struct {
+	*mock.Call
+}
+
+// TopSortOrder is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - teamID uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) TopSortOrder(ctx any, tx any, teamID any) *IssueRepositoryMock_TopSortOrder_Call {
+	return &IssueRepositoryMock_TopSortOrder_Call{Call: _e.mock.On("TopSortOrder", ctx, tx, teamID)}
+}
+
+func (_c *IssueRepositoryMock_TopSortOrder_Call) Run(run func(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID)) *IssueRepositoryMock_TopSortOrder_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_TopSortOrder_Call) Return(f float64, err error) *IssueRepositoryMock_TopSortOrder_Call {
+	_c.Call.Return(f, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_TopSortOrder_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, teamID uuid.UUID) (float64, error)) *IssueRepositoryMock_TopSortOrder_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// TryFilter provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) TryFilter(ctx context.Context, tx repository.TxInterface, condition *issue_repo.Condition) error {
+	ret := _mock.Called(ctx, tx, condition)
+
+	if len(ret) == 0 {
+		panic("no return value specified for TryFilter")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *issue_repo.Condition) error); ok {
+		r0 = returnFunc(ctx, tx, condition)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueRepositoryMock_TryFilter_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TryFilter'
+type IssueRepositoryMock_TryFilter_Call struct {
+	*mock.Call
+}
+
+// TryFilter is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - condition *issue_repo.Condition
+func (_e *IssueRepositoryMock_Expecter) TryFilter(ctx any, tx any, condition any) *IssueRepositoryMock_TryFilter_Call {
+	return &IssueRepositoryMock_TryFilter_Call{Call: _e.mock.On("TryFilter", ctx, tx, condition)}
+}
+
+func (_c *IssueRepositoryMock_TryFilter_Call) Run(run func(ctx context.Context, tx repository.TxInterface, condition *issue_repo.Condition)) *IssueRepositoryMock_TryFilter_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 *issue_repo.Condition
+		if args[2] != nil {
+			arg2 = args[2].(*issue_repo.Condition)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_TryFilter_Call) Return(err error) *IssueRepositoryMock_TryFilter_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_TryFilter_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, condition *issue_repo.Condition) error) *IssueRepositoryMock_TryFilter_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Unblocked provides a mock function for the type IssueRepositoryMock
 func (_mock *IssueRepositoryMock) Unblocked(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]uuid.UUID, error) {
 	ret := _mock.Called(ctx, tx, id)
@@ -1092,6 +5201,443 @@ func (_c *IssueRepositoryMock_Unblocked_Call) Return(uUIDs []uuid.UUID, err erro
 }
 
 func (_c *IssueRepositoryMock_Unblocked_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]uuid.UUID, error)) *IssueRepositoryMock_Unblocked_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Unrelate provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Unrelate(ctx context.Context, tx repository.TxInterface, from uuid.UUID, to uuid.UUID, kind string) error {
+	ret := _mock.Called(ctx, tx, from, to, kind)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Unrelate")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, string) error); ok {
+		r0 = returnFunc(ctx, tx, from, to, kind)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueRepositoryMock_Unrelate_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Unrelate'
+type IssueRepositoryMock_Unrelate_Call struct {
+	*mock.Call
+}
+
+// Unrelate is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - from uuid.UUID
+//   - to uuid.UUID
+//   - kind string
+func (_e *IssueRepositoryMock_Expecter) Unrelate(ctx any, tx any, from any, to any, kind any) *IssueRepositoryMock_Unrelate_Call {
+	return &IssueRepositoryMock_Unrelate_Call{Call: _e.mock.On("Unrelate", ctx, tx, from, to, kind)}
+}
+
+func (_c *IssueRepositoryMock_Unrelate_Call) Run(run func(ctx context.Context, tx repository.TxInterface, from uuid.UUID, to uuid.UUID, kind string)) *IssueRepositoryMock_Unrelate_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		var arg4 string
+		if args[4] != nil {
+			arg4 = args[4].(string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Unrelate_Call) Return(err error) *IssueRepositoryMock_Unrelate_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Unrelate_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, from uuid.UUID, to uuid.UUID, kind string) error) *IssueRepositoryMock_Unrelate_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Unshare provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Unshare(ctx context.Context, tx repository.TxInterface, id uuid.UUID, with uuid.UUID) error {
+	ret := _mock.Called(ctx, tx, id, with)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Unshare")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, tx, id, with)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueRepositoryMock_Unshare_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Unshare'
+type IssueRepositoryMock_Unshare_Call struct {
+	*mock.Call
+}
+
+// Unshare is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - with uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) Unshare(ctx any, tx any, id any, with any) *IssueRepositoryMock_Unshare_Call {
+	return &IssueRepositoryMock_Unshare_Call{Call: _e.mock.On("Unshare", ctx, tx, id, with)}
+}
+
+func (_c *IssueRepositoryMock_Unshare_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, with uuid.UUID)) *IssueRepositoryMock_Unshare_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Unshare_Call) Return(err error) *IssueRepositoryMock_Unshare_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Unshare_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, with uuid.UUID) error) *IssueRepositoryMock_Unshare_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Unsubscribe provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Unsubscribe(ctx context.Context, tx repository.TxInterface, id uuid.UUID, users []uuid.UUID) error {
+	ret := _mock.Called(ctx, tx, id, users)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Unsubscribe")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, []uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, tx, id, users)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueRepositoryMock_Unsubscribe_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Unsubscribe'
+type IssueRepositoryMock_Unsubscribe_Call struct {
+	*mock.Call
+}
+
+// Unsubscribe is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - users []uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) Unsubscribe(ctx any, tx any, id any, users any) *IssueRepositoryMock_Unsubscribe_Call {
+	return &IssueRepositoryMock_Unsubscribe_Call{Call: _e.mock.On("Unsubscribe", ctx, tx, id, users)}
+}
+
+func (_c *IssueRepositoryMock_Unsubscribe_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, users []uuid.UUID)) *IssueRepositoryMock_Unsubscribe_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 []uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].([]uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Unsubscribe_Call) Return(err error) *IssueRepositoryMock_Unsubscribe_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Unsubscribe_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, users []uuid.UUID) error) *IssueRepositoryMock_Unsubscribe_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Update provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) Update(ctx context.Context, tx repository.TxInterface, id uuid.UUID, changes ...issue_repo.Change) error {
+	// issue_repo.Change
+	_va := make([]any, len(changes))
+	for _i := range changes {
+		_va[_i] = changes[_i]
+	}
+	var _ca []any
+	_ca = append(_ca, ctx, tx, id)
+	_ca = append(_ca, _va...)
+	ret := _mock.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Update")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, ...issue_repo.Change) error); ok {
+		r0 = returnFunc(ctx, tx, id, changes...)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// IssueRepositoryMock_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type IssueRepositoryMock_Update_Call struct {
+	*mock.Call
+}
+
+// Update is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - changes ...issue_repo.Change
+func (_e *IssueRepositoryMock_Expecter) Update(ctx any, tx any, id any, changes ...any) *IssueRepositoryMock_Update_Call {
+	return &IssueRepositoryMock_Update_Call{Call: _e.mock.On("Update",
+		append([]any{ctx, tx, id}, changes...)...)}
+}
+
+func (_c *IssueRepositoryMock_Update_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, changes ...issue_repo.Change)) *IssueRepositoryMock_Update_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 []issue_repo.Change
+		variadicArgs := make([]issue_repo.Change, len(args)-3)
+		for i, a := range args[3:] {
+			if a != nil {
+				variadicArgs[i] = a.(issue_repo.Change)
+			}
+		}
+		arg3 = variadicArgs
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3...,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Update_Call) Return(err error) *IssueRepositoryMock_Update_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_Update_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, changes ...issue_repo.Change) error) *IssueRepositoryMock_Update_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// User provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) User(ctx context.Context, tx repository.TxInterface, id *uuid.UUID) (*ent.User, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for User")
+	}
+
+	var r0 *ent.User
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *uuid.UUID) (*ent.User, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *uuid.UUID) *ent.User); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ent.User)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, *uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_User_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'User'
+type IssueRepositoryMock_User_Call struct {
+	*mock.Call
+}
+
+// User is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id *uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) User(ctx any, tx any, id any) *IssueRepositoryMock_User_Call {
+	return &IssueRepositoryMock_User_Call{Call: _e.mock.On("User", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_User_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id *uuid.UUID)) *IssueRepositoryMock_User_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 *uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(*uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_User_Call) Return(user *ent.User, err error) *IssueRepositoryMock_User_Call {
+	_c.Call.Return(user, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_User_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id *uuid.UUID) (*ent.User, error)) *IssueRepositoryMock_User_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// View provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) View(ctx context.Context, id uuid.UUID) (*ent.CustomView, error) {
+	ret := _mock.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for View")
+	}
+
+	var r0 *ent.CustomView
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*ent.CustomView, error)); ok {
+		return returnFunc(ctx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) *ent.CustomView); ok {
+		r0 = returnFunc(ctx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ent.CustomView)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_View_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'View'
+type IssueRepositoryMock_View_Call struct {
+	*mock.Call
+}
+
+// View is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) View(ctx any, id any) *IssueRepositoryMock_View_Call {
+	return &IssueRepositoryMock_View_Call{Call: _e.mock.On("View", ctx, id)}
+}
+
+func (_c *IssueRepositoryMock_View_Call) Run(run func(ctx context.Context, id uuid.UUID)) *IssueRepositoryMock_View_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_View_Call) Return(customView *ent.CustomView, err error) *IssueRepositoryMock_View_Call {
+	_c.Call.Return(customView, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_View_Call) RunAndReturn(run func(ctx context.Context, id uuid.UUID) (*ent.CustomView, error)) *IssueRepositoryMock_View_Call {
 	_c.Call.Return(run)
 	return _c
 }

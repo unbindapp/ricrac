@@ -14,6 +14,7 @@ import (
 	label_repo "ricrac/internal/repositories/label"
 	resolve_repo "ricrac/internal/repositories/resolve"
 	seed_repo "ricrac/internal/repositories/seed"
+	view_repo "ricrac/internal/repositories/view"
 	"time"
 )
 
@@ -31,4 +32,5 @@ type RepositoriesInterface interface {
 	Seed() seed_repo.SeedRepositoryInterface
 	Comment() comment_repo.CommentRepositoryInterface
 	Attachment() attachment_repo.AttachmentRepositoryInterface
+	View() view_repo.ViewRepositoryInterface
 }
