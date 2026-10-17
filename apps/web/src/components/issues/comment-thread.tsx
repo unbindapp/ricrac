@@ -91,7 +91,7 @@ export function CommentComposer({
           onClick={() => void submit()}
         >
           {parentId ? "Reply" : "Comment"}
-          <Kbd className="bg-primary-foreground/2-10 text-primary-foreground border-transparent">
+          <Kbd className="bg-primary-foreground/2-10 text-primary-foreground group-disabled/button:text-muted-foreground border-transparent group-disabled/button:bg-transparent">
             {formatForDisplay("Mod+Enter")}
           </Kbd>
         </Button>

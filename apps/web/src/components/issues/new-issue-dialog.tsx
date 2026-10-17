@@ -249,7 +249,7 @@ function NewIssueForm({ defaults, onClose }: { defaults: TNewIssueDefaults; onCl
         </Button>
         <Button type="submit" size="sm" isPending={isPending} disabled={!teamId || !title.trim()}>
           Create issue
-          <Kbd className="bg-primary-foreground/2-10 text-primary-foreground border-transparent">
+          <Kbd className="bg-primary-foreground/2-10 text-primary-foreground group-disabled/button:text-muted-foreground border-transparent group-disabled/button:bg-transparent">
             {formatForDisplay("Mod+Enter")}
           </Kbd>
         </Button>
