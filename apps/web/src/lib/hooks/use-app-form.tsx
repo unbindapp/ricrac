@@ -8,12 +8,14 @@ import {
   type FormValidateOrFn,
   useStore,
 } from "@tanstack/react-form";
+import { UploadIcon } from "lucide-react";
 import type React from "react";
-import { type ComponentProps, type ReactNode, useId } from "react";
+import { type ComponentProps, type ReactNode, useId, useState } from "react";
 
 import { ColorPicker } from "@/components/shared/color-picker";
 import { IconPicker } from "@/components/shared/icon-picker";
 import { Button } from "@/components/ui/button";
+import { FileTrigger } from "@/components/ui/file-trigger";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -24,6 +26,9 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/components/ui/toast";
+import { imageUploadAccept } from "@/lib/queries/uploads";
+import { errorText } from "@/lib/server/errors";
 
 const { fieldContext, formContext, useFieldContext, useFormContext } = createFormHookContexts();
 
@@ -316,6 +321,63 @@ function IconField({ label, description, disabled, color }: TIconFieldProps) {
   );
 }
 
+type TImageFieldProps = TFieldShellProps & {
+  upload: (file: File) => Promise<string>;
+  preview: (url: string | null) => ReactNode;
+};
+
+/** An image's URL, set by uploading one. */
+function ImageField({ label, description, upload, preview }: TImageFieldProps) {
+  const field = useFieldContext<string>();
+  const { id, describedBy } = useFieldIds(description);
+  const [isUploading, setIsUploading] = useState(false);
+  const url = field.state.value || null;
+
+  const change = (value: string) => {
+    field.handleChange(value);
+    field.handleBlur();
+  };
+
+  const uploadImage = async (file: File) => {
+    setIsUploading(true);
+    try {
+      change(await upload(file));
+    } catch (error) {
+      toast.add({ type: "error", title: "Upload failed", description: errorText(error) });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  return (
+    <FieldShell id={id} label={label} description={description}>
+      <div className="flex items-center gap-2">
+        {preview(url)}
+        <FileTrigger accept={imageUploadAccept} onSelect={([file]) => void uploadImage(file)}>
+          {(pickFile) => (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              isPending={isUploading}
+              aria-describedby={describedBy}
+              onClick={pickFile}
+            >
+              <UploadIcon className="size-4" />
+              Upload
+            </Button>
+          )}
+        </FileTrigger>
+        {url && (
+          <Button type="button" variant="ghost" size="sm" onClick={() => change("")}>
+            Remove
+          </Button>
+        )}
+      </div>
+    </FieldShell>
+  );
+}
+
 type TSubmitButtonProps = Omit<ComponentProps<typeof Button>, "type" | "isPending"> & {
   requireDirty?: boolean;
 };
@@ -348,6 +410,7 @@ const {
     SwitchField,
     ColorField,
     IconField,
+    ImageField,
   },
   formComponents: {
     SubmitButton,

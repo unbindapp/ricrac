@@ -4,7 +4,7 @@ import { type ReactElement, useState } from "react";
 import { z } from "zod";
 
 import type { Customer } from "@/api/ops.gen";
-import { OptionDot } from "@/components/customers/customer-badges";
+import { CustomerLogo, OptionDot } from "@/components/customers/customer-badges";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,18 +25,14 @@ import {
   customerTiersQuery,
   useSaveCustomerMutation,
 } from "@/lib/queries/customers";
+import { useUploadImage } from "@/lib/queries/uploads";
 
 const NONE = "none";
 
 const formSchema = CustomerFormSchema.extend({
   status: z.string(),
   tier: z.string(),
-  logoUrl: z
-    .string()
-    .trim()
-    .refine((value) => value === "" || /^https?:\/\/\S+$/.test(value), {
-      message: "Use a link to an image, starting with https://.",
-    }),
+  logoUrl: z.string(),
   externalIds: z.string(),
 });
 
@@ -83,6 +79,7 @@ function CustomerForm({ customer, onDone }: { customer?: Customer; onDone: () =>
   const { data: statuses = [] } = useQuery(customerStatusesQuery(workspace.id));
   const { data: tiers = [] } = useQuery(customerTiersQuery(workspace.id));
   const { mutateAsync: save } = useSaveCustomerMutation(workspace.id);
+  const uploadImage = useUploadImage(workspace.id);
   const form = useAppForm({
     defaultValues: {
       name: customer?.name ?? "",
@@ -182,10 +179,17 @@ function CustomerForm({ customer, onDone }: { customer?: Customer; onDone: () =>
           <form.AppField
             name="logoUrl"
             children={(field) => (
-              <field.TextField
+              <field.ImageField
                 label="Logo"
-                placeholder="https://acme.com/logo.png"
-                inputMode="url"
+                upload={uploadImage}
+                preview={(logoUrl) => (
+                  <CustomerLogo
+                    id={customer.id}
+                    name={customer.name}
+                    logoUrl={logoUrl}
+                    size="lg"
+                  />
+                )}
               />
             )}
           />
