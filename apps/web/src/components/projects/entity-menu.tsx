@@ -69,7 +69,7 @@ export function TrashedRow({
   return (
     <div
       role="listitem"
-      className="text-muted-foreground flex h-9 w-full items-center gap-3 border-b px-3 text-sm last:border-b-0"
+      className="text-muted-foreground flex h-9 w-full items-center gap-3 border-b px-3 text-sm group-data-flush/list:h-11 group-data-flush/list:px-6 last:border-b-0"
     >
       {icon}
       <span className="min-w-0 flex-1 truncate">{name}</span>

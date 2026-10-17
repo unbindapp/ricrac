@@ -54,7 +54,7 @@ export function ViewIssues({ team, filter }: TProps) {
 
   return (
     <div className="flex w-full flex-col gap-2">
-      <List>
+      <List flush>
         {groups.map((group) => (
           <div
             key={group.type}
@@ -62,7 +62,7 @@ export function ViewIssues({ team, filter }: TProps) {
             aria-label={stateTypeLabels[group.type]}
             className="border-b last:border-b-0"
           >
-            <div className="bg-muted/50 flex h-9 items-center gap-2 border-b px-3">
+            <div className="bg-muted flex h-9 items-center gap-2 px-3 group-data-flush/list:px-6">
               <StateIcon type={group.type} />
               <span className="text-sm font-medium">{stateTypeLabels[group.type]}</span>
               <span className="text-muted-foreground text-xs tabular-nums">
@@ -97,7 +97,7 @@ function IssueRow({ issue }: { issue: Issue }) {
       to="/$workspace/issue/$identifier"
       params={{ workspace: workspace.urlKey, identifier: issue.identifier }}
       role="listitem"
-      className="has-hover:hover:bg-accent focus-visible:bg-accent flex h-9 w-full items-center gap-2 border-b px-3 text-sm outline-hidden last:border-b-0"
+      className="has-hover:hover:bg-muted focus-visible:bg-muted flex h-9 w-full items-center gap-2 border-b px-3 text-sm outline-hidden group-data-flush/list:h-11 group-data-flush/list:px-6 last:border-b-0"
     >
       <PriorityIcon priority={issue.priority} />
       <span className="text-muted-foreground w-16 shrink-0 font-mono text-xs">
@@ -148,7 +148,7 @@ export function ViewProjects({ team, filter }: TProps) {
   }
   return (
     <div className="flex w-full flex-col gap-2">
-      <List>
+      <List flush>
         {projects.map((project) => (
           <ProjectRow key={project.id} project={project} />
         ))}
@@ -175,7 +175,7 @@ function ProjectRow({ project }: { project: Project }) {
       to="/$workspace/project/$slug"
       params={{ workspace: workspace.urlKey, slug: project.slugId }}
       role="listitem"
-      className="has-hover:hover:bg-accent focus-visible:bg-accent flex h-9 w-full items-center gap-2 border-b px-3 text-sm outline-hidden last:border-b-0"
+      className="has-hover:hover:bg-muted focus-visible:bg-muted flex h-9 w-full items-center gap-2 border-b px-3 text-sm outline-hidden group-data-flush/list:h-11 group-data-flush/list:px-6 last:border-b-0"
     >
       <EntityIcon icon={project.icon} color={project.color} fallback={BoxIcon} />
       <span className="min-w-0 flex-1 truncate">{project.name}</span>

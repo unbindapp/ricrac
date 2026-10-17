@@ -2,12 +2,17 @@ import { ReactNode } from "react";
 
 import { cn } from "@/components/ui/utils";
 
-export function List({ children }: { children: ReactNode }) {
+/** A card of rows, or with `flush` rows that run edge to edge across the page. */
+export function List({ children, flush }: { children: ReactNode; flush?: boolean }) {
   return (
     <div
       data-slot="list"
+      data-flush={flush || undefined}
       role="list"
-      className="bg-card flex w-full flex-col overflow-hidden rounded-lg border"
+      className={cn(
+        "group/list flex flex-col",
+        flush ? "-mx-4 w-auto" : "bg-card w-full overflow-hidden rounded-lg border",
+      )}
     >
       {children}
     </div>
@@ -26,7 +31,7 @@ export function ListRow({ children, actions, muted }: TListRowProps) {
       role="listitem"
       data-slot="list-row"
       className={cn(
-        "flex h-9 w-full items-center gap-2 border-b px-3 text-sm last:border-b-0",
+        "flex h-9 w-full items-center gap-2 border-b px-3 text-sm group-data-flush/list:h-11 group-data-flush/list:px-6 last:border-b-0",
         muted && "text-muted-foreground",
       )}
     >

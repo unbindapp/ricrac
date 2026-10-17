@@ -12,8 +12,6 @@ import (
 	"strings"
 	"sync"
 	"testing"
-
-	"ricrac/ops"
 )
 
 type hookRequest struct {
@@ -28,7 +26,8 @@ type receiver struct {
 	requests []hookRequest
 }
 
-func newReceiver(t *testing.T, status int) *receiver {
+func newReceiver(world *World, status int) *receiver {
+	t := world.t
 	r := &receiver{}
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		body, _ := io.ReadAll(req.Body)
@@ -69,7 +68,7 @@ func verifies(secret string, body []byte, signature string) bool {
 
 func deliverDue(t *testing.T, w *World) int {
 	t.Helper()
-	sent, err := ops.DeliverDueWebhooks(context.Background(), w.State)
+	sent, err := w.B.DeliverDueWebhooks(context.Background())
 	if err != nil {
 		t.Fatalf("deliver: %v", err)
 	}
@@ -78,7 +77,7 @@ func deliverDue(t *testing.T, w *World) int {
 
 func TestDeliversSignedWebhooks(t *testing.T) {
 	w := world(t)
-	hooks := newReceiver(t, http.StatusOK)
+	hooks := newReceiver(w, http.StatusOK)
 	hook := call(t, w.Ann, "save_webhook", M{"url": hooks.url, "label": "CI", "resourceTypes": []any{"issue"}})
 	secret := hook.At("secret").Str()
 	check(t, strings.HasPrefix(secret, "rr_whs_"))
@@ -133,7 +132,7 @@ func TestDeliversSignedWebhooks(t *testing.T) {
 
 func TestRetriesFailedDeliveries(t *testing.T) {
 	w := world(t)
-	hooks := newReceiver(t, http.StatusInternalServerError)
+	hooks := newReceiver(w, http.StatusInternalServerError)
 	hook := call(t, w.Ann, "save_webhook", M{"url": hooks.url, "resourceTypes": []any{"Issue"}, "team": "ENG"})
 	eq(t, hook.At("team", "key").Str(), "ENG")
 	id := hook.At("id").Str()

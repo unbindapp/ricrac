@@ -4,6 +4,7 @@ import { FileTextIcon, PlusIcon, RocketIcon, Trash2Icon } from "lucide-react";
 
 import type { ReleaseNote } from "@/api/ops.gen";
 import { PropertyPicker } from "@/components/issues/property-picker";
+import { PageBar } from "@/components/layout/page-header";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
@@ -63,7 +64,7 @@ function NotePage({ note }: { note: ReleaseNote }) {
 
   return (
     <PageContainer width="narrow">
-      <div className="flex min-h-9 w-full items-center gap-2">
+      <PageBar>
         <div className="min-w-0 flex-1">
           <Breadcrumb
             items={[
@@ -85,7 +86,7 @@ function NotePage({ note }: { note: ReleaseNote }) {
           />
         </div>
         {canEdit && <DeleteNote note={note} />}
-      </div>
+      </PageBar>
       <div className="flex flex-col gap-3">
         <InlineText
           label="Title"

@@ -20,7 +20,6 @@ import {
 
 import type { Team } from "@/api/ops.gen";
 import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
-import { ShortcutKeys } from "@/components/command-panel/shortcut-keys";
 import { SidebarFavorites } from "@/components/favorites/sidebar-favorites";
 import { InboxUnreadBadge } from "@/components/inbox/inbox-unread-badge";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
@@ -50,9 +49,21 @@ export function Sidebar({ onNavigate }: TProps) {
   const params = { workspace: workspace.urlKey };
 
   return (
-    <div className="bg-card flex h-full w-full flex-col">
-      <div className="flex items-center gap-2 p-2">
+    <div className="bg-sidebar flex h-full w-full flex-col">
+      <div className="flex h-12 items-center gap-1 px-2">
         <WorkspaceSwitcher onNavigate={onNavigate} />
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Search"
+          onClick={() => {
+            onNavigate?.();
+            openCommandPanel(true);
+          }}
+          className="text-muted-foreground"
+        >
+          <SearchIcon className="size-4" />
+        </Button>
         {canEdit && (
           <Button
             variant="outline"
@@ -67,25 +78,9 @@ export function Sidebar({ onNavigate }: TProps) {
           </Button>
         )}
       </div>
-      <div className="px-2 pb-2">
-        <Button
-          variant="outline"
-          size="sm"
-          forceMinSize={false}
-          onClick={() => {
-            onNavigate?.();
-            openCommandPanel(true);
-          }}
-          className="text-muted-foreground w-full justify-start font-normal"
-        >
-          <SearchIcon className="size-4" />
-          <span className="flex-1 text-left">Search</span>
-          <ShortcutKeys keys={["Mod+K"]} />
-        </Button>
-      </div>
       <ScrollArea className="min-h-0" classNameViewport="px-2 pb-2">
         <nav aria-label="Workspace" className="flex flex-col gap-4">
-          <div className="flex flex-col gap-0.5">
+          <div className="flex flex-col">
             <SidebarNavItem
               label="Inbox"
               icon={InboxIcon}
@@ -159,7 +154,7 @@ export function Sidebar({ onNavigate }: TProps) {
                   forceMinSize={false}
                   aria-label="New team"
                   onClick={openCreateTeam}
-                  className="text-muted-foreground"
+                  className="text-muted-foreground size-6"
                 >
                   <PlusIcon className="size-3.5" />
                 </Button>
@@ -277,13 +272,14 @@ function SidebarFooter({ onNavigate }: TProps) {
   const openShortcuts = useCommandPanelStore((state) => state.setShortcutsOpen);
   const params = { workspace: workspace.urlKey };
   return (
-    <div className="flex items-center gap-2 border-t p-2">
+    <div className="flex items-center gap-1 p-2">
       <LinkButton
         to={isAdmin ? "/$workspace/settings" : "/$workspace/settings/account"}
         params={params}
         variant="ghost"
         size="icon"
         aria-label="Settings"
+        className="text-muted-foreground"
         onClick={onNavigate}
       >
         <SettingsIcon className="size-4" />
@@ -292,6 +288,7 @@ function SidebarFooter({ onNavigate }: TProps) {
         variant="ghost"
         size="icon"
         aria-label="Keyboard shortcuts"
+        className="text-muted-foreground"
         onClick={() => {
           onNavigate?.();
           openShortcuts(true);

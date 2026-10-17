@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"testing"
 	"time"
-
-	"ricrac/ops"
 )
 
 func enableCycles(w *World) {
@@ -17,7 +15,7 @@ func enableCycles(w *World) {
 
 func runCycleAutomations(w *World) {
 	w.t.Helper()
-	if err := ops.RunCycleAutomations(context.Background(), w.State); err != nil {
+	if err := w.B.RunCycleAutomations(context.Background()); err != nil {
 		w.t.Fatalf("cycle automations: %v", err)
 	}
 }
@@ -282,7 +280,7 @@ func TestRecurringTemplatesCreateIssuesOnSchedule(t *testing.T) {
 		"recurrence": M{"every": 1, "unit": "week", "startsAt": "-PT1M"}})
 	eq(t, template.At("recurrence", "unit").Str(), "week")
 	for range 2 {
-		if err := ops.RunRecurringTemplates(context.Background(), w.State); err != nil {
+		if err := w.B.RunRecurringTemplates(context.Background()); err != nil {
 			t.Fatalf("recurring templates: %v", err)
 		}
 	}

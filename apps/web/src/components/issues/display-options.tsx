@@ -107,21 +107,22 @@ export function DisplayOptions({ value, onChange, onReset }: TProps) {
         render={
           <Button variant="outline" size="sm">
             <SlidersHorizontalIcon className="size-4" />
-            Display
+            <span className="max-sm:sr-only">Display</span>
           </Button>
         }
       />
       <PopoverContent align="end" className="flex w-80 flex-col gap-4">
-        <div role="radiogroup" aria-label="Layout" className="grid grid-cols-2 gap-2">
+        <div role="radiogroup" aria-label="Layout" className="-mx-1 grid grid-cols-2">
           {layouts.map((layout) => (
             <Button
               key={layout.value}
               role="radio"
               aria-checked={value.layout === layout.value}
-              variant="outline"
+              variant="ghost"
               size="sm"
+              forceMinSize={false}
               data-active={value.layout === layout.value || undefined}
-              className="data-active:bg-accent data-active:text-foreground"
+              className="hit-gap-x bg-muted text-muted-foreground data-active:bg-accent data-active:text-foreground"
               onClick={() => onChange({ layout: layout.value })}
             >
               <layout.icon className="size-4" />
@@ -180,17 +181,18 @@ export function DisplayOptions({ value, onChange, onReset }: TProps) {
         </div>
         <div className="flex flex-col gap-2">
           <p className="text-muted-foreground text-xs font-medium">Display properties</p>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="-m-0.75 flex flex-wrap">
             {ISSUE_PROPERTIES.map((property) => {
               const isOn = value.properties.includes(property.value);
               return (
                 <Button
                   key={property.value}
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
+                  forceMinSize={false}
                   aria-pressed={isOn}
                   data-active={isOn || undefined}
-                  className="data-active:bg-accent data-active:text-foreground text-muted-foreground"
+                  className="hit-gap bg-muted text-muted-foreground data-active:bg-accent data-active:text-foreground h-7.5 px-2"
                   onClick={() =>
                     onChange({
                       properties: isOn

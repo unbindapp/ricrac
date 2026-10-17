@@ -45,7 +45,8 @@ export type TIssueListProps = {
   rowActions?: (issue: Issue) => ReactNode;
 };
 
-const ROW_HEIGHT = 36;
+const ROW_HEIGHT = 44;
+const HEADER_HEIGHT = 36;
 const OVERSCAN = 12;
 
 type TListItem =
@@ -206,7 +207,7 @@ function VirtualIssueList({
   const virtualizer = useVirtualizer({
     count: items.length,
     getScrollElement: () => scrollElement,
-    estimateSize: () => ROW_HEIGHT,
+    estimateSize: (index) => (items[index].kind === "header" ? HEADER_HEIGHT : ROW_HEIGHT),
     overscan: OVERSCAN,
     scrollMargin,
     getItemKey: (index) => items[index].key,
@@ -275,7 +276,7 @@ function VirtualIssueList({
   return (
     <>
       <div ref={containerRef}>
-        <List>
+        <List flush>
           <div className="relative w-full" style={{ height: virtualizer.getTotalSize() }}>
             {virtualItems.map((virtualItem) => {
               const item = items[virtualItem.index];

@@ -39,6 +39,7 @@ import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PropertyRow } from "@/components/layout/property-row";
 import { EntityNotFound } from "@/components/navigation/not-found-template";
+import { useDeviceSize } from "@/components/providers/device-size-provider";
 import { useNow } from "@/components/providers/now-provider";
 import { AutosaveMarkdown } from "@/components/shared/autosave-markdown";
 import { InlineText } from "@/components/shared/inline-text";
@@ -123,8 +124,10 @@ function IssueDetailContent({
   const { mutate: setSubscribed } = useIssueSubscriptionMutation(workspace.id);
   const { mutate: toggleReaction } = useIssueReactionMutation(workspace.id);
   const [isSettingSla, setIsSettingSla] = useState(false);
+  const { size } = useDeviceSize();
 
   const isPeek = variant === "peek";
+  const hasPropertiesAside = size === "lg" || size === "xl";
   const { data: customerNeeds } = useQuery({
     ...customerNeedsQuery(workspace.id, { issue: issue.identifier }),
     enabled: canEdit,
@@ -163,7 +166,7 @@ function IssueDetailContent({
   );
 
   const main = (
-    <div className="flex min-w-0 flex-1 flex-col gap-6">
+    <div className="flex min-w-0 flex-1 flex-col gap-8">
       <LifecycleBanner issue={issue} />
       <TriageBanner issue={issue} />
       <div className="flex flex-col gap-2">
@@ -191,6 +194,11 @@ function IssueDetailContent({
           <ReactionBar reactions={reactions} disabled={!canEdit} onToggle={react} />
         )}
       </div>
+      {!isPeek && !hasPropertiesAside && (
+        <section aria-label="Properties" className="rounded-lg border p-3">
+          {properties}
+        </section>
+      )}
       <SubIssues issue={issue} />
       <IssueRelations issue={issue} />
       <IssueAttachments issue={issue} />
@@ -234,15 +242,25 @@ function IssueDetailContent({
   }
 
   return (
-    <div className="flex w-full flex-col gap-6">
+    <>
       <IssueDetailHeader issue={issue} variant="page" onSetSla={() => setIsSettingSla(true)} />
-      <div className="flex w-full flex-col gap-6 lg:flex-row lg:items-start">
-        {main}
-        <aside aria-label="Properties" className="w-full shrink-0 lg:sticky lg:top-0 lg:w-72">
-          <div className="rounded-lg border p-2">{properties}</div>
-        </aside>
+      <div className="-mx-4 -mt-4 -mb-8 flex flex-1">
+        <div className="flex min-w-0 flex-1 justify-center px-4 py-6 sm:px-10 sm:py-8">
+          <div className="flex w-full max-w-3xl">{main}</div>
+        </div>
+        {hasPropertiesAside && (
+          <aside
+            aria-label="Properties"
+            className="flex w-80 shrink-0 flex-col gap-2 border-l px-5 py-4"
+          >
+            <h2 className="text-muted-foreground flex h-7 items-center text-xs font-medium">
+              Properties
+            </h2>
+            {properties}
+          </aside>
+        )}
       </div>
-    </div>
+    </>
   );
 }
 

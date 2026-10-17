@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { Badge } from "@/components/ui/badge";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { unreadCountQuery } from "@/lib/queries/notifications";
 
@@ -10,8 +9,8 @@ export function InboxUnreadBadge() {
   const { data: unread = 0 } = useQuery(unreadCountQuery(workspace.id));
   if (unread === 0) return null;
   return (
-    <Badge variant="muted" aria-label={`${unread} unread`}>
+    <span aria-label={`${unread} unread`} className="text-muted-foreground text-xs tabular-nums">
       {unread > 99 ? "99+" : unread}
-    </Badge>
+    </span>
   );
 }

@@ -1,27 +1,35 @@
 // Package e2e holds the end-to-end tests: each starts on a fresh database (cloned from a migrated
-// template on the compose Postgres) with a workspace, and calls operations as the API does.
+// template on the compose Postgres) with a workspace, and talks to the server only through its
+// HTTP router. backend_test.go is the one file that knows the server's packages.
 package e2e
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
+	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"strings"
 	"sync"
 	"testing"
+	"unicode"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-
-	"ricrac/app"
-	"ricrac/ops"
+	pgxuuid "github.com/vgarvardt/pgx-google-uuid/v5"
 )
 
 type M = map[string]any
+
+const publicURL = "http://localhost:3000"
 
 func databaseURL() string {
 	if url := os.Getenv("DATABASE_URL"); url != "" {
@@ -59,12 +67,7 @@ func template() (string, error) {
 			templateErr = err
 			return
 		}
-		pool, err := app.Connect(ctx, withDatabase(databaseURL(), templateName))
-		if err != nil {
-			templateErr = err
-			return
-		}
-		pool.Close()
+		templateErr = migrateDatabase(ctx, withDatabase(databaseURL(), templateName))
 	})
 	return templateName, templateErr
 }
@@ -88,7 +91,7 @@ func TestMain(m *testing.M) {
 }
 
 // freshDB is a new database with the schema, dropped when the test ends.
-func freshDB(t *testing.T) *pgxpool.Pool {
+func freshDB(t *testing.T) string {
 	t.Helper()
 	tmpl, err := template()
 	if err != nil {
@@ -104,126 +107,130 @@ func freshDB(t *testing.T) *pgxpool.Pool {
 	if _, err := admin.Exec(ctx, fmt.Sprintf("CREATE DATABASE %s TEMPLATE %s", name, tmpl)); err != nil {
 		t.Fatalf("create database: %v", err)
 	}
-	pool, err := app.Connect(ctx, withDatabase(databaseURL(), name))
-	if err != nil {
-		t.Fatalf("connect to test database: %v", err)
-	}
 	t.Cleanup(func() {
-		pool.Close()
 		if admin, err := pgx.Connect(context.Background(), databaseURL()); err == nil {
 			_, _ = admin.Exec(context.Background(), "DROP DATABASE IF EXISTS "+name+" WITH (FORCE)")
 			admin.Close(context.Background())
 		}
 	})
-	return pool
+	return withDatabase(databaseURL(), name)
 }
 
-func testConfig() app.Config {
-	return app.Config{
-		PublicURL:     "http://localhost:3000",
-		SecretKey:     "test-secret-key-that-is-long-enough-123",
-		MaxUploadSize: 1024 * 1024,
+func openPool(t *testing.T, url string) *pgxpool.Pool {
+	t.Helper()
+	config, err := pgxpool.ParseConfig(url)
+	if err != nil {
+		t.Fatal(err)
 	}
+	config.ConnConfig.RuntimeParams["timezone"] = "UTC"
+	config.AfterConnect = func(_ context.Context, conn *pgx.Conn) error {
+		pgxuuid.Register(conn.TypeMap())
+		return nil
+	}
+	pool, err := pgxpool.NewWithConfig(context.Background(), config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(pool.Close)
+	return pool
 }
 
 // World is a workspace "acme" owned by Ann, with the team ENG.
 type World struct {
 	t         *testing.T
-	State     *app.State
+	DB        *pgxpool.Pool
+	B         *backend
+	Router    http.Handler
 	Workspace uuid.UUID
-	Ann       *app.Ctx
+	Ann       *Actor
+}
+
+// Actor is someone calling operations in a workspace, through the web app's session.
+type Actor struct {
+	w         *World
+	User      uuid.UUID
+	Workspace uuid.UUID
 }
 
 func world(t *testing.T) *World {
 	t.Helper()
-	state := app.NewState(freshDB(t), testConfig())
-	w := &World{t: t, State: state}
+	url := freshDB(t)
+	w := &World{t: t, DB: openPool(t, url)}
+	w.B = newBackend(t, url)
+	w.Router = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) { w.B.Router().ServeHTTP(rw, r) })
 	ann := w.addUser("ann@acme.test", "Ann Smith")
-	ctx := context.Background()
-	err := pgx.BeginFunc(ctx, state.DB, func(tx pgx.Tx) error {
-		workspace, err := app.One[uuid.UUID](ctx, tx, "INSERT INTO workspaces (name, url_key) VALUES ('Acme', 'acme') RETURNING id")
-		if err != nil {
-			return err
-		}
-		w.Workspace = workspace
-		if err := app.Exec(ctx, tx, "INSERT INTO workspace_members (workspace_id, user_id, role) VALUES ($1, $2, 'owner')", workspace, ann); err != nil {
-			return err
-		}
-		if err := ops.WorkspaceDefaults(ctx, tx, workspace); err != nil {
-			return err
-		}
-		_, err = ops.CreateTeam(ctx, tx, workspace, ann, "Engineering", "ENG")
-		return err
-	})
-	if err != nil {
-		t.Fatalf("world: %v", err)
-	}
-	w.Ann = w.ctx(ann, w.Workspace)
+	w.Workspace = w.newWorkspace("Acme", "acme", "Engineering", "ENG", ann)
+	w.Ann = &Actor{w: w, User: ann, Workspace: w.Workspace}
 	return w
+}
+
+// newWorkspace is a workspace owned by owner with its defaults and one team.
+func (w *World) newWorkspace(name, urlKey, teamName, teamKey string, owner uuid.UUID) uuid.UUID {
+	w.t.Helper()
+	ctx := context.Background()
+	var workspace uuid.UUID
+	err := w.DB.QueryRow(ctx, "INSERT INTO workspaces (name, url_key) VALUES ($1, $2) RETURNING id", name, urlKey).Scan(&workspace)
+	if err != nil {
+		w.t.Fatalf("workspace: %v", err)
+	}
+	w.exec("INSERT INTO workspace_members (workspace_id, user_id, role) VALUES ($1, $2, 'owner')", workspace, owner)
+	if err := w.B.WorkspaceDefaults(ctx, workspace); err != nil {
+		w.t.Fatalf("workspace defaults: %v", err)
+	}
+	if _, err := w.B.CreateTeam(ctx, workspace, owner, teamName, teamKey); err != nil {
+		w.t.Fatalf("team: %v", err)
+	}
+	return workspace
 }
 
 func (w *World) addUser(email, name string) uuid.UUID {
 	w.t.Helper()
-	id, err := app.One[uuid.UUID](context.Background(), w.State.DB,
-		"INSERT INTO users (email, name, display_name) VALUES ($1, $2, $3) RETURNING id", email, name, app.DisplayName(name, email))
-	if err != nil {
-		w.t.Fatalf("add user: %v", err)
-	}
-	return id
+	return scalar[uuid.UUID](w, "INSERT INTO users (email, name, display_name) VALUES ($1, $2, $3) RETURNING id", email, name, displayName(name, email))
 }
 
-func (w *World) ctx(user, workspace uuid.UUID) *app.Ctx {
-	w.t.Helper()
-	c, err := app.LoadCtx(context.Background(), w.State, user, workspace, app.EveryAccess)
-	if err != nil || c == nil {
-		w.t.Fatalf("load ctx: %v", err)
+// displayName is how users get their @handle: the first name, lowercased, or the email's local part.
+func displayName(name, email string) string {
+	var first string
+	if words := strings.Fields(name); len(words) > 0 {
+		first = strings.Map(func(r rune) rune {
+			if unicode.IsLetter(r) || unicode.IsDigit(r) {
+				return r
+			}
+			return -1
+		}, words[0])
 	}
-	return c
+	if first != "" {
+		return strings.ToLower(first)
+	}
+	local, _, _ := strings.Cut(email, "@")
+	if local == "" {
+		return "user"
+	}
+	return strings.ToLower(local)
+}
+
+func (w *World) actor(user, workspace uuid.UUID) *Actor {
+	return &Actor{w: w, User: user, Workspace: workspace}
 }
 
 // member adds someone to the workspace with role (member, admin or guest).
-func (w *World) member(email, name, role string) *app.Ctx {
+func (w *World) member(email, name, role string) *Actor {
 	w.t.Helper()
 	user := w.addUser(email, name)
 	w.exec("INSERT INTO workspace_members (workspace_id, user_id, role) VALUES ($1, $2, $3)", w.Workspace, user, role)
-	return w.ctx(user, w.Workspace)
+	return w.actor(user, w.Workspace)
 }
 
 // secondWorkspace is another workspace owned by Ann, with one team.
 func (w *World) secondWorkspace(name, urlKey, teamKey string) uuid.UUID {
 	w.t.Helper()
-	ctx := context.Background()
-	var workspace uuid.UUID
-	err := pgx.BeginFunc(ctx, w.State.DB, func(tx pgx.Tx) error {
-		var err error
-		if workspace, err = app.One[uuid.UUID](ctx, tx, "INSERT INTO workspaces (name, url_key) VALUES ($1, $2) RETURNING id", name, urlKey); err != nil {
-			return err
-		}
-		if err := app.Exec(ctx, tx, "INSERT INTO workspace_members (workspace_id, user_id, role) VALUES ($1, $2, 'owner')", workspace, w.Ann.User); err != nil {
-			return err
-		}
-		if err := ops.WorkspaceDefaults(ctx, tx, workspace); err != nil {
-			return err
-		}
-		_, err = ops.CreateTeam(ctx, tx, workspace, w.Ann.User, name, teamKey)
-		return err
-	})
-	if err != nil {
-		w.t.Fatalf("second workspace: %v", err)
-	}
-	return workspace
+	return w.newWorkspace(name, urlKey, name, teamKey, w.Ann.User)
 }
 
 // createTeam adds a team to the workspace with Ann as its first member.
 func (w *World) createTeam(name, key string) uuid.UUID {
 	w.t.Helper()
-	ctx := context.Background()
-	var team uuid.UUID
-	err := pgx.BeginFunc(ctx, w.State.DB, func(tx pgx.Tx) error {
-		var err error
-		team, err = ops.CreateTeam(ctx, tx, w.Workspace, w.Ann.User, name, key)
-		return err
-	})
+	team, err := w.B.CreateTeam(context.Background(), w.Workspace, w.Ann.User, name, key)
 	if err != nil {
 		w.t.Fatalf("create team: %v", err)
 	}
@@ -232,7 +239,7 @@ func (w *World) createTeam(name, key string) uuid.UUID {
 
 func (w *World) exec(sql string, args ...any) {
 	w.t.Helper()
-	if _, err := w.State.DB.Exec(context.Background(), sql, args...); err != nil {
+	if _, err := w.DB.Exec(context.Background(), sql, args...); err != nil {
 		w.t.Fatalf("exec %s: %v", sql, err)
 	}
 }
@@ -240,7 +247,11 @@ func (w *World) exec(sql string, args ...any) {
 // strings reads one text column of every row.
 func (w *World) strings(sql string, args ...any) []string {
 	w.t.Helper()
-	list, err := app.All[string](context.Background(), w.State.DB, sql, args...)
+	rows, err := w.DB.Query(context.Background(), sql, args...)
+	if err != nil {
+		w.t.Fatalf("query %s: %v", sql, err)
+	}
+	list, err := pgx.CollectRows(rows, pgx.RowTo[string])
 	if err != nil {
 		w.t.Fatalf("query %s: %v", sql, err)
 	}
@@ -253,67 +264,103 @@ func (w *World) strings(sql string, args ...any) []string {
 // scalar reads one value.
 func scalar[T any](w *World, sql string, args ...any) T {
 	w.t.Helper()
-	value, err := app.One[T](context.Background(), w.State.DB, sql, args...)
-	if err != nil {
+	var value T
+	if err := w.DB.QueryRow(context.Background(), sql, args...).Scan(&value); err != nil {
 		w.t.Fatalf("query %s: %v", sql, err)
 	}
 	return value
 }
 
-func tryCall(c *app.Ctx, name string, args M) (J, error) {
-	op := ops.Find(name)
-	if op == nil {
-		panic("no operation " + name)
-	}
-	fresh, err := app.LoadCtx(context.Background(), c.State, c.User, c.Workspace, c.Scopes)
-	if err != nil {
-		return J{}, err
-	}
-	if fresh == nil {
-		return J{}, app.Forbidden("Not a member of this workspace")
-	}
+// session is the Cookie header of a signed-in user.
+func (w *World) session(user uuid.UUID) string {
+	return w.B.SessionCookie(user)
+}
+
+// callError is an operation's error answer.
+type callError struct {
+	Status  int
+	Message string
+}
+
+func (e *callError) Error() string { return fmt.Sprintf("%d: %s", e.Status, e.Message) }
+
+// tryCall runs an operation as the web app does: POST /v1/ops/{name} with the session.
+func tryCall(c *Actor, name string, args M) (J, error) {
 	if args == nil {
 		args = M{}
 	}
-	// The arguments go through JSON, as they do in the API.
-	var decoded M
-	if err := json.Unmarshal(app.Marshal(args), &decoded); err != nil {
-		panic(err)
+	req := httptest.NewRequest("POST", "/v1/ops/"+name, bytes.NewReader(marshal(args)))
+	req.Header.Set("Cookie", c.w.session(c.User))
+	req.Header.Set("X-Ricrac", "1")
+	req.Header.Set("X-Ricrac-Workspace", c.Workspace.String())
+	req.Header.Set("Content-Type", "application/json")
+	status, value := send(c.w.Router, req)
+	if status != http.StatusOK {
+		message := value.At("error").Str()
+		if message == "" {
+			message = value.JSON()
+		}
+		return J{}, &callError{status, message}
 	}
-	result, err := op.Call(fresh, decoded)
-	if err != nil {
-		return J{}, err
-	}
-	var value any
-	if err := json.Unmarshal(app.Marshal(result), &value); err != nil {
-		panic(err)
-	}
-	if op.Result != nil {
-		if err := validate(op.Result, value, name); err != nil {
+	if schema := c.w.B.ResultSchema(name); schema != nil {
+		if err := validate(schema, value.V, name); err != nil {
 			panic(fmt.Sprintf("%s answered something its result schema doesn't allow: %v", name, err))
 		}
 	}
-	return J{value}, nil
+	return value, nil
 }
 
 // call calls an operation and returns its result, failing the test on an error.
-func call(t *testing.T, c *app.Ctx, name string, args M) J {
+func call(t *testing.T, c *Actor, name string, args M) J {
 	t.Helper()
 	value, err := tryCall(c, name, args)
 	if err != nil {
-		t.Fatalf("%s failed: %s", name, app.AsError(err).Message)
+		t.Fatalf("%s failed: %s", name, err.(*callError).Message)
 	}
 	return value
 }
 
 // fails calls an operation that must fail, returning the error message.
-func fails(t *testing.T, c *app.Ctx, name string, args M) string {
+func fails(t *testing.T, c *Actor, name string, args M) string {
 	t.Helper()
 	value, err := tryCall(c, name, args)
 	if err == nil {
-		t.Fatalf("%s should have failed but returned %s", name, app.Marshal(value.V))
+		t.Fatalf("%s should have failed but returned %s", name, marshal(value.V))
 	}
-	return app.AsError(err).Message
+	return err.(*callError).Message
+}
+
+func send(router http.Handler, request *http.Request) (int, J) {
+	recorder := httptest.NewRecorder()
+	router.ServeHTTP(recorder, request)
+	body, _ := io.ReadAll(recorder.Result().Body)
+	var value any
+	if err := json.Unmarshal(body, &value); err != nil {
+		value = string(body)
+	}
+	return recorder.Code, J{value}
+}
+
+// marshal encodes JSON without escaping <, > and &.
+func marshal(value any) []byte {
+	var buffer bytes.Buffer
+	encoder := json.NewEncoder(&buffer)
+	encoder.SetEscapeHTML(false)
+	_ = encoder.Encode(value)
+	return bytes.TrimRight(buffer.Bytes(), "\n")
+}
+
+// randomSecret is a random URL-safe secret with a readable prefix, like the server makes.
+func randomSecret(prefix string) string {
+	bytes := make([]byte, 32)
+	_, _ = rand.Read(bytes)
+	return prefix + base64.RawURLEncoding.EncodeToString(bytes)
+}
+
+// secretHash is how the server stores secrets.
+func secretHash(secret string) string {
+	sum := sha256.Sum256([]byte(secret))
+	return hex.EncodeToString(sum[:])
 }
 
 // J is a JSON value with accessors for tests.
@@ -380,7 +427,7 @@ func (j J) Len() int {
 }
 
 func (j J) JSON() string {
-	return string(app.Marshal(j.V))
+	return string(marshal(j.V))
 }
 
 // Strings is the text of each item of a list, or of the key of each item.

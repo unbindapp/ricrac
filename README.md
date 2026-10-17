@@ -78,5 +78,5 @@ MCP server and a REST API, with the same workspaces, operations and permissions.
 
 ## Development
 
-See AGENTS.md. In short: `docker compose up -d`, then `go run .` in `apps/server` and
+See AGENTS.md. In short: `docker compose up -d`, then `go run ./cmd/server` in `apps/server` and
 `bun dev` in `apps/web`.

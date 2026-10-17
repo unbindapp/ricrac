@@ -54,11 +54,12 @@ export function WorkspaceSwitcher({ onNavigate }: { onNavigate?: () => void }) {
               size="sm"
               forceMinSize={false}
               aria-label="Switch workspace"
-              className="min-w-0 flex-1 justify-start"
+              className="h-8 min-w-0 flex-1 justify-start px-1.5"
             >
               <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} />
               <span className="min-w-0 truncate">{workspace.name}</span>
               <ChevronDownIcon className="text-muted-foreground size-3.5" />
+              <span className="flex-1" />
             </Button>
           }
         />

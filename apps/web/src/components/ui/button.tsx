@@ -10,7 +10,7 @@ export const minButtonSizeEnforcerClassName =
   "before:w-full before:h-full before:min-w-[44px] before:min-h-[44px] before:z-[-1] before:bg-transparent before:absolute before:-translate-y-1/2 before:top-1/2 before:-translate-x-1/2 before:left-1/2";
 
 const buttonVariants = cva(
-  "relative group/button focus-visible:z-[1] text-center leading-tight max-w-full select-none z-0 touch-manipulation gap-1.5 rounded-md text-sm font-medium focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-primary/8-10 disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 data-pending:[&>*:not([data-slot=button-spinner])]:opacity-0",
+  "relative group/button focus-visible:z-[1] text-center leading-tight max-w-full select-none z-0 touch-manipulation gap-1.5 rounded-md text-sm font-medium focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-primary/8-10 disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&>[data-slot=button-spinner]+svg]:hidden data-pending:[&:not(:has(>[data-slot=button-spinner]+svg))>*:not([data-slot=button-spinner])]:opacity-0",
   {
     variants: {
       variant: {
@@ -26,7 +26,7 @@ const buttonVariants = cva(
           "bg-process text-process-foreground has-hover:hover:bg-process/85 active:bg-process/85",
         change: "bg-change text-change-foreground has-hover:hover:bg-change/85 active:bg-change/85",
         outline:
-          "border border-border bg-background has-hover:hover:bg-border active:bg-border has-hover:hover:text-foreground active:text-foreground",
+          "border border-border bg-secondary shadow-xs shadow-shadow-color/shadow-opacity has-hover:hover:bg-accent active:bg-accent has-hover:hover:text-foreground active:text-foreground",
         "outline-muted":
           "border border-border bg-background has-hover:hover:bg-card active:bg-card has-hover:hover:text-foreground active:text-foreground",
         "outline-foreground":
@@ -40,7 +40,7 @@ const buttonVariants = cva(
         secondary:
           "bg-secondary text-secondary-foreground has-hover:hover:bg-secondary active:bg-secondary",
         ghost:
-          "has-hover:hover:bg-border has-hover:hover:text-foreground active:bg-border active:text-foreground",
+          "has-hover:hover:bg-accent has-hover:hover:text-foreground active:bg-accent active:text-foreground",
         "ghost-destructive":
           "text-destructive has-hover:hover:bg-destructive/4-10 has-hover:hover:text-destructive active:bg-destructive/4-10 active:text-destructive",
         "ghost-success":
@@ -61,9 +61,9 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 has-hover:hover:underline active:underline",
       },
       size: {
-        default: "h-9 px-4",
-        sm: "h-7 px-2.5",
-        icon: "size-8 shrink-0 flex items-center justify-center",
+        default: "h-8 px-3",
+        sm: "h-7 px-2",
+        icon: "size-7 shrink-0 flex items-center justify-center",
       },
       loadingState: {
         default: "",
@@ -109,7 +109,7 @@ const buttonVariants = cva(
 );
 
 const spinnerVariants = cva(
-  "pointer-events-none opacity-0 group-data-pending/button:opacity-100 absolute top-1/2 left-1/2 -translate-1/2 animate-spin group-data-submitting/button:opacity-100",
+  "pointer-events-none opacity-0 group-data-pending/button:opacity-100 absolute top-1/2 left-1/2 -translate-1/2 [&:has(+svg)]:static [&:has(+svg)]:translate-none animate-spin group-data-submitting/button:opacity-100",
   {
     variants: {
       size: {
@@ -175,7 +175,13 @@ function Button({
             data-slot="button-spinner"
             className={cn(spinnerVariants(spinnerVariantProps))}
           />
-          {isText ? <p className="min-w-0 shrink">{children}</p> : children}
+          {isText ? (
+            <p className="min-w-0 shrink">{children}</p>
+          ) : (
+            React.Children.map(children, (c) =>
+              typeof c === "string" || typeof c === "number" ? <span>{c}</span> : c,
+            )
+          )}
         </>
       ) : isText ? (
         <p className="min-w-0 shrink">{children}</p>

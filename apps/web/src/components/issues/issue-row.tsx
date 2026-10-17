@@ -15,7 +15,7 @@ const MAX_ROW_LABELS = 3;
 
 /** Empty controls stay out of sight until the row is hovered or the control is focused or open. */
 export const hiddenUntilHover =
-  "opacity-0 group-hover/row:opacity-100 group-focus-within/row:opacity-100 focus-visible:opacity-100 data-popup-open:opacity-100";
+  "opacity-0 touch:opacity-100 group-hover/row:opacity-100 group-focus-within/row:opacity-100 focus-visible:opacity-100 data-popup-open:opacity-100";
 
 type TProps = {
   issue: Issue;
@@ -66,7 +66,7 @@ export function IssueRow({
       }}
       onMouseEnter={() => onFocus(issue)}
       onFocus={() => onFocus(issue)}
-      className="group/row has-hover:hover:bg-accent data-selected:bg-primary/2-10 data-selected:has-hover:hover:bg-primary/3-10 data-active:bg-accent data-focused:bg-accent focus-visible:ring-primary/8-10 flex h-9 w-full cursor-default items-center gap-2 border-b px-3 text-sm outline-hidden focus-visible:ring-1 focus-visible:ring-inset"
+      className="group/row has-hover:hover:bg-muted data-focused:bg-muted data-active:bg-accent data-selected:bg-primary/2-10 data-selected:has-hover:hover:bg-primary/3-10 focus-visible:ring-primary/8-10 flex h-11 w-full cursor-default items-center gap-2 px-4 text-sm outline-hidden focus-visible:ring-1 focus-visible:ring-inset sm:px-6"
     >
       {show("priority") && (
         <PriorityPicker
@@ -78,7 +78,7 @@ export function IssueRow({
         />
       )}
       {show("identifier") && (
-        <span className="text-muted-foreground w-16 shrink-0 truncate font-mono text-xs">
+        <span className="text-muted-foreground w-16 shrink-0 truncate font-mono text-xs max-sm:hidden">
           {issue.identifier}
         </span>
       )}
@@ -93,7 +93,7 @@ export function IssueRow({
       )}
       <span
         data-nested={depth > 0 || undefined}
-        className="min-w-0 flex-1 truncate data-nested:pl-4"
+        className="min-w-0 flex-1 truncate font-medium data-nested:pl-4"
       >
         {issue.title}
       </span>

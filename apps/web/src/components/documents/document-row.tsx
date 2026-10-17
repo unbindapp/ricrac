@@ -26,7 +26,7 @@ export function DocumentRow({ document, showParent = true }: TProps) {
       to="/$workspace/document/$slug"
       params={{ workspace: workspace.urlKey, slug: entitySlug(document) }}
       data-trashed={document.trashed || undefined}
-      className="has-hover:hover:bg-accent focus-visible:bg-accent data-trashed:text-muted-foreground flex h-9 w-full items-center gap-3 border-b px-3 text-sm outline-hidden last:border-b-0"
+      className="has-hover:hover:bg-muted focus-visible:bg-muted data-trashed:text-muted-foreground flex h-9 w-full items-center gap-3 border-b px-3 text-sm outline-hidden group-data-flush/list:h-11 group-data-flush/list:px-6 last:border-b-0"
     >
       <EntityIcon icon={document.icon} color={document.color} fallback={FileTextIcon} />
       <span className="min-w-0 flex-1 truncate font-medium">{document.title}</span>

@@ -81,7 +81,7 @@ function InitiativesPage() {
           {scope === "trash" ? (
             <TrashedInitiatives initiatives={initiatives} />
           ) : (
-            <List>
+            <List flush>
               <InitiativeListHeader />
               {INITIATIVE_STATUSES.map((status) => (
                 <StatusGroup
@@ -103,7 +103,7 @@ function TrashedInitiatives({ initiatives }: { initiatives: Initiative[] }) {
   const { workspace, canEdit } = useWorkspace();
   const { mutate: change, isPending, variables } = useInitiativeLifecycleMutation(workspace.id);
   return (
-    <List>
+    <List flush>
       {initiatives.map((initiative) => (
         <TrashedRow
           key={initiative.id}
@@ -142,7 +142,7 @@ function StatusGroup({
   const ids = new Set(initiatives.map((initiative) => initiative.id));
   return (
     <div role="presentation" className="contents">
-      <div className="bg-muted flex h-9 items-center border-b px-1.5">
+      <div className="bg-muted flex h-9 items-center px-1.5 group-data-flush/list:px-4">
         <Button
           variant="ghost"
           size="sm"
