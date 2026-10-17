@@ -11,6 +11,7 @@ import (
 	attachment_service "ricrac/internal/services/attachment"
 	automation_service "ricrac/internal/services/automation"
 	comment_service "ricrac/internal/services/comment"
+	email_service "ricrac/internal/services/email"
 	events_service "ricrac/internal/services/events"
 	issue_service "ricrac/internal/services/issue"
 	label_service "ricrac/internal/services/label"
@@ -20,6 +21,9 @@ import (
 	search_service "ricrac/internal/services/search"
 	seed_service "ricrac/internal/services/seed"
 	signin_service "ricrac/internal/services/signin"
+	state_service "ricrac/internal/services/state"
+	team_service "ricrac/internal/services/team"
+	workspace_service "ricrac/internal/services/workspace"
 )
 
 type Server struct {
@@ -43,4 +47,8 @@ type Server struct {
 	AccountService      *account_service.AccountService
 	OAuthService        *oauth_service.OAuthService
 	SigninService       *signin_service.SigninService
+	EmailService        *email_service.EmailService
+	WorkspaceService    *workspace_service.WorkspaceService
+	TeamService         *team_service.TeamService
+	StateService        *state_service.StateService
 }

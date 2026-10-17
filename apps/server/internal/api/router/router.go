@@ -23,6 +23,9 @@ import (
 	oauthserver_handler "ricrac/internal/api/handlers/oauthserver"
 	search_handler "ricrac/internal/api/handlers/search"
 	signin_handler "ricrac/internal/api/handlers/signin"
+	states_handler "ricrac/internal/api/handlers/states"
+	teams_handler "ricrac/internal/api/handlers/teams"
+	workspace_handler "ricrac/internal/api/handlers/workspace"
 	"ricrac/internal/api/meta"
 	"ricrac/internal/api/middleware"
 	"ricrac/internal/api/oapi"
@@ -136,6 +139,9 @@ func unmatchedHandler(fallback Fallback) http.HandlerFunc {
 // RegisterHandlers puts every handler group's operations on the registry, in the order they
 // are listed.
 func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
+	workspace_handler.RegisterHandlers(srv, reg)
+	teams_handler.RegisterHandlers(srv, reg)
+	states_handler.RegisterHandlers(srv, reg)
 	labels_handler.RegisterHandlers(srv, reg)
 	comments_handler.RegisterHandlers(srv, reg)
 	attachments_handler.RegisterHandlers(srv, reg)

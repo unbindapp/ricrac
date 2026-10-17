@@ -11,6 +11,7 @@ import (
 	attachment_service "ricrac/internal/services/attachment"
 	automation_service "ricrac/internal/services/automation"
 	comment_service "ricrac/internal/services/comment"
+	email_service "ricrac/internal/services/email"
 	events_service "ricrac/internal/services/events"
 	issue_service "ricrac/internal/services/issue"
 	label_service "ricrac/internal/services/label"
@@ -20,6 +21,9 @@ import (
 	search_service "ricrac/internal/services/search"
 	seed_service "ricrac/internal/services/seed"
 	signin_service "ricrac/internal/services/signin"
+	state_service "ricrac/internal/services/state"
+	team_service "ricrac/internal/services/team"
+	workspace_service "ricrac/internal/services/workspace"
 )
 
 // New wires the services on the database. waker wakes the background senders.
@@ -45,5 +49,9 @@ func New(cfg config.Config, db *ent.Client, waker events_service.Waker) *Server 
 	srv.AccountService = account_service.NewAccountService(cfg, repo, srv.AccessService, srv.SeedService)
 	srv.OAuthService = oauth_service.NewOAuthService(cfg, repo, srv.AccountService)
 	srv.SigninService = signin_service.NewSigninService(cfg, srv.Keys, repo)
+	srv.EmailService = email_service.NewEmailService(cfg, repo)
+	srv.WorkspaceService = workspace_service.NewWorkspaceService(cfg, repo, srv.ResolveService, srv.EventsService, srv.EmailService)
+	srv.TeamService = team_service.NewTeamService(cfg, repo, srv.ResolveService, srv.EventsService, srv.IssueService, srv.SeedService, srv.WorkspaceService)
+	srv.StateService = state_service.NewStateService(repo, srv.ResolveService, srv.EventsService, srv.IssueService, srv.TeamService)
 	return srv
 }

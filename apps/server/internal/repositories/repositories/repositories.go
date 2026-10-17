@@ -11,6 +11,7 @@ import (
 	attachment_repo "ricrac/internal/repositories/attachment"
 	automation_repo "ricrac/internal/repositories/automation"
 	comment_repo "ricrac/internal/repositories/comment"
+	email_repo "ricrac/internal/repositories/email"
 	events_repo "ricrac/internal/repositories/events"
 	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
@@ -19,6 +20,9 @@ import (
 	resolve_repo "ricrac/internal/repositories/resolve"
 	search_repo "ricrac/internal/repositories/search"
 	seed_repo "ricrac/internal/repositories/seed"
+	state_repo "ricrac/internal/repositories/state"
+	team_repo "ricrac/internal/repositories/team"
+	workspace_repo "ricrac/internal/repositories/workspace"
 )
 
 //go:generate go run -mod=mod github.com/vburenin/ifacemaker -f "*.go" -i RepositoriesInterface -p repositories -s Repositories -o repositories_iface.go
@@ -38,6 +42,10 @@ type Repositories struct {
 	search       search_repo.SearchRepositoryInterface
 	account      account_repo.AccountRepositoryInterface
 	oauth        oauth_repo.OAuthRepositoryInterface
+	workspace    workspace_repo.WorkspaceRepositoryInterface
+	team         team_repo.TeamRepositoryInterface
+	state        state_repo.StateRepositoryInterface
+	email        email_repo.EmailRepositoryInterface
 }
 
 func NewRepositories(db *ent.Client) *Repositories {
@@ -57,6 +65,10 @@ func NewRepositories(db *ent.Client) *Repositories {
 		search:       search_repo.NewSearchRepository(db),
 		account:      account_repo.NewAccountRepository(db),
 		oauth:        oauth_repo.NewOAuthRepository(db),
+		workspace:    workspace_repo.NewWorkspaceRepository(db),
+		team:         team_repo.NewTeamRepository(db),
+		state:        state_repo.NewStateRepository(db),
+		email:        email_repo.NewEmailRepository(db),
 	}
 }
 
@@ -123,4 +135,20 @@ func (r *Repositories) Account() account_repo.AccountRepositoryInterface {
 
 func (r *Repositories) OAuth() oauth_repo.OAuthRepositoryInterface {
 	return r.oauth
+}
+
+func (r *Repositories) Workspace() workspace_repo.WorkspaceRepositoryInterface {
+	return r.workspace
+}
+
+func (r *Repositories) Team() team_repo.TeamRepositoryInterface {
+	return r.team
+}
+
+func (r *Repositories) State() state_repo.StateRepositoryInterface {
+	return r.state
+}
+
+func (r *Repositories) Email() email_repo.EmailRepositoryInterface {
+	return r.email
 }

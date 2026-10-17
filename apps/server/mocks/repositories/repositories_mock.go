@@ -13,6 +13,7 @@ import (
 	"ricrac/internal/repositories/attachment"
 	"ricrac/internal/repositories/automation"
 	"ricrac/internal/repositories/comment"
+	"ricrac/internal/repositories/email"
 	"ricrac/internal/repositories/events"
 	"ricrac/internal/repositories/issue"
 	"ricrac/internal/repositories/label"
@@ -21,6 +22,9 @@ import (
 	"ricrac/internal/repositories/resolve"
 	"ricrac/internal/repositories/search"
 	"ricrac/internal/repositories/seed"
+	"ricrac/internal/repositories/state"
+	"ricrac/internal/repositories/team"
+	"ricrac/internal/repositories/workspace"
 	"time"
 
 	mock "github.com/stretchr/testify/mock"
@@ -288,6 +292,52 @@ func (_c *RepositoriesMock_Comment_Call) Return(commentRepositoryInterface comme
 }
 
 func (_c *RepositoriesMock_Comment_Call) RunAndReturn(run func() comment_repo.CommentRepositoryInterface) *RepositoriesMock_Comment_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Email provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Email() email_repo.EmailRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Email")
+	}
+
+	var r0 email_repo.EmailRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() email_repo.EmailRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(email_repo.EmailRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Email_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Email'
+type RepositoriesMock_Email_Call struct {
+	*mock.Call
+}
+
+// Email is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Email() *RepositoriesMock_Email_Call {
+	return &RepositoriesMock_Email_Call{Call: _e.mock.On("Email")}
+}
+
+func (_c *RepositoriesMock_Email_Call) Run(run func()) *RepositoriesMock_Email_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Email_Call) Return(emailRepositoryInterface email_repo.EmailRepositoryInterface) *RepositoriesMock_Email_Call {
+	_c.Call.Return(emailRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Email_Call) RunAndReturn(run func() email_repo.EmailRepositoryInterface) *RepositoriesMock_Email_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -772,6 +822,98 @@ func (_c *RepositoriesMock_Seed_Call) RunAndReturn(run func() seed_repo.SeedRepo
 	return _c
 }
 
+// State provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) State() state_repo.StateRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for State")
+	}
+
+	var r0 state_repo.StateRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() state_repo.StateRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(state_repo.StateRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_State_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'State'
+type RepositoriesMock_State_Call struct {
+	*mock.Call
+}
+
+// State is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) State() *RepositoriesMock_State_Call {
+	return &RepositoriesMock_State_Call{Call: _e.mock.On("State")}
+}
+
+func (_c *RepositoriesMock_State_Call) Run(run func()) *RepositoriesMock_State_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_State_Call) Return(stateRepositoryInterface state_repo.StateRepositoryInterface) *RepositoriesMock_State_Call {
+	_c.Call.Return(stateRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_State_Call) RunAndReturn(run func() state_repo.StateRepositoryInterface) *RepositoriesMock_State_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Team provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Team() team_repo.TeamRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Team")
+	}
+
+	var r0 team_repo.TeamRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() team_repo.TeamRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(team_repo.TeamRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Team_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Team'
+type RepositoriesMock_Team_Call struct {
+	*mock.Call
+}
+
+// Team is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Team() *RepositoriesMock_Team_Call {
+	return &RepositoriesMock_Team_Call{Call: _e.mock.On("Team")}
+}
+
+func (_c *RepositoriesMock_Team_Call) Run(run func()) *RepositoriesMock_Team_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Team_Call) Return(teamRepositoryInterface team_repo.TeamRepositoryInterface) *RepositoriesMock_Team_Call {
+	_c.Call.Return(teamRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Team_Call) RunAndReturn(run func() team_repo.TeamRepositoryInterface) *RepositoriesMock_Team_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // WithTx provides a mock function for the type RepositoriesMock
 func (_mock *RepositoriesMock) WithTx(ctx context.Context, fn func(tx repository.TxInterface) error) error {
 	ret := _mock.Called(ctx, fn)
@@ -825,6 +967,52 @@ func (_c *RepositoriesMock_WithTx_Call) Return(err error) *RepositoriesMock_With
 }
 
 func (_c *RepositoriesMock_WithTx_Call) RunAndReturn(run func(ctx context.Context, fn func(tx repository.TxInterface) error) error) *RepositoriesMock_WithTx_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Workspace provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Workspace() workspace_repo.WorkspaceRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Workspace")
+	}
+
+	var r0 workspace_repo.WorkspaceRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() workspace_repo.WorkspaceRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(workspace_repo.WorkspaceRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Workspace_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Workspace'
+type RepositoriesMock_Workspace_Call struct {
+	*mock.Call
+}
+
+// Workspace is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Workspace() *RepositoriesMock_Workspace_Call {
+	return &RepositoriesMock_Workspace_Call{Call: _e.mock.On("Workspace")}
+}
+
+func (_c *RepositoriesMock_Workspace_Call) Run(run func()) *RepositoriesMock_Workspace_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Workspace_Call) Return(workspaceRepositoryInterface workspace_repo.WorkspaceRepositoryInterface) *RepositoriesMock_Workspace_Call {
+	_c.Call.Return(workspaceRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Workspace_Call) RunAndReturn(run func() workspace_repo.WorkspaceRepositoryInterface) *RepositoriesMock_Workspace_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -11,6 +11,7 @@ import (
 	attachment_repo "ricrac/internal/repositories/attachment"
 	automation_repo "ricrac/internal/repositories/automation"
 	comment_repo "ricrac/internal/repositories/comment"
+	email_repo "ricrac/internal/repositories/email"
 	events_repo "ricrac/internal/repositories/events"
 	issue_repo "ricrac/internal/repositories/issue"
 	label_repo "ricrac/internal/repositories/label"
@@ -19,6 +20,9 @@ import (
 	resolve_repo "ricrac/internal/repositories/resolve"
 	search_repo "ricrac/internal/repositories/search"
 	seed_repo "ricrac/internal/repositories/seed"
+	state_repo "ricrac/internal/repositories/state"
+	team_repo "ricrac/internal/repositories/team"
+	workspace_repo "ricrac/internal/repositories/workspace"
 	"time"
 )
 
@@ -41,4 +45,8 @@ type RepositoriesInterface interface {
 	Search() search_repo.SearchRepositoryInterface
 	Account() account_repo.AccountRepositoryInterface
 	OAuth() oauth_repo.OAuthRepositoryInterface
+	Workspace() workspace_repo.WorkspaceRepositoryInterface
+	Team() team_repo.TeamRepositoryInterface
+	State() state_repo.StateRepositoryInterface
+	Email() email_repo.EmailRepositoryInterface
 }

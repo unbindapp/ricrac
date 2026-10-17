@@ -13,6 +13,7 @@ import (
 	mocks_repository_account "ricrac/mocks/repository/account"
 	mocks_repository_attachment "ricrac/mocks/repository/attachment"
 	mocks_repository_comment "ricrac/mocks/repository/comment"
+	mocks_repository_email "ricrac/mocks/repository/email"
 	mocks_repository_events "ricrac/mocks/repository/events"
 	mocks_repository_issue "ricrac/mocks/repository/issue"
 	mocks_repository_label "ricrac/mocks/repository/label"
@@ -21,7 +22,10 @@ import (
 	mocks_repository_resolve "ricrac/mocks/repository/resolve"
 	mocks_repository_search "ricrac/mocks/repository/search"
 	mocks_repository_seed "ricrac/mocks/repository/seed"
+	mocks_repository_state "ricrac/mocks/repository/state"
+	mocks_repository_team "ricrac/mocks/repository/team"
 	mocks_repository_tx "ricrac/mocks/repository/tx"
+	mocks_repository_workspace "ricrac/mocks/repository/workspace"
 )
 
 type ServiceTestSuite struct {
@@ -41,6 +45,10 @@ type ServiceTestSuite struct {
 	MockSearchRepo       *mocks_repository_search.SearchRepositoryMock
 	MockAccountRepo      *mocks_repository_account.AccountRepositoryMock
 	MockOAuthRepo        *mocks_repository_oauth.OAuthRepositoryMock
+	MockWorkspaceRepo    *mocks_repository_workspace.WorkspaceRepositoryMock
+	MockTeamRepo         *mocks_repository_team.TeamRepositoryMock
+	MockStateRepo        *mocks_repository_state.StateRepositoryMock
+	MockEmailRepo        *mocks_repository_email.EmailRepositoryMock
 }
 
 func (suite *ServiceTestSuite) SetupTest() {
@@ -58,6 +66,10 @@ func (suite *ServiceTestSuite) SetupTest() {
 	suite.MockSearchRepo = mocks_repository_search.NewSearchRepositoryMock(suite.T())
 	suite.MockAccountRepo = mocks_repository_account.NewAccountRepositoryMock(suite.T())
 	suite.MockOAuthRepo = mocks_repository_oauth.NewOAuthRepositoryMock(suite.T())
+	suite.MockWorkspaceRepo = mocks_repository_workspace.NewWorkspaceRepositoryMock(suite.T())
+	suite.MockTeamRepo = mocks_repository_team.NewTeamRepositoryMock(suite.T())
+	suite.MockStateRepo = mocks_repository_state.NewStateRepositoryMock(suite.T())
+	suite.MockEmailRepo = mocks_repository_email.NewEmailRepositoryMock(suite.T())
 
 	suite.MockRepo.EXPECT().Access().Return(suite.MockAccessRepo).Maybe()
 	suite.MockRepo.EXPECT().Resolve().Return(suite.MockResolveRepo).Maybe()
@@ -71,6 +83,10 @@ func (suite *ServiceTestSuite) SetupTest() {
 	suite.MockRepo.EXPECT().Search().Return(suite.MockSearchRepo).Maybe()
 	suite.MockRepo.EXPECT().Account().Return(suite.MockAccountRepo).Maybe()
 	suite.MockRepo.EXPECT().OAuth().Return(suite.MockOAuthRepo).Maybe()
+	suite.MockRepo.EXPECT().Workspace().Return(suite.MockWorkspaceRepo).Maybe()
+	suite.MockRepo.EXPECT().Team().Return(suite.MockTeamRepo).Maybe()
+	suite.MockRepo.EXPECT().State().Return(suite.MockStateRepo).Maybe()
+	suite.MockRepo.EXPECT().Email().Return(suite.MockEmailRepo).Maybe()
 }
 
 // ExpectTx runs WithTx bodies directly; repository mocks match the tx argument with mock.Anything.

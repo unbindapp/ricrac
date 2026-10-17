@@ -106,6 +106,7 @@ func (b *backend) CreateTeam(ctx context.Context, workspace, user uuid.UUID, nam
 
 func (b *backend) SetMailer(sender mail.Sender) {
 	b.state.Mailer = sender
+	b.server.EmailService.SetMailer(sender)
 }
 
 func (b *backend) ConfigureGitHub(apiURL string, client *http.Client, key *rsa.PrivateKey, webhookSecret string) {
@@ -140,7 +141,7 @@ func (b *backend) RunRecurringTemplates(ctx context.Context) error {
 }
 
 func (b *backend) SendEmails(ctx context.Context) error {
-	return ops.SendEmails(ctx, b.state)
+	return b.server.EmailService.SendEmails(ctx)
 }
 
 func (b *backend) DeliverDueWebhooks(ctx context.Context) (int, error) {
