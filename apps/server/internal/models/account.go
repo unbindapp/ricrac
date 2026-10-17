@@ -13,10 +13,11 @@ type AppConfig struct {
 }
 
 type WorkspaceSummary struct {
-	ID     uuid.UUID `json:"id"`
-	Name   string    `json:"name"`
-	URLKey string    `json:"urlKey"`
-	Role   string    `json:"role"`
+	ID      uuid.UUID `json:"id"`
+	Name    string    `json:"name"`
+	URLKey  string    `json:"urlKey"`
+	Role    string    `json:"role"`
+	LogoURL *string   `json:"logoUrl"`
 }
 
 type PendingInvitation struct {

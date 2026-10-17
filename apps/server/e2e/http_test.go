@@ -359,3 +359,16 @@ func TestLeavingAWorkspaceTakesItOutOfKeys(t *testing.T) {
 	eq(t, reach[keys[1]], `false["Acme"]`)
 	eq(t, reach[keys[2]], "true[]")
 }
+
+func TestMeShowsTheLogoOfEveryWorkspace(t *testing.T) {
+	w := world(t)
+	w.secondWorkspace("Beta", "beta", "OPS")
+	call(t, w.Ann, "update_workspace", M{"logoUrl": "https://x/acme.png"})
+	req := httptest.NewRequest("GET", "/api/me", nil)
+	req.Header.Set("Cookie", w.session(w.Ann.User))
+	_, me := send(w.Router, req)
+	eq(t, me.At("workspaces", 0, "name").Str(), "Acme")
+	eq(t, me.At("workspaces", 0, "logoUrl").Str(), "https://x/acme.png")
+	eq(t, me.At("workspaces", 1, "name").Str(), "Beta")
+	check(t, me.At("workspaces", 1, "logoUrl").IsNull())
+}

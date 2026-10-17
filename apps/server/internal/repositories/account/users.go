@@ -52,10 +52,11 @@ func (self *AccountRepository) Membership(ctx context.Context, tx repository.TxI
 
 func (self *AccountRepository) summaries(ctx context.Context, tx repository.TxInterface, id uuid.UUID, only *uuid.UUID) ([]models.WorkspaceSummary, error) {
 	var rows []struct {
-		ID     uuid.UUID `json:"id"`
-		Name   string    `json:"name"`
-		URLKey string    `json:"url_key"`
-		Role   string    `json:"role"`
+		ID      uuid.UUID `json:"id"`
+		Name    string    `json:"name"`
+		URLKey  string    `json:"url_key"`
+		Role    string    `json:"role"`
+		LogoURL *string   `json:"logo_url"`
 	}
 	query := self.base.Client(tx).Workspace.Query().Modify(func(s *entsql.Selector) {
 		members := entsql.Table(workspacemember.Table)
@@ -67,14 +68,15 @@ func (self *AccountRepository) summaries(ctx context.Context, tx repository.TxIn
 			s.Where(entsql.EQ(members.C(workspacemember.FieldActive), true))
 			s.OrderBy(s.C(workspace.FieldName))
 		}
-		s.Select(s.C(workspace.FieldID), s.C(workspace.FieldName), s.C(workspace.FieldURLKey), members.C(workspacemember.FieldRole))
+		s.Select(s.C(workspace.FieldID), s.C(workspace.FieldName), s.C(workspace.FieldURLKey), members.C(workspacemember.FieldRole),
+			s.C(workspace.FieldLogoURL))
 	})
 	if err := query.Scan(ctx, &rows); err != nil {
 		return nil, err
 	}
 	summaries := make([]models.WorkspaceSummary, len(rows))
 	for i, row := range rows {
-		summaries[i] = models.WorkspaceSummary{ID: row.ID, Name: row.Name, URLKey: row.URLKey, Role: row.Role}
+		summaries[i] = models.WorkspaceSummary{ID: row.ID, Name: row.Name, URLKey: row.URLKey, Role: row.Role, LogoURL: row.LogoURL}
 	}
 	return summaries, nil
 }

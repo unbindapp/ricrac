@@ -1,6 +1,14 @@
 import type { QueryClient } from "@tanstack/react-query";
-import { createRootRouteWithContext, Outlet, redirect } from "@tanstack/react-router";
+import {
+  createRootRouteWithContext,
+  type ErrorComponentProps,
+  Outlet,
+  type ParsedLocation,
+  redirect,
+  useLocation,
+} from "@tanstack/react-router";
 import { TriangleAlertIcon } from "lucide-react";
+import { useLayoutEffect } from "react";
 
 import NotFoundTemplate from "@/components/navigation/not-found-template";
 import Providers from "@/components/providers/providers";
@@ -38,7 +46,22 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       />
     </main>
   ),
-  errorComponent: ({ error }) => (
+  errorComponent: RootError,
+});
+
+let retriedLocation: ParsedLocation | undefined;
+
+// TanStack/router#8198: a page being left can render once more after its route is gone and throw.
+function RootError({ error, reset }: ErrorComponentProps) {
+  const location = useLocation();
+  const shouldRetry = retriedLocation !== location;
+  useLayoutEffect(() => {
+    if (!shouldRetry) return;
+    retriedLocation = location;
+    reset();
+  }, [shouldRetry, location, reset]);
+  if (shouldRetry) return null;
+  return (
     <main className="flex min-h-svh flex-col">
       <NotFoundTemplate
         code={500}
@@ -48,8 +71,8 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         Icon={TriangleAlertIcon}
       />
     </main>
-  ),
-});
+  );
+}
 
 function RootComponent() {
   return (
