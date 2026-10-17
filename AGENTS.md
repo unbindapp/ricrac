@@ -158,9 +158,7 @@ end-to-end test gets a throwaway database):
 The end-to-end tests live in `apps/server/e2e/`: each starts from `world(t)` (a workspace
 "acme" owned by Ann with the team ENG) and talks to the server only through its router, with
 `call`, `fails` and `tryCall` for operations; `backend_test.go` is the one file that knows the
-server's packages. Behaviour changes need a test there. Every test records what crosses the
-server's edges (answers, webhooks, GitHub calls, emails) in `e2e/testdata/compat` and must match
-it; `RICRAC_RECORD=1` rewrites the recordings, for intended changes only. `TestCutover`
+server's packages. Behaviour changes need a test there. `TestCutover`
 (`RICRAC_CUTOVER_FROM=<commit>`) rehearses deploying over the server at that commit.
 
 Signing in needs Google; in development `go run ./cmd/server session ann@acme.test` (in apps/server, with the

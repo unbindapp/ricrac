@@ -8,12 +8,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"maps"
 	"net"
 	"net/http"
 	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"reflect"
 	"slices"
 	"strings"
 	"syscall"
@@ -462,4 +464,53 @@ func withoutLegacyBookkeeping(schema string) string {
 		}
 	}
 	return strings.Join(lines, "\n")
+}
+
+func diff(path string, w, h any, out *[]string) {
+	wm, wok := w.(map[string]any)
+	hm, hok := h.(map[string]any)
+	if wok && hok {
+		keys := slices.Sorted(maps.Keys(wm))
+		for key := range hm {
+			if _, ok := wm[key]; !ok {
+				keys = append(keys, key)
+			}
+		}
+		for _, key := range keys {
+			if !reflect.DeepEqual(wm[key], hm[key]) {
+				diff(path+"."+key, wm[key], hm[key], out)
+			}
+		}
+		return
+	}
+	wl, wok := w.([]any)
+	hl, hok := h.([]any)
+	if wok && hok && len(wl) == len(hl) {
+		for i := range wl {
+			if !reflect.DeepEqual(wl[i], hl[i]) {
+				diff(fmt.Sprintf("%s[%d]", path, i), wl[i], hl[i], out)
+			}
+		}
+		return
+	}
+	ws, wok := w.(string)
+	hs, hok := h.(string)
+	if wok && hok && (len(ws) > 200 || len(hs) > 200) {
+		at := 0
+		for at < min(len(ws), len(hs)) && ws[at] == hs[at] {
+			at++
+		}
+		from := max(0, at-80)
+		*out = append(*out, fmt.Sprintf("%s: from byte %d, recorded %q, got %q", path, at, ws[from:min(len(ws), at+120)], hs[from:min(len(hs), at+120)]))
+		return
+	}
+	*out = append(*out, fmt.Sprintf("%s: recorded %s, got %s", path, short(w), short(h)))
+}
+
+func short(v any) string {
+	text := string(marshal(v))
+	if len(text) > 300 {
+		return text[:300] + "..."
+	}
+	return text
 }

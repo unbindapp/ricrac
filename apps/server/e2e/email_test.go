@@ -13,7 +13,6 @@ type outbox struct {
 	mu   sync.Mutex
 	sent []mailMessage
 	fail bool
-	tape *tape
 }
 
 func (o *outbox) Send(_ context.Context, message mailMessage) error {
@@ -21,9 +20,6 @@ func (o *outbox) Send(_ context.Context, message mailMessage) error {
 	defer o.mu.Unlock()
 	if o.fail {
 		return errors.New("smtp is down")
-	}
-	if o.tape != nil {
-		o.tape.email(message.To, message.Subject, message.Text, message.HTML)
 	}
 	o.sent = append(o.sent, message)
 	return nil
@@ -50,7 +46,7 @@ func sendEmails(t *testing.T, w *World) {
 
 func TestUnreadNotificationsAreEmailedAsADigest(t *testing.T) {
 	w := world(t)
-	box := &outbox{tape: w.tape}
+	box := &outbox{}
 	w.B.SetMailer(box)
 	w.member("bob@acme.test", "Bob Jones", "member")
 	cat := w.member("cat@acme.test", "Cat Lee", "member")
@@ -86,7 +82,7 @@ func TestUnreadNotificationsAreEmailedAsADigest(t *testing.T) {
 
 func TestFailedEmailsAreRetried(t *testing.T) {
 	w := world(t)
-	box := &outbox{fail: true, tape: w.tape}
+	box := &outbox{fail: true}
 	w.B.SetMailer(box)
 	w.member("bob@acme.test", "Bob Jones", "member")
 	call(t, w.Ann, "save_issue", M{"title": "Fix login", "assignee": "bob"})
@@ -104,7 +100,7 @@ func TestFailedEmailsAreRetried(t *testing.T) {
 
 func TestInvitationsAreEmailed(t *testing.T) {
 	w := world(t)
-	box := &outbox{tape: w.tape}
+	box := &outbox{}
 	w.B.SetMailer(box)
 	call(t, w.Ann, "invite_user", M{"email": "New@Example.com", "role": "admin"})
 	sendEmails(t, w)

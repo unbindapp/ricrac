@@ -5,8 +5,6 @@ import (
 	"testing"
 )
 
-// Paths the other tests leave out, there for their recordings.
-
 func TestAutomationsArchiveCloseAndEmptyTheTrash(t *testing.T) {
 	w := world(t)
 	bob := w.member("bob@acme.test", "Bob Jones", "member")

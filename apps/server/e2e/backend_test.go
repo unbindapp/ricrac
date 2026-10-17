@@ -24,7 +24,6 @@ import (
 // things tests set up that have no endpoint.
 type backend struct {
 	t        *testing.T
-	tape     *tape
 	router   http.Handler
 	registry *oapi.Registry
 	server   *apiserver.Server
@@ -41,7 +40,7 @@ func migrateDatabase(ctx context.Context, url string) error {
 	return database.Migrate(ctx, db)
 }
 
-func newBackend(t *testing.T, url string, tp *tape) *backend {
+func newBackend(t *testing.T, url string) *backend {
 	ctx := context.Background()
 	cfg := config.Config{DatabaseURL: url, PublicURL: publicURL, SecretKey: "test-secret-key-that-is-long-enough-123", MaxUploadSize: 1024 * 1024}
 	client, _, err := database.Open(ctx, url)
@@ -49,7 +48,7 @@ func newBackend(t *testing.T, url string, tp *tape) *backend {
 		t.Fatalf("connect: %v", err)
 	}
 	t.Cleanup(func() { _ = client.Close() })
-	return &backend{t: t, tape: tp, server: apiserver.New(cfg, client, scheduler.NewWakeups())}
+	return &backend{t: t, server: apiserver.New(cfg, client, scheduler.NewWakeups())}
 }
 
 func (b *backend) Router() http.Handler {

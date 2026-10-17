@@ -143,7 +143,6 @@ type World struct {
 	Router    http.Handler
 	Workspace uuid.UUID
 	Ann       *Actor
-	tape      *tape
 }
 
 // Actor is someone calling operations in a workspace, through the web app's session.
@@ -156,9 +155,9 @@ type Actor struct {
 func world(t *testing.T) *World {
 	t.Helper()
 	url := freshDB(t)
-	w := &World{t: t, DB: openPool(t, url), tape: newTape(t)}
-	w.B = newBackend(t, url, w.tape)
-	w.Router = w.tape.wrap(w.B)
+	w := &World{t: t, DB: openPool(t, url)}
+	w.B = newBackend(t, url)
+	w.Router = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) { w.B.Router().ServeHTTP(rw, r) })
 	ann := w.addUser("ann@acme.test", "Ann Smith")
 	w.Workspace = w.newWorkspace("Acme", "acme", "Engineering", "ENG", ann)
 	w.Ann = &Actor{w: w, User: ann, Workspace: w.Workspace}

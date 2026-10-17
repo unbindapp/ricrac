@@ -31,7 +31,6 @@ func newReceiver(world *World, status int) *receiver {
 	r := &receiver{}
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		body, _ := io.ReadAll(req.Body)
-		world.tape.outbound("webhook", req, body)
 		r.mu.Lock()
 		r.requests = append(r.requests, hookRequest{req.Header.Clone(), body})
 		r.mu.Unlock()

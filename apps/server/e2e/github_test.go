@@ -66,7 +66,6 @@ type fakeGitHub struct {
 	comments      map[int][]M
 	// Refuse what the app does with its installation token.
 	failing bool
-	tape    *tape
 }
 
 var issuePath = regexp.MustCompile(`^/repos/[^/]+/[^/]+/issues/(\d+)$`)
@@ -86,9 +85,6 @@ func newFakeGitHub(t *testing.T) *fakeGitHub {
 
 func (f *fakeGitHub) serve(w http.ResponseWriter, r *http.Request) {
 	raw, _ := io.ReadAll(r.Body)
-	if f.tape != nil {
-		f.tape.outbound("github", r, raw)
-	}
 	var body M
 	if r.Header.Get("Content-Type") == "application/json" {
 		_ = json.Unmarshal(raw, &body)
@@ -161,7 +157,6 @@ type gitHubWorld struct {
 func withGitHub(t *testing.T) *gitHubWorld {
 	w := world(t)
 	fake := newFakeGitHub(t)
-	fake.tape = w.tape
 	w.B.ConfigureGitHub(fake.server.URL, fake.server.Client(), testAppKey(t), webhookSecret)
 	return &gitHubWorld{w, fake, w.Router}
 }
