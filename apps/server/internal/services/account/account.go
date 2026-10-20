@@ -51,7 +51,7 @@ type DeleteWorkspace struct {
 }
 
 func (self *AccountService) Config() models.AppConfig {
-	return models.AppConfig{GoogleConfigured: self.cfg.GoogleConfigured(), PublicURL: self.cfg.PublicURL, MCPURL: self.cfg.MCPURL()}
+	return models.AppConfig{GoogleConfigured: self.cfg.GoogleConfigured(), EmailConfigured: self.cfg.Mail != nil, PublicURL: self.cfg.PublicURL, MCPURL: self.cfg.MCPURL()}
 }
 
 // SignedIn checks that the session's user still exists.

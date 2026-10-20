@@ -1,5 +1,5 @@
-// Package signin_service is signing in with Google: the round trip through Google's OAuth, the
-// ID token's claims and the user it signs in.
+// Package signin_service is signing in with Google (the round trip through Google's OAuth, the
+// ID token's claims and the user it signs in) or with a link emailed to any address.
 package signin_service
 
 import (
@@ -24,6 +24,7 @@ import (
 	"ricrac/config"
 	"ricrac/internal/auth"
 	"ricrac/internal/repositories/repositories"
+	email_service "ricrac/internal/services/email"
 )
 
 const (
@@ -37,14 +38,15 @@ var googleIssuers = []string{"https://accounts.google.com", "accounts.google.com
 
 //go:generate go run -mod=mod github.com/vburenin/ifacemaker -f "*.go" -i SigninServiceInterface -p signin_service -s SigninService -o signin_service_iface.go
 type SigninService struct {
-	cfg  config.Config
-	keys auth.Keys
-	repo repositories.RepositoriesInterface
-	http *http.Client
+	cfg    config.Config
+	keys   auth.Keys
+	repo   repositories.RepositoriesInterface
+	emails email_service.EmailServiceInterface
+	http   *http.Client
 }
 
-func NewSigninService(cfg config.Config, keys auth.Keys, repo repositories.RepositoriesInterface) *SigninService {
-	return &SigninService{cfg: cfg, keys: keys, repo: repo, http: &http.Client{Timeout: 15 * time.Second}}
+func NewSigninService(cfg config.Config, keys auth.Keys, repo repositories.RepositoriesInterface, emails email_service.EmailServiceInterface) *SigninService {
+	return &SigninService{cfg: cfg, keys: keys, repo: repo, emails: emails, http: &http.Client{Timeout: 15 * time.Second}}
 }
 
 func (self *SigninService) redirectURI() string {

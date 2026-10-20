@@ -48,8 +48,8 @@ export function InviteMemberDialog() {
         <DialogHeader>
           <DialogTitle>Invite people</DialogTitle>
           <DialogDescription>
-            They join by signing in with the Google account of this email. Ricrac emails them the
-            invitation when email is set up.
+            They join by signing in as this email, with Google or a link sent to it. Ricrac emails
+            them the invitation when email is set up.
           </DialogDescription>
         </DialogHeader>
         {isOpen && <InviteForm onDone={() => setIsOpen(false)} />}

@@ -11,6 +11,10 @@ import (
 
 // SigninServiceInterface ...
 type SigninServiceInterface interface {
+	// SendLink emails a link that signs in as email and then goes on to returnTo.
+	SendLink(ctx context.Context, email, returnTo string) error
+	// FinishLink signs in with an emailed link, once: where to go next and who signed in.
+	FinishLink(ctx context.Context, email, token string) (string, uuid.UUID, error)
 	// Start is where to send the browser to sign in with Google, and the signed round trip to keep
 	// in a cookie until it comes back.
 	Start(returnTo string) (string, string)

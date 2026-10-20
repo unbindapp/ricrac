@@ -9,6 +9,7 @@ import (
 	"ricrac/internal/auth"
 	"ricrac/internal/infrastructure/mail"
 	"ricrac/internal/repositories"
+	"time"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -171,6 +172,119 @@ func (_c *EmailServiceMock_SendEmails_Call) Return(err error) *EmailServiceMock_
 }
 
 func (_c *EmailServiceMock_SendEmails_Call) RunAndReturn(run func(ctx context.Context) error) *EmailServiceMock_SendEmails_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SendSignInLink provides a mock function for the type EmailServiceMock
+func (_mock *EmailServiceMock) SendSignInLink(ctx context.Context, to string, link string, ttl time.Duration) error {
+	ret := _mock.Called(ctx, to, link, ttl)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SendSignInLink")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, time.Duration) error); ok {
+		r0 = returnFunc(ctx, to, link, ttl)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// EmailServiceMock_SendSignInLink_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SendSignInLink'
+type EmailServiceMock_SendSignInLink_Call struct {
+	*mock.Call
+}
+
+// SendSignInLink is a helper method to define mock.On call
+//   - ctx context.Context
+//   - to string
+//   - link string
+//   - ttl time.Duration
+func (_e *EmailServiceMock_Expecter) SendSignInLink(ctx any, to any, link any, ttl any) *EmailServiceMock_SendSignInLink_Call {
+	return &EmailServiceMock_SendSignInLink_Call{Call: _e.mock.On("SendSignInLink", ctx, to, link, ttl)}
+}
+
+func (_c *EmailServiceMock_SendSignInLink_Call) Run(run func(ctx context.Context, to string, link string, ttl time.Duration)) *EmailServiceMock_SendSignInLink_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		var arg2 string
+		if args[2] != nil {
+			arg2 = args[2].(string)
+		}
+		var arg3 time.Duration
+		if args[3] != nil {
+			arg3 = args[3].(time.Duration)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *EmailServiceMock_SendSignInLink_Call) Return(err error) *EmailServiceMock_SendSignInLink_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *EmailServiceMock_SendSignInLink_Call) RunAndReturn(run func(ctx context.Context, to string, link string, ttl time.Duration) error) *EmailServiceMock_SendSignInLink_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Sends provides a mock function for the type EmailServiceMock
+func (_mock *EmailServiceMock) Sends() bool {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Sends")
+	}
+
+	var r0 bool
+	if returnFunc, ok := ret.Get(0).(func() bool); ok {
+		r0 = returnFunc()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+	return r0
+}
+
+// EmailServiceMock_Sends_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Sends'
+type EmailServiceMock_Sends_Call struct {
+	*mock.Call
+}
+
+// Sends is a helper method to define mock.On call
+func (_e *EmailServiceMock_Expecter) Sends() *EmailServiceMock_Sends_Call {
+	return &EmailServiceMock_Sends_Call{Call: _e.mock.On("Sends")}
+}
+
+func (_c *EmailServiceMock_Sends_Call) Run(run func()) *EmailServiceMock_Sends_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *EmailServiceMock_Sends_Call) Return(b bool) *EmailServiceMock_Sends_Call {
+	_c.Call.Return(b)
+	return _c
+}
+
+func (_c *EmailServiceMock_Sends_Call) RunAndReturn(run func() bool) *EmailServiceMock_Sends_Call {
 	_c.Call.Return(run)
 	return _c
 }

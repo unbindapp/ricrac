@@ -3,6 +3,9 @@ package e2e
 import (
 	"context"
 	"errors"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"strings"
 	"sync"
 	"testing"
@@ -107,7 +110,7 @@ func TestInvitationsAreEmailed(t *testing.T) {
 	sent := box.to("new@example.com")
 	eq(t, len(sent), 1)
 	eq(t, sent[0].Subject, "Ann Smith invited you to Acme on Ricrac")
-	contains(t, sent[0].Text, "as an admin", "Sign in with Google as new@example.com", "http://localhost:3000")
+	contains(t, sent[0].Text, "as an admin", "Sign in as new@example.com", "http://localhost:3000")
 }
 
 func TestPeopleTurnEmailNotificationsOff(t *testing.T) {
@@ -118,4 +121,97 @@ func TestPeopleTurnEmailNotificationsOff(t *testing.T) {
 	eq(t, off.At("emailNotifications").Bool(), false)
 	check(t, call(t, w.Ann, "get_user", M{"id": "bob"}).At("emailNotifications").IsNull(), "only you see your setting")
 	contains(t, fails(t, w.Ann, "update_user", M{"id": "bob", "emailNotifications": true}), "your own")
+}
+
+func TestAnyEmailSignsInWithALinkThatWorksOnce(t *testing.T) {
+	w := world(t)
+	box := &outbox{}
+	w.B.SetMailer(box)
+	call(t, w.Ann, "invite_user", M{"email": "new@example.com", "role": "member"})
+	post := func(path string, body M) *httptest.ResponseRecorder {
+		req := httptest.NewRequest("POST", path, strings.NewReader(string(marshal(body))))
+		req.Header.Set("X-Ricrac", "1")
+		recorder := httptest.NewRecorder()
+		w.Router.ServeHTTP(recorder, req)
+		return recorder
+	}
+	emailedLink := func(to string) url.Values {
+		t.Helper()
+		sent := box.to(to)
+		check(t, len(sent) > 0, "a link went to ", to)
+		for line := range strings.Lines(sent[len(sent)-1].Text) {
+			if link, ok := strings.CutPrefix(strings.TrimSpace(line), publicURL+"/sign-in/email?"); ok {
+				query, _ := url.ParseQuery(link)
+				return query
+			}
+		}
+		t.Fatalf("no link in %s", sent[len(sent)-1].Text)
+		return nil
+	}
+	finish := func(link url.Values) *httptest.ResponseRecorder {
+		return post("/api/auth/email/callback", M{"email": link.Get("email"), "token": link.Get("token")})
+	}
+	me := func(signedIn *httptest.ResponseRecorder) J {
+		req := httptest.NewRequest("GET", "/api/me", nil)
+		for _, cookie := range signedIn.Result().Cookies() {
+			req.AddCookie(cookie)
+		}
+		_, found := send(w.Router, req)
+		return found
+	}
+
+	req := httptest.NewRequest("POST", "/api/auth/email", strings.NewReader(`{"email":"new@example.com"}`))
+	status, _ := send(w.Router, req)
+	eq(t, status, http.StatusForbidden, "writes need the x-ricrac header")
+	eq(t, post("/api/auth/email", M{"email": "not an email"}).Code, http.StatusBadRequest)
+
+	eq(t, post("/api/auth/email", M{"email": " New@Example.com ", "returnTo": "/acme"}).Code, http.StatusOK)
+	sent := box.to("new@example.com")
+	eq(t, len(sent), 1)
+	eq(t, sent[0].Subject, "Sign in to Ricrac")
+	link := emailedLink("new@example.com")
+	eq(t, link.Get("email"), "new@example.com")
+
+	forged := url.Values{"email": {"new@example.com"}, "token": {"forged"}}
+	eq(t, finish(forged).Code, http.StatusBadRequest)
+	elsewhere := url.Values{"email": {"ann@acme.test"}, "token": {link.Get("token")}}
+	eq(t, finish(elsewhere).Code, http.StatusBadRequest, "a link only signs in as its own email")
+
+	signedIn := finish(link)
+	eq(t, signedIn.Code, http.StatusOK, signedIn.Body.String())
+	contains(t, signedIn.Body.String(), `"returnTo":"/acme"`)
+	newcomer := me(signedIn)
+	eq(t, newcomer.At("email").Str(), "new@example.com")
+	eq(t, newcomer.At("displayName").Str(), "new")
+	eq(t, newcomer.At("invitations", 0, "workspaceName").Str(), "Acme")
+	again := finish(link)
+	eq(t, again.Code, http.StatusBadRequest)
+	contains(t, again.Body.String(), "expired or was already used")
+
+	eq(t, post("/api/auth/email", M{"email": "ann@acme.test", "returnTo": "https://evil.com"}).Code, http.StatusOK)
+	ann := finish(emailedLink("ann@acme.test"))
+	contains(t, ann.Body.String(), `"returnTo":"/"`)
+	eq(t, me(ann).At("id").Str(), w.Ann.User.String(), "an existing account signs in by its email")
+
+	eq(t, post("/api/auth/email", M{"email": "new@example.com"}).Code, http.StatusOK)
+	w.exec("UPDATE sign_in_links SET expires_at = now() - interval '1 second'")
+	eq(t, finish(emailedLink("new@example.com")).Code, http.StatusBadRequest, "expired links don't sign in")
+	for range 3 {
+		eq(t, post("/api/auth/email", M{"email": "new@example.com"}).Code, http.StatusOK)
+	}
+	tooMany := post("/api/auth/email", M{"email": "new@example.com"})
+	eq(t, tooMany.Code, http.StatusTooManyRequests)
+	eq(t, len(box.to("new@example.com")), 5)
+
+	box.fail = true
+	eq(t, post("/api/auth/email", M{"email": "cat@example.com"}).Code, http.StatusBadGateway)
+}
+
+func TestSigningInByEmailNeedsEmail(t *testing.T) {
+	w := world(t)
+	req := httptest.NewRequest("POST", "/api/auth/email", strings.NewReader(`{"email":"new@example.com"}`))
+	req.Header.Set("X-Ricrac", "1")
+	status, answer := send(w.Router, req)
+	eq(t, status, http.StatusBadRequest)
+	contains(t, answer.At("error").Str(), "isn't set up")
 }

@@ -1,9 +1,10 @@
 # Ricrac
 
 The issue tracker for people and agents. Ricrac has teams, issues, workflows, projects,
-initiatives, cycles and the rest. People work in it through the web app (sign in with Google):
-lists and boards, an inbox, a command panel and keyboard shortcuts. Agents work in it through an
-MCP server and a REST API, with the same workspaces, operations and permissions.
+initiatives, cycles and the rest. People work in it through the web app (sign in with Google or
+with a link emailed to any address): lists and boards, an inbox, a command panel and keyboard
+shortcuts. Agents work in it through an MCP server and a REST API, with the same workspaces,
+operations and permissions.
 
 ## Features
 
@@ -70,7 +71,7 @@ MCP server and a REST API, with the same workspaces, operations and permissions.
 | `PUBLIC_URL` | External base URL, e.g. `https://ricrac.example.com`. |
 | `SECRET_KEY` | At least 32 characters; signs session cookies. |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Sign-in with Google. The OAuth client's redirect URI is `<PUBLIC_URL>/api/auth/callback/google`. |
-| `SMTP_URL`, `EMAIL_FROM` | Email for invitations and notification digests, e.g. `smtps://resend:<API key>@smtp.resend.com:465` and `Ricrac <notifications@example.com>`. Without them no emails are sent. |
+| `SMTP_URL`, `EMAIL_FROM` | Email for sign-in links, invitations and notification digests, e.g. `smtps://resend:<API key>@smtp.resend.com:465` and `Ricrac <notifications@example.com>`. Without them no emails are sent. |
 | `GITHUB_APP_ID`, `GITHUB_APP_SLUG`, `GITHUB_APP_PRIVATE_KEY`, `GITHUB_WEBHOOK_SECRET`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | The GitHub App (see [docs/github-app.md](docs/github-app.md)): its id, its URL name (`github.com/apps/<slug>`), its private key (PEM; `\n` for line breaks works), the webhook secret, and its OAuth client id and secret. All or none; without them GitHub is off. |
 | `GITHUB_API_URL`, `GITHUB_WEB_URL` | GitHub's API and web addresses, `https://api.github.com` and `https://github.com` by default (for GitHub Enterprise or tests). |
 | `MAX_UPLOAD_MB` | Largest uploaded file, 25 by default. |

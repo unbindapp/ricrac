@@ -8,6 +8,7 @@ import (
 
 type AppConfig struct {
 	GoogleConfigured bool   `json:"googleConfigured"`
+	EmailConfigured  bool   `json:"emailConfigured"`
 	PublicURL        string `json:"publicUrl"`
 	MCPURL           string `json:"mcpUrl"`
 }

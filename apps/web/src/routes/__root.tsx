@@ -18,7 +18,7 @@ export type RouterContext = {
   queryClient: QueryClient;
 };
 
-const PUBLIC_PATHS = new Set(["/", "/sign-in", "/privacy", "/terms"]);
+const PUBLIC_PATHS = new Set(["/", "/sign-in", "/sign-in/email", "/privacy", "/terms"]);
 
 function isPublicPath(pathname: string) {
   const normalized = pathname.length > 1 ? pathname.replace(/\/$/, "") : pathname;

@@ -7,14 +7,19 @@ import (
 	"ricrac/internal/auth"
 	"ricrac/internal/infrastructure/mail"
 	repository "ricrac/internal/repositories"
+	"time"
 )
 
 // EmailServiceInterface ...
 type EmailServiceInterface interface {
 	// SetMailer sends with sender from now on.
 	SetMailer(sender mail.Sender)
-	// QueueInvitation tells someone they were invited; they join by signing in with Google.
+	// QueueInvitation tells someone they were invited; they join by signing in as that email.
 	QueueInvitation(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, to string, role auth.Role) error
+	// Sends is whether emails go out.
+	Sends() bool
+	// SendSignInLink emails the link now, not through the queue, which would store its token.
+	SendSignInLink(ctx context.Context, to, link string, ttl time.Duration) error
 	// SendEmails gathers due notification digests and sends the queued emails. Without a mailer it
 	// does nothing, and notifications stay unemailed.
 	SendEmails(ctx context.Context) error
