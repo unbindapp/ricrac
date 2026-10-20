@@ -23,6 +23,11 @@ operations and permissions.
   files, subscribers, sharing with people outside the team, history, archive and trash,
   changes to many issues at once, and imports from other trackers that keep issue numbers,
   dates, authors and comments.
+- **Writing** in Markdown everywhere (descriptions, documents, comments, updates, release notes)
+  with a toolbar, `/` commands, `@` mentions, `:` emoji, tables and code blocks with languages.
+  Paste, drop or upload images, videos and files: images and videos embed (`![demo.mp4](url)`
+  plays inline), and can be moved, aligned and resized; width and alignment ride in the URL
+  fragment (`#width=480&align=center`), so the Markdown stays plain for agents.
 - **Filtering** with a filter language (`and`/`or`, comparators, relation filters)
   and full-text search.
 - **Comments** in threads with replies, resolving and reactions, on issues, projects,

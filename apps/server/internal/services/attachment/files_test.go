@@ -90,6 +90,15 @@ func TestFilesInMarkdown(t *testing.T) {
 	if got := fileMarkdown("log.txt", "text/plain", "u"); got != "[log.txt](u)" {
 		t.Errorf("got %s", got)
 	}
+	if got := fileMarkdown("demo.MOV", "video/quicktime", "u"); got != "![demo.MOV](u)" {
+		t.Errorf("got %s", got)
+	}
+	if got := fileMarkdown("recording", "video/webm", "u"); got != "![recording.webm](u)" {
+		t.Errorf("got %s", got)
+	}
+	if got := fileMarkdown("clip.avi", "video/x-msvideo", "u"); got != "[clip.avi](u)" {
+		t.Errorf("got %s", got)
+	}
 	for size, want := range map[int64]string{12: "12 B", 2048: "2.0 KB", 3 * 1024 * 1024: "3.0 MB"} {
 		if got := humanSize(size); got != want {
 			t.Errorf("%d: got %s", size, got)

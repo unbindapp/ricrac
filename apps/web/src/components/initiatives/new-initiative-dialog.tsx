@@ -23,6 +23,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { useEditorUploads } from "@/lib/queries/uploads";
 import { entitySlug } from "@/lib/helpers/entity-slug";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
 import {
@@ -57,6 +58,7 @@ function NewInitiativeForm({ parentId, onDone }: { parentId?: string; onDone: ()
   const navigate = useNavigate();
   const { users } = useWorkspaceUserList();
   const mentionUsers = useMentionUsers();
+  const uploads = useEditorUploads(workspace.id);
   const { mutateAsync: saveInitiative } = useSaveInitiativeMutation(workspace.id);
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<TInitiativeStatus>("planned");
@@ -103,6 +105,7 @@ function NewInitiativeForm({ parentId, onDone }: { parentId?: string; onDone: ()
         value={description}
         onChange={setDescription}
         users={mentionUsers}
+        {...uploads.editorProps}
         placeholder="Why it matters and how you'll know it's done…"
       />
       <div className="flex flex-wrap items-center gap-2">

@@ -2,6 +2,7 @@
 package files_handler
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/http"
@@ -68,7 +69,7 @@ func (h *Handler) caller(r *http.Request) (*auth.Caller, error) {
 	return auth.SessionCaller(user), nil
 }
 
-// Download serves a file to members of its workspace.
+// Download serves a file to members of its workspace, in ranges for players that seek.
 func (h *Handler) Download(w http.ResponseWriter, r *http.Request) {
 	caller, err := h.caller(r)
 	if err != nil {
@@ -105,7 +106,7 @@ func (h *Handler) Download(w http.ResponseWriter, r *http.Request) {
 	header.Set("X-Content-Type-Options", "nosniff")
 	header.Set("Content-Security-Policy", "sandbox")
 	header.Set("Cache-Control", "private, max-age=3600")
-	_, _ = w.Write(*file.Data)
+	http.ServeContent(w, r, "", file.CreatedAt, bytes.NewReader(*file.Data))
 }
 
 // disposition downloads types a browser would run instead of showing them.

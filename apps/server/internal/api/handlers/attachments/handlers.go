@@ -29,14 +29,15 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 		Name: "prepare_file_upload", Access: auth.Write, Routes: []string{"POST /files"},
 		Description: "Get a one-time URL to upload a file (screenshot, log, recording, ...) to, valid for 15 minutes. Upload it " +
 			"by running the returned `curl` command with <file> replaced by the local path (an HTTP PUT of the raw bytes). " +
-			"Then embed the assetUrl in Markdown (`![name](assetUrl)` for images, `[name](assetUrl)` otherwise) in a " +
-			"description or comment, or attach it to an issue with create_attachment_from_upload. Agents that can't run " +
-			"commands use upload_file instead.",
+			"Then paste the returned markdown into a description, document or comment: images and videos embed " +
+			"(`![shot.png](assetUrl)`, `![demo.mp4](assetUrl)`; a video plays when the name ends in .mp4, .webm, .mov, " +
+			".m4v or .ogv) and other files link (`[name](assetUrl)`). Or attach it to an issue with " +
+			"create_attachment_from_upload. Agents that can't run commands use upload_file instead.",
 	}, attachments.PrepareFileUpload)
 	oapi.Register(reg, oapi.Operation{
 		Name: "upload_file", Access: auth.Write, Routes: []string{"POST /files/inline"},
 		Description: "Upload a small file (up to 5 MB) as base64 in the arguments, for agents that can't run commands; otherwise " +
-			"prefer prepare_file_upload. Embed the returned assetUrl in Markdown (`![name](assetUrl)`) or attach it to an " +
+			"prefer prepare_file_upload. Paste the returned markdown into a description, document or comment, or attach it to an " +
 			"issue with create_attachment_from_upload.",
 	}, attachments.UploadFile)
 	oapi.Register(reg, oapi.Operation{

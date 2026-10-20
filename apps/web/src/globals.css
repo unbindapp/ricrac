@@ -385,6 +385,54 @@
   .rr-prose img {
     @apply max-w-full rounded-md border;
   }
+  .rr-embed {
+    @apply relative block w-fit max-w-full;
+  }
+  .rr-embed[data-align="center"] {
+    @apply mx-auto;
+  }
+  .rr-embed[data-align="right"] {
+    @apply ml-auto;
+  }
+  .rr-media {
+    @apply block h-auto max-w-full rounded-md border;
+  }
+  .rr-embed[style] .rr-media {
+    @apply w-full;
+  }
+  .rr-embed[data-selected] .rr-media {
+    @apply ring-primary ring-2;
+  }
+  .rr-media-resize {
+    @apply bg-background absolute top-1/2 z-10 h-12 w-1.5 -translate-y-1/2 cursor-ew-resize touch-none rounded-full border opacity-0 shadow-sm transition-opacity;
+  }
+  .rr-embed:hover .rr-media-resize,
+  .rr-embed[data-selected] .rr-media-resize {
+    @apply opacity-100;
+  }
+  .rr-lightbox-image {
+    @apply max-w-full rounded-md object-contain;
+    max-height: calc(100dvh - 8rem);
+  }
+  .rr-dropcursor {
+    @apply bg-primary;
+  }
+  .rr-prose .ProseMirror-selectednode:not(.node-image) {
+    @apply ring-primary rounded-sm ring-2;
+  }
+  .rr-prose .tableWrapper {
+    @apply overflow-x-auto;
+  }
+  .rr-prose .selectedCell {
+    @apply bg-primary/1-10;
+  }
+  .rr-prose th {
+    @apply bg-muted font-semibold;
+  }
+  .rr-prose td > p,
+  .rr-prose th > p {
+    @apply m-0;
+  }
   .rr-prose table {
     @apply w-full border-collapse text-sm;
   }
@@ -427,7 +475,8 @@
   .rr-prose .ProseMirror > * + * {
     @apply mt-2;
   }
-  .rr-prose p.is-editor-empty:first-child::before {
+  .rr-prose p.is-editor-empty:first-child::before,
+  .rr-prose .ProseMirror-focused :is(p, h1, h2, h3).is-empty::before {
     @apply text-muted-foreground pointer-events-none float-left h-0;
     content: attr(data-placeholder);
   }
@@ -455,4 +504,15 @@
   .rr-prose .hljs-name {
     @apply text-process;
   }
+}
+
+/* Tiptap injects its own gap cursor styles unlayered; these must stay outside @layer to win. */
+.rr-prose .ProseMirror-gapcursor {
+  left: 0;
+  right: 0;
+}
+.rr-prose .ProseMirror-gapcursor::after {
+  top: 0.1875rem;
+  width: 100%;
+  border-top: 2px solid var(--color-primary);
 }

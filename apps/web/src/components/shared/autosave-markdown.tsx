@@ -1,7 +1,7 @@
 import { useWorkspaceUsers } from "@/components/issues/picker-sources";
 import { MarkdownEditor } from "@/components/shared/markdown-editor";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { useUploadImage } from "@/lib/queries/uploads";
+import { useUploadAsset } from "@/lib/queries/uploads";
 
 type TProps = {
   /** The server's text; it shows others' changes as they come in. */
@@ -17,7 +17,7 @@ type TProps = {
 export function AutosaveMarkdown({ value, label, placeholder, readOnly, onSave }: TProps) {
   const { workspace } = useWorkspace();
   const { users } = useWorkspaceUsers();
-  const uploadImage = useUploadImage(workspace.id);
+  const upload = useUploadAsset(workspace.id);
   if (readOnly && !value.trim()) return null;
   return (
     <MarkdownEditor
@@ -26,7 +26,7 @@ export function AutosaveMarkdown({ value, label, placeholder, readOnly, onSave }
       placeholder={placeholder}
       readOnly={readOnly}
       users={users}
-      onUploadImage={uploadImage}
+      onUpload={upload}
       autosave={{ onSave }}
     />
   );

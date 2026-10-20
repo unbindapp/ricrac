@@ -3,6 +3,7 @@ package e2e
 import (
 	bytesPkg "bytes"
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -231,6 +232,8 @@ func TestFilesUploadOnceAndDownloadForMembers(t *testing.T) {
 	assetURL := prepared.At("assetUrl").Str()
 	contains(t, prepared.At("curl").Str(), uploadURL)
 	eq(t, prepared.At("markdown").Str(), "![shot.png]("+assetURL+")")
+	video := call(t, w.Ann, "prepare_file_upload", M{"name": "demo", "contentType": "video/mp4", "size": 1})
+	eq(t, video.At("markdown").Str(), "![demo.mp4]("+video.At("assetUrl").Str()+")", "videos embed with a name the web app plays")
 
 	router := w.Router
 	uploadPath := strings.TrimPrefix(uploadURL, "http://localhost:3000")
@@ -271,6 +274,15 @@ func TestFilesUploadOnceAndDownloadForMembers(t *testing.T) {
 	eq(t, headers.Get("X-Content-Type-Options"), "nosniff")
 	eq(t, headers.Get("Content-Security-Policy"), "sandbox")
 	check(t, strings.HasPrefix(headers.Get("Content-Disposition"), `inline; filename="shot.png"`), headers.Get("Content-Disposition"))
+	eq(t, headers.Get("Accept-Ranges"), "bytes")
+	ranged := httptest.NewRequest("GET", filePath, nil)
+	ranged.Header.Set("Authorization", "Bearer "+key)
+	ranged.Header.Set("Range", "bytes=1-3")
+	partial := httptest.NewRecorder()
+	router.ServeHTTP(partial, ranged)
+	eq(t, partial.Code, http.StatusPartialContent, "players seek with ranges")
+	eq(t, partial.Body.String(), "PNG")
+	eq(t, partial.Header().Get("Content-Range"), fmt.Sprintf("bytes 1-3/%d", len(bytes)))
 
 	cookie := func(user uuid.UUID) string {
 		return w.session(user)

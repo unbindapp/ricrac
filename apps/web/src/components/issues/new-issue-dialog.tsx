@@ -28,7 +28,7 @@ import { useTeamFromRoute } from "@/components/workspace/use-team-from-route";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 import { ISSUE_TITLE_MAX_LENGTH, useCreateIssueMutation } from "@/lib/queries/issues";
-import { useUploadImage } from "@/lib/queries/uploads";
+import { useEditorUploads } from "@/lib/queries/uploads";
 
 const LAST_TEAM_KEY = "new-issue-team";
 
@@ -78,7 +78,7 @@ function NewIssueForm({ defaults, onClose }: { defaults: TNewIssueDefaults; onCl
   const { teams, myTeams, isPending: isTeamsPending } = useTeams();
   const team = useTeamDetail(teamId);
   const { users } = useWorkspaceUsers();
-  const uploadImage = useUploadImage(workspace.id);
+  const uploads = useEditorUploads(workspace.id);
   const { mutateAsync: createIssue, isPending } = useCreateIssueMutation(workspace.id);
 
   const provided = Object.fromEntries(
@@ -99,7 +99,7 @@ function NewIssueForm({ defaults, onClose }: { defaults: TNewIssueDefaults; onCl
   }, [formKey]);
 
   const submit = async () => {
-    if (!teamId || !title.trim() || submittingRef.current) return;
+    if (!teamId || !title.trim() || submittingRef.current || uploads.isUploading) return;
     submittingRef.current = true;
     const created = await createIssue(draftToCreateArgs({ teamId, title, description, draft }))
       .catch(() => null)
@@ -225,7 +225,7 @@ function NewIssueForm({ defaults, onClose }: { defaults: TNewIssueDefaults; onCl
         onChange={setDescription}
         placeholder="Add a description…"
         users={users}
-        onUploadImage={uploadImage}
+        {...uploads.editorProps}
       />
       {teamId && (
         <IssueProperties
@@ -247,7 +247,12 @@ function NewIssueForm({ defaults, onClose }: { defaults: TNewIssueDefaults; onCl
         <Button type="button" variant="outline" size="sm" onClick={onClose}>
           Cancel
         </Button>
-        <Button type="submit" size="sm" isPending={isPending} disabled={!teamId || !title.trim()}>
+        <Button
+          type="submit"
+          size="sm"
+          isPending={isPending}
+          disabled={!teamId || !title.trim() || uploads.isUploading}
+        >
           Create issue
           <Kbd className="bg-primary-foreground/2-10 text-primary-foreground group-disabled/button:text-muted-foreground border-transparent group-disabled/button:bg-transparent">
             {formatForDisplay("Mod+Enter")}

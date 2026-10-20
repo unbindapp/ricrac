@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SimpleTooltip } from "@/components/ui/tooltip";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { useEditorUploads } from "@/lib/queries/uploads";
 import { meQuery } from "@/lib/queries/me";
 import {
   statusUpdateCommentsQuery,
@@ -280,8 +281,9 @@ function CommentComposer({ updateId }: { updateId: string }) {
   const [body, setBody] = useState("");
   const [editorKey, setEditorKey] = useState(0);
   const { mutateAsync: saveComment, isPending } = useSaveStatusUpdateCommentMutation(workspace.id);
+  const uploads = useEditorUploads(workspace.id);
   const submit = async () => {
-    if (!body.trim() || isPending) return;
+    if (!body.trim() || isPending || uploads.isUploading) return;
     await saveComment({ statusUpdateId: updateId, body: body.trim() }).catch(() => undefined);
     setBody("");
     setEditorKey((key) => key + 1);
@@ -297,11 +299,12 @@ function CommentComposer({ updateId }: { updateId: string }) {
         label="Comment"
         placeholder="Leave a comment…"
         onSubmit={() => void submit()}
+        {...uploads.editorProps}
       />
       <Button
         size="sm"
         className="self-end"
-        disabled={!body.trim()}
+        disabled={!body.trim() || uploads.isUploading}
         isPending={isPending}
         onClick={() => void submit()}
       >

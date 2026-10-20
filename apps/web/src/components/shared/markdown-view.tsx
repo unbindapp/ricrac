@@ -3,6 +3,7 @@ import { createContext, use, useState } from "react";
 import ReactMarkdown, { defaultUrlTransform } from "react-markdown";
 import remarkGfm from "remark-gfm";
 
+import { MarkdownMedia } from "@/components/shared/markdown-media";
 import { splitMentions } from "@/components/shared/mention-text";
 import { TaskCheckbox } from "@/components/ui/task-checkbox";
 import { toggleTask } from "@/lib/helpers/task-list";
@@ -78,6 +79,8 @@ export function MarkdownView({ markdown, onChange }: TProps) {
               </li>
             ),
             input: ({ checked }) => <TaskInput checked={Boolean(checked)} />,
+            img: ({ src, alt }) =>
+              typeof src === "string" && src ? <MarkdownMedia src={src} alt={alt} /> : null,
           }}
         >
           {shown}

@@ -3,8 +3,10 @@ import { useState } from "react";
 import { HEALTHS, HealthIcon, healthLabels } from "@/components/projects/health-badge";
 import { useMentionUsers } from "@/components/projects/people";
 import { MarkdownEditor } from "@/components/shared/markdown-editor";
+import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useEditorUploads } from "@/lib/queries/uploads";
 import type { THealth } from "@/lib/queries/projects";
 
 type TProps = {
@@ -23,10 +25,12 @@ export function StatusUpdateComposer({
   onCancel,
 }: TProps) {
   const users = useMentionUsers();
+  const { workspace } = useWorkspace();
+  const uploads = useEditorUploads(workspace.id);
   const [body, setBody] = useState(initialBody);
   const [health, setHealth] = useState<THealth>(initialHealth);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const canSubmit = body.trim().length > 0 && !isSubmitting;
+  const canSubmit = body.trim().length > 0 && !isSubmitting && !uploads.isUploading;
 
   const submit = async () => {
     if (!canSubmit) return;
@@ -66,6 +70,7 @@ export function StatusUpdateComposer({
         placeholder="What changed, what's next, and what's in the way?"
         label="Update"
         onSubmit={() => void submit()}
+        {...uploads.editorProps}
       />
       <div className="flex items-center justify-end gap-2">
         {onCancel && (

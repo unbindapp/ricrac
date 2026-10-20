@@ -36,7 +36,7 @@ import {
   useSaveCommentMutation,
 } from "@/lib/queries/comments";
 import { meQuery } from "@/lib/queries/me";
-import { useUploadImage } from "@/lib/queries/uploads";
+import { useEditorUploads } from "@/lib/queries/uploads";
 
 export function CommentComposer({
   issueId,
@@ -55,10 +55,10 @@ export function CommentComposer({
   const [body, setBody] = useState("");
   const [formKey, setFormKey] = useState(0);
   const { users } = useWorkspaceUsers();
-  const uploadImage = useUploadImage(workspace.id);
+  const uploads = useEditorUploads(workspace.id);
   const { mutateAsync: saveComment, isPending } = useSaveCommentMutation(workspace.id);
   const submit = async () => {
-    if (!body.trim() || isPending) return;
+    if (!body.trim() || isPending || uploads.isUploading) return;
     const saved = await saveComment({ issueId, body, parentId }).catch(() => null);
     if (!saved) return;
     setBody("");
@@ -75,7 +75,7 @@ export function CommentComposer({
         onSubmit={() => void submit()}
         placeholder={placeholder}
         users={users}
-        onUploadImage={uploadImage}
+        {...uploads.editorProps}
         autoFocus={autoFocus}
       />
       <div className="flex items-center justify-end gap-2">
@@ -87,7 +87,7 @@ export function CommentComposer({
         <Button
           size="sm"
           isPending={isPending}
-          disabled={!body.trim()}
+          disabled={!body.trim() || uploads.isUploading}
           onClick={() => void submit()}
         >
           {parentId ? "Reply" : "Comment"}
@@ -195,7 +195,7 @@ function CommentItem({
   const [draft, setDraft] = useState(comment.body);
   const { data: me } = useQuery(meQuery);
   const { users } = useWorkspaceUsers();
-  const uploadImage = useUploadImage(workspace.id);
+  const uploads = useEditorUploads(workspace.id);
   const { mutateAsync: saveComment, isPending: isSaving } = useSaveCommentMutation(workspace.id);
   const { mutateAsync: deleteComment } = useDeleteCommentMutation(workspace.id);
   const { mutate: setResolved } = useResolveCommentMutation(workspace.id);
@@ -207,7 +207,7 @@ function CommentItem({
     toggleReaction({ commentId: comment.id, emoji, reacted });
 
   const save = async () => {
-    if (!draft.trim()) return;
+    if (!draft.trim() || uploads.isUploading) return;
     await saveComment({ id: comment.id, body: draft });
     setIsEditing(false);
   };
@@ -306,7 +306,7 @@ function CommentItem({
             onChange={setDraft}
             onSubmit={() => void save().catch(() => undefined)}
             users={users}
-            onUploadImage={uploadImage}
+            {...uploads.editorProps}
             autoFocus
             framed
           />
@@ -317,7 +317,7 @@ function CommentItem({
             <Button
               size="sm"
               isPending={isSaving}
-              disabled={!draft.trim() || draft === comment.body}
+              disabled={!draft.trim() || draft === comment.body || uploads.isUploading}
               onClick={() => void save().catch(() => undefined)}
             >
               Save

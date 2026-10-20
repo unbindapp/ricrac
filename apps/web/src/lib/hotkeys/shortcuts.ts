@@ -61,6 +61,21 @@ export const shortcutGroups: TShortcutGroup[] = [
     ],
   },
   {
+    title: "Editor",
+    shortcuts: [
+      { label: "Commands", keys: ["/"] },
+      { label: "Mention", keys: ["@"] },
+      { label: "Emoji", keys: [":"] },
+      { label: "Bold", keys: ["Mod+B"] },
+      { label: "Italic", keys: ["Mod+I"] },
+      { label: "Strikethrough", keys: ["Mod+Shift+S"] },
+      { label: "Inline code", keys: ["Mod+E"] },
+      { label: "Link the selection", keys: ["Mod+K"] },
+      { label: "Code block", keys: ["Mod+Alt+C"] },
+      { label: "Send a comment", keys: ["Mod+Enter"] },
+    ],
+  },
+  {
     title: "Inbox",
     shortcuts: [
       { label: "Next / previous", keys: ["J", "K"] },
