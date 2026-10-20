@@ -10,6 +10,7 @@ import (
 	"ricrac/internal/models"
 	"ricrac/internal/repositories"
 	"ricrac/internal/repositories/account"
+	"time"
 
 	"github.com/google/uuid"
 	mock "github.com/stretchr/testify/mock"
@@ -189,6 +190,87 @@ func (_c *AccountRepositoryMock_ActiveIn_Call) Return(uUIDs []uuid.UUID, err err
 }
 
 func (_c *AccountRepositoryMock_ActiveIn_Call) RunAndReturn(run func(ctx context.Context, user uuid.UUID, workspaces []uuid.UUID) ([]uuid.UUID, error)) *AccountRepositoryMock_ActiveIn_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// AddSignInLink provides a mock function for the type AccountRepositoryMock
+func (_mock *AccountRepositoryMock) AddSignInLink(ctx context.Context, tx repository.TxInterface, tokenHash string, email string, returnTo string, expiresAt time.Time) error {
+	ret := _mock.Called(ctx, tx, tokenHash, email, returnTo, expiresAt)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AddSignInLink")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, string, string, string, time.Time) error); ok {
+		r0 = returnFunc(ctx, tx, tokenHash, email, returnTo, expiresAt)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// AccountRepositoryMock_AddSignInLink_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddSignInLink'
+type AccountRepositoryMock_AddSignInLink_Call struct {
+	*mock.Call
+}
+
+// AddSignInLink is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - tokenHash string
+//   - email string
+//   - returnTo string
+//   - expiresAt time.Time
+func (_e *AccountRepositoryMock_Expecter) AddSignInLink(ctx any, tx any, tokenHash any, email any, returnTo any, expiresAt any) *AccountRepositoryMock_AddSignInLink_Call {
+	return &AccountRepositoryMock_AddSignInLink_Call{Call: _e.mock.On("AddSignInLink", ctx, tx, tokenHash, email, returnTo, expiresAt)}
+}
+
+func (_c *AccountRepositoryMock_AddSignInLink_Call) Run(run func(ctx context.Context, tx repository.TxInterface, tokenHash string, email string, returnTo string, expiresAt time.Time)) *AccountRepositoryMock_AddSignInLink_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 string
+		if args[2] != nil {
+			arg2 = args[2].(string)
+		}
+		var arg3 string
+		if args[3] != nil {
+			arg3 = args[3].(string)
+		}
+		var arg4 string
+		if args[4] != nil {
+			arg4 = args[4].(string)
+		}
+		var arg5 time.Time
+		if args[5] != nil {
+			arg5 = args[5].(time.Time)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+			arg5,
+		)
+	})
+	return _c
+}
+
+func (_c *AccountRepositoryMock_AddSignInLink_Call) Return(err error) *AccountRepositoryMock_AddSignInLink_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *AccountRepositoryMock_AddSignInLink_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, tokenHash string, email string, returnTo string, expiresAt time.Time) error) *AccountRepositoryMock_AddSignInLink_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1146,6 +1228,78 @@ func (_c *AccountRepositoryMock_Leave_Call) RunAndReturn(run func(ctx context.Co
 	return _c
 }
 
+// LiveSignInLinks provides a mock function for the type AccountRepositoryMock
+func (_mock *AccountRepositoryMock) LiveSignInLinks(ctx context.Context, tx repository.TxInterface, email string) (int, error) {
+	ret := _mock.Called(ctx, tx, email)
+
+	if len(ret) == 0 {
+		panic("no return value specified for LiveSignInLinks")
+	}
+
+	var r0 int
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, string) (int, error)); ok {
+		return returnFunc(ctx, tx, email)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, string) int); ok {
+		r0 = returnFunc(ctx, tx, email)
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, string) error); ok {
+		r1 = returnFunc(ctx, tx, email)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// AccountRepositoryMock_LiveSignInLinks_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LiveSignInLinks'
+type AccountRepositoryMock_LiveSignInLinks_Call struct {
+	*mock.Call
+}
+
+// LiveSignInLinks is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - email string
+func (_e *AccountRepositoryMock_Expecter) LiveSignInLinks(ctx any, tx any, email any) *AccountRepositoryMock_LiveSignInLinks_Call {
+	return &AccountRepositoryMock_LiveSignInLinks_Call{Call: _e.mock.On("LiveSignInLinks", ctx, tx, email)}
+}
+
+func (_c *AccountRepositoryMock_LiveSignInLinks_Call) Run(run func(ctx context.Context, tx repository.TxInterface, email string)) *AccountRepositoryMock_LiveSignInLinks_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 string
+		if args[2] != nil {
+			arg2 = args[2].(string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *AccountRepositoryMock_LiveSignInLinks_Call) Return(n int, err error) *AccountRepositoryMock_LiveSignInLinks_Call {
+	_c.Call.Return(n, err)
+	return _c
+}
+
+func (_c *AccountRepositoryMock_LiveSignInLinks_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, email string) (int, error)) *AccountRepositoryMock_LiveSignInLinks_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // LockOwners provides a mock function for the type AccountRepositoryMock
 func (_mock *AccountRepositoryMock) LockOwners(ctx context.Context, tx repository.TxInterface, workspaceID uuid.UUID) ([]uuid.UUID, error) {
 	ret := _mock.Called(ctx, tx, workspaceID)
@@ -1990,6 +2144,86 @@ func (_c *AccountRepositoryMock_TakeInvitation_Call) RunAndReturn(run func(ctx c
 	return _c
 }
 
+// TakeSignInLink provides a mock function for the type AccountRepositoryMock
+func (_mock *AccountRepositoryMock) TakeSignInLink(ctx context.Context, tx repository.TxInterface, tokenHash string, email string) (*string, error) {
+	ret := _mock.Called(ctx, tx, tokenHash, email)
+
+	if len(ret) == 0 {
+		panic("no return value specified for TakeSignInLink")
+	}
+
+	var r0 *string
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, string, string) (*string, error)); ok {
+		return returnFunc(ctx, tx, tokenHash, email)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, string, string) *string); ok {
+		r0 = returnFunc(ctx, tx, tokenHash, email)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*string)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, string, string) error); ok {
+		r1 = returnFunc(ctx, tx, tokenHash, email)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// AccountRepositoryMock_TakeSignInLink_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TakeSignInLink'
+type AccountRepositoryMock_TakeSignInLink_Call struct {
+	*mock.Call
+}
+
+// TakeSignInLink is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - tokenHash string
+//   - email string
+func (_e *AccountRepositoryMock_Expecter) TakeSignInLink(ctx any, tx any, tokenHash any, email any) *AccountRepositoryMock_TakeSignInLink_Call {
+	return &AccountRepositoryMock_TakeSignInLink_Call{Call: _e.mock.On("TakeSignInLink", ctx, tx, tokenHash, email)}
+}
+
+func (_c *AccountRepositoryMock_TakeSignInLink_Call) Run(run func(ctx context.Context, tx repository.TxInterface, tokenHash string, email string)) *AccountRepositoryMock_TakeSignInLink_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 string
+		if args[2] != nil {
+			arg2 = args[2].(string)
+		}
+		var arg3 string
+		if args[3] != nil {
+			arg3 = args[3].(string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *AccountRepositoryMock_TakeSignInLink_Call) Return(s *string, err error) *AccountRepositoryMock_TakeSignInLink_Call {
+	_c.Call.Return(s, err)
+	return _c
+}
+
+func (_c *AccountRepositoryMock_TakeSignInLink_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, tokenHash string, email string) (*string, error)) *AccountRepositoryMock_TakeSignInLink_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // URLKeyTaken provides a mock function for the type AccountRepositoryMock
 func (_mock *AccountRepositoryMock) URLKeyTaken(ctx context.Context, tx repository.TxInterface, urlKey string) (bool, error) {
 	ret := _mock.Called(ctx, tx, urlKey)
@@ -2121,6 +2355,98 @@ func (_c *AccountRepositoryMock_UpdateOAuthApp_Call) Return(err error) *AccountR
 }
 
 func (_c *AccountRepositoryMock_UpdateOAuthApp_Call) RunAndReturn(run func(ctx context.Context, id string, app account_repo.SavedApp) error) *AccountRepositoryMock_UpdateOAuthApp_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpsertEmailUser provides a mock function for the type AccountRepositoryMock
+func (_mock *AccountRepositoryMock) UpsertEmailUser(ctx context.Context, tx repository.TxInterface, email string, name string, displayName string, now time.Time) (uuid.UUID, error) {
+	ret := _mock.Called(ctx, tx, email, name, displayName, now)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpsertEmailUser")
+	}
+
+	var r0 uuid.UUID
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, string, string, string, time.Time) (uuid.UUID, error)); ok {
+		return returnFunc(ctx, tx, email, name, displayName, now)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, string, string, string, time.Time) uuid.UUID); ok {
+		r0 = returnFunc(ctx, tx, email, name, displayName, now)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, string, string, string, time.Time) error); ok {
+		r1 = returnFunc(ctx, tx, email, name, displayName, now)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// AccountRepositoryMock_UpsertEmailUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpsertEmailUser'
+type AccountRepositoryMock_UpsertEmailUser_Call struct {
+	*mock.Call
+}
+
+// UpsertEmailUser is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - email string
+//   - name string
+//   - displayName string
+//   - now time.Time
+func (_e *AccountRepositoryMock_Expecter) UpsertEmailUser(ctx any, tx any, email any, name any, displayName any, now any) *AccountRepositoryMock_UpsertEmailUser_Call {
+	return &AccountRepositoryMock_UpsertEmailUser_Call{Call: _e.mock.On("UpsertEmailUser", ctx, tx, email, name, displayName, now)}
+}
+
+func (_c *AccountRepositoryMock_UpsertEmailUser_Call) Run(run func(ctx context.Context, tx repository.TxInterface, email string, name string, displayName string, now time.Time)) *AccountRepositoryMock_UpsertEmailUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 string
+		if args[2] != nil {
+			arg2 = args[2].(string)
+		}
+		var arg3 string
+		if args[3] != nil {
+			arg3 = args[3].(string)
+		}
+		var arg4 string
+		if args[4] != nil {
+			arg4 = args[4].(string)
+		}
+		var arg5 time.Time
+		if args[5] != nil {
+			arg5 = args[5].(time.Time)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+			arg5,
+		)
+	})
+	return _c
+}
+
+func (_c *AccountRepositoryMock_UpsertEmailUser_Call) Return(uUID uuid.UUID, err error) *AccountRepositoryMock_UpsertEmailUser_Call {
+	_c.Call.Return(uUID, err)
+	return _c
+}
+
+func (_c *AccountRepositoryMock_UpsertEmailUser_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, email string, name string, displayName string, now time.Time) (uuid.UUID, error)) *AccountRepositoryMock_UpsertEmailUser_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -84,7 +84,7 @@ function ProfileSection({ me }: { me: WorkspaceUserDetail }) {
   return (
     <SettingsSection
       title="Details"
-      description="Your picture comes from your Google account."
+      description="Your picture comes from your Google account, if you signed in with Google."
       onSubmit={submitHandler(form)}
       footer={
         <form.AppForm>

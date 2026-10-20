@@ -94,6 +94,10 @@ export const account = {
   me: () => request<Account.Me | null>("GET", "/api/me"),
   updateMe: (body: Account.UpdateMe) => request<Account.Me>("PATCH", "/api/me", { body }),
   signOut: () => request<{ ok: boolean }>("POST", "/api/auth/sign-out"),
+  sendSignInLink: (body: { email: string; returnTo?: string }) =>
+    request<{ ok: boolean }>("POST", "/api/auth/email", { body }),
+  finishSignInLink: (body: { email: string; token: string }) =>
+    request<{ returnTo: string }>("POST", "/api/auth/email/callback", { body }),
   createWorkspace: (body: Account.CreateWorkspace) =>
     request<Account.WorkspaceSummary>("POST", "/api/workspaces", { body }),
   deleteWorkspace: (id: string, body: Account.DeleteWorkspace) =>

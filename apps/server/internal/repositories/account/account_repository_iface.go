@@ -7,6 +7,7 @@ import (
 	"ricrac/ent"
 	"ricrac/internal/models"
 	repository "ricrac/internal/repositories"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -33,6 +34,13 @@ type AccountRepositoryInterface interface {
 	// recently used first.
 	ConnectedApps(ctx context.Context, user uuid.UUID) ([]*ent.OAuthGrant, error)
 	RevokeGrant(ctx context.Context, id, user uuid.UUID) error
+	// LiveSignInLinks drops expired sign-in links and counts the email's others.
+	LiveSignInLinks(ctx context.Context, tx repository.TxInterface, email string) (int, error)
+	AddSignInLink(ctx context.Context, tx repository.TxInterface, tokenHash, email, returnTo string, expiresAt time.Time) error
+	// TakeSignInLink uses up the email's unexpired link and answers where it goes, nil when there's none.
+	TakeSignInLink(ctx context.Context, tx repository.TxInterface, tokenHash, email string) (*string, error)
+	// UpsertEmailUser refreshes the user with this email, or creates them, and returns their id.
+	UpsertEmailUser(ctx context.Context, tx repository.TxInterface, email, name, displayName string, now time.Time) (uuid.UUID, error)
 	UserExists(ctx context.Context, id uuid.UUID) (bool, error)
 	// User is the user, nil when there's none.
 	User(ctx context.Context, id uuid.UUID) (*ent.User, error)

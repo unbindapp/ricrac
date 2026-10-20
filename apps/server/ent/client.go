@@ -63,6 +63,7 @@ import (
 	"ricrac/ent/releasepipeline"
 	"ricrac/ent/releasepipelineteam"
 	"ricrac/ent/releasestage"
+	"ricrac/ent/signinlink"
 	"ricrac/ent/statusupdate"
 	"ricrac/ent/team"
 	"ricrac/ent/teammember"
@@ -192,6 +193,8 @@ type Client struct {
 	ReleasePipelineTeam *ReleasePipelineTeamClient
 	// ReleaseStage is the client for interacting with the ReleaseStage builders.
 	ReleaseStage *ReleaseStageClient
+	// SignInLink is the client for interacting with the SignInLink builders.
+	SignInLink *SignInLinkClient
 	// StatusUpdate is the client for interacting with the StatusUpdate builders.
 	StatusUpdate *StatusUpdateClient
 	// Team is the client for interacting with the Team builders.
@@ -275,6 +278,7 @@ func (c *Client) init() {
 	c.ReleasePipeline = NewReleasePipelineClient(c.config)
 	c.ReleasePipelineTeam = NewReleasePipelineTeamClient(c.config)
 	c.ReleaseStage = NewReleaseStageClient(c.config)
+	c.SignInLink = NewSignInLinkClient(c.config)
 	c.StatusUpdate = NewStatusUpdateClient(c.config)
 	c.Team = NewTeamClient(c.config)
 	c.TeamMember = NewTeamMemberClient(c.config)
@@ -429,6 +433,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ReleasePipeline:     NewReleasePipelineClient(cfg),
 		ReleasePipelineTeam: NewReleasePipelineTeamClient(cfg),
 		ReleaseStage:        NewReleaseStageClient(cfg),
+		SignInLink:          NewSignInLinkClient(cfg),
 		StatusUpdate:        NewStatusUpdateClient(cfg),
 		Team:                NewTeamClient(cfg),
 		TeamMember:          NewTeamMemberClient(cfg),
@@ -510,6 +515,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ReleasePipeline:     NewReleasePipelineClient(cfg),
 		ReleasePipelineTeam: NewReleasePipelineTeamClient(cfg),
 		ReleaseStage:        NewReleaseStageClient(cfg),
+		SignInLink:          NewSignInLinkClient(cfg),
 		StatusUpdate:        NewStatusUpdateClient(cfg),
 		Team:                NewTeamClient(cfg),
 		TeamMember:          NewTeamMemberClient(cfg),
@@ -560,8 +566,8 @@ func (c *Client) Use(hooks ...Hook) {
 		c.ProjectLabelLink, c.ProjectMember, c.ProjectMilestone, c.ProjectRelation,
 		c.ProjectStatus, c.ProjectSubscriber, c.ProjectTeam, c.Reaction, c.Release,
 		c.ReleaseNote, c.ReleasePipeline, c.ReleasePipelineTeam, c.ReleaseStage,
-		c.StatusUpdate, c.Team, c.TeamMember, c.Template, c.User, c.Webhook,
-		c.WebhookDelivery, c.WorkflowState, c.Workspace, c.WorkspaceMember,
+		c.SignInLink, c.StatusUpdate, c.Team, c.TeamMember, c.Template, c.User,
+		c.Webhook, c.WebhookDelivery, c.WorkflowState, c.Workspace, c.WorkspaceMember,
 	} {
 		n.Use(hooks...)
 	}
@@ -582,8 +588,8 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.ProjectLabelLink, c.ProjectMember, c.ProjectMilestone, c.ProjectRelation,
 		c.ProjectStatus, c.ProjectSubscriber, c.ProjectTeam, c.Reaction, c.Release,
 		c.ReleaseNote, c.ReleasePipeline, c.ReleasePipelineTeam, c.ReleaseStage,
-		c.StatusUpdate, c.Team, c.TeamMember, c.Template, c.User, c.Webhook,
-		c.WebhookDelivery, c.WorkflowState, c.Workspace, c.WorkspaceMember,
+		c.SignInLink, c.StatusUpdate, c.Team, c.TeamMember, c.Template, c.User,
+		c.Webhook, c.WebhookDelivery, c.WorkflowState, c.Workspace, c.WorkspaceMember,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -696,6 +702,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.ReleasePipelineTeam.mutate(ctx, m)
 	case *ReleaseStageMutation:
 		return c.ReleaseStage.mutate(ctx, m)
+	case *SignInLinkMutation:
+		return c.SignInLink.mutate(ctx, m)
 	case *StatusUpdateMutation:
 		return c.StatusUpdate.mutate(ctx, m)
 	case *TeamMutation:
@@ -10891,6 +10899,139 @@ func (c *ReleaseStageClient) mutate(ctx context.Context, m *ReleaseStageMutation
 	}
 }
 
+// SignInLinkClient is a client for the SignInLink schema.
+type SignInLinkClient struct {
+	config
+}
+
+// NewSignInLinkClient returns a client for the SignInLink from the given config.
+func NewSignInLinkClient(c config) *SignInLinkClient {
+	return &SignInLinkClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `signinlink.Hooks(f(g(h())))`.
+func (c *SignInLinkClient) Use(hooks ...Hook) {
+	c.hooks.SignInLink = append(c.hooks.SignInLink, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `signinlink.Intercept(f(g(h())))`.
+func (c *SignInLinkClient) Intercept(interceptors ...Interceptor) {
+	c.inters.SignInLink = append(c.inters.SignInLink, interceptors...)
+}
+
+// Create returns a builder for creating a SignInLink entity.
+func (c *SignInLinkClient) Create() *SignInLinkCreate {
+	mutation := newSignInLinkMutation(c.config, OpCreate)
+	return &SignInLinkCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of SignInLink entities.
+func (c *SignInLinkClient) CreateBulk(builders ...*SignInLinkCreate) *SignInLinkCreateBulk {
+	return &SignInLinkCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SignInLinkClient) MapCreateBulk(slice any, setFunc func(*SignInLinkCreate, int)) *SignInLinkCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SignInLinkCreateBulk{err: fmt.Errorf("calling to SignInLinkClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SignInLinkCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SignInLinkCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for SignInLink.
+func (c *SignInLinkClient) Update() *SignInLinkUpdate {
+	mutation := newSignInLinkMutation(c.config, OpUpdate)
+	return &SignInLinkUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SignInLinkClient) UpdateOne(_m *SignInLink) *SignInLinkUpdateOne {
+	mutation := newSignInLinkMutation(c.config, OpUpdateOne, withSignInLink(_m))
+	return &SignInLinkUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SignInLinkClient) UpdateOneID(id string) *SignInLinkUpdateOne {
+	mutation := newSignInLinkMutation(c.config, OpUpdateOne, withSignInLinkID(id))
+	return &SignInLinkUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for SignInLink.
+func (c *SignInLinkClient) Delete() *SignInLinkDelete {
+	mutation := newSignInLinkMutation(c.config, OpDelete)
+	return &SignInLinkDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SignInLinkClient) DeleteOne(_m *SignInLink) *SignInLinkDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SignInLinkClient) DeleteOneID(id string) *SignInLinkDeleteOne {
+	builder := c.Delete().Where(signinlink.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SignInLinkDeleteOne{builder}
+}
+
+// Query returns a query builder for SignInLink.
+func (c *SignInLinkClient) Query() *SignInLinkQuery {
+	return &SignInLinkQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSignInLink},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a SignInLink entity by its id.
+func (c *SignInLinkClient) Get(ctx context.Context, id string) (*SignInLink, error) {
+	return c.Query().Where(signinlink.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SignInLinkClient) GetX(ctx context.Context, id string) *SignInLink {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *SignInLinkClient) Hooks() []Hook {
+	return c.hooks.SignInLink
+}
+
+// Interceptors returns the client interceptors.
+func (c *SignInLinkClient) Interceptors() []Interceptor {
+	return c.inters.SignInLink
+}
+
+func (c *SignInLinkClient) mutate(ctx context.Context, m *SignInLinkMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SignInLinkCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SignInLinkUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SignInLinkUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SignInLinkDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown SignInLink mutation op: %q", m.Op())
+	}
+}
+
 // StatusUpdateClient is a client for the StatusUpdate schema.
 type StatusUpdateClient struct {
 	config
@@ -14247,9 +14388,9 @@ type (
 		OAuthCode, OAuthGrant, OAuthToken, Project, ProjectLabel, ProjectLabelLink,
 		ProjectMember, ProjectMilestone, ProjectRelation, ProjectStatus,
 		ProjectSubscriber, ProjectTeam, Reaction, Release, ReleaseNote,
-		ReleasePipeline, ReleasePipelineTeam, ReleaseStage, StatusUpdate, Team,
-		TeamMember, Template, User, Webhook, WebhookDelivery, WorkflowState, Workspace,
-		WorkspaceMember []ent.Hook
+		ReleasePipeline, ReleasePipelineTeam, ReleaseStage, SignInLink, StatusUpdate,
+		Team, TeamMember, Template, User, Webhook, WebhookDelivery, WorkflowState,
+		Workspace, WorkspaceMember []ent.Hook
 	}
 	inters struct {
 		APIKey, Attachment, AuditEntry, Comment, CustomView, Customer, CustomerNeed,
@@ -14261,9 +14402,9 @@ type (
 		OAuthCode, OAuthGrant, OAuthToken, Project, ProjectLabel, ProjectLabelLink,
 		ProjectMember, ProjectMilestone, ProjectRelation, ProjectStatus,
 		ProjectSubscriber, ProjectTeam, Reaction, Release, ReleaseNote,
-		ReleasePipeline, ReleasePipelineTeam, ReleaseStage, StatusUpdate, Team,
-		TeamMember, Template, User, Webhook, WebhookDelivery, WorkflowState, Workspace,
-		WorkspaceMember []ent.Interceptor
+		ReleasePipeline, ReleasePipelineTeam, ReleaseStage, SignInLink, StatusUpdate,
+		Team, TeamMember, Template, User, Webhook, WebhookDelivery, WorkflowState,
+		Workspace, WorkspaceMember []ent.Interceptor
 	}
 )
 

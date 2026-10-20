@@ -1969,6 +1969,20 @@ var (
 			},
 		},
 	}
+	// SignInLinksColumns holds the columns for the "sign_in_links" table.
+	SignInLinksColumns = []*schema.Column{
+		{Name: "token_hash", Type: field.TypeString, Size: 2147483647},
+		{Name: "email", Type: field.TypeString, Size: 2147483647},
+		{Name: "return_to", Type: field.TypeString, Size: 2147483647},
+		{Name: "expires_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true},
+	}
+	// SignInLinksTable holds the schema information for the "sign_in_links" table.
+	SignInLinksTable = &schema.Table{
+		Name:       "sign_in_links",
+		Columns:    SignInLinksColumns,
+		PrimaryKey: []*schema.Column{SignInLinksColumns[0]},
+	}
 	// StatusUpdatesColumns holds the columns for the "status_updates" table.
 	StatusUpdatesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
@@ -2385,6 +2399,7 @@ var (
 		ReleasePipelinesTable,
 		ReleasePipelineTeamsTable,
 		ReleaseStagesTable,
+		SignInLinksTable,
 		StatusUpdatesTable,
 		TeamsTable,
 		TeamMembersTable,
@@ -2703,6 +2718,9 @@ func init() {
 	ReleaseStagesTable.ForeignKeys[0].RefTable = ReleasePipelinesTable
 	ReleaseStagesTable.Annotation = &entsql.Annotation{
 		Table: "release_stages",
+	}
+	SignInLinksTable.Annotation = &entsql.Annotation{
+		Table: "sign_in_links",
 	}
 	StatusUpdatesTable.ForeignKeys[0].RefTable = InitiativesTable
 	StatusUpdatesTable.ForeignKeys[1].RefTable = ProjectsTable

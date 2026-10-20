@@ -59,6 +59,7 @@ import (
 	"ricrac/ent/releasepipeline"
 	"ricrac/ent/releasepipelineteam"
 	"ricrac/ent/releasestage"
+	"ricrac/ent/signinlink"
 	"ricrac/ent/statusupdate"
 	"ricrac/ent/team"
 	"ricrac/ent/teammember"
@@ -186,6 +187,7 @@ func checkColumn(t, c string) error {
 			releasepipeline.Table:     releasepipeline.ValidColumn,
 			releasepipelineteam.Table: releasepipelineteam.ValidColumn,
 			releasestage.Table:        releasestage.ValidColumn,
+			signinlink.Table:          signinlink.ValidColumn,
 			statusupdate.Table:        statusupdate.ValidColumn,
 			team.Table:                team.ValidColumn,
 			teammember.Table:          teammember.ValidColumn,

@@ -25,7 +25,7 @@ func (suite *SigninServiceSuite) SetupTest() {
 	suite.ServiceTestSuite.SetupTest()
 	cfg := config.Config{PublicURL: "https://ricrac.example", SecretKey: "test-secret-key-that-is-long-enough-123"}
 	suite.keys = auth.NewKeys(cfg)
-	suite.service = NewSigninService(cfg, suite.keys, suite.MockRepo)
+	suite.service = NewSigninService(cfg, suite.keys, suite.MockRepo, nil)
 }
 
 func TestSigninService(t *testing.T) {

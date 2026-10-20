@@ -1,17 +1,20 @@
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import {
   BotIcon,
   CableIcon,
   KanbanIcon,
   type LucideIcon,
+  MailIcon,
   MonitorIcon,
   RepeatIcon,
   UsersIcon,
 } from "lucide-react";
 
-import { GoogleNotConfigured, GoogleSignInButton } from "@/components/auth/google-sign-in";
+import { GoogleSignInButton, SignInNotConfigured } from "@/components/auth/sign-in";
 import { Logo } from "@/components/icons/logo";
 import { Button, LinkButton } from "@/components/ui/button";
+import { appConfigQuery } from "@/lib/queries/me";
 
 const features: { icon: LucideIcon; heading: string; body: string }[] = [
   {
@@ -47,6 +50,7 @@ const features: { icon: LucideIcon; heading: string; body: string }[] = [
 ];
 
 export function LandingPage() {
+  const { data: config } = useQuery(appConfigQuery);
   return (
     <main className="flex min-h-svh w-full flex-col">
       <header className="flex w-full items-center justify-between px-6 py-4">
@@ -69,12 +73,20 @@ export function LandingPage() {
           </p>
         </div>
         <div className="w-full max-w-sm">
-          <GoogleNotConfigured />
+          <SignInNotConfigured />
         </div>
         <div className="flex flex-wrap items-center justify-center gap-2">
-          <div className="w-64">
-            <GoogleSignInButton />
-          </div>
+          {config?.googleConfigured !== false && (
+            <div className="w-64">
+              <GoogleSignInButton />
+            </div>
+          )}
+          {config?.emailConfigured && (
+            <LinkButton to="/sign-in" variant="outline">
+              <MailIcon className="size-4" />
+              Continue with email
+            </LinkButton>
+          )}
           <Button variant="ghost" render={<a href="/llms.txt" />}>
             Read the API guide
           </Button>

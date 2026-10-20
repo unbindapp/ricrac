@@ -6,6 +6,7 @@ package email_service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -53,7 +54,7 @@ func (self *EmailService) queue(ctx context.Context, tx repository.TxInterface, 
 	return self.repo.Email().Queue(ctx, tx, to, encoded)
 }
 
-// QueueInvitation tells someone they were invited; they join by signing in with Google.
+// QueueInvitation tells someone they were invited; they join by signing in as that email.
 func (self *EmailService) QueueInvitation(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, to string, role auth.Role) error {
 	inviter, workspace, err := self.repo.Email().Names(ctx, tx, actor.User, actor.Workspace)
 	if err != nil {
@@ -68,12 +69,36 @@ func (self *EmailService) QueueInvitation(ctx context.Context, tx repository.TxI
 		Heading: fmt.Sprintf("Join %s on Ricrac", workspace),
 		Intro: []string{
 			fmt.Sprintf("%s invited you to the %s workspace as %s %s.", inviter, workspace, article, role),
-			fmt.Sprintf("Sign in with Google as %s to accept.", to),
+			fmt.Sprintf("Sign in as %s to accept.", to),
 		},
 		Button: mail.Button{Label: "Accept invitation", URL: self.cfg.PublicURL},
 		Note:   "This invitation expires in 14 days. If you weren't expecting it, you can ignore this email.",
 		Footer: mail.Footer{InstanceURL: self.cfg.PublicURL},
 	})
+}
+
+// Sends is whether emails go out.
+func (self *EmailService) Sends() bool {
+	return self.mailer != nil
+}
+
+// SendSignInLink emails the link now, not through the queue, which would store its token.
+func (self *EmailService) SendSignInLink(ctx context.Context, to, link string, ttl time.Duration) error {
+	if self.mailer == nil {
+		return errors.New("email is off")
+	}
+	message, err := mail.Render(to, mail.Content{
+		Subject: "Sign in to Ricrac",
+		Heading: "Sign in to Ricrac",
+		Intro:   []string{fmt.Sprintf("Use this link to sign in as %s.", to)},
+		Button:  mail.Button{Label: "Sign in", URL: link},
+		Note:    fmt.Sprintf("The link works once and expires in %d minutes. If you didn't ask for it, you can ignore this email.", int(ttl.Minutes())),
+		Footer:  mail.Footer{InstanceURL: self.cfg.PublicURL},
+	})
+	if err != nil {
+		return err
+	}
+	return self.mailer.Send(ctx, message)
 }
 
 // SendEmails gathers due notification digests and sends the queued emails. Without a mailer it

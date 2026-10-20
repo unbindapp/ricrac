@@ -162,6 +162,9 @@ type ReleasePipelineTeam func(*sql.Selector)
 // ReleaseStage is the predicate function for releasestage builders.
 type ReleaseStage func(*sql.Selector)
 
+// SignInLink is the predicate function for signinlink builders.
+type SignInLink func(*sql.Selector)
+
 // StatusUpdate is the predicate function for statusupdate builders.
 type StatusUpdate func(*sql.Selector)
 

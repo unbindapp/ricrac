@@ -2,13 +2,9 @@ import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
 
-import {
-  GoogleNotConfigured,
-  GoogleSignInButton,
-  SignInError,
-} from "@/components/auth/google-sign-in";
+import { SignInError, SignInOptions } from "@/components/auth/sign-in";
 import { AuthShell } from "@/components/layout/auth-shell";
-import { meQuery, safeRedirect } from "@/lib/queries/me";
+import { appConfigQuery, meQuery, safeRedirect } from "@/lib/queries/me";
 
 const searchSchema = z.object({
   redirect: z.string().optional(),
@@ -22,6 +18,7 @@ export const Route = createFileRoute("/sign-in/")({
     if (!me) return;
     throw redirect({ href: safeRedirect(search.redirect) ?? "/" });
   },
+  loader: ({ context }) => context.queryClient.ensureQueryData(appConfigQuery),
   component: SignIn,
 });
 
@@ -53,8 +50,7 @@ function SignIn() {
     >
       <div className="flex w-full flex-col gap-4">
         <SignInError reason={search.signin_error} />
-        <GoogleNotConfigured />
-        <GoogleSignInButton redirect={redirectTo} />
+        <SignInOptions redirect={redirectTo} />
       </div>
     </AuthShell>
   );

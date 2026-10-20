@@ -24,7 +24,7 @@ function TermsPage() {
             <p>
               Ricrac stores issues, projects and the other work of your workspaces, and lets you and
               the agents and apps you connect read and change them. You sign in with your Google
-              account.
+              account or with a link sent to your email address.
             </p>
           ),
         },
@@ -32,7 +32,7 @@ function TermsPage() {
           heading: "Your account and your agents",
           body: (
             <ul>
-              <li>Sign in only with a Google account that is yours.</li>
+              <li>Sign in only with a Google account or an email address that is yours.</li>
               <li>
                 Keep your API keys and OAuth app secrets private. Anything done with them, or by an
                 agent or app you connected, counts as done by you.

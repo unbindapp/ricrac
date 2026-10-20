@@ -14,6 +14,7 @@ import { Route as WorkspaceWorkspaceRouteRouteImport } from './routes/$workspace
 import { Route as CreateWorkspaceIndexRouteImport } from './routes/create-workspace/index'
 import { Route as PrivacyIndexRouteImport } from './routes/privacy/index'
 import { Route as SignInIndexRouteImport } from './routes/sign-in/index'
+import { Route as SignInEmailRouteImport } from './routes/sign-in/email'
 import { Route as TermsIndexRouteImport } from './routes/terms/index'
 import { Route as WorkspaceWorkspaceIndexRouteImport } from './routes/$workspace/_workspace/index'
 import { Route as WorkspaceWorkspaceCustomersRouteImport } from './routes/$workspace/_workspace/customers'
@@ -99,6 +100,11 @@ const PrivacyIndexRoute = PrivacyIndexRouteImport.update({
 const SignInIndexRoute = SignInIndexRouteImport.update({
   id: '/sign-in/',
   path: '/sign-in/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignInEmailRoute = SignInEmailRouteImport.update({
+  id: '/sign-in/email',
+  path: '/sign-in/email',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsIndexRoute = TermsIndexRouteImport.update({
@@ -466,6 +472,7 @@ const WorkspaceWorkspaceTeamKeyCycleNumberRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$workspace': typeof WorkspaceWorkspaceRouteRouteWithChildren
+  '/sign-in/email': typeof SignInEmailRoute
   '/create-workspace/': typeof CreateWorkspaceIndexRoute
   '/privacy/': typeof PrivacyIndexRoute
   '/sign-in/': typeof SignInIndexRoute
@@ -533,6 +540,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/sign-in/email': typeof SignInEmailRoute
   '/create-workspace': typeof CreateWorkspaceIndexRoute
   '/privacy': typeof PrivacyIndexRoute
   '/sign-in': typeof SignInIndexRoute
@@ -598,6 +606,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$workspace/_workspace': typeof WorkspaceWorkspaceRouteRouteWithChildren
+  '/sign-in/email': typeof SignInEmailRoute
   '/create-workspace/': typeof CreateWorkspaceIndexRoute
   '/privacy/': typeof PrivacyIndexRoute
   '/sign-in/': typeof SignInIndexRoute
@@ -668,6 +677,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$workspace'
+    | '/sign-in/email'
     | '/create-workspace/'
     | '/privacy/'
     | '/sign-in/'
@@ -735,6 +745,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/sign-in/email'
     | '/create-workspace'
     | '/privacy'
     | '/sign-in'
@@ -799,6 +810,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/$workspace/_workspace'
+    | '/sign-in/email'
     | '/create-workspace/'
     | '/privacy/'
     | '/sign-in/'
@@ -868,6 +880,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   WorkspaceWorkspaceRouteRoute: typeof WorkspaceWorkspaceRouteRouteWithChildren
+  SignInEmailRoute: typeof SignInEmailRoute
   CreateWorkspaceIndexRoute: typeof CreateWorkspaceIndexRoute
   PrivacyIndexRoute: typeof PrivacyIndexRoute
   SignInIndexRoute: typeof SignInIndexRoute
@@ -910,6 +923,13 @@ declare module '@tanstack/react-router' {
       path: '/sign-in'
       fullPath: '/sign-in/'
       preLoaderRoute: typeof SignInIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-in/email': {
+      id: '/sign-in/email'
+      path: '/sign-in/email'
+      fullPath: '/sign-in/email'
+      preLoaderRoute: typeof SignInEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms/': {
@@ -1563,6 +1583,7 @@ const WorkspaceWorkspaceRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   WorkspaceWorkspaceRouteRoute: WorkspaceWorkspaceRouteRouteWithChildren,
+  SignInEmailRoute: SignInEmailRoute,
   CreateWorkspaceIndexRoute: CreateWorkspaceIndexRoute,
   PrivacyIndexRoute: PrivacyIndexRoute,
   SignInIndexRoute: SignInIndexRoute,

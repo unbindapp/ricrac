@@ -12,6 +12,7 @@ export type APIKey = {
 }
 
 export type AppConfig = {
+  emailConfigured: boolean
   googleConfigured: boolean
   mcpUrl: string
   publicUrl: string

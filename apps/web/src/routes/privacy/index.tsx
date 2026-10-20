@@ -12,18 +12,18 @@ function PrivacyPage() {
   return (
     <LegalPage
       title="Privacy policy"
-      updated="16 October 2026"
+      updated="20 October 2026"
       intro={
         <p>
-          Ricrac is an issue tracker for people and agents. People sign in with Google to work in
-          their workspaces, and the agents and apps they connect read and write issues, projects and
-          other work through Ricrac's API. This page explains what Ricrac collects, what it does
-          with it, and how to have it removed.
+          Ricrac is an issue tracker for people and agents. People sign in with Google, or with a
+          link emailed to them, to work in their workspaces, and the agents and apps they connect
+          read and write issues, projects and other work through Ricrac's API. This page explains
+          what Ricrac collects, what it does with it, and how to have it removed.
         </p>
       }
       sections={[
         {
-          heading: "What Ricrac gets from Google",
+          heading: "What Ricrac gets when you sign in",
           body: (
             <>
               <p>
@@ -38,6 +38,10 @@ function PrivacyPage() {
                 Ricrac only asks for the <strong>openid</strong>, <strong>email</strong> and{" "}
                 <strong>profile</strong> scopes. It has no access to your Gmail, Drive, contacts,
                 calendar or anything else in your Google account.
+              </p>
+              <p>
+                When you sign in with a link sent to your email address instead, Ricrac only gets
+                that address. The link works once and expires after 15 minutes.
               </p>
             </>
           ),
@@ -95,8 +99,8 @@ function PrivacyPage() {
             <>
               <ul>
                 <li>
-                  Your account (the details from Google, your display name, timezone and when you
-                  last signed in), until it's deleted.
+                  Your account (your email address and the details from Google, your display name,
+                  timezone and when you last signed in), until it's deleted.
                 </li>
                 <li>
                   Workspace content, until it's deleted. Deleted issues, projects, initiatives and

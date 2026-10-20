@@ -632,6 +632,18 @@ func (f ReleaseStageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ReleaseStageMutation", m)
 }
 
+// The SignInLinkFunc type is an adapter to allow the use of ordinary
+// function as SignInLink mutator.
+type SignInLinkFunc func(context.Context, *ent.SignInLinkMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SignInLinkFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SignInLinkMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SignInLinkMutation", m)
+}
+
 // The StatusUpdateFunc type is an adapter to allow the use of ordinary
 // function as StatusUpdate mutator.
 type StatusUpdateFunc func(context.Context, *ent.StatusUpdateMutation) (ent.Value, error)

@@ -118,6 +118,8 @@ type Tx struct {
 	ReleasePipelineTeam *ReleasePipelineTeamClient
 	// ReleaseStage is the client for interacting with the ReleaseStage builders.
 	ReleaseStage *ReleaseStageClient
+	// SignInLink is the client for interacting with the SignInLink builders.
+	SignInLink *SignInLinkClient
 	// StatusUpdate is the client for interacting with the StatusUpdate builders.
 	StatusUpdate *StatusUpdateClient
 	// Team is the client for interacting with the Team builders.
@@ -321,6 +323,7 @@ func (tx *Tx) init() {
 	tx.ReleasePipeline = NewReleasePipelineClient(tx.config)
 	tx.ReleasePipelineTeam = NewReleasePipelineTeamClient(tx.config)
 	tx.ReleaseStage = NewReleaseStageClient(tx.config)
+	tx.SignInLink = NewSignInLinkClient(tx.config)
 	tx.StatusUpdate = NewStatusUpdateClient(tx.config)
 	tx.Team = NewTeamClient(tx.config)
 	tx.TeamMember = NewTeamMemberClient(tx.config)

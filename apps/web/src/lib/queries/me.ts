@@ -51,6 +51,23 @@ export function signInHref(redirect?: string) {
   return `/api/auth/sign-in?return_to=${encodeURIComponent(back)}`;
 }
 
+export function useSendSignInLinkMutation() {
+  return useMutation({
+    mutationFn: (input: { email: string; returnTo?: string }) => account.sendSignInLink(input),
+    meta: { errorTitle: "Could not send the sign-in link" },
+  });
+}
+
+export function useFinishSignInLinkMutation() {
+  return useMutation({
+    mutationFn: (input: { email: string; token: string }) => account.finishSignInLink(input),
+    meta: { errorTitle: "Could not sign in" },
+    onSuccess: ({ returnTo }) => {
+      window.location.href = safeRedirect(returnTo) ?? "/";
+    },
+  });
+}
+
 export async function signOut() {
   await account.signOut();
   window.location.href = "/";
