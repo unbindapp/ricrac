@@ -6,7 +6,7 @@ import { SettingsSection } from "@/components/layout/settings-section";
 import { WorkspaceIcon } from "@/components/workspace/workspace-icon";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
-import { useUploadImage } from "@/lib/queries/uploads";
+import { useUploadAsset } from "@/lib/queries/uploads";
 import { useUpdateWorkspaceMutation, WorkspaceFormSchema } from "@/lib/queries/workspaces";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/_admin/")({
@@ -21,7 +21,7 @@ function WorkspaceGeneralSettingsPage() {
   const { workspace } = useWorkspace();
   const navigate = useNavigate();
   const { mutateAsync: update } = useUpdateWorkspaceMutation(workspace.id);
-  const uploadImage = useUploadImage(workspace.id);
+  const uploadImage = useUploadAsset(workspace.id);
 
   const form = useAppForm({
     defaultValues: {

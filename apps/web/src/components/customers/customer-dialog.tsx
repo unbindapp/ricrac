@@ -25,7 +25,7 @@ import {
   customerTiersQuery,
   useSaveCustomerMutation,
 } from "@/lib/queries/customers";
-import { useUploadImage } from "@/lib/queries/uploads";
+import { useUploadAsset } from "@/lib/queries/uploads";
 
 const NONE = "none";
 
@@ -79,7 +79,7 @@ function CustomerForm({ customer, onDone }: { customer?: Customer; onDone: () =>
   const { data: statuses = [] } = useQuery(customerStatusesQuery(workspace.id));
   const { data: tiers = [] } = useQuery(customerTiersQuery(workspace.id));
   const { mutateAsync: save } = useSaveCustomerMutation(workspace.id);
-  const uploadImage = useUploadImage(workspace.id);
+  const uploadImage = useUploadAsset(workspace.id);
   const form = useAppForm({
     defaultValues: {
       name: customer?.name ?? "",

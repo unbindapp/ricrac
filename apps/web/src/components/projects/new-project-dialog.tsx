@@ -36,6 +36,7 @@ import {
 import { useTeams } from "@/components/workspace/teams-provider";
 import { useTeamFromRoute } from "@/components/workspace/use-team-from-route";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { useEditorUploads } from "@/lib/queries/uploads";
 import { entitySlug } from "@/lib/helpers/entity-slug";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
 import { useProjectLabelsById } from "@/components/projects/project-labels";
@@ -82,6 +83,7 @@ function NewProjectForm({
   const { statuses } = useProjectStatuses();
   const { users } = useWorkspaceUserList();
   const mentionUsers = useMentionUsers();
+  const uploads = useEditorUploads(workspace.id);
   const labelsById = useProjectLabelsById();
   const initialTeams = useInitialTeams(defaults);
   const [pickedTeamIds, setTeamIds] = useState<string[] | null>(null);
@@ -149,6 +151,7 @@ function NewProjectForm({
         value={description}
         onChange={setDescription}
         users={mentionUsers}
+        {...uploads.editorProps}
         placeholder="What is this project about? Write a plan, goals, links…"
         label="Description"
       />

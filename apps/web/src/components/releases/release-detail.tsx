@@ -35,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { useUploadAsset } from "@/lib/queries/uploads";
 import { formatDay, shortSha } from "@/lib/helpers/releases";
 import {
   pipelinesQuery,
@@ -91,6 +92,7 @@ function ReleasePage({
 }) {
   const { workspace, canEdit } = useWorkspace();
   const { mutate: save, mutateAsync: saveAsync } = useSaveReleaseMutation(workspace.id);
+  const upload = useUploadAsset(workspace.id);
   const description = release.description ?? "";
   const params = { workspace: workspace.urlKey };
 
@@ -137,6 +139,7 @@ function ReleasePage({
               key={release.id}
               label="Description"
               value={description}
+              onUpload={upload}
               placeholder={canEdit ? "Add a description…" : "No description."}
               readOnly={!canEdit}
               autosave={{

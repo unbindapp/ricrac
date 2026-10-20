@@ -24,6 +24,7 @@ import {
   useDeleteReleaseNoteMutation,
   useSaveReleaseNoteMutation,
 } from "@/lib/queries/releases";
+import { useUploadAsset } from "@/lib/queries/uploads";
 import { isNotFoundError } from "@/lib/server/errors";
 
 export function ReleaseNoteDetail({ slug }: { slug: string }) {
@@ -59,6 +60,7 @@ export function ReleaseNoteDetail({ slug }: { slug: string }) {
 function NotePage({ note }: { note: ReleaseNote }) {
   const { workspace, canEdit } = useWorkspace();
   const { mutate: save, mutateAsync: saveAsync } = useSaveReleaseNoteMutation(workspace.id);
+  const upload = useUploadAsset(workspace.id);
   const content = note.content ?? "";
   const params = { workspace: workspace.urlKey };
 
@@ -105,6 +107,7 @@ function NotePage({ note }: { note: ReleaseNote }) {
         key={note.id}
         label="Release notes"
         value={content}
+        onUpload={upload}
         placeholder={
           canEdit ? "What shipped, and why it matters to people…" : "Nothing written yet."
         }

@@ -4,6 +4,9 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"maps"
+	"path"
+	"slices"
 	"strings"
 	"time"
 	"unicode"
@@ -78,12 +81,24 @@ func checkContentType(value string) (string, error) {
 	return value, nil
 }
 
+var videoExtensions = map[string]string{
+	"video/mp4": ".mp4", "video/webm": ".webm", "video/quicktime": ".mov", "video/x-m4v": ".m4v", "video/ogg": ".ogv",
+}
+
+// fileMarkdown embeds images and videos; the web app plays an embed whose name ends in a video extension.
 func fileMarkdown(name, contentType, url string) string {
 	label := strings.NewReplacer("[", "", "]", "").Replace(name)
 	if strings.HasPrefix(contentType, "image/") {
 		return fmt.Sprintf("![%s](%s)", label, url)
 	}
-	return fmt.Sprintf("[%s](%s)", label, url)
+	extension, isVideo := videoExtensions[contentType]
+	if !isVideo {
+		return fmt.Sprintf("[%s](%s)", label, url)
+	}
+	if !slices.Contains(slices.Collect(maps.Values(videoExtensions)), strings.ToLower(path.Ext(label))) {
+		label += extension
+	}
+	return fmt.Sprintf("![%s](%s)", label, url)
 }
 
 func decodeBase64(value string) ([]byte, error) {

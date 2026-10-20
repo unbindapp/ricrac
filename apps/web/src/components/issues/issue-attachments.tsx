@@ -34,6 +34,7 @@ import {
   useCreateAttachmentMutation,
   useDeleteAttachmentMutation,
 } from "@/lib/queries/issues";
+import { fileKind } from "@/lib/helpers/media";
 import { uploadFile } from "@/lib/queries/uploads";
 import { errorText } from "@/lib/server/errors";
 
@@ -56,17 +57,15 @@ const SOURCES: Record<string, TSource> = {
 
 const sourceOf = (attachment: IssueAttachment) => SOURCES[attachment.sourceType] ?? SOURCES.link;
 
-const IMAGE_PATTERN = /\.(png|jpe?g|gif|webp|svg)$/i;
-
 function AttachmentIcon({ attachment }: { attachment: IssueAttachment }) {
   const github = githubLinkOf(attachment);
   if (github?.kind === "branch") return <GitBranchIcon className="text-muted-foreground size-4" />;
   if (github?.kind === "commit") {
     return <GitCommitHorizontalIcon className="text-muted-foreground size-4" />;
   }
-  if (attachment.sourceType === "upload" && IMAGE_PATTERN.test(attachment.title)) {
-    return <ImageIcon className="text-muted-foreground size-4 shrink-0" />;
-  }
+  const kind = attachment.sourceType === "upload" ? fileKind(attachment.title) : null;
+  if (kind === "image") return <ImageIcon className="text-muted-foreground size-4 shrink-0" />;
+  if (kind === "video") return <VideoIcon className="text-muted-foreground size-4 shrink-0" />;
   const Icon = sourceOf(attachment).icon;
   return <Icon className="text-muted-foreground size-4 shrink-0" />;
 }

@@ -22,7 +22,7 @@ const Instructions = `Ricrac is an issue tracker for agents: a workspace has tea
 
 Referencing things: wherever a tool takes a person, team, status, label, project, cycle or milestone you may pass a name, key or identifier instead of an id. People also take an email or "me". Issues take their identifier (ENG-123), id or link. Errors list the valid options when a name doesn't match.
 
-Writing: descriptions, comments, documents and updates are Markdown; write literal newlines, not escape sequences. Mention people with @displayName or @email: they are notified and subscribed. To change part of a long description or document, pass ` + "`patch`" + ` edits instead of resending it all.
+Writing: descriptions, comments, documents and updates are Markdown; write literal newlines, not escape sequences. Mention people with @displayName or @email: they are notified and subscribed. To change part of a long description or document, pass ` + "`patch`" + ` edits instead of resending it all. Show screenshots and recordings by uploading them with prepare_file_upload and embedding the returned markdown: ` + "`![shot.png](assetUrl)`" + ` shows an image and ` + "`![demo.mp4](assetUrl)`" + ` plays a video (mp4, webm, mov, m4v, ogv).
 
 Workspaces: a connection may reach several workspaces; list_workspaces lists them. When it reaches more than one, every tool takes a ` + "`workspace`" + ` argument (the URL key, like "acme") naming the one to act in. Identifiers like ENG-123 and names are only unique within a workspace; Ricrac links already name theirs.
 
