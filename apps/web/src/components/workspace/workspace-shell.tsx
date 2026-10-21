@@ -41,7 +41,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
       )}
       <div className="flex min-w-0 flex-1 flex-col md:py-2 md:pr-2 md:group-data-sidebar-collapsed/shell:pl-2">
         <FallbackMobileBar />
-        <main className="bg-background flex min-h-0 flex-1 flex-col overflow-hidden md:rounded-lg md:border">
+        <main className="bg-background flex min-h-0 flex-1 flex-col overflow-hidden md:rounded-lg">
           {children}
         </main>
       </div>

@@ -1,4 +1,4 @@
-import { MessageSquareReplyIcon, XIcon } from "lucide-react";
+import { ArrowLeftIcon, MessageSquareReplyIcon } from "lucide-react";
 
 import { ChatComposer, ChatDayDivider, ChatMessage } from "@/components/forum/chat-message";
 import { ChatSkeleton, useChatMessages } from "@/components/forum/chat-messages";
@@ -13,25 +13,26 @@ import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { chatRows } from "@/lib/helpers/chat";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 
-type TProps = { discussionId: string; messageId: string; onClose: () => void };
+type TProps = { discussionId: string; messageId: string; onBack: () => void };
 
 /** A message of the discussion's chat and the replies in its thread. */
-export function MessageThreadPanel({ discussionId, messageId, onClose }: TProps) {
+export function MessageThreadPanel({ discussionId, messageId, onBack }: TProps) {
   const { canEdit } = useWorkspace();
   const target = { discussionId };
   const { threads, isPending, isComplete, error, refetch } = useChatMessages(target);
   const root = threads.find((thread) => thread.id === messageId);
-  useHotkeyScope([{ hotkey: "Escape", callback: onClose }]);
+  useHotkeyScope([{ hotkey: "Escape", callback: onBack }]);
 
   const header = (
     <PanelBar>
+      <HeaderAction label="Back to the main chat" onClick={onBack}>
+        <ArrowLeftIcon className="size-4" />
+      </HeaderAction>
       <MessageSquareReplyIcon className="text-muted-foreground size-4" />
       <span className="min-w-0 flex-1 truncate text-sm font-medium">
-        Thread{root?.user && ` with ${userName(root.user)}`}
+        Replies{root?.user && ` to ${userName(root.user)}`}
+        <span className="text-muted-foreground font-normal"> in the main chat</span>
       </span>
-      <HeaderAction label="Close thread" onClick={onClose}>
-        <XIcon className="size-4" />
-      </HeaderAction>
     </PanelBar>
   );
 
@@ -68,8 +69,9 @@ export function MessageThreadPanel({ discussionId, messageId, onClose }: TProps)
           title="Message not found"
           description="It was deleted, or it isn't in this discussion."
           action={
-            <Button variant="outline" size="sm" onClick={onClose}>
-              Close
+            <Button variant="outline" size="sm" onClick={onBack}>
+              <ArrowLeftIcon className="size-4" />
+              Back to the main chat
             </Button>
           }
         />
