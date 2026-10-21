@@ -16,7 +16,9 @@ export function SettingsPage({ title, description, breadcrumb, actions, children
       <header data-slot="page-header" className="flex w-full flex-col gap-2">
         {breadcrumb && breadcrumb.length > 0 && <Breadcrumb items={breadcrumb} />}
         <div className="flex min-h-8 w-full items-center gap-2">
-          <h1 className="min-w-0 flex-1 truncate text-2xl leading-tight font-semibold">{title}</h1>
+          <h1 className="min-w-0 flex-1 truncate text-4xl leading-tight font-normal tracking-tight">
+            {title}
+          </h1>
           {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
         </div>
         {description && <p className="text-muted-foreground text-sm">{description}</p>}

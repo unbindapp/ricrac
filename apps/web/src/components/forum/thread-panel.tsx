@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import {
+  ArrowLeftIcon,
   CircleCheckIcon,
   CircleDotIcon,
   SplitIcon,
   Trash2Icon,
   UndoIcon,
-  XIcon,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -42,14 +42,14 @@ import {
 } from "@/lib/queries/discussions";
 import { isMissing } from "@/lib/queries/projects";
 
-type TProps = { threadId: string; onClose: () => void };
+type TProps = { threadId: string; onBack: () => void };
 
-export function ThreadPanel({ threadId, onClose }: TProps) {
+export function ThreadPanel({ threadId, onBack }: TProps) {
   const { workspace } = useWorkspace();
   const { data, isPending, error, refetch } = useQuery(
     discussionThreadQuery(workspace.id, threadId),
   );
-  useHotkeyScope([{ hotkey: "Escape", callback: onClose }]);
+  useHotkeyScope([{ hotkey: "Escape", callback: onBack }]);
   return (
     <section
       aria-label={data ? `Thread ${data.title}` : "Thread"}
@@ -60,7 +60,7 @@ export function ThreadPanel({ threadId, onClose }: TProps) {
         isPending={isPending}
         error={error}
         onRetry={() => void refetch()}
-        onClose={onClose}
+        onBack={onBack}
       />
     </section>
   );
@@ -71,13 +71,13 @@ function ThreadPanelBody({
   isPending,
   error,
   onRetry,
-  onClose,
+  onBack,
 }: {
   thread: DiscussionThreadDetail | undefined;
   isPending: boolean;
   error: Error | null;
   onRetry: () => void;
-  onClose: () => void;
+  onBack: () => void;
 }) {
   if (isPending) {
     return (
@@ -93,8 +93,9 @@ function ThreadPanelBody({
         title="Thread not found"
         description="It was deleted, or you cannot see it."
         action={
-          <Button variant="outline" size="sm" onClick={onClose}>
-            Close
+          <Button variant="outline" size="sm" onClick={onBack}>
+            <ArrowLeftIcon className="size-4" />
+            Back to the main chat
           </Button>
         }
       />
@@ -107,16 +108,10 @@ function ThreadPanelBody({
       </div>
     );
   }
-  return <ThreadContent key={thread.id} thread={thread} onClose={onClose} />;
+  return <ThreadContent key={thread.id} thread={thread} onBack={onBack} />;
 }
 
-function ThreadContent({
-  thread,
-  onClose,
-}: {
-  thread: DiscussionThreadDetail;
-  onClose: () => void;
-}) {
+function ThreadContent({ thread, onBack }: { thread: DiscussionThreadDetail; onBack: () => void }) {
   const { workspace, canEdit } = useWorkspace();
   const canRewrite = useCanRewrite(thread.creator);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -125,13 +120,16 @@ function ThreadContent({
   const isResolved = Boolean(thread.resolvedAt);
 
   const remove = async () => {
-    onClose();
+    onBack();
     await deleteThread(thread.id);
     toast.add({ type: "success", title: "Thread deleted" });
   };
 
   const header = (
     <PanelBar>
+      <HeaderAction label="Back to the main chat" onClick={onBack}>
+        <ArrowLeftIcon className="size-4" />
+      </HeaderAction>
       <div className="flex min-w-0 flex-1 items-center gap-2">
         <ThreadKindPicker
           kind={thread.kind}
@@ -148,7 +146,7 @@ function ThreadContent({
             onClick={() => save({ id: thread.id, resolved: !isResolved })}
           >
             {isResolved ? <UndoIcon className="size-4" /> : <CircleCheckIcon className="size-4" />}
-            {isResolved ? "Reopen" : "Resolve"}
+            <span className="max-sm:sr-only">{isResolved ? "Reopen" : "Resolve"}</span>
           </Button>
         )}
         <CopyLinkAction url={thread.url} />
@@ -157,9 +155,6 @@ function ThreadContent({
             <Trash2Icon className="size-4" />
           </HeaderAction>
         )}
-        <HeaderAction label="Close thread" onClick={onClose}>
-          <XIcon className="size-4" />
-        </HeaderAction>
       </HeaderActions>
     </PanelBar>
   );

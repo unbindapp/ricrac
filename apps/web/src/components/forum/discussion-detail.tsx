@@ -14,19 +14,18 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-import type { Comment, DiscussionDetail as TDiscussionDetail } from "@/api/ops.gen";
-import { ChatComposer } from "@/components/forum/chat-message";
-import { ChatMessages } from "@/components/forum/chat-messages";
+import type { DiscussionDetail as TDiscussionDetail } from "@/api/ops.gen";
 import { DiscussionTagBadges, DiscussionTagsPicker } from "@/components/forum/discussion-tags";
 import { DiscussionTeamPicker } from "@/components/forum/discussion-team-picker";
-import { DiscussionThreads } from "@/components/forum/discussion-threads";
-import { NewThreadDialog } from "@/components/forum/new-thread-dialog";
+import { MainChatComposer, MainChatMessages } from "@/components/forum/main-chat";
+import { ThreadBranches } from "@/components/forum/thread-branches";
 import { ThumbnailPicker } from "@/components/forum/thumbnail-picker";
 import { useCanRewrite } from "@/components/forum/use-can-rewrite";
-import { commentExcerpt } from "@/components/inbox/notifications";
-import { userName } from "@/components/issues/grouping";
 import { Breadcrumb, type TBreadcrumbItem } from "@/components/layout/breadcrumb";
 import { ChatLayout } from "@/components/layout/chat-layout";
+import { PageContainer } from "@/components/layout/page-container";
+import { PageBar } from "@/components/layout/page-header";
+import { SectionTitle } from "@/components/layout/section-title";
 import { EntityMenu, toastTrashed } from "@/components/projects/entity-menu";
 import { AvatarStack } from "@/components/projects/people";
 import { AutosaveMarkdown } from "@/components/shared/autosave-markdown";
@@ -44,22 +43,21 @@ import {
   useDiscussionLifecycleMutation,
   useSaveDiscussionMutation,
 } from "@/lib/queries/discussions";
-import { messagePlaceholder, shorten } from "@/lib/helpers/chat";
 import { meQuery } from "@/lib/queries/me";
-
-const THREAD_TITLE_FROM_MESSAGE_LENGTH = 80;
 
 type TProps = {
   discussion: TDiscussionDetail;
-  /** On narrow screens the threads list sits in the page instead of beside it. */
-  showThreads: boolean;
+  /** The main chat follows the topic on narrow screens and sits beside it on wide ones. */
+  chat: "inline" | "aside";
+  openThreadId?: string;
   openMessageId?: string;
   onOpenMessage: (messageId: string) => void;
 };
 
 export function DiscussionDetail({
   discussion,
-  showThreads,
+  chat,
+  openThreadId,
   openMessageId,
   onOpenMessage,
 }: TProps) {
@@ -69,7 +67,6 @@ export function DiscussionDetail({
   const { mutate: save, mutateAsync: saveAsync } = useSaveDiscussionMutation(workspace.id);
   const { mutateAsync: changeLifecycle } = useDiscussionLifecycleMutation(workspace.id);
   const navigate = useNavigate();
-  const [splitFrom, setSplitFrom] = useState<Comment | null>(null);
   const [isEditingThumbnail, setIsEditingThumbnail] = useState(false);
   const isPinned = Boolean(discussion.pinnedAt);
   const isClosed = Boolean(discussion.closedAt);
@@ -146,19 +143,8 @@ export function DiscussionDetail({
     </>
   );
 
-  return (
-    <ChatLayout
-      bar={bar}
-      width="narrow"
-      composer={
-        canEdit && (
-          <ChatComposer
-            target={{ discussionId: discussion.id }}
-            placeholder={messagePlaceholder(discussion.title)}
-          />
-        )
-      }
-    >
+  const topic = (
+    <>
       <div className="flex flex-col gap-2">
         <InlineText
           value={discussion.title}
@@ -231,24 +217,10 @@ export function DiscussionDetail({
           return saved.body ?? "";
         }}
       />
-      {showThreads && <DiscussionThreads discussion={discussion} variant="section" />}
-      <ChatMessages
-        target={{ discussionId: discussion.id }}
-        threads={{ openId: openMessageId, onOpen: onOpenMessage }}
-        onNewThread={setSplitFrom}
-        empty={{
-          title: "No messages yet",
-          description: "Say what you think. Reply in a thread to keep a side topic together.",
-        }}
-      />
-      <NewThreadDialog
-        key={splitFrom?.id}
+      <ThreadBranches
         discussion={discussion}
-        open={Boolean(splitFrom)}
-        onOpenChange={(open) => {
-          if (!open) setSplitFrom(null);
-        }}
-        defaults={splitFrom ? threadFromMessage(splitFrom) : undefined}
+        openThreadId={openThreadId}
+        isMainChatOpen={!openThreadId && !openMessageId}
       />
       <Dialog open={isEditingThumbnail} onOpenChange={setIsEditingThumbnail}>
         <DialogContent className="w-xl max-w-full">
@@ -262,16 +234,32 @@ export function DiscussionDetail({
           />
         </DialogContent>
       </Dialog>
+    </>
+  );
+
+  if (chat === "aside") {
+    return (
+      <PageContainer width="narrow">
+        <div className="flex w-full flex-col gap-6">
+          <PageBar>{bar}</PageBar>
+          {topic}
+        </div>
+      </PageContainer>
+    );
+  }
+  return (
+    <ChatLayout
+      bar={bar}
+      width="narrow"
+      composer={canEdit && <MainChatComposer discussion={discussion} />}
+    >
+      {topic}
+      <SectionTitle title="Main chat" />
+      <MainChatMessages
+        discussion={discussion}
+        openMessageId={openMessageId}
+        onOpenMessage={onOpenMessage}
+      />
     </ChatLayout>
   );
-}
-
-function threadFromMessage(message: Comment) {
-  const title = shorten(commentExcerpt(message.body), THREAD_TITLE_FROM_MESSAGE_LENGTH);
-  const author = message.user ? userName(message.user) : "A deleted user";
-  const quoted = message.body
-    .split("\n")
-    .map((line) => `> ${line}`.trimEnd())
-    .join("\n");
-  return { title, body: `${author} wrote:\n\n${quoted}\n\n` };
 }

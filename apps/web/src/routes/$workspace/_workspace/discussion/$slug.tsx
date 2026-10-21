@@ -5,7 +5,7 @@ import { MessagesSquareIcon } from "lucide-react";
 import { z } from "zod";
 
 import { DiscussionDetail } from "@/components/forum/discussion-detail";
-import { DiscussionThreads } from "@/components/forum/discussion-threads";
+import { MainChatPanel } from "@/components/forum/main-chat";
 import { MessageThreadPanel } from "@/components/forum/message-thread-panel";
 import { ThreadPanel } from "@/components/forum/thread-panel";
 import { ErrorCard } from "@/components/layout/error-card";
@@ -38,7 +38,7 @@ function DiscussionSlugPage() {
   const { size } = useDeviceSize();
   const { data, isPending, error, refetch } = useQuery(discussionQuery(workspace.id, slug));
   const hasPanel = size === "lg" || size === "xl";
-  const closePanel = () =>
+  const backToMainChat = () =>
     void navigate({
       search: (prev) => ({ ...prev, thread: undefined, message: undefined }),
       replace: true,
@@ -71,34 +71,46 @@ function DiscussionSlugPage() {
     );
   }
 
-  const panel = thread ? (
-    <ThreadPanel key={thread} threadId={thread} onClose={closePanel} />
+  const threadPanel = thread ? (
+    <ThreadPanel key={thread} threadId={thread} onBack={backToMainChat} />
   ) : message ? (
     <MessageThreadPanel
       key={message}
       discussionId={data.id}
       messageId={message}
-      onClose={closePanel}
+      onBack={backToMainChat}
     />
   ) : null;
-  if (panel && !hasPanel) return panel;
+  if (!hasPanel) {
+    return (
+      threadPanel ?? (
+        <DiscussionDetail
+          key={data.id}
+          discussion={data}
+          chat="inline"
+          onOpenMessage={openMessage}
+        />
+      )
+    );
+  }
   return (
     <SplitView
       storageKey="discussion-panel-width"
-      defaultAsideWidth={420}
+      defaultAsideWidth={460}
       main={
         <DiscussionDetail
           key={data.id}
           discussion={data}
-          showThreads={!hasPanel}
+          chat="aside"
+          openThreadId={thread}
           openMessageId={message}
           onOpenMessage={openMessage}
         />
       }
       aside={
-        hasPanel
-          ? (panel ?? <DiscussionThreads discussion={data} openThreadId={thread} variant="panel" />)
-          : undefined
+        threadPanel ?? (
+          <MainChatPanel discussion={data} openMessageId={message} onOpenMessage={openMessage} />
+        )
       }
     />
   );

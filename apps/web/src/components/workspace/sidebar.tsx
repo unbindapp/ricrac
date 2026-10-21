@@ -68,9 +68,10 @@ export function Sidebar({ onNavigate }: TProps) {
         </Button>
         {canEdit && (
           <Button
-            variant="outline"
+            variant="tonal"
             size="icon"
             aria-label="New issue"
+            className="rounded-md"
             onClick={() => {
               onNavigate?.();
               openNewIssue();

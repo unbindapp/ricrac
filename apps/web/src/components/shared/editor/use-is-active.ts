@@ -7,23 +7,36 @@ function isPopup(target: EventTarget | null) {
   return target instanceof Element && Boolean(target.closest(POPUPS));
 }
 
-/** True from focus landing in the element until focus or a click lands outside it and its menus. */
+/** True from focus or a press landing in the element until focus or a press lands outside it and its menus. */
 export function useIsActive(ref: RefObject<HTMLElement | null>, initial = false) {
   const [isActive, setIsActive] = useState(initial);
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
+    let pressed: EventTarget | null = null;
     const settle = (target: EventTarget | null) => {
       if (isPopup(target)) return;
       setIsActive(target instanceof Node && element.contains(target));
     };
-    const onEvent = (event: Event) => settle(event.target);
-    document.addEventListener("focusin", onEvent);
-    // On click, not pointerdown: what hides would otherwise move the button being clicked.
-    document.addEventListener("click", onEvent);
+    const onFocusIn = (event: Event) => settle(event.target);
+    const onPointerDown = (event: Event) => {
+      pressed = event.target;
+    };
+    // Where the press began: a selection dragged past the edge stays inside.
+    const onPointerUp = () => {
+      if (pressed === null) return;
+      settle(pressed);
+      pressed = null;
+    };
+    document.addEventListener("focusin", onFocusIn);
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("pointerup", onPointerUp);
+    document.addEventListener("pointercancel", onPointerUp);
     return () => {
-      document.removeEventListener("focusin", onEvent);
-      document.removeEventListener("click", onEvent);
+      document.removeEventListener("focusin", onFocusIn);
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("pointerup", onPointerUp);
+      document.removeEventListener("pointercancel", onPointerUp);
     };
   }, [ref]);
   return isActive;

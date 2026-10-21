@@ -96,7 +96,7 @@ export const dialogContentVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-background shadow-dialog shadow-shadow-color/shadow-opacity rounded-lg border p-5 pt-4",
+          "bg-surface-container-high shadow-dialog shadow-shadow-color/shadow-opacity rounded-xl p-6 pt-5",
         styleless: "",
       },
       animate: {
