@@ -400,6 +400,15 @@
   .rr-embed[style] .rr-media {
     @apply w-full;
   }
+  .rr-chat .rr-embed {
+    @apply max-w-md;
+  }
+  .rr-chat .rr-embed .rr-media {
+    @apply max-h-80 w-auto;
+  }
+  .rr-chat-draft .rr-embed .rr-media {
+    @apply max-h-40;
+  }
   .rr-embed[data-selected] .rr-media {
     @apply ring-primary ring-2;
   }
