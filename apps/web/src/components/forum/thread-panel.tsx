@@ -219,12 +219,10 @@ function ThreadContent({
             return saved.body;
           }}
         />
-        <div className="border-t pt-2">
-          <ChatMessages
-            target={{ discussionThreadId: thread.id }}
-            empty={{ title: "No messages yet", description: "Talk this thread through here." }}
-          />
-        </div>
+        <ChatMessages
+          target={{ discussionThreadId: thread.id }}
+          empty={{ title: "No messages yet", description: "Talk this thread through here." }}
+        />
       </ChatLayout>
       <ConfirmDialog
         open={isDeleting}
