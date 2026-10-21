@@ -140,6 +140,19 @@ func initiativeSQL() string {
 		searchSlug("n.name"), searchHeadline, vector, vector)
 }
 
+func discussionSQL() string {
+	return fmt.Sprintf(`SELECT d.id, d.title, NULL::text AS identifier,
+			a.base || '/' || w.url_key || '/discussion/' || %s || '-' || d.slug_id AS url,
+			left(ts_headline('english', coalesce(nullif(d.body, ''), d.title), a.ts, %s), 200) AS snippet,
+			ts_rank(d.search, a.ts) AS rank, d.updated_at, NULL::uuid AS ref, NULL::uuid AS ref2, NULL::text AS status,
+			false AS exact, (d.title ILIKE a.pattern OR to_tsvector('simple', d.title) @@ a.ts) AS title_match
+		 FROM a, discussions d JOIN workspaces w ON w.id = d.workspace_id
+		 WHERE d.workspace_id = a.ws AND d.trashed_at IS NULL AND (d.team_id IS NULL OR d.team_id = ANY(a.teams))
+		 AND (a.team IS NULL OR d.team_id = a.team)
+		 AND (d.search @@ a.ts OR d.title ILIKE a.pattern)`,
+		searchSlug("d.title"), searchHeadline)
+}
+
 func commentSQL() string {
 	return fmt.Sprintf(`SELECT c.id, i.title, t.key || '-' || i.number AS identifier,
 			a.base || '/' || w.url_key || '/issue/' || t.key || '-' || i.number || '#comment-' || c.id AS url,
@@ -158,10 +171,11 @@ var queries = map[string]func() string{
 	"project":    projectSQL,
 	"document":   documentSQL,
 	"initiative": initiativeSQL,
+	"discussion": discussionSQL,
 	"comment":    commentSQL,
 }
 
-// Search is the best matches of one type (issue, project, document, initiative or comment):
+// Search is the best matches of one type (issue, project, document, initiative, discussion or comment):
 // exact identifiers, then title matches, then by rank.
 func (self *SearchRepository) Search(ctx context.Context, kind string, params Params) ([]Hit, error) {
 	query, ok := queries[kind]

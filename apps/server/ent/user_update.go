@@ -13,6 +13,8 @@ import (
 	"ricrac/ent/customer"
 	"ricrac/ent/customerneed"
 	"ricrac/ent/customview"
+	"ricrac/ent/discussion"
+	"ricrac/ent/discussionthread"
 	"ricrac/ent/document"
 	"ricrac/ent/documentversion"
 	"ricrac/ent/entitylink"
@@ -606,6 +608,51 @@ func (_u *UserUpdate) AddDocumentsByCreator(v ...*Document) *UserUpdate {
 	return _u.AddDocumentsByCreatorIDs(ids...)
 }
 
+// AddDiscussionsByCreatorIDs adds the "discussions_by_creator" edge to the Discussion entity by IDs.
+func (_u *UserUpdate) AddDiscussionsByCreatorIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.AddDiscussionsByCreatorIDs(ids...)
+	return _u
+}
+
+// AddDiscussionsByCreator adds the "discussions_by_creator" edges to the Discussion entity.
+func (_u *UserUpdate) AddDiscussionsByCreator(v ...*Discussion) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddDiscussionsByCreatorIDs(ids...)
+}
+
+// AddDiscussionThreadsByCreatorIDs adds the "discussion_threads_by_creator" edge to the DiscussionThread entity by IDs.
+func (_u *UserUpdate) AddDiscussionThreadsByCreatorIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.AddDiscussionThreadsByCreatorIDs(ids...)
+	return _u
+}
+
+// AddDiscussionThreadsByCreator adds the "discussion_threads_by_creator" edges to the DiscussionThread entity.
+func (_u *UserUpdate) AddDiscussionThreadsByCreator(v ...*DiscussionThread) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddDiscussionThreadsByCreatorIDs(ids...)
+}
+
+// AddDiscussionThreadsByResolvingUserIDs adds the "discussion_threads_by_resolving_user" edge to the DiscussionThread entity by IDs.
+func (_u *UserUpdate) AddDiscussionThreadsByResolvingUserIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.AddDiscussionThreadsByResolvingUserIDs(ids...)
+	return _u
+}
+
+// AddDiscussionThreadsByResolvingUser adds the "discussion_threads_by_resolving_user" edges to the DiscussionThread entity.
+func (_u *UserUpdate) AddDiscussionThreadsByResolvingUser(v ...*DiscussionThread) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddDiscussionThreadsByResolvingUserIDs(ids...)
+}
+
 // AddDocumentsByUpdatedByIDs adds the "documents_by_updated_by" edge to the Document entity by IDs.
 func (_u *UserUpdate) AddDocumentsByUpdatedByIDs(ids ...uuid.UUID) *UserUpdate {
 	_u.mutation.AddDocumentsByUpdatedByIDs(ids...)
@@ -889,6 +936,21 @@ func (_u *UserUpdate) AddSubscribedProjects(v ...*Project) *UserUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.AddSubscribedProjectIDs(ids...)
+}
+
+// AddSubscribedDiscussionIDs adds the "subscribed_discussions" edge to the Discussion entity by IDs.
+func (_u *UserUpdate) AddSubscribedDiscussionIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.AddSubscribedDiscussionIDs(ids...)
+	return _u
+}
+
+// AddSubscribedDiscussions adds the "subscribed_discussions" edges to the Discussion entity.
+func (_u *UserUpdate) AddSubscribedDiscussions(v ...*Discussion) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddSubscribedDiscussionIDs(ids...)
 }
 
 // AddTeamIDs adds the "teams" edge to the Team entity by IDs.
@@ -1430,6 +1492,69 @@ func (_u *UserUpdate) RemoveDocumentsByCreator(v ...*Document) *UserUpdate {
 	return _u.RemoveDocumentsByCreatorIDs(ids...)
 }
 
+// ClearDiscussionsByCreator clears all "discussions_by_creator" edges to the Discussion entity.
+func (_u *UserUpdate) ClearDiscussionsByCreator() *UserUpdate {
+	_u.mutation.ClearDiscussionsByCreator()
+	return _u
+}
+
+// RemoveDiscussionsByCreatorIDs removes the "discussions_by_creator" edge to Discussion entities by IDs.
+func (_u *UserUpdate) RemoveDiscussionsByCreatorIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.RemoveDiscussionsByCreatorIDs(ids...)
+	return _u
+}
+
+// RemoveDiscussionsByCreator removes "discussions_by_creator" edges to Discussion entities.
+func (_u *UserUpdate) RemoveDiscussionsByCreator(v ...*Discussion) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveDiscussionsByCreatorIDs(ids...)
+}
+
+// ClearDiscussionThreadsByCreator clears all "discussion_threads_by_creator" edges to the DiscussionThread entity.
+func (_u *UserUpdate) ClearDiscussionThreadsByCreator() *UserUpdate {
+	_u.mutation.ClearDiscussionThreadsByCreator()
+	return _u
+}
+
+// RemoveDiscussionThreadsByCreatorIDs removes the "discussion_threads_by_creator" edge to DiscussionThread entities by IDs.
+func (_u *UserUpdate) RemoveDiscussionThreadsByCreatorIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.RemoveDiscussionThreadsByCreatorIDs(ids...)
+	return _u
+}
+
+// RemoveDiscussionThreadsByCreator removes "discussion_threads_by_creator" edges to DiscussionThread entities.
+func (_u *UserUpdate) RemoveDiscussionThreadsByCreator(v ...*DiscussionThread) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveDiscussionThreadsByCreatorIDs(ids...)
+}
+
+// ClearDiscussionThreadsByResolvingUser clears all "discussion_threads_by_resolving_user" edges to the DiscussionThread entity.
+func (_u *UserUpdate) ClearDiscussionThreadsByResolvingUser() *UserUpdate {
+	_u.mutation.ClearDiscussionThreadsByResolvingUser()
+	return _u
+}
+
+// RemoveDiscussionThreadsByResolvingUserIDs removes the "discussion_threads_by_resolving_user" edge to DiscussionThread entities by IDs.
+func (_u *UserUpdate) RemoveDiscussionThreadsByResolvingUserIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.RemoveDiscussionThreadsByResolvingUserIDs(ids...)
+	return _u
+}
+
+// RemoveDiscussionThreadsByResolvingUser removes "discussion_threads_by_resolving_user" edges to DiscussionThread entities.
+func (_u *UserUpdate) RemoveDiscussionThreadsByResolvingUser(v ...*DiscussionThread) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveDiscussionThreadsByResolvingUserIDs(ids...)
+}
+
 // ClearDocumentsByUpdatedBy clears all "documents_by_updated_by" edges to the Document entity.
 func (_u *UserUpdate) ClearDocumentsByUpdatedBy() *UserUpdate {
 	_u.mutation.ClearDocumentsByUpdatedBy()
@@ -1827,6 +1952,27 @@ func (_u *UserUpdate) RemoveSubscribedProjects(v ...*Project) *UserUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveSubscribedProjectIDs(ids...)
+}
+
+// ClearSubscribedDiscussions clears all "subscribed_discussions" edges to the Discussion entity.
+func (_u *UserUpdate) ClearSubscribedDiscussions() *UserUpdate {
+	_u.mutation.ClearSubscribedDiscussions()
+	return _u
+}
+
+// RemoveSubscribedDiscussionIDs removes the "subscribed_discussions" edge to Discussion entities by IDs.
+func (_u *UserUpdate) RemoveSubscribedDiscussionIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.RemoveSubscribedDiscussionIDs(ids...)
+	return _u
+}
+
+// RemoveSubscribedDiscussions removes "subscribed_discussions" edges to Discussion entities.
+func (_u *UserUpdate) RemoveSubscribedDiscussions(v ...*Discussion) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveSubscribedDiscussionIDs(ids...)
 }
 
 // ClearTeams clears all "teams" edges to the Team entity.
@@ -3044,6 +3190,141 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.DiscussionsByCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionsByCreatorTable,
+			Columns: []string{user.DiscussionsByCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedDiscussionsByCreatorIDs(); len(nodes) > 0 && !_u.mutation.DiscussionsByCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionsByCreatorTable,
+			Columns: []string{user.DiscussionsByCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionsByCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionsByCreatorTable,
+			Columns: []string{user.DiscussionsByCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DiscussionThreadsByCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionThreadsByCreatorTable,
+			Columns: []string{user.DiscussionThreadsByCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedDiscussionThreadsByCreatorIDs(); len(nodes) > 0 && !_u.mutation.DiscussionThreadsByCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionThreadsByCreatorTable,
+			Columns: []string{user.DiscussionThreadsByCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionThreadsByCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionThreadsByCreatorTable,
+			Columns: []string{user.DiscussionThreadsByCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DiscussionThreadsByResolvingUserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionThreadsByResolvingUserTable,
+			Columns: []string{user.DiscussionThreadsByResolvingUserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedDiscussionThreadsByResolvingUserIDs(); len(nodes) > 0 && !_u.mutation.DiscussionThreadsByResolvingUserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionThreadsByResolvingUserTable,
+			Columns: []string{user.DiscussionThreadsByResolvingUserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionThreadsByResolvingUserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionThreadsByResolvingUserTable,
+			Columns: []string{user.DiscussionThreadsByResolvingUserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _u.mutation.DocumentsByUpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -3899,6 +4180,51 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.SubscribedDiscussionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.SubscribedDiscussionsTable,
+			Columns: user.SubscribedDiscussionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedSubscribedDiscussionsIDs(); len(nodes) > 0 && !_u.mutation.SubscribedDiscussionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.SubscribedDiscussionsTable,
+			Columns: user.SubscribedDiscussionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.SubscribedDiscussionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.SubscribedDiscussionsTable,
+			Columns: user.SubscribedDiscussionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _u.mutation.TeamsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -4553,6 +4879,51 @@ func (_u *UserUpdateOne) AddDocumentsByCreator(v ...*Document) *UserUpdateOne {
 	return _u.AddDocumentsByCreatorIDs(ids...)
 }
 
+// AddDiscussionsByCreatorIDs adds the "discussions_by_creator" edge to the Discussion entity by IDs.
+func (_u *UserUpdateOne) AddDiscussionsByCreatorIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.AddDiscussionsByCreatorIDs(ids...)
+	return _u
+}
+
+// AddDiscussionsByCreator adds the "discussions_by_creator" edges to the Discussion entity.
+func (_u *UserUpdateOne) AddDiscussionsByCreator(v ...*Discussion) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddDiscussionsByCreatorIDs(ids...)
+}
+
+// AddDiscussionThreadsByCreatorIDs adds the "discussion_threads_by_creator" edge to the DiscussionThread entity by IDs.
+func (_u *UserUpdateOne) AddDiscussionThreadsByCreatorIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.AddDiscussionThreadsByCreatorIDs(ids...)
+	return _u
+}
+
+// AddDiscussionThreadsByCreator adds the "discussion_threads_by_creator" edges to the DiscussionThread entity.
+func (_u *UserUpdateOne) AddDiscussionThreadsByCreator(v ...*DiscussionThread) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddDiscussionThreadsByCreatorIDs(ids...)
+}
+
+// AddDiscussionThreadsByResolvingUserIDs adds the "discussion_threads_by_resolving_user" edge to the DiscussionThread entity by IDs.
+func (_u *UserUpdateOne) AddDiscussionThreadsByResolvingUserIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.AddDiscussionThreadsByResolvingUserIDs(ids...)
+	return _u
+}
+
+// AddDiscussionThreadsByResolvingUser adds the "discussion_threads_by_resolving_user" edges to the DiscussionThread entity.
+func (_u *UserUpdateOne) AddDiscussionThreadsByResolvingUser(v ...*DiscussionThread) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddDiscussionThreadsByResolvingUserIDs(ids...)
+}
+
 // AddDocumentsByUpdatedByIDs adds the "documents_by_updated_by" edge to the Document entity by IDs.
 func (_u *UserUpdateOne) AddDocumentsByUpdatedByIDs(ids ...uuid.UUID) *UserUpdateOne {
 	_u.mutation.AddDocumentsByUpdatedByIDs(ids...)
@@ -4836,6 +5207,21 @@ func (_u *UserUpdateOne) AddSubscribedProjects(v ...*Project) *UserUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.AddSubscribedProjectIDs(ids...)
+}
+
+// AddSubscribedDiscussionIDs adds the "subscribed_discussions" edge to the Discussion entity by IDs.
+func (_u *UserUpdateOne) AddSubscribedDiscussionIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.AddSubscribedDiscussionIDs(ids...)
+	return _u
+}
+
+// AddSubscribedDiscussions adds the "subscribed_discussions" edges to the Discussion entity.
+func (_u *UserUpdateOne) AddSubscribedDiscussions(v ...*Discussion) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddSubscribedDiscussionIDs(ids...)
 }
 
 // AddTeamIDs adds the "teams" edge to the Team entity by IDs.
@@ -5377,6 +5763,69 @@ func (_u *UserUpdateOne) RemoveDocumentsByCreator(v ...*Document) *UserUpdateOne
 	return _u.RemoveDocumentsByCreatorIDs(ids...)
 }
 
+// ClearDiscussionsByCreator clears all "discussions_by_creator" edges to the Discussion entity.
+func (_u *UserUpdateOne) ClearDiscussionsByCreator() *UserUpdateOne {
+	_u.mutation.ClearDiscussionsByCreator()
+	return _u
+}
+
+// RemoveDiscussionsByCreatorIDs removes the "discussions_by_creator" edge to Discussion entities by IDs.
+func (_u *UserUpdateOne) RemoveDiscussionsByCreatorIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.RemoveDiscussionsByCreatorIDs(ids...)
+	return _u
+}
+
+// RemoveDiscussionsByCreator removes "discussions_by_creator" edges to Discussion entities.
+func (_u *UserUpdateOne) RemoveDiscussionsByCreator(v ...*Discussion) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveDiscussionsByCreatorIDs(ids...)
+}
+
+// ClearDiscussionThreadsByCreator clears all "discussion_threads_by_creator" edges to the DiscussionThread entity.
+func (_u *UserUpdateOne) ClearDiscussionThreadsByCreator() *UserUpdateOne {
+	_u.mutation.ClearDiscussionThreadsByCreator()
+	return _u
+}
+
+// RemoveDiscussionThreadsByCreatorIDs removes the "discussion_threads_by_creator" edge to DiscussionThread entities by IDs.
+func (_u *UserUpdateOne) RemoveDiscussionThreadsByCreatorIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.RemoveDiscussionThreadsByCreatorIDs(ids...)
+	return _u
+}
+
+// RemoveDiscussionThreadsByCreator removes "discussion_threads_by_creator" edges to DiscussionThread entities.
+func (_u *UserUpdateOne) RemoveDiscussionThreadsByCreator(v ...*DiscussionThread) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveDiscussionThreadsByCreatorIDs(ids...)
+}
+
+// ClearDiscussionThreadsByResolvingUser clears all "discussion_threads_by_resolving_user" edges to the DiscussionThread entity.
+func (_u *UserUpdateOne) ClearDiscussionThreadsByResolvingUser() *UserUpdateOne {
+	_u.mutation.ClearDiscussionThreadsByResolvingUser()
+	return _u
+}
+
+// RemoveDiscussionThreadsByResolvingUserIDs removes the "discussion_threads_by_resolving_user" edge to DiscussionThread entities by IDs.
+func (_u *UserUpdateOne) RemoveDiscussionThreadsByResolvingUserIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.RemoveDiscussionThreadsByResolvingUserIDs(ids...)
+	return _u
+}
+
+// RemoveDiscussionThreadsByResolvingUser removes "discussion_threads_by_resolving_user" edges to DiscussionThread entities.
+func (_u *UserUpdateOne) RemoveDiscussionThreadsByResolvingUser(v ...*DiscussionThread) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveDiscussionThreadsByResolvingUserIDs(ids...)
+}
+
 // ClearDocumentsByUpdatedBy clears all "documents_by_updated_by" edges to the Document entity.
 func (_u *UserUpdateOne) ClearDocumentsByUpdatedBy() *UserUpdateOne {
 	_u.mutation.ClearDocumentsByUpdatedBy()
@@ -5774,6 +6223,27 @@ func (_u *UserUpdateOne) RemoveSubscribedProjects(v ...*Project) *UserUpdateOne 
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveSubscribedProjectIDs(ids...)
+}
+
+// ClearSubscribedDiscussions clears all "subscribed_discussions" edges to the Discussion entity.
+func (_u *UserUpdateOne) ClearSubscribedDiscussions() *UserUpdateOne {
+	_u.mutation.ClearSubscribedDiscussions()
+	return _u
+}
+
+// RemoveSubscribedDiscussionIDs removes the "subscribed_discussions" edge to Discussion entities by IDs.
+func (_u *UserUpdateOne) RemoveSubscribedDiscussionIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.RemoveSubscribedDiscussionIDs(ids...)
+	return _u
+}
+
+// RemoveSubscribedDiscussions removes "subscribed_discussions" edges to Discussion entities.
+func (_u *UserUpdateOne) RemoveSubscribedDiscussions(v ...*Discussion) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveSubscribedDiscussionIDs(ids...)
 }
 
 // ClearTeams clears all "teams" edges to the Team entity.
@@ -7021,6 +7491,141 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.DiscussionsByCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionsByCreatorTable,
+			Columns: []string{user.DiscussionsByCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedDiscussionsByCreatorIDs(); len(nodes) > 0 && !_u.mutation.DiscussionsByCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionsByCreatorTable,
+			Columns: []string{user.DiscussionsByCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionsByCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionsByCreatorTable,
+			Columns: []string{user.DiscussionsByCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DiscussionThreadsByCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionThreadsByCreatorTable,
+			Columns: []string{user.DiscussionThreadsByCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedDiscussionThreadsByCreatorIDs(); len(nodes) > 0 && !_u.mutation.DiscussionThreadsByCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionThreadsByCreatorTable,
+			Columns: []string{user.DiscussionThreadsByCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionThreadsByCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionThreadsByCreatorTable,
+			Columns: []string{user.DiscussionThreadsByCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DiscussionThreadsByResolvingUserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionThreadsByResolvingUserTable,
+			Columns: []string{user.DiscussionThreadsByResolvingUserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedDiscussionThreadsByResolvingUserIDs(); len(nodes) > 0 && !_u.mutation.DiscussionThreadsByResolvingUserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionThreadsByResolvingUserTable,
+			Columns: []string{user.DiscussionThreadsByResolvingUserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionThreadsByResolvingUserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionThreadsByResolvingUserTable,
+			Columns: []string{user.DiscussionThreadsByResolvingUserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _u.mutation.DocumentsByUpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -7869,6 +8474,51 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(project.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.SubscribedDiscussionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.SubscribedDiscussionsTable,
+			Columns: user.SubscribedDiscussionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedSubscribedDiscussionsIDs(); len(nodes) > 0 && !_u.mutation.SubscribedDiscussionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.SubscribedDiscussionsTable,
+			Columns: user.SubscribedDiscussionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.SubscribedDiscussionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.SubscribedDiscussionsTable,
+			Columns: user.SubscribedDiscussionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

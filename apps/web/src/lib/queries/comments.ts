@@ -1,23 +1,28 @@
 import { infiniteQueryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { queryKeyDiscussions } from "@/lib/queries/discussions";
 import { DETAIL_REFETCH_INTERVAL_MS, queryKeyIssues } from "@/lib/queries/issues";
 import { call, type OpArgs } from "@/lib/server/client";
 
 const COMMENTS_PAGE_SIZE = 100;
 
+/** What comment threads hang off. */
+export type TCommentTarget =
+  { issueId: string } | { discussionId: string } | { discussionThreadId: string };
+
 export const queryKeyComments = {
   all: (workspaceId: string) => [workspaceId, "comments"] as const,
-  issue: (workspaceId: string, issueId: string) =>
-    [workspaceId, "comments", "issue", issueId] as const,
+  target: (workspaceId: string, target: TCommentTarget) =>
+    [workspaceId, "comments", target] as const,
 };
 
-/** An issue's comment threads, oldest first, each with its replies. */
-export const issueCommentsQuery = (workspaceId: string, issueId: string) =>
+/** A target's comment threads, oldest first, each with its replies. */
+export const commentsQuery = (workspaceId: string, target: TCommentTarget) =>
   infiniteQueryOptions({
-    queryKey: queryKeyComments.issue(workspaceId, issueId),
+    queryKey: queryKeyComments.target(workspaceId, target),
     queryFn: ({ pageParam }) =>
       call(workspaceId, "list_comments", {
-        issueId,
+        ...target,
         limit: COMMENTS_PAGE_SIZE,
         cursor: pageParam,
       }),
@@ -27,13 +32,14 @@ export const issueCommentsQuery = (workspaceId: string, issueId: string) =>
     refetchInterval: DETAIL_REFETCH_INTERVAL_MS,
   });
 
-/** Comments change the issue's comment count and subscribers too. */
+/** Comments change the comment counts and subscribers of issues and discussions too. */
 function useInvalidateComments(workspaceId: string) {
   const queryClient = useQueryClient();
   return () =>
     Promise.all([
       queryClient.invalidateQueries({ queryKey: queryKeyComments.all(workspaceId) }),
       queryClient.invalidateQueries({ queryKey: queryKeyIssues.details(workspaceId) }),
+      queryClient.invalidateQueries({ queryKey: queryKeyDiscussions.all(workspaceId) }),
     ]);
 }
 

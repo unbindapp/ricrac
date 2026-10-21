@@ -63,6 +63,7 @@ type Notification struct {
 	Actor                                                       *uuid.UUID
 	Kind, Summary                                               string
 	Issue, Comment, Project, Initiative, Document, StatusUpdate *uuid.UUID
+	Discussion, DiscussionThread                                *uuid.UUID
 }
 
 func (self *EventsRepository) AddNotification(ctx context.Context, tx repository.TxInterface, n Notification) error {
@@ -70,6 +71,7 @@ func (self *EventsRepository) AddNotification(ctx context.Context, tx repository
 		SetWorkspaceID(n.Workspace).SetUserID(n.User).SetNillableActorID(n.Actor).SetType(n.Kind).
 		SetNillableIssueID(n.Issue).SetNillableCommentID(n.Comment).SetNillableProjectID(n.Project).
 		SetNillableInitiativeID(n.Initiative).SetNillableDocumentID(n.Document).SetNillableStatusUpdateID(n.StatusUpdate).
+		SetNillableDiscussionID(n.Discussion).SetNillableDiscussionThreadID(n.DiscussionThread).
 		SetSummary(n.Summary).Exec(ctx)
 }
 

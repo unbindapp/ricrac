@@ -27,6 +27,10 @@ const (
 	FieldMilestoneID = "milestone_id"
 	// FieldStatusUpdateID holds the string denoting the status_update_id field in the database.
 	FieldStatusUpdateID = "status_update_id"
+	// FieldDiscussionID holds the string denoting the discussion_id field in the database.
+	FieldDiscussionID = "discussion_id"
+	// FieldDiscussionThreadID holds the string denoting the discussion_thread_id field in the database.
+	FieldDiscussionThreadID = "discussion_thread_id"
 	// FieldParentID holds the string denoting the parent_id field in the database.
 	FieldParentID = "parent_id"
 	// FieldUserID holds the string denoting the user_id field in the database.
@@ -35,6 +39,10 @@ const (
 	FieldBody = "body"
 	// FieldQuotedText holds the string denoting the quoted_text field in the database.
 	FieldQuotedText = "quoted_text"
+	// FieldSuggestedText holds the string denoting the suggested_text field in the database.
+	FieldSuggestedText = "suggested_text"
+	// FieldSuggestionStatus holds the string denoting the suggestion_status field in the database.
+	FieldSuggestionStatus = "suggestion_status"
 	// FieldEditedAt holds the string denoting the edited_at field in the database.
 	FieldEditedAt = "edited_at"
 	// FieldResolvedAt holds the string denoting the resolved_at field in the database.
@@ -59,6 +67,10 @@ const (
 	EdgeMilestone = "milestone"
 	// EdgeStatusUpdate holds the string denoting the status_update edge name in mutations.
 	EdgeStatusUpdate = "status_update"
+	// EdgeDiscussion holds the string denoting the discussion edge name in mutations.
+	EdgeDiscussion = "discussion"
+	// EdgeDiscussionThread holds the string denoting the discussion_thread edge name in mutations.
+	EdgeDiscussionThread = "discussion_thread"
 	// EdgeParent holds the string denoting the parent edge name in mutations.
 	EdgeParent = "parent"
 	// EdgeChildren holds the string denoting the children edge name in mutations.
@@ -124,6 +136,20 @@ const (
 	StatusUpdateInverseTable = "status_updates"
 	// StatusUpdateColumn is the table column denoting the status_update relation/edge.
 	StatusUpdateColumn = "status_update_id"
+	// DiscussionTable is the table that holds the discussion relation/edge.
+	DiscussionTable = "comments"
+	// DiscussionInverseTable is the table name for the Discussion entity.
+	// It exists in this package in order to avoid circular dependency with the "discussion" package.
+	DiscussionInverseTable = "discussions"
+	// DiscussionColumn is the table column denoting the discussion relation/edge.
+	DiscussionColumn = "discussion_id"
+	// DiscussionThreadTable is the table that holds the discussion_thread relation/edge.
+	DiscussionThreadTable = "comments"
+	// DiscussionThreadInverseTable is the table name for the DiscussionThread entity.
+	// It exists in this package in order to avoid circular dependency with the "discussionthread" package.
+	DiscussionThreadInverseTable = "discussion_threads"
+	// DiscussionThreadColumn is the table column denoting the discussion_thread relation/edge.
+	DiscussionThreadColumn = "discussion_thread_id"
 	// ParentTable is the table that holds the parent relation/edge.
 	ParentTable = "comments"
 	// ParentColumn is the table column denoting the parent relation/edge.
@@ -179,10 +205,14 @@ var Columns = []string{
 	FieldDocumentID,
 	FieldMilestoneID,
 	FieldStatusUpdateID,
+	FieldDiscussionID,
+	FieldDiscussionThreadID,
 	FieldParentID,
 	FieldUserID,
 	FieldBody,
 	FieldQuotedText,
+	FieldSuggestedText,
+	FieldSuggestionStatus,
 	FieldEditedAt,
 	FieldResolvedAt,
 	FieldResolvingUserID,
@@ -248,6 +278,16 @@ func ByStatusUpdateID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatusUpdateID, opts...).ToFunc()
 }
 
+// ByDiscussionID orders the results by the discussion_id field.
+func ByDiscussionID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDiscussionID, opts...).ToFunc()
+}
+
+// ByDiscussionThreadID orders the results by the discussion_thread_id field.
+func ByDiscussionThreadID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDiscussionThreadID, opts...).ToFunc()
+}
+
 // ByParentID orders the results by the parent_id field.
 func ByParentID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldParentID, opts...).ToFunc()
@@ -266,6 +306,16 @@ func ByBody(opts ...sql.OrderTermOption) OrderOption {
 // ByQuotedText orders the results by the quoted_text field.
 func ByQuotedText(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldQuotedText, opts...).ToFunc()
+}
+
+// BySuggestedText orders the results by the suggested_text field.
+func BySuggestedText(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSuggestedText, opts...).ToFunc()
+}
+
+// BySuggestionStatus orders the results by the suggestion_status field.
+func BySuggestionStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSuggestionStatus, opts...).ToFunc()
 }
 
 // ByEditedAt orders the results by the edited_at field.
@@ -339,6 +389,20 @@ func ByMilestoneField(field string, opts ...sql.OrderTermOption) OrderOption {
 func ByStatusUpdateField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newStatusUpdateStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByDiscussionField orders the results by discussion field.
+func ByDiscussionField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDiscussionStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByDiscussionThreadField orders the results by discussion_thread field.
+func ByDiscussionThreadField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDiscussionThreadStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -465,6 +529,20 @@ func newStatusUpdateStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(StatusUpdateInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, StatusUpdateTable, StatusUpdateColumn),
+	)
+}
+func newDiscussionStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DiscussionInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, DiscussionTable, DiscussionColumn),
+	)
+}
+func newDiscussionThreadStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DiscussionThreadInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, DiscussionThreadTable, DiscussionThreadColumn),
 	)
 }
 func newParentStep() *sqlgraph.Step {

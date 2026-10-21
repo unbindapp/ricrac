@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"ricrac/ent/comment"
+	"ricrac/ent/discussion"
+	"ricrac/ent/discussionthread"
 	"ricrac/ent/document"
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/initiative"
@@ -125,6 +127,34 @@ func (_c *CommentCreate) SetNillableStatusUpdateID(v *uuid.UUID) *CommentCreate 
 	return _c
 }
 
+// SetDiscussionID sets the "discussion_id" field.
+func (_c *CommentCreate) SetDiscussionID(v uuid.UUID) *CommentCreate {
+	_c.mutation.SetDiscussionID(v)
+	return _c
+}
+
+// SetNillableDiscussionID sets the "discussion_id" field if the given value is not nil.
+func (_c *CommentCreate) SetNillableDiscussionID(v *uuid.UUID) *CommentCreate {
+	if v != nil {
+		_c.SetDiscussionID(*v)
+	}
+	return _c
+}
+
+// SetDiscussionThreadID sets the "discussion_thread_id" field.
+func (_c *CommentCreate) SetDiscussionThreadID(v uuid.UUID) *CommentCreate {
+	_c.mutation.SetDiscussionThreadID(v)
+	return _c
+}
+
+// SetNillableDiscussionThreadID sets the "discussion_thread_id" field if the given value is not nil.
+func (_c *CommentCreate) SetNillableDiscussionThreadID(v *uuid.UUID) *CommentCreate {
+	if v != nil {
+		_c.SetDiscussionThreadID(*v)
+	}
+	return _c
+}
+
 // SetParentID sets the "parent_id" field.
 func (_c *CommentCreate) SetParentID(v uuid.UUID) *CommentCreate {
 	_c.mutation.SetParentID(v)
@@ -169,6 +199,34 @@ func (_c *CommentCreate) SetQuotedText(v string) *CommentCreate {
 func (_c *CommentCreate) SetNillableQuotedText(v *string) *CommentCreate {
 	if v != nil {
 		_c.SetQuotedText(*v)
+	}
+	return _c
+}
+
+// SetSuggestedText sets the "suggested_text" field.
+func (_c *CommentCreate) SetSuggestedText(v string) *CommentCreate {
+	_c.mutation.SetSuggestedText(v)
+	return _c
+}
+
+// SetNillableSuggestedText sets the "suggested_text" field if the given value is not nil.
+func (_c *CommentCreate) SetNillableSuggestedText(v *string) *CommentCreate {
+	if v != nil {
+		_c.SetSuggestedText(*v)
+	}
+	return _c
+}
+
+// SetSuggestionStatus sets the "suggestion_status" field.
+func (_c *CommentCreate) SetSuggestionStatus(v string) *CommentCreate {
+	_c.mutation.SetSuggestionStatus(v)
+	return _c
+}
+
+// SetNillableSuggestionStatus sets the "suggestion_status" field if the given value is not nil.
+func (_c *CommentCreate) SetNillableSuggestionStatus(v *string) *CommentCreate {
+	if v != nil {
+		_c.SetSuggestionStatus(*v)
 	}
 	return _c
 }
@@ -290,6 +348,16 @@ func (_c *CommentCreate) SetMilestone(v *ProjectMilestone) *CommentCreate {
 // SetStatusUpdate sets the "status_update" edge to the StatusUpdate entity.
 func (_c *CommentCreate) SetStatusUpdate(v *StatusUpdate) *CommentCreate {
 	return _c.SetStatusUpdateID(v.ID)
+}
+
+// SetDiscussion sets the "discussion" edge to the Discussion entity.
+func (_c *CommentCreate) SetDiscussion(v *Discussion) *CommentCreate {
+	return _c.SetDiscussionID(v.ID)
+}
+
+// SetDiscussionThread sets the "discussion_thread" edge to the DiscussionThread entity.
+func (_c *CommentCreate) SetDiscussionThread(v *DiscussionThread) *CommentCreate {
+	return _c.SetDiscussionThreadID(v.ID)
 }
 
 // SetParent sets the "parent" edge to the Comment entity.
@@ -463,6 +531,14 @@ func (_c *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 		_spec.SetField(comment.FieldQuotedText, field.TypeString, value)
 		_node.QuotedText = &value
 	}
+	if value, ok := _c.mutation.SuggestedText(); ok {
+		_spec.SetField(comment.FieldSuggestedText, field.TypeString, value)
+		_node.SuggestedText = &value
+	}
+	if value, ok := _c.mutation.SuggestionStatus(); ok {
+		_spec.SetField(comment.FieldSuggestionStatus, field.TypeString, value)
+		_node.SuggestionStatus = &value
+	}
 	if value, ok := _c.mutation.EditedAt(); ok {
 		_spec.SetField(comment.FieldEditedAt, field.TypeTime, value)
 		_node.EditedAt = &value
@@ -596,6 +672,40 @@ func (_c *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.StatusUpdateID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.DiscussionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   comment.DiscussionTable,
+			Columns: []string{comment.DiscussionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.DiscussionID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.DiscussionThreadIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   comment.DiscussionThreadTable,
+			Columns: []string{comment.DiscussionThreadColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.DiscussionThreadID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.ParentIDs(); len(nodes) > 0 {
@@ -885,6 +995,42 @@ func (u *CommentUpsert) ClearStatusUpdateID() *CommentUpsert {
 	return u
 }
 
+// SetDiscussionID sets the "discussion_id" field.
+func (u *CommentUpsert) SetDiscussionID(v uuid.UUID) *CommentUpsert {
+	u.Set(comment.FieldDiscussionID, v)
+	return u
+}
+
+// UpdateDiscussionID sets the "discussion_id" field to the value that was provided on create.
+func (u *CommentUpsert) UpdateDiscussionID() *CommentUpsert {
+	u.SetExcluded(comment.FieldDiscussionID)
+	return u
+}
+
+// ClearDiscussionID clears the value of the "discussion_id" field.
+func (u *CommentUpsert) ClearDiscussionID() *CommentUpsert {
+	u.SetNull(comment.FieldDiscussionID)
+	return u
+}
+
+// SetDiscussionThreadID sets the "discussion_thread_id" field.
+func (u *CommentUpsert) SetDiscussionThreadID(v uuid.UUID) *CommentUpsert {
+	u.Set(comment.FieldDiscussionThreadID, v)
+	return u
+}
+
+// UpdateDiscussionThreadID sets the "discussion_thread_id" field to the value that was provided on create.
+func (u *CommentUpsert) UpdateDiscussionThreadID() *CommentUpsert {
+	u.SetExcluded(comment.FieldDiscussionThreadID)
+	return u
+}
+
+// ClearDiscussionThreadID clears the value of the "discussion_thread_id" field.
+func (u *CommentUpsert) ClearDiscussionThreadID() *CommentUpsert {
+	u.SetNull(comment.FieldDiscussionThreadID)
+	return u
+}
+
 // SetParentID sets the "parent_id" field.
 func (u *CommentUpsert) SetParentID(v uuid.UUID) *CommentUpsert {
 	u.Set(comment.FieldParentID, v)
@@ -948,6 +1094,42 @@ func (u *CommentUpsert) UpdateQuotedText() *CommentUpsert {
 // ClearQuotedText clears the value of the "quoted_text" field.
 func (u *CommentUpsert) ClearQuotedText() *CommentUpsert {
 	u.SetNull(comment.FieldQuotedText)
+	return u
+}
+
+// SetSuggestedText sets the "suggested_text" field.
+func (u *CommentUpsert) SetSuggestedText(v string) *CommentUpsert {
+	u.Set(comment.FieldSuggestedText, v)
+	return u
+}
+
+// UpdateSuggestedText sets the "suggested_text" field to the value that was provided on create.
+func (u *CommentUpsert) UpdateSuggestedText() *CommentUpsert {
+	u.SetExcluded(comment.FieldSuggestedText)
+	return u
+}
+
+// ClearSuggestedText clears the value of the "suggested_text" field.
+func (u *CommentUpsert) ClearSuggestedText() *CommentUpsert {
+	u.SetNull(comment.FieldSuggestedText)
+	return u
+}
+
+// SetSuggestionStatus sets the "suggestion_status" field.
+func (u *CommentUpsert) SetSuggestionStatus(v string) *CommentUpsert {
+	u.Set(comment.FieldSuggestionStatus, v)
+	return u
+}
+
+// UpdateSuggestionStatus sets the "suggestion_status" field to the value that was provided on create.
+func (u *CommentUpsert) UpdateSuggestionStatus() *CommentUpsert {
+	u.SetExcluded(comment.FieldSuggestionStatus)
+	return u
+}
+
+// ClearSuggestionStatus clears the value of the "suggestion_status" field.
+func (u *CommentUpsert) ClearSuggestionStatus() *CommentUpsert {
+	u.SetNull(comment.FieldSuggestionStatus)
 	return u
 }
 
@@ -1229,6 +1411,48 @@ func (u *CommentUpsertOne) ClearStatusUpdateID() *CommentUpsertOne {
 	})
 }
 
+// SetDiscussionID sets the "discussion_id" field.
+func (u *CommentUpsertOne) SetDiscussionID(v uuid.UUID) *CommentUpsertOne {
+	return u.Update(func(s *CommentUpsert) {
+		s.SetDiscussionID(v)
+	})
+}
+
+// UpdateDiscussionID sets the "discussion_id" field to the value that was provided on create.
+func (u *CommentUpsertOne) UpdateDiscussionID() *CommentUpsertOne {
+	return u.Update(func(s *CommentUpsert) {
+		s.UpdateDiscussionID()
+	})
+}
+
+// ClearDiscussionID clears the value of the "discussion_id" field.
+func (u *CommentUpsertOne) ClearDiscussionID() *CommentUpsertOne {
+	return u.Update(func(s *CommentUpsert) {
+		s.ClearDiscussionID()
+	})
+}
+
+// SetDiscussionThreadID sets the "discussion_thread_id" field.
+func (u *CommentUpsertOne) SetDiscussionThreadID(v uuid.UUID) *CommentUpsertOne {
+	return u.Update(func(s *CommentUpsert) {
+		s.SetDiscussionThreadID(v)
+	})
+}
+
+// UpdateDiscussionThreadID sets the "discussion_thread_id" field to the value that was provided on create.
+func (u *CommentUpsertOne) UpdateDiscussionThreadID() *CommentUpsertOne {
+	return u.Update(func(s *CommentUpsert) {
+		s.UpdateDiscussionThreadID()
+	})
+}
+
+// ClearDiscussionThreadID clears the value of the "discussion_thread_id" field.
+func (u *CommentUpsertOne) ClearDiscussionThreadID() *CommentUpsertOne {
+	return u.Update(func(s *CommentUpsert) {
+		s.ClearDiscussionThreadID()
+	})
+}
+
 // SetParentID sets the "parent_id" field.
 func (u *CommentUpsertOne) SetParentID(v uuid.UUID) *CommentUpsertOne {
 	return u.Update(func(s *CommentUpsert) {
@@ -1303,6 +1527,48 @@ func (u *CommentUpsertOne) UpdateQuotedText() *CommentUpsertOne {
 func (u *CommentUpsertOne) ClearQuotedText() *CommentUpsertOne {
 	return u.Update(func(s *CommentUpsert) {
 		s.ClearQuotedText()
+	})
+}
+
+// SetSuggestedText sets the "suggested_text" field.
+func (u *CommentUpsertOne) SetSuggestedText(v string) *CommentUpsertOne {
+	return u.Update(func(s *CommentUpsert) {
+		s.SetSuggestedText(v)
+	})
+}
+
+// UpdateSuggestedText sets the "suggested_text" field to the value that was provided on create.
+func (u *CommentUpsertOne) UpdateSuggestedText() *CommentUpsertOne {
+	return u.Update(func(s *CommentUpsert) {
+		s.UpdateSuggestedText()
+	})
+}
+
+// ClearSuggestedText clears the value of the "suggested_text" field.
+func (u *CommentUpsertOne) ClearSuggestedText() *CommentUpsertOne {
+	return u.Update(func(s *CommentUpsert) {
+		s.ClearSuggestedText()
+	})
+}
+
+// SetSuggestionStatus sets the "suggestion_status" field.
+func (u *CommentUpsertOne) SetSuggestionStatus(v string) *CommentUpsertOne {
+	return u.Update(func(s *CommentUpsert) {
+		s.SetSuggestionStatus(v)
+	})
+}
+
+// UpdateSuggestionStatus sets the "suggestion_status" field to the value that was provided on create.
+func (u *CommentUpsertOne) UpdateSuggestionStatus() *CommentUpsertOne {
+	return u.Update(func(s *CommentUpsert) {
+		s.UpdateSuggestionStatus()
+	})
+}
+
+// ClearSuggestionStatus clears the value of the "suggestion_status" field.
+func (u *CommentUpsertOne) ClearSuggestionStatus() *CommentUpsertOne {
+	return u.Update(func(s *CommentUpsert) {
+		s.ClearSuggestionStatus()
 	})
 }
 
@@ -1766,6 +2032,48 @@ func (u *CommentUpsertBulk) ClearStatusUpdateID() *CommentUpsertBulk {
 	})
 }
 
+// SetDiscussionID sets the "discussion_id" field.
+func (u *CommentUpsertBulk) SetDiscussionID(v uuid.UUID) *CommentUpsertBulk {
+	return u.Update(func(s *CommentUpsert) {
+		s.SetDiscussionID(v)
+	})
+}
+
+// UpdateDiscussionID sets the "discussion_id" field to the value that was provided on create.
+func (u *CommentUpsertBulk) UpdateDiscussionID() *CommentUpsertBulk {
+	return u.Update(func(s *CommentUpsert) {
+		s.UpdateDiscussionID()
+	})
+}
+
+// ClearDiscussionID clears the value of the "discussion_id" field.
+func (u *CommentUpsertBulk) ClearDiscussionID() *CommentUpsertBulk {
+	return u.Update(func(s *CommentUpsert) {
+		s.ClearDiscussionID()
+	})
+}
+
+// SetDiscussionThreadID sets the "discussion_thread_id" field.
+func (u *CommentUpsertBulk) SetDiscussionThreadID(v uuid.UUID) *CommentUpsertBulk {
+	return u.Update(func(s *CommentUpsert) {
+		s.SetDiscussionThreadID(v)
+	})
+}
+
+// UpdateDiscussionThreadID sets the "discussion_thread_id" field to the value that was provided on create.
+func (u *CommentUpsertBulk) UpdateDiscussionThreadID() *CommentUpsertBulk {
+	return u.Update(func(s *CommentUpsert) {
+		s.UpdateDiscussionThreadID()
+	})
+}
+
+// ClearDiscussionThreadID clears the value of the "discussion_thread_id" field.
+func (u *CommentUpsertBulk) ClearDiscussionThreadID() *CommentUpsertBulk {
+	return u.Update(func(s *CommentUpsert) {
+		s.ClearDiscussionThreadID()
+	})
+}
+
 // SetParentID sets the "parent_id" field.
 func (u *CommentUpsertBulk) SetParentID(v uuid.UUID) *CommentUpsertBulk {
 	return u.Update(func(s *CommentUpsert) {
@@ -1840,6 +2148,48 @@ func (u *CommentUpsertBulk) UpdateQuotedText() *CommentUpsertBulk {
 func (u *CommentUpsertBulk) ClearQuotedText() *CommentUpsertBulk {
 	return u.Update(func(s *CommentUpsert) {
 		s.ClearQuotedText()
+	})
+}
+
+// SetSuggestedText sets the "suggested_text" field.
+func (u *CommentUpsertBulk) SetSuggestedText(v string) *CommentUpsertBulk {
+	return u.Update(func(s *CommentUpsert) {
+		s.SetSuggestedText(v)
+	})
+}
+
+// UpdateSuggestedText sets the "suggested_text" field to the value that was provided on create.
+func (u *CommentUpsertBulk) UpdateSuggestedText() *CommentUpsertBulk {
+	return u.Update(func(s *CommentUpsert) {
+		s.UpdateSuggestedText()
+	})
+}
+
+// ClearSuggestedText clears the value of the "suggested_text" field.
+func (u *CommentUpsertBulk) ClearSuggestedText() *CommentUpsertBulk {
+	return u.Update(func(s *CommentUpsert) {
+		s.ClearSuggestedText()
+	})
+}
+
+// SetSuggestionStatus sets the "suggestion_status" field.
+func (u *CommentUpsertBulk) SetSuggestionStatus(v string) *CommentUpsertBulk {
+	return u.Update(func(s *CommentUpsert) {
+		s.SetSuggestionStatus(v)
+	})
+}
+
+// UpdateSuggestionStatus sets the "suggestion_status" field to the value that was provided on create.
+func (u *CommentUpsertBulk) UpdateSuggestionStatus() *CommentUpsertBulk {
+	return u.Update(func(s *CommentUpsert) {
+		s.UpdateSuggestionStatus()
+	})
+}
+
+// ClearSuggestionStatus clears the value of the "suggestion_status" field.
+func (u *CommentUpsertBulk) ClearSuggestionStatus() *CommentUpsertBulk {
+	return u.Update(func(s *CommentUpsert) {
+		s.ClearSuggestionStatus()
 	})
 }
 

@@ -30,6 +30,7 @@ import {
 import { Kbd } from "@/components/ui/kbd";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import {
+  type TCommentTarget,
   useCommentReactionMutation,
   useDeleteCommentMutation,
   useResolveCommentMutation,
@@ -39,13 +40,13 @@ import { meQuery } from "@/lib/queries/me";
 import { useEditorUploads } from "@/lib/queries/uploads";
 
 export function CommentComposer({
-  issueId,
+  target,
   parentId,
   placeholder = "Leave a comment…",
   autoFocus,
   onDone,
 }: {
-  issueId: string;
+  target: TCommentTarget;
   parentId?: string;
   placeholder?: string;
   autoFocus?: boolean;
@@ -59,7 +60,7 @@ export function CommentComposer({
   const { mutateAsync: saveComment, isPending } = useSaveCommentMutation(workspace.id);
   const submit = async () => {
     if (!body.trim() || isPending || uploads.isUploading) return;
-    const saved = await saveComment({ issueId, body, parentId }).catch(() => null);
+    const saved = await saveComment({ ...target, body, parentId }).catch(() => null);
     if (!saved) return;
     setBody("");
     setFormKey((key) => key + 1);
@@ -100,7 +101,13 @@ export function CommentComposer({
   );
 }
 
-export function CommentThread({ thread, issueId }: { thread: TCommentThread; issueId: string }) {
+export function CommentThread({
+  thread,
+  target,
+}: {
+  thread: TCommentThread;
+  target: TCommentTarget;
+}) {
   const [isReplying, setIsReplying] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const { canEdit } = useWorkspace();
@@ -140,7 +147,7 @@ export function CommentThread({ thread, issueId }: { thread: TCommentThread; iss
       {isReplying ? (
         <div className="border-t p-2">
           <CommentComposer
-            issueId={issueId}
+            target={target}
             parentId={thread.id}
             placeholder="Leave a reply…"
             autoFocus
@@ -214,6 +221,7 @@ function CommentItem({
 
   return (
     <article
+      id={`comment-${comment.id}`}
       aria-label={`Comment from ${authorName}`}
       className="group/comment group/reactable flex flex-col gap-2 p-3"
     >

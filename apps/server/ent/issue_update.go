@@ -10,6 +10,7 @@ import (
 	"ricrac/ent/comment"
 	"ricrac/ent/customerneed"
 	"ricrac/ent/cycle"
+	"ricrac/ent/discussionthread"
 	"ricrac/ent/document"
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/issue"
@@ -881,6 +882,21 @@ func (_u *IssueUpdate) AddComments(v ...*Comment) *IssueUpdate {
 	return _u.AddCommentIDs(ids...)
 }
 
+// AddDiscussionThreadIDs adds the "discussion_threads" edge to the DiscussionThread entity by IDs.
+func (_u *IssueUpdate) AddDiscussionThreadIDs(ids ...uuid.UUID) *IssueUpdate {
+	_u.mutation.AddDiscussionThreadIDs(ids...)
+	return _u
+}
+
+// AddDiscussionThreads adds the "discussion_threads" edges to the DiscussionThread entity.
+func (_u *IssueUpdate) AddDiscussionThreads(v ...*DiscussionThread) *IssueUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddDiscussionThreadIDs(ids...)
+}
+
 // AddReactionIDs adds the "reactions" edge to the Reaction entity by IDs.
 func (_u *IssueUpdate) AddReactionIDs(ids ...uuid.UUID) *IssueUpdate {
 	_u.mutation.AddReactionIDs(ids...)
@@ -1211,6 +1227,27 @@ func (_u *IssueUpdate) RemoveComments(v ...*Comment) *IssueUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveCommentIDs(ids...)
+}
+
+// ClearDiscussionThreads clears all "discussion_threads" edges to the DiscussionThread entity.
+func (_u *IssueUpdate) ClearDiscussionThreads() *IssueUpdate {
+	_u.mutation.ClearDiscussionThreads()
+	return _u
+}
+
+// RemoveDiscussionThreadIDs removes the "discussion_threads" edge to DiscussionThread entities by IDs.
+func (_u *IssueUpdate) RemoveDiscussionThreadIDs(ids ...uuid.UUID) *IssueUpdate {
+	_u.mutation.RemoveDiscussionThreadIDs(ids...)
+	return _u
+}
+
+// RemoveDiscussionThreads removes "discussion_threads" edges to DiscussionThread entities.
+func (_u *IssueUpdate) RemoveDiscussionThreads(v ...*DiscussionThread) *IssueUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveDiscussionThreadIDs(ids...)
 }
 
 // ClearReactions clears all "reactions" edges to the Reaction entity.
@@ -2191,6 +2228,51 @@ func (_u *IssueUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DiscussionThreadsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   issue.DiscussionThreadsTable,
+			Columns: []string{issue.DiscussionThreadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedDiscussionThreadsIDs(); len(nodes) > 0 && !_u.mutation.DiscussionThreadsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   issue.DiscussionThreadsTable,
+			Columns: []string{issue.DiscussionThreadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionThreadsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   issue.DiscussionThreadsTable,
+			Columns: []string{issue.DiscussionThreadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -3412,6 +3494,21 @@ func (_u *IssueUpdateOne) AddComments(v ...*Comment) *IssueUpdateOne {
 	return _u.AddCommentIDs(ids...)
 }
 
+// AddDiscussionThreadIDs adds the "discussion_threads" edge to the DiscussionThread entity by IDs.
+func (_u *IssueUpdateOne) AddDiscussionThreadIDs(ids ...uuid.UUID) *IssueUpdateOne {
+	_u.mutation.AddDiscussionThreadIDs(ids...)
+	return _u
+}
+
+// AddDiscussionThreads adds the "discussion_threads" edges to the DiscussionThread entity.
+func (_u *IssueUpdateOne) AddDiscussionThreads(v ...*DiscussionThread) *IssueUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddDiscussionThreadIDs(ids...)
+}
+
 // AddReactionIDs adds the "reactions" edge to the Reaction entity by IDs.
 func (_u *IssueUpdateOne) AddReactionIDs(ids ...uuid.UUID) *IssueUpdateOne {
 	_u.mutation.AddReactionIDs(ids...)
@@ -3742,6 +3839,27 @@ func (_u *IssueUpdateOne) RemoveComments(v ...*Comment) *IssueUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveCommentIDs(ids...)
+}
+
+// ClearDiscussionThreads clears all "discussion_threads" edges to the DiscussionThread entity.
+func (_u *IssueUpdateOne) ClearDiscussionThreads() *IssueUpdateOne {
+	_u.mutation.ClearDiscussionThreads()
+	return _u
+}
+
+// RemoveDiscussionThreadIDs removes the "discussion_threads" edge to DiscussionThread entities by IDs.
+func (_u *IssueUpdateOne) RemoveDiscussionThreadIDs(ids ...uuid.UUID) *IssueUpdateOne {
+	_u.mutation.RemoveDiscussionThreadIDs(ids...)
+	return _u
+}
+
+// RemoveDiscussionThreads removes "discussion_threads" edges to DiscussionThread entities.
+func (_u *IssueUpdateOne) RemoveDiscussionThreads(v ...*DiscussionThread) *IssueUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveDiscussionThreadIDs(ids...)
 }
 
 // ClearReactions clears all "reactions" edges to the Reaction entity.
@@ -4752,6 +4870,51 @@ func (_u *IssueUpdateOne) sqlSave(ctx context.Context) (_node *Issue, err error)
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DiscussionThreadsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   issue.DiscussionThreadsTable,
+			Columns: []string{issue.DiscussionThreadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedDiscussionThreadsIDs(); len(nodes) > 0 && !_u.mutation.DiscussionThreadsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   issue.DiscussionThreadsTable,
+			Columns: []string{issue.DiscussionThreadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionThreadsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   issue.DiscussionThreadsTable,
+			Columns: []string{issue.DiscussionThreadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

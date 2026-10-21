@@ -134,6 +134,78 @@ func (_c *ResolveServiceMock_ByID_Call) RunAndReturn(run func(ctx context.Contex
 	return _c
 }
 
+// CanSeeDiscussion provides a mock function for the type ResolveServiceMock
+func (_mock *ResolveServiceMock) CanSeeDiscussion(ctx context.Context, actor *auth.Actor, id uuid.UUID) (bool, error) {
+	ret := _mock.Called(ctx, actor, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CanSeeDiscussion")
+	}
+
+	var r0 bool
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, uuid.UUID) (bool, error)); ok {
+		return returnFunc(ctx, actor, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, uuid.UUID) bool); ok {
+		r0 = returnFunc(ctx, actor, id)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, actor, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// ResolveServiceMock_CanSeeDiscussion_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CanSeeDiscussion'
+type ResolveServiceMock_CanSeeDiscussion_Call struct {
+	*mock.Call
+}
+
+// CanSeeDiscussion is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - id uuid.UUID
+func (_e *ResolveServiceMock_Expecter) CanSeeDiscussion(ctx any, actor any, id any) *ResolveServiceMock_CanSeeDiscussion_Call {
+	return &ResolveServiceMock_CanSeeDiscussion_Call{Call: _e.mock.On("CanSeeDiscussion", ctx, actor, id)}
+}
+
+func (_c *ResolveServiceMock_CanSeeDiscussion_Call) Run(run func(ctx context.Context, actor *auth.Actor, id uuid.UUID)) *ResolveServiceMock_CanSeeDiscussion_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *ResolveServiceMock_CanSeeDiscussion_Call) Return(b bool, err error) *ResolveServiceMock_CanSeeDiscussion_Call {
+	_c.Call.Return(b, err)
+	return _c
+}
+
+func (_c *ResolveServiceMock_CanSeeDiscussion_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, id uuid.UUID) (bool, error)) *ResolveServiceMock_CanSeeDiscussion_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CanSeeDocument provides a mock function for the type ResolveServiceMock
 func (_mock *ResolveServiceMock) CanSeeDocument(ctx context.Context, actor *auth.Actor, id uuid.UUID) (bool, error) {
 	ret := _mock.Called(ctx, actor, id)
@@ -502,6 +574,80 @@ func (_c *ResolveServiceMock_Cycle_Call) Return(uUID uuid.UUID, err error) *Reso
 }
 
 func (_c *ResolveServiceMock_Cycle_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, team *uuid.UUID, value string) (uuid.UUID, error)) *ResolveServiceMock_Cycle_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Discussion provides a mock function for the type ResolveServiceMock
+func (_mock *ResolveServiceMock) Discussion(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error) {
+	ret := _mock.Called(ctx, actor, value)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Discussion")
+	}
+
+	var r0 uuid.UUID
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, string) (uuid.UUID, error)); ok {
+		return returnFunc(ctx, actor, value)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, string) uuid.UUID); ok {
+		r0 = returnFunc(ctx, actor, value)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, string) error); ok {
+		r1 = returnFunc(ctx, actor, value)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// ResolveServiceMock_Discussion_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Discussion'
+type ResolveServiceMock_Discussion_Call struct {
+	*mock.Call
+}
+
+// Discussion is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - value string
+func (_e *ResolveServiceMock_Expecter) Discussion(ctx any, actor any, value any) *ResolveServiceMock_Discussion_Call {
+	return &ResolveServiceMock_Discussion_Call{Call: _e.mock.On("Discussion", ctx, actor, value)}
+}
+
+func (_c *ResolveServiceMock_Discussion_Call) Run(run func(ctx context.Context, actor *auth.Actor, value string)) *ResolveServiceMock_Discussion_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 string
+		if args[2] != nil {
+			arg2 = args[2].(string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *ResolveServiceMock_Discussion_Call) Return(uUID uuid.UUID, err error) *ResolveServiceMock_Discussion_Call {
+	_c.Call.Return(uUID, err)
+	return _c
+}
+
+func (_c *ResolveServiceMock_Discussion_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error)) *ResolveServiceMock_Discussion_Call {
 	_c.Call.Return(run)
 	return _c
 }

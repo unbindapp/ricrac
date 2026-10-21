@@ -76,6 +76,10 @@ type WorkspaceEdges struct {
 	Files []*File `json:"files,omitempty"`
 	// Documents holds the value of the documents edge.
 	Documents []*Document `json:"documents,omitempty"`
+	// Discussions holds the value of the discussions edge.
+	Discussions []*Discussion `json:"discussions,omitempty"`
+	// DiscussionThreads holds the value of the discussion_threads edge.
+	DiscussionThreads []*DiscussionThread `json:"discussion_threads,omitempty"`
 	// Comments holds the value of the comments edge.
 	Comments []*Comment `json:"comments,omitempty"`
 	// Reactions holds the value of the reactions edge.
@@ -110,7 +114,7 @@ type WorkspaceEdges struct {
 	WorkspaceMembers []*WorkspaceMember `json:"workspace_members,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [33]bool
+	loadedTypes [35]bool
 }
 
 // InvitationsOrErr returns the Invitations value or an error if the edge
@@ -266,10 +270,28 @@ func (e WorkspaceEdges) DocumentsOrErr() ([]*Document, error) {
 	return nil, &NotLoadedError{edge: "documents"}
 }
 
+// DiscussionsOrErr returns the Discussions value or an error if the edge
+// was not loaded in eager-loading.
+func (e WorkspaceEdges) DiscussionsOrErr() ([]*Discussion, error) {
+	if e.loadedTypes[17] {
+		return e.Discussions, nil
+	}
+	return nil, &NotLoadedError{edge: "discussions"}
+}
+
+// DiscussionThreadsOrErr returns the DiscussionThreads value or an error if the edge
+// was not loaded in eager-loading.
+func (e WorkspaceEdges) DiscussionThreadsOrErr() ([]*DiscussionThread, error) {
+	if e.loadedTypes[18] {
+		return e.DiscussionThreads, nil
+	}
+	return nil, &NotLoadedError{edge: "discussion_threads"}
+}
+
 // CommentsOrErr returns the Comments value or an error if the edge
 // was not loaded in eager-loading.
 func (e WorkspaceEdges) CommentsOrErr() ([]*Comment, error) {
-	if e.loadedTypes[17] {
+	if e.loadedTypes[19] {
 		return e.Comments, nil
 	}
 	return nil, &NotLoadedError{edge: "comments"}
@@ -278,7 +300,7 @@ func (e WorkspaceEdges) CommentsOrErr() ([]*Comment, error) {
 // ReactionsOrErr returns the Reactions value or an error if the edge
 // was not loaded in eager-loading.
 func (e WorkspaceEdges) ReactionsOrErr() ([]*Reaction, error) {
-	if e.loadedTypes[18] {
+	if e.loadedTypes[20] {
 		return e.Reactions, nil
 	}
 	return nil, &NotLoadedError{edge: "reactions"}
@@ -287,7 +309,7 @@ func (e WorkspaceEdges) ReactionsOrErr() ([]*Reaction, error) {
 // CustomerStatusesOrErr returns the CustomerStatuses value or an error if the edge
 // was not loaded in eager-loading.
 func (e WorkspaceEdges) CustomerStatusesOrErr() ([]*CustomerStatus, error) {
-	if e.loadedTypes[19] {
+	if e.loadedTypes[21] {
 		return e.CustomerStatuses, nil
 	}
 	return nil, &NotLoadedError{edge: "customer_statuses"}
@@ -296,7 +318,7 @@ func (e WorkspaceEdges) CustomerStatusesOrErr() ([]*CustomerStatus, error) {
 // CustomerTiersOrErr returns the CustomerTiers value or an error if the edge
 // was not loaded in eager-loading.
 func (e WorkspaceEdges) CustomerTiersOrErr() ([]*CustomerTier, error) {
-	if e.loadedTypes[20] {
+	if e.loadedTypes[22] {
 		return e.CustomerTiers, nil
 	}
 	return nil, &NotLoadedError{edge: "customer_tiers"}
@@ -305,7 +327,7 @@ func (e WorkspaceEdges) CustomerTiersOrErr() ([]*CustomerTier, error) {
 // CustomersOrErr returns the Customers value or an error if the edge
 // was not loaded in eager-loading.
 func (e WorkspaceEdges) CustomersOrErr() ([]*Customer, error) {
-	if e.loadedTypes[21] {
+	if e.loadedTypes[23] {
 		return e.Customers, nil
 	}
 	return nil, &NotLoadedError{edge: "customers"}
@@ -314,7 +336,7 @@ func (e WorkspaceEdges) CustomersOrErr() ([]*Customer, error) {
 // CustomerNeedsOrErr returns the CustomerNeeds value or an error if the edge
 // was not loaded in eager-loading.
 func (e WorkspaceEdges) CustomerNeedsOrErr() ([]*CustomerNeed, error) {
-	if e.loadedTypes[22] {
+	if e.loadedTypes[24] {
 		return e.CustomerNeeds, nil
 	}
 	return nil, &NotLoadedError{edge: "customer_needs"}
@@ -323,7 +345,7 @@ func (e WorkspaceEdges) CustomerNeedsOrErr() ([]*CustomerNeed, error) {
 // CustomViewsOrErr returns the CustomViews value or an error if the edge
 // was not loaded in eager-loading.
 func (e WorkspaceEdges) CustomViewsOrErr() ([]*CustomView, error) {
-	if e.loadedTypes[23] {
+	if e.loadedTypes[25] {
 		return e.CustomViews, nil
 	}
 	return nil, &NotLoadedError{edge: "custom_views"}
@@ -332,7 +354,7 @@ func (e WorkspaceEdges) CustomViewsOrErr() ([]*CustomView, error) {
 // FavoritesOrErr returns the Favorites value or an error if the edge
 // was not loaded in eager-loading.
 func (e WorkspaceEdges) FavoritesOrErr() ([]*Favorite, error) {
-	if e.loadedTypes[24] {
+	if e.loadedTypes[26] {
 		return e.Favorites, nil
 	}
 	return nil, &NotLoadedError{edge: "favorites"}
@@ -341,7 +363,7 @@ func (e WorkspaceEdges) FavoritesOrErr() ([]*Favorite, error) {
 // TemplatesOrErr returns the Templates value or an error if the edge
 // was not loaded in eager-loading.
 func (e WorkspaceEdges) TemplatesOrErr() ([]*Template, error) {
-	if e.loadedTypes[25] {
+	if e.loadedTypes[27] {
 		return e.Templates, nil
 	}
 	return nil, &NotLoadedError{edge: "templates"}
@@ -350,7 +372,7 @@ func (e WorkspaceEdges) TemplatesOrErr() ([]*Template, error) {
 // NotificationsOrErr returns the Notifications value or an error if the edge
 // was not loaded in eager-loading.
 func (e WorkspaceEdges) NotificationsOrErr() ([]*Notification, error) {
-	if e.loadedTypes[26] {
+	if e.loadedTypes[28] {
 		return e.Notifications, nil
 	}
 	return nil, &NotLoadedError{edge: "notifications"}
@@ -359,7 +381,7 @@ func (e WorkspaceEdges) NotificationsOrErr() ([]*Notification, error) {
 // WebhooksOrErr returns the Webhooks value or an error if the edge
 // was not loaded in eager-loading.
 func (e WorkspaceEdges) WebhooksOrErr() ([]*Webhook, error) {
-	if e.loadedTypes[27] {
+	if e.loadedTypes[29] {
 		return e.Webhooks, nil
 	}
 	return nil, &NotLoadedError{edge: "webhooks"}
@@ -368,7 +390,7 @@ func (e WorkspaceEdges) WebhooksOrErr() ([]*Webhook, error) {
 // AuditEntriesOrErr returns the AuditEntries value or an error if the edge
 // was not loaded in eager-loading.
 func (e WorkspaceEdges) AuditEntriesOrErr() ([]*AuditEntry, error) {
-	if e.loadedTypes[28] {
+	if e.loadedTypes[30] {
 		return e.AuditEntries, nil
 	}
 	return nil, &NotLoadedError{edge: "audit_entries"}
@@ -377,7 +399,7 @@ func (e WorkspaceEdges) AuditEntriesOrErr() ([]*AuditEntry, error) {
 // GithubInstallationsOrErr returns the GithubInstallations value or an error if the edge
 // was not loaded in eager-loading.
 func (e WorkspaceEdges) GithubInstallationsOrErr() ([]*GithubInstallation, error) {
-	if e.loadedTypes[29] {
+	if e.loadedTypes[31] {
 		return e.GithubInstallations, nil
 	}
 	return nil, &NotLoadedError{edge: "github_installations"}
@@ -386,7 +408,7 @@ func (e WorkspaceEdges) GithubInstallationsOrErr() ([]*GithubInstallation, error
 // GithubRepoSyncsOrErr returns the GithubRepoSyncs value or an error if the edge
 // was not loaded in eager-loading.
 func (e WorkspaceEdges) GithubRepoSyncsOrErr() ([]*GithubRepoSync, error) {
-	if e.loadedTypes[30] {
+	if e.loadedTypes[32] {
 		return e.GithubRepoSyncs, nil
 	}
 	return nil, &NotLoadedError{edge: "github_repo_syncs"}
@@ -395,7 +417,7 @@ func (e WorkspaceEdges) GithubRepoSyncsOrErr() ([]*GithubRepoSync, error) {
 // MembersOrErr returns the Members value or an error if the edge
 // was not loaded in eager-loading.
 func (e WorkspaceEdges) MembersOrErr() ([]*User, error) {
-	if e.loadedTypes[31] {
+	if e.loadedTypes[33] {
 		return e.Members, nil
 	}
 	return nil, &NotLoadedError{edge: "members"}
@@ -404,7 +426,7 @@ func (e WorkspaceEdges) MembersOrErr() ([]*User, error) {
 // WorkspaceMembersOrErr returns the WorkspaceMembers value or an error if the edge
 // was not loaded in eager-loading.
 func (e WorkspaceEdges) WorkspaceMembersOrErr() ([]*WorkspaceMember, error) {
-	if e.loadedTypes[32] {
+	if e.loadedTypes[34] {
 		return e.WorkspaceMembers, nil
 	}
 	return nil, &NotLoadedError{edge: "workspace_members"}
@@ -586,6 +608,16 @@ func (_m *Workspace) QueryFiles() *FileQuery {
 // QueryDocuments queries the "documents" edge of the Workspace entity.
 func (_m *Workspace) QueryDocuments() *DocumentQuery {
 	return NewWorkspaceClient(_m.config).QueryDocuments(_m)
+}
+
+// QueryDiscussions queries the "discussions" edge of the Workspace entity.
+func (_m *Workspace) QueryDiscussions() *DiscussionQuery {
+	return NewWorkspaceClient(_m.config).QueryDiscussions(_m)
+}
+
+// QueryDiscussionThreads queries the "discussion_threads" edge of the Workspace entity.
+func (_m *Workspace) QueryDiscussionThreads() *DiscussionThreadQuery {
+	return NewWorkspaceClient(_m.config).QueryDiscussionThreads(_m)
 }
 
 // QueryComments queries the "comments" edge of the Workspace entity.

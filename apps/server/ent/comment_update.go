@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"ricrac/ent/comment"
+	"ricrac/ent/discussion"
+	"ricrac/ent/discussionthread"
 	"ricrac/ent/document"
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/initiative"
@@ -175,6 +177,46 @@ func (_u *CommentUpdate) ClearStatusUpdateID() *CommentUpdate {
 	return _u
 }
 
+// SetDiscussionID sets the "discussion_id" field.
+func (_u *CommentUpdate) SetDiscussionID(v uuid.UUID) *CommentUpdate {
+	_u.mutation.SetDiscussionID(v)
+	return _u
+}
+
+// SetNillableDiscussionID sets the "discussion_id" field if the given value is not nil.
+func (_u *CommentUpdate) SetNillableDiscussionID(v *uuid.UUID) *CommentUpdate {
+	if v != nil {
+		_u.SetDiscussionID(*v)
+	}
+	return _u
+}
+
+// ClearDiscussionID clears the value of the "discussion_id" field.
+func (_u *CommentUpdate) ClearDiscussionID() *CommentUpdate {
+	_u.mutation.ClearDiscussionID()
+	return _u
+}
+
+// SetDiscussionThreadID sets the "discussion_thread_id" field.
+func (_u *CommentUpdate) SetDiscussionThreadID(v uuid.UUID) *CommentUpdate {
+	_u.mutation.SetDiscussionThreadID(v)
+	return _u
+}
+
+// SetNillableDiscussionThreadID sets the "discussion_thread_id" field if the given value is not nil.
+func (_u *CommentUpdate) SetNillableDiscussionThreadID(v *uuid.UUID) *CommentUpdate {
+	if v != nil {
+		_u.SetDiscussionThreadID(*v)
+	}
+	return _u
+}
+
+// ClearDiscussionThreadID clears the value of the "discussion_thread_id" field.
+func (_u *CommentUpdate) ClearDiscussionThreadID() *CommentUpdate {
+	_u.mutation.ClearDiscussionThreadID()
+	return _u
+}
+
 // SetParentID sets the "parent_id" field.
 func (_u *CommentUpdate) SetParentID(v uuid.UUID) *CommentUpdate {
 	_u.mutation.SetParentID(v)
@@ -246,6 +288,46 @@ func (_u *CommentUpdate) SetNillableQuotedText(v *string) *CommentUpdate {
 // ClearQuotedText clears the value of the "quoted_text" field.
 func (_u *CommentUpdate) ClearQuotedText() *CommentUpdate {
 	_u.mutation.ClearQuotedText()
+	return _u
+}
+
+// SetSuggestedText sets the "suggested_text" field.
+func (_u *CommentUpdate) SetSuggestedText(v string) *CommentUpdate {
+	_u.mutation.SetSuggestedText(v)
+	return _u
+}
+
+// SetNillableSuggestedText sets the "suggested_text" field if the given value is not nil.
+func (_u *CommentUpdate) SetNillableSuggestedText(v *string) *CommentUpdate {
+	if v != nil {
+		_u.SetSuggestedText(*v)
+	}
+	return _u
+}
+
+// ClearSuggestedText clears the value of the "suggested_text" field.
+func (_u *CommentUpdate) ClearSuggestedText() *CommentUpdate {
+	_u.mutation.ClearSuggestedText()
+	return _u
+}
+
+// SetSuggestionStatus sets the "suggestion_status" field.
+func (_u *CommentUpdate) SetSuggestionStatus(v string) *CommentUpdate {
+	_u.mutation.SetSuggestionStatus(v)
+	return _u
+}
+
+// SetNillableSuggestionStatus sets the "suggestion_status" field if the given value is not nil.
+func (_u *CommentUpdate) SetNillableSuggestionStatus(v *string) *CommentUpdate {
+	if v != nil {
+		_u.SetSuggestionStatus(*v)
+	}
+	return _u
+}
+
+// ClearSuggestionStatus clears the value of the "suggestion_status" field.
+func (_u *CommentUpdate) ClearSuggestionStatus() *CommentUpdate {
+	_u.mutation.ClearSuggestionStatus()
 	return _u
 }
 
@@ -384,6 +466,16 @@ func (_u *CommentUpdate) SetStatusUpdate(v *StatusUpdate) *CommentUpdate {
 	return _u.SetStatusUpdateID(v.ID)
 }
 
+// SetDiscussion sets the "discussion" edge to the Discussion entity.
+func (_u *CommentUpdate) SetDiscussion(v *Discussion) *CommentUpdate {
+	return _u.SetDiscussionID(v.ID)
+}
+
+// SetDiscussionThread sets the "discussion_thread" edge to the DiscussionThread entity.
+func (_u *CommentUpdate) SetDiscussionThread(v *DiscussionThread) *CommentUpdate {
+	return _u.SetDiscussionThreadID(v.ID)
+}
+
 // SetParent sets the "parent" edge to the Comment entity.
 func (_u *CommentUpdate) SetParent(v *Comment) *CommentUpdate {
 	return _u.SetParentID(v.ID)
@@ -503,6 +595,18 @@ func (_u *CommentUpdate) ClearMilestone() *CommentUpdate {
 // ClearStatusUpdate clears the "status_update" edge to the StatusUpdate entity.
 func (_u *CommentUpdate) ClearStatusUpdate() *CommentUpdate {
 	_u.mutation.ClearStatusUpdate()
+	return _u
+}
+
+// ClearDiscussion clears the "discussion" edge to the Discussion entity.
+func (_u *CommentUpdate) ClearDiscussion() *CommentUpdate {
+	_u.mutation.ClearDiscussion()
+	return _u
+}
+
+// ClearDiscussionThread clears the "discussion_thread" edge to the DiscussionThread entity.
+func (_u *CommentUpdate) ClearDiscussionThread() *CommentUpdate {
+	_u.mutation.ClearDiscussionThread()
 	return _u
 }
 
@@ -669,6 +773,18 @@ func (_u *CommentUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.QuotedTextCleared() {
 		_spec.ClearField(comment.FieldQuotedText, field.TypeString)
+	}
+	if value, ok := _u.mutation.SuggestedText(); ok {
+		_spec.SetField(comment.FieldSuggestedText, field.TypeString, value)
+	}
+	if _u.mutation.SuggestedTextCleared() {
+		_spec.ClearField(comment.FieldSuggestedText, field.TypeString)
+	}
+	if value, ok := _u.mutation.SuggestionStatus(); ok {
+		_spec.SetField(comment.FieldSuggestionStatus, field.TypeString, value)
+	}
+	if _u.mutation.SuggestionStatusCleared() {
+		_spec.ClearField(comment.FieldSuggestionStatus, field.TypeString)
 	}
 	if value, ok := _u.mutation.EditedAt(); ok {
 		_spec.SetField(comment.FieldEditedAt, field.TypeTime, value)
@@ -890,6 +1006,64 @@ func (_u *CommentUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(statusupdate.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DiscussionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   comment.DiscussionTable,
+			Columns: []string{comment.DiscussionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   comment.DiscussionTable,
+			Columns: []string{comment.DiscussionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DiscussionThreadCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   comment.DiscussionThreadTable,
+			Columns: []string{comment.DiscussionThreadColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionThreadIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   comment.DiscussionThreadTable,
+			Columns: []string{comment.DiscussionThreadColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -1320,6 +1494,46 @@ func (_u *CommentUpdateOne) ClearStatusUpdateID() *CommentUpdateOne {
 	return _u
 }
 
+// SetDiscussionID sets the "discussion_id" field.
+func (_u *CommentUpdateOne) SetDiscussionID(v uuid.UUID) *CommentUpdateOne {
+	_u.mutation.SetDiscussionID(v)
+	return _u
+}
+
+// SetNillableDiscussionID sets the "discussion_id" field if the given value is not nil.
+func (_u *CommentUpdateOne) SetNillableDiscussionID(v *uuid.UUID) *CommentUpdateOne {
+	if v != nil {
+		_u.SetDiscussionID(*v)
+	}
+	return _u
+}
+
+// ClearDiscussionID clears the value of the "discussion_id" field.
+func (_u *CommentUpdateOne) ClearDiscussionID() *CommentUpdateOne {
+	_u.mutation.ClearDiscussionID()
+	return _u
+}
+
+// SetDiscussionThreadID sets the "discussion_thread_id" field.
+func (_u *CommentUpdateOne) SetDiscussionThreadID(v uuid.UUID) *CommentUpdateOne {
+	_u.mutation.SetDiscussionThreadID(v)
+	return _u
+}
+
+// SetNillableDiscussionThreadID sets the "discussion_thread_id" field if the given value is not nil.
+func (_u *CommentUpdateOne) SetNillableDiscussionThreadID(v *uuid.UUID) *CommentUpdateOne {
+	if v != nil {
+		_u.SetDiscussionThreadID(*v)
+	}
+	return _u
+}
+
+// ClearDiscussionThreadID clears the value of the "discussion_thread_id" field.
+func (_u *CommentUpdateOne) ClearDiscussionThreadID() *CommentUpdateOne {
+	_u.mutation.ClearDiscussionThreadID()
+	return _u
+}
+
 // SetParentID sets the "parent_id" field.
 func (_u *CommentUpdateOne) SetParentID(v uuid.UUID) *CommentUpdateOne {
 	_u.mutation.SetParentID(v)
@@ -1391,6 +1605,46 @@ func (_u *CommentUpdateOne) SetNillableQuotedText(v *string) *CommentUpdateOne {
 // ClearQuotedText clears the value of the "quoted_text" field.
 func (_u *CommentUpdateOne) ClearQuotedText() *CommentUpdateOne {
 	_u.mutation.ClearQuotedText()
+	return _u
+}
+
+// SetSuggestedText sets the "suggested_text" field.
+func (_u *CommentUpdateOne) SetSuggestedText(v string) *CommentUpdateOne {
+	_u.mutation.SetSuggestedText(v)
+	return _u
+}
+
+// SetNillableSuggestedText sets the "suggested_text" field if the given value is not nil.
+func (_u *CommentUpdateOne) SetNillableSuggestedText(v *string) *CommentUpdateOne {
+	if v != nil {
+		_u.SetSuggestedText(*v)
+	}
+	return _u
+}
+
+// ClearSuggestedText clears the value of the "suggested_text" field.
+func (_u *CommentUpdateOne) ClearSuggestedText() *CommentUpdateOne {
+	_u.mutation.ClearSuggestedText()
+	return _u
+}
+
+// SetSuggestionStatus sets the "suggestion_status" field.
+func (_u *CommentUpdateOne) SetSuggestionStatus(v string) *CommentUpdateOne {
+	_u.mutation.SetSuggestionStatus(v)
+	return _u
+}
+
+// SetNillableSuggestionStatus sets the "suggestion_status" field if the given value is not nil.
+func (_u *CommentUpdateOne) SetNillableSuggestionStatus(v *string) *CommentUpdateOne {
+	if v != nil {
+		_u.SetSuggestionStatus(*v)
+	}
+	return _u
+}
+
+// ClearSuggestionStatus clears the value of the "suggestion_status" field.
+func (_u *CommentUpdateOne) ClearSuggestionStatus() *CommentUpdateOne {
+	_u.mutation.ClearSuggestionStatus()
 	return _u
 }
 
@@ -1529,6 +1783,16 @@ func (_u *CommentUpdateOne) SetStatusUpdate(v *StatusUpdate) *CommentUpdateOne {
 	return _u.SetStatusUpdateID(v.ID)
 }
 
+// SetDiscussion sets the "discussion" edge to the Discussion entity.
+func (_u *CommentUpdateOne) SetDiscussion(v *Discussion) *CommentUpdateOne {
+	return _u.SetDiscussionID(v.ID)
+}
+
+// SetDiscussionThread sets the "discussion_thread" edge to the DiscussionThread entity.
+func (_u *CommentUpdateOne) SetDiscussionThread(v *DiscussionThread) *CommentUpdateOne {
+	return _u.SetDiscussionThreadID(v.ID)
+}
+
 // SetParent sets the "parent" edge to the Comment entity.
 func (_u *CommentUpdateOne) SetParent(v *Comment) *CommentUpdateOne {
 	return _u.SetParentID(v.ID)
@@ -1648,6 +1912,18 @@ func (_u *CommentUpdateOne) ClearMilestone() *CommentUpdateOne {
 // ClearStatusUpdate clears the "status_update" edge to the StatusUpdate entity.
 func (_u *CommentUpdateOne) ClearStatusUpdate() *CommentUpdateOne {
 	_u.mutation.ClearStatusUpdate()
+	return _u
+}
+
+// ClearDiscussion clears the "discussion" edge to the Discussion entity.
+func (_u *CommentUpdateOne) ClearDiscussion() *CommentUpdateOne {
+	_u.mutation.ClearDiscussion()
+	return _u
+}
+
+// ClearDiscussionThread clears the "discussion_thread" edge to the DiscussionThread entity.
+func (_u *CommentUpdateOne) ClearDiscussionThread() *CommentUpdateOne {
+	_u.mutation.ClearDiscussionThread()
 	return _u
 }
 
@@ -1844,6 +2120,18 @@ func (_u *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err er
 	}
 	if _u.mutation.QuotedTextCleared() {
 		_spec.ClearField(comment.FieldQuotedText, field.TypeString)
+	}
+	if value, ok := _u.mutation.SuggestedText(); ok {
+		_spec.SetField(comment.FieldSuggestedText, field.TypeString, value)
+	}
+	if _u.mutation.SuggestedTextCleared() {
+		_spec.ClearField(comment.FieldSuggestedText, field.TypeString)
+	}
+	if value, ok := _u.mutation.SuggestionStatus(); ok {
+		_spec.SetField(comment.FieldSuggestionStatus, field.TypeString, value)
+	}
+	if _u.mutation.SuggestionStatusCleared() {
+		_spec.ClearField(comment.FieldSuggestionStatus, field.TypeString)
 	}
 	if value, ok := _u.mutation.EditedAt(); ok {
 		_spec.SetField(comment.FieldEditedAt, field.TypeTime, value)
@@ -2065,6 +2353,64 @@ func (_u *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(statusupdate.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DiscussionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   comment.DiscussionTable,
+			Columns: []string{comment.DiscussionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   comment.DiscussionTable,
+			Columns: []string{comment.DiscussionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DiscussionThreadCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   comment.DiscussionThreadTable,
+			Columns: []string{comment.DiscussionThreadColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionThreadIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   comment.DiscussionThreadTable,
+			Columns: []string{comment.DiscussionThreadColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

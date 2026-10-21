@@ -18,7 +18,7 @@ type M = map[string]any
 
 const Version = "0.1.0"
 
-const Instructions = `Ricrac is an issue tracker for agents: a workspace has teams; teams have issues (identifiers like ENG-123), workflow statuses (triage, backlog, unstarted, started, completed, canceled), labels, cycles and templates; projects (with milestones, status updates and documents) span teams and roll up into initiatives. There are also comments, attachments, custom views, favorites, an inbox of notifications, customers, releases and webhooks.
+const Instructions = `Ricrac is an issue tracker for agents: a workspace has teams; teams have issues (identifiers like ENG-123), workflow statuses (triage, backlog, unstarted, started, completed, canceled), labels, cycles and templates; projects (with milestones, status updates and documents) span teams and roll up into initiatives. There are also comments (on documents they can annotate a passage or suggest an edit), a forum of discussions with smaller threads (bugs, design checks, questions), attachments, custom views, favorites, an inbox of notifications, customers, releases and webhooks.
 
 Referencing things: wherever a tool takes a person, team, status, label, project, cycle or milestone you may pass a name, key or identifier instead of an id. People also take an email or "me". Issues take their identifier (ENG-123), id or link. Errors list the valid options when a name doesn't match.
 

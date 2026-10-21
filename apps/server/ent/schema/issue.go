@@ -73,6 +73,7 @@ func (Issue) Edges() []ent.Edge {
 		edge.To("attachments", Attachment.Type),
 		edge.To("documents", Document.Type),
 		edge.To("comments", Comment.Type),
+		edge.To("discussion_threads", DiscussionThread.Type),
 		edge.To("reactions", Reaction.Type),
 		edge.To("customer_needs", CustomerNeed.Type),
 		edge.To("notifications", Notification.Type),

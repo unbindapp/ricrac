@@ -12,6 +12,8 @@ import (
 	"ricrac/ent/customertier"
 	"ricrac/ent/customview"
 	"ricrac/ent/cycle"
+	"ricrac/ent/discussion"
+	"ricrac/ent/discussionthread"
 	"ricrac/ent/document"
 	"ricrac/ent/email"
 	"ricrac/ent/entitylink"
@@ -106,6 +108,18 @@ func init() {
 	cycleDescID := cycleFields[0].Descriptor()
 	// cycle.DefaultID holds the default value on creation for the id field.
 	cycle.DefaultID = cycleDescID.Default.(func() uuid.UUID)
+	discussionFields := schema.Discussion{}.Fields()
+	_ = discussionFields
+	// discussionDescID is the schema descriptor for id field.
+	discussionDescID := discussionFields[0].Descriptor()
+	// discussion.DefaultID holds the default value on creation for the id field.
+	discussion.DefaultID = discussionDescID.Default.(func() uuid.UUID)
+	discussionthreadFields := schema.DiscussionThread{}.Fields()
+	_ = discussionthreadFields
+	// discussionthreadDescID is the schema descriptor for id field.
+	discussionthreadDescID := discussionthreadFields[0].Descriptor()
+	// discussionthread.DefaultID holds the default value on creation for the id field.
+	discussionthread.DefaultID = discussionthreadDescID.Default.(func() uuid.UUID)
 	documentFields := schema.Document{}.Fields()
 	_ = documentFields
 	// documentDescID is the schema descriptor for id field.

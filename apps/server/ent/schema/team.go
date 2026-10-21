@@ -77,6 +77,7 @@ func (Team) Edges() []ent.Edge {
 		edge.To("cycles", Cycle.Type),
 		edge.To("issues", Issue.Type),
 		edge.To("documents", Document.Type),
+		edge.To("discussions", Discussion.Type),
 		edge.To("custom_views", CustomView.Type),
 		edge.To("templates", Template.Type),
 		edge.To("webhooks", Webhook.Type),

@@ -36,6 +36,15 @@ type CustomerTier func(*sql.Selector)
 // Cycle is the predicate function for cycle builders.
 type Cycle func(*sql.Selector)
 
+// Discussion is the predicate function for discussion builders.
+type Discussion func(*sql.Selector)
+
+// DiscussionSubscriber is the predicate function for discussionsubscriber builders.
+type DiscussionSubscriber func(*sql.Selector)
+
+// DiscussionThread is the predicate function for discussionthread builders.
+type DiscussionThread func(*sql.Selector)
+
 // Document is the predicate function for document builders.
 type Document func(*sql.Selector)
 

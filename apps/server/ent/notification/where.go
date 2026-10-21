@@ -106,6 +106,16 @@ func StatusUpdateID(v uuid.UUID) predicate.Notification {
 	return predicate.Notification(sql.FieldEQ(FieldStatusUpdateID, v))
 }
 
+// DiscussionID applies equality check predicate on the "discussion_id" field. It's identical to DiscussionIDEQ.
+func DiscussionID(v uuid.UUID) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldDiscussionID, v))
+}
+
+// DiscussionThreadID applies equality check predicate on the "discussion_thread_id" field. It's identical to DiscussionThreadIDEQ.
+func DiscussionThreadID(v uuid.UUID) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldDiscussionThreadID, v))
+}
+
 // Summary applies equality check predicate on the "summary" field. It's identical to SummaryEQ.
 func Summary(v string) predicate.Notification {
 	return predicate.Notification(sql.FieldEQ(FieldSummary, v))
@@ -449,6 +459,66 @@ func StatusUpdateIDIsNil() predicate.Notification {
 // StatusUpdateIDNotNil applies the NotNil predicate on the "status_update_id" field.
 func StatusUpdateIDNotNil() predicate.Notification {
 	return predicate.Notification(sql.FieldNotNull(FieldStatusUpdateID))
+}
+
+// DiscussionIDEQ applies the EQ predicate on the "discussion_id" field.
+func DiscussionIDEQ(v uuid.UUID) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldDiscussionID, v))
+}
+
+// DiscussionIDNEQ applies the NEQ predicate on the "discussion_id" field.
+func DiscussionIDNEQ(v uuid.UUID) predicate.Notification {
+	return predicate.Notification(sql.FieldNEQ(FieldDiscussionID, v))
+}
+
+// DiscussionIDIn applies the In predicate on the "discussion_id" field.
+func DiscussionIDIn(vs ...uuid.UUID) predicate.Notification {
+	return predicate.Notification(sql.FieldIn(FieldDiscussionID, vs...))
+}
+
+// DiscussionIDNotIn applies the NotIn predicate on the "discussion_id" field.
+func DiscussionIDNotIn(vs ...uuid.UUID) predicate.Notification {
+	return predicate.Notification(sql.FieldNotIn(FieldDiscussionID, vs...))
+}
+
+// DiscussionIDIsNil applies the IsNil predicate on the "discussion_id" field.
+func DiscussionIDIsNil() predicate.Notification {
+	return predicate.Notification(sql.FieldIsNull(FieldDiscussionID))
+}
+
+// DiscussionIDNotNil applies the NotNil predicate on the "discussion_id" field.
+func DiscussionIDNotNil() predicate.Notification {
+	return predicate.Notification(sql.FieldNotNull(FieldDiscussionID))
+}
+
+// DiscussionThreadIDEQ applies the EQ predicate on the "discussion_thread_id" field.
+func DiscussionThreadIDEQ(v uuid.UUID) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldDiscussionThreadID, v))
+}
+
+// DiscussionThreadIDNEQ applies the NEQ predicate on the "discussion_thread_id" field.
+func DiscussionThreadIDNEQ(v uuid.UUID) predicate.Notification {
+	return predicate.Notification(sql.FieldNEQ(FieldDiscussionThreadID, v))
+}
+
+// DiscussionThreadIDIn applies the In predicate on the "discussion_thread_id" field.
+func DiscussionThreadIDIn(vs ...uuid.UUID) predicate.Notification {
+	return predicate.Notification(sql.FieldIn(FieldDiscussionThreadID, vs...))
+}
+
+// DiscussionThreadIDNotIn applies the NotIn predicate on the "discussion_thread_id" field.
+func DiscussionThreadIDNotIn(vs ...uuid.UUID) predicate.Notification {
+	return predicate.Notification(sql.FieldNotIn(FieldDiscussionThreadID, vs...))
+}
+
+// DiscussionThreadIDIsNil applies the IsNil predicate on the "discussion_thread_id" field.
+func DiscussionThreadIDIsNil() predicate.Notification {
+	return predicate.Notification(sql.FieldIsNull(FieldDiscussionThreadID))
+}
+
+// DiscussionThreadIDNotNil applies the NotNil predicate on the "discussion_thread_id" field.
+func DiscussionThreadIDNotNil() predicate.Notification {
+	return predicate.Notification(sql.FieldNotNull(FieldDiscussionThreadID))
 }
 
 // SummaryEQ applies the EQ predicate on the "summary" field.
@@ -965,6 +1035,52 @@ func HasStatusUpdate() predicate.Notification {
 func HasStatusUpdateWith(preds ...predicate.StatusUpdate) predicate.Notification {
 	return predicate.Notification(func(s *sql.Selector) {
 		step := newStatusUpdateStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasDiscussion applies the HasEdge predicate on the "discussion" edge.
+func HasDiscussion() predicate.Notification {
+	return predicate.Notification(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, DiscussionTable, DiscussionColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDiscussionWith applies the HasEdge predicate on the "discussion" edge with a given conditions (other predicates).
+func HasDiscussionWith(preds ...predicate.Discussion) predicate.Notification {
+	return predicate.Notification(func(s *sql.Selector) {
+		step := newDiscussionStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasDiscussionThread applies the HasEdge predicate on the "discussion_thread" edge.
+func HasDiscussionThread() predicate.Notification {
+	return predicate.Notification(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, DiscussionThreadTable, DiscussionThreadColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDiscussionThreadWith applies the HasEdge predicate on the "discussion_thread" edge with a given conditions (other predicates).
+func HasDiscussionThreadWith(preds ...predicate.DiscussionThread) predicate.Notification {
+	return predicate.Notification(func(s *sql.Selector) {
+		step := newDiscussionThreadStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

@@ -128,6 +128,42 @@ func (f CycleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CycleMutation", m)
 }
 
+// The DiscussionFunc type is an adapter to allow the use of ordinary
+// function as Discussion mutator.
+type DiscussionFunc func(context.Context, *ent.DiscussionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DiscussionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.DiscussionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DiscussionMutation", m)
+}
+
+// The DiscussionSubscriberFunc type is an adapter to allow the use of ordinary
+// function as DiscussionSubscriber mutator.
+type DiscussionSubscriberFunc func(context.Context, *ent.DiscussionSubscriberMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DiscussionSubscriberFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.DiscussionSubscriberMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DiscussionSubscriberMutation", m)
+}
+
+// The DiscussionThreadFunc type is an adapter to allow the use of ordinary
+// function as DiscussionThread mutator.
+type DiscussionThreadFunc func(context.Context, *ent.DiscussionThreadMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DiscussionThreadFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.DiscussionThreadMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DiscussionThreadMutation", m)
+}
+
 // The DocumentFunc type is an adapter to allow the use of ordinary
 // function as Document mutator.
 type DocumentFunc func(context.Context, *ent.DocumentMutation) (ent.Value, error)

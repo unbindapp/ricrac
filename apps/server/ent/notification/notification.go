@@ -33,6 +33,10 @@ const (
 	FieldDocumentID = "document_id"
 	// FieldStatusUpdateID holds the string denoting the status_update_id field in the database.
 	FieldStatusUpdateID = "status_update_id"
+	// FieldDiscussionID holds the string denoting the discussion_id field in the database.
+	FieldDiscussionID = "discussion_id"
+	// FieldDiscussionThreadID holds the string denoting the discussion_thread_id field in the database.
+	FieldDiscussionThreadID = "discussion_thread_id"
 	// FieldSummary holds the string denoting the summary field in the database.
 	FieldSummary = "summary"
 	// FieldReadAt holds the string denoting the read_at field in the database.
@@ -63,6 +67,10 @@ const (
 	EdgeDocument = "document"
 	// EdgeStatusUpdate holds the string denoting the status_update edge name in mutations.
 	EdgeStatusUpdate = "status_update"
+	// EdgeDiscussion holds the string denoting the discussion edge name in mutations.
+	EdgeDiscussion = "discussion"
+	// EdgeDiscussionThread holds the string denoting the discussion_thread edge name in mutations.
+	EdgeDiscussionThread = "discussion_thread"
 	// Table holds the table name of the notification in the database.
 	Table = "notifications"
 	// WorkspaceTable is the table that holds the workspace relation/edge.
@@ -128,6 +136,20 @@ const (
 	StatusUpdateInverseTable = "status_updates"
 	// StatusUpdateColumn is the table column denoting the status_update relation/edge.
 	StatusUpdateColumn = "status_update_id"
+	// DiscussionTable is the table that holds the discussion relation/edge.
+	DiscussionTable = "notifications"
+	// DiscussionInverseTable is the table name for the Discussion entity.
+	// It exists in this package in order to avoid circular dependency with the "discussion" package.
+	DiscussionInverseTable = "discussions"
+	// DiscussionColumn is the table column denoting the discussion relation/edge.
+	DiscussionColumn = "discussion_id"
+	// DiscussionThreadTable is the table that holds the discussion_thread relation/edge.
+	DiscussionThreadTable = "notifications"
+	// DiscussionThreadInverseTable is the table name for the DiscussionThread entity.
+	// It exists in this package in order to avoid circular dependency with the "discussionthread" package.
+	DiscussionThreadInverseTable = "discussion_threads"
+	// DiscussionThreadColumn is the table column denoting the discussion_thread relation/edge.
+	DiscussionThreadColumn = "discussion_thread_id"
 )
 
 // Columns holds all SQL columns for notification fields.
@@ -143,6 +165,8 @@ var Columns = []string{
 	FieldInitiativeID,
 	FieldDocumentID,
 	FieldStatusUpdateID,
+	FieldDiscussionID,
+	FieldDiscussionThreadID,
 	FieldSummary,
 	FieldReadAt,
 	FieldSnoozedUntil,
@@ -222,6 +246,16 @@ func ByDocumentID(opts ...sql.OrderTermOption) OrderOption {
 // ByStatusUpdateID orders the results by the status_update_id field.
 func ByStatusUpdateID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatusUpdateID, opts...).ToFunc()
+}
+
+// ByDiscussionID orders the results by the discussion_id field.
+func ByDiscussionID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDiscussionID, opts...).ToFunc()
+}
+
+// ByDiscussionThreadID orders the results by the discussion_thread_id field.
+func ByDiscussionThreadID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDiscussionThreadID, opts...).ToFunc()
 }
 
 // BySummary orders the results by the summary field.
@@ -316,6 +350,20 @@ func ByStatusUpdateField(field string, opts ...sql.OrderTermOption) OrderOption 
 		sqlgraph.OrderByNeighborTerms(s, newStatusUpdateStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByDiscussionField orders the results by discussion field.
+func ByDiscussionField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDiscussionStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByDiscussionThreadField orders the results by discussion_thread field.
+func ByDiscussionThreadField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDiscussionThreadStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newWorkspaceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -377,5 +425,19 @@ func newStatusUpdateStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(StatusUpdateInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, StatusUpdateTable, StatusUpdateColumn),
+	)
+}
+func newDiscussionStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DiscussionInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, DiscussionTable, DiscussionColumn),
+	)
+}
+func newDiscussionThreadStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DiscussionThreadInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, DiscussionThreadTable, DiscussionThreadColumn),
 	)
 }

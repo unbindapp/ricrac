@@ -55,6 +55,9 @@ func (User) Edges() []ent.Edge {
 		edge.To("attachments", Attachment.Type),
 		edge.To("files", File.Type),
 		edge.To("documents_by_creator", Document.Type),
+		edge.To("discussions_by_creator", Discussion.Type),
+		edge.To("discussion_threads_by_creator", DiscussionThread.Type),
+		edge.To("discussion_threads_by_resolving_user", DiscussionThread.Type),
 		edge.To("documents_by_updated_by", Document.Type),
 		edge.To("document_versions", DocumentVersion.Type),
 		edge.To("comments_by_user", Comment.Type),
@@ -74,6 +77,7 @@ func (User) Edges() []ent.Edge {
 		edge.From("subscribed_issues", Issue.Type).Ref("subscribers").Through("issue_subscribers", IssueSubscriber.Type),
 		edge.From("member_projects", Project.Type).Ref("members").Through("project_members", ProjectMember.Type),
 		edge.From("subscribed_projects", Project.Type).Ref("subscribers").Through("project_subscribers", ProjectSubscriber.Type),
+		edge.From("subscribed_discussions", Discussion.Type).Ref("subscribers").Through("discussion_subscribers", DiscussionSubscriber.Type),
 		edge.From("teams", Team.Type).Ref("members").Through("team_members", TeamMember.Type),
 		edge.From("workspaces", Workspace.Type).Ref("members").Through("workspace_members", WorkspaceMember.Type),
 	}

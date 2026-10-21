@@ -10,15 +10,17 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	comments := srv.CommentService
 	oapi.Register(reg, oapi.Operation{
 		Name: "list_comments", Access: auth.Read, Routes: []string{"GET /comments"},
-		Description: "List the comment threads on one issue, project, initiative, document, milestone or status update, oldest " +
-			"first. Each thread is its first comment with its replies, reactions and whether it was resolved.",
+		Description: "List the comment threads on one issue, project, initiative, document, milestone, status update, " +
+			"discussion or discussion thread, oldest first. Each thread is its first comment with its replies, reactions, " +
+			"whether it was resolved and, on documents, the passage it quotes and any suggested replacement.",
 	}, comments.List)
 	oapi.Register(reg, oapi.Operation{
 		Name: "save_comment", Access: auth.Write, Routes: []string{"POST /comments", "PATCH /comments/{id}"},
-		Description: "Comment on an issue, project, initiative, document, milestone or status update (pass exactly one of them), " +
-			"or reply to a comment with parentId. Pass id and body to edit your own comment. The body is Markdown; " +
-			"mention people with @displayName or @email to notify them. Commenting on an issue subscribes you to it and " +
-			"notifies its subscribers.",
+		Description: "Comment on an issue, project, initiative, document, milestone, status update, discussion or discussion " +
+			"thread (pass exactly one of them), or reply to a comment with parentId. Pass id and body to edit your own " +
+			"comment. The body is Markdown; mention people with @displayName or @email to notify them. Commenting on an " +
+			"issue or discussion subscribes you to it and notifies its subscribers. On a document, quotedText annotates " +
+			"a passage, and suggestedText with it suggests an edit the document's editors accept or reject.",
 	}, comments.Save)
 	oapi.Register(reg, oapi.Operation{
 		Name: "delete_comment", Access: auth.Write, Routes: []string{"DELETE /comments/{id}"},

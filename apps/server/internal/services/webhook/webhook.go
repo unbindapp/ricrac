@@ -39,6 +39,8 @@ var resourceTypes = []string{
 	"InitiativeUpdate",
 	"Cycle",
 	"Document",
+	"Discussion",
+	"DiscussionThread",
 	"Team",
 	"WorkflowState",
 	"Customer",

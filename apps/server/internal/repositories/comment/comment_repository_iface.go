@@ -19,6 +19,8 @@ type CommentRepositoryInterface interface {
 	SetBody(ctx context.Context, tx repository.TxInterface, id uuid.UUID, body string, now time.Time) error
 	// SetResolved resolves the thread (keeping when and by whom it was first resolved) or reopens it.
 	SetResolved(ctx context.Context, tx repository.TxInterface, id uuid.UUID, resolved bool, by uuid.UUID, now time.Time) error
+	// Decide settles a suggestion (accepted or rejected), resolving its thread.
+	Decide(ctx context.Context, tx repository.TxInterface, id uuid.UUID, status string, by uuid.UUID, now time.Time) error
 	Delete(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error
 	// AddReaction reacts unless the user already reacted so, saying whether it added one.
 	AddReaction(ctx context.Context, tx repository.TxInterface, workspace, userID uuid.UUID, emoji, column string, id uuid.UUID) (bool, error)
@@ -38,6 +40,9 @@ type CommentRepositoryInterface interface {
 	ProjectName(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (string, error)
 	InitiativeName(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (string, error)
 	DocumentTitle(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (string, error)
+	DocumentContent(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (string, error)
+	// DocumentCreator is who created the document, nil when they're gone.
+	DocumentCreator(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*uuid.UUID, error)
 	// Milestone is the milestone with its project.
 	Milestone(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.ProjectMilestone, error)
 	Reaction(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.Reaction, error)

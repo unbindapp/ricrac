@@ -47,6 +47,8 @@ func (Workspace) Edges() []ent.Edge {
 		edge.To("attachments", Attachment.Type),
 		edge.To("files", File.Type),
 		edge.To("documents", Document.Type),
+		edge.To("discussions", Discussion.Type),
+		edge.To("discussion_threads", DiscussionThread.Type),
 		edge.To("comments", Comment.Type),
 		edge.To("reactions", Reaction.Type),
 		edge.To("customer_statuses", CustomerStatus.Type),

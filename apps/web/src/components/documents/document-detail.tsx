@@ -1,26 +1,38 @@
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
-import { FileTextIcon, FolderInputIcon } from "lucide-react";
-import { useState } from "react";
+import { useLocation, useNavigate } from "@tanstack/react-router";
+import { FileTextIcon, FolderInputIcon, MessageSquareTextIcon } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { DocumentDetail as TDocumentDetail } from "@/api/ops.gen";
+import {
+  DocumentAnnotations,
+  type TCommentDraft,
+} from "@/components/documents/document-annotations";
+import { DocumentComments } from "@/components/documents/document-comments";
+import { linkedThreadId, threadAnnotations } from "@/components/documents/document-threads";
 import { FavoriteButton } from "@/components/favorites/favorite-button";
 import { useDocumentParent } from "@/components/documents/document-parent";
 import { DocumentParentPicker } from "@/components/documents/document-parent-picker";
 import { AutosaveMarkdown } from "@/components/shared/autosave-markdown";
 import { VersionHistoryDialog } from "@/components/documents/version-history";
+import { PageContainer } from "@/components/layout/page-container";
 import { PageBar } from "@/components/layout/page-header";
+import { SplitView } from "@/components/layout/split-view";
 import { Breadcrumb, type TBreadcrumbItem } from "@/components/layout/breadcrumb";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { EntityNotFound } from "@/components/navigation/not-found-template";
 import { EntityMenu, toastTrashed } from "@/components/projects/entity-menu";
+import { useDeviceSize } from "@/components/providers/device-size-provider";
 import { CopyLinkAction, HeaderActions } from "@/components/shared/detail-actions";
+import { Annotations } from "@/components/shared/editor/annotations";
 import { IconPicker } from "@/components/shared/icon-picker";
 import { InlineText } from "@/components/shared/inline-text";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Button } from "@/components/ui/button";
+import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import { toast } from "@/components/ui/toast";
+import { SimpleTooltip } from "@/components/ui/tooltip";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import {
   DOCUMENT_TITLE_MAX_LENGTH,
@@ -28,22 +40,32 @@ import {
   useDocumentLifecycleMutation,
   useSaveDocumentMutation,
 } from "@/lib/queries/documents";
+import { documentCommentsQuery } from "@/lib/queries/document-comments";
 import { isMissing } from "@/lib/queries/projects";
 
 export function DocumentDetail({ slug }: { slug: string }) {
   const { workspace } = useWorkspace();
   const { data, isPending, error, refetch } = useQuery(documentQuery(workspace.id, slug));
-  if (isPending) return <ListSkeleton rows={4} />;
+  if (isPending) {
+    return (
+      <PageContainer width="narrow">
+        <ListSkeleton rows={4} />
+      </PageContainer>
+    );
+  }
   if (error) {
-    if (isMissing(error)) {
-      return (
-        <EntityNotFound
-          Icon={FileTextIcon}
-          description="Document not found. It was deleted, or you cannot see it."
-        />
-      );
-    }
-    return <ErrorCard message={error.message} onRetry={() => void refetch()} />;
+    return (
+      <PageContainer width="narrow">
+        {isMissing(error) ? (
+          <EntityNotFound
+            Icon={FileTextIcon}
+            description="Document not found. It was deleted, or you cannot see it."
+          />
+        ) : (
+          <ErrorCard message={error.message} onRetry={() => void refetch()} />
+        )}
+      </PageContainer>
+    );
   }
   return <DocumentDetailContent key={data.id} document={data} />;
 }
@@ -57,6 +79,7 @@ function DocumentDetailContent({ document }: { document: TDocumentDetail }) {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [revision, setRevision] = useState(0);
   const editor = document.updatedBy ?? document.creator;
+  const comments = useDocumentComments(document.id);
 
   const trash = () =>
     void changeLifecycle({ id: document.id, action: "trash" })
@@ -84,13 +107,14 @@ function DocumentDetailContent({ document }: { document: TDocumentDetail }) {
     { label: document.title },
   ];
 
-  return (
+  const main = (
     <div className="flex w-full flex-col gap-6">
       <PageBar>
         <div className="min-w-0 flex-1">
           <Breadcrumb items={breadcrumb} />
         </div>
         <HeaderActions>
+          <CommentsToggle count={comments.openCount} onToggle={comments.toggle} />
           <FavoriteButton kind="document" entityId={document.id} />
           <CopyLinkAction url={document.url} />
           {canEdit && (
@@ -170,6 +194,18 @@ function DocumentDetailContent({ document }: { document: TDocumentDetail }) {
           const saved = await saveAsync({ id: document.id, edit: { before, after } });
           return saved.content ?? "";
         }}
+        addons={{
+          extensions: comments.extensions,
+          render: (current) => (
+            <DocumentAnnotations
+              editor={current}
+              annotations={comments.annotations}
+              activeId={comments.highlightedId}
+              canSuggest={canEdit}
+              onAnnotate={comments.startDraft}
+            />
+          ),
+        }}
       />
       <VersionHistoryDialog
         document={document}
@@ -178,6 +214,110 @@ function DocumentDetailContent({ document }: { document: TDocumentDetail }) {
         onRestored={() => setRevision((value) => value + 1)}
       />
     </div>
+  );
+
+  const panel = (onClose: () => void) => (
+    <DocumentComments
+      documentId={document.id}
+      content={document.content ?? ""}
+      draft={comments.draft}
+      onDraftDone={() => comments.setDraft(null)}
+      activeId={comments.activeId}
+      onActivate={comments.setActiveId}
+      onHover={comments.setHoverId}
+      onAccepted={() => setRevision((value) => value + 1)}
+      onClose={onClose}
+    />
+  );
+
+  return (
+    <>
+      <SplitView
+        storageKey="document-comments-width"
+        defaultAsideWidth={COMMENTS_WIDTH}
+        main={<PageContainer width="narrow">{main}</PageContainer>}
+        aside={comments.isAsideShown ? panel(() => comments.setIsAsideOpen(false)) : undefined}
+      />
+      {!comments.hasAside && (
+        <Drawer
+          direction="right"
+          open={comments.isDrawerOpen}
+          onOpenChange={comments.setIsDrawerOpen}
+        >
+          <DrawerContent className="w-96 max-w-full">
+            <DrawerTitle className="sr-only">Comments</DrawerTitle>
+            {panel(() => comments.setIsDrawerOpen(false))}
+          </DrawerContent>
+        </Drawer>
+      )}
+    </>
+  );
+}
+
+const COMMENTS_WIDTH = 384;
+
+/** The comments panel's state: a column on wide screens, a drawer otherwise. */
+function useDocumentComments(documentId: string) {
+  const { workspace } = useWorkspace();
+  const { size } = useDeviceSize();
+  const hasAside = size === "xl";
+  const hash = useLocation({ select: (location) => location.hash });
+  const [isAsideOpen, setIsAsideOpen] = useState(true);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(() => hash.startsWith("comment-"));
+  const [draft, setDraft] = useState<TCommentDraft | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [hoverId, setHoverId] = useState<string | null>(null);
+  const { data: threads } = useQuery(documentCommentsQuery(workspace.id, documentId));
+  const annotations = useMemo(() => threadAnnotations(threads ?? []), [threads]);
+  const linkedId = useMemo(() => linkedThreadId(threads ?? [], hash), [threads, hash]);
+
+  const show = () => (hasAside ? setIsAsideOpen(true) : setIsDrawerOpen(true));
+  const activate = (id: string) => {
+    setActiveId(id);
+    show();
+  };
+  const activateRef = useRef(activate);
+  useEffect(() => {
+    activateRef.current = activate;
+  });
+  const [extensions] = useState(() => [Annotations.configure({ onActivate: activateRef })]);
+
+  return {
+    hasAside,
+    isAsideShown: hasAside && isAsideOpen,
+    setIsAsideOpen,
+    isDrawerOpen,
+    setIsDrawerOpen,
+    toggle: () => (hasAside ? setIsAsideOpen((open) => !open) : setIsDrawerOpen((open) => !open)),
+    openCount: threads?.filter((thread) => !thread.resolvedAt).length ?? 0,
+    draft,
+    setDraft,
+    startDraft: (next: TCommentDraft) => {
+      setDraft(next);
+      show();
+    },
+    activeId: activeId ?? linkedId,
+    setActiveId,
+    setHoverId,
+    highlightedId: hoverId ?? activeId ?? linkedId,
+    annotations,
+    extensions,
+  };
+}
+
+function CommentsToggle({ count, onToggle }: { count: number; onToggle: () => void }) {
+  return (
+    <SimpleTooltip content="Comments">
+      <Button
+        variant="ghost"
+        size="sm"
+        aria-label={count > 0 ? `Comments, ${count} open` : "Comments"}
+        onClick={onToggle}
+      >
+        <MessageSquareTextIcon className="size-4" />
+        {count > 0 && <span className="text-xs">{count}</span>}
+      </Button>
+    </SimpleTooltip>
   );
 }
 

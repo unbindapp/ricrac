@@ -2386,6 +2386,29 @@ func HasDocumentsWith(preds ...predicate.Document) predicate.Team {
 	})
 }
 
+// HasDiscussions applies the HasEdge predicate on the "discussions" edge.
+func HasDiscussions() predicate.Team {
+	return predicate.Team(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, DiscussionsTable, DiscussionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDiscussionsWith applies the HasEdge predicate on the "discussions" edge with a given conditions (other predicates).
+func HasDiscussionsWith(preds ...predicate.Discussion) predicate.Team {
+	return predicate.Team(func(s *sql.Selector) {
+		step := newDiscussionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasCustomViews applies the HasEdge predicate on the "custom_views" edge.
 func HasCustomViews() predicate.Team {
 	return predicate.Team(func(s *sql.Selector) {

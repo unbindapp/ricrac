@@ -29,15 +29,20 @@ type targetInput struct {
 	DocumentID     *string `json:"documentId" doc:"Document title, slug or id."`
 	MilestoneID    *string `json:"milestoneId" doc:"Project milestone id."`
 	StatusUpdateID *string `json:"statusUpdateId" doc:"Status update id."`
+	DiscussionID   *string `json:"discussionId" doc:"Discussion id, slug, link or title."`
+	ThreadID       *string `json:"discussionThreadId" doc:"Discussion thread id."`
 }
 
+// targetNames is the arguments naming what a comment is on, for errors.
+const targetNames = "issueId, projectId, initiativeId, documentId, milestoneId, statusUpdateId, discussionId or discussionThreadId"
+
 func (t targetInput) given() []*string {
-	return []*string{t.IssueID, t.ProjectID, t.InitiativeID, t.DocumentID, t.MilestoneID, t.StatusUpdateID}
+	return []*string{t.IssueID, t.ProjectID, t.InitiativeID, t.DocumentID, t.MilestoneID, t.StatusUpdateID, t.DiscussionID, t.ThreadID}
 }
 
 // TargetOf is what a comment is on.
 func TargetOf(c *ent.Comment) (Target, error) {
-	for i, id := range []*uuid.UUID{c.IssueID, c.ProjectID, c.InitiativeID, c.DocumentID, c.MilestoneID, c.StatusUpdateID} {
+	for i, id := range []*uuid.UUID{c.IssueID, c.ProjectID, c.InitiativeID, c.DocumentID, c.MilestoneID, c.StatusUpdateID, c.DiscussionID, c.DiscussionThreadID} {
 		if id != nil {
 			return Target{comment_repo.Targets[i], *id}, nil
 		}
@@ -60,7 +65,7 @@ func (self *CommentService) namedTarget(ctx context.Context, actor *auth.Actor, 
 		return nil, nil
 	}
 	if count > 1 {
-		return nil, errdefs.BadRequest("Pass only one of issueId, projectId, initiativeId, documentId, milestoneId and statusUpdateId")
+		return nil, errdefs.BadRequest("Pass only one of %s", targetNames)
 	}
 	var id uuid.UUID
 	var err error
@@ -75,6 +80,12 @@ func (self *CommentService) namedTarget(ctx context.Context, actor *auth.Actor, 
 		id, err = self.resolve.Document(ctx, actor, value)
 	case "milestone_id":
 		id, err = self.resolve.Milestone(ctx, actor, nil, value)
+	case "discussion_id":
+		id, err = self.resolve.Discussion(ctx, actor, value)
+	case "discussion_thread_id":
+		if id, err = self.resolve.ByID(ctx, actor, "discussion_threads", "discussion thread", value); err == nil {
+			err = self.checkVisible(ctx, actor, Target{column, id})
+		}
 	default:
 		if id, err = self.resolve.ByID(ctx, actor, "status_updates", "status update", value); err == nil {
 			err = self.checkVisible(ctx, actor, Target{"status_update_id", id})
@@ -104,6 +115,13 @@ func (self *CommentService) checkVisible(ctx context.Context, actor *auth.Actor,
 	case "milestone_id":
 		_, resolveErr := self.resolve.Milestone(ctx, actor, nil, id)
 		visible = resolveErr == nil
+	case "discussion_id":
+		visible, err = self.resolve.CanSeeDiscussion(ctx, actor, target.ID)
+	case "discussion_thread_id":
+		var thread *ent.DiscussionThread
+		if thread, err = self.repo.Discussion().FindThread(ctx, actor.Workspace, target.ID); err == nil && thread != nil {
+			visible, err = self.resolve.CanSeeDiscussion(ctx, actor, thread.DiscussionID)
+		}
 	default:
 		var update *ent.StatusUpdate
 		update, err = self.repo.Comment().StatusUpdate(ctx, nil, target.ID)
@@ -162,10 +180,14 @@ func (self *CommentService) detail(ctx context.Context, tx repository.TxInterfac
 	return models.CommentDetailOf(found, self.cfg.PublicURL), nil
 }
 
-// teamOf is the team of the issue a comment is on, for webhooks.
+// teamOf is the team of the issue or discussion a comment is on, for webhooks.
 func (self *CommentService) teamOf(ctx context.Context, tx repository.TxInterface, target Target) (*uuid.UUID, error) {
-	if target.Column != "issue_id" {
-		return nil, nil
+	switch target.Column {
+	case "issue_id":
+		return self.repo.Comment().IssueTeam(ctx, tx, target.ID)
+	case "discussion_id", "discussion_thread_id":
+		about, err := self.about(ctx, tx, target)
+		return about.team, err
 	}
-	return self.repo.Comment().IssueTeam(ctx, tx, target.ID)
+	return nil, nil
 }

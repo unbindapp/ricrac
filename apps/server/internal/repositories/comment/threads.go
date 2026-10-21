@@ -15,7 +15,7 @@ import (
 )
 
 // Targets is the columns comments can be on.
-var Targets = []string{"issue_id", "project_id", "initiative_id", "document_id", "milestone_id", "status_update_id"}
+var Targets = []string{"issue_id", "project_id", "initiative_id", "document_id", "milestone_id", "status_update_id", "discussion_id", "discussion_thread_id"}
 
 func oldestFirst(q *ent.CommentQuery) {
 	q.Order(ent.Asc(comment.FieldCreatedAt), ent.Asc(comment.FieldID))

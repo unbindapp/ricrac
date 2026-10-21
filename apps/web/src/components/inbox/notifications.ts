@@ -6,7 +6,12 @@ import type { TInboxFilter } from "@/lib/queries/notifications";
 /** What a notification is about: the inbox shows one row per target. */
 export type TNotificationTarget =
   | { kind: "issue"; id: string; identifier: string; title: string; state: StateRef }
-  | { kind: "project" | "initiative" | "document"; id: string; title: string; slugId: string }
+  | {
+      kind: "project" | "initiative" | "document" | "discussion";
+      id: string;
+      title: string;
+      slugId: string;
+    }
   | { kind: "none"; id: string; title: string };
 
 export type TNotificationGroup = {
@@ -19,7 +24,7 @@ export type TNotificationGroup = {
 };
 
 export function notificationTarget(notification: Notification): TNotificationTarget {
-  const { issue, project, initiative, document } = notification;
+  const { issue, project, initiative, document, discussion } = notification;
   if (issue) return { kind: "issue", ...issue };
   if (project)
     return { kind: "project", id: project.id, title: project.name, slugId: project.slugId };
@@ -32,6 +37,7 @@ export function notificationTarget(notification: Notification): TNotificationTar
     };
   }
   if (document) return { kind: "document", ...document };
+  if (discussion) return { kind: "discussion", ...discussion };
   return { kind: "none", id: notification.id, title: notification.summary };
 }
 
@@ -48,7 +54,7 @@ export function matchesFilter(notification: Notification, filter: TInboxFilter, 
 }
 
 /**
- * The notifications of a filter, one group per issue, project, initiative or document, newest
+ * The notifications of a filter, one group per issue, project, initiative, document or discussion, newest
  * first. `keep` stays listed in the unread filter once read, so opening it doesn't make it vanish.
  */
 export function groupNotifications(
@@ -104,6 +110,15 @@ const sentences: Record<string, [string, string]> = {
   projectUpdateCreated: ["posted an update", "New update"],
   initiativeUpdateCreated: ["posted an update", "New update"],
   projectUpdateMention: ["mentioned you in an update", "You were mentioned in an update"],
+  discussionMention: ["mentioned you", "You were mentioned"],
+  discussionNewThread: ["started a thread", "New thread"],
+  discussionThreadResolved: ["resolved a thread", "Thread resolved"],
+};
+
+/** Discussion events about one of its threads, which they name. */
+const threadSentences: Record<string, [string, string]> = {
+  discussionNewThread: ["started the thread", "New thread"],
+  discussionThreadResolved: ["resolved the thread", "Thread resolved"],
 };
 
 /** What happened, said about the target the row already names: "moved it to Done". */
@@ -116,10 +131,15 @@ export function notificationSentence(notification: Notification): {
   const say = (withActor: string, alone: string) =>
     actor ? { actor, text: withActor } : { actor: null, text: alone };
 
-  const comment = type.match(/^(?:issue|project|initiative|document)(\w*Comment\w*)$/);
+  const comment = type.match(/^(?:issue|project|initiative|document|discussion)(\w*Comment\w*)$/);
   if (comment && commentSentences[comment[1]]) {
     const text = commentSentences[comment[1]];
     return say(text, text.charAt(0).toUpperCase() + text.slice(1));
+  }
+  const threadSentence = threadSentences[type];
+  if (threadSentence && notification.discussionThread) {
+    const title = `“${notification.discussionThread.title}”`;
+    return say(`${threadSentence[0]} ${title}`, `${threadSentence[1]}: ${title}`);
   }
   if (type === "issueStatusChanged") {
     const state = summary.split(" moved to ")[1];
@@ -147,7 +167,10 @@ export function commentExcerpt(body: string) {
     .trim();
 }
 
-/** Where a notification leads: its issue (at the comment), project, initiative or document. */
+/**
+ * Where a notification leads: its issue (at the comment), project, initiative, document or
+ * discussion (with the thread open).
+ */
 export function notificationLink(notification: Notification, workspace: string): LinkProps | null {
   const target = notificationTarget(notification);
   const hash = notification.comment
@@ -172,6 +195,15 @@ export function notificationLink(notification: Notification, workspace: string):
       };
     case "document":
       return { to: "/$workspace/document/$slug", params: { workspace, slug: target.slugId }, hash };
+    case "discussion":
+      return {
+        to: "/$workspace/discussion/$slug",
+        params: { workspace, slug: target.slugId },
+        ...(notification.discussionThread && {
+          search: { thread: notification.discussionThread.id },
+        }),
+        hash,
+      };
     case "none":
       return null;
   }

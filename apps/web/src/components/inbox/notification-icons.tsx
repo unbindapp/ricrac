@@ -3,14 +3,20 @@ import {
   BellIcon,
   BoxIcon,
   CalendarClockIcon,
+  CheckCheckIcon,
   CircleArrowRightIcon,
+  CircleCheckIcon,
+  CircleXIcon,
   FileTextIcon,
   FlagIcon,
   type LucideIcon,
   MegaphoneIcon,
   MessageSquareIcon,
+  MessagesSquareIcon,
+  PencilLineIcon,
   ReplyIcon,
   Share2Icon,
+  SplitIcon,
   TargetIcon,
   TriangleIcon,
   UnlockIcon,
@@ -32,6 +38,11 @@ const typeIcons: Record<string, LucideIcon> = {
   projectAssigned: FlagIcon,
   projectUpdateCreated: MegaphoneIcon,
   initiativeUpdateCreated: MegaphoneIcon,
+  documentSuggestion: PencilLineIcon,
+  documentSuggestionAccepted: CheckCheckIcon,
+  documentSuggestionRejected: CircleXIcon,
+  discussionNewThread: SplitIcon,
+  discussionThreadResolved: CircleCheckIcon,
 };
 
 /** The icon of what happened: a mention, a comment, a reply, an assignment... */
@@ -47,6 +58,7 @@ const targetIcons: Record<Exclude<TNotificationTarget["kind"], "issue">, LucideI
   project: BoxIcon,
   initiative: TargetIcon,
   document: FileTextIcon,
+  discussion: MessagesSquareIcon,
   none: BellIcon,
 };
 

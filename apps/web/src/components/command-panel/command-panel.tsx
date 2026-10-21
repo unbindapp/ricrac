@@ -9,6 +9,7 @@ import {
   LayersIcon,
   ListTodoIcon,
   LogOutIcon,
+  MessagesSquareIcon,
   MonitorIcon,
   MoonIcon,
   SettingsIcon,
@@ -95,6 +96,11 @@ function useDestinations(): Record<
       label: "Documents",
       icon: <FileTextIcon />,
       link: { to: "/$workspace/documents", params },
+    },
+    forum: {
+      label: "Forum",
+      icon: <MessagesSquareIcon />,
+      link: { to: "/$workspace/forum", params },
     },
     settings: {
       label: "Settings",
@@ -286,7 +292,7 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
         value={query}
         onValueChange={setQuery}
         showSpinner={search.isPending}
-        placeholder="Search issues, projects, documents… or type a command"
+        placeholder="Search issues, projects, documents, discussions… or type a command"
       />
       <ScrollArea className="min-h-0">
         <CommandList>
@@ -312,7 +318,14 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
   );
 }
 
-const HIT_ORDER: TSearchHit["type"][] = ["issue", "project", "initiative", "document", "comment"];
+const HIT_ORDER: TSearchHit["type"][] = [
+  "issue",
+  "project",
+  "initiative",
+  "document",
+  "discussion",
+  "comment",
+];
 
 function SearchGroups({
   hits,

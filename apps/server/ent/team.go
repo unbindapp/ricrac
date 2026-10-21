@@ -139,6 +139,8 @@ type TeamEdges struct {
 	Issues []*Issue `json:"issues,omitempty"`
 	// Documents holds the value of the documents edge.
 	Documents []*Document `json:"documents,omitempty"`
+	// Discussions holds the value of the discussions edge.
+	Discussions []*Discussion `json:"discussions,omitempty"`
 	// CustomViews holds the value of the custom_views edge.
 	CustomViews []*CustomView `json:"custom_views,omitempty"`
 	// Templates holds the value of the templates edge.
@@ -161,7 +163,7 @@ type TeamEdges struct {
 	TeamMembers []*TeamMember `json:"team_members,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [23]bool
+	loadedTypes [24]bool
 }
 
 // WorkspaceOrErr returns the Workspace value or an error if the edge
@@ -293,10 +295,19 @@ func (e TeamEdges) DocumentsOrErr() ([]*Document, error) {
 	return nil, &NotLoadedError{edge: "documents"}
 }
 
+// DiscussionsOrErr returns the Discussions value or an error if the edge
+// was not loaded in eager-loading.
+func (e TeamEdges) DiscussionsOrErr() ([]*Discussion, error) {
+	if e.loadedTypes[13] {
+		return e.Discussions, nil
+	}
+	return nil, &NotLoadedError{edge: "discussions"}
+}
+
 // CustomViewsOrErr returns the CustomViews value or an error if the edge
 // was not loaded in eager-loading.
 func (e TeamEdges) CustomViewsOrErr() ([]*CustomView, error) {
-	if e.loadedTypes[13] {
+	if e.loadedTypes[14] {
 		return e.CustomViews, nil
 	}
 	return nil, &NotLoadedError{edge: "custom_views"}
@@ -305,7 +316,7 @@ func (e TeamEdges) CustomViewsOrErr() ([]*CustomView, error) {
 // TemplatesOrErr returns the Templates value or an error if the edge
 // was not loaded in eager-loading.
 func (e TeamEdges) TemplatesOrErr() ([]*Template, error) {
-	if e.loadedTypes[14] {
+	if e.loadedTypes[15] {
 		return e.Templates, nil
 	}
 	return nil, &NotLoadedError{edge: "templates"}
@@ -314,7 +325,7 @@ func (e TeamEdges) TemplatesOrErr() ([]*Template, error) {
 // WebhooksOrErr returns the Webhooks value or an error if the edge
 // was not loaded in eager-loading.
 func (e TeamEdges) WebhooksOrErr() ([]*Webhook, error) {
-	if e.loadedTypes[15] {
+	if e.loadedTypes[16] {
 		return e.Webhooks, nil
 	}
 	return nil, &NotLoadedError{edge: "webhooks"}
@@ -323,7 +334,7 @@ func (e TeamEdges) WebhooksOrErr() ([]*Webhook, error) {
 // GithubRepoSyncsOrErr returns the GithubRepoSyncs value or an error if the edge
 // was not loaded in eager-loading.
 func (e TeamEdges) GithubRepoSyncsOrErr() ([]*GithubRepoSync, error) {
-	if e.loadedTypes[16] {
+	if e.loadedTypes[17] {
 		return e.GithubRepoSyncs, nil
 	}
 	return nil, &NotLoadedError{edge: "github_repo_syncs"}
@@ -332,7 +343,7 @@ func (e TeamEdges) GithubRepoSyncsOrErr() ([]*GithubRepoSync, error) {
 // ProjectsOrErr returns the Projects value or an error if the edge
 // was not loaded in eager-loading.
 func (e TeamEdges) ProjectsOrErr() ([]*Project, error) {
-	if e.loadedTypes[17] {
+	if e.loadedTypes[18] {
 		return e.Projects, nil
 	}
 	return nil, &NotLoadedError{edge: "projects"}
@@ -341,7 +352,7 @@ func (e TeamEdges) ProjectsOrErr() ([]*Project, error) {
 // ReleasePipelinesOrErr returns the ReleasePipelines value or an error if the edge
 // was not loaded in eager-loading.
 func (e TeamEdges) ReleasePipelinesOrErr() ([]*ReleasePipeline, error) {
-	if e.loadedTypes[18] {
+	if e.loadedTypes[19] {
 		return e.ReleasePipelines, nil
 	}
 	return nil, &NotLoadedError{edge: "release_pipelines"}
@@ -350,7 +361,7 @@ func (e TeamEdges) ReleasePipelinesOrErr() ([]*ReleasePipeline, error) {
 // MembersOrErr returns the Members value or an error if the edge
 // was not loaded in eager-loading.
 func (e TeamEdges) MembersOrErr() ([]*User, error) {
-	if e.loadedTypes[19] {
+	if e.loadedTypes[20] {
 		return e.Members, nil
 	}
 	return nil, &NotLoadedError{edge: "members"}
@@ -359,7 +370,7 @@ func (e TeamEdges) MembersOrErr() ([]*User, error) {
 // ProjectTeamsOrErr returns the ProjectTeams value or an error if the edge
 // was not loaded in eager-loading.
 func (e TeamEdges) ProjectTeamsOrErr() ([]*ProjectTeam, error) {
-	if e.loadedTypes[20] {
+	if e.loadedTypes[21] {
 		return e.ProjectTeams, nil
 	}
 	return nil, &NotLoadedError{edge: "project_teams"}
@@ -368,7 +379,7 @@ func (e TeamEdges) ProjectTeamsOrErr() ([]*ProjectTeam, error) {
 // ReleasePipelineTeamsOrErr returns the ReleasePipelineTeams value or an error if the edge
 // was not loaded in eager-loading.
 func (e TeamEdges) ReleasePipelineTeamsOrErr() ([]*ReleasePipelineTeam, error) {
-	if e.loadedTypes[21] {
+	if e.loadedTypes[22] {
 		return e.ReleasePipelineTeams, nil
 	}
 	return nil, &NotLoadedError{edge: "release_pipeline_teams"}
@@ -377,7 +388,7 @@ func (e TeamEdges) ReleasePipelineTeamsOrErr() ([]*ReleasePipelineTeam, error) {
 // TeamMembersOrErr returns the TeamMembers value or an error if the edge
 // was not loaded in eager-loading.
 func (e TeamEdges) TeamMembersOrErr() ([]*TeamMember, error) {
-	if e.loadedTypes[22] {
+	if e.loadedTypes[23] {
 		return e.TeamMembers, nil
 	}
 	return nil, &NotLoadedError{edge: "team_members"}
@@ -770,6 +781,11 @@ func (_m *Team) QueryIssues() *IssueQuery {
 // QueryDocuments queries the "documents" edge of the Team entity.
 func (_m *Team) QueryDocuments() *DocumentQuery {
 	return NewTeamClient(_m.config).QueryDocuments(_m)
+}
+
+// QueryDiscussions queries the "discussions" edge of the Team entity.
+func (_m *Team) QueryDiscussions() *DiscussionQuery {
+	return NewTeamClient(_m.config).QueryDiscussions(_m)
 }
 
 // QueryCustomViews queries the "custom_views" edge of the Team entity.

@@ -1,5 +1,5 @@
 import { useWorkspaceUsers } from "@/components/issues/picker-sources";
-import { MarkdownEditor } from "@/components/shared/markdown-editor";
+import { MarkdownEditor, type TEditorAddons } from "@/components/shared/markdown-editor";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { useUploadAsset } from "@/lib/queries/uploads";
 
@@ -11,10 +11,11 @@ type TProps = {
   readOnly: boolean;
   /** Saves the edit from `base` and resolves to the server's text after it. */
   onSave: (markdown: string, base: string) => Promise<string>;
+  addons?: TEditorAddons;
 };
 
 /** A description or document body that saves as you type, a moment after you stop. */
-export function AutosaveMarkdown({ value, label, placeholder, readOnly, onSave }: TProps) {
+export function AutosaveMarkdown({ value, label, placeholder, readOnly, onSave, addons }: TProps) {
   const { workspace } = useWorkspace();
   const { users } = useWorkspaceUsers();
   const upload = useUploadAsset(workspace.id);
@@ -28,6 +29,7 @@ export function AutosaveMarkdown({ value, label, placeholder, readOnly, onSave }
       users={users}
       onUpload={upload}
       autosave={{ onSave }}
+      addons={addons}
     />
   );
 }

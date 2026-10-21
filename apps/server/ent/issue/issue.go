@@ -115,6 +115,8 @@ const (
 	EdgeDocuments = "documents"
 	// EdgeComments holds the string denoting the comments edge name in mutations.
 	EdgeComments = "comments"
+	// EdgeDiscussionThreads holds the string denoting the discussion_threads edge name in mutations.
+	EdgeDiscussionThreads = "discussion_threads"
 	// EdgeReactions holds the string denoting the reactions edge name in mutations.
 	EdgeReactions = "reactions"
 	// EdgeCustomerNeeds holds the string denoting the customer_needs edge name in mutations.
@@ -254,6 +256,13 @@ const (
 	CommentsInverseTable = "comments"
 	// CommentsColumn is the table column denoting the comments relation/edge.
 	CommentsColumn = "issue_id"
+	// DiscussionThreadsTable is the table that holds the discussion_threads relation/edge.
+	DiscussionThreadsTable = "discussion_threads"
+	// DiscussionThreadsInverseTable is the table name for the DiscussionThread entity.
+	// It exists in this package in order to avoid circular dependency with the "discussionthread" package.
+	DiscussionThreadsInverseTable = "discussion_threads"
+	// DiscussionThreadsColumn is the table column denoting the discussion_threads relation/edge.
+	DiscussionThreadsColumn = "issue_id"
 	// ReactionsTable is the table that holds the reactions relation/edge.
 	ReactionsTable = "reactions"
 	// ReactionsInverseTable is the table name for the Reaction entity.
@@ -747,6 +756,20 @@ func ByComments(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByDiscussionThreadsCount orders the results by discussion_threads count.
+func ByDiscussionThreadsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newDiscussionThreadsStep(), opts...)
+	}
+}
+
+// ByDiscussionThreads orders the results by discussion_threads terms.
+func ByDiscussionThreads(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDiscussionThreadsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByReactionsCount orders the results by reactions count.
 func ByReactionsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -1031,6 +1054,13 @@ func newCommentsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CommentsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, CommentsTable, CommentsColumn),
+	)
+}
+func newDiscussionThreadsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DiscussionThreadsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, DiscussionThreadsTable, DiscussionThreadsColumn),
 	)
 }
 func newReactionsStep() *sqlgraph.Step {

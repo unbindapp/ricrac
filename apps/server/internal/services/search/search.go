@@ -1,5 +1,5 @@
-// Package search_service is full-text search across issues, projects, documents, initiatives and
-// comments, limited to what the caller can see.
+// Package search_service is full-text search across issues, projects, documents, initiatives,
+// discussions and comments, limited to what the caller can see.
 package search_service
 
 import (
@@ -32,11 +32,11 @@ func NewSearchService(cfg config.Config, repo repositories.RepositoriesInterface
 	return &SearchService{cfg: cfg, repo: repo, resolve: resolve}
 }
 
-var searchTypes = []string{"issue", "project", "document", "initiative", "comment"}
+var searchTypes = []string{"issue", "project", "document", "initiative", "discussion", "comment"}
 
 type SearchInput struct {
 	Query           string   `json:"query" doc:"Words to find; \"quoted phrases\", OR and -excluded words work too."`
-	Types           []string `json:"types" doc:"What to search: issue, project, document, initiative, comment. All but comment by default."`
+	Types           []string `json:"types" doc:"What to search: issue, project, document, initiative, discussion, comment. All but comment by default."`
 	Team            *string  `json:"team" doc:"Only things of this team (key, name or id)."`
 	IncludeArchived bool     `json:"includeArchived,omitempty" doc:"Also archived issues, projects and initiatives."`
 	Limit           *int64   `json:"limit" doc:"How many results, 20 by default, at most 50."`
@@ -44,7 +44,7 @@ type SearchInput struct {
 
 func parseTypes(types []string) ([]string, error) {
 	if len(types) == 0 {
-		return searchTypes[:4], nil
+		return searchTypes[:5], nil
 	}
 	var chosen []string
 	for _, kind := range types {
@@ -193,6 +193,8 @@ func (self *SearchService) results(ctx context.Context, hits []found) (models.Se
 			value = hit
 		case "initiative":
 			value = models.InitiativeSearchHit{Type: "initiative", SearchHitBase: base, Status: utils.OrEmpty(row.Status)}
+		case "discussion":
+			value = models.DiscussionSearchHit{Type: "discussion", SearchHitBase: base}
 		case "comment":
 			hit := models.CommentSearchHit{
 				Type: "comment", SearchHitBase: base, Identifier: utils.OrEmpty(row.Identifier), Issue: *models.IssueRefOf(issues[*row.Ref]),

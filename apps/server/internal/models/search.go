@@ -25,7 +25,7 @@ func (h SearchHit) MarshalJSON() ([]byte, error) {
 func (SearchHit) JSONSchema() M {
 	return M{"anyOf": []any{
 		args.ResultOf[IssueSearchHit](), args.ResultOf[ProjectSearchHit](), args.ResultOf[DocumentSearchHit](),
-		args.ResultOf[InitiativeSearchHit](), args.ResultOf[CommentSearchHit](),
+		args.ResultOf[InitiativeSearchHit](), args.ResultOf[DiscussionSearchHit](), args.ResultOf[CommentSearchHit](),
 	}}
 }
 
@@ -63,6 +63,11 @@ type InitiativeSearchHit struct {
 	Type string `json:"type" enum:"initiative"`
 	SearchHitBase
 	Status string `json:"status" enum:"planned,active,completed"`
+}
+
+type DiscussionSearchHit struct {
+	Type string `json:"type" enum:"discussion"`
+	SearchHitBase
 }
 
 type CommentSearchHit struct {

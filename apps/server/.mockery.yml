@@ -301,6 +301,15 @@ packages:
           filename: cycle_repository_mock.go
           structname: CycleRepositoryMock
           pkgname: mocks_repository_cycle
+  ricrac/internal/repositories/discussion:
+    config:
+      dir: ./mocks/repository/discussion
+    interfaces:
+      DiscussionRepositoryInterface:
+        config:
+          filename: discussion_repository_mock.go
+          structname: DiscussionRepositoryMock
+          pkgname: mocks_repository_discussion
   ricrac/internal/repositories/document:
     config:
       dir: ./mocks/repository/document
@@ -337,6 +346,15 @@ packages:
           filename: cycle_service_mock.go
           structname: CycleServiceMock
           pkgname: mocks_services_cycle
+  ricrac/internal/services/discussion:
+    config:
+      dir: ./mocks/services/discussion
+    interfaces:
+      DiscussionServiceInterface:
+        config:
+          filename: discussion_service_mock.go
+          structname: DiscussionServiceMock
+          pkgname: mocks_services_discussion
   ricrac/internal/services/document:
     config:
       dir: ./mocks/services/document

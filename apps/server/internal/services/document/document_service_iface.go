@@ -18,4 +18,6 @@ type DocumentServiceInterface interface {
 	Get(ctx context.Context, actor *auth.Actor, input *IDInput) (models.DocumentDetail, error)
 	ListVersions(ctx context.Context, actor *auth.Actor, input *IDInput) ([]models.DocumentVersionSummary, error)
 	GetVersion(ctx context.Context, actor *auth.Actor, input *IDInput) (models.DocumentVersion, error)
+	AcceptSuggestion(ctx context.Context, actor *auth.Actor, input *SuggestionInput) (models.CommentDetail, error)
+	RejectSuggestion(ctx context.Context, actor *auth.Actor, input *SuggestionInput) (models.CommentDetail, error)
 }

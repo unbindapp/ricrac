@@ -4,7 +4,7 @@ import { call } from "@/lib/server/client";
 
 export type TSearchHit = Awaited<ReturnType<typeof search>>[number];
 
-const SEARCH_TYPES = ["issue", "project", "initiative", "document", "comment"];
+const SEARCH_TYPES = ["issue", "project", "initiative", "document", "discussion", "comment"];
 const SEARCH_LIMIT = 25;
 
 export const queryKeySearch = {
@@ -21,7 +21,7 @@ async function search(workspaceId: string, query: string) {
   return results.nodes;
 }
 
-/** Issues, projects, initiatives, documents and comments you can see, best matches first. */
+/** Issues, projects, initiatives, documents, discussions and comments you can see, best matches first. */
 export const searchQuery = (workspaceId: string, query: string) =>
   queryOptions({
     queryKey: queryKeySearch.query(workspaceId, query),

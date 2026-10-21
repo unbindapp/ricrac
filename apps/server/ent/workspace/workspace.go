@@ -61,6 +61,10 @@ const (
 	EdgeFiles = "files"
 	// EdgeDocuments holds the string denoting the documents edge name in mutations.
 	EdgeDocuments = "documents"
+	// EdgeDiscussions holds the string denoting the discussions edge name in mutations.
+	EdgeDiscussions = "discussions"
+	// EdgeDiscussionThreads holds the string denoting the discussion_threads edge name in mutations.
+	EdgeDiscussionThreads = "discussion_threads"
 	// EdgeComments holds the string denoting the comments edge name in mutations.
 	EdgeComments = "comments"
 	// EdgeReactions holds the string denoting the reactions edge name in mutations.
@@ -214,6 +218,20 @@ const (
 	DocumentsInverseTable = "documents"
 	// DocumentsColumn is the table column denoting the documents relation/edge.
 	DocumentsColumn = "workspace_id"
+	// DiscussionsTable is the table that holds the discussions relation/edge.
+	DiscussionsTable = "discussions"
+	// DiscussionsInverseTable is the table name for the Discussion entity.
+	// It exists in this package in order to avoid circular dependency with the "discussion" package.
+	DiscussionsInverseTable = "discussions"
+	// DiscussionsColumn is the table column denoting the discussions relation/edge.
+	DiscussionsColumn = "workspace_id"
+	// DiscussionThreadsTable is the table that holds the discussion_threads relation/edge.
+	DiscussionThreadsTable = "discussion_threads"
+	// DiscussionThreadsInverseTable is the table name for the DiscussionThread entity.
+	// It exists in this package in order to avoid circular dependency with the "discussionthread" package.
+	DiscussionThreadsInverseTable = "discussion_threads"
+	// DiscussionThreadsColumn is the table column denoting the discussion_threads relation/edge.
+	DiscussionThreadsColumn = "workspace_id"
 	// CommentsTable is the table that holds the comments relation/edge.
 	CommentsTable = "comments"
 	// CommentsInverseTable is the table name for the Comment entity.
@@ -635,6 +653,34 @@ func ByDocuments(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByDiscussionsCount orders the results by discussions count.
+func ByDiscussionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newDiscussionsStep(), opts...)
+	}
+}
+
+// ByDiscussions orders the results by discussions terms.
+func ByDiscussions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDiscussionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByDiscussionThreadsCount orders the results by discussion_threads count.
+func ByDiscussionThreadsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newDiscussionThreadsStep(), opts...)
+	}
+}
+
+// ByDiscussionThreads orders the results by discussion_threads terms.
+func ByDiscussionThreads(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDiscussionThreadsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByCommentsCount orders the results by comments count.
 func ByCommentsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -975,6 +1021,20 @@ func newDocumentsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(DocumentsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, DocumentsTable, DocumentsColumn),
+	)
+}
+func newDiscussionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DiscussionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, DiscussionsTable, DiscussionsColumn),
+	)
+}
+func newDiscussionThreadsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DiscussionThreadsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, DiscussionThreadsTable, DiscussionThreadsColumn),
 	)
 }
 func newCommentsStep() *sqlgraph.Step {

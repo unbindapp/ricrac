@@ -13,6 +13,8 @@ import (
 	"ricrac/ent/customer"
 	"ricrac/ent/customerneed"
 	"ricrac/ent/customview"
+	"ricrac/ent/discussion"
+	"ricrac/ent/discussionthread"
 	"ricrac/ent/document"
 	"ricrac/ent/documentversion"
 	"ricrac/ent/entitylink"
@@ -548,6 +550,51 @@ func (_c *UserCreate) AddDocumentsByCreator(v ...*Document) *UserCreate {
 	return _c.AddDocumentsByCreatorIDs(ids...)
 }
 
+// AddDiscussionsByCreatorIDs adds the "discussions_by_creator" edge to the Discussion entity by IDs.
+func (_c *UserCreate) AddDiscussionsByCreatorIDs(ids ...uuid.UUID) *UserCreate {
+	_c.mutation.AddDiscussionsByCreatorIDs(ids...)
+	return _c
+}
+
+// AddDiscussionsByCreator adds the "discussions_by_creator" edges to the Discussion entity.
+func (_c *UserCreate) AddDiscussionsByCreator(v ...*Discussion) *UserCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddDiscussionsByCreatorIDs(ids...)
+}
+
+// AddDiscussionThreadsByCreatorIDs adds the "discussion_threads_by_creator" edge to the DiscussionThread entity by IDs.
+func (_c *UserCreate) AddDiscussionThreadsByCreatorIDs(ids ...uuid.UUID) *UserCreate {
+	_c.mutation.AddDiscussionThreadsByCreatorIDs(ids...)
+	return _c
+}
+
+// AddDiscussionThreadsByCreator adds the "discussion_threads_by_creator" edges to the DiscussionThread entity.
+func (_c *UserCreate) AddDiscussionThreadsByCreator(v ...*DiscussionThread) *UserCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddDiscussionThreadsByCreatorIDs(ids...)
+}
+
+// AddDiscussionThreadsByResolvingUserIDs adds the "discussion_threads_by_resolving_user" edge to the DiscussionThread entity by IDs.
+func (_c *UserCreate) AddDiscussionThreadsByResolvingUserIDs(ids ...uuid.UUID) *UserCreate {
+	_c.mutation.AddDiscussionThreadsByResolvingUserIDs(ids...)
+	return _c
+}
+
+// AddDiscussionThreadsByResolvingUser adds the "discussion_threads_by_resolving_user" edges to the DiscussionThread entity.
+func (_c *UserCreate) AddDiscussionThreadsByResolvingUser(v ...*DiscussionThread) *UserCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddDiscussionThreadsByResolvingUserIDs(ids...)
+}
+
 // AddDocumentsByUpdatedByIDs adds the "documents_by_updated_by" edge to the Document entity by IDs.
 func (_c *UserCreate) AddDocumentsByUpdatedByIDs(ids ...uuid.UUID) *UserCreate {
 	_c.mutation.AddDocumentsByUpdatedByIDs(ids...)
@@ -831,6 +878,21 @@ func (_c *UserCreate) AddSubscribedProjects(v ...*Project) *UserCreate {
 		ids[i] = v[i].ID
 	}
 	return _c.AddSubscribedProjectIDs(ids...)
+}
+
+// AddSubscribedDiscussionIDs adds the "subscribed_discussions" edge to the Discussion entity by IDs.
+func (_c *UserCreate) AddSubscribedDiscussionIDs(ids ...uuid.UUID) *UserCreate {
+	_c.mutation.AddSubscribedDiscussionIDs(ids...)
+	return _c
+}
+
+// AddSubscribedDiscussions adds the "subscribed_discussions" edges to the Discussion entity.
+func (_c *UserCreate) AddSubscribedDiscussions(v ...*Discussion) *UserCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddSubscribedDiscussionIDs(ids...)
 }
 
 // AddTeamIDs adds the "teams" edge to the Team entity by IDs.
@@ -1375,6 +1437,54 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := _c.mutation.DiscussionsByCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionsByCreatorTable,
+			Columns: []string{user.DiscussionsByCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.DiscussionThreadsByCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionThreadsByCreatorTable,
+			Columns: []string{user.DiscussionThreadsByCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.DiscussionThreadsByResolvingUserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DiscussionThreadsByResolvingUserTable,
+			Columns: []string{user.DiscussionThreadsByResolvingUserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	if nodes := _c.mutation.DocumentsByUpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -1672,6 +1782,22 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(project.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.SubscribedDiscussionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.SubscribedDiscussionsTable,
+			Columns: user.SubscribedDiscussionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

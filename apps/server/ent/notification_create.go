@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"ricrac/ent/comment"
+	"ricrac/ent/discussion"
+	"ricrac/ent/discussionthread"
 	"ricrac/ent/document"
 	"ricrac/ent/initiative"
 	"ricrac/ent/issue"
@@ -148,6 +150,34 @@ func (_c *NotificationCreate) SetNillableStatusUpdateID(v *uuid.UUID) *Notificat
 	return _c
 }
 
+// SetDiscussionID sets the "discussion_id" field.
+func (_c *NotificationCreate) SetDiscussionID(v uuid.UUID) *NotificationCreate {
+	_c.mutation.SetDiscussionID(v)
+	return _c
+}
+
+// SetNillableDiscussionID sets the "discussion_id" field if the given value is not nil.
+func (_c *NotificationCreate) SetNillableDiscussionID(v *uuid.UUID) *NotificationCreate {
+	if v != nil {
+		_c.SetDiscussionID(*v)
+	}
+	return _c
+}
+
+// SetDiscussionThreadID sets the "discussion_thread_id" field.
+func (_c *NotificationCreate) SetDiscussionThreadID(v uuid.UUID) *NotificationCreate {
+	_c.mutation.SetDiscussionThreadID(v)
+	return _c
+}
+
+// SetNillableDiscussionThreadID sets the "discussion_thread_id" field if the given value is not nil.
+func (_c *NotificationCreate) SetNillableDiscussionThreadID(v *uuid.UUID) *NotificationCreate {
+	if v != nil {
+		_c.SetDiscussionThreadID(*v)
+	}
+	return _c
+}
+
 // SetSummary sets the "summary" field.
 func (_c *NotificationCreate) SetSummary(v string) *NotificationCreate {
 	_c.mutation.SetSummary(v)
@@ -281,6 +311,16 @@ func (_c *NotificationCreate) SetDocument(v *Document) *NotificationCreate {
 // SetStatusUpdate sets the "status_update" edge to the StatusUpdate entity.
 func (_c *NotificationCreate) SetStatusUpdate(v *StatusUpdate) *NotificationCreate {
 	return _c.SetStatusUpdateID(v.ID)
+}
+
+// SetDiscussion sets the "discussion" edge to the Discussion entity.
+func (_c *NotificationCreate) SetDiscussion(v *Discussion) *NotificationCreate {
+	return _c.SetDiscussionID(v.ID)
+}
+
+// SetDiscussionThread sets the "discussion_thread" edge to the DiscussionThread entity.
+func (_c *NotificationCreate) SetDiscussionThread(v *DiscussionThread) *NotificationCreate {
+	return _c.SetDiscussionThreadID(v.ID)
 }
 
 // Mutation returns the NotificationMutation object of the builder.
@@ -561,6 +601,40 @@ func (_c *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec)
 		_node.StatusUpdateID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := _c.mutation.DiscussionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.DiscussionTable,
+			Columns: []string{notification.DiscussionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.DiscussionID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.DiscussionThreadIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.DiscussionThreadTable,
+			Columns: []string{notification.DiscussionThreadColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.DiscussionThreadID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	return _node, _spec
 }
 
@@ -772,6 +846,42 @@ func (u *NotificationUpsert) UpdateStatusUpdateID() *NotificationUpsert {
 // ClearStatusUpdateID clears the value of the "status_update_id" field.
 func (u *NotificationUpsert) ClearStatusUpdateID() *NotificationUpsert {
 	u.SetNull(notification.FieldStatusUpdateID)
+	return u
+}
+
+// SetDiscussionID sets the "discussion_id" field.
+func (u *NotificationUpsert) SetDiscussionID(v uuid.UUID) *NotificationUpsert {
+	u.Set(notification.FieldDiscussionID, v)
+	return u
+}
+
+// UpdateDiscussionID sets the "discussion_id" field to the value that was provided on create.
+func (u *NotificationUpsert) UpdateDiscussionID() *NotificationUpsert {
+	u.SetExcluded(notification.FieldDiscussionID)
+	return u
+}
+
+// ClearDiscussionID clears the value of the "discussion_id" field.
+func (u *NotificationUpsert) ClearDiscussionID() *NotificationUpsert {
+	u.SetNull(notification.FieldDiscussionID)
+	return u
+}
+
+// SetDiscussionThreadID sets the "discussion_thread_id" field.
+func (u *NotificationUpsert) SetDiscussionThreadID(v uuid.UUID) *NotificationUpsert {
+	u.Set(notification.FieldDiscussionThreadID, v)
+	return u
+}
+
+// UpdateDiscussionThreadID sets the "discussion_thread_id" field to the value that was provided on create.
+func (u *NotificationUpsert) UpdateDiscussionThreadID() *NotificationUpsert {
+	u.SetExcluded(notification.FieldDiscussionThreadID)
+	return u
+}
+
+// ClearDiscussionThreadID clears the value of the "discussion_thread_id" field.
+func (u *NotificationUpsert) ClearDiscussionThreadID() *NotificationUpsert {
+	u.SetNull(notification.FieldDiscussionThreadID)
 	return u
 }
 
@@ -1111,6 +1221,48 @@ func (u *NotificationUpsertOne) UpdateStatusUpdateID() *NotificationUpsertOne {
 func (u *NotificationUpsertOne) ClearStatusUpdateID() *NotificationUpsertOne {
 	return u.Update(func(s *NotificationUpsert) {
 		s.ClearStatusUpdateID()
+	})
+}
+
+// SetDiscussionID sets the "discussion_id" field.
+func (u *NotificationUpsertOne) SetDiscussionID(v uuid.UUID) *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.SetDiscussionID(v)
+	})
+}
+
+// UpdateDiscussionID sets the "discussion_id" field to the value that was provided on create.
+func (u *NotificationUpsertOne) UpdateDiscussionID() *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.UpdateDiscussionID()
+	})
+}
+
+// ClearDiscussionID clears the value of the "discussion_id" field.
+func (u *NotificationUpsertOne) ClearDiscussionID() *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.ClearDiscussionID()
+	})
+}
+
+// SetDiscussionThreadID sets the "discussion_thread_id" field.
+func (u *NotificationUpsertOne) SetDiscussionThreadID(v uuid.UUID) *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.SetDiscussionThreadID(v)
+	})
+}
+
+// UpdateDiscussionThreadID sets the "discussion_thread_id" field to the value that was provided on create.
+func (u *NotificationUpsertOne) UpdateDiscussionThreadID() *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.UpdateDiscussionThreadID()
+	})
+}
+
+// ClearDiscussionThreadID clears the value of the "discussion_thread_id" field.
+func (u *NotificationUpsertOne) ClearDiscussionThreadID() *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.ClearDiscussionThreadID()
 	})
 }
 
@@ -1634,6 +1786,48 @@ func (u *NotificationUpsertBulk) UpdateStatusUpdateID() *NotificationUpsertBulk 
 func (u *NotificationUpsertBulk) ClearStatusUpdateID() *NotificationUpsertBulk {
 	return u.Update(func(s *NotificationUpsert) {
 		s.ClearStatusUpdateID()
+	})
+}
+
+// SetDiscussionID sets the "discussion_id" field.
+func (u *NotificationUpsertBulk) SetDiscussionID(v uuid.UUID) *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.SetDiscussionID(v)
+	})
+}
+
+// UpdateDiscussionID sets the "discussion_id" field to the value that was provided on create.
+func (u *NotificationUpsertBulk) UpdateDiscussionID() *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.UpdateDiscussionID()
+	})
+}
+
+// ClearDiscussionID clears the value of the "discussion_id" field.
+func (u *NotificationUpsertBulk) ClearDiscussionID() *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.ClearDiscussionID()
+	})
+}
+
+// SetDiscussionThreadID sets the "discussion_thread_id" field.
+func (u *NotificationUpsertBulk) SetDiscussionThreadID(v uuid.UUID) *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.SetDiscussionThreadID(v)
+	})
+}
+
+// UpdateDiscussionThreadID sets the "discussion_thread_id" field to the value that was provided on create.
+func (u *NotificationUpsertBulk) UpdateDiscussionThreadID() *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.UpdateDiscussionThreadID()
+	})
+}
+
+// ClearDiscussionThreadID clears the value of the "discussion_thread_id" field.
+func (u *NotificationUpsertBulk) ClearDiscussionThreadID() *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.ClearDiscussionThreadID()
 	})
 }
 

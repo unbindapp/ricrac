@@ -19,6 +19,7 @@ import { Route as TermsIndexRouteImport } from './routes/terms/index'
 import { Route as WorkspaceWorkspaceIndexRouteImport } from './routes/$workspace/_workspace/index'
 import { Route as WorkspaceWorkspaceCustomersRouteImport } from './routes/$workspace/_workspace/customers'
 import { Route as WorkspaceWorkspaceDocumentsRouteImport } from './routes/$workspace/_workspace/documents'
+import { Route as WorkspaceWorkspaceForumRouteImport } from './routes/$workspace/_workspace/forum'
 import { Route as WorkspaceWorkspaceInboxRouteImport } from './routes/$workspace/_workspace/inbox'
 import { Route as WorkspaceWorkspaceInitiativesRouteImport } from './routes/$workspace/_workspace/initiatives'
 import { Route as WorkspaceWorkspaceIssuesRouteImport } from './routes/$workspace/_workspace/issues'
@@ -28,6 +29,7 @@ import { Route as WorkspaceWorkspaceReleasesRouteImport } from './routes/$worksp
 import { Route as WorkspaceWorkspaceViewsRouteImport } from './routes/$workspace/_workspace/views'
 import { Route as OauthAuthorizeIndexRouteImport } from './routes/oauth/authorize/index'
 import { Route as WorkspaceWorkspaceCustomerSlugRouteImport } from './routes/$workspace/_workspace/customer/$slug'
+import { Route as WorkspaceWorkspaceDiscussionSlugRouteImport } from './routes/$workspace/_workspace/discussion/$slug'
 import { Route as WorkspaceWorkspaceDocumentSlugRouteImport } from './routes/$workspace/_workspace/document/$slug'
 import { Route as WorkspaceWorkspaceInitiativeSlugRouteImport } from './routes/$workspace/_workspace/initiative/$slug'
 import { Route as WorkspaceWorkspaceIssueIdentifierRouteImport } from './routes/$workspace/_workspace/issue/$identifier'
@@ -129,6 +131,11 @@ const WorkspaceWorkspaceDocumentsRoute =
     path: '/documents',
     getParentRoute: () => WorkspaceWorkspaceRouteRoute,
   } as any)
+const WorkspaceWorkspaceForumRoute = WorkspaceWorkspaceForumRouteImport.update({
+  id: '/forum',
+  path: '/forum',
+  getParentRoute: () => WorkspaceWorkspaceRouteRoute,
+} as any)
 const WorkspaceWorkspaceInboxRoute = WorkspaceWorkspaceInboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
@@ -178,6 +185,12 @@ const WorkspaceWorkspaceCustomerSlugRoute =
   WorkspaceWorkspaceCustomerSlugRouteImport.update({
     id: '/customer/$slug',
     path: '/customer/$slug',
+    getParentRoute: () => WorkspaceWorkspaceRouteRoute,
+  } as any)
+const WorkspaceWorkspaceDiscussionSlugRoute =
+  WorkspaceWorkspaceDiscussionSlugRouteImport.update({
+    id: '/discussion/$slug',
+    path: '/discussion/$slug',
     getParentRoute: () => WorkspaceWorkspaceRouteRoute,
   } as any)
 const WorkspaceWorkspaceDocumentSlugRoute =
@@ -479,6 +492,7 @@ export interface FileRoutesByFullPath {
   '/terms/': typeof TermsIndexRoute
   '/$workspace/customers': typeof WorkspaceWorkspaceCustomersRoute
   '/$workspace/documents': typeof WorkspaceWorkspaceDocumentsRoute
+  '/$workspace/forum': typeof WorkspaceWorkspaceForumRoute
   '/$workspace/inbox': typeof WorkspaceWorkspaceInboxRoute
   '/$workspace/initiatives': typeof WorkspaceWorkspaceInitiativesRoute
   '/$workspace/issues': typeof WorkspaceWorkspaceIssuesRoute
@@ -492,6 +506,7 @@ export interface FileRoutesByFullPath {
   '/$workspace/settings/account': typeof WorkspaceWorkspaceSettingsAccountRouteRouteWithChildren
   '/$workspace/team/$key': typeof WorkspaceWorkspaceTeamKeyRouteRouteWithChildren
   '/$workspace/customer/$slug': typeof WorkspaceWorkspaceCustomerSlugRoute
+  '/$workspace/discussion/$slug': typeof WorkspaceWorkspaceDiscussionSlugRoute
   '/$workspace/document/$slug': typeof WorkspaceWorkspaceDocumentSlugRoute
   '/$workspace/initiative/$slug': typeof WorkspaceWorkspaceInitiativeSlugRoute
   '/$workspace/issue/$identifier': typeof WorkspaceWorkspaceIssueIdentifierRoute
@@ -547,6 +562,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsIndexRoute
   '/$workspace/customers': typeof WorkspaceWorkspaceCustomersRoute
   '/$workspace/documents': typeof WorkspaceWorkspaceDocumentsRoute
+  '/$workspace/forum': typeof WorkspaceWorkspaceForumRoute
   '/$workspace/inbox': typeof WorkspaceWorkspaceInboxRoute
   '/$workspace/initiatives': typeof WorkspaceWorkspaceInitiativesRoute
   '/$workspace/issues': typeof WorkspaceWorkspaceIssuesRoute
@@ -557,6 +573,7 @@ export interface FileRoutesByTo {
   '/$workspace': typeof WorkspaceWorkspaceIndexRoute
   '/oauth/authorize': typeof OauthAuthorizeIndexRoute
   '/$workspace/customer/$slug': typeof WorkspaceWorkspaceCustomerSlugRoute
+  '/$workspace/discussion/$slug': typeof WorkspaceWorkspaceDiscussionSlugRoute
   '/$workspace/document/$slug': typeof WorkspaceWorkspaceDocumentSlugRoute
   '/$workspace/initiative/$slug': typeof WorkspaceWorkspaceInitiativeSlugRoute
   '/$workspace/issue/$identifier': typeof WorkspaceWorkspaceIssueIdentifierRoute
@@ -613,6 +630,7 @@ export interface FileRoutesById {
   '/terms/': typeof TermsIndexRoute
   '/$workspace/_workspace/customers': typeof WorkspaceWorkspaceCustomersRoute
   '/$workspace/_workspace/documents': typeof WorkspaceWorkspaceDocumentsRoute
+  '/$workspace/_workspace/forum': typeof WorkspaceWorkspaceForumRoute
   '/$workspace/_workspace/inbox': typeof WorkspaceWorkspaceInboxRoute
   '/$workspace/_workspace/initiatives': typeof WorkspaceWorkspaceInitiativesRoute
   '/$workspace/_workspace/issues': typeof WorkspaceWorkspaceIssuesRoute
@@ -626,6 +644,7 @@ export interface FileRoutesById {
   '/$workspace/_workspace/settings/account': typeof WorkspaceWorkspaceSettingsAccountRouteRouteWithChildren
   '/$workspace/_workspace/team/$key': typeof WorkspaceWorkspaceTeamKeyRouteRouteWithChildren
   '/$workspace/_workspace/customer/$slug': typeof WorkspaceWorkspaceCustomerSlugRoute
+  '/$workspace/_workspace/discussion/$slug': typeof WorkspaceWorkspaceDiscussionSlugRoute
   '/$workspace/_workspace/document/$slug': typeof WorkspaceWorkspaceDocumentSlugRoute
   '/$workspace/_workspace/initiative/$slug': typeof WorkspaceWorkspaceInitiativeSlugRoute
   '/$workspace/_workspace/issue/$identifier': typeof WorkspaceWorkspaceIssueIdentifierRoute
@@ -684,6 +703,7 @@ export interface FileRouteTypes {
     | '/terms/'
     | '/$workspace/customers'
     | '/$workspace/documents'
+    | '/$workspace/forum'
     | '/$workspace/inbox'
     | '/$workspace/initiatives'
     | '/$workspace/issues'
@@ -697,6 +717,7 @@ export interface FileRouteTypes {
     | '/$workspace/settings/account'
     | '/$workspace/team/$key'
     | '/$workspace/customer/$slug'
+    | '/$workspace/discussion/$slug'
     | '/$workspace/document/$slug'
     | '/$workspace/initiative/$slug'
     | '/$workspace/issue/$identifier'
@@ -752,6 +773,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/$workspace/customers'
     | '/$workspace/documents'
+    | '/$workspace/forum'
     | '/$workspace/inbox'
     | '/$workspace/initiatives'
     | '/$workspace/issues'
@@ -762,6 +784,7 @@ export interface FileRouteTypes {
     | '/$workspace'
     | '/oauth/authorize'
     | '/$workspace/customer/$slug'
+    | '/$workspace/discussion/$slug'
     | '/$workspace/document/$slug'
     | '/$workspace/initiative/$slug'
     | '/$workspace/issue/$identifier'
@@ -817,6 +840,7 @@ export interface FileRouteTypes {
     | '/terms/'
     | '/$workspace/_workspace/customers'
     | '/$workspace/_workspace/documents'
+    | '/$workspace/_workspace/forum'
     | '/$workspace/_workspace/inbox'
     | '/$workspace/_workspace/initiatives'
     | '/$workspace/_workspace/issues'
@@ -830,6 +854,7 @@ export interface FileRouteTypes {
     | '/$workspace/_workspace/settings/account'
     | '/$workspace/_workspace/team/$key'
     | '/$workspace/_workspace/customer/$slug'
+    | '/$workspace/_workspace/discussion/$slug'
     | '/$workspace/_workspace/document/$slug'
     | '/$workspace/_workspace/initiative/$slug'
     | '/$workspace/_workspace/issue/$identifier'
@@ -960,6 +985,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceWorkspaceDocumentsRouteImport
       parentRoute: typeof WorkspaceWorkspaceRouteRoute
     }
+    '/$workspace/_workspace/forum': {
+      id: '/$workspace/_workspace/forum'
+      path: '/forum'
+      fullPath: '/$workspace/forum'
+      preLoaderRoute: typeof WorkspaceWorkspaceForumRouteImport
+      parentRoute: typeof WorkspaceWorkspaceRouteRoute
+    }
     '/$workspace/_workspace/inbox': {
       id: '/$workspace/_workspace/inbox'
       path: '/inbox'
@@ -1021,6 +1053,13 @@ declare module '@tanstack/react-router' {
       path: '/customer/$slug'
       fullPath: '/$workspace/customer/$slug'
       preLoaderRoute: typeof WorkspaceWorkspaceCustomerSlugRouteImport
+      parentRoute: typeof WorkspaceWorkspaceRouteRoute
+    }
+    '/$workspace/_workspace/discussion/$slug': {
+      id: '/$workspace/_workspace/discussion/$slug'
+      path: '/discussion/$slug'
+      fullPath: '/$workspace/discussion/$slug'
+      preLoaderRoute: typeof WorkspaceWorkspaceDiscussionSlugRouteImport
       parentRoute: typeof WorkspaceWorkspaceRouteRoute
     }
     '/$workspace/_workspace/document/$slug': {
@@ -1516,6 +1555,7 @@ const WorkspaceWorkspaceSettingsTeamKeyRouteRouteWithChildren =
 interface WorkspaceWorkspaceRouteRouteChildren {
   WorkspaceWorkspaceCustomersRoute: typeof WorkspaceWorkspaceCustomersRoute
   WorkspaceWorkspaceDocumentsRoute: typeof WorkspaceWorkspaceDocumentsRoute
+  WorkspaceWorkspaceForumRoute: typeof WorkspaceWorkspaceForumRoute
   WorkspaceWorkspaceInboxRoute: typeof WorkspaceWorkspaceInboxRoute
   WorkspaceWorkspaceInitiativesRoute: typeof WorkspaceWorkspaceInitiativesRoute
   WorkspaceWorkspaceIssuesRoute: typeof WorkspaceWorkspaceIssuesRoute
@@ -1528,6 +1568,7 @@ interface WorkspaceWorkspaceRouteRouteChildren {
   WorkspaceWorkspaceSettingsAccountRouteRoute: typeof WorkspaceWorkspaceSettingsAccountRouteRouteWithChildren
   WorkspaceWorkspaceTeamKeyRouteRoute: typeof WorkspaceWorkspaceTeamKeyRouteRouteWithChildren
   WorkspaceWorkspaceCustomerSlugRoute: typeof WorkspaceWorkspaceCustomerSlugRoute
+  WorkspaceWorkspaceDiscussionSlugRoute: typeof WorkspaceWorkspaceDiscussionSlugRoute
   WorkspaceWorkspaceDocumentSlugRoute: typeof WorkspaceWorkspaceDocumentSlugRoute
   WorkspaceWorkspaceInitiativeSlugRoute: typeof WorkspaceWorkspaceInitiativeSlugRoute
   WorkspaceWorkspaceIssueIdentifierRoute: typeof WorkspaceWorkspaceIssueIdentifierRoute
@@ -1543,6 +1584,7 @@ const WorkspaceWorkspaceRouteRouteChildren: WorkspaceWorkspaceRouteRouteChildren
   {
     WorkspaceWorkspaceCustomersRoute: WorkspaceWorkspaceCustomersRoute,
     WorkspaceWorkspaceDocumentsRoute: WorkspaceWorkspaceDocumentsRoute,
+    WorkspaceWorkspaceForumRoute: WorkspaceWorkspaceForumRoute,
     WorkspaceWorkspaceInboxRoute: WorkspaceWorkspaceInboxRoute,
     WorkspaceWorkspaceInitiativesRoute: WorkspaceWorkspaceInitiativesRoute,
     WorkspaceWorkspaceIssuesRoute: WorkspaceWorkspaceIssuesRoute,
@@ -1558,6 +1600,8 @@ const WorkspaceWorkspaceRouteRouteChildren: WorkspaceWorkspaceRouteRouteChildren
     WorkspaceWorkspaceTeamKeyRouteRoute:
       WorkspaceWorkspaceTeamKeyRouteRouteWithChildren,
     WorkspaceWorkspaceCustomerSlugRoute: WorkspaceWorkspaceCustomerSlugRoute,
+    WorkspaceWorkspaceDiscussionSlugRoute:
+      WorkspaceWorkspaceDiscussionSlugRoute,
     WorkspaceWorkspaceDocumentSlugRoute: WorkspaceWorkspaceDocumentSlugRoute,
     WorkspaceWorkspaceInitiativeSlugRoute:
       WorkspaceWorkspaceInitiativeSlugRoute,

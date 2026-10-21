@@ -13,6 +13,7 @@ import (
 	comment_repo "ricrac/internal/repositories/comment"
 	customer_repo "ricrac/internal/repositories/customer"
 	cycle_repo "ricrac/internal/repositories/cycle"
+	discussion_repo "ricrac/internal/repositories/discussion"
 	document_repo "ricrac/internal/repositories/document"
 	email_repo "ricrac/internal/repositories/email"
 	events_repo "ricrac/internal/repositories/events"
@@ -61,6 +62,7 @@ type Repositories struct {
 	email        email_repo.EmailRepositoryInterface
 	cycle        cycle_repo.CycleRepositoryInterface
 	document     document_repo.DocumentRepositoryInterface
+	discussion   discussion_repo.DiscussionRepositoryInterface
 	favorite     favorite_repo.FavoriteRepositoryInterface
 	template     template_repo.TemplateRepositoryInterface
 	customer     customer_repo.CustomerRepositoryInterface
@@ -97,6 +99,7 @@ func NewRepositories(db *ent.Client) *Repositories {
 		email:        email_repo.NewEmailRepository(db),
 		cycle:        cycle_repo.NewCycleRepository(db),
 		document:     document_repo.NewDocumentRepository(db),
+		discussion:   discussion_repo.NewDiscussionRepository(db),
 		favorite:     favorite_repo.NewFavoriteRepository(db),
 		template:     template_repo.NewTemplateRepository(db),
 		customer:     customer_repo.NewCustomerRepository(db),
@@ -198,6 +201,10 @@ func (r *Repositories) Cycle() cycle_repo.CycleRepositoryInterface {
 
 func (r *Repositories) Document() document_repo.DocumentRepositoryInterface {
 	return r.document
+}
+
+func (r *Repositories) Discussion() discussion_repo.DiscussionRepositoryInterface {
+	return r.discussion
 }
 
 func (r *Repositories) Favorite() favorite_repo.FavoriteRepositoryInterface {

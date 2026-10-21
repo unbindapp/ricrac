@@ -7,6 +7,7 @@ import {
   KeyboardIcon,
   LayersIcon,
   ListTodoIcon,
+  MessagesSquareIcon,
   PlusIcon,
   RefreshCwIcon,
   RocketIcon,
@@ -120,6 +121,12 @@ export function Sidebar({ onNavigate }: TProps) {
               label="Documents"
               icon={FileTextIcon}
               link={{ to: "/$workspace/documents", params }}
+              onNavigate={onNavigate}
+            />
+            <SidebarNavItem
+              label="Forum"
+              icon={MessagesSquareIcon}
+              link={{ to: "/$workspace/forum", params }}
               onNavigate={onNavigate}
             />
             {canEdit && (

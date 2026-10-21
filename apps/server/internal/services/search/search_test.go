@@ -6,7 +6,7 @@ import (
 )
 
 func TestSearchTypes(t *testing.T) {
-	if got, _ := parseTypes(nil); !slices.Equal(got, []string{"issue", "project", "document", "initiative"}) {
+	if got, _ := parseTypes(nil); !slices.Equal(got, []string{"issue", "project", "document", "initiative", "discussion"}) {
 		t.Errorf("by default got %v", got)
 	}
 	if got, _ := parseTypes([]string{"Comments", " issue", "comment"}); !slices.Equal(got, []string{"comment", "issue"}) {

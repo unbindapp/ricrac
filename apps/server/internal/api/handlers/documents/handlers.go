@@ -43,4 +43,13 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 		Name: "get_document_version", Access: auth.Read, Routes: []string{"GET /document-versions/{id}"},
 		Description: "Read an earlier version of a document: its title and content as they were.",
 	}, documents.GetVersion)
+	oapi.Register(reg, oapi.Operation{
+		Name: "accept_suggestion", Access: auth.Write, Routes: []string{"POST /suggestions/{id}/accept"},
+		Description: "Accept a suggested edit on a document (a comment with suggestedText): its text replaces the passage it " +
+			"quotes, the previous content is kept as a version, and the suggestion's thread is resolved.",
+	}, documents.AcceptSuggestion)
+	oapi.Register(reg, oapi.Operation{
+		Name: "reject_suggestion", Access: auth.Write, Routes: []string{"POST /suggestions/{id}/reject"},
+		Description: "Reject a suggested edit on a document, leaving the document as it is and resolving the suggestion's thread.",
+	}, documents.RejectSuggestion)
 }

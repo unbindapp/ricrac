@@ -1,5 +1,11 @@
 import type { LinkProps } from "@tanstack/react-router";
-import { BoxIcon, FileTextIcon, MessageSquareIcon, TargetIcon } from "lucide-react";
+import {
+  BoxIcon,
+  FileTextIcon,
+  MessageSquareIcon,
+  MessagesSquareIcon,
+  TargetIcon,
+} from "lucide-react";
 import { Fragment } from "react";
 
 import { StateIcon } from "@/components/shared/state-icon";
@@ -10,10 +16,11 @@ export const searchHitHeadings: Record<TSearchHit["type"], string> = {
   project: "Projects",
   initiative: "Initiatives",
   document: "Documents",
+  discussion: "Discussions",
   comment: "Comments",
 };
 
-/** The page a hit opens; projects, initiatives and documents by the slug of their link. */
+/** The page a hit opens; projects, initiatives, documents and discussions by the slug of their link. */
 export function searchHitLink(hit: TSearchHit, workspace: string): LinkProps {
   const slug = new URL(hit.url, window.location.origin).pathname.split("/").pop() ?? hit.id;
   switch (hit.type) {
@@ -34,6 +41,8 @@ export function searchHitLink(hit: TSearchHit, workspace: string): LinkProps {
       return { to: "/$workspace/initiative/$slug", params: { workspace, slug } };
     case "document":
       return { to: "/$workspace/document/$slug", params: { workspace, slug } };
+    case "discussion":
+      return { to: "/$workspace/discussion/$slug", params: { workspace, slug } };
   }
 }
 
@@ -47,6 +56,8 @@ export function SearchHitIcon({ hit }: { hit: TSearchHit }) {
       return <TargetIcon className="text-muted-foreground size-4" />;
     case "document":
       return <FileTextIcon className="text-muted-foreground size-4" />;
+    case "discussion":
+      return <MessagesSquareIcon className="text-muted-foreground size-4" />;
     case "comment":
       return <MessageSquareIcon className="text-muted-foreground size-4" />;
   }
@@ -66,6 +77,7 @@ export function searchHitContext(hit: TSearchHit) {
         ? `${hit.user.name || hit.user.displayName} on ${hit.identifier}`
         : hit.identifier;
     case "initiative":
+    case "discussion":
       return undefined;
   }
 }

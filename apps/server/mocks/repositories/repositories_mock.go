@@ -15,6 +15,7 @@ import (
 	"ricrac/internal/repositories/comment"
 	"ricrac/internal/repositories/customer"
 	"ricrac/internal/repositories/cycle"
+	"ricrac/internal/repositories/discussion"
 	"ricrac/internal/repositories/document"
 	"ricrac/internal/repositories/email"
 	"ricrac/internal/repositories/events"
@@ -397,6 +398,52 @@ func (_c *RepositoriesMock_Cycle_Call) Return(cycleRepositoryInterface cycle_rep
 }
 
 func (_c *RepositoriesMock_Cycle_Call) RunAndReturn(run func() cycle_repo.CycleRepositoryInterface) *RepositoriesMock_Cycle_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Discussion provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Discussion() discussion_repo.DiscussionRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Discussion")
+	}
+
+	var r0 discussion_repo.DiscussionRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() discussion_repo.DiscussionRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(discussion_repo.DiscussionRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Discussion_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Discussion'
+type RepositoriesMock_Discussion_Call struct {
+	*mock.Call
+}
+
+// Discussion is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Discussion() *RepositoriesMock_Discussion_Call {
+	return &RepositoriesMock_Discussion_Call{Call: _e.mock.On("Discussion")}
+}
+
+func (_c *RepositoriesMock_Discussion_Call) Run(run func()) *RepositoriesMock_Discussion_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Discussion_Call) Return(discussionRepositoryInterface discussion_repo.DiscussionRepositoryInterface) *RepositoriesMock_Discussion_Call {
+	_c.Call.Return(discussionRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Discussion_Call) RunAndReturn(run func() discussion_repo.DiscussionRepositoryInterface) *RepositoriesMock_Discussion_Call {
 	_c.Call.Return(run)
 	return _c
 }

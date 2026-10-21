@@ -5,6 +5,8 @@ package ent
 import (
 	"fmt"
 	"ricrac/ent/comment"
+	"ricrac/ent/discussion"
+	"ricrac/ent/discussionthread"
 	"ricrac/ent/document"
 	"ricrac/ent/initiative"
 	"ricrac/ent/issue"
@@ -40,6 +42,10 @@ type Comment struct {
 	MilestoneID *uuid.UUID `json:"milestone_id,omitempty"`
 	// StatusUpdateID holds the value of the "status_update_id" field.
 	StatusUpdateID *uuid.UUID `json:"status_update_id,omitempty"`
+	// DiscussionID holds the value of the "discussion_id" field.
+	DiscussionID *uuid.UUID `json:"discussion_id,omitempty"`
+	// DiscussionThreadID holds the value of the "discussion_thread_id" field.
+	DiscussionThreadID *uuid.UUID `json:"discussion_thread_id,omitempty"`
 	// ParentID holds the value of the "parent_id" field.
 	ParentID *uuid.UUID `json:"parent_id,omitempty"`
 	// UserID holds the value of the "user_id" field.
@@ -48,6 +54,10 @@ type Comment struct {
 	Body string `json:"body,omitempty"`
 	// QuotedText holds the value of the "quoted_text" field.
 	QuotedText *string `json:"quoted_text,omitempty"`
+	// SuggestedText holds the value of the "suggested_text" field.
+	SuggestedText *string `json:"suggested_text,omitempty"`
+	// SuggestionStatus holds the value of the "suggestion_status" field.
+	SuggestionStatus *string `json:"suggestion_status,omitempty"`
 	// EditedAt holds the value of the "edited_at" field.
 	EditedAt *time.Time `json:"edited_at,omitempty"`
 	// ResolvedAt holds the value of the "resolved_at" field.
@@ -80,6 +90,10 @@ type CommentEdges struct {
 	Milestone *ProjectMilestone `json:"milestone,omitempty"`
 	// StatusUpdate holds the value of the status_update edge.
 	StatusUpdate *StatusUpdate `json:"status_update,omitempty"`
+	// Discussion holds the value of the discussion edge.
+	Discussion *Discussion `json:"discussion,omitempty"`
+	// DiscussionThread holds the value of the discussion_thread edge.
+	DiscussionThread *DiscussionThread `json:"discussion_thread,omitempty"`
 	// Parent holds the value of the parent edge.
 	Parent *Comment `json:"parent,omitempty"`
 	// Children holds the value of the children edge.
@@ -96,7 +110,7 @@ type CommentEdges struct {
 	GithubOutbox []*GithubOutbox `json:"github_outbox,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [14]bool
+	loadedTypes [16]bool
 }
 
 // WorkspaceOrErr returns the Workspace value or an error if the edge
@@ -176,12 +190,34 @@ func (e CommentEdges) StatusUpdateOrErr() (*StatusUpdate, error) {
 	return nil, &NotLoadedError{edge: "status_update"}
 }
 
+// DiscussionOrErr returns the Discussion value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CommentEdges) DiscussionOrErr() (*Discussion, error) {
+	if e.Discussion != nil {
+		return e.Discussion, nil
+	} else if e.loadedTypes[7] {
+		return nil, &NotFoundError{label: discussion.Label}
+	}
+	return nil, &NotLoadedError{edge: "discussion"}
+}
+
+// DiscussionThreadOrErr returns the DiscussionThread value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CommentEdges) DiscussionThreadOrErr() (*DiscussionThread, error) {
+	if e.DiscussionThread != nil {
+		return e.DiscussionThread, nil
+	} else if e.loadedTypes[8] {
+		return nil, &NotFoundError{label: discussionthread.Label}
+	}
+	return nil, &NotLoadedError{edge: "discussion_thread"}
+}
+
 // ParentOrErr returns the Parent value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e CommentEdges) ParentOrErr() (*Comment, error) {
 	if e.Parent != nil {
 		return e.Parent, nil
-	} else if e.loadedTypes[7] {
+	} else if e.loadedTypes[9] {
 		return nil, &NotFoundError{label: comment.Label}
 	}
 	return nil, &NotLoadedError{edge: "parent"}
@@ -190,7 +226,7 @@ func (e CommentEdges) ParentOrErr() (*Comment, error) {
 // ChildrenOrErr returns the Children value or an error if the edge
 // was not loaded in eager-loading.
 func (e CommentEdges) ChildrenOrErr() ([]*Comment, error) {
-	if e.loadedTypes[8] {
+	if e.loadedTypes[10] {
 		return e.Children, nil
 	}
 	return nil, &NotLoadedError{edge: "children"}
@@ -201,7 +237,7 @@ func (e CommentEdges) ChildrenOrErr() ([]*Comment, error) {
 func (e CommentEdges) UserOrErr() (*User, error) {
 	if e.User != nil {
 		return e.User, nil
-	} else if e.loadedTypes[9] {
+	} else if e.loadedTypes[11] {
 		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "user"}
@@ -212,7 +248,7 @@ func (e CommentEdges) UserOrErr() (*User, error) {
 func (e CommentEdges) ResolvingUserOrErr() (*User, error) {
 	if e.ResolvingUser != nil {
 		return e.ResolvingUser, nil
-	} else if e.loadedTypes[10] {
+	} else if e.loadedTypes[12] {
 		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "resolving_user"}
@@ -221,7 +257,7 @@ func (e CommentEdges) ResolvingUserOrErr() (*User, error) {
 // ReactionsOrErr returns the Reactions value or an error if the edge
 // was not loaded in eager-loading.
 func (e CommentEdges) ReactionsOrErr() ([]*Reaction, error) {
-	if e.loadedTypes[11] {
+	if e.loadedTypes[13] {
 		return e.Reactions, nil
 	}
 	return nil, &NotLoadedError{edge: "reactions"}
@@ -230,7 +266,7 @@ func (e CommentEdges) ReactionsOrErr() ([]*Reaction, error) {
 // NotificationsOrErr returns the Notifications value or an error if the edge
 // was not loaded in eager-loading.
 func (e CommentEdges) NotificationsOrErr() ([]*Notification, error) {
-	if e.loadedTypes[12] {
+	if e.loadedTypes[14] {
 		return e.Notifications, nil
 	}
 	return nil, &NotLoadedError{edge: "notifications"}
@@ -239,7 +275,7 @@ func (e CommentEdges) NotificationsOrErr() ([]*Notification, error) {
 // GithubOutboxOrErr returns the GithubOutbox value or an error if the edge
 // was not loaded in eager-loading.
 func (e CommentEdges) GithubOutboxOrErr() ([]*GithubOutbox, error) {
-	if e.loadedTypes[13] {
+	if e.loadedTypes[15] {
 		return e.GithubOutbox, nil
 	}
 	return nil, &NotLoadedError{edge: "github_outbox"}
@@ -250,9 +286,9 @@ func (*Comment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case comment.FieldIssueID, comment.FieldProjectID, comment.FieldInitiativeID, comment.FieldDocumentID, comment.FieldMilestoneID, comment.FieldStatusUpdateID, comment.FieldParentID, comment.FieldUserID, comment.FieldResolvingUserID:
+		case comment.FieldIssueID, comment.FieldProjectID, comment.FieldInitiativeID, comment.FieldDocumentID, comment.FieldMilestoneID, comment.FieldStatusUpdateID, comment.FieldDiscussionID, comment.FieldDiscussionThreadID, comment.FieldParentID, comment.FieldUserID, comment.FieldResolvingUserID:
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case comment.FieldBody, comment.FieldQuotedText:
+		case comment.FieldBody, comment.FieldQuotedText, comment.FieldSuggestedText, comment.FieldSuggestionStatus:
 			values[i] = new(sql.NullString)
 		case comment.FieldEditedAt, comment.FieldResolvedAt, comment.FieldCreatedAt, comment.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -327,6 +363,20 @@ func (_m *Comment) assignValues(columns []string, values []any) error {
 				_m.StatusUpdateID = new(uuid.UUID)
 				*_m.StatusUpdateID = *value.S.(*uuid.UUID)
 			}
+		case comment.FieldDiscussionID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field discussion_id", values[i])
+			} else if value.Valid {
+				_m.DiscussionID = new(uuid.UUID)
+				*_m.DiscussionID = *value.S.(*uuid.UUID)
+			}
+		case comment.FieldDiscussionThreadID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field discussion_thread_id", values[i])
+			} else if value.Valid {
+				_m.DiscussionThreadID = new(uuid.UUID)
+				*_m.DiscussionThreadID = *value.S.(*uuid.UUID)
+			}
 		case comment.FieldParentID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field parent_id", values[i])
@@ -353,6 +403,20 @@ func (_m *Comment) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.QuotedText = new(string)
 				*_m.QuotedText = value.String
+			}
+		case comment.FieldSuggestedText:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field suggested_text", values[i])
+			} else if value.Valid {
+				_m.SuggestedText = new(string)
+				*_m.SuggestedText = value.String
+			}
+		case comment.FieldSuggestionStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field suggestion_status", values[i])
+			} else if value.Valid {
+				_m.SuggestionStatus = new(string)
+				*_m.SuggestionStatus = value.String
 			}
 		case comment.FieldEditedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -433,6 +497,16 @@ func (_m *Comment) QueryMilestone() *ProjectMilestoneQuery {
 // QueryStatusUpdate queries the "status_update" edge of the Comment entity.
 func (_m *Comment) QueryStatusUpdate() *StatusUpdateQuery {
 	return NewCommentClient(_m.config).QueryStatusUpdate(_m)
+}
+
+// QueryDiscussion queries the "discussion" edge of the Comment entity.
+func (_m *Comment) QueryDiscussion() *DiscussionQuery {
+	return NewCommentClient(_m.config).QueryDiscussion(_m)
+}
+
+// QueryDiscussionThread queries the "discussion_thread" edge of the Comment entity.
+func (_m *Comment) QueryDiscussionThread() *DiscussionThreadQuery {
+	return NewCommentClient(_m.config).QueryDiscussionThread(_m)
 }
 
 // QueryParent queries the "parent" edge of the Comment entity.
@@ -526,6 +600,16 @@ func (_m *Comment) String() string {
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
+	if v := _m.DiscussionID; v != nil {
+		builder.WriteString("discussion_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.DiscussionThreadID; v != nil {
+		builder.WriteString("discussion_thread_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
 	if v := _m.ParentID; v != nil {
 		builder.WriteString("parent_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
@@ -541,6 +625,16 @@ func (_m *Comment) String() string {
 	builder.WriteString(", ")
 	if v := _m.QuotedText; v != nil {
 		builder.WriteString("quoted_text=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := _m.SuggestedText; v != nil {
+		builder.WriteString("suggested_text=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := _m.SuggestionStatus; v != nil {
+		builder.WriteString("suggestion_status=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")

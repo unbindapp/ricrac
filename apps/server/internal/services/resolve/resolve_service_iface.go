@@ -43,6 +43,10 @@ type ResolveServiceInterface interface {
 	// the caller can't see are left out.
 	Document(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error)
 	CanSeeDocument(ctx context.Context, actor *auth.Actor, id uuid.UUID) (bool, error)
+	// Discussion is a discussion by id, slug, link or title, among those of the workspace and of the
+	// teams the caller sees.
+	Discussion(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error)
+	CanSeeDiscussion(ctx context.Context, actor *auth.Actor, id uuid.UUID) (bool, error)
 	ProjectStatus(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error)
 	ProjectLabels(ctx context.Context, actor *auth.Actor, values []string) ([]uuid.UUID, error)
 	// PipelineVisible is SQL that is true when the pipeline in column has no teams or one the

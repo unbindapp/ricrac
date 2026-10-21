@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"ricrac/ent/comment"
+	"ricrac/ent/discussion"
+	"ricrac/ent/discussionthread"
 	"ricrac/ent/document"
 	"ricrac/ent/initiative"
 	"ricrac/ent/issue"
@@ -220,6 +222,46 @@ func (_u *NotificationUpdate) ClearStatusUpdateID() *NotificationUpdate {
 	return _u
 }
 
+// SetDiscussionID sets the "discussion_id" field.
+func (_u *NotificationUpdate) SetDiscussionID(v uuid.UUID) *NotificationUpdate {
+	_u.mutation.SetDiscussionID(v)
+	return _u
+}
+
+// SetNillableDiscussionID sets the "discussion_id" field if the given value is not nil.
+func (_u *NotificationUpdate) SetNillableDiscussionID(v *uuid.UUID) *NotificationUpdate {
+	if v != nil {
+		_u.SetDiscussionID(*v)
+	}
+	return _u
+}
+
+// ClearDiscussionID clears the value of the "discussion_id" field.
+func (_u *NotificationUpdate) ClearDiscussionID() *NotificationUpdate {
+	_u.mutation.ClearDiscussionID()
+	return _u
+}
+
+// SetDiscussionThreadID sets the "discussion_thread_id" field.
+func (_u *NotificationUpdate) SetDiscussionThreadID(v uuid.UUID) *NotificationUpdate {
+	_u.mutation.SetDiscussionThreadID(v)
+	return _u
+}
+
+// SetNillableDiscussionThreadID sets the "discussion_thread_id" field if the given value is not nil.
+func (_u *NotificationUpdate) SetNillableDiscussionThreadID(v *uuid.UUID) *NotificationUpdate {
+	if v != nil {
+		_u.SetDiscussionThreadID(*v)
+	}
+	return _u
+}
+
+// ClearDiscussionThreadID clears the value of the "discussion_thread_id" field.
+func (_u *NotificationUpdate) ClearDiscussionThreadID() *NotificationUpdate {
+	_u.mutation.ClearDiscussionThreadID()
+	return _u
+}
+
 // SetSummary sets the "summary" field.
 func (_u *NotificationUpdate) SetSummary(v string) *NotificationUpdate {
 	_u.mutation.SetSummary(v)
@@ -379,6 +421,16 @@ func (_u *NotificationUpdate) SetStatusUpdate(v *StatusUpdate) *NotificationUpda
 	return _u.SetStatusUpdateID(v.ID)
 }
 
+// SetDiscussion sets the "discussion" edge to the Discussion entity.
+func (_u *NotificationUpdate) SetDiscussion(v *Discussion) *NotificationUpdate {
+	return _u.SetDiscussionID(v.ID)
+}
+
+// SetDiscussionThread sets the "discussion_thread" edge to the DiscussionThread entity.
+func (_u *NotificationUpdate) SetDiscussionThread(v *DiscussionThread) *NotificationUpdate {
+	return _u.SetDiscussionThreadID(v.ID)
+}
+
 // Mutation returns the NotificationMutation object of the builder.
 func (_u *NotificationUpdate) Mutation() *NotificationMutation {
 	return _u.mutation
@@ -435,6 +487,18 @@ func (_u *NotificationUpdate) ClearDocument() *NotificationUpdate {
 // ClearStatusUpdate clears the "status_update" edge to the StatusUpdate entity.
 func (_u *NotificationUpdate) ClearStatusUpdate() *NotificationUpdate {
 	_u.mutation.ClearStatusUpdate()
+	return _u
+}
+
+// ClearDiscussion clears the "discussion" edge to the Discussion entity.
+func (_u *NotificationUpdate) ClearDiscussion() *NotificationUpdate {
+	_u.mutation.ClearDiscussion()
+	return _u
+}
+
+// ClearDiscussionThread clears the "discussion_thread" edge to the DiscussionThread entity.
+func (_u *NotificationUpdate) ClearDiscussionThread() *NotificationUpdate {
+	_u.mutation.ClearDiscussionThread()
 	return _u
 }
 
@@ -791,6 +855,64 @@ func (_u *NotificationUpdate) sqlSave(ctx context.Context) (_node int, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.DiscussionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.DiscussionTable,
+			Columns: []string{notification.DiscussionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.DiscussionTable,
+			Columns: []string{notification.DiscussionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DiscussionThreadCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.DiscussionThreadTable,
+			Columns: []string{notification.DiscussionThreadColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionThreadIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.DiscussionThreadTable,
+			Columns: []string{notification.DiscussionThreadColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -995,6 +1117,46 @@ func (_u *NotificationUpdateOne) ClearStatusUpdateID() *NotificationUpdateOne {
 	return _u
 }
 
+// SetDiscussionID sets the "discussion_id" field.
+func (_u *NotificationUpdateOne) SetDiscussionID(v uuid.UUID) *NotificationUpdateOne {
+	_u.mutation.SetDiscussionID(v)
+	return _u
+}
+
+// SetNillableDiscussionID sets the "discussion_id" field if the given value is not nil.
+func (_u *NotificationUpdateOne) SetNillableDiscussionID(v *uuid.UUID) *NotificationUpdateOne {
+	if v != nil {
+		_u.SetDiscussionID(*v)
+	}
+	return _u
+}
+
+// ClearDiscussionID clears the value of the "discussion_id" field.
+func (_u *NotificationUpdateOne) ClearDiscussionID() *NotificationUpdateOne {
+	_u.mutation.ClearDiscussionID()
+	return _u
+}
+
+// SetDiscussionThreadID sets the "discussion_thread_id" field.
+func (_u *NotificationUpdateOne) SetDiscussionThreadID(v uuid.UUID) *NotificationUpdateOne {
+	_u.mutation.SetDiscussionThreadID(v)
+	return _u
+}
+
+// SetNillableDiscussionThreadID sets the "discussion_thread_id" field if the given value is not nil.
+func (_u *NotificationUpdateOne) SetNillableDiscussionThreadID(v *uuid.UUID) *NotificationUpdateOne {
+	if v != nil {
+		_u.SetDiscussionThreadID(*v)
+	}
+	return _u
+}
+
+// ClearDiscussionThreadID clears the value of the "discussion_thread_id" field.
+func (_u *NotificationUpdateOne) ClearDiscussionThreadID() *NotificationUpdateOne {
+	_u.mutation.ClearDiscussionThreadID()
+	return _u
+}
+
 // SetSummary sets the "summary" field.
 func (_u *NotificationUpdateOne) SetSummary(v string) *NotificationUpdateOne {
 	_u.mutation.SetSummary(v)
@@ -1154,6 +1316,16 @@ func (_u *NotificationUpdateOne) SetStatusUpdate(v *StatusUpdate) *NotificationU
 	return _u.SetStatusUpdateID(v.ID)
 }
 
+// SetDiscussion sets the "discussion" edge to the Discussion entity.
+func (_u *NotificationUpdateOne) SetDiscussion(v *Discussion) *NotificationUpdateOne {
+	return _u.SetDiscussionID(v.ID)
+}
+
+// SetDiscussionThread sets the "discussion_thread" edge to the DiscussionThread entity.
+func (_u *NotificationUpdateOne) SetDiscussionThread(v *DiscussionThread) *NotificationUpdateOne {
+	return _u.SetDiscussionThreadID(v.ID)
+}
+
 // Mutation returns the NotificationMutation object of the builder.
 func (_u *NotificationUpdateOne) Mutation() *NotificationMutation {
 	return _u.mutation
@@ -1210,6 +1382,18 @@ func (_u *NotificationUpdateOne) ClearDocument() *NotificationUpdateOne {
 // ClearStatusUpdate clears the "status_update" edge to the StatusUpdate entity.
 func (_u *NotificationUpdateOne) ClearStatusUpdate() *NotificationUpdateOne {
 	_u.mutation.ClearStatusUpdate()
+	return _u
+}
+
+// ClearDiscussion clears the "discussion" edge to the Discussion entity.
+func (_u *NotificationUpdateOne) ClearDiscussion() *NotificationUpdateOne {
+	_u.mutation.ClearDiscussion()
+	return _u
+}
+
+// ClearDiscussionThread clears the "discussion_thread" edge to the DiscussionThread entity.
+func (_u *NotificationUpdateOne) ClearDiscussionThread() *NotificationUpdateOne {
+	_u.mutation.ClearDiscussionThread()
 	return _u
 }
 
@@ -1589,6 +1773,64 @@ func (_u *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificati
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(statusupdate.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DiscussionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.DiscussionTable,
+			Columns: []string{notification.DiscussionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.DiscussionTable,
+			Columns: []string{notification.DiscussionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DiscussionThreadCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.DiscussionThreadTable,
+			Columns: []string{notification.DiscussionThreadColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionThreadIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.DiscussionThreadTable,
+			Columns: []string{notification.DiscussionThreadColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
