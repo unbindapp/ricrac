@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { format, isSameDay, isSameYear, subDays } from "date-fns";
 
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
@@ -35,4 +35,17 @@ export function formatDate(value: TDateInput) {
 
 export function formatDateTime(value: TDateInput) {
   return format(toDate(value), "MMM d, yyyy, h:mm a");
+}
+
+export function formatTime(value: TDateInput) {
+  return format(toDate(value), "h:mm a");
+}
+
+/** A day as a chat divides messages: Today, Yesterday, or its date. */
+export function formatDay(value: TDateInput, now: TDateInput = Date.now()) {
+  const date = toDate(value);
+  if (isSameDay(date, now)) return "Today";
+  if (isSameDay(date, subDays(toDate(now), 1))) return "Yesterday";
+  if (isSameYear(date, now)) return format(date, "EEEE, MMMM d");
+  return format(date, "MMMM d, yyyy");
 }

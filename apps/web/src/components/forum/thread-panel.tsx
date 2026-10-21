@@ -10,15 +10,18 @@ import {
 import { useState } from "react";
 
 import type { DiscussionThreadDetail } from "@/api/ops.gen";
-import { CommentsSection } from "@/components/forum/comments-section";
+import { ChatComposer } from "@/components/forum/chat-message";
+import { ChatMessages } from "@/components/forum/chat-messages";
 import { IssueLinkPicker } from "@/components/forum/issue-link-picker";
 import { THREAD_KINDS, threadKindOf, threadKinds } from "@/components/forum/thread-kinds";
 import { useCanRewrite } from "@/components/forum/use-can-rewrite";
 import { PickerTrigger } from "@/components/issues/pickers";
 import { PropertyPicker } from "@/components/issues/property-picker";
+import { ChatLayout } from "@/components/layout/chat-layout";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
+import { PanelBar } from "@/components/layout/panel-bar";
 import { AutosaveMarkdown } from "@/components/shared/autosave-markdown";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { CopyLinkAction, HeaderAction, HeaderActions } from "@/components/shared/detail-actions";
@@ -28,6 +31,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { messagePlaceholder } from "@/lib/helpers/chat";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 import {
   DISCUSSION_TITLE_MAX_LENGTH,
@@ -49,7 +53,7 @@ export function ThreadPanel({ threadId, onClose }: TProps) {
   return (
     <section
       aria-label={data ? `Thread ${data.title}` : "Thread"}
-      className="bg-background flex min-h-0 w-full flex-1 flex-col overflow-y-auto"
+      className="bg-background flex min-h-0 w-full flex-1 flex-col"
     >
       <ThreadPanelBody
         thread={data}
@@ -126,44 +130,53 @@ function ThreadContent({
     toast.add({ type: "success", title: "Thread deleted" });
   };
 
+  const header = (
+    <PanelBar>
+      <div className="flex min-w-0 flex-1 items-center gap-2">
+        <ThreadKindPicker
+          kind={thread.kind}
+          disabled={!canEdit}
+          onChange={(kind) => save({ id: thread.id, kind })}
+        />
+        <ThreadStatusBadge thread={thread} />
+      </div>
+      <HeaderActions>
+        {canEdit && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => save({ id: thread.id, resolved: !isResolved })}
+          >
+            {isResolved ? <UndoIcon className="size-4" /> : <CircleCheckIcon className="size-4" />}
+            {isResolved ? "Reopen" : "Resolve"}
+          </Button>
+        )}
+        <CopyLinkAction url={thread.url} />
+        {canRewrite && (
+          <HeaderAction label="Delete thread" onClick={() => setIsDeleting(true)}>
+            <Trash2Icon className="size-4" />
+          </HeaderAction>
+        )}
+        <HeaderAction label="Close thread" onClick={onClose}>
+          <XIcon className="size-4" />
+        </HeaderAction>
+      </HeaderActions>
+    </PanelBar>
+  );
+
   return (
     <>
-      <div className="flex h-12 shrink-0 items-center gap-2 border-b px-3">
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-          <ThreadKindPicker
-            kind={thread.kind}
-            disabled={!canEdit}
-            onChange={(kind) => save({ id: thread.id, kind })}
-          />
-          <ThreadStatusBadge thread={thread} />
-        </div>
-        <HeaderActions>
-          {canEdit && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => save({ id: thread.id, resolved: !isResolved })}
-            >
-              {isResolved ? (
-                <UndoIcon className="size-4" />
-              ) : (
-                <CircleCheckIcon className="size-4" />
-              )}
-              {isResolved ? "Reopen" : "Resolve"}
-            </Button>
-          )}
-          <CopyLinkAction url={thread.url} />
-          {canRewrite && (
-            <HeaderAction label="Delete thread" onClick={() => setIsDeleting(true)}>
-              <Trash2Icon className="size-4" />
-            </HeaderAction>
-          )}
-          <HeaderAction label="Close thread" onClick={onClose}>
-            <XIcon className="size-4" />
-          </HeaderAction>
-        </HeaderActions>
-      </div>
-      <div className="flex w-full flex-col gap-6 p-4">
+      <ChatLayout
+        header={header}
+        composer={
+          canEdit && (
+            <ChatComposer
+              target={{ discussionThreadId: thread.id }}
+              placeholder={messagePlaceholder(thread.title)}
+            />
+          )
+        }
+      >
         <div className="flex flex-col gap-2">
           <InlineText
             value={thread.title}
@@ -206,8 +219,13 @@ function ThreadContent({
             return saved.body;
           }}
         />
-        <CommentsSection target={{ discussionThreadId: thread.id }} />
-      </div>
+        <div className="border-t pt-2">
+          <ChatMessages
+            target={{ discussionThreadId: thread.id }}
+            empty={{ title: "No messages yet", description: "Talk this thread through here." }}
+          />
+        </div>
+      </ChatLayout>
       <ConfirmDialog
         open={isDeleting}
         onOpenChange={setIsDeleting}

@@ -24,6 +24,7 @@ import { useCommandPanelStore } from "@/components/command-panel/command-panel-s
 import { SidebarFavorites } from "@/components/favorites/sidebar-favorites";
 import { InboxUnreadBadge } from "@/components/inbox/inbox-unread-badge";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
+import { HideSidebarButton } from "@/components/layout/sidebar-button";
 import { useCreateTeamStore } from "@/components/settings/create-team-store";
 import { TeamIcon } from "@/components/shared/team-icon";
 import { Button, LinkButton } from "@/components/ui/button";
@@ -78,6 +79,7 @@ export function Sidebar({ onNavigate }: TProps) {
             <SquarePenIcon className="size-4" />
           </Button>
         )}
+        {!onNavigate && <HideSidebarButton />}
       </div>
       <ScrollArea className="min-h-0" classNameViewport="px-2 pb-2">
         <nav aria-label="Workspace" className="flex flex-col gap-4">

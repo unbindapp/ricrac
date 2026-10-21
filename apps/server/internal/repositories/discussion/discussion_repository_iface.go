@@ -16,6 +16,8 @@ import (
 type DiscussionRepositoryInterface interface {
 	Create(ctx context.Context, tx repository.TxInterface, input CreateInput) (uuid.UUID, error)
 	SetText(ctx context.Context, tx repository.TxInterface, id uuid.UUID, title, body string) error
+	SetThumbnail(ctx context.Context, tx repository.TxInterface, id uuid.UUID, url *string) error
+	SetTags(ctx context.Context, tx repository.TxInterface, id uuid.UUID, tags []string) error
 	SetTeam(ctx context.Context, tx repository.TxInterface, id uuid.UUID, team *uuid.UUID) error
 	// SetPinned pins the discussion at now, or unpins it when now is nil.
 	SetPinned(ctx context.Context, tx repository.TxInterface, id uuid.UUID, now *time.Time) error
@@ -59,4 +61,6 @@ type DiscussionRepositoryInterface interface {
 	ThreadCommentCounts(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) (map[uuid.UUID]int, error)
 	// Get is the discussion with its workspace.
 	Get(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.Discussion, error)
+	// Tags is the tags on the discussions the caller sees outside the trash, the most used first.
+	Tags(ctx context.Context, workspace uuid.UUID, teams []uuid.UUID, limit, offset int64) ([]models.DiscussionTag, error)
 }

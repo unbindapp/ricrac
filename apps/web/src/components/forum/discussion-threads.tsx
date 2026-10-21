@@ -19,6 +19,7 @@ import {
 } from "@/components/forum/thread-kinds";
 import { EmptyState } from "@/components/layout/empty-state";
 import { List } from "@/components/layout/list";
+import { PanelBar } from "@/components/layout/panel-bar";
 import { SectionTitle } from "@/components/layout/section-title";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTab } from "@/components/ui/tabs";
@@ -30,9 +31,14 @@ import type { TThreadKind } from "@/lib/queries/discussions";
 type TStatusFilter = "all" | "open" | "resolved";
 const ALL_KINDS = "all";
 
-type TProps = { discussion: DiscussionDetail; openThreadId?: string };
+type TProps = {
+  discussion: DiscussionDetail;
+  openThreadId?: string;
+  /** A panel beside the chat, or a section in the page on narrow screens. */
+  variant: "panel" | "section";
+};
 
-export function DiscussionThreads({ discussion, openThreadId }: TProps) {
+export function DiscussionThreads({ discussion, openThreadId, variant }: TProps) {
   const { canEdit } = useWorkspace();
   const [status, setStatus] = useState<TStatusFilter>("all");
   const [kind, setKind] = useState<TThreadKind | typeof ALL_KINDS>(ALL_KINDS);
@@ -45,52 +51,73 @@ export function DiscussionThreads({ discussion, openThreadId }: TProps) {
       matchesStatus(thread, status) && (kind === ALL_KINDS || threadKindOf(thread.kind) === kind),
   );
 
-  return (
-    <section aria-label="Threads" className="flex w-full flex-col gap-4">
-      <SectionTitle
-        title="Threads"
-        actions={
-          canEdit && (
-            <NewThreadDialog
-              discussion={discussion}
-              trigger={
-                <Button variant="outline" size="sm">
-                  <PlusIcon className="size-4" />
-                  New thread
-                </Button>
-              }
-            />
-          )
-        }
-      />
-      {threads.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
-          <Tabs value={status} onValueChange={(value) => setStatus(value as TStatusFilter)}>
-            <TabsList>
-              <TabsTab value="all">All</TabsTab>
-              <TabsTab value="open">Open</TabsTab>
-              <TabsTab value="resolved">Resolved</TabsTab>
-            </TabsList>
-          </Tabs>
-          {kinds.length > 1 && (
-            <Tabs value={kind} onValueChange={(value) => setKind(value as typeof kind)}>
-              <TabsList>
-                <TabsTab value={ALL_KINDS}>All kinds</TabsTab>
-                {kinds.map((known) => {
-                  const { label, icon: Icon } = threadKinds[known];
-                  return (
-                    <TabsTab key={known} value={known}>
-                      <Icon />
-                      <span className="max-sm:sr-only">{label}</span>
-                    </TabsTab>
-                  );
-                })}
-              </TabsList>
-            </Tabs>
-          )}
-        </div>
+  const isPanel = variant === "panel";
+  const newThread = canEdit && (
+    <NewThreadDialog
+      discussion={discussion}
+      trigger={
+        <Button variant="outline" size="sm">
+          <PlusIcon className="size-4" />
+          New thread
+        </Button>
+      }
+    />
+  );
+  const filters = threads.length > 0 && (
+    <div className="flex flex-wrap items-center gap-2">
+      <Tabs value={status} onValueChange={(value) => setStatus(value as TStatusFilter)}>
+        <TabsList>
+          <TabsTab value="all">All</TabsTab>
+          <TabsTab value="open">Open</TabsTab>
+          <TabsTab value="resolved">Resolved</TabsTab>
+        </TabsList>
+      </Tabs>
+      {kinds.length > 1 && (
+        <Tabs value={kind} onValueChange={(value) => setKind(value as typeof kind)}>
+          <TabsList>
+            <TabsTab value={ALL_KINDS}>All kinds</TabsTab>
+            {kinds.map((known) => {
+              const { label, icon: Icon } = threadKinds[known];
+              return (
+                <TabsTab key={known} value={known}>
+                  <Icon />
+                  <span className={isPanel ? "sr-only" : "max-sm:sr-only"}>{label}</span>
+                </TabsTab>
+              );
+            })}
+          </TabsList>
+        </Tabs>
       )}
-      <ThreadList discussion={discussion} threads={shown} openThreadId={openThreadId} />
+    </div>
+  );
+  const list = <ThreadList discussion={discussion} threads={shown} openThreadId={openThreadId} />;
+
+  if (!isPanel) {
+    return (
+      <section aria-label="Threads" className="flex w-full flex-col gap-4">
+        <SectionTitle title="Threads" actions={newThread} />
+        {filters}
+        {list}
+      </section>
+    );
+  }
+  return (
+    <section aria-label="Threads" className="bg-background flex min-h-0 w-full flex-1 flex-col">
+      <PanelBar>
+        <SplitIcon className="text-muted-foreground size-4" />
+        <span className="text-sm font-medium">Threads</span>
+        {threads.length > 0 && (
+          <span className="text-muted-foreground text-xs tabular-nums">
+            {discussion.openThreadCount} open
+          </span>
+        )}
+        <span className="flex-1" />
+        {newThread}
+      </PanelBar>
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3">
+        {filters}
+        {list}
+      </div>
     </section>
   );
 }

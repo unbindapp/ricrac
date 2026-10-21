@@ -5,6 +5,7 @@ import { DETAIL_REFETCH_INTERVAL_MS, queryKeyIssues } from "@/lib/queries/issues
 import { call, type OpArgs } from "@/lib/server/client";
 
 const COMMENTS_PAGE_SIZE = 100;
+const CHAT_REFETCH_INTERVAL_MS = 4 * 1000;
 
 /** What comment threads hang off. */
 export type TCommentTarget =
@@ -16,8 +17,12 @@ export const queryKeyComments = {
     [workspaceId, "comments", target] as const,
 };
 
-/** A target's comment threads, oldest first, each with its replies. */
-export const commentsQuery = (workspaceId: string, target: TCommentTarget) =>
+/** A target's comment threads, oldest first, each with its replies; `live` polls like a chat. */
+export const commentsQuery = (
+  workspaceId: string,
+  target: TCommentTarget,
+  { live = false }: { live?: boolean } = {},
+) =>
   infiniteQueryOptions({
     queryKey: queryKeyComments.target(workspaceId, target),
     queryFn: ({ pageParam }) =>
@@ -29,7 +34,7 @@ export const commentsQuery = (workspaceId: string, target: TCommentTarget) =>
     initialPageParam: null as string | null,
     getNextPageParam: (last) =>
       last.pageInfo.hasNextPage ? (last.pageInfo.endCursor ?? undefined) : undefined,
-    refetchInterval: DETAIL_REFETCH_INTERVAL_MS,
+    refetchInterval: live ? CHAT_REFETCH_INTERVAL_MS : DETAIL_REFETCH_INTERVAL_MS,
   });
 
 /** Comments change the comment counts and subscribers of issues and discussions too. */

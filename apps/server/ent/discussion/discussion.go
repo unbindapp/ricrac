@@ -21,6 +21,10 @@ const (
 	FieldTitle = "title"
 	// FieldBody holds the string denoting the body field in the database.
 	FieldBody = "body"
+	// FieldThumbnailURL holds the string denoting the thumbnail_url field in the database.
+	FieldThumbnailURL = "thumbnail_url"
+	// FieldTags holds the string denoting the tags field in the database.
+	FieldTags = "tags"
 	// FieldTeamID holds the string denoting the team_id field in the database.
 	FieldTeamID = "team_id"
 	// FieldCreatorID holds the string denoting the creator_id field in the database.
@@ -118,6 +122,8 @@ var Columns = []string{
 	FieldSlugID,
 	FieldTitle,
 	FieldBody,
+	FieldThumbnailURL,
+	FieldTags,
 	FieldTeamID,
 	FieldCreatorID,
 	FieldPinnedAt,
@@ -175,6 +181,16 @@ func ByTitle(opts ...sql.OrderTermOption) OrderOption {
 // ByBody orders the results by the body field.
 func ByBody(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldBody, opts...).ToFunc()
+}
+
+// ByThumbnailURL orders the results by the thumbnail_url field.
+func ByThumbnailURL(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldThumbnailURL, opts...).ToFunc()
+}
+
+// ByTags orders the results by the tags field.
+func ByTags(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTags, opts...).ToFunc()
 }
 
 // ByTeamID orders the results by the team_id field.

@@ -8,13 +8,15 @@ import {
 import { slugIdFromParam } from "@/lib/helpers/entity-slug";
 import { DETAIL_REFETCH_INTERVAL_MS } from "@/lib/queries/issues";
 import { savePatchOrText, type TTextEdit } from "@/lib/queries/text-edits";
-import { call, type OpArgs } from "@/lib/server/client";
+import { call, callAll, type OpArgs } from "@/lib/server/client";
 
 export type TDiscussionListArgs = Omit<OpArgs<"list_discussions">, "cursor" | "limit">;
 export type TDiscussionStatus = NonNullable<TDiscussionListArgs["status"]>;
 export type TThreadKind = NonNullable<OpArgs<"save_discussion_thread">["kind"]>;
 
 export const DISCUSSION_TITLE_MAX_LENGTH = 255;
+export const DISCUSSION_MAX_TAGS = 10;
+const DISCUSSION_TAG_MAX_LENGTH = 32;
 const DISCUSSIONS_PAGE_SIZE = 50;
 
 export const queryKeyDiscussions = {
@@ -25,7 +27,20 @@ export const queryKeyDiscussions = {
     [workspaceId, "discussions", "detail", slugId] as const,
   thread: (workspaceId: string, threadId: string) =>
     [workspaceId, "discussions", "thread", threadId] as const,
+  tags: (workspaceId: string) => [workspaceId, "discussions", "tags"] as const,
 };
+
+/** A tag as the server stores it: lowercase, single spaces. */
+export function normalTag(tag: string) {
+  return tag.trim().split(/\s+/).join(" ").toLowerCase().slice(0, DISCUSSION_TAG_MAX_LENGTH);
+}
+
+/** The tags in use, the most used first. */
+export const discussionTagsQuery = (workspaceId: string) =>
+  queryOptions({
+    queryKey: queryKeyDiscussions.tags(workspaceId),
+    queryFn: () => callAll(workspaceId, "list_discussion_tags", {}),
+  });
 
 /** Pinned first, then the most recently active. */
 export const discussionsQuery = (workspaceId: string, args: TDiscussionListArgs) =>

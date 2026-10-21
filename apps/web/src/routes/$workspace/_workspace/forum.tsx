@@ -12,6 +12,7 @@ import {
   DiscussionGrid,
   DiscussionGridSkeleton,
 } from "@/components/forum/discussion-card";
+import { DiscussionTagFilter } from "@/components/forum/discussion-tags";
 import { DiscussionTeamPicker } from "@/components/forum/discussion-team-picker";
 import { NewDiscussionDialog } from "@/components/forum/new-discussion-dialog";
 import { useCanRewrite } from "@/components/forum/use-can-rewrite";
@@ -36,6 +37,7 @@ const searchSchema = z.object({
   status: z.enum(["closed", "all", "trash"]).optional(),
   /** A team's key. */
   team: z.string().optional(),
+  tag: z.string().optional(),
 });
 
 export const Route = createFileRoute("/$workspace/_workspace/forum")({
@@ -55,7 +57,7 @@ const isView = (value: unknown): value is TForumView => VIEWS.includes(value as 
 function ForumPage() {
   const { workspace, canEdit } = useWorkspace();
   const { teams } = useTeams();
-  const { status = "open", team: teamKey } = Route.useSearch();
+  const { status = "open", team: teamKey, tag } = Route.useSearch();
   const navigate = Route.useNavigate();
   const [query, setQuery] = useState("");
   const [debouncedQuery] = useDebounceValue(query.trim(), 300);
@@ -66,6 +68,7 @@ function ForumPage() {
       status: isTrash ? "all" : status,
       onlyTrashed: isTrash || undefined,
       team: teamKey,
+      tag,
       query: debouncedQuery || undefined,
       includeBody: !isTrash || undefined,
     }),
@@ -145,6 +148,15 @@ function ForumPage() {
                 })
               }
             />
+            <DiscussionTagFilter
+              value={tag ?? null}
+              onChange={(next) =>
+                void navigate({
+                  search: (prev) => ({ ...prev, tag: next ?? undefined }),
+                  replace: true,
+                })
+              }
+            />
           </PageToolbar>
         }
       />
@@ -156,7 +168,7 @@ function ForumPage() {
         isEmpty={discussions.length === 0}
         empty={emptyState({
           status,
-          isFiltered: Boolean(debouncedQuery || teamKey),
+          isFiltered: Boolean(debouncedQuery || teamKey || tag),
           action: canEdit && status !== "closed" && !isTrash && newButton("empty"),
         })}
       >

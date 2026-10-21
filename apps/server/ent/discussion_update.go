@@ -11,6 +11,7 @@ import (
 	"ricrac/ent/discussionthread"
 	"ricrac/ent/notification"
 	"ricrac/ent/predicate"
+	"ricrac/ent/schema/pgarray"
 	"ricrac/ent/team"
 	"ricrac/ent/user"
 	"ricrac/ent/workspace"
@@ -95,6 +96,38 @@ func (_u *DiscussionUpdate) SetNillableBody(v *string) *DiscussionUpdate {
 // ClearBody clears the value of the "body" field.
 func (_u *DiscussionUpdate) ClearBody() *DiscussionUpdate {
 	_u.mutation.ClearBody()
+	return _u
+}
+
+// SetThumbnailURL sets the "thumbnail_url" field.
+func (_u *DiscussionUpdate) SetThumbnailURL(v string) *DiscussionUpdate {
+	_u.mutation.SetThumbnailURL(v)
+	return _u
+}
+
+// SetNillableThumbnailURL sets the "thumbnail_url" field if the given value is not nil.
+func (_u *DiscussionUpdate) SetNillableThumbnailURL(v *string) *DiscussionUpdate {
+	if v != nil {
+		_u.SetThumbnailURL(*v)
+	}
+	return _u
+}
+
+// ClearThumbnailURL clears the value of the "thumbnail_url" field.
+func (_u *DiscussionUpdate) ClearThumbnailURL() *DiscussionUpdate {
+	_u.mutation.ClearThumbnailURL()
+	return _u
+}
+
+// SetTags sets the "tags" field.
+func (_u *DiscussionUpdate) SetTags(v pgarray.Text) *DiscussionUpdate {
+	_u.mutation.SetTags(v)
+	return _u
+}
+
+// ClearTags clears the value of the "tags" field.
+func (_u *DiscussionUpdate) ClearTags() *DiscussionUpdate {
+	_u.mutation.ClearTags()
 	return _u
 }
 
@@ -505,6 +538,18 @@ func (_u *DiscussionUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 	if _u.mutation.BodyCleared() {
 		_spec.ClearField(discussion.FieldBody, field.TypeString)
 	}
+	if value, ok := _u.mutation.ThumbnailURL(); ok {
+		_spec.SetField(discussion.FieldThumbnailURL, field.TypeString, value)
+	}
+	if _u.mutation.ThumbnailURLCleared() {
+		_spec.ClearField(discussion.FieldThumbnailURL, field.TypeString)
+	}
+	if value, ok := _u.mutation.Tags(); ok {
+		_spec.SetField(discussion.FieldTags, field.TypeOther, value)
+	}
+	if _u.mutation.TagsCleared() {
+		_spec.ClearField(discussion.FieldTags, field.TypeOther)
+	}
 	if value, ok := _u.mutation.PinnedAt(); ok {
 		_spec.SetField(discussion.FieldPinnedAt, field.TypeTime, value)
 	}
@@ -889,6 +934,38 @@ func (_u *DiscussionUpdateOne) SetNillableBody(v *string) *DiscussionUpdateOne {
 // ClearBody clears the value of the "body" field.
 func (_u *DiscussionUpdateOne) ClearBody() *DiscussionUpdateOne {
 	_u.mutation.ClearBody()
+	return _u
+}
+
+// SetThumbnailURL sets the "thumbnail_url" field.
+func (_u *DiscussionUpdateOne) SetThumbnailURL(v string) *DiscussionUpdateOne {
+	_u.mutation.SetThumbnailURL(v)
+	return _u
+}
+
+// SetNillableThumbnailURL sets the "thumbnail_url" field if the given value is not nil.
+func (_u *DiscussionUpdateOne) SetNillableThumbnailURL(v *string) *DiscussionUpdateOne {
+	if v != nil {
+		_u.SetThumbnailURL(*v)
+	}
+	return _u
+}
+
+// ClearThumbnailURL clears the value of the "thumbnail_url" field.
+func (_u *DiscussionUpdateOne) ClearThumbnailURL() *DiscussionUpdateOne {
+	_u.mutation.ClearThumbnailURL()
+	return _u
+}
+
+// SetTags sets the "tags" field.
+func (_u *DiscussionUpdateOne) SetTags(v pgarray.Text) *DiscussionUpdateOne {
+	_u.mutation.SetTags(v)
+	return _u
+}
+
+// ClearTags clears the value of the "tags" field.
+func (_u *DiscussionUpdateOne) ClearTags() *DiscussionUpdateOne {
+	_u.mutation.ClearTags()
 	return _u
 }
 
@@ -1328,6 +1405,18 @@ func (_u *DiscussionUpdateOne) sqlSave(ctx context.Context) (_node *Discussion, 
 	}
 	if _u.mutation.BodyCleared() {
 		_spec.ClearField(discussion.FieldBody, field.TypeString)
+	}
+	if value, ok := _u.mutation.ThumbnailURL(); ok {
+		_spec.SetField(discussion.FieldThumbnailURL, field.TypeString, value)
+	}
+	if _u.mutation.ThumbnailURLCleared() {
+		_spec.ClearField(discussion.FieldThumbnailURL, field.TypeString)
+	}
+	if value, ok := _u.mutation.Tags(); ok {
+		_spec.SetField(discussion.FieldTags, field.TypeOther, value)
+	}
+	if _u.mutation.TagsCleared() {
+		_spec.ClearField(discussion.FieldTags, field.TypeOther)
 	}
 	if value, ok := _u.mutation.PinnedAt(); ok {
 		_spec.SetField(discussion.FieldPinnedAt, field.TypeTime, value)

@@ -994,6 +994,75 @@ func (_c *DiscussionRepositoryMock_SetPinned_Call) RunAndReturn(run func(ctx con
 	return _c
 }
 
+// SetTags provides a mock function for the type DiscussionRepositoryMock
+func (_mock *DiscussionRepositoryMock) SetTags(ctx context.Context, tx repository.TxInterface, id uuid.UUID, tags []string) error {
+	ret := _mock.Called(ctx, tx, id, tags)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetTags")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, []string) error); ok {
+		r0 = returnFunc(ctx, tx, id, tags)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// DiscussionRepositoryMock_SetTags_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetTags'
+type DiscussionRepositoryMock_SetTags_Call struct {
+	*mock.Call
+}
+
+// SetTags is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - tags []string
+func (_e *DiscussionRepositoryMock_Expecter) SetTags(ctx any, tx any, id any, tags any) *DiscussionRepositoryMock_SetTags_Call {
+	return &DiscussionRepositoryMock_SetTags_Call{Call: _e.mock.On("SetTags", ctx, tx, id, tags)}
+}
+
+func (_c *DiscussionRepositoryMock_SetTags_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, tags []string)) *DiscussionRepositoryMock_SetTags_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 []string
+		if args[3] != nil {
+			arg3 = args[3].([]string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *DiscussionRepositoryMock_SetTags_Call) Return(err error) *DiscussionRepositoryMock_SetTags_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *DiscussionRepositoryMock_SetTags_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, tags []string) error) *DiscussionRepositoryMock_SetTags_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // SetTeam provides a mock function for the type DiscussionRepositoryMock
 func (_mock *DiscussionRepositoryMock) SetTeam(ctx context.Context, tx repository.TxInterface, id uuid.UUID, team *uuid.UUID) error {
 	ret := _mock.Called(ctx, tx, id, team)
@@ -1215,6 +1284,75 @@ func (_c *DiscussionRepositoryMock_SetThreadResolved_Call) Return(err error) *Di
 }
 
 func (_c *DiscussionRepositoryMock_SetThreadResolved_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, resolved bool, by uuid.UUID, now time.Time) error) *DiscussionRepositoryMock_SetThreadResolved_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SetThumbnail provides a mock function for the type DiscussionRepositoryMock
+func (_mock *DiscussionRepositoryMock) SetThumbnail(ctx context.Context, tx repository.TxInterface, id uuid.UUID, url *string) error {
+	ret := _mock.Called(ctx, tx, id, url)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetThumbnail")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, *string) error); ok {
+		r0 = returnFunc(ctx, tx, id, url)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// DiscussionRepositoryMock_SetThumbnail_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetThumbnail'
+type DiscussionRepositoryMock_SetThumbnail_Call struct {
+	*mock.Call
+}
+
+// SetThumbnail is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - url *string
+func (_e *DiscussionRepositoryMock_Expecter) SetThumbnail(ctx any, tx any, id any, url any) *DiscussionRepositoryMock_SetThumbnail_Call {
+	return &DiscussionRepositoryMock_SetThumbnail_Call{Call: _e.mock.On("SetThumbnail", ctx, tx, id, url)}
+}
+
+func (_c *DiscussionRepositoryMock_SetThumbnail_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, url *string)) *DiscussionRepositoryMock_SetThumbnail_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 *string
+		if args[3] != nil {
+			arg3 = args[3].(*string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *DiscussionRepositoryMock_SetThumbnail_Call) Return(err error) *DiscussionRepositoryMock_SetThumbnail_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *DiscussionRepositoryMock_SetThumbnail_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, url *string) error) *DiscussionRepositoryMock_SetThumbnail_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1507,6 +1645,92 @@ func (_c *DiscussionRepositoryMock_Subscribers_Call) Return(users []*ent.User, e
 }
 
 func (_c *DiscussionRepositoryMock_Subscribers_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.User, error)) *DiscussionRepositoryMock_Subscribers_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Tags provides a mock function for the type DiscussionRepositoryMock
+func (_mock *DiscussionRepositoryMock) Tags(ctx context.Context, workspace uuid.UUID, teams []uuid.UUID, limit int64, offset int64) ([]models.DiscussionTag, error) {
+	ret := _mock.Called(ctx, workspace, teams, limit, offset)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Tags")
+	}
+
+	var r0 []models.DiscussionTag
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, []uuid.UUID, int64, int64) ([]models.DiscussionTag, error)); ok {
+		return returnFunc(ctx, workspace, teams, limit, offset)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, []uuid.UUID, int64, int64) []models.DiscussionTag); ok {
+		r0 = returnFunc(ctx, workspace, teams, limit, offset)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]models.DiscussionTag)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID, []uuid.UUID, int64, int64) error); ok {
+		r1 = returnFunc(ctx, workspace, teams, limit, offset)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// DiscussionRepositoryMock_Tags_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Tags'
+type DiscussionRepositoryMock_Tags_Call struct {
+	*mock.Call
+}
+
+// Tags is a helper method to define mock.On call
+//   - ctx context.Context
+//   - workspace uuid.UUID
+//   - teams []uuid.UUID
+//   - limit int64
+//   - offset int64
+func (_e *DiscussionRepositoryMock_Expecter) Tags(ctx any, workspace any, teams any, limit any, offset any) *DiscussionRepositoryMock_Tags_Call {
+	return &DiscussionRepositoryMock_Tags_Call{Call: _e.mock.On("Tags", ctx, workspace, teams, limit, offset)}
+}
+
+func (_c *DiscussionRepositoryMock_Tags_Call) Run(run func(ctx context.Context, workspace uuid.UUID, teams []uuid.UUID, limit int64, offset int64)) *DiscussionRepositoryMock_Tags_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		var arg2 []uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].([]uuid.UUID)
+		}
+		var arg3 int64
+		if args[3] != nil {
+			arg3 = args[3].(int64)
+		}
+		var arg4 int64
+		if args[4] != nil {
+			arg4 = args[4].(int64)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+		)
+	})
+	return _c
+}
+
+func (_c *DiscussionRepositoryMock_Tags_Call) Return(discussionTags []models.DiscussionTag, err error) *DiscussionRepositoryMock_Tags_Call {
+	_c.Call.Return(discussionTags, err)
+	return _c
+}
+
+func (_c *DiscussionRepositoryMock_Tags_Call) RunAndReturn(run func(ctx context.Context, workspace uuid.UUID, teams []uuid.UUID, limit int64, offset int64) ([]models.DiscussionTag, error)) *DiscussionRepositoryMock_Tags_Call {
 	_c.Call.Return(run)
 	return _c
 }

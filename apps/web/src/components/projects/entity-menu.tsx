@@ -27,6 +27,8 @@ type TProps = {
   onArchive?: (archive: boolean) => void;
   onTrash: () => void;
   onShowHistory?: () => void;
+  /** Items of the page's own, first. */
+  children?: ReactNode;
 };
 
 /** Trashed things can't be opened, so their page is left with a toast that brings them back. */
@@ -89,7 +91,14 @@ export function TrashedRow({
 }
 
 /** The ⋯ menu of a project, initiative or document page. */
-export function EntityMenu({ noun, isArchived, onArchive, onTrash, onShowHistory }: TProps) {
+export function EntityMenu({
+  noun,
+  isArchived,
+  onArchive,
+  onTrash,
+  onShowHistory,
+  children,
+}: TProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -100,6 +109,7 @@ export function EntityMenu({ noun, isArchived, onArchive, onTrash, onShowHistory
         }
       />
       <DropdownMenuContent align="end" className="w-52">
+        {children}
         {onShowHistory && (
           <>
             <DropdownMenuItem onClick={onShowHistory}>

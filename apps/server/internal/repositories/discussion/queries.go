@@ -71,6 +71,7 @@ type ListFilter struct {
 	Teams   []uuid.UUID
 	Team    *uuid.UUID
 	Creator *uuid.UUID
+	Tag     *string
 	// open, closed or all.
 	Status         string
 	IncludeTrashed bool
@@ -93,6 +94,11 @@ func (self *DiscussionRepository) List(ctx context.Context, filter ListFilter) (
 	}
 	if filter.Creator != nil {
 		query = query.Where(discussion.CreatorID(*filter.Creator))
+	}
+	if filter.Tag != nil {
+		query = query.Where(func(s *entsql.Selector) {
+			s.Where(repository.Raw("? = ANY("+s.C(discussion.FieldTags)+")", *filter.Tag))
+		})
 	}
 	switch filter.Status {
 	case "open":
@@ -219,4 +225,25 @@ func (self *DiscussionRepository) ThreadCommentCounts(ctx context.Context, tx re
 // Get is the discussion with its workspace.
 func (self *DiscussionRepository) Get(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.Discussion, error) {
 	return self.base.Client(tx).Discussion.Query().Where(discussion.ID(id)).WithWorkspace().Only(ctx)
+}
+
+// Tags is the tags on the discussions the caller sees outside the trash, the most used first.
+func (self *DiscussionRepository) Tags(ctx context.Context, workspace uuid.UUID, teams []uuid.UUID, limit, offset int64) ([]models.DiscussionTag, error) {
+	rows, err := self.base.DB.QueryContext(ctx, `
+		SELECT tag, count(*) FROM discussions d, unnest(d.tags) AS tag
+		WHERE d.workspace_id = $1 AND d.trashed_at IS NULL AND (d.team_id IS NULL OR d.team_id = ANY($2))
+		GROUP BY tag ORDER BY count(*) DESC, tag LIMIT $3 OFFSET $4`, workspace, teams, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	tags := []models.DiscussionTag{}
+	for rows.Next() {
+		var tag models.DiscussionTag
+		if err := rows.Scan(&tag.Name, &tag.Count); err != nil {
+			return nil, err
+		}
+		tags = append(tags, tag)
+	}
+	return tags, rows.Err()
 }

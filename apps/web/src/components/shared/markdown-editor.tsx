@@ -77,6 +77,8 @@ type TProps = {
   framed?: boolean;
   toolbar?: boolean;
   addons?: TEditorAddons;
+  /** Like a chat box: one line tall, no toolbar, Enter sends and Shift+Enter starts a new line. */
+  chat?: boolean;
 };
 
 export function MarkdownEditor({
@@ -94,6 +96,7 @@ export function MarkdownEditor({
   framed = false,
   toolbar = true,
   addons,
+  chat = false,
 }: TProps) {
   const usersRef = useRef(users ?? []);
   const uploadRef = useRef(onUpload);
@@ -246,9 +249,20 @@ export function MarkdownEditor({
     autofocus: autoFocus ? "end" : false,
     shouldRerenderOnTransaction: false,
     editorProps: {
-      attributes: { "aria-label": label, class: "min-h-16 outline-none" },
+      attributes: {
+        "aria-label": label,
+        class: chat ? "min-h-6 outline-none" : "min-h-16 outline-none",
+      },
       handleKeyDown: (_view, event) => {
         const isMod = event.metaKey || event.ctrlKey;
+        if (
+          chat &&
+          isPlainEnter(event) &&
+          !suggestionRef.current &&
+          !isInBlock(editorRef.current)
+        ) {
+          return submitFromKeyboard();
+        }
         if (!isMod) return false;
         if (event.key === "Enter") return submitFromKeyboard();
         if (event.key.toLowerCase() !== "k" || event.shiftKey || event.altKey) return false;
@@ -396,7 +410,7 @@ export function MarkdownEditor({
     },
   };
 
-  const showToolbar = toolbar && !readOnly && editor && (isActive || isLinkOpen);
+  const showToolbar = toolbar && !chat && !readOnly && editor && (isActive || isLinkOpen);
 
   return (
     <div
@@ -463,6 +477,17 @@ export function MarkdownEditor({
       {canUpload && filePicker.input}
     </div>
   );
+}
+
+function isPlainEnter(event: KeyboardEvent) {
+  const hasModifier = event.shiftKey || event.altKey || event.metaKey || event.ctrlKey;
+  return event.key === "Enter" && !hasModifier && !event.isComposing;
+}
+
+/** Enter keeps making new items and lines in lists, code and quotes. */
+function isInBlock(editor: Editor | null) {
+  if (!editor) return false;
+  return ["codeBlock", "listItem", "taskItem", "blockquote"].some((name) => editor.isActive(name));
 }
 
 /** Keeps the cursor about where it was when the server's text replaces the content. */

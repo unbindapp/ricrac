@@ -30,6 +30,15 @@ export function embedKind(
 
 const EMBED_PATTERN = /!\[([^\]]*)\]\(<?([^)\s>]+)>?(?:\s+"[^"]*")?\)/;
 
+/** Every image embedded in the Markdown, without layout fragments, in order and once each. */
+export function imageEmbeds(markdown: string): string[] {
+  const urls = [...markdown.matchAll(new RegExp(EMBED_PATTERN, "g"))]
+    .map(([, name, src]) => ({ name, url: mediaLayout(src).url }))
+    .filter(({ name, url }) => embedKind(name, url) === "image")
+    .map(({ url }) => url);
+  return [...new Set(urls)];
+}
+
 /** The first image or video embedded in the Markdown, without its layout fragment. */
 export function firstEmbed(markdown: string): { url: string; kind: TMediaKind } | null {
   const match = EMBED_PATTERN.exec(markdown);
