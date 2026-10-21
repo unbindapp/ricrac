@@ -17,6 +17,7 @@ import { LinkBubble } from "@/components/shared/editor/link-bubble";
 import { EditorMedia } from "@/components/shared/editor/media-node";
 import { suggestionRenderer, type TSuggestionState } from "@/components/shared/editor/suggestions";
 import { EditorToolbar } from "@/components/shared/editor/toolbar";
+import { useIsActive } from "@/components/shared/editor/use-is-active";
 import {
   editorHasPendingUploads,
   hasPendingUploads,
@@ -108,6 +109,8 @@ export function MarkdownEditor({
   const insertAtRef = useRef<number | undefined>(undefined);
   const dragDepthRef = useRef(0);
   const [incoming, setIncoming] = useState<string | null>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const isActive = useIsActive(rootRef, Boolean(autoFocus));
   const [suggestion, setSuggestion] = useState<TSuggestionState | null>(null);
   const suggestionRef = useRef<TSuggestionState | null>(null);
   const suggestionSinkRef = useRef((next: TSuggestionState | null) => {
@@ -391,10 +394,11 @@ export function MarkdownEditor({
     },
   };
 
-  const showToolbar = toolbar && !readOnly && editor;
+  const showToolbar = toolbar && !readOnly && editor && (isActive || isLinkOpen);
 
   return (
     <div
+      ref={rootRef}
       data-slot="markdown-editor"
       className="relative flex w-full flex-col gap-1.5"
       {...dragHandlers}
