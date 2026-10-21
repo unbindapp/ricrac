@@ -97,6 +97,24 @@ type PullRequest struct {
 		Ref string `json:"ref"`
 		SHA string `json:"sha"`
 	} `json:"head"`
+	Base struct {
+		Ref string `json:"ref"`
+	} `json:"base"`
+	Additions    int        `json:"additions"`
+	Deletions    int        `json:"deletions"`
+	ChangedFiles int        `json:"changed_files"`
+	MergedAt     *time.Time `json:"merged_at"`
+}
+
+const maxSummaryLength = 4000
+
+// Summary is the body cut to 4000 characters, enough to know what it does without GitHub.
+func (p PullRequest) Summary() string {
+	runes := []rune(strings.TrimSpace(p.Body))
+	if len(runes) <= maxSummaryLength {
+		return string(runes)
+	}
+	return strings.TrimSpace(string(runes[:maxSummaryLength])) + "…"
 }
 
 // DisplayState is open, draft, merged or closed.

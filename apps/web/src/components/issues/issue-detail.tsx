@@ -16,6 +16,7 @@ import { type ReactNode, useEffect, useState } from "react";
 import type { IssueDetail as TIssueDetail } from "@/api/ops.gen";
 import { CustomerNeedDialog } from "@/components/customers/customer-need-dialog";
 import { CustomerNeedsSection } from "@/components/customers/customer-needs-section";
+import { GithubIcon } from "@/components/icons/github";
 import { IssueActivity } from "@/components/issues/issue-activity";
 import { AttachMenu, IssueAttachments } from "@/components/issues/issue-attachments";
 import { IssueDetailHeader } from "@/components/issues/issue-detail-header";
@@ -159,6 +160,7 @@ function IssueDetailContent({
         },
       }}
     >
+      <GitHubIssueRow issue={issue} />
       <SharedWithRow issue={issue} />
       <SlaRow issue={issue} isOpen={isSettingSla} onOpenChange={setIsSettingSla} />
       <SnoozedRow issue={issue} />
@@ -352,6 +354,24 @@ function TriageBanner({ issue }: { issue: TIssueDetail }) {
 }
 
 /** Guests see only their teams' issues and those shared with them. */
+function GitHubIssueRow({ issue }: { issue: TIssueDetail }) {
+  if (!issue.github) return null;
+  return (
+    <PropertyRow label="GitHub">
+      <a
+        href={issue.github.url}
+        target="_blank"
+        rel="noreferrer noopener"
+        className="flex min-w-0 flex-1 items-center gap-1.5 px-2.5 text-sm outline-hidden focus-visible:underline has-hover:hover:underline"
+      >
+        <GithubIcon className="text-muted-foreground" />
+        <span className="shrink-0">#{issue.github.number}</span>
+        <span className="text-muted-foreground truncate text-xs">{issue.github.repository}</span>
+      </a>
+    </PropertyRow>
+  );
+}
+
 function SharedWithRow({ issue }: { issue: TIssueDetail }) {
   const { workspace, canEdit } = useWorkspace();
   const { users } = useWorkspaceUsers();

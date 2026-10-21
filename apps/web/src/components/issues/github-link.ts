@@ -1,8 +1,17 @@
 export const PULL_REQUEST_STATES = ["open", "draft", "merged", "closed"] as const;
 export type TPullRequestState = (typeof PULL_REQUEST_STATES)[number];
 
+export type TPullRequestStats = { additions: number; deletions: number; changedFiles: number };
+
 export type TGithubLink =
-  | { kind: "pull_request"; reference: string; state: TPullRequestState | null }
+  | {
+      kind: "pull_request";
+      reference: string;
+      state: TPullRequestState | null;
+      summary: string;
+      base: string;
+      stats: TPullRequestStats | null;
+    }
   | { kind: "branch"; reference: string }
   | { kind: "commit"; reference: string; sha: string; subject: string };
 
@@ -12,6 +21,13 @@ const SHORT_SHA_LENGTH = 7;
 
 function text(value: unknown) {
   return typeof value === "string" ? value : "";
+}
+
+function statsOf(metadata: Record<string, unknown>): TPullRequestStats | null {
+  const { additions, deletions, changed_files: changedFiles } = metadata;
+  if (typeof additions !== "number" || typeof deletions !== "number") return null;
+  if (typeof changedFiles !== "number") return null;
+  return { additions, deletions, changedFiles };
 }
 
 export function githubLinkOf(attachment: TLinkedAttachment): TGithubLink | null {
@@ -25,6 +41,9 @@ export function githubLinkOf(attachment: TLinkedAttachment): TGithubLink | null 
         kind: "pull_request",
         reference: `${repo}#${number}`,
         state: state ?? null,
+        summary: text(attachment.metadata.summary).trim(),
+        base: text(attachment.metadata.base),
+        stats: statsOf(attachment.metadata),
       };
     }
     case "github_branch":

@@ -82,3 +82,73 @@ func findOverlapping(pattern *regexp.Regexp, text string) [][]string {
 	}
 	return matches
 }
+
+// IssueNumber is a GitHub issue mentioned as #123, owner/repo#123 or its link; Repo is empty
+// for #123, the repository the mention is in.
+type IssueNumber struct {
+	Repo   string
+	Number int
+	Closes bool
+}
+
+const (
+	repoName    = `[a-z0-9][a-z0-9-]{0,38}/[a-z0-9._-]{1,100}`
+	issueNumber = `(?:https?://[^\s/]+/(` + repoName + `)/issues/([0-9]{1,9})|(` + repoName + `)?#([0-9]{1,9}))`
+)
+
+var (
+	textIssueNumber   = regexp.MustCompile(`(?i)(?:^|[^a-z0-9_&/])` + issueNumber + `\b`)
+	closingIssueTexts = regexp.MustCompile(`(?i)\b(?:fix(?:es|ed)?|close[sd]?|resolve[sd]?)\b:?((?:(?:[ \t]*,[ \t]*|[ \t]+and[ \t]+|[ \t]+)` + issueNumber + `)+)`)
+)
+
+var exactIssue = regexp.MustCompile(`(?i)^(?:https?://[^\s/]+/(` + repoName + `)/issues/([0-9]{1,9})(?:[/?#]\S*)?|(` + repoName + `)#([0-9]{1,9}))$`)
+
+// ParseIssue reads a GitHub issue given as owner/repo#123 or its link.
+func ParseIssue(value string) (string, int, bool) {
+	match := exactIssue.FindStringSubmatch(strings.TrimSpace(value))
+	if match == nil {
+		return "", 0, false
+	}
+	repo, digits := match[1], match[2]
+	if digits == "" {
+		repo, digits = match[3], match[4]
+	}
+	number, err := strconv.Atoi(digits)
+	return strings.ToLower(repo), number, err == nil && number > 0
+}
+
+// IssueNumbers is the GitHub issues texts mention, in the order they first appear.
+func IssueNumbers(texts ...string) []IssueNumber {
+	var found []IssueNumber
+	add := func(match []string, closes bool) {
+		repo, digits := match[1], match[2]
+		if digits == "" {
+			repo, digits = match[3], match[4]
+		}
+		number, err := strconv.Atoi(digits)
+		if err != nil || number <= 0 {
+			return
+		}
+		ref := IssueNumber{Repo: strings.ToLower(repo), Number: number, Closes: closes}
+		for i := range found {
+			if found[i].Repo == ref.Repo && found[i].Number == ref.Number {
+				found[i].Closes = found[i].Closes || closes
+				return
+			}
+		}
+		if len(found) < MaxReferences {
+			found = append(found, ref)
+		}
+	}
+	for _, text := range texts {
+		for _, phrase := range closingIssueTexts.FindAllStringSubmatch(text, -1) {
+			for _, match := range textIssueNumber.FindAllStringSubmatch(phrase[1], -1) {
+				add(match, true)
+			}
+		}
+		for _, match := range textIssueNumber.FindAllStringSubmatch(text, -1) {
+			add(match, false)
+		}
+	}
+	return found
+}

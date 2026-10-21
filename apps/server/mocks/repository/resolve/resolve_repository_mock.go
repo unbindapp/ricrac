@@ -906,6 +906,92 @@ func (_c *ResolveRepositoryMock_IssueLabels_Call) RunAndReturn(run func(ctx cont
 	return _c
 }
 
+// IssueSyncedAs provides a mock function for the type ResolveRepositoryMock
+func (_mock *ResolveRepositoryMock) IssueSyncedAs(ctx context.Context, workspace uuid.UUID, repo string, number int) (uuid.UUID, bool, error) {
+	ret := _mock.Called(ctx, workspace, repo, number)
+
+	if len(ret) == 0 {
+		panic("no return value specified for IssueSyncedAs")
+	}
+
+	var r0 uuid.UUID
+	var r1 bool
+	var r2 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, string, int) (uuid.UUID, bool, error)); ok {
+		return returnFunc(ctx, workspace, repo, number)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, string, int) uuid.UUID); ok {
+		r0 = returnFunc(ctx, workspace, repo, number)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID, string, int) bool); ok {
+		r1 = returnFunc(ctx, workspace, repo, number)
+	} else {
+		r1 = ret.Get(1).(bool)
+	}
+	if returnFunc, ok := ret.Get(2).(func(context.Context, uuid.UUID, string, int) error); ok {
+		r2 = returnFunc(ctx, workspace, repo, number)
+	} else {
+		r2 = ret.Error(2)
+	}
+	return r0, r1, r2
+}
+
+// ResolveRepositoryMock_IssueSyncedAs_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'IssueSyncedAs'
+type ResolveRepositoryMock_IssueSyncedAs_Call struct {
+	*mock.Call
+}
+
+// IssueSyncedAs is a helper method to define mock.On call
+//   - ctx context.Context
+//   - workspace uuid.UUID
+//   - repo string
+//   - number int
+func (_e *ResolveRepositoryMock_Expecter) IssueSyncedAs(ctx any, workspace any, repo any, number any) *ResolveRepositoryMock_IssueSyncedAs_Call {
+	return &ResolveRepositoryMock_IssueSyncedAs_Call{Call: _e.mock.On("IssueSyncedAs", ctx, workspace, repo, number)}
+}
+
+func (_c *ResolveRepositoryMock_IssueSyncedAs_Call) Run(run func(ctx context.Context, workspace uuid.UUID, repo string, number int)) *ResolveRepositoryMock_IssueSyncedAs_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		var arg2 string
+		if args[2] != nil {
+			arg2 = args[2].(string)
+		}
+		var arg3 int
+		if args[3] != nil {
+			arg3 = args[3].(int)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *ResolveRepositoryMock_IssueSyncedAs_Call) Return(uUID uuid.UUID, b bool, err error) *ResolveRepositoryMock_IssueSyncedAs_Call {
+	_c.Call.Return(uUID, b, err)
+	return _c
+}
+
+func (_c *ResolveRepositoryMock_IssueSyncedAs_Call) RunAndReturn(run func(ctx context.Context, workspace uuid.UUID, repo string, number int) (uuid.UUID, bool, error)) *ResolveRepositoryMock_IssueSyncedAs_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // IssueVisible provides a mock function for the type ResolveRepositoryMock
 func (_mock *ResolveRepositoryMock) IssueVisible(ctx context.Context, id uuid.UUID, teams []uuid.UUID, viewer uuid.UUID) (bool, error) {
 	ret := _mock.Called(ctx, id, teams, viewer)

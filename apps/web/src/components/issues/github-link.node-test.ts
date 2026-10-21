@@ -10,7 +10,14 @@ test("pull request attachments read their repository, number and state", () => {
       title: "#42 Limit reads",
       metadata: { repo: "unbindapp/unbind", number: 42, state: "merged", branch: "unb-1" },
     }),
-    { kind: "pull_request", reference: "unbindapp/unbind#42", state: "merged" },
+    {
+      kind: "pull_request",
+      reference: "unbindapp/unbind#42",
+      state: "merged",
+      summary: "",
+      base: "",
+      stats: null,
+    },
   );
 });
 
@@ -21,7 +28,34 @@ test("an unknown pull request state shows no chip", () => {
       title: "#1 Fix",
       metadata: { repo: "a/b", number: 1, state: "weird" },
     }),
-    { kind: "pull_request", reference: "a/b#1", state: null },
+    { kind: "pull_request", reference: "a/b#1", state: null, summary: "", base: "", stats: null },
+  );
+});
+
+test("pull requests read their summary and size", () => {
+  assert.deepEqual(
+    githubLinkOf({
+      sourceType: "github",
+      title: "#42 Limit reads",
+      metadata: {
+        repo: "a/b",
+        number: 42,
+        state: "open",
+        summary: " Resolves #7 \n",
+        base: "main",
+        additions: 12,
+        deletions: 3,
+        changed_files: 2,
+      },
+    }),
+    {
+      kind: "pull_request",
+      reference: "a/b#42",
+      state: "open",
+      summary: "Resolves #7",
+      base: "main",
+      stats: { additions: 12, deletions: 3, changedFiles: 2 },
+    },
   );
 });
 

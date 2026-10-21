@@ -563,6 +563,13 @@ export type GitHubIntegration = {
   repoSyncs: GitHubRepoSync[]
 }
 
+export type GitHubIssueRef = {
+  number: number
+  /** owner/name */
+  repository: string
+  url: string
+}
+
 export type GitHubRepoSync = {
   /** The import of the repository's existing issues; null when none was asked for. */
   backfill: GitHubBackfill | null
@@ -799,6 +806,7 @@ export type IssueChild = {
 export type IssueDetail = {
   archivedAt: string | null
   assignee: UserRef | null
+  /** GitHub pull requests are sourceType github, their metadata has repo, number, state, author, branch, base, summary (the body), additions, deletions, changed_files and merged_at. */
   attachments: IssueAttachment[]
   autoArchivedAt: string | null
   autoClosedAt: string | null
@@ -817,6 +825,8 @@ export type IssueDetail = {
   documents: DocumentRef[]
   dueDate: string | null
   estimate: number | null
+  /** The GitHub issue it syncs with; null when none. */
+  github: GitHubIssueRef | null
   /** With includeHistory. */
   history?: HistoryEntry[]
   id: string

@@ -465,6 +465,57 @@ func TestGitHubIssuesAndCommentsSyncIntoRicrac(t *testing.T) {
 	eq(t, scalar[int](g.World, "SELECT count(*) FROM github_issue_links"), 0)
 }
 
+func TestPullRequestsLinkSyncedGitHubIssues(t *testing.T) {
+	g := withGitHub(t)
+	g.syncRepo(t, "ENG")
+	g.deliver(t, "issues", "issues_opened.json", nil)
+	g.deliver(t, "issues", "issues_opened.json", func(p M) {
+		issue := p["issue"].(M)
+		issue["id"], issue["number"], issue["html_url"] = 3500001348, 1348, "https://github.com/unbindapp/unbind/issues/1348"
+	})
+	synced := call(t, g.Ann, "get_issue", M{"id": "ENG-1"})
+	eq(t, synced.At("github", "repository").Str(), "unbindapp/unbind")
+	eq(t, synced.At("github", "number").Num(), 1347.0)
+	eq(t, synced.At("github", "url").Str(), "https://github.com/unbindapp/unbind/issues/1347")
+	call(t, g.Ann, "save_issue", M{"team": "ENG", "title": "Not on GitHub"})
+	check(t, call(t, g.Ann, "get_issue", M{"id": "ENG-3"}).At("github").IsNull())
+	eq(t, call(t, g.Ann, "get_issue", M{"id": "Unbindapp/Unbind#1348"}).At("identifier").Str(), "ENG-2")
+	eq(t, call(t, g.Ann, "get_issue", M{"id": "https://github.com/unbindapp/unbind/issues/1347"}).At("identifier").Str(), "ENG-1")
+	check(t, strings.Contains(fails(t, g.Ann, "get_issue", M{"id": "unbindapp/unbind#99"}), "synced GitHub issue (owner/repo#123)"))
+	before := call(t, g.Ann, "get_issue", M{"id": "ENG-2"}).At("state", "name").Str()
+
+	body := "Raises the idle timeout.\r\n\r\nResolves #1347, follow-up to unbindapp/unbind#1348."
+	pullRequest := func(p M) {
+		pr := p["pull_request"].(M)
+		pr["body"] = body
+		pr["head"].(M)["ref"] = "bbedward/idle-timeout"
+	}
+	eq(t, g.deliver(t, "pull_request", "pull_request_opened.json", pullRequest), http.StatusOK)
+	opened := call(t, g.Ann, "get_issue", M{"id": "ENG-1"})
+	eq(t, opened.At("state", "type").Str(), "started", opened.JSON())
+	attachment := opened.At("attachments", 0)
+	eq(t, attachment.At("title").Str(), "#42 Limit websocket message size")
+	eq(t, attachment.At("metadata", "summary").Str(), body)
+	eq(t, attachment.At("metadata", "base").Str(), "master")
+	eq(t, attachment.At("metadata", "additions").Num(), 3.0)
+	eq(t, attachment.At("metadata", "changed_files").Num(), 1.0)
+	eq(t, lastHistory(t, g.World, "ENG-1").At("changes", "github", "label").Str(), "Pull request #42 opened")
+	mentioned := call(t, g.Ann, "get_issue", M{"id": "ENG-2"})
+	eq(t, mentioned.At("attachments", 0, "url").Str(), "https://github.com/unbindapp/unbind/pull/42")
+	eq(t, mentioned.At("state", "name").Str(), before, "a mention links without moving")
+
+	g.deliver(t, "pull_request", "pull_request_closed_merged.json", func(p M) {
+		pullRequest(p)
+		p["pull_request"].(M)["base"].(M)["ref"] = "release"
+	})
+	eq(t, call(t, g.Ann, "get_issue", M{"id": "ENG-1"}).At("state", "type").Str(), "started", "merged away from the default branch")
+	g.deliver(t, "pull_request", "pull_request_closed_merged.json", pullRequest)
+	merged := call(t, g.Ann, "get_issue", M{"id": "ENG-1"})
+	eq(t, merged.At("state", "type").Str(), "completed", merged.JSON())
+	eq(t, merged.At("attachments", 0, "metadata", "merged_at").Str(), "2026-10-16T10:00:00Z")
+	eq(t, call(t, g.Ann, "get_issue", M{"id": "ENG-2"}).At("state", "name").Str(), before)
+}
+
 func TestRicracChangesGoToGitHubButNotBack(t *testing.T) {
 	g := withGitHub(t)
 	g.syncRepo(t, "ENG")

@@ -11,6 +11,7 @@ import (
 	"ricrac/ent"
 	"ricrac/ent/attachment"
 	"ricrac/ent/githubinstallation"
+	"ricrac/ent/githubissuelink"
 	"ricrac/ent/githubreposync"
 	"ricrac/ent/issue"
 	"ricrac/ent/team"
@@ -75,6 +76,18 @@ func (self *GitHubRepository) IssuesNamed(ctx context.Context, workspace uuid.UU
 				s.Where(repository.Raw("? = ANY("+s.C(issue.FieldPreviousIdentifiers)+")", identifier))
 			},
 		)).IDs(ctx)
+}
+
+// IssuesSyncedAs is the workspace's issues (not in the trash) synced with this GitHub issue.
+func (self *GitHubRepository) IssuesSyncedAs(ctx context.Context, workspace uuid.UUID, repo string, number int) ([]uuid.UUID, error) {
+	linked, err := self.base.DB.GithubIssueLink.Query().
+		Where(githubissuelink.GithubNumber(number), githubissuelink.HasRepoSyncWith(
+			githubreposync.WorkspaceID(workspace), githubreposync.FullNameEqualFold(repo),
+		)).IDs(ctx)
+	if err != nil || len(linked) == 0 {
+		return nil, err
+	}
+	return self.base.DB.Issue.Query().Where(issue.IDIn(linked...), issue.TrashedAtIsNil()).IDs(ctx)
 }
 
 // HasPullRequestFrom says whether the issue has a pull request from this branch attached.

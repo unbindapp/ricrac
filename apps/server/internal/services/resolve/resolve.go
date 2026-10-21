@@ -15,6 +15,7 @@ import (
 	"ricrac/internal/auth"
 	"ricrac/internal/common/errdefs"
 	"ricrac/internal/common/utils"
+	"ricrac/internal/integrations/github"
 	"ricrac/internal/repositories/repositories"
 	resolve_repo "ricrac/internal/repositories/resolve"
 )
@@ -202,11 +203,13 @@ func (self *ResolveService) Issue(ctx context.Context, actor *auth.Actor, value 
 			}
 		}
 	}
-	notFound := errdefs.NotFound("No issue %q; use an identifier like ENG-123 or an id", raw)
+	notFound := errdefs.NotFound("No issue %q; use an identifier like ENG-123, an id or a synced GitHub issue (owner/repo#123)", raw)
 	var id uuid.UUID
 	var found bool
 	var err error
-	if uid, ok := utils.AsUUID(candidate); ok {
+	if repo, number, ok := github.ParseIssue(raw); ok {
+		id, found, err = self.lookups().IssueSyncedAs(ctx, actor.Workspace, repo, number)
+	} else if uid, ok := utils.AsUUID(candidate); ok {
 		id, found, err = self.lookups().IssueByID(ctx, actor.Workspace, uid)
 	} else if key, number, ok := utils.ParseIdentifier(candidate); ok {
 		id, found, err = self.lookups().IssueByNumber(ctx, actor.Workspace, key, number)

@@ -11,6 +11,8 @@ import (
 	"ricrac/ent"
 	"ricrac/ent/cycle"
 	"ricrac/ent/document"
+	"ricrac/ent/githubissuelink"
+	"ricrac/ent/githubreposync"
 	"ricrac/ent/issue"
 	"ricrac/ent/issuelabel"
 	"ricrac/ent/issueshare"
@@ -146,6 +148,15 @@ func (self *ResolveRepository) IssueByPreviousIdentifier(ctx context.Context, wo
 		Where(issue.WorkspaceID(workspace), func(s *entsql.Selector) {
 			s.Where(repository.Raw("? = ANY("+s.C(issue.FieldPreviousIdentifiers)+")", identifier))
 		}).IDs(ctx)
+	return firstID(ctx, ids, err)
+}
+
+// IssueSyncedAs is the workspace's issue synced with this GitHub issue.
+func (self *ResolveRepository) IssueSyncedAs(ctx context.Context, workspace uuid.UUID, repo string, number int) (uuid.UUID, bool, error) {
+	ids, err := self.base.DB.GithubIssueLink.Query().
+		Where(githubissuelink.GithubNumber(number), githubissuelink.HasRepoSyncWith(
+			githubreposync.WorkspaceID(workspace), githubreposync.FullNameEqualFold(repo),
+		)).IDs(ctx)
 	return firstID(ctx, ids, err)
 }
 

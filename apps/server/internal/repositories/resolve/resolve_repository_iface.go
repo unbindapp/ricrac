@@ -23,6 +23,8 @@ type ResolveRepositoryInterface interface {
 	// archived one with the same key.
 	IssueByNumber(ctx context.Context, workspace uuid.UUID, key string, number int) (uuid.UUID, bool, error)
 	IssueByPreviousIdentifier(ctx context.Context, workspace uuid.UUID, identifier string) (uuid.UUID, bool, error)
+	// IssueSyncedAs is the workspace's issue synced with this GitHub issue.
+	IssueSyncedAs(ctx context.Context, workspace uuid.UUID, repo string, number int) (uuid.UUID, bool, error)
 	// IssueVisible says whether the issue is in one of teams or shared with the user.
 	IssueVisible(ctx context.Context, id uuid.UUID, teams []uuid.UUID, viewer uuid.UUID) (bool, error)
 	// IssueLabels is the unretired labels of the workspace and of the team, if any.
