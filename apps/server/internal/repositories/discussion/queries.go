@@ -74,13 +74,16 @@ type ListFilter struct {
 	// open, closed or all.
 	Status         string
 	IncludeTrashed bool
+	// Only those in the trash, the most recently trashed first.
+	OnlyTrashed bool
 	// Words to find in the title or body.
 	Query  *string
 	Limit  int64
 	Offset int64
 }
 
-// List is the discussions that match, pinned ones first, then by their latest activity.
+// List is the discussions that match, pinned ones first, then by their latest activity (unless
+// only trashed ones are asked for).
 func (self *DiscussionRepository) List(ctx context.Context, filter ListFilter) ([]uuid.UUID, error) {
 	query := self.base.DB.Discussion.Query().Where(discussion.WorkspaceID(filter.Workspace), func(s *entsql.Selector) {
 		s.Where(repository.Raw(s.C(discussion.FieldTeamID)+" IS NULL OR "+s.C(discussion.FieldTeamID)+" = ANY(?)", filter.Teams))
@@ -97,7 +100,10 @@ func (self *DiscussionRepository) List(ctx context.Context, filter ListFilter) (
 	case "closed":
 		query = query.Where(discussion.ClosedAtNotNil())
 	}
-	if !filter.IncludeTrashed {
+	switch {
+	case filter.OnlyTrashed:
+		query = query.Where(discussion.TrashedAtNotNil()).Order(ent.Desc(discussion.FieldTrashedAt))
+	case !filter.IncludeTrashed:
 		query = query.Where(discussion.TrashedAtIsNil())
 	}
 	if filter.Query != nil {

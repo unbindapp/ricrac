@@ -1,28 +1,35 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
-import { MessagesSquareIcon, PlusIcon, SearchIcon } from "lucide-react";
+import { MessagesSquareIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import { z } from "zod";
 
+import type { Discussion } from "@/api/ops.gen";
 import { DiscussionRow } from "@/components/forum/discussion-row";
 import { DiscussionTeamPicker } from "@/components/forum/discussion-team-picker";
 import { NewDiscussionDialog } from "@/components/forum/new-discussion-dialog";
+import { useCanRewrite } from "@/components/forum/use-can-rewrite";
 import { List } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageToolbar } from "@/components/layout/page-toolbar";
+import { TrashedRow } from "@/components/projects/entity-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTab } from "@/components/ui/tabs";
+import { toast } from "@/components/ui/toast";
 import { useTeams } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { discussionsQuery, type TDiscussionStatus } from "@/lib/queries/discussions";
+import { discussionsQuery, useDiscussionLifecycleMutation } from "@/lib/queries/discussions";
+
+const VIEWS = ["open", "closed", "all", "trash"] as const;
+type TForumView = (typeof VIEWS)[number];
 
 const searchSchema = z.object({
-  status: z.enum(["closed", "all"]).optional(),
+  status: z.enum(["closed", "all", "trash"]).optional(),
   /** A team's key. */
   team: z.string().optional(),
 });
@@ -32,11 +39,14 @@ export const Route = createFileRoute("/$workspace/_workspace/forum")({
   component: ForumPage,
 });
 
-const statusLabels: Record<TDiscussionStatus, string> = {
+const viewLabels: Record<TForumView, string> = {
   open: "Open",
   closed: "Closed",
   all: "All",
+  trash: "Trash",
 };
+
+const isView = (value: unknown): value is TForumView => VIEWS.includes(value as TForumView);
 
 function ForumPage() {
   const { workspace, canEdit } = useWorkspace();
@@ -46,9 +56,11 @@ function ForumPage() {
   const [query, setQuery] = useState("");
   const [debouncedQuery] = useDebounceValue(query.trim(), 300);
   const team = teams.find((item) => item.key === teamKey);
+  const isTrash = status === "trash";
   const list = useInfiniteQuery(
     discussionsQuery(workspace.id, {
-      status,
+      status: isTrash ? "all" : status,
+      onlyTrashed: isTrash || undefined,
       team: teamKey,
       query: debouncedQuery || undefined,
     }),
@@ -84,16 +96,17 @@ function ForumPage() {
                   void navigate({
                     search: (prev) => ({
                       ...prev,
-                      status: value === "closed" || value === "all" ? value : undefined,
+                      status: isView(value) && value !== "open" ? value : undefined,
                     }),
                     replace: true,
                   })
                 }
               >
                 <TabsList>
-                  {(["open", "closed", "all"] as const).map((value) => (
+                  {VIEWS.map((value) => (
                     <TabsTab key={value} value={value}>
-                      {statusLabels[value]}
+                      {value === "trash" && <Trash2Icon />}
+                      {viewLabels[value]}
                     </TabsTab>
                   ))}
                 </TabsList>
@@ -138,14 +151,18 @@ function ForumPage() {
         empty={emptyState({
           status,
           isFiltered: Boolean(debouncedQuery || teamKey),
-          action: canEdit && status !== "closed" && newButton("empty"),
+          action: canEdit && status !== "closed" && !isTrash && newButton("empty"),
         })}
       >
         <div className="flex w-full flex-col gap-2">
           <List flush>
-            {discussions.map((discussion) => (
-              <DiscussionRow key={discussion.id} discussion={discussion} />
-            ))}
+            {discussions.map((discussion) =>
+              isTrash ? (
+                <TrashedDiscussionRow key={discussion.id} discussion={discussion} />
+              ) : (
+                <DiscussionRow key={discussion.id} discussion={discussion} />
+              ),
+            )}
           </List>
           {list.hasNextPage && (
             <Button
@@ -164,12 +181,35 @@ function ForumPage() {
   );
 }
 
+function TrashedDiscussionRow({ discussion }: { discussion: Discussion }) {
+  const { workspace } = useWorkspace();
+  const canRestore = useCanRewrite(discussion.creator);
+  const { mutate: change, isPending } = useDiscussionLifecycleMutation(workspace.id);
+  return (
+    <TrashedRow
+      icon={<MessagesSquareIcon className="size-4" />}
+      name={discussion.title}
+      trashedAt={discussion.trashedAt}
+      isPending={isPending}
+      onRestore={
+        canRestore
+          ? () =>
+              change(
+                { id: discussion.id, action: "restore" },
+                { onSuccess: () => toast.add({ type: "success", title: "Discussion restored" }) },
+              )
+          : undefined
+      }
+    />
+  );
+}
+
 function emptyState({
   status,
   isFiltered,
   action,
 }: {
-  status: TDiscussionStatus;
+  status: TForumView;
   isFiltered: boolean;
   action: ReactNode;
 }) {
@@ -178,6 +218,13 @@ function emptyState({
       icon: SearchIcon,
       title: "No matching discussions",
       description: "Nothing matches these filters.",
+    };
+  }
+  if (status === "trash") {
+    return {
+      icon: Trash2Icon,
+      title: "No trashed discussions yet",
+      description: "Discussions moved to the trash stay here for 30 days.",
     };
   }
   if (status === "closed") {

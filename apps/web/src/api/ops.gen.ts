@@ -3156,6 +3156,8 @@ export type ListDiscussionsArgs = {
   includeTrashed?: boolean
   /** How many to return, 50 by default, at most 250. */
   limit?: number | null
+  /** Only discussions in the trash, the most recently trashed first. */
+  onlyTrashed?: boolean
   /** Words to find in the title or body. */
   query?: string | null
   /** open (default), closed or all. */

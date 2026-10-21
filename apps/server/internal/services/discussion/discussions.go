@@ -25,6 +25,7 @@ type ListInput struct {
 	Status         *string `json:"status" enum:"open,closed,all" doc:"open (default), closed or all."`
 	Query          *string `json:"query" doc:"Words to find in the title or body."`
 	IncludeTrashed bool    `json:"includeTrashed,omitempty"`
+	OnlyTrashed    bool    `json:"onlyTrashed,omitempty" doc:"Only discussions in the trash, the most recently trashed first."`
 	IncludeBody    bool    `json:"includeBody,omitempty" doc:"Include each discussion's body."`
 	args.Page
 }
@@ -55,7 +56,9 @@ func (self *DiscussionService) List(ctx context.Context, actor *auth.Actor, inpu
 	if err != nil {
 		return args.PageOf[models.Discussion]{}, err
 	}
-	filter := discussion_repo.ListFilter{Workspace: actor.Workspace, Teams: teams, Status: status, IncludeTrashed: input.IncludeTrashed}
+	filter := discussion_repo.ListFilter{
+		Workspace: actor.Workspace, Teams: teams, Status: status, IncludeTrashed: input.IncludeTrashed, OnlyTrashed: input.OnlyTrashed,
+	}
 	if filter.Team, err = self.resolve.OptionalTeam(ctx, actor, input.Team); err != nil {
 		return args.PageOf[models.Discussion]{}, err
 	}
@@ -302,7 +305,7 @@ func (self *DiscussionService) checkOwner(ctx context.Context, actor *auth.Actor
 		return err
 	}
 	if found.CreatorID == nil || *found.CreatorID != actor.User {
-		return errdefs.Forbidden("Only its author or a workspace admin can delete a discussion")
+		return errdefs.Forbidden("Only its author or a workspace admin can trash or restore a discussion")
 	}
 	return nil
 }

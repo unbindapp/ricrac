@@ -69,6 +69,8 @@ func TestDiscussionsThreadsAndTheirNotifications(t *testing.T) {
 
 	call(t, w.Ann, "delete_discussion", M{"id": "Offsite"})
 	fails(t, bob, "get_discussion", M{"id": "Offsite"})
+	eqList(t, call(t, bob, "list_discussions", M{"status": "all", "onlyTrashed": true}).At("nodes").Strings("title"), []string{"Offsite"})
+	contains(t, fails(t, bob, "restore_discussion", M{"id": "Offsite"}), "author")
 	call(t, w.Ann, "restore_discussion", M{"id": "Offsite"})
 	call(t, carl, "delete_discussion_thread", M{"id": thread.At("id").V})
 	eq(t, call(t, bob, "get_discussion", M{"id": "Q4 launch"}).At("threadCount").Num(), 0)

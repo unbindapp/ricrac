@@ -36,7 +36,8 @@ type DiscussionRepositoryInterface interface {
 	Load(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) ([]*ent.Discussion, error)
 	// Counts is how many threads, open threads and comments of their own each discussion has.
 	Counts(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) (map[uuid.UUID]models.DiscussionCounts, error)
-	// List is the discussions that match, pinned ones first, then by their latest activity.
+	// List is the discussions that match, pinned ones first, then by their latest activity (unless
+	// only trashed ones are asked for).
 	List(ctx context.Context, filter ListFilter) ([]uuid.UUID, error)
 	// Owner is the team a discussion belongs to (nil for the whole workspace) and whether it is in
 	// the trash; found is false when the workspace has no such discussion.
