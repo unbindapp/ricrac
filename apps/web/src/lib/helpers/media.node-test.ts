@@ -5,6 +5,7 @@ import {
   embedKind,
   embedName,
   fileKind,
+  firstEmbed,
   mediaLayout,
   uploadKind,
   withMediaLayout,
@@ -56,4 +57,16 @@ test("width and alignment ride in the fragment and leave the URL as it was", () 
     withMediaLayout("/files/1#width=320&align=right", { width: null, align: "left" }),
     "/files/1",
   );
+});
+
+test("the first embed is found with its layout left out", () => {
+  assert.deepEqual(firstEmbed("Intro\n\n![shot.png](/files/1#width=480)\n\n![b.png](/files/2)"), {
+    url: "/files/1",
+    kind: "image",
+  });
+  assert.deepEqual(firstEmbed('![demo.mp4](https://ricrac.app/files/3 "Demo")'), {
+    url: "https://ricrac.app/files/3",
+    kind: "video",
+  });
+  assert.equal(firstEmbed("A [link](https://ricrac.app) only"), null);
 });

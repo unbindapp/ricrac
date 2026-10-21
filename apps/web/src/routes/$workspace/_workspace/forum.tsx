@@ -7,7 +7,11 @@ import { useDebounceValue } from "usehooks-ts";
 import { z } from "zod";
 
 import type { Discussion } from "@/api/ops.gen";
-import { DiscussionRow } from "@/components/forum/discussion-row";
+import {
+  DiscussionCard,
+  DiscussionGrid,
+  DiscussionGridSkeleton,
+} from "@/components/forum/discussion-card";
 import { DiscussionTeamPicker } from "@/components/forum/discussion-team-picker";
 import { NewDiscussionDialog } from "@/components/forum/new-discussion-dialog";
 import { useCanRewrite } from "@/components/forum/use-can-rewrite";
@@ -63,6 +67,7 @@ function ForumPage() {
       onlyTrashed: isTrash || undefined,
       team: teamKey,
       query: debouncedQuery || undefined,
+      includeBody: !isTrash || undefined,
     }),
   );
   const discussions = list.data?.pages.flatMap((page) => page.nodes) ?? [];
@@ -145,6 +150,7 @@ function ForumPage() {
       />
       <ListStates
         isPending={list.isPending}
+        skeleton={!isTrash && <DiscussionGridSkeleton />}
         error={list.error}
         onRetry={() => void list.refetch()}
         isEmpty={discussions.length === 0}
@@ -154,16 +160,20 @@ function ForumPage() {
           action: canEdit && status !== "closed" && !isTrash && newButton("empty"),
         })}
       >
-        <div className="flex w-full flex-col gap-2">
-          <List flush>
-            {discussions.map((discussion) =>
-              isTrash ? (
+        <div className="flex w-full flex-col gap-3">
+          {isTrash ? (
+            <List flush>
+              {discussions.map((discussion) => (
                 <TrashedDiscussionRow key={discussion.id} discussion={discussion} />
-              ) : (
-                <DiscussionRow key={discussion.id} discussion={discussion} />
-              ),
-            )}
-          </List>
+              ))}
+            </List>
+          ) : (
+            <DiscussionGrid>
+              {discussions.map((discussion) => (
+                <DiscussionCard key={discussion.id} discussion={discussion} />
+              ))}
+            </DiscussionGrid>
+          )}
           {list.hasNextPage && (
             <Button
               variant="ghost"

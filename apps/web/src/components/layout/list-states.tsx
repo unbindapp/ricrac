@@ -17,6 +17,7 @@ type TProps = {
     action?: ReactNode;
   } | null;
   skeletonRows?: number;
+  skeleton?: ReactNode;
   children: ReactNode;
 };
 
@@ -27,9 +28,10 @@ export function ListStates({
   onRetry,
   empty,
   skeletonRows,
+  skeleton,
   children,
 }: TProps) {
-  if (isPending) return <ListSkeleton rows={skeletonRows} />;
+  if (isPending) return skeleton ?? <ListSkeleton rows={skeletonRows} />;
   if (error) return <ErrorCard message={error.message} onRetry={onRetry} />;
   if (isEmpty) return empty && <EmptyState {...empty} />;
   return children;
