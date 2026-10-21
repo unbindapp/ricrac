@@ -10,6 +10,7 @@ import { UploadIcon, XIcon } from "lucide-react";
 import { type DragEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
 import { Avatar } from "@/components/shared/avatar";
+import { BlockGaps } from "@/components/shared/editor/block-gaps";
 import { EditorCodeBlock } from "@/components/shared/editor/code-block";
 import { SlashCommands, type TPickFiles } from "@/components/shared/editor/commands";
 import { EmojiSuggestions } from "@/components/shared/editor/emoji";
@@ -203,6 +204,7 @@ export function MarkdownEditor({
       TaskItem.configure({ nested: true }),
       TableKit.configure({ table: { resizable: false } }),
       EditorMedia,
+      BlockGaps,
       Placeholder.configure({
         placeholder: ({ editor, node }) => {
           if (editor.isEmpty) return placeholder;
@@ -405,7 +407,8 @@ export function MarkdownEditor({
     >
       <div
         data-framed={framed || undefined}
-        className="data-framed:bg-input data-framed:has-hover:hover:ring-border data-framed:focus-within:ring-primary/8-10 flex w-full flex-col data-framed:rounded-md data-framed:border data-framed:focus-within:ring-1 data-framed:has-hover:hover:ring-1"
+        data-inline={(hasAutosave && !framed && !readOnly) || undefined}
+        className="data-framed:bg-input data-framed:has-hover:hover:ring-border data-framed:focus-within:ring-primary/8-10 data-inline:has-hover:hover:ring-border data-inline:focus-within:ring-border flex w-full flex-col transition-shadow data-framed:rounded-md data-framed:border data-framed:focus-within:ring-1 data-framed:has-hover:hover:ring-1 data-inline:-mx-3 data-inline:-my-2 data-inline:w-auto data-inline:rounded-md data-inline:px-3 data-inline:py-2 data-inline:ring-1 data-inline:ring-transparent"
       >
         {showToolbar && (
           <div

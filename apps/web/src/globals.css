@@ -475,6 +475,19 @@
   .rr-prose .ProseMirror > * + * {
     @apply mt-2;
   }
+  .rr-prose .ProseMirror > .rr-block-gap {
+    @apply relative mt-0 h-4 cursor-text;
+  }
+  .rr-prose .ProseMirror > .rr-block-gap + * {
+    @apply mt-0;
+  }
+  .rr-block-gap::after {
+    @apply absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 rounded-full transition-colors;
+    content: "";
+  }
+  .rr-block-gap:hover::after {
+    @apply bg-primary/8-10;
+  }
   .rr-prose p.is-editor-empty:first-child::before,
   .rr-prose .ProseMirror-focused :is(p, h1, h2, h3).is-empty::before {
     @apply text-muted-foreground pointer-events-none float-left h-0;

@@ -28,6 +28,17 @@ export function embedKind(
   return "image";
 }
 
+const EMBED_PATTERN = /!\[([^\]]*)\]\(<?([^)\s>]+)>?(?:\s+"[^"]*")?\)/;
+
+/** The first image or video embedded in the Markdown, without its layout fragment. */
+export function firstEmbed(markdown: string): { url: string; kind: TMediaKind } | null {
+  const match = EMBED_PATTERN.exec(markdown);
+  if (!match) return null;
+  const [, name, src] = match;
+  const { url } = mediaLayout(src);
+  return { url, kind: embedKind(name, url) };
+}
+
 export function fileKind(name: string): TMediaKind | null {
   if (VIDEO_PATTERN.test(name)) return "video";
   if (IMAGE_PATTERN.test(name)) return "image";
