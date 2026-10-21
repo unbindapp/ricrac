@@ -6,7 +6,7 @@ import { TaskList } from "@tiptap/extension-task-list";
 import { Markdown } from "@tiptap/markdown";
 import { type AnyExtension, type Editor, EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
-import { UploadIcon, XIcon } from "lucide-react";
+import { CirclePlusIcon, UploadIcon, XIcon } from "lucide-react";
 import { type DragEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
 import { Avatar } from "@/components/shared/avatar";
@@ -410,6 +410,14 @@ export function MarkdownEditor({
     },
   };
 
+  const content = (
+    <EditorContent
+      editor={editor}
+      data-framed={framed || undefined}
+      className="rr-prose w-full data-chat:py-0.5 data-framed:px-3 data-framed:py-2"
+      data-chat={chat || undefined}
+    />
+  );
   const showToolbar = toolbar && !chat && !readOnly && editor && (isActive || isLinkOpen);
 
   return (
@@ -439,11 +447,24 @@ export function MarkdownEditor({
             />
           </div>
         )}
-        <EditorContent
-          editor={editor}
-          data-framed={framed || undefined}
-          className="rr-prose w-full data-framed:px-3 data-framed:py-2"
-        />
+        {chat && canUpload ? (
+          <div className="flex w-full items-start gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              forceMinSize={false}
+              aria-label="Attach images or videos"
+              className="text-muted-foreground size-7 shrink-0"
+              onClick={() => pickFiles("media")}
+            >
+              <CirclePlusIcon className="size-5" />
+            </Button>
+            {content}
+          </div>
+        ) : (
+          content
+        )}
       </div>
       {isDraggingFiles && (
         <div

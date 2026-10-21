@@ -79,7 +79,7 @@ export function MessageThreadPanel({ discussionId, messageId, onClose }: TProps)
     return (
       <div className="flex flex-col">
         <ChatMessage message={root} />
-        <p className="text-muted-foreground border-b pt-4 pb-2 text-xs font-medium">
+        <p className="text-muted-foreground pt-4 text-xs font-medium">
           {count === 0 ? "No replies yet" : `${count} ${count === 1 ? "reply" : "replies"}`}
         </p>
         <ol aria-label="Replies" className="flex flex-col">

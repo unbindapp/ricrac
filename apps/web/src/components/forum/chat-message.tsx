@@ -17,6 +17,7 @@ import { UserAvatar } from "@/components/issues/pickers";
 import { AddReactionButton, groupReactions, ReactionBar } from "@/components/issues/reaction-bar";
 import { useChatScroll } from "@/components/layout/chat-layout";
 import { AvatarStack } from "@/components/projects/people";
+import { useNow } from "@/components/providers/now-provider";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { MarkdownEditor } from "@/components/shared/markdown-editor";
 import { MarkdownView } from "@/components/shared/markdown-view";
@@ -30,7 +31,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SimpleTooltip } from "@/components/ui/tooltip";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { formatDateTime, formatDay, formatTime } from "@/lib/helpers/dates";
+import { formatDateTime, formatDay, formatMessageTime, formatTime } from "@/lib/helpers/dates";
 import {
   type TCommentTarget,
   useCommentReactionMutation,
@@ -98,9 +99,7 @@ export function ChatMessage({
         {!isContinuation && (
           <header className="flex min-w-0 items-baseline gap-2">
             <span className="truncate text-sm font-semibold">{authorName}</span>
-            <span className="text-muted-foreground text-xs">
-              <RelativeTime value={message.createdAt} />
-            </span>
+            <MessageTime value={message.createdAt} />
           </header>
         )}
         {replyTo !== undefined && (
@@ -116,7 +115,7 @@ export function ChatMessage({
             onSave={(body) => saveComment({ id: message.id, body })}
           />
         ) : (
-          <div className="flex min-w-0 flex-col">
+          <div className="rr-chat flex min-w-0 flex-col">
             <MarkdownView
               markdown={message.body}
               onChange={
@@ -127,7 +126,7 @@ export function ChatMessage({
           </div>
         )}
         {reactions.length > 0 && (
-          <ReactionBar reactions={reactions} disabled={!canEdit} onToggle={react} />
+          <ReactionBar reactions={reactions} disabled={!canEdit} onToggle={react} revealOnHover />
         )}
         {thread && replyCount > 0 && <ThreadChip replies={thread.replies} onOpen={thread.onOpen} />}
       </div>
@@ -203,6 +202,17 @@ export function ChatMessage({
         onConfirm={() => deleteComment(message.id)}
       />
     </article>
+  );
+}
+
+function MessageTime({ value }: { value: string }) {
+  const now = useNow();
+  return (
+    <SimpleTooltip content={formatDateTime(value)}>
+      <time dateTime={value} className="text-muted-foreground text-xs whitespace-nowrap">
+        {formatMessageTime(value, now)}
+      </time>
+    </SimpleTooltip>
   );
 }
 
@@ -322,8 +332,8 @@ export function ChatComposer({
   };
   return (
     <div className="flex flex-col gap-1.5">
-      <div className="bg-input focus-within:ring-primary/8-10 flex items-end gap-2 rounded-lg border py-1 pr-1 pl-3 focus-within:ring-1">
-        <div className="min-w-0 flex-1 py-1">
+      <div className="bg-input focus-within:ring-primary/8-10 flex items-end gap-2 rounded-lg border p-1 focus-within:ring-1">
+        <div className="rr-chat rr-chat-draft max-h-80 min-w-0 flex-1 overflow-y-auto py-0.5">
           <MarkdownEditor
             key={sent}
             label={parentId ? "Reply" : "Message"}

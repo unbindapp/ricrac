@@ -232,17 +232,15 @@ export function DiscussionDetail({
         }}
       />
       {showThreads && <DiscussionThreads discussion={discussion} variant="section" />}
-      <div className="border-t pt-2">
-        <ChatMessages
-          target={{ discussionId: discussion.id }}
-          threads={{ openId: openMessageId, onOpen: onOpenMessage }}
-          onNewThread={setSplitFrom}
-          empty={{
-            title: "No messages yet",
-            description: "Say what you think. Reply in a thread to keep a side topic together.",
-          }}
-        />
-      </div>
+      <ChatMessages
+        target={{ discussionId: discussion.id }}
+        threads={{ openId: openMessageId, onOpen: onOpenMessage }}
+        onNewThread={setSplitFrom}
+        empty={{
+          title: "No messages yet",
+          description: "Say what you think. Reply in a thread to keep a side topic together.",
+        }}
+      />
       <NewThreadDialog
         key={splitFrom?.id}
         discussion={discussion}

@@ -49,3 +49,11 @@ export function formatDay(value: TDateInput, now: TDateInput = Date.now()) {
   if (isSameYear(date, now)) return format(date, "EEEE, MMMM d");
   return format(date, "MMMM d, yyyy");
 }
+
+/** When a chat message was sent: Today at 3:09 PM, Yesterday at 3:09 PM, or 10/18/2026 3:09 PM. */
+export function formatMessageTime(value: TDateInput, now: TDateInput = Date.now()) {
+  const date = toDate(value);
+  if (isSameDay(date, now)) return `Today at ${formatTime(date)}`;
+  if (isSameDay(date, subDays(toDate(now), 1))) return `Yesterday at ${formatTime(date)}`;
+  return format(date, "M/d/yyyy h:mm a");
+}

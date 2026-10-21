@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { formatDate, formatDay, formatRelative } from "./dates.ts";
+import { formatDate, formatDay, formatMessageTime, formatRelative } from "./dates.ts";
 
 const now = new Date("2026-03-10T12:00:00Z");
 
@@ -38,4 +38,11 @@ test("chat days read as today, yesterday, then dates", () => {
   assert.equal(formatDay(new Date(2026, 2, 9, 23), noon), "Yesterday");
   assert.equal(formatDay(new Date(2026, 2, 2, 9), noon), "Monday, March 2");
   assert.equal(formatDay(new Date(2025, 11, 31, 9), noon), "December 31, 2025");
+});
+
+test("chat messages read their time like Discord", () => {
+  const noon = new Date(2026, 9, 21, 12);
+  assert.equal(formatMessageTime(new Date(2026, 9, 21, 15, 9), noon), "Today at 3:09 PM");
+  assert.equal(formatMessageTime(new Date(2026, 9, 20, 9, 30), noon), "Yesterday at 9:30 AM");
+  assert.equal(formatMessageTime(new Date(2026, 9, 18, 15, 9), noon), "10/18/2026 3:09 PM");
 });
