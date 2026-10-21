@@ -503,6 +503,27 @@ func (self *ResolveService) CanSeeDocument(ctx context.Context, actor *auth.Acto
 	return true, nil
 }
 
+// Discussion is a discussion by id, slug, link or title, among those of the workspace and of the
+// teams the caller sees.
+func (self *ResolveService) Discussion(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error) {
+	teams, err := actor.TeamIDs(ctx)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	return self.named(ctx, actor, "discussions", "title", "AND trashed_at IS NULL AND (team_id IS NULL OR team_id = ANY($2))", "discussion", value, teams)
+}
+
+func (self *ResolveService) CanSeeDiscussion(ctx context.Context, actor *auth.Actor, id uuid.UUID) (bool, error) {
+	team, _, found, err := self.repo.Discussion().Owner(ctx, actor.Workspace, id)
+	if err != nil || !found {
+		return false, err
+	}
+	if team == nil {
+		return true, nil
+	}
+	return actor.CanSeeTeam(ctx, *team)
+}
+
 func (self *ResolveService) ProjectStatus(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error) {
 	rows, err := self.lookups().ProjectStatuses(ctx, actor.Workspace)
 	if err != nil {

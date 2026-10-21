@@ -15,6 +15,8 @@ import (
 	"ricrac/ent/customerstatus"
 	"ricrac/ent/customertier"
 	"ricrac/ent/customview"
+	"ricrac/ent/discussion"
+	"ricrac/ent/discussionthread"
 	"ricrac/ent/document"
 	"ricrac/ent/entitylink"
 	"ricrac/ent/favorite"
@@ -443,6 +445,36 @@ func (_u *WorkspaceUpdate) AddDocuments(v ...*Document) *WorkspaceUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.AddDocumentIDs(ids...)
+}
+
+// AddDiscussionIDs adds the "discussions" edge to the Discussion entity by IDs.
+func (_u *WorkspaceUpdate) AddDiscussionIDs(ids ...uuid.UUID) *WorkspaceUpdate {
+	_u.mutation.AddDiscussionIDs(ids...)
+	return _u
+}
+
+// AddDiscussions adds the "discussions" edges to the Discussion entity.
+func (_u *WorkspaceUpdate) AddDiscussions(v ...*Discussion) *WorkspaceUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddDiscussionIDs(ids...)
+}
+
+// AddDiscussionThreadIDs adds the "discussion_threads" edge to the DiscussionThread entity by IDs.
+func (_u *WorkspaceUpdate) AddDiscussionThreadIDs(ids ...uuid.UUID) *WorkspaceUpdate {
+	_u.mutation.AddDiscussionThreadIDs(ids...)
+	return _u
+}
+
+// AddDiscussionThreads adds the "discussion_threads" edges to the DiscussionThread entity.
+func (_u *WorkspaceUpdate) AddDiscussionThreads(v ...*DiscussionThread) *WorkspaceUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddDiscussionThreadIDs(ids...)
 }
 
 // AddCommentIDs adds the "comments" edge to the Comment entity by IDs.
@@ -1030,6 +1062,48 @@ func (_u *WorkspaceUpdate) RemoveDocuments(v ...*Document) *WorkspaceUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveDocumentIDs(ids...)
+}
+
+// ClearDiscussions clears all "discussions" edges to the Discussion entity.
+func (_u *WorkspaceUpdate) ClearDiscussions() *WorkspaceUpdate {
+	_u.mutation.ClearDiscussions()
+	return _u
+}
+
+// RemoveDiscussionIDs removes the "discussions" edge to Discussion entities by IDs.
+func (_u *WorkspaceUpdate) RemoveDiscussionIDs(ids ...uuid.UUID) *WorkspaceUpdate {
+	_u.mutation.RemoveDiscussionIDs(ids...)
+	return _u
+}
+
+// RemoveDiscussions removes "discussions" edges to Discussion entities.
+func (_u *WorkspaceUpdate) RemoveDiscussions(v ...*Discussion) *WorkspaceUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveDiscussionIDs(ids...)
+}
+
+// ClearDiscussionThreads clears all "discussion_threads" edges to the DiscussionThread entity.
+func (_u *WorkspaceUpdate) ClearDiscussionThreads() *WorkspaceUpdate {
+	_u.mutation.ClearDiscussionThreads()
+	return _u
+}
+
+// RemoveDiscussionThreadIDs removes the "discussion_threads" edge to DiscussionThread entities by IDs.
+func (_u *WorkspaceUpdate) RemoveDiscussionThreadIDs(ids ...uuid.UUID) *WorkspaceUpdate {
+	_u.mutation.RemoveDiscussionThreadIDs(ids...)
+	return _u
+}
+
+// RemoveDiscussionThreads removes "discussion_threads" edges to DiscussionThread entities.
+func (_u *WorkspaceUpdate) RemoveDiscussionThreads(v ...*DiscussionThread) *WorkspaceUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveDiscussionThreadIDs(ids...)
 }
 
 // ClearComments clears all "comments" edges to the Comment entity.
@@ -2195,6 +2269,96 @@ func (_u *WorkspaceUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.DiscussionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.DiscussionsTable,
+			Columns: []string{workspace.DiscussionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedDiscussionsIDs(); len(nodes) > 0 && !_u.mutation.DiscussionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.DiscussionsTable,
+			Columns: []string{workspace.DiscussionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.DiscussionsTable,
+			Columns: []string{workspace.DiscussionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DiscussionThreadsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.DiscussionThreadsTable,
+			Columns: []string{workspace.DiscussionThreadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedDiscussionThreadsIDs(); len(nodes) > 0 && !_u.mutation.DiscussionThreadsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.DiscussionThreadsTable,
+			Columns: []string{workspace.DiscussionThreadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionThreadsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.DiscussionThreadsTable,
+			Columns: []string{workspace.DiscussionThreadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _u.mutation.CommentsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -3273,6 +3437,36 @@ func (_u *WorkspaceUpdateOne) AddDocuments(v ...*Document) *WorkspaceUpdateOne {
 	return _u.AddDocumentIDs(ids...)
 }
 
+// AddDiscussionIDs adds the "discussions" edge to the Discussion entity by IDs.
+func (_u *WorkspaceUpdateOne) AddDiscussionIDs(ids ...uuid.UUID) *WorkspaceUpdateOne {
+	_u.mutation.AddDiscussionIDs(ids...)
+	return _u
+}
+
+// AddDiscussions adds the "discussions" edges to the Discussion entity.
+func (_u *WorkspaceUpdateOne) AddDiscussions(v ...*Discussion) *WorkspaceUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddDiscussionIDs(ids...)
+}
+
+// AddDiscussionThreadIDs adds the "discussion_threads" edge to the DiscussionThread entity by IDs.
+func (_u *WorkspaceUpdateOne) AddDiscussionThreadIDs(ids ...uuid.UUID) *WorkspaceUpdateOne {
+	_u.mutation.AddDiscussionThreadIDs(ids...)
+	return _u
+}
+
+// AddDiscussionThreads adds the "discussion_threads" edges to the DiscussionThread entity.
+func (_u *WorkspaceUpdateOne) AddDiscussionThreads(v ...*DiscussionThread) *WorkspaceUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddDiscussionThreadIDs(ids...)
+}
+
 // AddCommentIDs adds the "comments" edge to the Comment entity by IDs.
 func (_u *WorkspaceUpdateOne) AddCommentIDs(ids ...uuid.UUID) *WorkspaceUpdateOne {
 	_u.mutation.AddCommentIDs(ids...)
@@ -3858,6 +4052,48 @@ func (_u *WorkspaceUpdateOne) RemoveDocuments(v ...*Document) *WorkspaceUpdateOn
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveDocumentIDs(ids...)
+}
+
+// ClearDiscussions clears all "discussions" edges to the Discussion entity.
+func (_u *WorkspaceUpdateOne) ClearDiscussions() *WorkspaceUpdateOne {
+	_u.mutation.ClearDiscussions()
+	return _u
+}
+
+// RemoveDiscussionIDs removes the "discussions" edge to Discussion entities by IDs.
+func (_u *WorkspaceUpdateOne) RemoveDiscussionIDs(ids ...uuid.UUID) *WorkspaceUpdateOne {
+	_u.mutation.RemoveDiscussionIDs(ids...)
+	return _u
+}
+
+// RemoveDiscussions removes "discussions" edges to Discussion entities.
+func (_u *WorkspaceUpdateOne) RemoveDiscussions(v ...*Discussion) *WorkspaceUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveDiscussionIDs(ids...)
+}
+
+// ClearDiscussionThreads clears all "discussion_threads" edges to the DiscussionThread entity.
+func (_u *WorkspaceUpdateOne) ClearDiscussionThreads() *WorkspaceUpdateOne {
+	_u.mutation.ClearDiscussionThreads()
+	return _u
+}
+
+// RemoveDiscussionThreadIDs removes the "discussion_threads" edge to DiscussionThread entities by IDs.
+func (_u *WorkspaceUpdateOne) RemoveDiscussionThreadIDs(ids ...uuid.UUID) *WorkspaceUpdateOne {
+	_u.mutation.RemoveDiscussionThreadIDs(ids...)
+	return _u
+}
+
+// RemoveDiscussionThreads removes "discussion_threads" edges to DiscussionThread entities.
+func (_u *WorkspaceUpdateOne) RemoveDiscussionThreads(v ...*DiscussionThread) *WorkspaceUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveDiscussionThreadIDs(ids...)
 }
 
 // ClearComments clears all "comments" edges to the Comment entity.
@@ -5046,6 +5282,96 @@ func (_u *WorkspaceUpdateOne) sqlSave(ctx context.Context) (_node *Workspace, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(document.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DiscussionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.DiscussionsTable,
+			Columns: []string{workspace.DiscussionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedDiscussionsIDs(); len(nodes) > 0 && !_u.mutation.DiscussionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.DiscussionsTable,
+			Columns: []string{workspace.DiscussionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.DiscussionsTable,
+			Columns: []string{workspace.DiscussionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DiscussionThreadsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.DiscussionThreadsTable,
+			Columns: []string{workspace.DiscussionThreadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedDiscussionThreadsIDs(); len(nodes) > 0 && !_u.mutation.DiscussionThreadsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.DiscussionThreadsTable,
+			Columns: []string{workspace.DiscussionThreadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionThreadsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.DiscussionThreadsTable,
+			Columns: []string{workspace.DiscussionThreadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

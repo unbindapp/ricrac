@@ -13,6 +13,7 @@ import (
 	comment_repo "ricrac/internal/repositories/comment"
 	customer_repo "ricrac/internal/repositories/customer"
 	cycle_repo "ricrac/internal/repositories/cycle"
+	discussion_repo "ricrac/internal/repositories/discussion"
 	document_repo "ricrac/internal/repositories/document"
 	email_repo "ricrac/internal/repositories/email"
 	events_repo "ricrac/internal/repositories/events"
@@ -64,6 +65,7 @@ type RepositoriesInterface interface {
 	Email() email_repo.EmailRepositoryInterface
 	Cycle() cycle_repo.CycleRepositoryInterface
 	Document() document_repo.DocumentRepositoryInterface
+	Discussion() discussion_repo.DiscussionRepositoryInterface
 	Favorite() favorite_repo.FavoriteRepositoryInterface
 	Template() template_repo.TemplateRepositoryInterface
 	Customer() customer_repo.CustomerRepositoryInterface

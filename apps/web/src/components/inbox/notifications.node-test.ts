@@ -14,6 +14,8 @@ const bob = { id: "u-bob", name: "Bob Builder", displayName: "bob", email: "bob@
 const state = { id: "s1", name: "Done", type: "completed" as const, color: "#000" };
 const eng1 = { id: "i1", identifier: "ENG-1", title: "Fix login", state };
 const project = { id: "p1", name: "Billing", slugId: "a1b2c3" };
+const discussion = { id: "d1", title: "Dark mode", slugId: "0a1b2c3d4e5f" };
+const thread = { id: "t1", title: "Contrast on charts", kind: "design" };
 
 function notification(overrides: Partial<Notification>): Notification {
   return {
@@ -26,6 +28,8 @@ function notification(overrides: Partial<Notification>): Notification {
     project: null,
     initiative: null,
     document: null,
+    discussion: null,
+    discussionThread: null,
     statusUpdate: null,
     readAt: null,
     snoozedUntil: null,
@@ -128,6 +132,69 @@ test("links lead to the target, at the comment or update", () => {
     hash: "update-u1",
   });
   assert.equal(notificationLink(notification({}), "acme"), null);
+});
+
+test("notifications about a discussion and its threads make one row", () => {
+  const groups = groupNotifications(
+    [
+      notification({ id: "a", type: "discussionNewComment", discussion }),
+      notification({ id: "b", type: "discussionNewThread", discussion, discussionThread: thread }),
+      notification({ id: "c", issue: eng1 }),
+    ],
+    "inbox",
+    now,
+  );
+  assert.deepEqual(
+    groups.map((group) => [group.key, group.target.kind, group.notifications.map((n) => n.id)]),
+    [
+      ["discussion:d1", "discussion", ["a", "b"]],
+      ["issue:i1", "issue", ["c"]],
+    ],
+  );
+});
+
+test("discussion links open the thread, at the comment", () => {
+  assert.deepEqual(
+    notificationLink(
+      notification({
+        type: "discussionCommentReply",
+        discussion,
+        discussionThread: thread,
+        comment: { id: "c1", body: "" },
+      }),
+      "acme",
+    ),
+    {
+      to: "/$workspace/discussion/$slug",
+      params: { workspace: "acme", slug: "0a1b2c3d4e5f" },
+      search: { thread: "t1" },
+      hash: "comment-c1",
+    },
+  );
+  assert.deepEqual(
+    notificationLink(notification({ type: "discussionMention", discussion }), "acme"),
+    {
+      to: "/$workspace/discussion/$slug",
+      params: { workspace: "acme", slug: "0a1b2c3d4e5f" },
+      hash: undefined,
+    },
+  );
+});
+
+test("discussion sentences name the thread", () => {
+  const say = (overrides: Partial<Notification>) => notificationSentence(notification(overrides));
+  assert.deepEqual(say({ type: "discussionNewComment", discussion }), {
+    actor: "Bob Builder",
+    text: "commented",
+  });
+  assert.deepEqual(
+    say({ type: "discussionNewThread", discussion, discussionThread: thread }).text,
+    "started the thread “Contrast on charts”",
+  );
+  assert.deepEqual(
+    say({ type: "discussionThreadResolved", actor: null, discussion, discussionThread: thread }),
+    { actor: null, text: "Thread resolved: “Contrast on charts”" },
+  );
 });
 
 test("comment excerpts are plain text on one line", () => {

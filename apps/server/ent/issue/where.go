@@ -2143,6 +2143,29 @@ func HasCommentsWith(preds ...predicate.Comment) predicate.Issue {
 	})
 }
 
+// HasDiscussionThreads applies the HasEdge predicate on the "discussion_threads" edge.
+func HasDiscussionThreads() predicate.Issue {
+	return predicate.Issue(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, DiscussionThreadsTable, DiscussionThreadsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDiscussionThreadsWith applies the HasEdge predicate on the "discussion_threads" edge with a given conditions (other predicates).
+func HasDiscussionThreadsWith(preds ...predicate.DiscussionThread) predicate.Issue {
+	return predicate.Issue(func(s *sql.Selector) {
+		step := newDiscussionThreadsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasReactions applies the HasEdge predicate on the "reactions" edge.
 func HasReactions() predicate.Issue {
 	return predicate.Issue(func(s *sql.Selector) {

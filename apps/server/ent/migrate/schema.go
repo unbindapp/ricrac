@@ -110,11 +110,15 @@ var (
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "body", Type: field.TypeString, Size: 2147483647},
 		{Name: "quoted_text", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "suggested_text", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "suggestion_status", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "edited_at", Type: field.TypeTime, Nullable: true},
 		{Name: "resolved_at", Type: field.TypeTime, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "parent_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "discussion_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "discussion_thread_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "document_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "initiative_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "issue_id", Type: field.TypeUUID, Nullable: true},
@@ -133,61 +137,73 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "comments_comments_children",
-				Columns:    []*schema.Column{CommentsColumns[7]},
+				Columns:    []*schema.Column{CommentsColumns[9]},
 				RefColumns: []*schema.Column{CommentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
+				Symbol:     "comments_discussions_comments",
+				Columns:    []*schema.Column{CommentsColumns[10]},
+				RefColumns: []*schema.Column{DiscussionsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "comments_discussion_threads_comments",
+				Columns:    []*schema.Column{CommentsColumns[11]},
+				RefColumns: []*schema.Column{DiscussionThreadsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
 				Symbol:     "comments_documents_comments",
-				Columns:    []*schema.Column{CommentsColumns[8]},
+				Columns:    []*schema.Column{CommentsColumns[12]},
 				RefColumns: []*schema.Column{DocumentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "comments_initiatives_comments",
-				Columns:    []*schema.Column{CommentsColumns[9]},
+				Columns:    []*schema.Column{CommentsColumns[13]},
 				RefColumns: []*schema.Column{InitiativesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "comments_issues_comments",
-				Columns:    []*schema.Column{CommentsColumns[10]},
+				Columns:    []*schema.Column{CommentsColumns[14]},
 				RefColumns: []*schema.Column{IssuesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "comments_projects_comments",
-				Columns:    []*schema.Column{CommentsColumns[11]},
+				Columns:    []*schema.Column{CommentsColumns[15]},
 				RefColumns: []*schema.Column{ProjectsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "comments_project_milestones_comments",
-				Columns:    []*schema.Column{CommentsColumns[12]},
+				Columns:    []*schema.Column{CommentsColumns[16]},
 				RefColumns: []*schema.Column{ProjectMilestonesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "comments_status_updates_comments",
-				Columns:    []*schema.Column{CommentsColumns[13]},
+				Columns:    []*schema.Column{CommentsColumns[17]},
 				RefColumns: []*schema.Column{StatusUpdatesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "comments_users_comments_by_user",
-				Columns:    []*schema.Column{CommentsColumns[14]},
+				Columns:    []*schema.Column{CommentsColumns[18]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "comments_users_comments_by_resolving_user",
-				Columns:    []*schema.Column{CommentsColumns[15]},
+				Columns:    []*schema.Column{CommentsColumns[19]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "comments_workspaces_comments",
-				Columns:    []*schema.Column{CommentsColumns[16]},
+				Columns:    []*schema.Column{CommentsColumns[20]},
 				RefColumns: []*schema.Column{WorkspacesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -411,6 +427,126 @@ var (
 				Symbol:     "cycles_teams_cycles",
 				Columns:    []*schema.Column{CyclesColumns[11]},
 				RefColumns: []*schema.Column{TeamsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// DiscussionsColumns holds the columns for the "discussions" table.
+	DiscussionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "slug_id", Type: field.TypeString, Size: 2147483647},
+		{Name: "title", Type: field.TypeString, Size: 2147483647},
+		{Name: "body", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "pinned_at", Type: field.TypeTime, Nullable: true},
+		{Name: "closed_at", Type: field.TypeTime, Nullable: true},
+		{Name: "trashed_at", Type: field.TypeTime, Nullable: true},
+		{Name: "last_activity_at", Type: field.TypeTime, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "team_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "creator_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "workspace_id", Type: field.TypeUUID},
+	}
+	// DiscussionsTable holds the schema information for the "discussions" table.
+	DiscussionsTable = &schema.Table{
+		Name:       "discussions",
+		Columns:    DiscussionsColumns,
+		PrimaryKey: []*schema.Column{DiscussionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "discussions_teams_discussions",
+				Columns:    []*schema.Column{DiscussionsColumns[10]},
+				RefColumns: []*schema.Column{TeamsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "discussions_users_discussions_by_creator",
+				Columns:    []*schema.Column{DiscussionsColumns[11]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "discussions_workspaces_discussions",
+				Columns:    []*schema.Column{DiscussionsColumns[12]},
+				RefColumns: []*schema.Column{WorkspacesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// DiscussionSubscribersColumns holds the columns for the "discussion_subscribers" table.
+	DiscussionSubscribersColumns = []*schema.Column{
+		{Name: "discussion_id", Type: field.TypeUUID},
+		{Name: "user_id", Type: field.TypeUUID},
+	}
+	// DiscussionSubscribersTable holds the schema information for the "discussion_subscribers" table.
+	DiscussionSubscribersTable = &schema.Table{
+		Name:       "discussion_subscribers",
+		Columns:    DiscussionSubscribersColumns,
+		PrimaryKey: []*schema.Column{DiscussionSubscribersColumns[0], DiscussionSubscribersColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "discussion_subscribers_discussions_discussion",
+				Columns:    []*schema.Column{DiscussionSubscribersColumns[0]},
+				RefColumns: []*schema.Column{DiscussionsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "discussion_subscribers_users_user",
+				Columns:    []*schema.Column{DiscussionSubscribersColumns[1]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// DiscussionThreadsColumns holds the columns for the "discussion_threads" table.
+	DiscussionThreadsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "kind", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "title", Type: field.TypeString, Size: 2147483647},
+		{Name: "body", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "resolved_at", Type: field.TypeTime, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "discussion_id", Type: field.TypeUUID},
+		{Name: "issue_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "creator_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "resolving_user_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "workspace_id", Type: field.TypeUUID},
+	}
+	// DiscussionThreadsTable holds the schema information for the "discussion_threads" table.
+	DiscussionThreadsTable = &schema.Table{
+		Name:       "discussion_threads",
+		Columns:    DiscussionThreadsColumns,
+		PrimaryKey: []*schema.Column{DiscussionThreadsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "discussion_threads_discussions_threads",
+				Columns:    []*schema.Column{DiscussionThreadsColumns[7]},
+				RefColumns: []*schema.Column{DiscussionsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "discussion_threads_issues_discussion_threads",
+				Columns:    []*schema.Column{DiscussionThreadsColumns[8]},
+				RefColumns: []*schema.Column{IssuesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "discussion_threads_users_discussion_threads_by_creator",
+				Columns:    []*schema.Column{DiscussionThreadsColumns[9]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "discussion_threads_users_discussion_threads_by_resolving_user",
+				Columns:    []*schema.Column{DiscussionThreadsColumns[10]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "discussion_threads_workspaces_discussion_threads",
+				Columns:    []*schema.Column{DiscussionThreadsColumns[11]},
+				RefColumns: []*schema.Column{WorkspacesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -1271,6 +1407,8 @@ var (
 		{Name: "created_at", Type: field.TypeTime, Nullable: true},
 		{Name: "emailed_at", Type: field.TypeTime, Nullable: true},
 		{Name: "comment_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "discussion_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "discussion_thread_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "document_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "initiative_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "issue_id", Type: field.TypeUUID, Nullable: true},
@@ -1293,50 +1431,62 @@ var (
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "notifications_documents_notifications",
+				Symbol:     "notifications_discussions_notifications",
 				Columns:    []*schema.Column{NotificationsColumns[9]},
+				RefColumns: []*schema.Column{DiscussionsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "notifications_discussion_threads_notifications",
+				Columns:    []*schema.Column{NotificationsColumns[10]},
+				RefColumns: []*schema.Column{DiscussionThreadsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "notifications_documents_notifications",
+				Columns:    []*schema.Column{NotificationsColumns[11]},
 				RefColumns: []*schema.Column{DocumentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "notifications_initiatives_notifications",
-				Columns:    []*schema.Column{NotificationsColumns[10]},
+				Columns:    []*schema.Column{NotificationsColumns[12]},
 				RefColumns: []*schema.Column{InitiativesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "notifications_issues_notifications",
-				Columns:    []*schema.Column{NotificationsColumns[11]},
+				Columns:    []*schema.Column{NotificationsColumns[13]},
 				RefColumns: []*schema.Column{IssuesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "notifications_projects_notifications",
-				Columns:    []*schema.Column{NotificationsColumns[12]},
+				Columns:    []*schema.Column{NotificationsColumns[14]},
 				RefColumns: []*schema.Column{ProjectsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "notifications_status_updates_notifications",
-				Columns:    []*schema.Column{NotificationsColumns[13]},
+				Columns:    []*schema.Column{NotificationsColumns[15]},
 				RefColumns: []*schema.Column{StatusUpdatesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "notifications_users_notifications_by_user",
-				Columns:    []*schema.Column{NotificationsColumns[14]},
+				Columns:    []*schema.Column{NotificationsColumns[16]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "notifications_users_notifications_by_actor",
-				Columns:    []*schema.Column{NotificationsColumns[15]},
+				Columns:    []*schema.Column{NotificationsColumns[17]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "notifications_workspaces_notifications",
-				Columns:    []*schema.Column{NotificationsColumns[16]},
+				Columns:    []*schema.Column{NotificationsColumns[18]},
 				RefColumns: []*schema.Column{WorkspacesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -2357,6 +2507,9 @@ var (
 		CustomerStatusesTable,
 		CustomerTiersTable,
 		CyclesTable,
+		DiscussionsTable,
+		DiscussionSubscribersTable,
+		DiscussionThreadsTable,
 		DocumentsTable,
 		DocumentVersionsTable,
 		EmailsTable,
@@ -2430,15 +2583,17 @@ func init() {
 		Table: "audit_entries",
 	}
 	CommentsTable.ForeignKeys[0].RefTable = CommentsTable
-	CommentsTable.ForeignKeys[1].RefTable = DocumentsTable
-	CommentsTable.ForeignKeys[2].RefTable = InitiativesTable
-	CommentsTable.ForeignKeys[3].RefTable = IssuesTable
-	CommentsTable.ForeignKeys[4].RefTable = ProjectsTable
-	CommentsTable.ForeignKeys[5].RefTable = ProjectMilestonesTable
-	CommentsTable.ForeignKeys[6].RefTable = StatusUpdatesTable
-	CommentsTable.ForeignKeys[7].RefTable = UsersTable
-	CommentsTable.ForeignKeys[8].RefTable = UsersTable
-	CommentsTable.ForeignKeys[9].RefTable = WorkspacesTable
+	CommentsTable.ForeignKeys[1].RefTable = DiscussionsTable
+	CommentsTable.ForeignKeys[2].RefTable = DiscussionThreadsTable
+	CommentsTable.ForeignKeys[3].RefTable = DocumentsTable
+	CommentsTable.ForeignKeys[4].RefTable = InitiativesTable
+	CommentsTable.ForeignKeys[5].RefTable = IssuesTable
+	CommentsTable.ForeignKeys[6].RefTable = ProjectsTable
+	CommentsTable.ForeignKeys[7].RefTable = ProjectMilestonesTable
+	CommentsTable.ForeignKeys[8].RefTable = StatusUpdatesTable
+	CommentsTable.ForeignKeys[9].RefTable = UsersTable
+	CommentsTable.ForeignKeys[10].RefTable = UsersTable
+	CommentsTable.ForeignKeys[11].RefTable = WorkspacesTable
 	CommentsTable.Annotation = &entsql.Annotation{
 		Table: "comments",
 	}
@@ -2474,6 +2629,25 @@ func init() {
 	CyclesTable.ForeignKeys[0].RefTable = TeamsTable
 	CyclesTable.Annotation = &entsql.Annotation{
 		Table: "cycles",
+	}
+	DiscussionsTable.ForeignKeys[0].RefTable = TeamsTable
+	DiscussionsTable.ForeignKeys[1].RefTable = UsersTable
+	DiscussionsTable.ForeignKeys[2].RefTable = WorkspacesTable
+	DiscussionsTable.Annotation = &entsql.Annotation{
+		Table: "discussions",
+	}
+	DiscussionSubscribersTable.ForeignKeys[0].RefTable = DiscussionsTable
+	DiscussionSubscribersTable.ForeignKeys[1].RefTable = UsersTable
+	DiscussionSubscribersTable.Annotation = &entsql.Annotation{
+		Table: "discussion_subscribers",
+	}
+	DiscussionThreadsTable.ForeignKeys[0].RefTable = DiscussionsTable
+	DiscussionThreadsTable.ForeignKeys[1].RefTable = IssuesTable
+	DiscussionThreadsTable.ForeignKeys[2].RefTable = UsersTable
+	DiscussionThreadsTable.ForeignKeys[3].RefTable = UsersTable
+	DiscussionThreadsTable.ForeignKeys[4].RefTable = WorkspacesTable
+	DiscussionThreadsTable.Annotation = &entsql.Annotation{
+		Table: "discussion_threads",
 	}
 	DocumentsTable.ForeignKeys[0].RefTable = CyclesTable
 	DocumentsTable.ForeignKeys[1].RefTable = InitiativesTable
@@ -2607,14 +2781,16 @@ func init() {
 		Table: "issue_subscribers",
 	}
 	NotificationsTable.ForeignKeys[0].RefTable = CommentsTable
-	NotificationsTable.ForeignKeys[1].RefTable = DocumentsTable
-	NotificationsTable.ForeignKeys[2].RefTable = InitiativesTable
-	NotificationsTable.ForeignKeys[3].RefTable = IssuesTable
-	NotificationsTable.ForeignKeys[4].RefTable = ProjectsTable
-	NotificationsTable.ForeignKeys[5].RefTable = StatusUpdatesTable
-	NotificationsTable.ForeignKeys[6].RefTable = UsersTable
-	NotificationsTable.ForeignKeys[7].RefTable = UsersTable
-	NotificationsTable.ForeignKeys[8].RefTable = WorkspacesTable
+	NotificationsTable.ForeignKeys[1].RefTable = DiscussionsTable
+	NotificationsTable.ForeignKeys[2].RefTable = DiscussionThreadsTable
+	NotificationsTable.ForeignKeys[3].RefTable = DocumentsTable
+	NotificationsTable.ForeignKeys[4].RefTable = InitiativesTable
+	NotificationsTable.ForeignKeys[5].RefTable = IssuesTable
+	NotificationsTable.ForeignKeys[6].RefTable = ProjectsTable
+	NotificationsTable.ForeignKeys[7].RefTable = StatusUpdatesTable
+	NotificationsTable.ForeignKeys[8].RefTable = UsersTable
+	NotificationsTable.ForeignKeys[9].RefTable = UsersTable
+	NotificationsTable.ForeignKeys[10].RefTable = WorkspacesTable
 	NotificationsTable.Annotation = &entsql.Annotation{
 		Table: "notifications",
 	}

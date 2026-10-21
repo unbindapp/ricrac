@@ -46,6 +46,7 @@ const targetLabels = {
   project: "Open project",
   initiative: "Open initiative",
   document: "Open document",
+  discussion: "Open discussion",
   none: "Open",
 };
 

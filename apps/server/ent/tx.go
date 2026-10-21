@@ -34,6 +34,12 @@ type Tx struct {
 	CustomerTier *CustomerTierClient
 	// Cycle is the client for interacting with the Cycle builders.
 	Cycle *CycleClient
+	// Discussion is the client for interacting with the Discussion builders.
+	Discussion *DiscussionClient
+	// DiscussionSubscriber is the client for interacting with the DiscussionSubscriber builders.
+	DiscussionSubscriber *DiscussionSubscriberClient
+	// DiscussionThread is the client for interacting with the DiscussionThread builders.
+	DiscussionThread *DiscussionThreadClient
 	// Document is the client for interacting with the Document builders.
 	Document *DocumentClient
 	// DocumentVersion is the client for interacting with the DocumentVersion builders.
@@ -281,6 +287,9 @@ func (tx *Tx) init() {
 	tx.CustomerStatus = NewCustomerStatusClient(tx.config)
 	tx.CustomerTier = NewCustomerTierClient(tx.config)
 	tx.Cycle = NewCycleClient(tx.config)
+	tx.Discussion = NewDiscussionClient(tx.config)
+	tx.DiscussionSubscriber = NewDiscussionSubscriberClient(tx.config)
+	tx.DiscussionThread = NewDiscussionThreadClient(tx.config)
 	tx.Document = NewDocumentClient(tx.config)
 	tx.DocumentVersion = NewDocumentVersionClient(tx.config)
 	tx.Email = NewEmailClient(tx.config)

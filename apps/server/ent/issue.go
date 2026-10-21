@@ -136,6 +136,8 @@ type IssueEdges struct {
 	Documents []*Document `json:"documents,omitempty"`
 	// Comments holds the value of the comments edge.
 	Comments []*Comment `json:"comments,omitempty"`
+	// DiscussionThreads holds the value of the discussion_threads edge.
+	DiscussionThreads []*DiscussionThread `json:"discussion_threads,omitempty"`
 	// Reactions holds the value of the reactions edge.
 	Reactions []*Reaction `json:"reactions,omitempty"`
 	// CustomerNeeds holds the value of the customer_needs edge.
@@ -162,7 +164,7 @@ type IssueEdges struct {
 	IssueSubscribers []*IssueSubscriber `json:"issue_subscribers,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [29]bool
+	loadedTypes [30]bool
 }
 
 // WorkspaceOrErr returns the Workspace value or an error if the edge
@@ -338,10 +340,19 @@ func (e IssueEdges) CommentsOrErr() ([]*Comment, error) {
 	return nil, &NotLoadedError{edge: "comments"}
 }
 
+// DiscussionThreadsOrErr returns the DiscussionThreads value or an error if the edge
+// was not loaded in eager-loading.
+func (e IssueEdges) DiscussionThreadsOrErr() ([]*DiscussionThread, error) {
+	if e.loadedTypes[17] {
+		return e.DiscussionThreads, nil
+	}
+	return nil, &NotLoadedError{edge: "discussion_threads"}
+}
+
 // ReactionsOrErr returns the Reactions value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) ReactionsOrErr() ([]*Reaction, error) {
-	if e.loadedTypes[17] {
+	if e.loadedTypes[18] {
 		return e.Reactions, nil
 	}
 	return nil, &NotLoadedError{edge: "reactions"}
@@ -350,7 +361,7 @@ func (e IssueEdges) ReactionsOrErr() ([]*Reaction, error) {
 // CustomerNeedsOrErr returns the CustomerNeeds value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) CustomerNeedsOrErr() ([]*CustomerNeed, error) {
-	if e.loadedTypes[18] {
+	if e.loadedTypes[19] {
 		return e.CustomerNeeds, nil
 	}
 	return nil, &NotLoadedError{edge: "customer_needs"}
@@ -359,7 +370,7 @@ func (e IssueEdges) CustomerNeedsOrErr() ([]*CustomerNeed, error) {
 // NotificationsOrErr returns the Notifications value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) NotificationsOrErr() ([]*Notification, error) {
-	if e.loadedTypes[19] {
+	if e.loadedTypes[20] {
 		return e.Notifications, nil
 	}
 	return nil, &NotLoadedError{edge: "notifications"}
@@ -368,7 +379,7 @@ func (e IssueEdges) NotificationsOrErr() ([]*Notification, error) {
 // GithubOutboxOrErr returns the GithubOutbox value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) GithubOutboxOrErr() ([]*GithubOutbox, error) {
-	if e.loadedTypes[20] {
+	if e.loadedTypes[21] {
 		return e.GithubOutbox, nil
 	}
 	return nil, &NotLoadedError{edge: "github_outbox"}
@@ -377,7 +388,7 @@ func (e IssueEdges) GithubOutboxOrErr() ([]*GithubOutbox, error) {
 // LabelsOrErr returns the Labels value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) LabelsOrErr() ([]*IssueLabel, error) {
-	if e.loadedTypes[21] {
+	if e.loadedTypes[22] {
 		return e.Labels, nil
 	}
 	return nil, &NotLoadedError{edge: "labels"}
@@ -386,7 +397,7 @@ func (e IssueEdges) LabelsOrErr() ([]*IssueLabel, error) {
 // ReleasesOrErr returns the Releases value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) ReleasesOrErr() ([]*Release, error) {
-	if e.loadedTypes[22] {
+	if e.loadedTypes[23] {
 		return e.Releases, nil
 	}
 	return nil, &NotLoadedError{edge: "releases"}
@@ -395,7 +406,7 @@ func (e IssueEdges) ReleasesOrErr() ([]*Release, error) {
 // SharedWithOrErr returns the SharedWith value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) SharedWithOrErr() ([]*User, error) {
-	if e.loadedTypes[23] {
+	if e.loadedTypes[24] {
 		return e.SharedWith, nil
 	}
 	return nil, &NotLoadedError{edge: "shared_with"}
@@ -404,7 +415,7 @@ func (e IssueEdges) SharedWithOrErr() ([]*User, error) {
 // SubscribersOrErr returns the Subscribers value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) SubscribersOrErr() ([]*User, error) {
-	if e.loadedTypes[24] {
+	if e.loadedTypes[25] {
 		return e.Subscribers, nil
 	}
 	return nil, &NotLoadedError{edge: "subscribers"}
@@ -413,7 +424,7 @@ func (e IssueEdges) SubscribersOrErr() ([]*User, error) {
 // IssueLabelLinksOrErr returns the IssueLabelLinks value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) IssueLabelLinksOrErr() ([]*IssueLabelLink, error) {
-	if e.loadedTypes[25] {
+	if e.loadedTypes[26] {
 		return e.IssueLabelLinks, nil
 	}
 	return nil, &NotLoadedError{edge: "issue_label_links"}
@@ -422,7 +433,7 @@ func (e IssueEdges) IssueLabelLinksOrErr() ([]*IssueLabelLink, error) {
 // IssueReleasesOrErr returns the IssueReleases value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) IssueReleasesOrErr() ([]*IssueRelease, error) {
-	if e.loadedTypes[26] {
+	if e.loadedTypes[27] {
 		return e.IssueReleases, nil
 	}
 	return nil, &NotLoadedError{edge: "issue_releases"}
@@ -431,7 +442,7 @@ func (e IssueEdges) IssueReleasesOrErr() ([]*IssueRelease, error) {
 // IssueSharesOrErr returns the IssueShares value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) IssueSharesOrErr() ([]*IssueShare, error) {
-	if e.loadedTypes[27] {
+	if e.loadedTypes[28] {
 		return e.IssueShares, nil
 	}
 	return nil, &NotLoadedError{edge: "issue_shares"}
@@ -440,7 +451,7 @@ func (e IssueEdges) IssueSharesOrErr() ([]*IssueShare, error) {
 // IssueSubscribersOrErr returns the IssueSubscribers value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) IssueSubscribersOrErr() ([]*IssueSubscriber, error) {
-	if e.loadedTypes[28] {
+	if e.loadedTypes[29] {
 		return e.IssueSubscribers, nil
 	}
 	return nil, &NotLoadedError{edge: "issue_subscribers"}
@@ -809,6 +820,11 @@ func (_m *Issue) QueryDocuments() *DocumentQuery {
 // QueryComments queries the "comments" edge of the Issue entity.
 func (_m *Issue) QueryComments() *CommentQuery {
 	return NewIssueClient(_m.config).QueryComments(_m)
+}
+
+// QueryDiscussionThreads queries the "discussion_threads" edge of the Issue entity.
+func (_m *Issue) QueryDiscussionThreads() *DiscussionThreadQuery {
+	return NewIssueClient(_m.config).QueryDiscussionThreads(_m)
 }
 
 // QueryReactions queries the "reactions" edge of the Issue entity.

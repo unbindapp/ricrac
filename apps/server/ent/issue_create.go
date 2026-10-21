@@ -10,6 +10,7 @@ import (
 	"ricrac/ent/comment"
 	"ricrac/ent/customerneed"
 	"ricrac/ent/cycle"
+	"ricrac/ent/discussionthread"
 	"ricrac/ent/document"
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/issue"
@@ -640,6 +641,21 @@ func (_c *IssueCreate) AddComments(v ...*Comment) *IssueCreate {
 	return _c.AddCommentIDs(ids...)
 }
 
+// AddDiscussionThreadIDs adds the "discussion_threads" edge to the DiscussionThread entity by IDs.
+func (_c *IssueCreate) AddDiscussionThreadIDs(ids ...uuid.UUID) *IssueCreate {
+	_c.mutation.AddDiscussionThreadIDs(ids...)
+	return _c
+}
+
+// AddDiscussionThreads adds the "discussion_threads" edges to the DiscussionThread entity.
+func (_c *IssueCreate) AddDiscussionThreads(v ...*DiscussionThread) *IssueCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddDiscussionThreadIDs(ids...)
+}
+
 // AddReactionIDs adds the "reactions" edge to the Reaction entity by IDs.
 func (_c *IssueCreate) AddReactionIDs(ids ...uuid.UUID) *IssueCreate {
 	_c.mutation.AddReactionIDs(ids...)
@@ -1234,6 +1250,22 @@ func (_c *IssueCreate) createSpec() (*Issue, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.DiscussionThreadsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   issue.DiscussionThreadsTable,
+			Columns: []string{issue.DiscussionThreadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussionthread.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

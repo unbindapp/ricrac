@@ -26,6 +26,8 @@ func (Notification) Fields() []ent.Field {
 		field.UUID("initiative_id", uuid.UUID{}).Optional().Nillable(),
 		field.UUID("document_id", uuid.UUID{}).Optional().Nillable(),
 		field.UUID("status_update_id", uuid.UUID{}).Optional().Nillable(),
+		field.UUID("discussion_id", uuid.UUID{}).Optional().Nillable(),
+		field.UUID("discussion_thread_id", uuid.UUID{}).Optional().Nillable(),
 		field.Text("summary"),
 		field.Time("read_at").Optional().Nillable(),
 		field.Time("snoozed_until").Optional().Nillable(),
@@ -46,6 +48,8 @@ func (Notification) Edges() []ent.Edge {
 		edge.From("initiative", Initiative.Type).Ref("notifications").Field("initiative_id").Unique(),
 		edge.From("document", Document.Type).Ref("notifications").Field("document_id").Unique(),
 		edge.From("status_update", StatusUpdate.Type).Ref("notifications").Field("status_update_id").Unique(),
+		edge.From("discussion", Discussion.Type).Ref("notifications").Field("discussion_id").Unique(),
+		edge.From("discussion_thread", DiscussionThread.Type).Ref("notifications").Field("discussion_thread_id").Unique(),
 	}
 }
 

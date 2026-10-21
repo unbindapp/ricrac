@@ -9,6 +9,7 @@ import (
 	"math"
 	"ricrac/ent/customview"
 	"ricrac/ent/cycle"
+	"ricrac/ent/discussion"
 	"ricrac/ent/document"
 	"ricrac/ent/githubreposync"
 	"ricrac/ent/issue"
@@ -54,6 +55,7 @@ type TeamQuery struct {
 	withCycles               *CycleQuery
 	withIssues               *IssueQuery
 	withDocuments            *DocumentQuery
+	withDiscussions          *DiscussionQuery
 	withCustomViews          *CustomViewQuery
 	withTemplates            *TemplateQuery
 	withWebhooks             *WebhookQuery
@@ -380,6 +382,28 @@ func (_q *TeamQuery) QueryDocuments() *DocumentQuery {
 			sqlgraph.From(team.Table, team.FieldID, selector),
 			sqlgraph.To(document.Table, document.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, team.DocumentsTable, team.DocumentsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDiscussions chains the current query on the "discussions" edge.
+func (_q *TeamQuery) QueryDiscussions() *DiscussionQuery {
+	query := (&DiscussionClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(team.Table, team.FieldID, selector),
+			sqlgraph.To(discussion.Table, discussion.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, team.DiscussionsTable, team.DiscussionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -812,6 +836,7 @@ func (_q *TeamQuery) Clone() *TeamQuery {
 		withCycles:               _q.withCycles.Clone(),
 		withIssues:               _q.withIssues.Clone(),
 		withDocuments:            _q.withDocuments.Clone(),
+		withDiscussions:          _q.withDiscussions.Clone(),
 		withCustomViews:          _q.withCustomViews.Clone(),
 		withTemplates:            _q.withTemplates.Clone(),
 		withWebhooks:             _q.withWebhooks.Clone(),
@@ -969,6 +994,17 @@ func (_q *TeamQuery) WithDocuments(opts ...func(*DocumentQuery)) *TeamQuery {
 		opt(query)
 	}
 	_q.withDocuments = query
+	return _q
+}
+
+// WithDiscussions tells the query-builder to eager-load the nodes that are connected to
+// the "discussions" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *TeamQuery) WithDiscussions(opts ...func(*DiscussionQuery)) *TeamQuery {
+	query := (&DiscussionClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withDiscussions = query
 	return _q
 }
 
@@ -1160,7 +1196,7 @@ func (_q *TeamQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Team, e
 	var (
 		nodes       = []*Team{}
 		_spec       = _q.querySpec()
-		loadedTypes = [23]bool{
+		loadedTypes = [24]bool{
 			_q.withWorkspace != nil,
 			_q.withParent != nil,
 			_q.withChildren != nil,
@@ -1174,6 +1210,7 @@ func (_q *TeamQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Team, e
 			_q.withCycles != nil,
 			_q.withIssues != nil,
 			_q.withDocuments != nil,
+			_q.withDiscussions != nil,
 			_q.withCustomViews != nil,
 			_q.withTemplates != nil,
 			_q.withWebhooks != nil,
@@ -1289,6 +1326,13 @@ func (_q *TeamQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Team, e
 		if err := _q.loadDocuments(ctx, query, nodes,
 			func(n *Team) { n.Edges.Documents = []*Document{} },
 			func(n *Team, e *Document) { n.Edges.Documents = append(n.Edges.Documents, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withDiscussions; query != nil {
+		if err := _q.loadDiscussions(ctx, query, nodes,
+			func(n *Team) { n.Edges.Discussions = []*Discussion{} },
+			func(n *Team, e *Discussion) { n.Edges.Discussions = append(n.Edges.Discussions, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1760,6 +1804,39 @@ func (_q *TeamQuery) loadDocuments(ctx context.Context, query *DocumentQuery, no
 	}
 	query.Where(predicate.Document(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(team.DocumentsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.TeamID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "team_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "team_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *TeamQuery) loadDiscussions(ctx context.Context, query *DiscussionQuery, nodes []*Team, init func(*Team), assign func(*Team, *Discussion)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Team)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(discussion.FieldTeamID)
+	}
+	query.Where(predicate.Discussion(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(team.DiscussionsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

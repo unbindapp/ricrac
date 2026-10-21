@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"math"
 	"ricrac/ent/comment"
+	"ricrac/ent/discussion"
+	"ricrac/ent/discussionthread"
 	"ricrac/ent/document"
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/initiative"
@@ -32,25 +34,27 @@ import (
 // CommentQuery is the builder for querying Comment entities.
 type CommentQuery struct {
 	config
-	ctx               *QueryContext
-	order             []comment.OrderOption
-	inters            []Interceptor
-	predicates        []predicate.Comment
-	withWorkspace     *WorkspaceQuery
-	withIssue         *IssueQuery
-	withProject       *ProjectQuery
-	withInitiative    *InitiativeQuery
-	withDocument      *DocumentQuery
-	withMilestone     *ProjectMilestoneQuery
-	withStatusUpdate  *StatusUpdateQuery
-	withParent        *CommentQuery
-	withChildren      *CommentQuery
-	withUser          *UserQuery
-	withResolvingUser *UserQuery
-	withReactions     *ReactionQuery
-	withNotifications *NotificationQuery
-	withGithubOutbox  *GithubOutboxQuery
-	modifiers         []func(*sql.Selector)
+	ctx                  *QueryContext
+	order                []comment.OrderOption
+	inters               []Interceptor
+	predicates           []predicate.Comment
+	withWorkspace        *WorkspaceQuery
+	withIssue            *IssueQuery
+	withProject          *ProjectQuery
+	withInitiative       *InitiativeQuery
+	withDocument         *DocumentQuery
+	withMilestone        *ProjectMilestoneQuery
+	withStatusUpdate     *StatusUpdateQuery
+	withDiscussion       *DiscussionQuery
+	withDiscussionThread *DiscussionThreadQuery
+	withParent           *CommentQuery
+	withChildren         *CommentQuery
+	withUser             *UserQuery
+	withResolvingUser    *UserQuery
+	withReactions        *ReactionQuery
+	withNotifications    *NotificationQuery
+	withGithubOutbox     *GithubOutboxQuery
+	modifiers            []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -234,6 +238,50 @@ func (_q *CommentQuery) QueryStatusUpdate() *StatusUpdateQuery {
 			sqlgraph.From(comment.Table, comment.FieldID, selector),
 			sqlgraph.To(statusupdate.Table, statusupdate.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, comment.StatusUpdateTable, comment.StatusUpdateColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDiscussion chains the current query on the "discussion" edge.
+func (_q *CommentQuery) QueryDiscussion() *DiscussionQuery {
+	query := (&DiscussionClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(comment.Table, comment.FieldID, selector),
+			sqlgraph.To(discussion.Table, discussion.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, comment.DiscussionTable, comment.DiscussionColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDiscussionThread chains the current query on the "discussion_thread" edge.
+func (_q *CommentQuery) QueryDiscussionThread() *DiscussionThreadQuery {
+	query := (&DiscussionThreadClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(comment.Table, comment.FieldID, selector),
+			sqlgraph.To(discussionthread.Table, discussionthread.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, comment.DiscussionThreadTable, comment.DiscussionThreadColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -582,25 +630,27 @@ func (_q *CommentQuery) Clone() *CommentQuery {
 		return nil
 	}
 	return &CommentQuery{
-		config:            _q.config,
-		ctx:               _q.ctx.Clone(),
-		order:             append([]comment.OrderOption{}, _q.order...),
-		inters:            append([]Interceptor{}, _q.inters...),
-		predicates:        append([]predicate.Comment{}, _q.predicates...),
-		withWorkspace:     _q.withWorkspace.Clone(),
-		withIssue:         _q.withIssue.Clone(),
-		withProject:       _q.withProject.Clone(),
-		withInitiative:    _q.withInitiative.Clone(),
-		withDocument:      _q.withDocument.Clone(),
-		withMilestone:     _q.withMilestone.Clone(),
-		withStatusUpdate:  _q.withStatusUpdate.Clone(),
-		withParent:        _q.withParent.Clone(),
-		withChildren:      _q.withChildren.Clone(),
-		withUser:          _q.withUser.Clone(),
-		withResolvingUser: _q.withResolvingUser.Clone(),
-		withReactions:     _q.withReactions.Clone(),
-		withNotifications: _q.withNotifications.Clone(),
-		withGithubOutbox:  _q.withGithubOutbox.Clone(),
+		config:               _q.config,
+		ctx:                  _q.ctx.Clone(),
+		order:                append([]comment.OrderOption{}, _q.order...),
+		inters:               append([]Interceptor{}, _q.inters...),
+		predicates:           append([]predicate.Comment{}, _q.predicates...),
+		withWorkspace:        _q.withWorkspace.Clone(),
+		withIssue:            _q.withIssue.Clone(),
+		withProject:          _q.withProject.Clone(),
+		withInitiative:       _q.withInitiative.Clone(),
+		withDocument:         _q.withDocument.Clone(),
+		withMilestone:        _q.withMilestone.Clone(),
+		withStatusUpdate:     _q.withStatusUpdate.Clone(),
+		withDiscussion:       _q.withDiscussion.Clone(),
+		withDiscussionThread: _q.withDiscussionThread.Clone(),
+		withParent:           _q.withParent.Clone(),
+		withChildren:         _q.withChildren.Clone(),
+		withUser:             _q.withUser.Clone(),
+		withResolvingUser:    _q.withResolvingUser.Clone(),
+		withReactions:        _q.withReactions.Clone(),
+		withNotifications:    _q.withNotifications.Clone(),
+		withGithubOutbox:     _q.withGithubOutbox.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
 		path:      _q.path,
@@ -682,6 +732,28 @@ func (_q *CommentQuery) WithStatusUpdate(opts ...func(*StatusUpdateQuery)) *Comm
 		opt(query)
 	}
 	_q.withStatusUpdate = query
+	return _q
+}
+
+// WithDiscussion tells the query-builder to eager-load the nodes that are connected to
+// the "discussion" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *CommentQuery) WithDiscussion(opts ...func(*DiscussionQuery)) *CommentQuery {
+	query := (&DiscussionClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withDiscussion = query
+	return _q
+}
+
+// WithDiscussionThread tells the query-builder to eager-load the nodes that are connected to
+// the "discussion_thread" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *CommentQuery) WithDiscussionThread(opts ...func(*DiscussionThreadQuery)) *CommentQuery {
+	query := (&DiscussionThreadClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withDiscussionThread = query
 	return _q
 }
 
@@ -840,7 +912,7 @@ func (_q *CommentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Comm
 	var (
 		nodes       = []*Comment{}
 		_spec       = _q.querySpec()
-		loadedTypes = [14]bool{
+		loadedTypes = [16]bool{
 			_q.withWorkspace != nil,
 			_q.withIssue != nil,
 			_q.withProject != nil,
@@ -848,6 +920,8 @@ func (_q *CommentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Comm
 			_q.withDocument != nil,
 			_q.withMilestone != nil,
 			_q.withStatusUpdate != nil,
+			_q.withDiscussion != nil,
+			_q.withDiscussionThread != nil,
 			_q.withParent != nil,
 			_q.withChildren != nil,
 			_q.withUser != nil,
@@ -917,6 +991,18 @@ func (_q *CommentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Comm
 	if query := _q.withStatusUpdate; query != nil {
 		if err := _q.loadStatusUpdate(ctx, query, nodes, nil,
 			func(n *Comment, e *StatusUpdate) { n.Edges.StatusUpdate = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withDiscussion; query != nil {
+		if err := _q.loadDiscussion(ctx, query, nodes, nil,
+			func(n *Comment, e *Discussion) { n.Edges.Discussion = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withDiscussionThread; query != nil {
+		if err := _q.loadDiscussionThread(ctx, query, nodes, nil,
+			func(n *Comment, e *DiscussionThread) { n.Edges.DiscussionThread = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -1183,6 +1269,70 @@ func (_q *CommentQuery) loadStatusUpdate(ctx context.Context, query *StatusUpdat
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "status_update_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (_q *CommentQuery) loadDiscussion(ctx context.Context, query *DiscussionQuery, nodes []*Comment, init func(*Comment), assign func(*Comment, *Discussion)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Comment)
+	for i := range nodes {
+		if nodes[i].DiscussionID == nil {
+			continue
+		}
+		fk := *nodes[i].DiscussionID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(discussion.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "discussion_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (_q *CommentQuery) loadDiscussionThread(ctx context.Context, query *DiscussionThreadQuery, nodes []*Comment, init func(*Comment), assign func(*Comment, *DiscussionThread)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Comment)
+	for i := range nodes {
+		if nodes[i].DiscussionThreadID == nil {
+			continue
+		}
+		fk := *nodes[i].DiscussionThreadID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(discussionthread.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "discussion_thread_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -1467,6 +1617,12 @@ func (_q *CommentQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if _q.withStatusUpdate != nil {
 			_spec.Node.AddColumnOnce(comment.FieldStatusUpdateID)
+		}
+		if _q.withDiscussion != nil {
+			_spec.Node.AddColumnOnce(comment.FieldDiscussionID)
+		}
+		if _q.withDiscussionThread != nil {
+			_spec.Node.AddColumnOnce(comment.FieldDiscussionThreadID)
 		}
 		if _q.withParent != nil {
 			_spec.Node.AddColumnOnce(comment.FieldParentID)

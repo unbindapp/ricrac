@@ -13,6 +13,7 @@ import (
 	comment_service "ricrac/internal/services/comment"
 	customer_service "ricrac/internal/services/customer"
 	cycle_service "ricrac/internal/services/cycle"
+	discussion_service "ricrac/internal/services/discussion"
 	document_service "ricrac/internal/services/document"
 	email_service "ricrac/internal/services/email"
 	events_service "ricrac/internal/services/events"
@@ -66,6 +67,7 @@ type Server struct {
 	StateService        *state_service.StateService
 	CycleService        *cycle_service.CycleService
 	DocumentService     *document_service.DocumentService
+	DiscussionService   *discussion_service.DiscussionService
 	FavoriteService     *favorite_service.FavoriteService
 	TemplateService     *template_service.TemplateService
 	CustomerService     *customer_service.CustomerService

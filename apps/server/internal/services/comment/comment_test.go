@@ -52,9 +52,9 @@ func (suite *CommentServiceSuite) TestCommentsAreOnOneThing() {
 	_, err := suite.service.Save(suite.Ctx, suite.actor, &SaveInput{
 		Body: new("Hi"), targetInput: targetInput{IssueID: new("ENG-1"), ProjectID: new("Launch")},
 	})
-	suite.Equal("Pass only one of issueId, projectId, initiativeId, documentId, milestoneId and statusUpdateId", errdefs.As(err).Message)
+	suite.Equal("Pass only one of issueId, projectId, initiativeId, documentId, milestoneId, statusUpdateId, discussionId or discussionThreadId", errdefs.As(err).Message)
 	_, err = suite.service.Save(suite.Ctx, suite.actor, &SaveInput{Body: new("Hi")})
-	suite.Equal("Pass what to comment on (issueId, projectId, initiativeId, documentId, milestoneId or statusUpdateId) or parentId", errdefs.As(err).Message)
+	suite.Equal("Pass what to comment on (issueId, projectId, initiativeId, documentId, milestoneId, statusUpdateId, discussionId or discussionThreadId) or parentId", errdefs.As(err).Message)
 }
 
 func (suite *CommentServiceSuite) TestEditsOnlyChangeTheBody() {

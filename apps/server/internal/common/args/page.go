@@ -113,6 +113,17 @@ func (TextEdit) JSONSchema() M {
 	}}
 }
 
+// CheckPassage refuses a passage the document's content doesn't have exactly once.
+func CheckPassage(content, passage string) error {
+	switch count := strings.Count(content, passage); {
+	case count == 0:
+		return errdefs.BadRequest("The document has no passage %q; quote its Markdown exactly", passage)
+	case count > 1:
+		return errdefs.BadRequest("The document has %q %d times; quote a longer passage so it is unique", passage, count)
+	}
+	return nil
+}
+
 func findOnce(content, needle string) (int, error) {
 	if needle == "" {
 		return 0, errdefs.BadRequest("Patch anchors can't be empty")

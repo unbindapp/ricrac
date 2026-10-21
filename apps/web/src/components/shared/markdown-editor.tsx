@@ -4,10 +4,10 @@ import { TableKit } from "@tiptap/extension-table";
 import { TaskItem } from "@tiptap/extension-task-item";
 import { TaskList } from "@tiptap/extension-task-list";
 import { Markdown } from "@tiptap/markdown";
-import { type Editor, EditorContent, useEditor } from "@tiptap/react";
+import { type AnyExtension, type Editor, EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { UploadIcon, XIcon } from "lucide-react";
-import { type DragEvent, useEffect, useMemo, useRef, useState } from "react";
+import { type DragEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
 import { Avatar } from "@/components/shared/avatar";
 import { EditorCodeBlock } from "@/components/shared/editor/code-block";
@@ -33,10 +33,17 @@ import { mediaAccept } from "@/lib/helpers/media";
 
 const AUTOSAVE_DELAY_MS = 800;
 const MAX_MENTION_RESULTS = 8;
+const NO_EXTENSIONS: AnyExtension[] = [];
 
 type TSaveStatus = "idle" | "saving" | "saved" | "error";
 
 /** Someone who can be @mentioned. */
+/** More for one editor: extensions (keep the array stable) and what renders with it, like a bubble menu. */
+export type TEditorAddons = {
+  extensions: AnyExtension[];
+  render: (editor: Editor) => ReactNode;
+};
+
 export type TMentionUser = {
   id: string;
   name: string;
@@ -67,6 +74,7 @@ type TProps = {
   label?: string;
   framed?: boolean;
   toolbar?: boolean;
+  addons?: TEditorAddons;
 };
 
 export function MarkdownEditor({
@@ -83,6 +91,7 @@ export function MarkdownEditor({
   label = "Editor",
   framed = false,
   toolbar = true,
+  addons,
 }: TProps) {
   const usersRef = useRef(users ?? []);
   const uploadRef = useRef(onUpload);
@@ -176,6 +185,7 @@ export function MarkdownEditor({
     return () => window.removeEventListener("beforeunload", flushBeforeUnload);
   }, [hasAutosave, save]);
 
+  const extraExtensions = addons?.extensions ?? NO_EXTENSIONS;
   const extensions = useMemo(
     () => [
       StarterKit.configure({
@@ -218,8 +228,9 @@ export function MarkdownEditor({
         canUpload: canUploadRef,
       }),
       EmojiSuggestions.configure({ sink: suggestionSinkRef, state: suggestionRef }),
+      ...extraExtensions,
     ],
-    [placeholder],
+    [placeholder, extraExtensions],
   );
 
   const editor = useEditor({
@@ -432,6 +443,7 @@ export function MarkdownEditor({
         />
       )}
       {editor && !readOnly && <LinkBubble editor={editor} onEdit={() => setIsLinkOpen(true)} />}
+      {editor && addons?.render(editor)}
       {autosave && (
         <div className="flex min-h-4 items-center gap-2">
           {incoming !== null && (

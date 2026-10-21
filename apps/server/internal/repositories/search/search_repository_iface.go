@@ -11,7 +11,7 @@ import (
 
 // SearchRepositoryInterface ...
 type SearchRepositoryInterface interface {
-	// Search is the best matches of one type (issue, project, document, initiative or comment):
+	// Search is the best matches of one type (issue, project, document, initiative, discussion or comment):
 	// exact identifiers, then title matches, then by rank.
 	Search(ctx context.Context, kind string, params Params) ([]Hit, error)
 	// Issues is the issues with their team and state, by id.

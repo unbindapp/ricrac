@@ -64,6 +64,11 @@ var core = []string{
 	"list_documents",
 	"get_document",
 	"save_document",
+	"list_discussions",
+	"get_discussion",
+	"save_discussion",
+	"get_discussion_thread",
+	"save_discussion_thread",
 	"list_custom_views",
 	"list_templates",
 	"get_template",
@@ -82,7 +87,8 @@ type callOperationArgs struct {
 }
 
 const findDescription = "Find operations beyond the tools listed here: webhooks, customers and customer needs, " +
-	"releases, pipelines and release notes, favorites, document versions, templates and custom views (saving/deleting), " +
+	"releases, pipelines and release notes, favorites, document versions and suggestions, deleting discussions and threads, " +
+	"templates and custom views (saving/deleting), " +
 	"project and issue labels and statuses (saving/deleting), cycles (saving/archiving), teams and members (saving, " +
 	"inviting, roles), archiving/restoring, sharing, the audit log, importing issues from another tracker, the GitHub " +
 	"integration, and more. With a query, returns the matching operations " +

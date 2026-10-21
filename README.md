@@ -31,14 +31,17 @@ operations and permissions.
 - **Filtering** with a filter language (`and`/`or`, comparators, relation filters)
   and full-text search.
 - **Comments** in threads with replies, resolving and reactions, on issues, projects,
-  initiatives, documents, milestones and status updates. **@mentions** notify people.
+  initiatives, documents, milestones, status updates and discussions. **@mentions** notify people.
 - **Projects** across teams, with statuses, lead, members, labels, dates, priority, milestones,
   dependencies, links, status updates with health, and progress.
 - **Initiatives** grouping projects, with sub-initiatives and status updates.
 - **Cycles**, created and completed automatically, with rollover of unfinished issues and daily
   progress history.
 - **Documents** attached to projects, initiatives, teams, issues, cycles or releases, with
-  version history.
+  version history, comments on passages in a sidebar and suggested edits to accept or reject.
+- **Forum** of discussions, for the workspace or one team, each with smaller threads for a bug,
+  a design check, a question, an idea or a task, which link to issues and get resolved.
+  Subscribers hear about new threads and comments.
 - **Custom views**, **favorites**, **templates** (issue templates with sub-issues, recurring
   issues on a schedule, project templates with milestones and issues, document templates), an **inbox** of notifications
   (read, archive, snooze), **customers** and customer requests, **releases** with pipelines,

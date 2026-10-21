@@ -1273,6 +1273,75 @@ func HasDocumentsByCreatorWith(preds ...predicate.Document) predicate.User {
 	})
 }
 
+// HasDiscussionsByCreator applies the HasEdge predicate on the "discussions_by_creator" edge.
+func HasDiscussionsByCreator() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, DiscussionsByCreatorTable, DiscussionsByCreatorColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDiscussionsByCreatorWith applies the HasEdge predicate on the "discussions_by_creator" edge with a given conditions (other predicates).
+func HasDiscussionsByCreatorWith(preds ...predicate.Discussion) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newDiscussionsByCreatorStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasDiscussionThreadsByCreator applies the HasEdge predicate on the "discussion_threads_by_creator" edge.
+func HasDiscussionThreadsByCreator() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, DiscussionThreadsByCreatorTable, DiscussionThreadsByCreatorColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDiscussionThreadsByCreatorWith applies the HasEdge predicate on the "discussion_threads_by_creator" edge with a given conditions (other predicates).
+func HasDiscussionThreadsByCreatorWith(preds ...predicate.DiscussionThread) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newDiscussionThreadsByCreatorStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasDiscussionThreadsByResolvingUser applies the HasEdge predicate on the "discussion_threads_by_resolving_user" edge.
+func HasDiscussionThreadsByResolvingUser() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, DiscussionThreadsByResolvingUserTable, DiscussionThreadsByResolvingUserColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDiscussionThreadsByResolvingUserWith applies the HasEdge predicate on the "discussion_threads_by_resolving_user" edge with a given conditions (other predicates).
+func HasDiscussionThreadsByResolvingUserWith(preds ...predicate.DiscussionThread) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newDiscussionThreadsByResolvingUserStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasDocumentsByUpdatedBy applies the HasEdge predicate on the "documents_by_updated_by" edge.
 func HasDocumentsByUpdatedBy() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
@@ -1710,6 +1779,29 @@ func HasSubscribedProjectsWith(preds ...predicate.Project) predicate.User {
 	})
 }
 
+// HasSubscribedDiscussions applies the HasEdge predicate on the "subscribed_discussions" edge.
+func HasSubscribedDiscussions() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, SubscribedDiscussionsTable, SubscribedDiscussionsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSubscribedDiscussionsWith applies the HasEdge predicate on the "subscribed_discussions" edge with a given conditions (other predicates).
+func HasSubscribedDiscussionsWith(preds ...predicate.Discussion) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newSubscribedDiscussionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasTeams applies the HasEdge predicate on the "teams" edge.
 func HasTeams() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
@@ -1840,6 +1932,29 @@ func HasProjectSubscribers() predicate.User {
 func HasProjectSubscribersWith(preds ...predicate.ProjectSubscriber) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := newProjectSubscribersStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasDiscussionSubscribers applies the HasEdge predicate on the "discussion_subscribers" edge.
+func HasDiscussionSubscribers() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, DiscussionSubscribersTable, DiscussionSubscribersColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDiscussionSubscribersWith applies the HasEdge predicate on the "discussion_subscribers" edge with a given conditions (other predicates).
+func HasDiscussionSubscribersWith(preds ...predicate.DiscussionSubscriber) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newDiscussionSubscribersStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

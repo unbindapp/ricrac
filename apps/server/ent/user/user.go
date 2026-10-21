@@ -81,6 +81,12 @@ const (
 	EdgeFiles = "files"
 	// EdgeDocumentsByCreator holds the string denoting the documents_by_creator edge name in mutations.
 	EdgeDocumentsByCreator = "documents_by_creator"
+	// EdgeDiscussionsByCreator holds the string denoting the discussions_by_creator edge name in mutations.
+	EdgeDiscussionsByCreator = "discussions_by_creator"
+	// EdgeDiscussionThreadsByCreator holds the string denoting the discussion_threads_by_creator edge name in mutations.
+	EdgeDiscussionThreadsByCreator = "discussion_threads_by_creator"
+	// EdgeDiscussionThreadsByResolvingUser holds the string denoting the discussion_threads_by_resolving_user edge name in mutations.
+	EdgeDiscussionThreadsByResolvingUser = "discussion_threads_by_resolving_user"
 	// EdgeDocumentsByUpdatedBy holds the string denoting the documents_by_updated_by edge name in mutations.
 	EdgeDocumentsByUpdatedBy = "documents_by_updated_by"
 	// EdgeDocumentVersions holds the string denoting the document_versions edge name in mutations.
@@ -119,6 +125,8 @@ const (
 	EdgeMemberProjects = "member_projects"
 	// EdgeSubscribedProjects holds the string denoting the subscribed_projects edge name in mutations.
 	EdgeSubscribedProjects = "subscribed_projects"
+	// EdgeSubscribedDiscussions holds the string denoting the subscribed_discussions edge name in mutations.
+	EdgeSubscribedDiscussions = "subscribed_discussions"
 	// EdgeTeams holds the string denoting the teams edge name in mutations.
 	EdgeTeams = "teams"
 	// EdgeWorkspaces holds the string denoting the workspaces edge name in mutations.
@@ -131,6 +139,8 @@ const (
 	EdgeProjectMembers = "project_members"
 	// EdgeProjectSubscribers holds the string denoting the project_subscribers edge name in mutations.
 	EdgeProjectSubscribers = "project_subscribers"
+	// EdgeDiscussionSubscribers holds the string denoting the discussion_subscribers edge name in mutations.
+	EdgeDiscussionSubscribers = "discussion_subscribers"
 	// EdgeTeamMembers holds the string denoting the team_members edge name in mutations.
 	EdgeTeamMembers = "team_members"
 	// EdgeWorkspaceMembers holds the string denoting the workspace_members edge name in mutations.
@@ -307,6 +317,27 @@ const (
 	DocumentsByCreatorInverseTable = "documents"
 	// DocumentsByCreatorColumn is the table column denoting the documents_by_creator relation/edge.
 	DocumentsByCreatorColumn = "creator_id"
+	// DiscussionsByCreatorTable is the table that holds the discussions_by_creator relation/edge.
+	DiscussionsByCreatorTable = "discussions"
+	// DiscussionsByCreatorInverseTable is the table name for the Discussion entity.
+	// It exists in this package in order to avoid circular dependency with the "discussion" package.
+	DiscussionsByCreatorInverseTable = "discussions"
+	// DiscussionsByCreatorColumn is the table column denoting the discussions_by_creator relation/edge.
+	DiscussionsByCreatorColumn = "creator_id"
+	// DiscussionThreadsByCreatorTable is the table that holds the discussion_threads_by_creator relation/edge.
+	DiscussionThreadsByCreatorTable = "discussion_threads"
+	// DiscussionThreadsByCreatorInverseTable is the table name for the DiscussionThread entity.
+	// It exists in this package in order to avoid circular dependency with the "discussionthread" package.
+	DiscussionThreadsByCreatorInverseTable = "discussion_threads"
+	// DiscussionThreadsByCreatorColumn is the table column denoting the discussion_threads_by_creator relation/edge.
+	DiscussionThreadsByCreatorColumn = "creator_id"
+	// DiscussionThreadsByResolvingUserTable is the table that holds the discussion_threads_by_resolving_user relation/edge.
+	DiscussionThreadsByResolvingUserTable = "discussion_threads"
+	// DiscussionThreadsByResolvingUserInverseTable is the table name for the DiscussionThread entity.
+	// It exists in this package in order to avoid circular dependency with the "discussionthread" package.
+	DiscussionThreadsByResolvingUserInverseTable = "discussion_threads"
+	// DiscussionThreadsByResolvingUserColumn is the table column denoting the discussion_threads_by_resolving_user relation/edge.
+	DiscussionThreadsByResolvingUserColumn = "resolving_user_id"
 	// DocumentsByUpdatedByTable is the table that holds the documents_by_updated_by relation/edge.
 	DocumentsByUpdatedByTable = "documents"
 	// DocumentsByUpdatedByInverseTable is the table name for the Document entity.
@@ -432,6 +463,11 @@ const (
 	// SubscribedProjectsInverseTable is the table name for the Project entity.
 	// It exists in this package in order to avoid circular dependency with the "project" package.
 	SubscribedProjectsInverseTable = "projects"
+	// SubscribedDiscussionsTable is the table that holds the subscribed_discussions relation/edge. The primary key declared below.
+	SubscribedDiscussionsTable = "discussion_subscribers"
+	// SubscribedDiscussionsInverseTable is the table name for the Discussion entity.
+	// It exists in this package in order to avoid circular dependency with the "discussion" package.
+	SubscribedDiscussionsInverseTable = "discussions"
 	// TeamsTable is the table that holds the teams relation/edge. The primary key declared below.
 	TeamsTable = "team_members"
 	// TeamsInverseTable is the table name for the Team entity.
@@ -470,6 +506,13 @@ const (
 	ProjectSubscribersInverseTable = "project_subscribers"
 	// ProjectSubscribersColumn is the table column denoting the project_subscribers relation/edge.
 	ProjectSubscribersColumn = "user_id"
+	// DiscussionSubscribersTable is the table that holds the discussion_subscribers relation/edge.
+	DiscussionSubscribersTable = "discussion_subscribers"
+	// DiscussionSubscribersInverseTable is the table name for the DiscussionSubscriber entity.
+	// It exists in this package in order to avoid circular dependency with the "discussionsubscriber" package.
+	DiscussionSubscribersInverseTable = "discussion_subscribers"
+	// DiscussionSubscribersColumn is the table column denoting the discussion_subscribers relation/edge.
+	DiscussionSubscribersColumn = "user_id"
 	// TeamMembersTable is the table that holds the team_members relation/edge.
 	TeamMembersTable = "team_members"
 	// TeamMembersInverseTable is the table name for the TeamMember entity.
@@ -514,6 +557,9 @@ var (
 	// SubscribedProjectsPrimaryKey and SubscribedProjectsColumn2 are the table columns denoting the
 	// primary key for the subscribed_projects relation (M2M).
 	SubscribedProjectsPrimaryKey = []string{"project_id", "user_id"}
+	// SubscribedDiscussionsPrimaryKey and SubscribedDiscussionsColumn2 are the table columns denoting the
+	// primary key for the subscribed_discussions relation (M2M).
+	SubscribedDiscussionsPrimaryKey = []string{"discussion_id", "user_id"}
 	// TeamsPrimaryKey and TeamsColumn2 are the table columns denoting the
 	// primary key for the teams relation (M2M).
 	TeamsPrimaryKey = []string{"team_id", "user_id"}
@@ -931,6 +977,48 @@ func ByDocumentsByCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOptio
 	}
 }
 
+// ByDiscussionsByCreatorCount orders the results by discussions_by_creator count.
+func ByDiscussionsByCreatorCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newDiscussionsByCreatorStep(), opts...)
+	}
+}
+
+// ByDiscussionsByCreator orders the results by discussions_by_creator terms.
+func ByDiscussionsByCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDiscussionsByCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByDiscussionThreadsByCreatorCount orders the results by discussion_threads_by_creator count.
+func ByDiscussionThreadsByCreatorCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newDiscussionThreadsByCreatorStep(), opts...)
+	}
+}
+
+// ByDiscussionThreadsByCreator orders the results by discussion_threads_by_creator terms.
+func ByDiscussionThreadsByCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDiscussionThreadsByCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByDiscussionThreadsByResolvingUserCount orders the results by discussion_threads_by_resolving_user count.
+func ByDiscussionThreadsByResolvingUserCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newDiscussionThreadsByResolvingUserStep(), opts...)
+	}
+}
+
+// ByDiscussionThreadsByResolvingUser orders the results by discussion_threads_by_resolving_user terms.
+func ByDiscussionThreadsByResolvingUser(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDiscussionThreadsByResolvingUserStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByDocumentsByUpdatedByCount orders the results by documents_by_updated_by count.
 func ByDocumentsByUpdatedByCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -1197,6 +1285,20 @@ func BySubscribedProjects(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOptio
 	}
 }
 
+// BySubscribedDiscussionsCount orders the results by subscribed_discussions count.
+func BySubscribedDiscussionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSubscribedDiscussionsStep(), opts...)
+	}
+}
+
+// BySubscribedDiscussions orders the results by subscribed_discussions terms.
+func BySubscribedDiscussions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubscribedDiscussionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByTeamsCount orders the results by teams count.
 func ByTeamsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -1278,6 +1380,20 @@ func ByProjectSubscribersCount(opts ...sql.OrderTermOption) OrderOption {
 func ByProjectSubscribers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newProjectSubscribersStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByDiscussionSubscribersCount orders the results by discussion_subscribers count.
+func ByDiscussionSubscribersCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newDiscussionSubscribersStep(), opts...)
+	}
+}
+
+// ByDiscussionSubscribers orders the results by discussion_subscribers terms.
+func ByDiscussionSubscribers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDiscussionSubscribersStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -1476,6 +1592,27 @@ func newDocumentsByCreatorStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, DocumentsByCreatorTable, DocumentsByCreatorColumn),
 	)
 }
+func newDiscussionsByCreatorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DiscussionsByCreatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, DiscussionsByCreatorTable, DiscussionsByCreatorColumn),
+	)
+}
+func newDiscussionThreadsByCreatorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DiscussionThreadsByCreatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, DiscussionThreadsByCreatorTable, DiscussionThreadsByCreatorColumn),
+	)
+}
+func newDiscussionThreadsByResolvingUserStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DiscussionThreadsByResolvingUserInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, DiscussionThreadsByResolvingUserTable, DiscussionThreadsByResolvingUserColumn),
+	)
+}
 func newDocumentsByUpdatedByStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -1609,6 +1746,13 @@ func newSubscribedProjectsStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2M, true, SubscribedProjectsTable, SubscribedProjectsPrimaryKey...),
 	)
 }
+func newSubscribedDiscussionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SubscribedDiscussionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, SubscribedDiscussionsTable, SubscribedDiscussionsPrimaryKey...),
+	)
+}
 func newTeamsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -1649,6 +1793,13 @@ func newProjectSubscribersStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ProjectSubscribersInverseTable, ProjectSubscribersColumn),
 		sqlgraph.Edge(sqlgraph.O2M, true, ProjectSubscribersTable, ProjectSubscribersColumn),
+	)
+}
+func newDiscussionSubscribersStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DiscussionSubscribersInverseTable, DiscussionSubscribersColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, DiscussionSubscribersTable, DiscussionSubscribersColumn),
 	)
 }
 func newTeamMembersStep() *sqlgraph.Step {

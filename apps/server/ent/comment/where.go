@@ -91,6 +91,16 @@ func StatusUpdateID(v uuid.UUID) predicate.Comment {
 	return predicate.Comment(sql.FieldEQ(FieldStatusUpdateID, v))
 }
 
+// DiscussionID applies equality check predicate on the "discussion_id" field. It's identical to DiscussionIDEQ.
+func DiscussionID(v uuid.UUID) predicate.Comment {
+	return predicate.Comment(sql.FieldEQ(FieldDiscussionID, v))
+}
+
+// DiscussionThreadID applies equality check predicate on the "discussion_thread_id" field. It's identical to DiscussionThreadIDEQ.
+func DiscussionThreadID(v uuid.UUID) predicate.Comment {
+	return predicate.Comment(sql.FieldEQ(FieldDiscussionThreadID, v))
+}
+
 // ParentID applies equality check predicate on the "parent_id" field. It's identical to ParentIDEQ.
 func ParentID(v uuid.UUID) predicate.Comment {
 	return predicate.Comment(sql.FieldEQ(FieldParentID, v))
@@ -109,6 +119,16 @@ func Body(v string) predicate.Comment {
 // QuotedText applies equality check predicate on the "quoted_text" field. It's identical to QuotedTextEQ.
 func QuotedText(v string) predicate.Comment {
 	return predicate.Comment(sql.FieldEQ(FieldQuotedText, v))
+}
+
+// SuggestedText applies equality check predicate on the "suggested_text" field. It's identical to SuggestedTextEQ.
+func SuggestedText(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldEQ(FieldSuggestedText, v))
+}
+
+// SuggestionStatus applies equality check predicate on the "suggestion_status" field. It's identical to SuggestionStatusEQ.
+func SuggestionStatus(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldEQ(FieldSuggestionStatus, v))
 }
 
 // EditedAt applies equality check predicate on the "edited_at" field. It's identical to EditedAtEQ.
@@ -336,6 +356,66 @@ func StatusUpdateIDNotNil() predicate.Comment {
 	return predicate.Comment(sql.FieldNotNull(FieldStatusUpdateID))
 }
 
+// DiscussionIDEQ applies the EQ predicate on the "discussion_id" field.
+func DiscussionIDEQ(v uuid.UUID) predicate.Comment {
+	return predicate.Comment(sql.FieldEQ(FieldDiscussionID, v))
+}
+
+// DiscussionIDNEQ applies the NEQ predicate on the "discussion_id" field.
+func DiscussionIDNEQ(v uuid.UUID) predicate.Comment {
+	return predicate.Comment(sql.FieldNEQ(FieldDiscussionID, v))
+}
+
+// DiscussionIDIn applies the In predicate on the "discussion_id" field.
+func DiscussionIDIn(vs ...uuid.UUID) predicate.Comment {
+	return predicate.Comment(sql.FieldIn(FieldDiscussionID, vs...))
+}
+
+// DiscussionIDNotIn applies the NotIn predicate on the "discussion_id" field.
+func DiscussionIDNotIn(vs ...uuid.UUID) predicate.Comment {
+	return predicate.Comment(sql.FieldNotIn(FieldDiscussionID, vs...))
+}
+
+// DiscussionIDIsNil applies the IsNil predicate on the "discussion_id" field.
+func DiscussionIDIsNil() predicate.Comment {
+	return predicate.Comment(sql.FieldIsNull(FieldDiscussionID))
+}
+
+// DiscussionIDNotNil applies the NotNil predicate on the "discussion_id" field.
+func DiscussionIDNotNil() predicate.Comment {
+	return predicate.Comment(sql.FieldNotNull(FieldDiscussionID))
+}
+
+// DiscussionThreadIDEQ applies the EQ predicate on the "discussion_thread_id" field.
+func DiscussionThreadIDEQ(v uuid.UUID) predicate.Comment {
+	return predicate.Comment(sql.FieldEQ(FieldDiscussionThreadID, v))
+}
+
+// DiscussionThreadIDNEQ applies the NEQ predicate on the "discussion_thread_id" field.
+func DiscussionThreadIDNEQ(v uuid.UUID) predicate.Comment {
+	return predicate.Comment(sql.FieldNEQ(FieldDiscussionThreadID, v))
+}
+
+// DiscussionThreadIDIn applies the In predicate on the "discussion_thread_id" field.
+func DiscussionThreadIDIn(vs ...uuid.UUID) predicate.Comment {
+	return predicate.Comment(sql.FieldIn(FieldDiscussionThreadID, vs...))
+}
+
+// DiscussionThreadIDNotIn applies the NotIn predicate on the "discussion_thread_id" field.
+func DiscussionThreadIDNotIn(vs ...uuid.UUID) predicate.Comment {
+	return predicate.Comment(sql.FieldNotIn(FieldDiscussionThreadID, vs...))
+}
+
+// DiscussionThreadIDIsNil applies the IsNil predicate on the "discussion_thread_id" field.
+func DiscussionThreadIDIsNil() predicate.Comment {
+	return predicate.Comment(sql.FieldIsNull(FieldDiscussionThreadID))
+}
+
+// DiscussionThreadIDNotNil applies the NotNil predicate on the "discussion_thread_id" field.
+func DiscussionThreadIDNotNil() predicate.Comment {
+	return predicate.Comment(sql.FieldNotNull(FieldDiscussionThreadID))
+}
+
 // ParentIDEQ applies the EQ predicate on the "parent_id" field.
 func ParentIDEQ(v uuid.UUID) predicate.Comment {
 	return predicate.Comment(sql.FieldEQ(FieldParentID, v))
@@ -534,6 +614,156 @@ func QuotedTextEqualFold(v string) predicate.Comment {
 // QuotedTextContainsFold applies the ContainsFold predicate on the "quoted_text" field.
 func QuotedTextContainsFold(v string) predicate.Comment {
 	return predicate.Comment(sql.FieldContainsFold(FieldQuotedText, v))
+}
+
+// SuggestedTextEQ applies the EQ predicate on the "suggested_text" field.
+func SuggestedTextEQ(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldEQ(FieldSuggestedText, v))
+}
+
+// SuggestedTextNEQ applies the NEQ predicate on the "suggested_text" field.
+func SuggestedTextNEQ(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldNEQ(FieldSuggestedText, v))
+}
+
+// SuggestedTextIn applies the In predicate on the "suggested_text" field.
+func SuggestedTextIn(vs ...string) predicate.Comment {
+	return predicate.Comment(sql.FieldIn(FieldSuggestedText, vs...))
+}
+
+// SuggestedTextNotIn applies the NotIn predicate on the "suggested_text" field.
+func SuggestedTextNotIn(vs ...string) predicate.Comment {
+	return predicate.Comment(sql.FieldNotIn(FieldSuggestedText, vs...))
+}
+
+// SuggestedTextGT applies the GT predicate on the "suggested_text" field.
+func SuggestedTextGT(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldGT(FieldSuggestedText, v))
+}
+
+// SuggestedTextGTE applies the GTE predicate on the "suggested_text" field.
+func SuggestedTextGTE(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldGTE(FieldSuggestedText, v))
+}
+
+// SuggestedTextLT applies the LT predicate on the "suggested_text" field.
+func SuggestedTextLT(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldLT(FieldSuggestedText, v))
+}
+
+// SuggestedTextLTE applies the LTE predicate on the "suggested_text" field.
+func SuggestedTextLTE(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldLTE(FieldSuggestedText, v))
+}
+
+// SuggestedTextContains applies the Contains predicate on the "suggested_text" field.
+func SuggestedTextContains(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldContains(FieldSuggestedText, v))
+}
+
+// SuggestedTextHasPrefix applies the HasPrefix predicate on the "suggested_text" field.
+func SuggestedTextHasPrefix(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldHasPrefix(FieldSuggestedText, v))
+}
+
+// SuggestedTextHasSuffix applies the HasSuffix predicate on the "suggested_text" field.
+func SuggestedTextHasSuffix(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldHasSuffix(FieldSuggestedText, v))
+}
+
+// SuggestedTextIsNil applies the IsNil predicate on the "suggested_text" field.
+func SuggestedTextIsNil() predicate.Comment {
+	return predicate.Comment(sql.FieldIsNull(FieldSuggestedText))
+}
+
+// SuggestedTextNotNil applies the NotNil predicate on the "suggested_text" field.
+func SuggestedTextNotNil() predicate.Comment {
+	return predicate.Comment(sql.FieldNotNull(FieldSuggestedText))
+}
+
+// SuggestedTextEqualFold applies the EqualFold predicate on the "suggested_text" field.
+func SuggestedTextEqualFold(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldEqualFold(FieldSuggestedText, v))
+}
+
+// SuggestedTextContainsFold applies the ContainsFold predicate on the "suggested_text" field.
+func SuggestedTextContainsFold(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldContainsFold(FieldSuggestedText, v))
+}
+
+// SuggestionStatusEQ applies the EQ predicate on the "suggestion_status" field.
+func SuggestionStatusEQ(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldEQ(FieldSuggestionStatus, v))
+}
+
+// SuggestionStatusNEQ applies the NEQ predicate on the "suggestion_status" field.
+func SuggestionStatusNEQ(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldNEQ(FieldSuggestionStatus, v))
+}
+
+// SuggestionStatusIn applies the In predicate on the "suggestion_status" field.
+func SuggestionStatusIn(vs ...string) predicate.Comment {
+	return predicate.Comment(sql.FieldIn(FieldSuggestionStatus, vs...))
+}
+
+// SuggestionStatusNotIn applies the NotIn predicate on the "suggestion_status" field.
+func SuggestionStatusNotIn(vs ...string) predicate.Comment {
+	return predicate.Comment(sql.FieldNotIn(FieldSuggestionStatus, vs...))
+}
+
+// SuggestionStatusGT applies the GT predicate on the "suggestion_status" field.
+func SuggestionStatusGT(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldGT(FieldSuggestionStatus, v))
+}
+
+// SuggestionStatusGTE applies the GTE predicate on the "suggestion_status" field.
+func SuggestionStatusGTE(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldGTE(FieldSuggestionStatus, v))
+}
+
+// SuggestionStatusLT applies the LT predicate on the "suggestion_status" field.
+func SuggestionStatusLT(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldLT(FieldSuggestionStatus, v))
+}
+
+// SuggestionStatusLTE applies the LTE predicate on the "suggestion_status" field.
+func SuggestionStatusLTE(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldLTE(FieldSuggestionStatus, v))
+}
+
+// SuggestionStatusContains applies the Contains predicate on the "suggestion_status" field.
+func SuggestionStatusContains(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldContains(FieldSuggestionStatus, v))
+}
+
+// SuggestionStatusHasPrefix applies the HasPrefix predicate on the "suggestion_status" field.
+func SuggestionStatusHasPrefix(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldHasPrefix(FieldSuggestionStatus, v))
+}
+
+// SuggestionStatusHasSuffix applies the HasSuffix predicate on the "suggestion_status" field.
+func SuggestionStatusHasSuffix(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldHasSuffix(FieldSuggestionStatus, v))
+}
+
+// SuggestionStatusIsNil applies the IsNil predicate on the "suggestion_status" field.
+func SuggestionStatusIsNil() predicate.Comment {
+	return predicate.Comment(sql.FieldIsNull(FieldSuggestionStatus))
+}
+
+// SuggestionStatusNotNil applies the NotNil predicate on the "suggestion_status" field.
+func SuggestionStatusNotNil() predicate.Comment {
+	return predicate.Comment(sql.FieldNotNull(FieldSuggestionStatus))
+}
+
+// SuggestionStatusEqualFold applies the EqualFold predicate on the "suggestion_status" field.
+func SuggestionStatusEqualFold(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldEqualFold(FieldSuggestionStatus, v))
+}
+
+// SuggestionStatusContainsFold applies the ContainsFold predicate on the "suggestion_status" field.
+func SuggestionStatusContainsFold(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldContainsFold(FieldSuggestionStatus, v))
 }
 
 // EditedAtEQ applies the EQ predicate on the "edited_at" field.
@@ -919,6 +1149,52 @@ func HasStatusUpdate() predicate.Comment {
 func HasStatusUpdateWith(preds ...predicate.StatusUpdate) predicate.Comment {
 	return predicate.Comment(func(s *sql.Selector) {
 		step := newStatusUpdateStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasDiscussion applies the HasEdge predicate on the "discussion" edge.
+func HasDiscussion() predicate.Comment {
+	return predicate.Comment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, DiscussionTable, DiscussionColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDiscussionWith applies the HasEdge predicate on the "discussion" edge with a given conditions (other predicates).
+func HasDiscussionWith(preds ...predicate.Discussion) predicate.Comment {
+	return predicate.Comment(func(s *sql.Selector) {
+		step := newDiscussionStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasDiscussionThread applies the HasEdge predicate on the "discussion_thread" edge.
+func HasDiscussionThread() predicate.Comment {
+	return predicate.Comment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, DiscussionThreadTable, DiscussionThreadColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDiscussionThreadWith applies the HasEdge predicate on the "discussion_thread" edge with a given conditions (other predicates).
+func HasDiscussionThreadWith(preds ...predicate.DiscussionThread) predicate.Comment {
+	return predicate.Comment(func(s *sql.Selector) {
+		step := newDiscussionThreadStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

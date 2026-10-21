@@ -23,6 +23,8 @@ type CreateInput struct {
 	User   *uuid.UUID
 	Body   string
 	Quoted *string
+	// Text suggested in place of Quoted, on a document.
+	Suggested *string
 }
 
 func (self *CommentRepository) Create(ctx context.Context, tx repository.TxInterface, input CreateInput) (uuid.UUID, error) {
@@ -31,7 +33,10 @@ func (self *CommentRepository) Create(ctx context.Context, tx repository.TxInter
 	}
 	create := self.base.Client(tx).Comment.Create().
 		SetWorkspaceID(input.Workspace).SetNillableParentID(input.Root).SetNillableUserID(input.User).
-		SetBody(input.Body).SetNillableQuotedText(input.Quoted)
+		SetBody(input.Body).SetNillableQuotedText(input.Quoted).SetNillableSuggestedText(input.Suggested)
+	if input.Suggested != nil {
+		create.SetSuggestionStatus("pending")
+	}
 	if err := create.Mutation().SetField(input.Column, input.Target); err != nil {
 		return uuid.Nil, err
 	}
@@ -70,6 +75,12 @@ func (self *CommentRepository) SetResolved(ctx context.Context, tx repository.Tx
 		}
 	}
 	return update.Exec(ctx)
+}
+
+// Decide settles a suggestion (accepted or rejected), resolving its thread.
+func (self *CommentRepository) Decide(ctx context.Context, tx repository.TxInterface, id uuid.UUID, status string, by uuid.UUID, now time.Time) error {
+	return self.base.Client(tx).Comment.UpdateOneID(id).SetSuggestionStatus(status).
+		SetResolvedAt(now).SetResolvingUserID(by).SetUpdatedAt(now).Exec(ctx)
 }
 
 func (self *CommentRepository) Delete(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error {

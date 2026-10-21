@@ -17,6 +17,9 @@ import (
 	"ricrac/ent/customertier"
 	"ricrac/ent/customview"
 	"ricrac/ent/cycle"
+	"ricrac/ent/discussion"
+	"ricrac/ent/discussionsubscriber"
+	"ricrac/ent/discussionthread"
 	"ricrac/ent/document"
 	"ricrac/ent/documentversion"
 	"ricrac/ent/email"
@@ -89,69 +92,72 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeAPIKey              = "APIKey"
-	TypeAttachment          = "Attachment"
-	TypeAuditEntry          = "AuditEntry"
-	TypeComment             = "Comment"
-	TypeCustomView          = "CustomView"
-	TypeCustomer            = "Customer"
-	TypeCustomerNeed        = "CustomerNeed"
-	TypeCustomerStatus      = "CustomerStatus"
-	TypeCustomerTier        = "CustomerTier"
-	TypeCycle               = "Cycle"
-	TypeDocument            = "Document"
-	TypeDocumentVersion     = "DocumentVersion"
-	TypeEmail               = "Email"
-	TypeEntityLink          = "EntityLink"
-	TypeFavorite            = "Favorite"
-	TypeFile                = "File"
-	TypeGithubCommentLink   = "GithubCommentLink"
-	TypeGithubInstallation  = "GithubInstallation"
-	TypeGithubIssueLink     = "GithubIssueLink"
-	TypeGithubOutbox        = "GithubOutbox"
-	TypeGithubRepoSync      = "GithubRepoSync"
-	TypeInitiative          = "Initiative"
-	TypeInitiativeProject   = "InitiativeProject"
-	TypeInvitation          = "Invitation"
-	TypeIssue               = "Issue"
-	TypeIssueHistory        = "IssueHistory"
-	TypeIssueLabel          = "IssueLabel"
-	TypeIssueLabelLink      = "IssueLabelLink"
-	TypeIssueRelation       = "IssueRelation"
-	TypeIssueRelease        = "IssueRelease"
-	TypeIssueShare          = "IssueShare"
-	TypeIssueSubscriber     = "IssueSubscriber"
-	TypeNotification        = "Notification"
-	TypeOAuthClient         = "OAuthClient"
-	TypeOAuthCode           = "OAuthCode"
-	TypeOAuthGrant          = "OAuthGrant"
-	TypeOAuthToken          = "OAuthToken"
-	TypeProject             = "Project"
-	TypeProjectLabel        = "ProjectLabel"
-	TypeProjectLabelLink    = "ProjectLabelLink"
-	TypeProjectMember       = "ProjectMember"
-	TypeProjectMilestone    = "ProjectMilestone"
-	TypeProjectRelation     = "ProjectRelation"
-	TypeProjectStatus       = "ProjectStatus"
-	TypeProjectSubscriber   = "ProjectSubscriber"
-	TypeProjectTeam         = "ProjectTeam"
-	TypeReaction            = "Reaction"
-	TypeRelease             = "Release"
-	TypeReleaseNote         = "ReleaseNote"
-	TypeReleasePipeline     = "ReleasePipeline"
-	TypeReleasePipelineTeam = "ReleasePipelineTeam"
-	TypeReleaseStage        = "ReleaseStage"
-	TypeSignInLink          = "SignInLink"
-	TypeStatusUpdate        = "StatusUpdate"
-	TypeTeam                = "Team"
-	TypeTeamMember          = "TeamMember"
-	TypeTemplate            = "Template"
-	TypeUser                = "User"
-	TypeWebhook             = "Webhook"
-	TypeWebhookDelivery     = "WebhookDelivery"
-	TypeWorkflowState       = "WorkflowState"
-	TypeWorkspace           = "Workspace"
-	TypeWorkspaceMember     = "WorkspaceMember"
+	TypeAPIKey               = "APIKey"
+	TypeAttachment           = "Attachment"
+	TypeAuditEntry           = "AuditEntry"
+	TypeComment              = "Comment"
+	TypeCustomView           = "CustomView"
+	TypeCustomer             = "Customer"
+	TypeCustomerNeed         = "CustomerNeed"
+	TypeCustomerStatus       = "CustomerStatus"
+	TypeCustomerTier         = "CustomerTier"
+	TypeCycle                = "Cycle"
+	TypeDiscussion           = "Discussion"
+	TypeDiscussionSubscriber = "DiscussionSubscriber"
+	TypeDiscussionThread     = "DiscussionThread"
+	TypeDocument             = "Document"
+	TypeDocumentVersion      = "DocumentVersion"
+	TypeEmail                = "Email"
+	TypeEntityLink           = "EntityLink"
+	TypeFavorite             = "Favorite"
+	TypeFile                 = "File"
+	TypeGithubCommentLink    = "GithubCommentLink"
+	TypeGithubInstallation   = "GithubInstallation"
+	TypeGithubIssueLink      = "GithubIssueLink"
+	TypeGithubOutbox         = "GithubOutbox"
+	TypeGithubRepoSync       = "GithubRepoSync"
+	TypeInitiative           = "Initiative"
+	TypeInitiativeProject    = "InitiativeProject"
+	TypeInvitation           = "Invitation"
+	TypeIssue                = "Issue"
+	TypeIssueHistory         = "IssueHistory"
+	TypeIssueLabel           = "IssueLabel"
+	TypeIssueLabelLink       = "IssueLabelLink"
+	TypeIssueRelation        = "IssueRelation"
+	TypeIssueRelease         = "IssueRelease"
+	TypeIssueShare           = "IssueShare"
+	TypeIssueSubscriber      = "IssueSubscriber"
+	TypeNotification         = "Notification"
+	TypeOAuthClient          = "OAuthClient"
+	TypeOAuthCode            = "OAuthCode"
+	TypeOAuthGrant           = "OAuthGrant"
+	TypeOAuthToken           = "OAuthToken"
+	TypeProject              = "Project"
+	TypeProjectLabel         = "ProjectLabel"
+	TypeProjectLabelLink     = "ProjectLabelLink"
+	TypeProjectMember        = "ProjectMember"
+	TypeProjectMilestone     = "ProjectMilestone"
+	TypeProjectRelation      = "ProjectRelation"
+	TypeProjectStatus        = "ProjectStatus"
+	TypeProjectSubscriber    = "ProjectSubscriber"
+	TypeProjectTeam          = "ProjectTeam"
+	TypeReaction             = "Reaction"
+	TypeRelease              = "Release"
+	TypeReleaseNote          = "ReleaseNote"
+	TypeReleasePipeline      = "ReleasePipeline"
+	TypeReleasePipelineTeam  = "ReleasePipelineTeam"
+	TypeReleaseStage         = "ReleaseStage"
+	TypeSignInLink           = "SignInLink"
+	TypeStatusUpdate         = "StatusUpdate"
+	TypeTeam                 = "Team"
+	TypeTeamMember           = "TeamMember"
+	TypeTemplate             = "Template"
+	TypeUser                 = "User"
+	TypeWebhook              = "Webhook"
+	TypeWebhookDelivery      = "WebhookDelivery"
+	TypeWorkflowState        = "WorkflowState"
+	TypeWorkspace            = "Workspace"
+	TypeWorkspaceMember      = "WorkspaceMember"
 )
 
 // APIKeyMutation represents an operation that mutates the APIKey nodes in the graph.
@@ -2877,51 +2883,57 @@ func (m *AuditEntryMutation) ResetEdge(name string) error {
 // CommentMutation represents an operation that mutates the Comment nodes in the graph.
 type CommentMutation struct {
 	config
-	op                    Op
-	typ                   string
-	id                    *uuid.UUID
-	body                  *string
-	quoted_text           *string
-	edited_at             *time.Time
-	resolved_at           *time.Time
-	created_at            *time.Time
-	updated_at            *time.Time
-	clearedFields         map[string]struct{}
-	workspace             *uuid.UUID
-	clearedworkspace      bool
-	issue                 *uuid.UUID
-	clearedissue          bool
-	project               *uuid.UUID
-	clearedproject        bool
-	initiative            *uuid.UUID
-	clearedinitiative     bool
-	document              *uuid.UUID
-	cleareddocument       bool
-	milestone             *uuid.UUID
-	clearedmilestone      bool
-	status_update         *uuid.UUID
-	clearedstatus_update  bool
-	parent                *uuid.UUID
-	clearedparent         bool
-	children              map[uuid.UUID]struct{}
-	removedchildren       map[uuid.UUID]struct{}
-	clearedchildren       bool
-	user                  *uuid.UUID
-	cleareduser           bool
-	resolving_user        *uuid.UUID
-	clearedresolving_user bool
-	reactions             map[uuid.UUID]struct{}
-	removedreactions      map[uuid.UUID]struct{}
-	clearedreactions      bool
-	notifications         map[uuid.UUID]struct{}
-	removednotifications  map[uuid.UUID]struct{}
-	clearednotifications  bool
-	github_outbox         map[int64]struct{}
-	removedgithub_outbox  map[int64]struct{}
-	clearedgithub_outbox  bool
-	done                  bool
-	oldValue              func(context.Context) (*Comment, error)
-	predicates            []predicate.Comment
+	op                       Op
+	typ                      string
+	id                       *uuid.UUID
+	body                     *string
+	quoted_text              *string
+	suggested_text           *string
+	suggestion_status        *string
+	edited_at                *time.Time
+	resolved_at              *time.Time
+	created_at               *time.Time
+	updated_at               *time.Time
+	clearedFields            map[string]struct{}
+	workspace                *uuid.UUID
+	clearedworkspace         bool
+	issue                    *uuid.UUID
+	clearedissue             bool
+	project                  *uuid.UUID
+	clearedproject           bool
+	initiative               *uuid.UUID
+	clearedinitiative        bool
+	document                 *uuid.UUID
+	cleareddocument          bool
+	milestone                *uuid.UUID
+	clearedmilestone         bool
+	status_update            *uuid.UUID
+	clearedstatus_update     bool
+	discussion               *uuid.UUID
+	cleareddiscussion        bool
+	discussion_thread        *uuid.UUID
+	cleareddiscussion_thread bool
+	parent                   *uuid.UUID
+	clearedparent            bool
+	children                 map[uuid.UUID]struct{}
+	removedchildren          map[uuid.UUID]struct{}
+	clearedchildren          bool
+	user                     *uuid.UUID
+	cleareduser              bool
+	resolving_user           *uuid.UUID
+	clearedresolving_user    bool
+	reactions                map[uuid.UUID]struct{}
+	removedreactions         map[uuid.UUID]struct{}
+	clearedreactions         bool
+	notifications            map[uuid.UUID]struct{}
+	removednotifications     map[uuid.UUID]struct{}
+	clearednotifications     bool
+	github_outbox            map[int64]struct{}
+	removedgithub_outbox     map[int64]struct{}
+	clearedgithub_outbox     bool
+	done                     bool
+	oldValue                 func(context.Context) (*Comment, error)
+	predicates               []predicate.Comment
 }
 
 var _ ent.Mutation = (*CommentMutation)(nil)
@@ -3358,6 +3370,104 @@ func (m *CommentMutation) ResetStatusUpdateID() {
 	delete(m.clearedFields, comment.FieldStatusUpdateID)
 }
 
+// SetDiscussionID sets the "discussion_id" field.
+func (m *CommentMutation) SetDiscussionID(u uuid.UUID) {
+	m.discussion = &u
+}
+
+// DiscussionID returns the value of the "discussion_id" field in the mutation.
+func (m *CommentMutation) DiscussionID() (r uuid.UUID, exists bool) {
+	v := m.discussion
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDiscussionID returns the old "discussion_id" field's value of the Comment entity.
+// If the Comment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CommentMutation) OldDiscussionID(ctx context.Context) (v *uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDiscussionID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDiscussionID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDiscussionID: %w", err)
+	}
+	return oldValue.DiscussionID, nil
+}
+
+// ClearDiscussionID clears the value of the "discussion_id" field.
+func (m *CommentMutation) ClearDiscussionID() {
+	m.discussion = nil
+	m.clearedFields[comment.FieldDiscussionID] = struct{}{}
+}
+
+// DiscussionIDCleared returns if the "discussion_id" field was cleared in this mutation.
+func (m *CommentMutation) DiscussionIDCleared() bool {
+	_, ok := m.clearedFields[comment.FieldDiscussionID]
+	return ok
+}
+
+// ResetDiscussionID resets all changes to the "discussion_id" field.
+func (m *CommentMutation) ResetDiscussionID() {
+	m.discussion = nil
+	delete(m.clearedFields, comment.FieldDiscussionID)
+}
+
+// SetDiscussionThreadID sets the "discussion_thread_id" field.
+func (m *CommentMutation) SetDiscussionThreadID(u uuid.UUID) {
+	m.discussion_thread = &u
+}
+
+// DiscussionThreadID returns the value of the "discussion_thread_id" field in the mutation.
+func (m *CommentMutation) DiscussionThreadID() (r uuid.UUID, exists bool) {
+	v := m.discussion_thread
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDiscussionThreadID returns the old "discussion_thread_id" field's value of the Comment entity.
+// If the Comment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CommentMutation) OldDiscussionThreadID(ctx context.Context) (v *uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDiscussionThreadID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDiscussionThreadID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDiscussionThreadID: %w", err)
+	}
+	return oldValue.DiscussionThreadID, nil
+}
+
+// ClearDiscussionThreadID clears the value of the "discussion_thread_id" field.
+func (m *CommentMutation) ClearDiscussionThreadID() {
+	m.discussion_thread = nil
+	m.clearedFields[comment.FieldDiscussionThreadID] = struct{}{}
+}
+
+// DiscussionThreadIDCleared returns if the "discussion_thread_id" field was cleared in this mutation.
+func (m *CommentMutation) DiscussionThreadIDCleared() bool {
+	_, ok := m.clearedFields[comment.FieldDiscussionThreadID]
+	return ok
+}
+
+// ResetDiscussionThreadID resets all changes to the "discussion_thread_id" field.
+func (m *CommentMutation) ResetDiscussionThreadID() {
+	m.discussion_thread = nil
+	delete(m.clearedFields, comment.FieldDiscussionThreadID)
+}
+
 // SetParentID sets the "parent_id" field.
 func (m *CommentMutation) SetParentID(u uuid.UUID) {
 	m.parent = &u
@@ -3539,6 +3649,104 @@ func (m *CommentMutation) QuotedTextCleared() bool {
 func (m *CommentMutation) ResetQuotedText() {
 	m.quoted_text = nil
 	delete(m.clearedFields, comment.FieldQuotedText)
+}
+
+// SetSuggestedText sets the "suggested_text" field.
+func (m *CommentMutation) SetSuggestedText(s string) {
+	m.suggested_text = &s
+}
+
+// SuggestedText returns the value of the "suggested_text" field in the mutation.
+func (m *CommentMutation) SuggestedText() (r string, exists bool) {
+	v := m.suggested_text
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSuggestedText returns the old "suggested_text" field's value of the Comment entity.
+// If the Comment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CommentMutation) OldSuggestedText(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSuggestedText is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSuggestedText requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSuggestedText: %w", err)
+	}
+	return oldValue.SuggestedText, nil
+}
+
+// ClearSuggestedText clears the value of the "suggested_text" field.
+func (m *CommentMutation) ClearSuggestedText() {
+	m.suggested_text = nil
+	m.clearedFields[comment.FieldSuggestedText] = struct{}{}
+}
+
+// SuggestedTextCleared returns if the "suggested_text" field was cleared in this mutation.
+func (m *CommentMutation) SuggestedTextCleared() bool {
+	_, ok := m.clearedFields[comment.FieldSuggestedText]
+	return ok
+}
+
+// ResetSuggestedText resets all changes to the "suggested_text" field.
+func (m *CommentMutation) ResetSuggestedText() {
+	m.suggested_text = nil
+	delete(m.clearedFields, comment.FieldSuggestedText)
+}
+
+// SetSuggestionStatus sets the "suggestion_status" field.
+func (m *CommentMutation) SetSuggestionStatus(s string) {
+	m.suggestion_status = &s
+}
+
+// SuggestionStatus returns the value of the "suggestion_status" field in the mutation.
+func (m *CommentMutation) SuggestionStatus() (r string, exists bool) {
+	v := m.suggestion_status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSuggestionStatus returns the old "suggestion_status" field's value of the Comment entity.
+// If the Comment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CommentMutation) OldSuggestionStatus(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSuggestionStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSuggestionStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSuggestionStatus: %w", err)
+	}
+	return oldValue.SuggestionStatus, nil
+}
+
+// ClearSuggestionStatus clears the value of the "suggestion_status" field.
+func (m *CommentMutation) ClearSuggestionStatus() {
+	m.suggestion_status = nil
+	m.clearedFields[comment.FieldSuggestionStatus] = struct{}{}
+}
+
+// SuggestionStatusCleared returns if the "suggestion_status" field was cleared in this mutation.
+func (m *CommentMutation) SuggestionStatusCleared() bool {
+	_, ok := m.clearedFields[comment.FieldSuggestionStatus]
+	return ok
+}
+
+// ResetSuggestionStatus resets all changes to the "suggestion_status" field.
+func (m *CommentMutation) ResetSuggestionStatus() {
+	m.suggestion_status = nil
+	delete(m.clearedFields, comment.FieldSuggestionStatus)
 }
 
 // SetEditedAt sets the "edited_at" field.
@@ -3975,6 +4183,60 @@ func (m *CommentMutation) ResetStatusUpdate() {
 	m.clearedstatus_update = false
 }
 
+// ClearDiscussion clears the "discussion" edge to the Discussion entity.
+func (m *CommentMutation) ClearDiscussion() {
+	m.cleareddiscussion = true
+	m.clearedFields[comment.FieldDiscussionID] = struct{}{}
+}
+
+// DiscussionCleared reports if the "discussion" edge to the Discussion entity was cleared.
+func (m *CommentMutation) DiscussionCleared() bool {
+	return m.DiscussionIDCleared() || m.cleareddiscussion
+}
+
+// DiscussionIDs returns the "discussion" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// DiscussionID instead. It exists only for internal usage by the builders.
+func (m *CommentMutation) DiscussionIDs() (ids []uuid.UUID) {
+	if id := m.discussion; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetDiscussion resets all changes to the "discussion" edge.
+func (m *CommentMutation) ResetDiscussion() {
+	m.discussion = nil
+	m.cleareddiscussion = false
+}
+
+// ClearDiscussionThread clears the "discussion_thread" edge to the DiscussionThread entity.
+func (m *CommentMutation) ClearDiscussionThread() {
+	m.cleareddiscussion_thread = true
+	m.clearedFields[comment.FieldDiscussionThreadID] = struct{}{}
+}
+
+// DiscussionThreadCleared reports if the "discussion_thread" edge to the DiscussionThread entity was cleared.
+func (m *CommentMutation) DiscussionThreadCleared() bool {
+	return m.DiscussionThreadIDCleared() || m.cleareddiscussion_thread
+}
+
+// DiscussionThreadIDs returns the "discussion_thread" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// DiscussionThreadID instead. It exists only for internal usage by the builders.
+func (m *CommentMutation) DiscussionThreadIDs() (ids []uuid.UUID) {
+	if id := m.discussion_thread; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetDiscussionThread resets all changes to the "discussion_thread" edge.
+func (m *CommentMutation) ResetDiscussionThread() {
+	m.discussion_thread = nil
+	m.cleareddiscussion_thread = false
+}
+
 // ClearParent clears the "parent" edge to the Comment entity.
 func (m *CommentMutation) ClearParent() {
 	m.clearedparent = true
@@ -4306,7 +4568,7 @@ func (m *CommentMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CommentMutation) Fields() []string {
-	fields := make([]string, 0, 16)
+	fields := make([]string, 0, 20)
 	if m.workspace != nil {
 		fields = append(fields, comment.FieldWorkspaceID)
 	}
@@ -4328,6 +4590,12 @@ func (m *CommentMutation) Fields() []string {
 	if m.status_update != nil {
 		fields = append(fields, comment.FieldStatusUpdateID)
 	}
+	if m.discussion != nil {
+		fields = append(fields, comment.FieldDiscussionID)
+	}
+	if m.discussion_thread != nil {
+		fields = append(fields, comment.FieldDiscussionThreadID)
+	}
 	if m.parent != nil {
 		fields = append(fields, comment.FieldParentID)
 	}
@@ -4339,6 +4607,12 @@ func (m *CommentMutation) Fields() []string {
 	}
 	if m.quoted_text != nil {
 		fields = append(fields, comment.FieldQuotedText)
+	}
+	if m.suggested_text != nil {
+		fields = append(fields, comment.FieldSuggestedText)
+	}
+	if m.suggestion_status != nil {
+		fields = append(fields, comment.FieldSuggestionStatus)
 	}
 	if m.edited_at != nil {
 		fields = append(fields, comment.FieldEditedAt)
@@ -4377,6 +4651,10 @@ func (m *CommentMutation) Field(name string) (ent.Value, bool) {
 		return m.MilestoneID()
 	case comment.FieldStatusUpdateID:
 		return m.StatusUpdateID()
+	case comment.FieldDiscussionID:
+		return m.DiscussionID()
+	case comment.FieldDiscussionThreadID:
+		return m.DiscussionThreadID()
 	case comment.FieldParentID:
 		return m.ParentID()
 	case comment.FieldUserID:
@@ -4385,6 +4663,10 @@ func (m *CommentMutation) Field(name string) (ent.Value, bool) {
 		return m.Body()
 	case comment.FieldQuotedText:
 		return m.QuotedText()
+	case comment.FieldSuggestedText:
+		return m.SuggestedText()
+	case comment.FieldSuggestionStatus:
+		return m.SuggestionStatus()
 	case comment.FieldEditedAt:
 		return m.EditedAt()
 	case comment.FieldResolvedAt:
@@ -4418,6 +4700,10 @@ func (m *CommentMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldMilestoneID(ctx)
 	case comment.FieldStatusUpdateID:
 		return m.OldStatusUpdateID(ctx)
+	case comment.FieldDiscussionID:
+		return m.OldDiscussionID(ctx)
+	case comment.FieldDiscussionThreadID:
+		return m.OldDiscussionThreadID(ctx)
 	case comment.FieldParentID:
 		return m.OldParentID(ctx)
 	case comment.FieldUserID:
@@ -4426,6 +4712,10 @@ func (m *CommentMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldBody(ctx)
 	case comment.FieldQuotedText:
 		return m.OldQuotedText(ctx)
+	case comment.FieldSuggestedText:
+		return m.OldSuggestedText(ctx)
+	case comment.FieldSuggestionStatus:
+		return m.OldSuggestionStatus(ctx)
 	case comment.FieldEditedAt:
 		return m.OldEditedAt(ctx)
 	case comment.FieldResolvedAt:
@@ -4494,6 +4784,20 @@ func (m *CommentMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStatusUpdateID(v)
 		return nil
+	case comment.FieldDiscussionID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDiscussionID(v)
+		return nil
+	case comment.FieldDiscussionThreadID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDiscussionThreadID(v)
+		return nil
 	case comment.FieldParentID:
 		v, ok := value.(uuid.UUID)
 		if !ok {
@@ -4521,6 +4825,20 @@ func (m *CommentMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetQuotedText(v)
+		return nil
+	case comment.FieldSuggestedText:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSuggestedText(v)
+		return nil
+	case comment.FieldSuggestionStatus:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSuggestionStatus(v)
 		return nil
 	case comment.FieldEditedAt:
 		v, ok := value.(time.Time)
@@ -4605,6 +4923,12 @@ func (m *CommentMutation) ClearedFields() []string {
 	if m.FieldCleared(comment.FieldStatusUpdateID) {
 		fields = append(fields, comment.FieldStatusUpdateID)
 	}
+	if m.FieldCleared(comment.FieldDiscussionID) {
+		fields = append(fields, comment.FieldDiscussionID)
+	}
+	if m.FieldCleared(comment.FieldDiscussionThreadID) {
+		fields = append(fields, comment.FieldDiscussionThreadID)
+	}
 	if m.FieldCleared(comment.FieldParentID) {
 		fields = append(fields, comment.FieldParentID)
 	}
@@ -4613,6 +4937,12 @@ func (m *CommentMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(comment.FieldQuotedText) {
 		fields = append(fields, comment.FieldQuotedText)
+	}
+	if m.FieldCleared(comment.FieldSuggestedText) {
+		fields = append(fields, comment.FieldSuggestedText)
+	}
+	if m.FieldCleared(comment.FieldSuggestionStatus) {
+		fields = append(fields, comment.FieldSuggestionStatus)
 	}
 	if m.FieldCleared(comment.FieldEditedAt) {
 		fields = append(fields, comment.FieldEditedAt)
@@ -4661,6 +4991,12 @@ func (m *CommentMutation) ClearField(name string) error {
 	case comment.FieldStatusUpdateID:
 		m.ClearStatusUpdateID()
 		return nil
+	case comment.FieldDiscussionID:
+		m.ClearDiscussionID()
+		return nil
+	case comment.FieldDiscussionThreadID:
+		m.ClearDiscussionThreadID()
+		return nil
 	case comment.FieldParentID:
 		m.ClearParentID()
 		return nil
@@ -4669,6 +5005,12 @@ func (m *CommentMutation) ClearField(name string) error {
 		return nil
 	case comment.FieldQuotedText:
 		m.ClearQuotedText()
+		return nil
+	case comment.FieldSuggestedText:
+		m.ClearSuggestedText()
+		return nil
+	case comment.FieldSuggestionStatus:
+		m.ClearSuggestionStatus()
 		return nil
 	case comment.FieldEditedAt:
 		m.ClearEditedAt()
@@ -4714,6 +5056,12 @@ func (m *CommentMutation) ResetField(name string) error {
 	case comment.FieldStatusUpdateID:
 		m.ResetStatusUpdateID()
 		return nil
+	case comment.FieldDiscussionID:
+		m.ResetDiscussionID()
+		return nil
+	case comment.FieldDiscussionThreadID:
+		m.ResetDiscussionThreadID()
+		return nil
 	case comment.FieldParentID:
 		m.ResetParentID()
 		return nil
@@ -4725,6 +5073,12 @@ func (m *CommentMutation) ResetField(name string) error {
 		return nil
 	case comment.FieldQuotedText:
 		m.ResetQuotedText()
+		return nil
+	case comment.FieldSuggestedText:
+		m.ResetSuggestedText()
+		return nil
+	case comment.FieldSuggestionStatus:
+		m.ResetSuggestionStatus()
 		return nil
 	case comment.FieldEditedAt:
 		m.ResetEditedAt()
@@ -4747,7 +5101,7 @@ func (m *CommentMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CommentMutation) AddedEdges() []string {
-	edges := make([]string, 0, 14)
+	edges := make([]string, 0, 16)
 	if m.workspace != nil {
 		edges = append(edges, comment.EdgeWorkspace)
 	}
@@ -4768,6 +5122,12 @@ func (m *CommentMutation) AddedEdges() []string {
 	}
 	if m.status_update != nil {
 		edges = append(edges, comment.EdgeStatusUpdate)
+	}
+	if m.discussion != nil {
+		edges = append(edges, comment.EdgeDiscussion)
+	}
+	if m.discussion_thread != nil {
+		edges = append(edges, comment.EdgeDiscussionThread)
 	}
 	if m.parent != nil {
 		edges = append(edges, comment.EdgeParent)
@@ -4825,6 +5185,14 @@ func (m *CommentMutation) AddedIDs(name string) []ent.Value {
 		if id := m.status_update; id != nil {
 			return []ent.Value{*id}
 		}
+	case comment.EdgeDiscussion:
+		if id := m.discussion; id != nil {
+			return []ent.Value{*id}
+		}
+	case comment.EdgeDiscussionThread:
+		if id := m.discussion_thread; id != nil {
+			return []ent.Value{*id}
+		}
 	case comment.EdgeParent:
 		if id := m.parent; id != nil {
 			return []ent.Value{*id}
@@ -4867,7 +5235,7 @@ func (m *CommentMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CommentMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 14)
+	edges := make([]string, 0, 16)
 	if m.removedchildren != nil {
 		edges = append(edges, comment.EdgeChildren)
 	}
@@ -4917,7 +5285,7 @@ func (m *CommentMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CommentMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 14)
+	edges := make([]string, 0, 16)
 	if m.clearedworkspace {
 		edges = append(edges, comment.EdgeWorkspace)
 	}
@@ -4938,6 +5306,12 @@ func (m *CommentMutation) ClearedEdges() []string {
 	}
 	if m.clearedstatus_update {
 		edges = append(edges, comment.EdgeStatusUpdate)
+	}
+	if m.cleareddiscussion {
+		edges = append(edges, comment.EdgeDiscussion)
+	}
+	if m.cleareddiscussion_thread {
+		edges = append(edges, comment.EdgeDiscussionThread)
 	}
 	if m.clearedparent {
 		edges = append(edges, comment.EdgeParent)
@@ -4981,6 +5355,10 @@ func (m *CommentMutation) EdgeCleared(name string) bool {
 		return m.clearedmilestone
 	case comment.EdgeStatusUpdate:
 		return m.clearedstatus_update
+	case comment.EdgeDiscussion:
+		return m.cleareddiscussion
+	case comment.EdgeDiscussionThread:
+		return m.cleareddiscussion_thread
 	case comment.EdgeParent:
 		return m.clearedparent
 	case comment.EdgeChildren:
@@ -5024,6 +5402,12 @@ func (m *CommentMutation) ClearEdge(name string) error {
 	case comment.EdgeStatusUpdate:
 		m.ClearStatusUpdate()
 		return nil
+	case comment.EdgeDiscussion:
+		m.ClearDiscussion()
+		return nil
+	case comment.EdgeDiscussionThread:
+		m.ClearDiscussionThread()
+		return nil
 	case comment.EdgeParent:
 		m.ClearParent()
 		return nil
@@ -5061,6 +5445,12 @@ func (m *CommentMutation) ResetEdge(name string) error {
 		return nil
 	case comment.EdgeStatusUpdate:
 		m.ResetStatusUpdate()
+		return nil
+	case comment.EdgeDiscussion:
+		m.ResetDiscussion()
+		return nil
+	case comment.EdgeDiscussionThread:
+		m.ResetDiscussionThread()
 		return nil
 	case comment.EdgeParent:
 		m.ResetParent()
@@ -12218,6 +12608,3398 @@ func (m *CycleMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Cycle edge %s", name)
+}
+
+// DiscussionMutation represents an operation that mutates the Discussion nodes in the graph.
+type DiscussionMutation struct {
+	config
+	op                   Op
+	typ                  string
+	id                   *uuid.UUID
+	slug_id              *string
+	title                *string
+	body                 *string
+	pinned_at            *time.Time
+	closed_at            *time.Time
+	trashed_at           *time.Time
+	last_activity_at     *time.Time
+	created_at           *time.Time
+	updated_at           *time.Time
+	clearedFields        map[string]struct{}
+	workspace            *uuid.UUID
+	clearedworkspace     bool
+	team                 *uuid.UUID
+	clearedteam          bool
+	creator              *uuid.UUID
+	clearedcreator       bool
+	threads              map[uuid.UUID]struct{}
+	removedthreads       map[uuid.UUID]struct{}
+	clearedthreads       bool
+	comments             map[uuid.UUID]struct{}
+	removedcomments      map[uuid.UUID]struct{}
+	clearedcomments      bool
+	notifications        map[uuid.UUID]struct{}
+	removednotifications map[uuid.UUID]struct{}
+	clearednotifications bool
+	subscribers          map[uuid.UUID]struct{}
+	removedsubscribers   map[uuid.UUID]struct{}
+	clearedsubscribers   bool
+	done                 bool
+	oldValue             func(context.Context) (*Discussion, error)
+	predicates           []predicate.Discussion
+}
+
+var _ ent.Mutation = (*DiscussionMutation)(nil)
+
+// discussionOption allows management of the mutation configuration using functional options.
+type discussionOption func(*DiscussionMutation)
+
+// newDiscussionMutation creates new mutation for the Discussion entity.
+func newDiscussionMutation(c config, op Op, opts ...discussionOption) *DiscussionMutation {
+	m := &DiscussionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeDiscussion,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withDiscussionID sets the ID field of the mutation.
+func withDiscussionID(id uuid.UUID) discussionOption {
+	return func(m *DiscussionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Discussion
+		)
+		m.oldValue = func(ctx context.Context) (*Discussion, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Discussion.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withDiscussion sets the old Discussion of the mutation.
+func withDiscussion(node *Discussion) discussionOption {
+	return func(m *DiscussionMutation) {
+		m.oldValue = func(context.Context) (*Discussion, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m DiscussionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m DiscussionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Discussion entities.
+func (m *DiscussionMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *DiscussionMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *DiscussionMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Discussion.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetWorkspaceID sets the "workspace_id" field.
+func (m *DiscussionMutation) SetWorkspaceID(u uuid.UUID) {
+	m.workspace = &u
+}
+
+// WorkspaceID returns the value of the "workspace_id" field in the mutation.
+func (m *DiscussionMutation) WorkspaceID() (r uuid.UUID, exists bool) {
+	v := m.workspace
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWorkspaceID returns the old "workspace_id" field's value of the Discussion entity.
+// If the Discussion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionMutation) OldWorkspaceID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWorkspaceID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWorkspaceID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWorkspaceID: %w", err)
+	}
+	return oldValue.WorkspaceID, nil
+}
+
+// ResetWorkspaceID resets all changes to the "workspace_id" field.
+func (m *DiscussionMutation) ResetWorkspaceID() {
+	m.workspace = nil
+}
+
+// SetSlugID sets the "slug_id" field.
+func (m *DiscussionMutation) SetSlugID(s string) {
+	m.slug_id = &s
+}
+
+// SlugID returns the value of the "slug_id" field in the mutation.
+func (m *DiscussionMutation) SlugID() (r string, exists bool) {
+	v := m.slug_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSlugID returns the old "slug_id" field's value of the Discussion entity.
+// If the Discussion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionMutation) OldSlugID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSlugID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSlugID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSlugID: %w", err)
+	}
+	return oldValue.SlugID, nil
+}
+
+// ResetSlugID resets all changes to the "slug_id" field.
+func (m *DiscussionMutation) ResetSlugID() {
+	m.slug_id = nil
+}
+
+// SetTitle sets the "title" field.
+func (m *DiscussionMutation) SetTitle(s string) {
+	m.title = &s
+}
+
+// Title returns the value of the "title" field in the mutation.
+func (m *DiscussionMutation) Title() (r string, exists bool) {
+	v := m.title
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTitle returns the old "title" field's value of the Discussion entity.
+// If the Discussion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionMutation) OldTitle(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTitle requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+	}
+	return oldValue.Title, nil
+}
+
+// ResetTitle resets all changes to the "title" field.
+func (m *DiscussionMutation) ResetTitle() {
+	m.title = nil
+}
+
+// SetBody sets the "body" field.
+func (m *DiscussionMutation) SetBody(s string) {
+	m.body = &s
+}
+
+// Body returns the value of the "body" field in the mutation.
+func (m *DiscussionMutation) Body() (r string, exists bool) {
+	v := m.body
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBody returns the old "body" field's value of the Discussion entity.
+// If the Discussion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionMutation) OldBody(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBody is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBody requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBody: %w", err)
+	}
+	return oldValue.Body, nil
+}
+
+// ClearBody clears the value of the "body" field.
+func (m *DiscussionMutation) ClearBody() {
+	m.body = nil
+	m.clearedFields[discussion.FieldBody] = struct{}{}
+}
+
+// BodyCleared returns if the "body" field was cleared in this mutation.
+func (m *DiscussionMutation) BodyCleared() bool {
+	_, ok := m.clearedFields[discussion.FieldBody]
+	return ok
+}
+
+// ResetBody resets all changes to the "body" field.
+func (m *DiscussionMutation) ResetBody() {
+	m.body = nil
+	delete(m.clearedFields, discussion.FieldBody)
+}
+
+// SetTeamID sets the "team_id" field.
+func (m *DiscussionMutation) SetTeamID(u uuid.UUID) {
+	m.team = &u
+}
+
+// TeamID returns the value of the "team_id" field in the mutation.
+func (m *DiscussionMutation) TeamID() (r uuid.UUID, exists bool) {
+	v := m.team
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTeamID returns the old "team_id" field's value of the Discussion entity.
+// If the Discussion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionMutation) OldTeamID(ctx context.Context) (v *uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTeamID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTeamID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTeamID: %w", err)
+	}
+	return oldValue.TeamID, nil
+}
+
+// ClearTeamID clears the value of the "team_id" field.
+func (m *DiscussionMutation) ClearTeamID() {
+	m.team = nil
+	m.clearedFields[discussion.FieldTeamID] = struct{}{}
+}
+
+// TeamIDCleared returns if the "team_id" field was cleared in this mutation.
+func (m *DiscussionMutation) TeamIDCleared() bool {
+	_, ok := m.clearedFields[discussion.FieldTeamID]
+	return ok
+}
+
+// ResetTeamID resets all changes to the "team_id" field.
+func (m *DiscussionMutation) ResetTeamID() {
+	m.team = nil
+	delete(m.clearedFields, discussion.FieldTeamID)
+}
+
+// SetCreatorID sets the "creator_id" field.
+func (m *DiscussionMutation) SetCreatorID(u uuid.UUID) {
+	m.creator = &u
+}
+
+// CreatorID returns the value of the "creator_id" field in the mutation.
+func (m *DiscussionMutation) CreatorID() (r uuid.UUID, exists bool) {
+	v := m.creator
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatorID returns the old "creator_id" field's value of the Discussion entity.
+// If the Discussion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionMutation) OldCreatorID(ctx context.Context) (v *uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatorID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatorID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatorID: %w", err)
+	}
+	return oldValue.CreatorID, nil
+}
+
+// ClearCreatorID clears the value of the "creator_id" field.
+func (m *DiscussionMutation) ClearCreatorID() {
+	m.creator = nil
+	m.clearedFields[discussion.FieldCreatorID] = struct{}{}
+}
+
+// CreatorIDCleared returns if the "creator_id" field was cleared in this mutation.
+func (m *DiscussionMutation) CreatorIDCleared() bool {
+	_, ok := m.clearedFields[discussion.FieldCreatorID]
+	return ok
+}
+
+// ResetCreatorID resets all changes to the "creator_id" field.
+func (m *DiscussionMutation) ResetCreatorID() {
+	m.creator = nil
+	delete(m.clearedFields, discussion.FieldCreatorID)
+}
+
+// SetPinnedAt sets the "pinned_at" field.
+func (m *DiscussionMutation) SetPinnedAt(t time.Time) {
+	m.pinned_at = &t
+}
+
+// PinnedAt returns the value of the "pinned_at" field in the mutation.
+func (m *DiscussionMutation) PinnedAt() (r time.Time, exists bool) {
+	v := m.pinned_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPinnedAt returns the old "pinned_at" field's value of the Discussion entity.
+// If the Discussion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionMutation) OldPinnedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPinnedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPinnedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPinnedAt: %w", err)
+	}
+	return oldValue.PinnedAt, nil
+}
+
+// ClearPinnedAt clears the value of the "pinned_at" field.
+func (m *DiscussionMutation) ClearPinnedAt() {
+	m.pinned_at = nil
+	m.clearedFields[discussion.FieldPinnedAt] = struct{}{}
+}
+
+// PinnedAtCleared returns if the "pinned_at" field was cleared in this mutation.
+func (m *DiscussionMutation) PinnedAtCleared() bool {
+	_, ok := m.clearedFields[discussion.FieldPinnedAt]
+	return ok
+}
+
+// ResetPinnedAt resets all changes to the "pinned_at" field.
+func (m *DiscussionMutation) ResetPinnedAt() {
+	m.pinned_at = nil
+	delete(m.clearedFields, discussion.FieldPinnedAt)
+}
+
+// SetClosedAt sets the "closed_at" field.
+func (m *DiscussionMutation) SetClosedAt(t time.Time) {
+	m.closed_at = &t
+}
+
+// ClosedAt returns the value of the "closed_at" field in the mutation.
+func (m *DiscussionMutation) ClosedAt() (r time.Time, exists bool) {
+	v := m.closed_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldClosedAt returns the old "closed_at" field's value of the Discussion entity.
+// If the Discussion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionMutation) OldClosedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldClosedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldClosedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldClosedAt: %w", err)
+	}
+	return oldValue.ClosedAt, nil
+}
+
+// ClearClosedAt clears the value of the "closed_at" field.
+func (m *DiscussionMutation) ClearClosedAt() {
+	m.closed_at = nil
+	m.clearedFields[discussion.FieldClosedAt] = struct{}{}
+}
+
+// ClosedAtCleared returns if the "closed_at" field was cleared in this mutation.
+func (m *DiscussionMutation) ClosedAtCleared() bool {
+	_, ok := m.clearedFields[discussion.FieldClosedAt]
+	return ok
+}
+
+// ResetClosedAt resets all changes to the "closed_at" field.
+func (m *DiscussionMutation) ResetClosedAt() {
+	m.closed_at = nil
+	delete(m.clearedFields, discussion.FieldClosedAt)
+}
+
+// SetTrashedAt sets the "trashed_at" field.
+func (m *DiscussionMutation) SetTrashedAt(t time.Time) {
+	m.trashed_at = &t
+}
+
+// TrashedAt returns the value of the "trashed_at" field in the mutation.
+func (m *DiscussionMutation) TrashedAt() (r time.Time, exists bool) {
+	v := m.trashed_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTrashedAt returns the old "trashed_at" field's value of the Discussion entity.
+// If the Discussion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionMutation) OldTrashedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTrashedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTrashedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTrashedAt: %w", err)
+	}
+	return oldValue.TrashedAt, nil
+}
+
+// ClearTrashedAt clears the value of the "trashed_at" field.
+func (m *DiscussionMutation) ClearTrashedAt() {
+	m.trashed_at = nil
+	m.clearedFields[discussion.FieldTrashedAt] = struct{}{}
+}
+
+// TrashedAtCleared returns if the "trashed_at" field was cleared in this mutation.
+func (m *DiscussionMutation) TrashedAtCleared() bool {
+	_, ok := m.clearedFields[discussion.FieldTrashedAt]
+	return ok
+}
+
+// ResetTrashedAt resets all changes to the "trashed_at" field.
+func (m *DiscussionMutation) ResetTrashedAt() {
+	m.trashed_at = nil
+	delete(m.clearedFields, discussion.FieldTrashedAt)
+}
+
+// SetLastActivityAt sets the "last_activity_at" field.
+func (m *DiscussionMutation) SetLastActivityAt(t time.Time) {
+	m.last_activity_at = &t
+}
+
+// LastActivityAt returns the value of the "last_activity_at" field in the mutation.
+func (m *DiscussionMutation) LastActivityAt() (r time.Time, exists bool) {
+	v := m.last_activity_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastActivityAt returns the old "last_activity_at" field's value of the Discussion entity.
+// If the Discussion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionMutation) OldLastActivityAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastActivityAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastActivityAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastActivityAt: %w", err)
+	}
+	return oldValue.LastActivityAt, nil
+}
+
+// ClearLastActivityAt clears the value of the "last_activity_at" field.
+func (m *DiscussionMutation) ClearLastActivityAt() {
+	m.last_activity_at = nil
+	m.clearedFields[discussion.FieldLastActivityAt] = struct{}{}
+}
+
+// LastActivityAtCleared returns if the "last_activity_at" field was cleared in this mutation.
+func (m *DiscussionMutation) LastActivityAtCleared() bool {
+	_, ok := m.clearedFields[discussion.FieldLastActivityAt]
+	return ok
+}
+
+// ResetLastActivityAt resets all changes to the "last_activity_at" field.
+func (m *DiscussionMutation) ResetLastActivityAt() {
+	m.last_activity_at = nil
+	delete(m.clearedFields, discussion.FieldLastActivityAt)
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *DiscussionMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *DiscussionMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Discussion entity.
+// If the Discussion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ClearCreatedAt clears the value of the "created_at" field.
+func (m *DiscussionMutation) ClearCreatedAt() {
+	m.created_at = nil
+	m.clearedFields[discussion.FieldCreatedAt] = struct{}{}
+}
+
+// CreatedAtCleared returns if the "created_at" field was cleared in this mutation.
+func (m *DiscussionMutation) CreatedAtCleared() bool {
+	_, ok := m.clearedFields[discussion.FieldCreatedAt]
+	return ok
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *DiscussionMutation) ResetCreatedAt() {
+	m.created_at = nil
+	delete(m.clearedFields, discussion.FieldCreatedAt)
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *DiscussionMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *DiscussionMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Discussion entity.
+// If the Discussion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (m *DiscussionMutation) ClearUpdatedAt() {
+	m.updated_at = nil
+	m.clearedFields[discussion.FieldUpdatedAt] = struct{}{}
+}
+
+// UpdatedAtCleared returns if the "updated_at" field was cleared in this mutation.
+func (m *DiscussionMutation) UpdatedAtCleared() bool {
+	_, ok := m.clearedFields[discussion.FieldUpdatedAt]
+	return ok
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *DiscussionMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	delete(m.clearedFields, discussion.FieldUpdatedAt)
+}
+
+// ClearWorkspace clears the "workspace" edge to the Workspace entity.
+func (m *DiscussionMutation) ClearWorkspace() {
+	m.clearedworkspace = true
+	m.clearedFields[discussion.FieldWorkspaceID] = struct{}{}
+}
+
+// WorkspaceCleared reports if the "workspace" edge to the Workspace entity was cleared.
+func (m *DiscussionMutation) WorkspaceCleared() bool {
+	return m.clearedworkspace
+}
+
+// WorkspaceIDs returns the "workspace" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// WorkspaceID instead. It exists only for internal usage by the builders.
+func (m *DiscussionMutation) WorkspaceIDs() (ids []uuid.UUID) {
+	if id := m.workspace; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetWorkspace resets all changes to the "workspace" edge.
+func (m *DiscussionMutation) ResetWorkspace() {
+	m.workspace = nil
+	m.clearedworkspace = false
+}
+
+// ClearTeam clears the "team" edge to the Team entity.
+func (m *DiscussionMutation) ClearTeam() {
+	m.clearedteam = true
+	m.clearedFields[discussion.FieldTeamID] = struct{}{}
+}
+
+// TeamCleared reports if the "team" edge to the Team entity was cleared.
+func (m *DiscussionMutation) TeamCleared() bool {
+	return m.TeamIDCleared() || m.clearedteam
+}
+
+// TeamIDs returns the "team" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// TeamID instead. It exists only for internal usage by the builders.
+func (m *DiscussionMutation) TeamIDs() (ids []uuid.UUID) {
+	if id := m.team; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetTeam resets all changes to the "team" edge.
+func (m *DiscussionMutation) ResetTeam() {
+	m.team = nil
+	m.clearedteam = false
+}
+
+// ClearCreator clears the "creator" edge to the User entity.
+func (m *DiscussionMutation) ClearCreator() {
+	m.clearedcreator = true
+	m.clearedFields[discussion.FieldCreatorID] = struct{}{}
+}
+
+// CreatorCleared reports if the "creator" edge to the User entity was cleared.
+func (m *DiscussionMutation) CreatorCleared() bool {
+	return m.CreatorIDCleared() || m.clearedcreator
+}
+
+// CreatorIDs returns the "creator" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CreatorID instead. It exists only for internal usage by the builders.
+func (m *DiscussionMutation) CreatorIDs() (ids []uuid.UUID) {
+	if id := m.creator; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCreator resets all changes to the "creator" edge.
+func (m *DiscussionMutation) ResetCreator() {
+	m.creator = nil
+	m.clearedcreator = false
+}
+
+// AddThreadIDs adds the "threads" edge to the DiscussionThread entity by ids.
+func (m *DiscussionMutation) AddThreadIDs(ids ...uuid.UUID) {
+	if m.threads == nil {
+		m.threads = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.threads[ids[i]] = struct{}{}
+	}
+}
+
+// ClearThreads clears the "threads" edge to the DiscussionThread entity.
+func (m *DiscussionMutation) ClearThreads() {
+	m.clearedthreads = true
+}
+
+// ThreadsCleared reports if the "threads" edge to the DiscussionThread entity was cleared.
+func (m *DiscussionMutation) ThreadsCleared() bool {
+	return m.clearedthreads
+}
+
+// RemoveThreadIDs removes the "threads" edge to the DiscussionThread entity by IDs.
+func (m *DiscussionMutation) RemoveThreadIDs(ids ...uuid.UUID) {
+	if m.removedthreads == nil {
+		m.removedthreads = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.threads, ids[i])
+		m.removedthreads[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedThreads returns the removed IDs of the "threads" edge to the DiscussionThread entity.
+func (m *DiscussionMutation) RemovedThreadsIDs() (ids []uuid.UUID) {
+	for id := range m.removedthreads {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ThreadsIDs returns the "threads" edge IDs in the mutation.
+func (m *DiscussionMutation) ThreadsIDs() (ids []uuid.UUID) {
+	for id := range m.threads {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetThreads resets all changes to the "threads" edge.
+func (m *DiscussionMutation) ResetThreads() {
+	m.threads = nil
+	m.clearedthreads = false
+	m.removedthreads = nil
+}
+
+// AddCommentIDs adds the "comments" edge to the Comment entity by ids.
+func (m *DiscussionMutation) AddCommentIDs(ids ...uuid.UUID) {
+	if m.comments == nil {
+		m.comments = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.comments[ids[i]] = struct{}{}
+	}
+}
+
+// ClearComments clears the "comments" edge to the Comment entity.
+func (m *DiscussionMutation) ClearComments() {
+	m.clearedcomments = true
+}
+
+// CommentsCleared reports if the "comments" edge to the Comment entity was cleared.
+func (m *DiscussionMutation) CommentsCleared() bool {
+	return m.clearedcomments
+}
+
+// RemoveCommentIDs removes the "comments" edge to the Comment entity by IDs.
+func (m *DiscussionMutation) RemoveCommentIDs(ids ...uuid.UUID) {
+	if m.removedcomments == nil {
+		m.removedcomments = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.comments, ids[i])
+		m.removedcomments[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedComments returns the removed IDs of the "comments" edge to the Comment entity.
+func (m *DiscussionMutation) RemovedCommentsIDs() (ids []uuid.UUID) {
+	for id := range m.removedcomments {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CommentsIDs returns the "comments" edge IDs in the mutation.
+func (m *DiscussionMutation) CommentsIDs() (ids []uuid.UUID) {
+	for id := range m.comments {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetComments resets all changes to the "comments" edge.
+func (m *DiscussionMutation) ResetComments() {
+	m.comments = nil
+	m.clearedcomments = false
+	m.removedcomments = nil
+}
+
+// AddNotificationIDs adds the "notifications" edge to the Notification entity by ids.
+func (m *DiscussionMutation) AddNotificationIDs(ids ...uuid.UUID) {
+	if m.notifications == nil {
+		m.notifications = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.notifications[ids[i]] = struct{}{}
+	}
+}
+
+// ClearNotifications clears the "notifications" edge to the Notification entity.
+func (m *DiscussionMutation) ClearNotifications() {
+	m.clearednotifications = true
+}
+
+// NotificationsCleared reports if the "notifications" edge to the Notification entity was cleared.
+func (m *DiscussionMutation) NotificationsCleared() bool {
+	return m.clearednotifications
+}
+
+// RemoveNotificationIDs removes the "notifications" edge to the Notification entity by IDs.
+func (m *DiscussionMutation) RemoveNotificationIDs(ids ...uuid.UUID) {
+	if m.removednotifications == nil {
+		m.removednotifications = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.notifications, ids[i])
+		m.removednotifications[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedNotifications returns the removed IDs of the "notifications" edge to the Notification entity.
+func (m *DiscussionMutation) RemovedNotificationsIDs() (ids []uuid.UUID) {
+	for id := range m.removednotifications {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// NotificationsIDs returns the "notifications" edge IDs in the mutation.
+func (m *DiscussionMutation) NotificationsIDs() (ids []uuid.UUID) {
+	for id := range m.notifications {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetNotifications resets all changes to the "notifications" edge.
+func (m *DiscussionMutation) ResetNotifications() {
+	m.notifications = nil
+	m.clearednotifications = false
+	m.removednotifications = nil
+}
+
+// AddSubscriberIDs adds the "subscribers" edge to the User entity by ids.
+func (m *DiscussionMutation) AddSubscriberIDs(ids ...uuid.UUID) {
+	if m.subscribers == nil {
+		m.subscribers = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.subscribers[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSubscribers clears the "subscribers" edge to the User entity.
+func (m *DiscussionMutation) ClearSubscribers() {
+	m.clearedsubscribers = true
+}
+
+// SubscribersCleared reports if the "subscribers" edge to the User entity was cleared.
+func (m *DiscussionMutation) SubscribersCleared() bool {
+	return m.clearedsubscribers
+}
+
+// RemoveSubscriberIDs removes the "subscribers" edge to the User entity by IDs.
+func (m *DiscussionMutation) RemoveSubscriberIDs(ids ...uuid.UUID) {
+	if m.removedsubscribers == nil {
+		m.removedsubscribers = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.subscribers, ids[i])
+		m.removedsubscribers[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSubscribers returns the removed IDs of the "subscribers" edge to the User entity.
+func (m *DiscussionMutation) RemovedSubscribersIDs() (ids []uuid.UUID) {
+	for id := range m.removedsubscribers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SubscribersIDs returns the "subscribers" edge IDs in the mutation.
+func (m *DiscussionMutation) SubscribersIDs() (ids []uuid.UUID) {
+	for id := range m.subscribers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSubscribers resets all changes to the "subscribers" edge.
+func (m *DiscussionMutation) ResetSubscribers() {
+	m.subscribers = nil
+	m.clearedsubscribers = false
+	m.removedsubscribers = nil
+}
+
+// Where appends a list predicates to the DiscussionMutation builder.
+func (m *DiscussionMutation) Where(ps ...predicate.Discussion) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the DiscussionMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *DiscussionMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Discussion, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *DiscussionMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *DiscussionMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Discussion).
+func (m *DiscussionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *DiscussionMutation) Fields() []string {
+	fields := make([]string, 0, 12)
+	if m.workspace != nil {
+		fields = append(fields, discussion.FieldWorkspaceID)
+	}
+	if m.slug_id != nil {
+		fields = append(fields, discussion.FieldSlugID)
+	}
+	if m.title != nil {
+		fields = append(fields, discussion.FieldTitle)
+	}
+	if m.body != nil {
+		fields = append(fields, discussion.FieldBody)
+	}
+	if m.team != nil {
+		fields = append(fields, discussion.FieldTeamID)
+	}
+	if m.creator != nil {
+		fields = append(fields, discussion.FieldCreatorID)
+	}
+	if m.pinned_at != nil {
+		fields = append(fields, discussion.FieldPinnedAt)
+	}
+	if m.closed_at != nil {
+		fields = append(fields, discussion.FieldClosedAt)
+	}
+	if m.trashed_at != nil {
+		fields = append(fields, discussion.FieldTrashedAt)
+	}
+	if m.last_activity_at != nil {
+		fields = append(fields, discussion.FieldLastActivityAt)
+	}
+	if m.created_at != nil {
+		fields = append(fields, discussion.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, discussion.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *DiscussionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case discussion.FieldWorkspaceID:
+		return m.WorkspaceID()
+	case discussion.FieldSlugID:
+		return m.SlugID()
+	case discussion.FieldTitle:
+		return m.Title()
+	case discussion.FieldBody:
+		return m.Body()
+	case discussion.FieldTeamID:
+		return m.TeamID()
+	case discussion.FieldCreatorID:
+		return m.CreatorID()
+	case discussion.FieldPinnedAt:
+		return m.PinnedAt()
+	case discussion.FieldClosedAt:
+		return m.ClosedAt()
+	case discussion.FieldTrashedAt:
+		return m.TrashedAt()
+	case discussion.FieldLastActivityAt:
+		return m.LastActivityAt()
+	case discussion.FieldCreatedAt:
+		return m.CreatedAt()
+	case discussion.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *DiscussionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case discussion.FieldWorkspaceID:
+		return m.OldWorkspaceID(ctx)
+	case discussion.FieldSlugID:
+		return m.OldSlugID(ctx)
+	case discussion.FieldTitle:
+		return m.OldTitle(ctx)
+	case discussion.FieldBody:
+		return m.OldBody(ctx)
+	case discussion.FieldTeamID:
+		return m.OldTeamID(ctx)
+	case discussion.FieldCreatorID:
+		return m.OldCreatorID(ctx)
+	case discussion.FieldPinnedAt:
+		return m.OldPinnedAt(ctx)
+	case discussion.FieldClosedAt:
+		return m.OldClosedAt(ctx)
+	case discussion.FieldTrashedAt:
+		return m.OldTrashedAt(ctx)
+	case discussion.FieldLastActivityAt:
+		return m.OldLastActivityAt(ctx)
+	case discussion.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case discussion.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown Discussion field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DiscussionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case discussion.FieldWorkspaceID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWorkspaceID(v)
+		return nil
+	case discussion.FieldSlugID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSlugID(v)
+		return nil
+	case discussion.FieldTitle:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTitle(v)
+		return nil
+	case discussion.FieldBody:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBody(v)
+		return nil
+	case discussion.FieldTeamID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTeamID(v)
+		return nil
+	case discussion.FieldCreatorID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatorID(v)
+		return nil
+	case discussion.FieldPinnedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPinnedAt(v)
+		return nil
+	case discussion.FieldClosedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetClosedAt(v)
+		return nil
+	case discussion.FieldTrashedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTrashedAt(v)
+		return nil
+	case discussion.FieldLastActivityAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastActivityAt(v)
+		return nil
+	case discussion.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case discussion.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Discussion field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *DiscussionMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *DiscussionMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DiscussionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Discussion numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *DiscussionMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(discussion.FieldBody) {
+		fields = append(fields, discussion.FieldBody)
+	}
+	if m.FieldCleared(discussion.FieldTeamID) {
+		fields = append(fields, discussion.FieldTeamID)
+	}
+	if m.FieldCleared(discussion.FieldCreatorID) {
+		fields = append(fields, discussion.FieldCreatorID)
+	}
+	if m.FieldCleared(discussion.FieldPinnedAt) {
+		fields = append(fields, discussion.FieldPinnedAt)
+	}
+	if m.FieldCleared(discussion.FieldClosedAt) {
+		fields = append(fields, discussion.FieldClosedAt)
+	}
+	if m.FieldCleared(discussion.FieldTrashedAt) {
+		fields = append(fields, discussion.FieldTrashedAt)
+	}
+	if m.FieldCleared(discussion.FieldLastActivityAt) {
+		fields = append(fields, discussion.FieldLastActivityAt)
+	}
+	if m.FieldCleared(discussion.FieldCreatedAt) {
+		fields = append(fields, discussion.FieldCreatedAt)
+	}
+	if m.FieldCleared(discussion.FieldUpdatedAt) {
+		fields = append(fields, discussion.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *DiscussionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *DiscussionMutation) ClearField(name string) error {
+	switch name {
+	case discussion.FieldBody:
+		m.ClearBody()
+		return nil
+	case discussion.FieldTeamID:
+		m.ClearTeamID()
+		return nil
+	case discussion.FieldCreatorID:
+		m.ClearCreatorID()
+		return nil
+	case discussion.FieldPinnedAt:
+		m.ClearPinnedAt()
+		return nil
+	case discussion.FieldClosedAt:
+		m.ClearClosedAt()
+		return nil
+	case discussion.FieldTrashedAt:
+		m.ClearTrashedAt()
+		return nil
+	case discussion.FieldLastActivityAt:
+		m.ClearLastActivityAt()
+		return nil
+	case discussion.FieldCreatedAt:
+		m.ClearCreatedAt()
+		return nil
+	case discussion.FieldUpdatedAt:
+		m.ClearUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Discussion nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *DiscussionMutation) ResetField(name string) error {
+	switch name {
+	case discussion.FieldWorkspaceID:
+		m.ResetWorkspaceID()
+		return nil
+	case discussion.FieldSlugID:
+		m.ResetSlugID()
+		return nil
+	case discussion.FieldTitle:
+		m.ResetTitle()
+		return nil
+	case discussion.FieldBody:
+		m.ResetBody()
+		return nil
+	case discussion.FieldTeamID:
+		m.ResetTeamID()
+		return nil
+	case discussion.FieldCreatorID:
+		m.ResetCreatorID()
+		return nil
+	case discussion.FieldPinnedAt:
+		m.ResetPinnedAt()
+		return nil
+	case discussion.FieldClosedAt:
+		m.ResetClosedAt()
+		return nil
+	case discussion.FieldTrashedAt:
+		m.ResetTrashedAt()
+		return nil
+	case discussion.FieldLastActivityAt:
+		m.ResetLastActivityAt()
+		return nil
+	case discussion.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case discussion.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Discussion field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *DiscussionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 7)
+	if m.workspace != nil {
+		edges = append(edges, discussion.EdgeWorkspace)
+	}
+	if m.team != nil {
+		edges = append(edges, discussion.EdgeTeam)
+	}
+	if m.creator != nil {
+		edges = append(edges, discussion.EdgeCreator)
+	}
+	if m.threads != nil {
+		edges = append(edges, discussion.EdgeThreads)
+	}
+	if m.comments != nil {
+		edges = append(edges, discussion.EdgeComments)
+	}
+	if m.notifications != nil {
+		edges = append(edges, discussion.EdgeNotifications)
+	}
+	if m.subscribers != nil {
+		edges = append(edges, discussion.EdgeSubscribers)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *DiscussionMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case discussion.EdgeWorkspace:
+		if id := m.workspace; id != nil {
+			return []ent.Value{*id}
+		}
+	case discussion.EdgeTeam:
+		if id := m.team; id != nil {
+			return []ent.Value{*id}
+		}
+	case discussion.EdgeCreator:
+		if id := m.creator; id != nil {
+			return []ent.Value{*id}
+		}
+	case discussion.EdgeThreads:
+		ids := make([]ent.Value, 0, len(m.threads))
+		for id := range m.threads {
+			ids = append(ids, id)
+		}
+		return ids
+	case discussion.EdgeComments:
+		ids := make([]ent.Value, 0, len(m.comments))
+		for id := range m.comments {
+			ids = append(ids, id)
+		}
+		return ids
+	case discussion.EdgeNotifications:
+		ids := make([]ent.Value, 0, len(m.notifications))
+		for id := range m.notifications {
+			ids = append(ids, id)
+		}
+		return ids
+	case discussion.EdgeSubscribers:
+		ids := make([]ent.Value, 0, len(m.subscribers))
+		for id := range m.subscribers {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *DiscussionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 7)
+	if m.removedthreads != nil {
+		edges = append(edges, discussion.EdgeThreads)
+	}
+	if m.removedcomments != nil {
+		edges = append(edges, discussion.EdgeComments)
+	}
+	if m.removednotifications != nil {
+		edges = append(edges, discussion.EdgeNotifications)
+	}
+	if m.removedsubscribers != nil {
+		edges = append(edges, discussion.EdgeSubscribers)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *DiscussionMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case discussion.EdgeThreads:
+		ids := make([]ent.Value, 0, len(m.removedthreads))
+		for id := range m.removedthreads {
+			ids = append(ids, id)
+		}
+		return ids
+	case discussion.EdgeComments:
+		ids := make([]ent.Value, 0, len(m.removedcomments))
+		for id := range m.removedcomments {
+			ids = append(ids, id)
+		}
+		return ids
+	case discussion.EdgeNotifications:
+		ids := make([]ent.Value, 0, len(m.removednotifications))
+		for id := range m.removednotifications {
+			ids = append(ids, id)
+		}
+		return ids
+	case discussion.EdgeSubscribers:
+		ids := make([]ent.Value, 0, len(m.removedsubscribers))
+		for id := range m.removedsubscribers {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *DiscussionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 7)
+	if m.clearedworkspace {
+		edges = append(edges, discussion.EdgeWorkspace)
+	}
+	if m.clearedteam {
+		edges = append(edges, discussion.EdgeTeam)
+	}
+	if m.clearedcreator {
+		edges = append(edges, discussion.EdgeCreator)
+	}
+	if m.clearedthreads {
+		edges = append(edges, discussion.EdgeThreads)
+	}
+	if m.clearedcomments {
+		edges = append(edges, discussion.EdgeComments)
+	}
+	if m.clearednotifications {
+		edges = append(edges, discussion.EdgeNotifications)
+	}
+	if m.clearedsubscribers {
+		edges = append(edges, discussion.EdgeSubscribers)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *DiscussionMutation) EdgeCleared(name string) bool {
+	switch name {
+	case discussion.EdgeWorkspace:
+		return m.clearedworkspace
+	case discussion.EdgeTeam:
+		return m.clearedteam
+	case discussion.EdgeCreator:
+		return m.clearedcreator
+	case discussion.EdgeThreads:
+		return m.clearedthreads
+	case discussion.EdgeComments:
+		return m.clearedcomments
+	case discussion.EdgeNotifications:
+		return m.clearednotifications
+	case discussion.EdgeSubscribers:
+		return m.clearedsubscribers
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *DiscussionMutation) ClearEdge(name string) error {
+	switch name {
+	case discussion.EdgeWorkspace:
+		m.ClearWorkspace()
+		return nil
+	case discussion.EdgeTeam:
+		m.ClearTeam()
+		return nil
+	case discussion.EdgeCreator:
+		m.ClearCreator()
+		return nil
+	}
+	return fmt.Errorf("unknown Discussion unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *DiscussionMutation) ResetEdge(name string) error {
+	switch name {
+	case discussion.EdgeWorkspace:
+		m.ResetWorkspace()
+		return nil
+	case discussion.EdgeTeam:
+		m.ResetTeam()
+		return nil
+	case discussion.EdgeCreator:
+		m.ResetCreator()
+		return nil
+	case discussion.EdgeThreads:
+		m.ResetThreads()
+		return nil
+	case discussion.EdgeComments:
+		m.ResetComments()
+		return nil
+	case discussion.EdgeNotifications:
+		m.ResetNotifications()
+		return nil
+	case discussion.EdgeSubscribers:
+		m.ResetSubscribers()
+		return nil
+	}
+	return fmt.Errorf("unknown Discussion edge %s", name)
+}
+
+// DiscussionSubscriberMutation represents an operation that mutates the DiscussionSubscriber nodes in the graph.
+type DiscussionSubscriberMutation struct {
+	config
+	op                Op
+	typ               string
+	clearedFields     map[string]struct{}
+	discussion        *uuid.UUID
+	cleareddiscussion bool
+	user              *uuid.UUID
+	cleareduser       bool
+	done              bool
+	oldValue          func(context.Context) (*DiscussionSubscriber, error)
+	predicates        []predicate.DiscussionSubscriber
+}
+
+var _ ent.Mutation = (*DiscussionSubscriberMutation)(nil)
+
+// discussionsubscriberOption allows management of the mutation configuration using functional options.
+type discussionsubscriberOption func(*DiscussionSubscriberMutation)
+
+// newDiscussionSubscriberMutation creates new mutation for the DiscussionSubscriber entity.
+func newDiscussionSubscriberMutation(c config, op Op, opts ...discussionsubscriberOption) *DiscussionSubscriberMutation {
+	m := &DiscussionSubscriberMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeDiscussionSubscriber,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m DiscussionSubscriberMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m DiscussionSubscriberMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetDiscussionID sets the "discussion_id" field.
+func (m *DiscussionSubscriberMutation) SetDiscussionID(u uuid.UUID) {
+	m.discussion = &u
+}
+
+// DiscussionID returns the value of the "discussion_id" field in the mutation.
+func (m *DiscussionSubscriberMutation) DiscussionID() (r uuid.UUID, exists bool) {
+	v := m.discussion
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDiscussionID resets all changes to the "discussion_id" field.
+func (m *DiscussionSubscriberMutation) ResetDiscussionID() {
+	m.discussion = nil
+}
+
+// SetUserID sets the "user_id" field.
+func (m *DiscussionSubscriberMutation) SetUserID(u uuid.UUID) {
+	m.user = &u
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *DiscussionSubscriberMutation) UserID() (r uuid.UUID, exists bool) {
+	v := m.user
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *DiscussionSubscriberMutation) ResetUserID() {
+	m.user = nil
+}
+
+// ClearDiscussion clears the "discussion" edge to the Discussion entity.
+func (m *DiscussionSubscriberMutation) ClearDiscussion() {
+	m.cleareddiscussion = true
+	m.clearedFields[discussionsubscriber.FieldDiscussionID] = struct{}{}
+}
+
+// DiscussionCleared reports if the "discussion" edge to the Discussion entity was cleared.
+func (m *DiscussionSubscriberMutation) DiscussionCleared() bool {
+	return m.cleareddiscussion
+}
+
+// DiscussionIDs returns the "discussion" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// DiscussionID instead. It exists only for internal usage by the builders.
+func (m *DiscussionSubscriberMutation) DiscussionIDs() (ids []uuid.UUID) {
+	if id := m.discussion; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetDiscussion resets all changes to the "discussion" edge.
+func (m *DiscussionSubscriberMutation) ResetDiscussion() {
+	m.discussion = nil
+	m.cleareddiscussion = false
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (m *DiscussionSubscriberMutation) ClearUser() {
+	m.cleareduser = true
+	m.clearedFields[discussionsubscriber.FieldUserID] = struct{}{}
+}
+
+// UserCleared reports if the "user" edge to the User entity was cleared.
+func (m *DiscussionSubscriberMutation) UserCleared() bool {
+	return m.cleareduser
+}
+
+// UserIDs returns the "user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
+func (m *DiscussionSubscriberMutation) UserIDs() (ids []uuid.UUID) {
+	if id := m.user; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUser resets all changes to the "user" edge.
+func (m *DiscussionSubscriberMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
+}
+
+// Where appends a list predicates to the DiscussionSubscriberMutation builder.
+func (m *DiscussionSubscriberMutation) Where(ps ...predicate.DiscussionSubscriber) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the DiscussionSubscriberMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *DiscussionSubscriberMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.DiscussionSubscriber, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *DiscussionSubscriberMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *DiscussionSubscriberMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (DiscussionSubscriber).
+func (m *DiscussionSubscriberMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *DiscussionSubscriberMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.discussion != nil {
+		fields = append(fields, discussionsubscriber.FieldDiscussionID)
+	}
+	if m.user != nil {
+		fields = append(fields, discussionsubscriber.FieldUserID)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *DiscussionSubscriberMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case discussionsubscriber.FieldDiscussionID:
+		return m.DiscussionID()
+	case discussionsubscriber.FieldUserID:
+		return m.UserID()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *DiscussionSubscriberMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	return nil, errors.New("edge schema DiscussionSubscriber does not support getting old values")
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DiscussionSubscriberMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case discussionsubscriber.FieldDiscussionID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDiscussionID(v)
+		return nil
+	case discussionsubscriber.FieldUserID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown DiscussionSubscriber field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *DiscussionSubscriberMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *DiscussionSubscriberMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DiscussionSubscriberMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown DiscussionSubscriber numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *DiscussionSubscriberMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *DiscussionSubscriberMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *DiscussionSubscriberMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown DiscussionSubscriber nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *DiscussionSubscriberMutation) ResetField(name string) error {
+	switch name {
+	case discussionsubscriber.FieldDiscussionID:
+		m.ResetDiscussionID()
+		return nil
+	case discussionsubscriber.FieldUserID:
+		m.ResetUserID()
+		return nil
+	}
+	return fmt.Errorf("unknown DiscussionSubscriber field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *DiscussionSubscriberMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.discussion != nil {
+		edges = append(edges, discussionsubscriber.EdgeDiscussion)
+	}
+	if m.user != nil {
+		edges = append(edges, discussionsubscriber.EdgeUser)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *DiscussionSubscriberMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case discussionsubscriber.EdgeDiscussion:
+		if id := m.discussion; id != nil {
+			return []ent.Value{*id}
+		}
+	case discussionsubscriber.EdgeUser:
+		if id := m.user; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *DiscussionSubscriberMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *DiscussionSubscriberMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *DiscussionSubscriberMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.cleareddiscussion {
+		edges = append(edges, discussionsubscriber.EdgeDiscussion)
+	}
+	if m.cleareduser {
+		edges = append(edges, discussionsubscriber.EdgeUser)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *DiscussionSubscriberMutation) EdgeCleared(name string) bool {
+	switch name {
+	case discussionsubscriber.EdgeDiscussion:
+		return m.cleareddiscussion
+	case discussionsubscriber.EdgeUser:
+		return m.cleareduser
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *DiscussionSubscriberMutation) ClearEdge(name string) error {
+	switch name {
+	case discussionsubscriber.EdgeDiscussion:
+		m.ClearDiscussion()
+		return nil
+	case discussionsubscriber.EdgeUser:
+		m.ClearUser()
+		return nil
+	}
+	return fmt.Errorf("unknown DiscussionSubscriber unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *DiscussionSubscriberMutation) ResetEdge(name string) error {
+	switch name {
+	case discussionsubscriber.EdgeDiscussion:
+		m.ResetDiscussion()
+		return nil
+	case discussionsubscriber.EdgeUser:
+		m.ResetUser()
+		return nil
+	}
+	return fmt.Errorf("unknown DiscussionSubscriber edge %s", name)
+}
+
+// DiscussionThreadMutation represents an operation that mutates the DiscussionThread nodes in the graph.
+type DiscussionThreadMutation struct {
+	config
+	op                    Op
+	typ                   string
+	id                    *uuid.UUID
+	kind                  *string
+	title                 *string
+	body                  *string
+	resolved_at           *time.Time
+	created_at            *time.Time
+	updated_at            *time.Time
+	clearedFields         map[string]struct{}
+	workspace             *uuid.UUID
+	clearedworkspace      bool
+	discussion            *uuid.UUID
+	cleareddiscussion     bool
+	creator               *uuid.UUID
+	clearedcreator        bool
+	resolving_user        *uuid.UUID
+	clearedresolving_user bool
+	issue                 *uuid.UUID
+	clearedissue          bool
+	comments              map[uuid.UUID]struct{}
+	removedcomments       map[uuid.UUID]struct{}
+	clearedcomments       bool
+	notifications         map[uuid.UUID]struct{}
+	removednotifications  map[uuid.UUID]struct{}
+	clearednotifications  bool
+	done                  bool
+	oldValue              func(context.Context) (*DiscussionThread, error)
+	predicates            []predicate.DiscussionThread
+}
+
+var _ ent.Mutation = (*DiscussionThreadMutation)(nil)
+
+// discussionthreadOption allows management of the mutation configuration using functional options.
+type discussionthreadOption func(*DiscussionThreadMutation)
+
+// newDiscussionThreadMutation creates new mutation for the DiscussionThread entity.
+func newDiscussionThreadMutation(c config, op Op, opts ...discussionthreadOption) *DiscussionThreadMutation {
+	m := &DiscussionThreadMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeDiscussionThread,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withDiscussionThreadID sets the ID field of the mutation.
+func withDiscussionThreadID(id uuid.UUID) discussionthreadOption {
+	return func(m *DiscussionThreadMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *DiscussionThread
+		)
+		m.oldValue = func(ctx context.Context) (*DiscussionThread, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().DiscussionThread.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withDiscussionThread sets the old DiscussionThread of the mutation.
+func withDiscussionThread(node *DiscussionThread) discussionthreadOption {
+	return func(m *DiscussionThreadMutation) {
+		m.oldValue = func(context.Context) (*DiscussionThread, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m DiscussionThreadMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m DiscussionThreadMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of DiscussionThread entities.
+func (m *DiscussionThreadMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *DiscussionThreadMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *DiscussionThreadMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().DiscussionThread.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetWorkspaceID sets the "workspace_id" field.
+func (m *DiscussionThreadMutation) SetWorkspaceID(u uuid.UUID) {
+	m.workspace = &u
+}
+
+// WorkspaceID returns the value of the "workspace_id" field in the mutation.
+func (m *DiscussionThreadMutation) WorkspaceID() (r uuid.UUID, exists bool) {
+	v := m.workspace
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWorkspaceID returns the old "workspace_id" field's value of the DiscussionThread entity.
+// If the DiscussionThread object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionThreadMutation) OldWorkspaceID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWorkspaceID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWorkspaceID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWorkspaceID: %w", err)
+	}
+	return oldValue.WorkspaceID, nil
+}
+
+// ResetWorkspaceID resets all changes to the "workspace_id" field.
+func (m *DiscussionThreadMutation) ResetWorkspaceID() {
+	m.workspace = nil
+}
+
+// SetDiscussionID sets the "discussion_id" field.
+func (m *DiscussionThreadMutation) SetDiscussionID(u uuid.UUID) {
+	m.discussion = &u
+}
+
+// DiscussionID returns the value of the "discussion_id" field in the mutation.
+func (m *DiscussionThreadMutation) DiscussionID() (r uuid.UUID, exists bool) {
+	v := m.discussion
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDiscussionID returns the old "discussion_id" field's value of the DiscussionThread entity.
+// If the DiscussionThread object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionThreadMutation) OldDiscussionID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDiscussionID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDiscussionID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDiscussionID: %w", err)
+	}
+	return oldValue.DiscussionID, nil
+}
+
+// ResetDiscussionID resets all changes to the "discussion_id" field.
+func (m *DiscussionThreadMutation) ResetDiscussionID() {
+	m.discussion = nil
+}
+
+// SetKind sets the "kind" field.
+func (m *DiscussionThreadMutation) SetKind(s string) {
+	m.kind = &s
+}
+
+// Kind returns the value of the "kind" field in the mutation.
+func (m *DiscussionThreadMutation) Kind() (r string, exists bool) {
+	v := m.kind
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldKind returns the old "kind" field's value of the DiscussionThread entity.
+// If the DiscussionThread object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionThreadMutation) OldKind(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldKind is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldKind requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldKind: %w", err)
+	}
+	return oldValue.Kind, nil
+}
+
+// ClearKind clears the value of the "kind" field.
+func (m *DiscussionThreadMutation) ClearKind() {
+	m.kind = nil
+	m.clearedFields[discussionthread.FieldKind] = struct{}{}
+}
+
+// KindCleared returns if the "kind" field was cleared in this mutation.
+func (m *DiscussionThreadMutation) KindCleared() bool {
+	_, ok := m.clearedFields[discussionthread.FieldKind]
+	return ok
+}
+
+// ResetKind resets all changes to the "kind" field.
+func (m *DiscussionThreadMutation) ResetKind() {
+	m.kind = nil
+	delete(m.clearedFields, discussionthread.FieldKind)
+}
+
+// SetTitle sets the "title" field.
+func (m *DiscussionThreadMutation) SetTitle(s string) {
+	m.title = &s
+}
+
+// Title returns the value of the "title" field in the mutation.
+func (m *DiscussionThreadMutation) Title() (r string, exists bool) {
+	v := m.title
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTitle returns the old "title" field's value of the DiscussionThread entity.
+// If the DiscussionThread object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionThreadMutation) OldTitle(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTitle requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+	}
+	return oldValue.Title, nil
+}
+
+// ResetTitle resets all changes to the "title" field.
+func (m *DiscussionThreadMutation) ResetTitle() {
+	m.title = nil
+}
+
+// SetBody sets the "body" field.
+func (m *DiscussionThreadMutation) SetBody(s string) {
+	m.body = &s
+}
+
+// Body returns the value of the "body" field in the mutation.
+func (m *DiscussionThreadMutation) Body() (r string, exists bool) {
+	v := m.body
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBody returns the old "body" field's value of the DiscussionThread entity.
+// If the DiscussionThread object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionThreadMutation) OldBody(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBody is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBody requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBody: %w", err)
+	}
+	return oldValue.Body, nil
+}
+
+// ClearBody clears the value of the "body" field.
+func (m *DiscussionThreadMutation) ClearBody() {
+	m.body = nil
+	m.clearedFields[discussionthread.FieldBody] = struct{}{}
+}
+
+// BodyCleared returns if the "body" field was cleared in this mutation.
+func (m *DiscussionThreadMutation) BodyCleared() bool {
+	_, ok := m.clearedFields[discussionthread.FieldBody]
+	return ok
+}
+
+// ResetBody resets all changes to the "body" field.
+func (m *DiscussionThreadMutation) ResetBody() {
+	m.body = nil
+	delete(m.clearedFields, discussionthread.FieldBody)
+}
+
+// SetCreatorID sets the "creator_id" field.
+func (m *DiscussionThreadMutation) SetCreatorID(u uuid.UUID) {
+	m.creator = &u
+}
+
+// CreatorID returns the value of the "creator_id" field in the mutation.
+func (m *DiscussionThreadMutation) CreatorID() (r uuid.UUID, exists bool) {
+	v := m.creator
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatorID returns the old "creator_id" field's value of the DiscussionThread entity.
+// If the DiscussionThread object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionThreadMutation) OldCreatorID(ctx context.Context) (v *uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatorID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatorID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatorID: %w", err)
+	}
+	return oldValue.CreatorID, nil
+}
+
+// ClearCreatorID clears the value of the "creator_id" field.
+func (m *DiscussionThreadMutation) ClearCreatorID() {
+	m.creator = nil
+	m.clearedFields[discussionthread.FieldCreatorID] = struct{}{}
+}
+
+// CreatorIDCleared returns if the "creator_id" field was cleared in this mutation.
+func (m *DiscussionThreadMutation) CreatorIDCleared() bool {
+	_, ok := m.clearedFields[discussionthread.FieldCreatorID]
+	return ok
+}
+
+// ResetCreatorID resets all changes to the "creator_id" field.
+func (m *DiscussionThreadMutation) ResetCreatorID() {
+	m.creator = nil
+	delete(m.clearedFields, discussionthread.FieldCreatorID)
+}
+
+// SetIssueID sets the "issue_id" field.
+func (m *DiscussionThreadMutation) SetIssueID(u uuid.UUID) {
+	m.issue = &u
+}
+
+// IssueID returns the value of the "issue_id" field in the mutation.
+func (m *DiscussionThreadMutation) IssueID() (r uuid.UUID, exists bool) {
+	v := m.issue
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIssueID returns the old "issue_id" field's value of the DiscussionThread entity.
+// If the DiscussionThread object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionThreadMutation) OldIssueID(ctx context.Context) (v *uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIssueID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIssueID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIssueID: %w", err)
+	}
+	return oldValue.IssueID, nil
+}
+
+// ClearIssueID clears the value of the "issue_id" field.
+func (m *DiscussionThreadMutation) ClearIssueID() {
+	m.issue = nil
+	m.clearedFields[discussionthread.FieldIssueID] = struct{}{}
+}
+
+// IssueIDCleared returns if the "issue_id" field was cleared in this mutation.
+func (m *DiscussionThreadMutation) IssueIDCleared() bool {
+	_, ok := m.clearedFields[discussionthread.FieldIssueID]
+	return ok
+}
+
+// ResetIssueID resets all changes to the "issue_id" field.
+func (m *DiscussionThreadMutation) ResetIssueID() {
+	m.issue = nil
+	delete(m.clearedFields, discussionthread.FieldIssueID)
+}
+
+// SetResolvedAt sets the "resolved_at" field.
+func (m *DiscussionThreadMutation) SetResolvedAt(t time.Time) {
+	m.resolved_at = &t
+}
+
+// ResolvedAt returns the value of the "resolved_at" field in the mutation.
+func (m *DiscussionThreadMutation) ResolvedAt() (r time.Time, exists bool) {
+	v := m.resolved_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldResolvedAt returns the old "resolved_at" field's value of the DiscussionThread entity.
+// If the DiscussionThread object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionThreadMutation) OldResolvedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldResolvedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldResolvedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldResolvedAt: %w", err)
+	}
+	return oldValue.ResolvedAt, nil
+}
+
+// ClearResolvedAt clears the value of the "resolved_at" field.
+func (m *DiscussionThreadMutation) ClearResolvedAt() {
+	m.resolved_at = nil
+	m.clearedFields[discussionthread.FieldResolvedAt] = struct{}{}
+}
+
+// ResolvedAtCleared returns if the "resolved_at" field was cleared in this mutation.
+func (m *DiscussionThreadMutation) ResolvedAtCleared() bool {
+	_, ok := m.clearedFields[discussionthread.FieldResolvedAt]
+	return ok
+}
+
+// ResetResolvedAt resets all changes to the "resolved_at" field.
+func (m *DiscussionThreadMutation) ResetResolvedAt() {
+	m.resolved_at = nil
+	delete(m.clearedFields, discussionthread.FieldResolvedAt)
+}
+
+// SetResolvingUserID sets the "resolving_user_id" field.
+func (m *DiscussionThreadMutation) SetResolvingUserID(u uuid.UUID) {
+	m.resolving_user = &u
+}
+
+// ResolvingUserID returns the value of the "resolving_user_id" field in the mutation.
+func (m *DiscussionThreadMutation) ResolvingUserID() (r uuid.UUID, exists bool) {
+	v := m.resolving_user
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldResolvingUserID returns the old "resolving_user_id" field's value of the DiscussionThread entity.
+// If the DiscussionThread object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionThreadMutation) OldResolvingUserID(ctx context.Context) (v *uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldResolvingUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldResolvingUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldResolvingUserID: %w", err)
+	}
+	return oldValue.ResolvingUserID, nil
+}
+
+// ClearResolvingUserID clears the value of the "resolving_user_id" field.
+func (m *DiscussionThreadMutation) ClearResolvingUserID() {
+	m.resolving_user = nil
+	m.clearedFields[discussionthread.FieldResolvingUserID] = struct{}{}
+}
+
+// ResolvingUserIDCleared returns if the "resolving_user_id" field was cleared in this mutation.
+func (m *DiscussionThreadMutation) ResolvingUserIDCleared() bool {
+	_, ok := m.clearedFields[discussionthread.FieldResolvingUserID]
+	return ok
+}
+
+// ResetResolvingUserID resets all changes to the "resolving_user_id" field.
+func (m *DiscussionThreadMutation) ResetResolvingUserID() {
+	m.resolving_user = nil
+	delete(m.clearedFields, discussionthread.FieldResolvingUserID)
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *DiscussionThreadMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *DiscussionThreadMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the DiscussionThread entity.
+// If the DiscussionThread object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionThreadMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ClearCreatedAt clears the value of the "created_at" field.
+func (m *DiscussionThreadMutation) ClearCreatedAt() {
+	m.created_at = nil
+	m.clearedFields[discussionthread.FieldCreatedAt] = struct{}{}
+}
+
+// CreatedAtCleared returns if the "created_at" field was cleared in this mutation.
+func (m *DiscussionThreadMutation) CreatedAtCleared() bool {
+	_, ok := m.clearedFields[discussionthread.FieldCreatedAt]
+	return ok
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *DiscussionThreadMutation) ResetCreatedAt() {
+	m.created_at = nil
+	delete(m.clearedFields, discussionthread.FieldCreatedAt)
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *DiscussionThreadMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *DiscussionThreadMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the DiscussionThread entity.
+// If the DiscussionThread object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionThreadMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (m *DiscussionThreadMutation) ClearUpdatedAt() {
+	m.updated_at = nil
+	m.clearedFields[discussionthread.FieldUpdatedAt] = struct{}{}
+}
+
+// UpdatedAtCleared returns if the "updated_at" field was cleared in this mutation.
+func (m *DiscussionThreadMutation) UpdatedAtCleared() bool {
+	_, ok := m.clearedFields[discussionthread.FieldUpdatedAt]
+	return ok
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *DiscussionThreadMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	delete(m.clearedFields, discussionthread.FieldUpdatedAt)
+}
+
+// ClearWorkspace clears the "workspace" edge to the Workspace entity.
+func (m *DiscussionThreadMutation) ClearWorkspace() {
+	m.clearedworkspace = true
+	m.clearedFields[discussionthread.FieldWorkspaceID] = struct{}{}
+}
+
+// WorkspaceCleared reports if the "workspace" edge to the Workspace entity was cleared.
+func (m *DiscussionThreadMutation) WorkspaceCleared() bool {
+	return m.clearedworkspace
+}
+
+// WorkspaceIDs returns the "workspace" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// WorkspaceID instead. It exists only for internal usage by the builders.
+func (m *DiscussionThreadMutation) WorkspaceIDs() (ids []uuid.UUID) {
+	if id := m.workspace; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetWorkspace resets all changes to the "workspace" edge.
+func (m *DiscussionThreadMutation) ResetWorkspace() {
+	m.workspace = nil
+	m.clearedworkspace = false
+}
+
+// ClearDiscussion clears the "discussion" edge to the Discussion entity.
+func (m *DiscussionThreadMutation) ClearDiscussion() {
+	m.cleareddiscussion = true
+	m.clearedFields[discussionthread.FieldDiscussionID] = struct{}{}
+}
+
+// DiscussionCleared reports if the "discussion" edge to the Discussion entity was cleared.
+func (m *DiscussionThreadMutation) DiscussionCleared() bool {
+	return m.cleareddiscussion
+}
+
+// DiscussionIDs returns the "discussion" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// DiscussionID instead. It exists only for internal usage by the builders.
+func (m *DiscussionThreadMutation) DiscussionIDs() (ids []uuid.UUID) {
+	if id := m.discussion; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetDiscussion resets all changes to the "discussion" edge.
+func (m *DiscussionThreadMutation) ResetDiscussion() {
+	m.discussion = nil
+	m.cleareddiscussion = false
+}
+
+// ClearCreator clears the "creator" edge to the User entity.
+func (m *DiscussionThreadMutation) ClearCreator() {
+	m.clearedcreator = true
+	m.clearedFields[discussionthread.FieldCreatorID] = struct{}{}
+}
+
+// CreatorCleared reports if the "creator" edge to the User entity was cleared.
+func (m *DiscussionThreadMutation) CreatorCleared() bool {
+	return m.CreatorIDCleared() || m.clearedcreator
+}
+
+// CreatorIDs returns the "creator" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CreatorID instead. It exists only for internal usage by the builders.
+func (m *DiscussionThreadMutation) CreatorIDs() (ids []uuid.UUID) {
+	if id := m.creator; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCreator resets all changes to the "creator" edge.
+func (m *DiscussionThreadMutation) ResetCreator() {
+	m.creator = nil
+	m.clearedcreator = false
+}
+
+// ClearResolvingUser clears the "resolving_user" edge to the User entity.
+func (m *DiscussionThreadMutation) ClearResolvingUser() {
+	m.clearedresolving_user = true
+	m.clearedFields[discussionthread.FieldResolvingUserID] = struct{}{}
+}
+
+// ResolvingUserCleared reports if the "resolving_user" edge to the User entity was cleared.
+func (m *DiscussionThreadMutation) ResolvingUserCleared() bool {
+	return m.ResolvingUserIDCleared() || m.clearedresolving_user
+}
+
+// ResolvingUserIDs returns the "resolving_user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ResolvingUserID instead. It exists only for internal usage by the builders.
+func (m *DiscussionThreadMutation) ResolvingUserIDs() (ids []uuid.UUID) {
+	if id := m.resolving_user; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetResolvingUser resets all changes to the "resolving_user" edge.
+func (m *DiscussionThreadMutation) ResetResolvingUser() {
+	m.resolving_user = nil
+	m.clearedresolving_user = false
+}
+
+// ClearIssue clears the "issue" edge to the Issue entity.
+func (m *DiscussionThreadMutation) ClearIssue() {
+	m.clearedissue = true
+	m.clearedFields[discussionthread.FieldIssueID] = struct{}{}
+}
+
+// IssueCleared reports if the "issue" edge to the Issue entity was cleared.
+func (m *DiscussionThreadMutation) IssueCleared() bool {
+	return m.IssueIDCleared() || m.clearedissue
+}
+
+// IssueIDs returns the "issue" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// IssueID instead. It exists only for internal usage by the builders.
+func (m *DiscussionThreadMutation) IssueIDs() (ids []uuid.UUID) {
+	if id := m.issue; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetIssue resets all changes to the "issue" edge.
+func (m *DiscussionThreadMutation) ResetIssue() {
+	m.issue = nil
+	m.clearedissue = false
+}
+
+// AddCommentIDs adds the "comments" edge to the Comment entity by ids.
+func (m *DiscussionThreadMutation) AddCommentIDs(ids ...uuid.UUID) {
+	if m.comments == nil {
+		m.comments = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.comments[ids[i]] = struct{}{}
+	}
+}
+
+// ClearComments clears the "comments" edge to the Comment entity.
+func (m *DiscussionThreadMutation) ClearComments() {
+	m.clearedcomments = true
+}
+
+// CommentsCleared reports if the "comments" edge to the Comment entity was cleared.
+func (m *DiscussionThreadMutation) CommentsCleared() bool {
+	return m.clearedcomments
+}
+
+// RemoveCommentIDs removes the "comments" edge to the Comment entity by IDs.
+func (m *DiscussionThreadMutation) RemoveCommentIDs(ids ...uuid.UUID) {
+	if m.removedcomments == nil {
+		m.removedcomments = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.comments, ids[i])
+		m.removedcomments[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedComments returns the removed IDs of the "comments" edge to the Comment entity.
+func (m *DiscussionThreadMutation) RemovedCommentsIDs() (ids []uuid.UUID) {
+	for id := range m.removedcomments {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CommentsIDs returns the "comments" edge IDs in the mutation.
+func (m *DiscussionThreadMutation) CommentsIDs() (ids []uuid.UUID) {
+	for id := range m.comments {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetComments resets all changes to the "comments" edge.
+func (m *DiscussionThreadMutation) ResetComments() {
+	m.comments = nil
+	m.clearedcomments = false
+	m.removedcomments = nil
+}
+
+// AddNotificationIDs adds the "notifications" edge to the Notification entity by ids.
+func (m *DiscussionThreadMutation) AddNotificationIDs(ids ...uuid.UUID) {
+	if m.notifications == nil {
+		m.notifications = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.notifications[ids[i]] = struct{}{}
+	}
+}
+
+// ClearNotifications clears the "notifications" edge to the Notification entity.
+func (m *DiscussionThreadMutation) ClearNotifications() {
+	m.clearednotifications = true
+}
+
+// NotificationsCleared reports if the "notifications" edge to the Notification entity was cleared.
+func (m *DiscussionThreadMutation) NotificationsCleared() bool {
+	return m.clearednotifications
+}
+
+// RemoveNotificationIDs removes the "notifications" edge to the Notification entity by IDs.
+func (m *DiscussionThreadMutation) RemoveNotificationIDs(ids ...uuid.UUID) {
+	if m.removednotifications == nil {
+		m.removednotifications = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.notifications, ids[i])
+		m.removednotifications[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedNotifications returns the removed IDs of the "notifications" edge to the Notification entity.
+func (m *DiscussionThreadMutation) RemovedNotificationsIDs() (ids []uuid.UUID) {
+	for id := range m.removednotifications {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// NotificationsIDs returns the "notifications" edge IDs in the mutation.
+func (m *DiscussionThreadMutation) NotificationsIDs() (ids []uuid.UUID) {
+	for id := range m.notifications {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetNotifications resets all changes to the "notifications" edge.
+func (m *DiscussionThreadMutation) ResetNotifications() {
+	m.notifications = nil
+	m.clearednotifications = false
+	m.removednotifications = nil
+}
+
+// Where appends a list predicates to the DiscussionThreadMutation builder.
+func (m *DiscussionThreadMutation) Where(ps ...predicate.DiscussionThread) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the DiscussionThreadMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *DiscussionThreadMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.DiscussionThread, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *DiscussionThreadMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *DiscussionThreadMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (DiscussionThread).
+func (m *DiscussionThreadMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *DiscussionThreadMutation) Fields() []string {
+	fields := make([]string, 0, 11)
+	if m.workspace != nil {
+		fields = append(fields, discussionthread.FieldWorkspaceID)
+	}
+	if m.discussion != nil {
+		fields = append(fields, discussionthread.FieldDiscussionID)
+	}
+	if m.kind != nil {
+		fields = append(fields, discussionthread.FieldKind)
+	}
+	if m.title != nil {
+		fields = append(fields, discussionthread.FieldTitle)
+	}
+	if m.body != nil {
+		fields = append(fields, discussionthread.FieldBody)
+	}
+	if m.creator != nil {
+		fields = append(fields, discussionthread.FieldCreatorID)
+	}
+	if m.issue != nil {
+		fields = append(fields, discussionthread.FieldIssueID)
+	}
+	if m.resolved_at != nil {
+		fields = append(fields, discussionthread.FieldResolvedAt)
+	}
+	if m.resolving_user != nil {
+		fields = append(fields, discussionthread.FieldResolvingUserID)
+	}
+	if m.created_at != nil {
+		fields = append(fields, discussionthread.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, discussionthread.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *DiscussionThreadMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case discussionthread.FieldWorkspaceID:
+		return m.WorkspaceID()
+	case discussionthread.FieldDiscussionID:
+		return m.DiscussionID()
+	case discussionthread.FieldKind:
+		return m.Kind()
+	case discussionthread.FieldTitle:
+		return m.Title()
+	case discussionthread.FieldBody:
+		return m.Body()
+	case discussionthread.FieldCreatorID:
+		return m.CreatorID()
+	case discussionthread.FieldIssueID:
+		return m.IssueID()
+	case discussionthread.FieldResolvedAt:
+		return m.ResolvedAt()
+	case discussionthread.FieldResolvingUserID:
+		return m.ResolvingUserID()
+	case discussionthread.FieldCreatedAt:
+		return m.CreatedAt()
+	case discussionthread.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *DiscussionThreadMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case discussionthread.FieldWorkspaceID:
+		return m.OldWorkspaceID(ctx)
+	case discussionthread.FieldDiscussionID:
+		return m.OldDiscussionID(ctx)
+	case discussionthread.FieldKind:
+		return m.OldKind(ctx)
+	case discussionthread.FieldTitle:
+		return m.OldTitle(ctx)
+	case discussionthread.FieldBody:
+		return m.OldBody(ctx)
+	case discussionthread.FieldCreatorID:
+		return m.OldCreatorID(ctx)
+	case discussionthread.FieldIssueID:
+		return m.OldIssueID(ctx)
+	case discussionthread.FieldResolvedAt:
+		return m.OldResolvedAt(ctx)
+	case discussionthread.FieldResolvingUserID:
+		return m.OldResolvingUserID(ctx)
+	case discussionthread.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case discussionthread.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown DiscussionThread field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DiscussionThreadMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case discussionthread.FieldWorkspaceID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWorkspaceID(v)
+		return nil
+	case discussionthread.FieldDiscussionID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDiscussionID(v)
+		return nil
+	case discussionthread.FieldKind:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetKind(v)
+		return nil
+	case discussionthread.FieldTitle:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTitle(v)
+		return nil
+	case discussionthread.FieldBody:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBody(v)
+		return nil
+	case discussionthread.FieldCreatorID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatorID(v)
+		return nil
+	case discussionthread.FieldIssueID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIssueID(v)
+		return nil
+	case discussionthread.FieldResolvedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetResolvedAt(v)
+		return nil
+	case discussionthread.FieldResolvingUserID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetResolvingUserID(v)
+		return nil
+	case discussionthread.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case discussionthread.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown DiscussionThread field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *DiscussionThreadMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *DiscussionThreadMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DiscussionThreadMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown DiscussionThread numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *DiscussionThreadMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(discussionthread.FieldKind) {
+		fields = append(fields, discussionthread.FieldKind)
+	}
+	if m.FieldCleared(discussionthread.FieldBody) {
+		fields = append(fields, discussionthread.FieldBody)
+	}
+	if m.FieldCleared(discussionthread.FieldCreatorID) {
+		fields = append(fields, discussionthread.FieldCreatorID)
+	}
+	if m.FieldCleared(discussionthread.FieldIssueID) {
+		fields = append(fields, discussionthread.FieldIssueID)
+	}
+	if m.FieldCleared(discussionthread.FieldResolvedAt) {
+		fields = append(fields, discussionthread.FieldResolvedAt)
+	}
+	if m.FieldCleared(discussionthread.FieldResolvingUserID) {
+		fields = append(fields, discussionthread.FieldResolvingUserID)
+	}
+	if m.FieldCleared(discussionthread.FieldCreatedAt) {
+		fields = append(fields, discussionthread.FieldCreatedAt)
+	}
+	if m.FieldCleared(discussionthread.FieldUpdatedAt) {
+		fields = append(fields, discussionthread.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *DiscussionThreadMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *DiscussionThreadMutation) ClearField(name string) error {
+	switch name {
+	case discussionthread.FieldKind:
+		m.ClearKind()
+		return nil
+	case discussionthread.FieldBody:
+		m.ClearBody()
+		return nil
+	case discussionthread.FieldCreatorID:
+		m.ClearCreatorID()
+		return nil
+	case discussionthread.FieldIssueID:
+		m.ClearIssueID()
+		return nil
+	case discussionthread.FieldResolvedAt:
+		m.ClearResolvedAt()
+		return nil
+	case discussionthread.FieldResolvingUserID:
+		m.ClearResolvingUserID()
+		return nil
+	case discussionthread.FieldCreatedAt:
+		m.ClearCreatedAt()
+		return nil
+	case discussionthread.FieldUpdatedAt:
+		m.ClearUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown DiscussionThread nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *DiscussionThreadMutation) ResetField(name string) error {
+	switch name {
+	case discussionthread.FieldWorkspaceID:
+		m.ResetWorkspaceID()
+		return nil
+	case discussionthread.FieldDiscussionID:
+		m.ResetDiscussionID()
+		return nil
+	case discussionthread.FieldKind:
+		m.ResetKind()
+		return nil
+	case discussionthread.FieldTitle:
+		m.ResetTitle()
+		return nil
+	case discussionthread.FieldBody:
+		m.ResetBody()
+		return nil
+	case discussionthread.FieldCreatorID:
+		m.ResetCreatorID()
+		return nil
+	case discussionthread.FieldIssueID:
+		m.ResetIssueID()
+		return nil
+	case discussionthread.FieldResolvedAt:
+		m.ResetResolvedAt()
+		return nil
+	case discussionthread.FieldResolvingUserID:
+		m.ResetResolvingUserID()
+		return nil
+	case discussionthread.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case discussionthread.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown DiscussionThread field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *DiscussionThreadMutation) AddedEdges() []string {
+	edges := make([]string, 0, 7)
+	if m.workspace != nil {
+		edges = append(edges, discussionthread.EdgeWorkspace)
+	}
+	if m.discussion != nil {
+		edges = append(edges, discussionthread.EdgeDiscussion)
+	}
+	if m.creator != nil {
+		edges = append(edges, discussionthread.EdgeCreator)
+	}
+	if m.resolving_user != nil {
+		edges = append(edges, discussionthread.EdgeResolvingUser)
+	}
+	if m.issue != nil {
+		edges = append(edges, discussionthread.EdgeIssue)
+	}
+	if m.comments != nil {
+		edges = append(edges, discussionthread.EdgeComments)
+	}
+	if m.notifications != nil {
+		edges = append(edges, discussionthread.EdgeNotifications)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *DiscussionThreadMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case discussionthread.EdgeWorkspace:
+		if id := m.workspace; id != nil {
+			return []ent.Value{*id}
+		}
+	case discussionthread.EdgeDiscussion:
+		if id := m.discussion; id != nil {
+			return []ent.Value{*id}
+		}
+	case discussionthread.EdgeCreator:
+		if id := m.creator; id != nil {
+			return []ent.Value{*id}
+		}
+	case discussionthread.EdgeResolvingUser:
+		if id := m.resolving_user; id != nil {
+			return []ent.Value{*id}
+		}
+	case discussionthread.EdgeIssue:
+		if id := m.issue; id != nil {
+			return []ent.Value{*id}
+		}
+	case discussionthread.EdgeComments:
+		ids := make([]ent.Value, 0, len(m.comments))
+		for id := range m.comments {
+			ids = append(ids, id)
+		}
+		return ids
+	case discussionthread.EdgeNotifications:
+		ids := make([]ent.Value, 0, len(m.notifications))
+		for id := range m.notifications {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *DiscussionThreadMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 7)
+	if m.removedcomments != nil {
+		edges = append(edges, discussionthread.EdgeComments)
+	}
+	if m.removednotifications != nil {
+		edges = append(edges, discussionthread.EdgeNotifications)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *DiscussionThreadMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case discussionthread.EdgeComments:
+		ids := make([]ent.Value, 0, len(m.removedcomments))
+		for id := range m.removedcomments {
+			ids = append(ids, id)
+		}
+		return ids
+	case discussionthread.EdgeNotifications:
+		ids := make([]ent.Value, 0, len(m.removednotifications))
+		for id := range m.removednotifications {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *DiscussionThreadMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 7)
+	if m.clearedworkspace {
+		edges = append(edges, discussionthread.EdgeWorkspace)
+	}
+	if m.cleareddiscussion {
+		edges = append(edges, discussionthread.EdgeDiscussion)
+	}
+	if m.clearedcreator {
+		edges = append(edges, discussionthread.EdgeCreator)
+	}
+	if m.clearedresolving_user {
+		edges = append(edges, discussionthread.EdgeResolvingUser)
+	}
+	if m.clearedissue {
+		edges = append(edges, discussionthread.EdgeIssue)
+	}
+	if m.clearedcomments {
+		edges = append(edges, discussionthread.EdgeComments)
+	}
+	if m.clearednotifications {
+		edges = append(edges, discussionthread.EdgeNotifications)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *DiscussionThreadMutation) EdgeCleared(name string) bool {
+	switch name {
+	case discussionthread.EdgeWorkspace:
+		return m.clearedworkspace
+	case discussionthread.EdgeDiscussion:
+		return m.cleareddiscussion
+	case discussionthread.EdgeCreator:
+		return m.clearedcreator
+	case discussionthread.EdgeResolvingUser:
+		return m.clearedresolving_user
+	case discussionthread.EdgeIssue:
+		return m.clearedissue
+	case discussionthread.EdgeComments:
+		return m.clearedcomments
+	case discussionthread.EdgeNotifications:
+		return m.clearednotifications
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *DiscussionThreadMutation) ClearEdge(name string) error {
+	switch name {
+	case discussionthread.EdgeWorkspace:
+		m.ClearWorkspace()
+		return nil
+	case discussionthread.EdgeDiscussion:
+		m.ClearDiscussion()
+		return nil
+	case discussionthread.EdgeCreator:
+		m.ClearCreator()
+		return nil
+	case discussionthread.EdgeResolvingUser:
+		m.ClearResolvingUser()
+		return nil
+	case discussionthread.EdgeIssue:
+		m.ClearIssue()
+		return nil
+	}
+	return fmt.Errorf("unknown DiscussionThread unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *DiscussionThreadMutation) ResetEdge(name string) error {
+	switch name {
+	case discussionthread.EdgeWorkspace:
+		m.ResetWorkspace()
+		return nil
+	case discussionthread.EdgeDiscussion:
+		m.ResetDiscussion()
+		return nil
+	case discussionthread.EdgeCreator:
+		m.ResetCreator()
+		return nil
+	case discussionthread.EdgeResolvingUser:
+		m.ResetResolvingUser()
+		return nil
+	case discussionthread.EdgeIssue:
+		m.ResetIssue()
+		return nil
+	case discussionthread.EdgeComments:
+		m.ResetComments()
+		return nil
+	case discussionthread.EdgeNotifications:
+		m.ResetNotifications()
+		return nil
+	}
+	return fmt.Errorf("unknown DiscussionThread edge %s", name)
 }
 
 // DocumentMutation represents an operation that mutates the Document nodes in the graph.
@@ -28598,6 +32380,9 @@ type IssueMutation struct {
 	comments                                map[uuid.UUID]struct{}
 	removedcomments                         map[uuid.UUID]struct{}
 	clearedcomments                         bool
+	discussion_threads                      map[uuid.UUID]struct{}
+	removeddiscussion_threads               map[uuid.UUID]struct{}
+	cleareddiscussion_threads               bool
 	reactions                               map[uuid.UUID]struct{}
 	removedreactions                        map[uuid.UUID]struct{}
 	clearedreactions                        bool
@@ -31084,6 +34869,60 @@ func (m *IssueMutation) ResetComments() {
 	m.removedcomments = nil
 }
 
+// AddDiscussionThreadIDs adds the "discussion_threads" edge to the DiscussionThread entity by ids.
+func (m *IssueMutation) AddDiscussionThreadIDs(ids ...uuid.UUID) {
+	if m.discussion_threads == nil {
+		m.discussion_threads = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.discussion_threads[ids[i]] = struct{}{}
+	}
+}
+
+// ClearDiscussionThreads clears the "discussion_threads" edge to the DiscussionThread entity.
+func (m *IssueMutation) ClearDiscussionThreads() {
+	m.cleareddiscussion_threads = true
+}
+
+// DiscussionThreadsCleared reports if the "discussion_threads" edge to the DiscussionThread entity was cleared.
+func (m *IssueMutation) DiscussionThreadsCleared() bool {
+	return m.cleareddiscussion_threads
+}
+
+// RemoveDiscussionThreadIDs removes the "discussion_threads" edge to the DiscussionThread entity by IDs.
+func (m *IssueMutation) RemoveDiscussionThreadIDs(ids ...uuid.UUID) {
+	if m.removeddiscussion_threads == nil {
+		m.removeddiscussion_threads = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.discussion_threads, ids[i])
+		m.removeddiscussion_threads[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedDiscussionThreads returns the removed IDs of the "discussion_threads" edge to the DiscussionThread entity.
+func (m *IssueMutation) RemovedDiscussionThreadsIDs() (ids []uuid.UUID) {
+	for id := range m.removeddiscussion_threads {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// DiscussionThreadsIDs returns the "discussion_threads" edge IDs in the mutation.
+func (m *IssueMutation) DiscussionThreadsIDs() (ids []uuid.UUID) {
+	for id := range m.discussion_threads {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetDiscussionThreads resets all changes to the "discussion_threads" edge.
+func (m *IssueMutation) ResetDiscussionThreads() {
+	m.discussion_threads = nil
+	m.cleareddiscussion_threads = false
+	m.removeddiscussion_threads = nil
+}
+
 // AddReactionIDs adds the "reactions" edge to the Reaction entity by ids.
 func (m *IssueMutation) AddReactionIDs(ids ...uuid.UUID) {
 	if m.reactions == nil {
@@ -32450,7 +36289,7 @@ func (m *IssueMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *IssueMutation) AddedEdges() []string {
-	edges := make([]string, 0, 25)
+	edges := make([]string, 0, 26)
 	if m.workspace != nil {
 		edges = append(edges, issue.EdgeWorkspace)
 	}
@@ -32501,6 +36340,9 @@ func (m *IssueMutation) AddedEdges() []string {
 	}
 	if m.comments != nil {
 		edges = append(edges, issue.EdgeComments)
+	}
+	if m.discussion_threads != nil {
+		edges = append(edges, issue.EdgeDiscussionThreads)
 	}
 	if m.reactions != nil {
 		edges = append(edges, issue.EdgeReactions)
@@ -32615,6 +36457,12 @@ func (m *IssueMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case issue.EdgeDiscussionThreads:
+		ids := make([]ent.Value, 0, len(m.discussion_threads))
+		for id := range m.discussion_threads {
+			ids = append(ids, id)
+		}
+		return ids
 	case issue.EdgeReactions:
 		ids := make([]ent.Value, 0, len(m.reactions))
 		for id := range m.reactions {
@@ -32669,7 +36517,7 @@ func (m *IssueMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *IssueMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 25)
+	edges := make([]string, 0, 26)
 	if m.removedchildren != nil {
 		edges = append(edges, issue.EdgeChildren)
 	}
@@ -32690,6 +36538,9 @@ func (m *IssueMutation) RemovedEdges() []string {
 	}
 	if m.removedcomments != nil {
 		edges = append(edges, issue.EdgeComments)
+	}
+	if m.removeddiscussion_threads != nil {
+		edges = append(edges, issue.EdgeDiscussionThreads)
 	}
 	if m.removedreactions != nil {
 		edges = append(edges, issue.EdgeReactions)
@@ -32764,6 +36615,12 @@ func (m *IssueMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case issue.EdgeDiscussionThreads:
+		ids := make([]ent.Value, 0, len(m.removeddiscussion_threads))
+		for id := range m.removeddiscussion_threads {
+			ids = append(ids, id)
+		}
+		return ids
 	case issue.EdgeReactions:
 		ids := make([]ent.Value, 0, len(m.removedreactions))
 		for id := range m.removedreactions {
@@ -32818,7 +36675,7 @@ func (m *IssueMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *IssueMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 25)
+	edges := make([]string, 0, 26)
 	if m.clearedworkspace {
 		edges = append(edges, issue.EdgeWorkspace)
 	}
@@ -32869,6 +36726,9 @@ func (m *IssueMutation) ClearedEdges() []string {
 	}
 	if m.clearedcomments {
 		edges = append(edges, issue.EdgeComments)
+	}
+	if m.cleareddiscussion_threads {
+		edges = append(edges, issue.EdgeDiscussionThreads)
 	}
 	if m.clearedreactions {
 		edges = append(edges, issue.EdgeReactions)
@@ -32935,6 +36795,8 @@ func (m *IssueMutation) EdgeCleared(name string) bool {
 		return m.cleareddocuments
 	case issue.EdgeComments:
 		return m.clearedcomments
+	case issue.EdgeDiscussionThreads:
+		return m.cleareddiscussion_threads
 	case issue.EdgeReactions:
 		return m.clearedreactions
 	case issue.EdgeCustomerNeeds:
@@ -33047,6 +36909,9 @@ func (m *IssueMutation) ResetEdge(name string) error {
 		return nil
 	case issue.EdgeComments:
 		m.ResetComments()
+		return nil
+	case issue.EdgeDiscussionThreads:
+		m.ResetDiscussionThreads()
 		return nil
 	case issue.EdgeReactions:
 		m.ResetReactions()
@@ -37626,38 +41491,42 @@ func (m *IssueSubscriberMutation) ResetEdge(name string) error {
 // NotificationMutation represents an operation that mutates the Notification nodes in the graph.
 type NotificationMutation struct {
 	config
-	op                   Op
-	typ                  string
-	id                   *uuid.UUID
-	_type                *string
-	summary              *string
-	read_at              *time.Time
-	snoozed_until        *time.Time
-	archived_at          *time.Time
-	created_at           *time.Time
-	emailed_at           *time.Time
-	clearedFields        map[string]struct{}
-	workspace            *uuid.UUID
-	clearedworkspace     bool
-	user                 *uuid.UUID
-	cleareduser          bool
-	actor                *uuid.UUID
-	clearedactor         bool
-	issue                *uuid.UUID
-	clearedissue         bool
-	comment              *uuid.UUID
-	clearedcomment       bool
-	project              *uuid.UUID
-	clearedproject       bool
-	initiative           *uuid.UUID
-	clearedinitiative    bool
-	document             *uuid.UUID
-	cleareddocument      bool
-	status_update        *uuid.UUID
-	clearedstatus_update bool
-	done                 bool
-	oldValue             func(context.Context) (*Notification, error)
-	predicates           []predicate.Notification
+	op                       Op
+	typ                      string
+	id                       *uuid.UUID
+	_type                    *string
+	summary                  *string
+	read_at                  *time.Time
+	snoozed_until            *time.Time
+	archived_at              *time.Time
+	created_at               *time.Time
+	emailed_at               *time.Time
+	clearedFields            map[string]struct{}
+	workspace                *uuid.UUID
+	clearedworkspace         bool
+	user                     *uuid.UUID
+	cleareduser              bool
+	actor                    *uuid.UUID
+	clearedactor             bool
+	issue                    *uuid.UUID
+	clearedissue             bool
+	comment                  *uuid.UUID
+	clearedcomment           bool
+	project                  *uuid.UUID
+	clearedproject           bool
+	initiative               *uuid.UUID
+	clearedinitiative        bool
+	document                 *uuid.UUID
+	cleareddocument          bool
+	status_update            *uuid.UUID
+	clearedstatus_update     bool
+	discussion               *uuid.UUID
+	cleareddiscussion        bool
+	discussion_thread        *uuid.UUID
+	cleareddiscussion_thread bool
+	done                     bool
+	oldValue                 func(context.Context) (*Notification, error)
+	predicates               []predicate.Notification
 }
 
 var _ ent.Mutation = (*NotificationMutation)(nil)
@@ -38215,6 +42084,104 @@ func (m *NotificationMutation) ResetStatusUpdateID() {
 	delete(m.clearedFields, notification.FieldStatusUpdateID)
 }
 
+// SetDiscussionID sets the "discussion_id" field.
+func (m *NotificationMutation) SetDiscussionID(u uuid.UUID) {
+	m.discussion = &u
+}
+
+// DiscussionID returns the value of the "discussion_id" field in the mutation.
+func (m *NotificationMutation) DiscussionID() (r uuid.UUID, exists bool) {
+	v := m.discussion
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDiscussionID returns the old "discussion_id" field's value of the Notification entity.
+// If the Notification object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NotificationMutation) OldDiscussionID(ctx context.Context) (v *uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDiscussionID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDiscussionID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDiscussionID: %w", err)
+	}
+	return oldValue.DiscussionID, nil
+}
+
+// ClearDiscussionID clears the value of the "discussion_id" field.
+func (m *NotificationMutation) ClearDiscussionID() {
+	m.discussion = nil
+	m.clearedFields[notification.FieldDiscussionID] = struct{}{}
+}
+
+// DiscussionIDCleared returns if the "discussion_id" field was cleared in this mutation.
+func (m *NotificationMutation) DiscussionIDCleared() bool {
+	_, ok := m.clearedFields[notification.FieldDiscussionID]
+	return ok
+}
+
+// ResetDiscussionID resets all changes to the "discussion_id" field.
+func (m *NotificationMutation) ResetDiscussionID() {
+	m.discussion = nil
+	delete(m.clearedFields, notification.FieldDiscussionID)
+}
+
+// SetDiscussionThreadID sets the "discussion_thread_id" field.
+func (m *NotificationMutation) SetDiscussionThreadID(u uuid.UUID) {
+	m.discussion_thread = &u
+}
+
+// DiscussionThreadID returns the value of the "discussion_thread_id" field in the mutation.
+func (m *NotificationMutation) DiscussionThreadID() (r uuid.UUID, exists bool) {
+	v := m.discussion_thread
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDiscussionThreadID returns the old "discussion_thread_id" field's value of the Notification entity.
+// If the Notification object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NotificationMutation) OldDiscussionThreadID(ctx context.Context) (v *uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDiscussionThreadID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDiscussionThreadID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDiscussionThreadID: %w", err)
+	}
+	return oldValue.DiscussionThreadID, nil
+}
+
+// ClearDiscussionThreadID clears the value of the "discussion_thread_id" field.
+func (m *NotificationMutation) ClearDiscussionThreadID() {
+	m.discussion_thread = nil
+	m.clearedFields[notification.FieldDiscussionThreadID] = struct{}{}
+}
+
+// DiscussionThreadIDCleared returns if the "discussion_thread_id" field was cleared in this mutation.
+func (m *NotificationMutation) DiscussionThreadIDCleared() bool {
+	_, ok := m.clearedFields[notification.FieldDiscussionThreadID]
+	return ok
+}
+
+// ResetDiscussionThreadID resets all changes to the "discussion_thread_id" field.
+func (m *NotificationMutation) ResetDiscussionThreadID() {
+	m.discussion_thread = nil
+	delete(m.clearedFields, notification.FieldDiscussionThreadID)
+}
+
 // SetSummary sets the "summary" field.
 func (m *NotificationMutation) SetSummary(s string) {
 	m.summary = &s
@@ -38739,6 +42706,60 @@ func (m *NotificationMutation) ResetStatusUpdate() {
 	m.clearedstatus_update = false
 }
 
+// ClearDiscussion clears the "discussion" edge to the Discussion entity.
+func (m *NotificationMutation) ClearDiscussion() {
+	m.cleareddiscussion = true
+	m.clearedFields[notification.FieldDiscussionID] = struct{}{}
+}
+
+// DiscussionCleared reports if the "discussion" edge to the Discussion entity was cleared.
+func (m *NotificationMutation) DiscussionCleared() bool {
+	return m.DiscussionIDCleared() || m.cleareddiscussion
+}
+
+// DiscussionIDs returns the "discussion" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// DiscussionID instead. It exists only for internal usage by the builders.
+func (m *NotificationMutation) DiscussionIDs() (ids []uuid.UUID) {
+	if id := m.discussion; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetDiscussion resets all changes to the "discussion" edge.
+func (m *NotificationMutation) ResetDiscussion() {
+	m.discussion = nil
+	m.cleareddiscussion = false
+}
+
+// ClearDiscussionThread clears the "discussion_thread" edge to the DiscussionThread entity.
+func (m *NotificationMutation) ClearDiscussionThread() {
+	m.cleareddiscussion_thread = true
+	m.clearedFields[notification.FieldDiscussionThreadID] = struct{}{}
+}
+
+// DiscussionThreadCleared reports if the "discussion_thread" edge to the DiscussionThread entity was cleared.
+func (m *NotificationMutation) DiscussionThreadCleared() bool {
+	return m.DiscussionThreadIDCleared() || m.cleareddiscussion_thread
+}
+
+// DiscussionThreadIDs returns the "discussion_thread" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// DiscussionThreadID instead. It exists only for internal usage by the builders.
+func (m *NotificationMutation) DiscussionThreadIDs() (ids []uuid.UUID) {
+	if id := m.discussion_thread; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetDiscussionThread resets all changes to the "discussion_thread" edge.
+func (m *NotificationMutation) ResetDiscussionThread() {
+	m.discussion_thread = nil
+	m.cleareddiscussion_thread = false
+}
+
 // Where appends a list predicates to the NotificationMutation builder.
 func (m *NotificationMutation) Where(ps ...predicate.Notification) {
 	m.predicates = append(m.predicates, ps...)
@@ -38773,7 +42794,7 @@ func (m *NotificationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NotificationMutation) Fields() []string {
-	fields := make([]string, 0, 16)
+	fields := make([]string, 0, 18)
 	if m.workspace != nil {
 		fields = append(fields, notification.FieldWorkspaceID)
 	}
@@ -38803,6 +42824,12 @@ func (m *NotificationMutation) Fields() []string {
 	}
 	if m.status_update != nil {
 		fields = append(fields, notification.FieldStatusUpdateID)
+	}
+	if m.discussion != nil {
+		fields = append(fields, notification.FieldDiscussionID)
+	}
+	if m.discussion_thread != nil {
+		fields = append(fields, notification.FieldDiscussionThreadID)
 	}
 	if m.summary != nil {
 		fields = append(fields, notification.FieldSummary)
@@ -38850,6 +42877,10 @@ func (m *NotificationMutation) Field(name string) (ent.Value, bool) {
 		return m.DocumentID()
 	case notification.FieldStatusUpdateID:
 		return m.StatusUpdateID()
+	case notification.FieldDiscussionID:
+		return m.DiscussionID()
+	case notification.FieldDiscussionThreadID:
+		return m.DiscussionThreadID()
 	case notification.FieldSummary:
 		return m.Summary()
 	case notification.FieldReadAt:
@@ -38891,6 +42922,10 @@ func (m *NotificationMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldDocumentID(ctx)
 	case notification.FieldStatusUpdateID:
 		return m.OldStatusUpdateID(ctx)
+	case notification.FieldDiscussionID:
+		return m.OldDiscussionID(ctx)
+	case notification.FieldDiscussionThreadID:
+		return m.OldDiscussionThreadID(ctx)
 	case notification.FieldSummary:
 		return m.OldSummary(ctx)
 	case notification.FieldReadAt:
@@ -38981,6 +43016,20 @@ func (m *NotificationMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStatusUpdateID(v)
+		return nil
+	case notification.FieldDiscussionID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDiscussionID(v)
+		return nil
+	case notification.FieldDiscussionThreadID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDiscussionThreadID(v)
 		return nil
 	case notification.FieldSummary:
 		v, ok := value.(string)
@@ -39075,6 +43124,12 @@ func (m *NotificationMutation) ClearedFields() []string {
 	if m.FieldCleared(notification.FieldStatusUpdateID) {
 		fields = append(fields, notification.FieldStatusUpdateID)
 	}
+	if m.FieldCleared(notification.FieldDiscussionID) {
+		fields = append(fields, notification.FieldDiscussionID)
+	}
+	if m.FieldCleared(notification.FieldDiscussionThreadID) {
+		fields = append(fields, notification.FieldDiscussionThreadID)
+	}
 	if m.FieldCleared(notification.FieldReadAt) {
 		fields = append(fields, notification.FieldReadAt)
 	}
@@ -39124,6 +43179,12 @@ func (m *NotificationMutation) ClearField(name string) error {
 		return nil
 	case notification.FieldStatusUpdateID:
 		m.ClearStatusUpdateID()
+		return nil
+	case notification.FieldDiscussionID:
+		m.ClearDiscussionID()
+		return nil
+	case notification.FieldDiscussionThreadID:
+		m.ClearDiscussionThreadID()
 		return nil
 	case notification.FieldReadAt:
 		m.ClearReadAt()
@@ -39178,6 +43239,12 @@ func (m *NotificationMutation) ResetField(name string) error {
 	case notification.FieldStatusUpdateID:
 		m.ResetStatusUpdateID()
 		return nil
+	case notification.FieldDiscussionID:
+		m.ResetDiscussionID()
+		return nil
+	case notification.FieldDiscussionThreadID:
+		m.ResetDiscussionThreadID()
+		return nil
 	case notification.FieldSummary:
 		m.ResetSummary()
 		return nil
@@ -39202,7 +43269,7 @@ func (m *NotificationMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *NotificationMutation) AddedEdges() []string {
-	edges := make([]string, 0, 9)
+	edges := make([]string, 0, 11)
 	if m.workspace != nil {
 		edges = append(edges, notification.EdgeWorkspace)
 	}
@@ -39229,6 +43296,12 @@ func (m *NotificationMutation) AddedEdges() []string {
 	}
 	if m.status_update != nil {
 		edges = append(edges, notification.EdgeStatusUpdate)
+	}
+	if m.discussion != nil {
+		edges = append(edges, notification.EdgeDiscussion)
+	}
+	if m.discussion_thread != nil {
+		edges = append(edges, notification.EdgeDiscussionThread)
 	}
 	return edges
 }
@@ -39273,13 +43346,21 @@ func (m *NotificationMutation) AddedIDs(name string) []ent.Value {
 		if id := m.status_update; id != nil {
 			return []ent.Value{*id}
 		}
+	case notification.EdgeDiscussion:
+		if id := m.discussion; id != nil {
+			return []ent.Value{*id}
+		}
+	case notification.EdgeDiscussionThread:
+		if id := m.discussion_thread; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *NotificationMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 9)
+	edges := make([]string, 0, 11)
 	return edges
 }
 
@@ -39291,7 +43372,7 @@ func (m *NotificationMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *NotificationMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 9)
+	edges := make([]string, 0, 11)
 	if m.clearedworkspace {
 		edges = append(edges, notification.EdgeWorkspace)
 	}
@@ -39319,6 +43400,12 @@ func (m *NotificationMutation) ClearedEdges() []string {
 	if m.clearedstatus_update {
 		edges = append(edges, notification.EdgeStatusUpdate)
 	}
+	if m.cleareddiscussion {
+		edges = append(edges, notification.EdgeDiscussion)
+	}
+	if m.cleareddiscussion_thread {
+		edges = append(edges, notification.EdgeDiscussionThread)
+	}
 	return edges
 }
 
@@ -39344,6 +43431,10 @@ func (m *NotificationMutation) EdgeCleared(name string) bool {
 		return m.cleareddocument
 	case notification.EdgeStatusUpdate:
 		return m.clearedstatus_update
+	case notification.EdgeDiscussion:
+		return m.cleareddiscussion
+	case notification.EdgeDiscussionThread:
+		return m.cleareddiscussion_thread
 	}
 	return false
 }
@@ -39379,6 +43470,12 @@ func (m *NotificationMutation) ClearEdge(name string) error {
 	case notification.EdgeStatusUpdate:
 		m.ClearStatusUpdate()
 		return nil
+	case notification.EdgeDiscussion:
+		m.ClearDiscussion()
+		return nil
+	case notification.EdgeDiscussionThread:
+		m.ClearDiscussionThread()
+		return nil
 	}
 	return fmt.Errorf("unknown Notification unique edge %s", name)
 }
@@ -39413,6 +43510,12 @@ func (m *NotificationMutation) ResetEdge(name string) error {
 		return nil
 	case notification.EdgeStatusUpdate:
 		m.ResetStatusUpdate()
+		return nil
+	case notification.EdgeDiscussion:
+		m.ResetDiscussion()
+		return nil
+	case notification.EdgeDiscussionThread:
+		m.ResetDiscussionThread()
 		return nil
 	}
 	return fmt.Errorf("unknown Notification edge %s", name)
@@ -60175,6 +64278,9 @@ type TeamMutation struct {
 	documents                        map[uuid.UUID]struct{}
 	removeddocuments                 map[uuid.UUID]struct{}
 	cleareddocuments                 bool
+	discussions                      map[uuid.UUID]struct{}
+	removeddiscussions               map[uuid.UUID]struct{}
+	cleareddiscussions               bool
 	custom_views                     map[uuid.UUID]struct{}
 	removedcustom_views              map[uuid.UUID]struct{}
 	clearedcustom_views              bool
@@ -63053,6 +67159,60 @@ func (m *TeamMutation) ResetDocuments() {
 	m.removeddocuments = nil
 }
 
+// AddDiscussionIDs adds the "discussions" edge to the Discussion entity by ids.
+func (m *TeamMutation) AddDiscussionIDs(ids ...uuid.UUID) {
+	if m.discussions == nil {
+		m.discussions = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.discussions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearDiscussions clears the "discussions" edge to the Discussion entity.
+func (m *TeamMutation) ClearDiscussions() {
+	m.cleareddiscussions = true
+}
+
+// DiscussionsCleared reports if the "discussions" edge to the Discussion entity was cleared.
+func (m *TeamMutation) DiscussionsCleared() bool {
+	return m.cleareddiscussions
+}
+
+// RemoveDiscussionIDs removes the "discussions" edge to the Discussion entity by IDs.
+func (m *TeamMutation) RemoveDiscussionIDs(ids ...uuid.UUID) {
+	if m.removeddiscussions == nil {
+		m.removeddiscussions = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.discussions, ids[i])
+		m.removeddiscussions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedDiscussions returns the removed IDs of the "discussions" edge to the Discussion entity.
+func (m *TeamMutation) RemovedDiscussionsIDs() (ids []uuid.UUID) {
+	for id := range m.removeddiscussions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// DiscussionsIDs returns the "discussions" edge IDs in the mutation.
+func (m *TeamMutation) DiscussionsIDs() (ids []uuid.UUID) {
+	for id := range m.discussions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetDiscussions resets all changes to the "discussions" edge.
+func (m *TeamMutation) ResetDiscussions() {
+	m.discussions = nil
+	m.cleareddiscussions = false
+	m.removeddiscussions = nil
+}
+
 // AddCustomViewIDs adds the "custom_views" edge to the CustomView entity by ids.
 func (m *TeamMutation) AddCustomViewIDs(ids ...uuid.UUID) {
 	if m.custom_views == nil {
@@ -64609,7 +68769,7 @@ func (m *TeamMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TeamMutation) AddedEdges() []string {
-	edges := make([]string, 0, 20)
+	edges := make([]string, 0, 21)
 	if m.workspace != nil {
 		edges = append(edges, team.EdgeWorkspace)
 	}
@@ -64648,6 +68808,9 @@ func (m *TeamMutation) AddedEdges() []string {
 	}
 	if m.documents != nil {
 		edges = append(edges, team.EdgeDocuments)
+	}
+	if m.discussions != nil {
+		edges = append(edges, team.EdgeDiscussions)
 	}
 	if m.custom_views != nil {
 		edges = append(edges, team.EdgeCustomViews)
@@ -64743,6 +68906,12 @@ func (m *TeamMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case team.EdgeDiscussions:
+		ids := make([]ent.Value, 0, len(m.discussions))
+		for id := range m.discussions {
+			ids = append(ids, id)
+		}
+		return ids
 	case team.EdgeCustomViews:
 		ids := make([]ent.Value, 0, len(m.custom_views))
 		for id := range m.custom_views {
@@ -64791,7 +68960,7 @@ func (m *TeamMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TeamMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 20)
+	edges := make([]string, 0, 21)
 	if m.removedchildren != nil {
 		edges = append(edges, team.EdgeChildren)
 	}
@@ -64812,6 +68981,9 @@ func (m *TeamMutation) RemovedEdges() []string {
 	}
 	if m.removeddocuments != nil {
 		edges = append(edges, team.EdgeDocuments)
+	}
+	if m.removeddiscussions != nil {
+		edges = append(edges, team.EdgeDiscussions)
 	}
 	if m.removedcustom_views != nil {
 		edges = append(edges, team.EdgeCustomViews)
@@ -64883,6 +69055,12 @@ func (m *TeamMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case team.EdgeDiscussions:
+		ids := make([]ent.Value, 0, len(m.removeddiscussions))
+		for id := range m.removeddiscussions {
+			ids = append(ids, id)
+		}
+		return ids
 	case team.EdgeCustomViews:
 		ids := make([]ent.Value, 0, len(m.removedcustom_views))
 		for id := range m.removedcustom_views {
@@ -64931,7 +69109,7 @@ func (m *TeamMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TeamMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 20)
+	edges := make([]string, 0, 21)
 	if m.clearedworkspace {
 		edges = append(edges, team.EdgeWorkspace)
 	}
@@ -64970,6 +69148,9 @@ func (m *TeamMutation) ClearedEdges() []string {
 	}
 	if m.cleareddocuments {
 		edges = append(edges, team.EdgeDocuments)
+	}
+	if m.cleareddiscussions {
+		edges = append(edges, team.EdgeDiscussions)
 	}
 	if m.clearedcustom_views {
 		edges = append(edges, team.EdgeCustomViews)
@@ -65025,6 +69206,8 @@ func (m *TeamMutation) EdgeCleared(name string) bool {
 		return m.clearedissues
 	case team.EdgeDocuments:
 		return m.cleareddocuments
+	case team.EdgeDiscussions:
+		return m.cleareddiscussions
 	case team.EdgeCustomViews:
 		return m.clearedcustom_views
 	case team.EdgeTemplates:
@@ -65111,6 +69294,9 @@ func (m *TeamMutation) ResetEdge(name string) error {
 		return nil
 	case team.EdgeDocuments:
 		m.ResetDocuments()
+		return nil
+	case team.EdgeDiscussions:
+		m.ResetDiscussions()
 		return nil
 	case team.EdgeCustomViews:
 		m.ResetCustomViews()
@@ -66837,158 +71023,170 @@ func (m *TemplateMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op                                Op
-	typ                               string
-	id                                *uuid.UUID
-	google_subject                    *string
-	email                             *string
-	name                              *string
-	display_name                      *string
-	avatar_url                        *string
-	timezone                          *string
-	created_at                        *time.Time
-	last_seen_at                      *time.Time
-	email_notifications               *bool
-	github_login                      *string
-	clearedFields                     map[string]struct{}
-	invitations                       map[uuid.UUID]struct{}
-	removedinvitations                map[uuid.UUID]struct{}
-	clearedinvitations                bool
-	api_keys                          map[uuid.UUID]struct{}
-	removedapi_keys                   map[uuid.UUID]struct{}
-	clearedapi_keys                   bool
-	oauth_clients                     map[string]struct{}
-	removedoauth_clients              map[string]struct{}
-	clearedoauth_clients              bool
-	oauth_grants                      map[uuid.UUID]struct{}
-	removedoauth_grants               map[uuid.UUID]struct{}
-	clearedoauth_grants               bool
-	oauth_codes                       map[string]struct{}
-	removedoauth_codes                map[string]struct{}
-	clearedoauth_codes                bool
-	issue_labels                      map[uuid.UUID]struct{}
-	removedissue_labels               map[uuid.UUID]struct{}
-	clearedissue_labels               bool
-	project_labels                    map[uuid.UUID]struct{}
-	removedproject_labels             map[uuid.UUID]struct{}
-	clearedproject_labels             bool
-	projects_by_lead                  map[uuid.UUID]struct{}
-	removedprojects_by_lead           map[uuid.UUID]struct{}
-	clearedprojects_by_lead           bool
-	projects_by_creator               map[uuid.UUID]struct{}
-	removedprojects_by_creator        map[uuid.UUID]struct{}
-	clearedprojects_by_creator        bool
-	project_relations                 map[uuid.UUID]struct{}
-	removedproject_relations          map[uuid.UUID]struct{}
-	clearedproject_relations          bool
-	initiatives_by_owner              map[uuid.UUID]struct{}
-	removedinitiatives_by_owner       map[uuid.UUID]struct{}
-	clearedinitiatives_by_owner       bool
-	initiatives_by_creator            map[uuid.UUID]struct{}
-	removedinitiatives_by_creator     map[uuid.UUID]struct{}
-	clearedinitiatives_by_creator     bool
-	status_updates                    map[uuid.UUID]struct{}
-	removedstatus_updates             map[uuid.UUID]struct{}
-	clearedstatus_updates             bool
-	entity_links                      map[uuid.UUID]struct{}
-	removedentity_links               map[uuid.UUID]struct{}
-	clearedentity_links               bool
-	releases                          map[uuid.UUID]struct{}
-	removedreleases                   map[uuid.UUID]struct{}
-	clearedreleases                   bool
-	release_notes                     map[uuid.UUID]struct{}
-	removedrelease_notes              map[uuid.UUID]struct{}
-	clearedrelease_notes              bool
-	issues_by_assignee                map[uuid.UUID]struct{}
-	removedissues_by_assignee         map[uuid.UUID]struct{}
-	clearedissues_by_assignee         bool
-	issues_by_creator                 map[uuid.UUID]struct{}
-	removedissues_by_creator          map[uuid.UUID]struct{}
-	clearedissues_by_creator          bool
-	issues_by_snoozed_by              map[uuid.UUID]struct{}
-	removedissues_by_snoozed_by       map[uuid.UUID]struct{}
-	clearedissues_by_snoozed_by       bool
-	issue_relations                   map[uuid.UUID]struct{}
-	removedissue_relations            map[uuid.UUID]struct{}
-	clearedissue_relations            bool
-	issue_history                     map[int64]struct{}
-	removedissue_history              map[int64]struct{}
-	clearedissue_history              bool
-	attachments                       map[uuid.UUID]struct{}
-	removedattachments                map[uuid.UUID]struct{}
-	clearedattachments                bool
-	files                             map[uuid.UUID]struct{}
-	removedfiles                      map[uuid.UUID]struct{}
-	clearedfiles                      bool
-	documents_by_creator              map[uuid.UUID]struct{}
-	removeddocuments_by_creator       map[uuid.UUID]struct{}
-	cleareddocuments_by_creator       bool
-	documents_by_updated_by           map[uuid.UUID]struct{}
-	removeddocuments_by_updated_by    map[uuid.UUID]struct{}
-	cleareddocuments_by_updated_by    bool
-	document_versions                 map[int64]struct{}
-	removeddocument_versions          map[int64]struct{}
-	cleareddocument_versions          bool
-	comments_by_user                  map[uuid.UUID]struct{}
-	removedcomments_by_user           map[uuid.UUID]struct{}
-	clearedcomments_by_user           bool
-	comments_by_resolving_user        map[uuid.UUID]struct{}
-	removedcomments_by_resolving_user map[uuid.UUID]struct{}
-	clearedcomments_by_resolving_user bool
-	reactions                         map[uuid.UUID]struct{}
-	removedreactions                  map[uuid.UUID]struct{}
-	clearedreactions                  bool
-	customers                         map[uuid.UUID]struct{}
-	removedcustomers                  map[uuid.UUID]struct{}
-	clearedcustomers                  bool
-	customer_needs                    map[uuid.UUID]struct{}
-	removedcustomer_needs             map[uuid.UUID]struct{}
-	clearedcustomer_needs             bool
-	custom_views                      map[uuid.UUID]struct{}
-	removedcustom_views               map[uuid.UUID]struct{}
-	clearedcustom_views               bool
-	favorites                         map[uuid.UUID]struct{}
-	removedfavorites                  map[uuid.UUID]struct{}
-	clearedfavorites                  bool
-	templates                         map[uuid.UUID]struct{}
-	removedtemplates                  map[uuid.UUID]struct{}
-	clearedtemplates                  bool
-	notifications_by_user             map[uuid.UUID]struct{}
-	removednotifications_by_user      map[uuid.UUID]struct{}
-	clearednotifications_by_user      bool
-	notifications_by_actor            map[uuid.UUID]struct{}
-	removednotifications_by_actor     map[uuid.UUID]struct{}
-	clearednotifications_by_actor     bool
-	webhooks                          map[uuid.UUID]struct{}
-	removedwebhooks                   map[uuid.UUID]struct{}
-	clearedwebhooks                   bool
-	audit_entries                     map[int64]struct{}
-	removedaudit_entries              map[int64]struct{}
-	clearedaudit_entries              bool
-	github_installations              map[int64]struct{}
-	removedgithub_installations       map[int64]struct{}
-	clearedgithub_installations       bool
-	shared_issues                     map[uuid.UUID]struct{}
-	removedshared_issues              map[uuid.UUID]struct{}
-	clearedshared_issues              bool
-	subscribed_issues                 map[uuid.UUID]struct{}
-	removedsubscribed_issues          map[uuid.UUID]struct{}
-	clearedsubscribed_issues          bool
-	member_projects                   map[uuid.UUID]struct{}
-	removedmember_projects            map[uuid.UUID]struct{}
-	clearedmember_projects            bool
-	subscribed_projects               map[uuid.UUID]struct{}
-	removedsubscribed_projects        map[uuid.UUID]struct{}
-	clearedsubscribed_projects        bool
-	teams                             map[uuid.UUID]struct{}
-	removedteams                      map[uuid.UUID]struct{}
-	clearedteams                      bool
-	workspaces                        map[uuid.UUID]struct{}
-	removedworkspaces                 map[uuid.UUID]struct{}
-	clearedworkspaces                 bool
-	done                              bool
-	oldValue                          func(context.Context) (*User, error)
-	predicates                        []predicate.User
+	op                                          Op
+	typ                                         string
+	id                                          *uuid.UUID
+	google_subject                              *string
+	email                                       *string
+	name                                        *string
+	display_name                                *string
+	avatar_url                                  *string
+	timezone                                    *string
+	created_at                                  *time.Time
+	last_seen_at                                *time.Time
+	email_notifications                         *bool
+	github_login                                *string
+	clearedFields                               map[string]struct{}
+	invitations                                 map[uuid.UUID]struct{}
+	removedinvitations                          map[uuid.UUID]struct{}
+	clearedinvitations                          bool
+	api_keys                                    map[uuid.UUID]struct{}
+	removedapi_keys                             map[uuid.UUID]struct{}
+	clearedapi_keys                             bool
+	oauth_clients                               map[string]struct{}
+	removedoauth_clients                        map[string]struct{}
+	clearedoauth_clients                        bool
+	oauth_grants                                map[uuid.UUID]struct{}
+	removedoauth_grants                         map[uuid.UUID]struct{}
+	clearedoauth_grants                         bool
+	oauth_codes                                 map[string]struct{}
+	removedoauth_codes                          map[string]struct{}
+	clearedoauth_codes                          bool
+	issue_labels                                map[uuid.UUID]struct{}
+	removedissue_labels                         map[uuid.UUID]struct{}
+	clearedissue_labels                         bool
+	project_labels                              map[uuid.UUID]struct{}
+	removedproject_labels                       map[uuid.UUID]struct{}
+	clearedproject_labels                       bool
+	projects_by_lead                            map[uuid.UUID]struct{}
+	removedprojects_by_lead                     map[uuid.UUID]struct{}
+	clearedprojects_by_lead                     bool
+	projects_by_creator                         map[uuid.UUID]struct{}
+	removedprojects_by_creator                  map[uuid.UUID]struct{}
+	clearedprojects_by_creator                  bool
+	project_relations                           map[uuid.UUID]struct{}
+	removedproject_relations                    map[uuid.UUID]struct{}
+	clearedproject_relations                    bool
+	initiatives_by_owner                        map[uuid.UUID]struct{}
+	removedinitiatives_by_owner                 map[uuid.UUID]struct{}
+	clearedinitiatives_by_owner                 bool
+	initiatives_by_creator                      map[uuid.UUID]struct{}
+	removedinitiatives_by_creator               map[uuid.UUID]struct{}
+	clearedinitiatives_by_creator               bool
+	status_updates                              map[uuid.UUID]struct{}
+	removedstatus_updates                       map[uuid.UUID]struct{}
+	clearedstatus_updates                       bool
+	entity_links                                map[uuid.UUID]struct{}
+	removedentity_links                         map[uuid.UUID]struct{}
+	clearedentity_links                         bool
+	releases                                    map[uuid.UUID]struct{}
+	removedreleases                             map[uuid.UUID]struct{}
+	clearedreleases                             bool
+	release_notes                               map[uuid.UUID]struct{}
+	removedrelease_notes                        map[uuid.UUID]struct{}
+	clearedrelease_notes                        bool
+	issues_by_assignee                          map[uuid.UUID]struct{}
+	removedissues_by_assignee                   map[uuid.UUID]struct{}
+	clearedissues_by_assignee                   bool
+	issues_by_creator                           map[uuid.UUID]struct{}
+	removedissues_by_creator                    map[uuid.UUID]struct{}
+	clearedissues_by_creator                    bool
+	issues_by_snoozed_by                        map[uuid.UUID]struct{}
+	removedissues_by_snoozed_by                 map[uuid.UUID]struct{}
+	clearedissues_by_snoozed_by                 bool
+	issue_relations                             map[uuid.UUID]struct{}
+	removedissue_relations                      map[uuid.UUID]struct{}
+	clearedissue_relations                      bool
+	issue_history                               map[int64]struct{}
+	removedissue_history                        map[int64]struct{}
+	clearedissue_history                        bool
+	attachments                                 map[uuid.UUID]struct{}
+	removedattachments                          map[uuid.UUID]struct{}
+	clearedattachments                          bool
+	files                                       map[uuid.UUID]struct{}
+	removedfiles                                map[uuid.UUID]struct{}
+	clearedfiles                                bool
+	documents_by_creator                        map[uuid.UUID]struct{}
+	removeddocuments_by_creator                 map[uuid.UUID]struct{}
+	cleareddocuments_by_creator                 bool
+	discussions_by_creator                      map[uuid.UUID]struct{}
+	removeddiscussions_by_creator               map[uuid.UUID]struct{}
+	cleareddiscussions_by_creator               bool
+	discussion_threads_by_creator               map[uuid.UUID]struct{}
+	removeddiscussion_threads_by_creator        map[uuid.UUID]struct{}
+	cleareddiscussion_threads_by_creator        bool
+	discussion_threads_by_resolving_user        map[uuid.UUID]struct{}
+	removeddiscussion_threads_by_resolving_user map[uuid.UUID]struct{}
+	cleareddiscussion_threads_by_resolving_user bool
+	documents_by_updated_by                     map[uuid.UUID]struct{}
+	removeddocuments_by_updated_by              map[uuid.UUID]struct{}
+	cleareddocuments_by_updated_by              bool
+	document_versions                           map[int64]struct{}
+	removeddocument_versions                    map[int64]struct{}
+	cleareddocument_versions                    bool
+	comments_by_user                            map[uuid.UUID]struct{}
+	removedcomments_by_user                     map[uuid.UUID]struct{}
+	clearedcomments_by_user                     bool
+	comments_by_resolving_user                  map[uuid.UUID]struct{}
+	removedcomments_by_resolving_user           map[uuid.UUID]struct{}
+	clearedcomments_by_resolving_user           bool
+	reactions                                   map[uuid.UUID]struct{}
+	removedreactions                            map[uuid.UUID]struct{}
+	clearedreactions                            bool
+	customers                                   map[uuid.UUID]struct{}
+	removedcustomers                            map[uuid.UUID]struct{}
+	clearedcustomers                            bool
+	customer_needs                              map[uuid.UUID]struct{}
+	removedcustomer_needs                       map[uuid.UUID]struct{}
+	clearedcustomer_needs                       bool
+	custom_views                                map[uuid.UUID]struct{}
+	removedcustom_views                         map[uuid.UUID]struct{}
+	clearedcustom_views                         bool
+	favorites                                   map[uuid.UUID]struct{}
+	removedfavorites                            map[uuid.UUID]struct{}
+	clearedfavorites                            bool
+	templates                                   map[uuid.UUID]struct{}
+	removedtemplates                            map[uuid.UUID]struct{}
+	clearedtemplates                            bool
+	notifications_by_user                       map[uuid.UUID]struct{}
+	removednotifications_by_user                map[uuid.UUID]struct{}
+	clearednotifications_by_user                bool
+	notifications_by_actor                      map[uuid.UUID]struct{}
+	removednotifications_by_actor               map[uuid.UUID]struct{}
+	clearednotifications_by_actor               bool
+	webhooks                                    map[uuid.UUID]struct{}
+	removedwebhooks                             map[uuid.UUID]struct{}
+	clearedwebhooks                             bool
+	audit_entries                               map[int64]struct{}
+	removedaudit_entries                        map[int64]struct{}
+	clearedaudit_entries                        bool
+	github_installations                        map[int64]struct{}
+	removedgithub_installations                 map[int64]struct{}
+	clearedgithub_installations                 bool
+	shared_issues                               map[uuid.UUID]struct{}
+	removedshared_issues                        map[uuid.UUID]struct{}
+	clearedshared_issues                        bool
+	subscribed_issues                           map[uuid.UUID]struct{}
+	removedsubscribed_issues                    map[uuid.UUID]struct{}
+	clearedsubscribed_issues                    bool
+	member_projects                             map[uuid.UUID]struct{}
+	removedmember_projects                      map[uuid.UUID]struct{}
+	clearedmember_projects                      bool
+	subscribed_projects                         map[uuid.UUID]struct{}
+	removedsubscribed_projects                  map[uuid.UUID]struct{}
+	clearedsubscribed_projects                  bool
+	subscribed_discussions                      map[uuid.UUID]struct{}
+	removedsubscribed_discussions               map[uuid.UUID]struct{}
+	clearedsubscribed_discussions               bool
+	teams                                       map[uuid.UUID]struct{}
+	removedteams                                map[uuid.UUID]struct{}
+	clearedteams                                bool
+	workspaces                                  map[uuid.UUID]struct{}
+	removedworkspaces                           map[uuid.UUID]struct{}
+	clearedworkspaces                           bool
+	done                                        bool
+	oldValue                                    func(context.Context) (*User, error)
+	predicates                                  []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -68842,6 +73040,168 @@ func (m *UserMutation) ResetDocumentsByCreator() {
 	m.removeddocuments_by_creator = nil
 }
 
+// AddDiscussionsByCreatorIDs adds the "discussions_by_creator" edge to the Discussion entity by ids.
+func (m *UserMutation) AddDiscussionsByCreatorIDs(ids ...uuid.UUID) {
+	if m.discussions_by_creator == nil {
+		m.discussions_by_creator = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.discussions_by_creator[ids[i]] = struct{}{}
+	}
+}
+
+// ClearDiscussionsByCreator clears the "discussions_by_creator" edge to the Discussion entity.
+func (m *UserMutation) ClearDiscussionsByCreator() {
+	m.cleareddiscussions_by_creator = true
+}
+
+// DiscussionsByCreatorCleared reports if the "discussions_by_creator" edge to the Discussion entity was cleared.
+func (m *UserMutation) DiscussionsByCreatorCleared() bool {
+	return m.cleareddiscussions_by_creator
+}
+
+// RemoveDiscussionsByCreatorIDs removes the "discussions_by_creator" edge to the Discussion entity by IDs.
+func (m *UserMutation) RemoveDiscussionsByCreatorIDs(ids ...uuid.UUID) {
+	if m.removeddiscussions_by_creator == nil {
+		m.removeddiscussions_by_creator = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.discussions_by_creator, ids[i])
+		m.removeddiscussions_by_creator[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedDiscussionsByCreator returns the removed IDs of the "discussions_by_creator" edge to the Discussion entity.
+func (m *UserMutation) RemovedDiscussionsByCreatorIDs() (ids []uuid.UUID) {
+	for id := range m.removeddiscussions_by_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// DiscussionsByCreatorIDs returns the "discussions_by_creator" edge IDs in the mutation.
+func (m *UserMutation) DiscussionsByCreatorIDs() (ids []uuid.UUID) {
+	for id := range m.discussions_by_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetDiscussionsByCreator resets all changes to the "discussions_by_creator" edge.
+func (m *UserMutation) ResetDiscussionsByCreator() {
+	m.discussions_by_creator = nil
+	m.cleareddiscussions_by_creator = false
+	m.removeddiscussions_by_creator = nil
+}
+
+// AddDiscussionThreadsByCreatorIDs adds the "discussion_threads_by_creator" edge to the DiscussionThread entity by ids.
+func (m *UserMutation) AddDiscussionThreadsByCreatorIDs(ids ...uuid.UUID) {
+	if m.discussion_threads_by_creator == nil {
+		m.discussion_threads_by_creator = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.discussion_threads_by_creator[ids[i]] = struct{}{}
+	}
+}
+
+// ClearDiscussionThreadsByCreator clears the "discussion_threads_by_creator" edge to the DiscussionThread entity.
+func (m *UserMutation) ClearDiscussionThreadsByCreator() {
+	m.cleareddiscussion_threads_by_creator = true
+}
+
+// DiscussionThreadsByCreatorCleared reports if the "discussion_threads_by_creator" edge to the DiscussionThread entity was cleared.
+func (m *UserMutation) DiscussionThreadsByCreatorCleared() bool {
+	return m.cleareddiscussion_threads_by_creator
+}
+
+// RemoveDiscussionThreadsByCreatorIDs removes the "discussion_threads_by_creator" edge to the DiscussionThread entity by IDs.
+func (m *UserMutation) RemoveDiscussionThreadsByCreatorIDs(ids ...uuid.UUID) {
+	if m.removeddiscussion_threads_by_creator == nil {
+		m.removeddiscussion_threads_by_creator = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.discussion_threads_by_creator, ids[i])
+		m.removeddiscussion_threads_by_creator[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedDiscussionThreadsByCreator returns the removed IDs of the "discussion_threads_by_creator" edge to the DiscussionThread entity.
+func (m *UserMutation) RemovedDiscussionThreadsByCreatorIDs() (ids []uuid.UUID) {
+	for id := range m.removeddiscussion_threads_by_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// DiscussionThreadsByCreatorIDs returns the "discussion_threads_by_creator" edge IDs in the mutation.
+func (m *UserMutation) DiscussionThreadsByCreatorIDs() (ids []uuid.UUID) {
+	for id := range m.discussion_threads_by_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetDiscussionThreadsByCreator resets all changes to the "discussion_threads_by_creator" edge.
+func (m *UserMutation) ResetDiscussionThreadsByCreator() {
+	m.discussion_threads_by_creator = nil
+	m.cleareddiscussion_threads_by_creator = false
+	m.removeddiscussion_threads_by_creator = nil
+}
+
+// AddDiscussionThreadsByResolvingUserIDs adds the "discussion_threads_by_resolving_user" edge to the DiscussionThread entity by ids.
+func (m *UserMutation) AddDiscussionThreadsByResolvingUserIDs(ids ...uuid.UUID) {
+	if m.discussion_threads_by_resolving_user == nil {
+		m.discussion_threads_by_resolving_user = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.discussion_threads_by_resolving_user[ids[i]] = struct{}{}
+	}
+}
+
+// ClearDiscussionThreadsByResolvingUser clears the "discussion_threads_by_resolving_user" edge to the DiscussionThread entity.
+func (m *UserMutation) ClearDiscussionThreadsByResolvingUser() {
+	m.cleareddiscussion_threads_by_resolving_user = true
+}
+
+// DiscussionThreadsByResolvingUserCleared reports if the "discussion_threads_by_resolving_user" edge to the DiscussionThread entity was cleared.
+func (m *UserMutation) DiscussionThreadsByResolvingUserCleared() bool {
+	return m.cleareddiscussion_threads_by_resolving_user
+}
+
+// RemoveDiscussionThreadsByResolvingUserIDs removes the "discussion_threads_by_resolving_user" edge to the DiscussionThread entity by IDs.
+func (m *UserMutation) RemoveDiscussionThreadsByResolvingUserIDs(ids ...uuid.UUID) {
+	if m.removeddiscussion_threads_by_resolving_user == nil {
+		m.removeddiscussion_threads_by_resolving_user = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.discussion_threads_by_resolving_user, ids[i])
+		m.removeddiscussion_threads_by_resolving_user[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedDiscussionThreadsByResolvingUser returns the removed IDs of the "discussion_threads_by_resolving_user" edge to the DiscussionThread entity.
+func (m *UserMutation) RemovedDiscussionThreadsByResolvingUserIDs() (ids []uuid.UUID) {
+	for id := range m.removeddiscussion_threads_by_resolving_user {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// DiscussionThreadsByResolvingUserIDs returns the "discussion_threads_by_resolving_user" edge IDs in the mutation.
+func (m *UserMutation) DiscussionThreadsByResolvingUserIDs() (ids []uuid.UUID) {
+	for id := range m.discussion_threads_by_resolving_user {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetDiscussionThreadsByResolvingUser resets all changes to the "discussion_threads_by_resolving_user" edge.
+func (m *UserMutation) ResetDiscussionThreadsByResolvingUser() {
+	m.discussion_threads_by_resolving_user = nil
+	m.cleareddiscussion_threads_by_resolving_user = false
+	m.removeddiscussion_threads_by_resolving_user = nil
+}
+
 // AddDocumentsByUpdatedByIDs adds the "documents_by_updated_by" edge to the Document entity by ids.
 func (m *UserMutation) AddDocumentsByUpdatedByIDs(ids ...uuid.UUID) {
 	if m.documents_by_updated_by == nil {
@@ -69868,6 +74228,60 @@ func (m *UserMutation) ResetSubscribedProjects() {
 	m.removedsubscribed_projects = nil
 }
 
+// AddSubscribedDiscussionIDs adds the "subscribed_discussions" edge to the Discussion entity by ids.
+func (m *UserMutation) AddSubscribedDiscussionIDs(ids ...uuid.UUID) {
+	if m.subscribed_discussions == nil {
+		m.subscribed_discussions = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.subscribed_discussions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSubscribedDiscussions clears the "subscribed_discussions" edge to the Discussion entity.
+func (m *UserMutation) ClearSubscribedDiscussions() {
+	m.clearedsubscribed_discussions = true
+}
+
+// SubscribedDiscussionsCleared reports if the "subscribed_discussions" edge to the Discussion entity was cleared.
+func (m *UserMutation) SubscribedDiscussionsCleared() bool {
+	return m.clearedsubscribed_discussions
+}
+
+// RemoveSubscribedDiscussionIDs removes the "subscribed_discussions" edge to the Discussion entity by IDs.
+func (m *UserMutation) RemoveSubscribedDiscussionIDs(ids ...uuid.UUID) {
+	if m.removedsubscribed_discussions == nil {
+		m.removedsubscribed_discussions = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.subscribed_discussions, ids[i])
+		m.removedsubscribed_discussions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSubscribedDiscussions returns the removed IDs of the "subscribed_discussions" edge to the Discussion entity.
+func (m *UserMutation) RemovedSubscribedDiscussionsIDs() (ids []uuid.UUID) {
+	for id := range m.removedsubscribed_discussions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SubscribedDiscussionsIDs returns the "subscribed_discussions" edge IDs in the mutation.
+func (m *UserMutation) SubscribedDiscussionsIDs() (ids []uuid.UUID) {
+	for id := range m.subscribed_discussions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSubscribedDiscussions resets all changes to the "subscribed_discussions" edge.
+func (m *UserMutation) ResetSubscribedDiscussions() {
+	m.subscribed_discussions = nil
+	m.clearedsubscribed_discussions = false
+	m.removedsubscribed_discussions = nil
+}
+
 // AddTeamIDs adds the "teams" edge to the Team entity by ids.
 func (m *UserMutation) AddTeamIDs(ids ...uuid.UUID) {
 	if m.teams == nil {
@@ -70307,7 +74721,7 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 45)
+	edges := make([]string, 0, 49)
 	if m.invitations != nil {
 		edges = append(edges, user.EdgeInvitations)
 	}
@@ -70380,6 +74794,15 @@ func (m *UserMutation) AddedEdges() []string {
 	if m.documents_by_creator != nil {
 		edges = append(edges, user.EdgeDocumentsByCreator)
 	}
+	if m.discussions_by_creator != nil {
+		edges = append(edges, user.EdgeDiscussionsByCreator)
+	}
+	if m.discussion_threads_by_creator != nil {
+		edges = append(edges, user.EdgeDiscussionThreadsByCreator)
+	}
+	if m.discussion_threads_by_resolving_user != nil {
+		edges = append(edges, user.EdgeDiscussionThreadsByResolvingUser)
+	}
 	if m.documents_by_updated_by != nil {
 		edges = append(edges, user.EdgeDocumentsByUpdatedBy)
 	}
@@ -70436,6 +74859,9 @@ func (m *UserMutation) AddedEdges() []string {
 	}
 	if m.subscribed_projects != nil {
 		edges = append(edges, user.EdgeSubscribedProjects)
+	}
+	if m.subscribed_discussions != nil {
+		edges = append(edges, user.EdgeSubscribedDiscussions)
 	}
 	if m.teams != nil {
 		edges = append(edges, user.EdgeTeams)
@@ -70594,6 +75020,24 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeDiscussionsByCreator:
+		ids := make([]ent.Value, 0, len(m.discussions_by_creator))
+		for id := range m.discussions_by_creator {
+			ids = append(ids, id)
+		}
+		return ids
+	case user.EdgeDiscussionThreadsByCreator:
+		ids := make([]ent.Value, 0, len(m.discussion_threads_by_creator))
+		for id := range m.discussion_threads_by_creator {
+			ids = append(ids, id)
+		}
+		return ids
+	case user.EdgeDiscussionThreadsByResolvingUser:
+		ids := make([]ent.Value, 0, len(m.discussion_threads_by_resolving_user))
+		for id := range m.discussion_threads_by_resolving_user {
+			ids = append(ids, id)
+		}
+		return ids
 	case user.EdgeDocumentsByUpdatedBy:
 		ids := make([]ent.Value, 0, len(m.documents_by_updated_by))
 		for id := range m.documents_by_updated_by {
@@ -70708,6 +75152,12 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeSubscribedDiscussions:
+		ids := make([]ent.Value, 0, len(m.subscribed_discussions))
+		for id := range m.subscribed_discussions {
+			ids = append(ids, id)
+		}
+		return ids
 	case user.EdgeTeams:
 		ids := make([]ent.Value, 0, len(m.teams))
 		for id := range m.teams {
@@ -70726,7 +75176,7 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 45)
+	edges := make([]string, 0, 49)
 	if m.removedinvitations != nil {
 		edges = append(edges, user.EdgeInvitations)
 	}
@@ -70799,6 +75249,15 @@ func (m *UserMutation) RemovedEdges() []string {
 	if m.removeddocuments_by_creator != nil {
 		edges = append(edges, user.EdgeDocumentsByCreator)
 	}
+	if m.removeddiscussions_by_creator != nil {
+		edges = append(edges, user.EdgeDiscussionsByCreator)
+	}
+	if m.removeddiscussion_threads_by_creator != nil {
+		edges = append(edges, user.EdgeDiscussionThreadsByCreator)
+	}
+	if m.removeddiscussion_threads_by_resolving_user != nil {
+		edges = append(edges, user.EdgeDiscussionThreadsByResolvingUser)
+	}
 	if m.removeddocuments_by_updated_by != nil {
 		edges = append(edges, user.EdgeDocumentsByUpdatedBy)
 	}
@@ -70855,6 +75314,9 @@ func (m *UserMutation) RemovedEdges() []string {
 	}
 	if m.removedsubscribed_projects != nil {
 		edges = append(edges, user.EdgeSubscribedProjects)
+	}
+	if m.removedsubscribed_discussions != nil {
+		edges = append(edges, user.EdgeSubscribedDiscussions)
 	}
 	if m.removedteams != nil {
 		edges = append(edges, user.EdgeTeams)
@@ -71013,6 +75475,24 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeDiscussionsByCreator:
+		ids := make([]ent.Value, 0, len(m.removeddiscussions_by_creator))
+		for id := range m.removeddiscussions_by_creator {
+			ids = append(ids, id)
+		}
+		return ids
+	case user.EdgeDiscussionThreadsByCreator:
+		ids := make([]ent.Value, 0, len(m.removeddiscussion_threads_by_creator))
+		for id := range m.removeddiscussion_threads_by_creator {
+			ids = append(ids, id)
+		}
+		return ids
+	case user.EdgeDiscussionThreadsByResolvingUser:
+		ids := make([]ent.Value, 0, len(m.removeddiscussion_threads_by_resolving_user))
+		for id := range m.removeddiscussion_threads_by_resolving_user {
+			ids = append(ids, id)
+		}
+		return ids
 	case user.EdgeDocumentsByUpdatedBy:
 		ids := make([]ent.Value, 0, len(m.removeddocuments_by_updated_by))
 		for id := range m.removeddocuments_by_updated_by {
@@ -71127,6 +75607,12 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeSubscribedDiscussions:
+		ids := make([]ent.Value, 0, len(m.removedsubscribed_discussions))
+		for id := range m.removedsubscribed_discussions {
+			ids = append(ids, id)
+		}
+		return ids
 	case user.EdgeTeams:
 		ids := make([]ent.Value, 0, len(m.removedteams))
 		for id := range m.removedteams {
@@ -71145,7 +75631,7 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 45)
+	edges := make([]string, 0, 49)
 	if m.clearedinvitations {
 		edges = append(edges, user.EdgeInvitations)
 	}
@@ -71218,6 +75704,15 @@ func (m *UserMutation) ClearedEdges() []string {
 	if m.cleareddocuments_by_creator {
 		edges = append(edges, user.EdgeDocumentsByCreator)
 	}
+	if m.cleareddiscussions_by_creator {
+		edges = append(edges, user.EdgeDiscussionsByCreator)
+	}
+	if m.cleareddiscussion_threads_by_creator {
+		edges = append(edges, user.EdgeDiscussionThreadsByCreator)
+	}
+	if m.cleareddiscussion_threads_by_resolving_user {
+		edges = append(edges, user.EdgeDiscussionThreadsByResolvingUser)
+	}
 	if m.cleareddocuments_by_updated_by {
 		edges = append(edges, user.EdgeDocumentsByUpdatedBy)
 	}
@@ -71274,6 +75769,9 @@ func (m *UserMutation) ClearedEdges() []string {
 	}
 	if m.clearedsubscribed_projects {
 		edges = append(edges, user.EdgeSubscribedProjects)
+	}
+	if m.clearedsubscribed_discussions {
+		edges = append(edges, user.EdgeSubscribedDiscussions)
 	}
 	if m.clearedteams {
 		edges = append(edges, user.EdgeTeams)
@@ -71336,6 +75834,12 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 		return m.clearedfiles
 	case user.EdgeDocumentsByCreator:
 		return m.cleareddocuments_by_creator
+	case user.EdgeDiscussionsByCreator:
+		return m.cleareddiscussions_by_creator
+	case user.EdgeDiscussionThreadsByCreator:
+		return m.cleareddiscussion_threads_by_creator
+	case user.EdgeDiscussionThreadsByResolvingUser:
+		return m.cleareddiscussion_threads_by_resolving_user
 	case user.EdgeDocumentsByUpdatedBy:
 		return m.cleareddocuments_by_updated_by
 	case user.EdgeDocumentVersions:
@@ -71374,6 +75878,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 		return m.clearedmember_projects
 	case user.EdgeSubscribedProjects:
 		return m.clearedsubscribed_projects
+	case user.EdgeSubscribedDiscussions:
+		return m.clearedsubscribed_discussions
 	case user.EdgeTeams:
 		return m.clearedteams
 	case user.EdgeWorkspaces:
@@ -71466,6 +75972,15 @@ func (m *UserMutation) ResetEdge(name string) error {
 	case user.EdgeDocumentsByCreator:
 		m.ResetDocumentsByCreator()
 		return nil
+	case user.EdgeDiscussionsByCreator:
+		m.ResetDiscussionsByCreator()
+		return nil
+	case user.EdgeDiscussionThreadsByCreator:
+		m.ResetDiscussionThreadsByCreator()
+		return nil
+	case user.EdgeDiscussionThreadsByResolvingUser:
+		m.ResetDiscussionThreadsByResolvingUser()
+		return nil
 	case user.EdgeDocumentsByUpdatedBy:
 		m.ResetDocumentsByUpdatedBy()
 		return nil
@@ -71522,6 +76037,9 @@ func (m *UserMutation) ResetEdge(name string) error {
 		return nil
 	case user.EdgeSubscribedProjects:
 		m.ResetSubscribedProjects()
+		return nil
+	case user.EdgeSubscribedDiscussions:
+		m.ResetSubscribedDiscussions()
 		return nil
 	case user.EdgeTeams:
 		m.ResetTeams()
@@ -75156,6 +79674,12 @@ type WorkspaceMutation struct {
 	documents                   map[uuid.UUID]struct{}
 	removeddocuments            map[uuid.UUID]struct{}
 	cleareddocuments            bool
+	discussions                 map[uuid.UUID]struct{}
+	removeddiscussions          map[uuid.UUID]struct{}
+	cleareddiscussions          bool
+	discussion_threads          map[uuid.UUID]struct{}
+	removeddiscussion_threads   map[uuid.UUID]struct{}
+	cleareddiscussion_threads   bool
 	comments                    map[uuid.UUID]struct{}
 	removedcomments             map[uuid.UUID]struct{}
 	clearedcomments             bool
@@ -76561,6 +81085,114 @@ func (m *WorkspaceMutation) ResetDocuments() {
 	m.removeddocuments = nil
 }
 
+// AddDiscussionIDs adds the "discussions" edge to the Discussion entity by ids.
+func (m *WorkspaceMutation) AddDiscussionIDs(ids ...uuid.UUID) {
+	if m.discussions == nil {
+		m.discussions = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.discussions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearDiscussions clears the "discussions" edge to the Discussion entity.
+func (m *WorkspaceMutation) ClearDiscussions() {
+	m.cleareddiscussions = true
+}
+
+// DiscussionsCleared reports if the "discussions" edge to the Discussion entity was cleared.
+func (m *WorkspaceMutation) DiscussionsCleared() bool {
+	return m.cleareddiscussions
+}
+
+// RemoveDiscussionIDs removes the "discussions" edge to the Discussion entity by IDs.
+func (m *WorkspaceMutation) RemoveDiscussionIDs(ids ...uuid.UUID) {
+	if m.removeddiscussions == nil {
+		m.removeddiscussions = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.discussions, ids[i])
+		m.removeddiscussions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedDiscussions returns the removed IDs of the "discussions" edge to the Discussion entity.
+func (m *WorkspaceMutation) RemovedDiscussionsIDs() (ids []uuid.UUID) {
+	for id := range m.removeddiscussions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// DiscussionsIDs returns the "discussions" edge IDs in the mutation.
+func (m *WorkspaceMutation) DiscussionsIDs() (ids []uuid.UUID) {
+	for id := range m.discussions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetDiscussions resets all changes to the "discussions" edge.
+func (m *WorkspaceMutation) ResetDiscussions() {
+	m.discussions = nil
+	m.cleareddiscussions = false
+	m.removeddiscussions = nil
+}
+
+// AddDiscussionThreadIDs adds the "discussion_threads" edge to the DiscussionThread entity by ids.
+func (m *WorkspaceMutation) AddDiscussionThreadIDs(ids ...uuid.UUID) {
+	if m.discussion_threads == nil {
+		m.discussion_threads = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.discussion_threads[ids[i]] = struct{}{}
+	}
+}
+
+// ClearDiscussionThreads clears the "discussion_threads" edge to the DiscussionThread entity.
+func (m *WorkspaceMutation) ClearDiscussionThreads() {
+	m.cleareddiscussion_threads = true
+}
+
+// DiscussionThreadsCleared reports if the "discussion_threads" edge to the DiscussionThread entity was cleared.
+func (m *WorkspaceMutation) DiscussionThreadsCleared() bool {
+	return m.cleareddiscussion_threads
+}
+
+// RemoveDiscussionThreadIDs removes the "discussion_threads" edge to the DiscussionThread entity by IDs.
+func (m *WorkspaceMutation) RemoveDiscussionThreadIDs(ids ...uuid.UUID) {
+	if m.removeddiscussion_threads == nil {
+		m.removeddiscussion_threads = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.discussion_threads, ids[i])
+		m.removeddiscussion_threads[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedDiscussionThreads returns the removed IDs of the "discussion_threads" edge to the DiscussionThread entity.
+func (m *WorkspaceMutation) RemovedDiscussionThreadsIDs() (ids []uuid.UUID) {
+	for id := range m.removeddiscussion_threads {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// DiscussionThreadsIDs returns the "discussion_threads" edge IDs in the mutation.
+func (m *WorkspaceMutation) DiscussionThreadsIDs() (ids []uuid.UUID) {
+	for id := range m.discussion_threads {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetDiscussionThreads resets all changes to the "discussion_threads" edge.
+func (m *WorkspaceMutation) ResetDiscussionThreads() {
+	m.discussion_threads = nil
+	m.cleareddiscussion_threads = false
+	m.removeddiscussion_threads = nil
+}
+
 // AddCommentIDs adds the "comments" edge to the Comment entity by ids.
 func (m *WorkspaceMutation) AddCommentIDs(ids ...uuid.UUID) {
 	if m.comments == nil {
@@ -77639,7 +82271,7 @@ func (m *WorkspaceMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *WorkspaceMutation) AddedEdges() []string {
-	edges := make([]string, 0, 32)
+	edges := make([]string, 0, 34)
 	if m.invitations != nil {
 		edges = append(edges, workspace.EdgeInvitations)
 	}
@@ -77690,6 +82322,12 @@ func (m *WorkspaceMutation) AddedEdges() []string {
 	}
 	if m.documents != nil {
 		edges = append(edges, workspace.EdgeDocuments)
+	}
+	if m.discussions != nil {
+		edges = append(edges, workspace.EdgeDiscussions)
+	}
+	if m.discussion_threads != nil {
+		edges = append(edges, workspace.EdgeDiscussionThreads)
 	}
 	if m.comments != nil {
 		edges = append(edges, workspace.EdgeComments)
@@ -77845,6 +82483,18 @@ func (m *WorkspaceMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case workspace.EdgeDiscussions:
+		ids := make([]ent.Value, 0, len(m.discussions))
+		for id := range m.discussions {
+			ids = append(ids, id)
+		}
+		return ids
+	case workspace.EdgeDiscussionThreads:
+		ids := make([]ent.Value, 0, len(m.discussion_threads))
+		for id := range m.discussion_threads {
+			ids = append(ids, id)
+		}
+		return ids
 	case workspace.EdgeComments:
 		ids := make([]ent.Value, 0, len(m.comments))
 		for id := range m.comments {
@@ -77941,7 +82591,7 @@ func (m *WorkspaceMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *WorkspaceMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 32)
+	edges := make([]string, 0, 34)
 	if m.removedinvitations != nil {
 		edges = append(edges, workspace.EdgeInvitations)
 	}
@@ -77992,6 +82642,12 @@ func (m *WorkspaceMutation) RemovedEdges() []string {
 	}
 	if m.removeddocuments != nil {
 		edges = append(edges, workspace.EdgeDocuments)
+	}
+	if m.removeddiscussions != nil {
+		edges = append(edges, workspace.EdgeDiscussions)
+	}
+	if m.removeddiscussion_threads != nil {
+		edges = append(edges, workspace.EdgeDiscussionThreads)
 	}
 	if m.removedcomments != nil {
 		edges = append(edges, workspace.EdgeComments)
@@ -78147,6 +82803,18 @@ func (m *WorkspaceMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case workspace.EdgeDiscussions:
+		ids := make([]ent.Value, 0, len(m.removeddiscussions))
+		for id := range m.removeddiscussions {
+			ids = append(ids, id)
+		}
+		return ids
+	case workspace.EdgeDiscussionThreads:
+		ids := make([]ent.Value, 0, len(m.removeddiscussion_threads))
+		for id := range m.removeddiscussion_threads {
+			ids = append(ids, id)
+		}
+		return ids
 	case workspace.EdgeComments:
 		ids := make([]ent.Value, 0, len(m.removedcomments))
 		for id := range m.removedcomments {
@@ -78243,7 +82911,7 @@ func (m *WorkspaceMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *WorkspaceMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 32)
+	edges := make([]string, 0, 34)
 	if m.clearedinvitations {
 		edges = append(edges, workspace.EdgeInvitations)
 	}
@@ -78294,6 +82962,12 @@ func (m *WorkspaceMutation) ClearedEdges() []string {
 	}
 	if m.cleareddocuments {
 		edges = append(edges, workspace.EdgeDocuments)
+	}
+	if m.cleareddiscussions {
+		edges = append(edges, workspace.EdgeDiscussions)
+	}
+	if m.cleareddiscussion_threads {
+		edges = append(edges, workspace.EdgeDiscussionThreads)
 	}
 	if m.clearedcomments {
 		edges = append(edges, workspace.EdgeComments)
@@ -78381,6 +83055,10 @@ func (m *WorkspaceMutation) EdgeCleared(name string) bool {
 		return m.clearedfiles
 	case workspace.EdgeDocuments:
 		return m.cleareddocuments
+	case workspace.EdgeDiscussions:
+		return m.cleareddiscussions
+	case workspace.EdgeDiscussionThreads:
+		return m.cleareddiscussion_threads
 	case workspace.EdgeComments:
 		return m.clearedcomments
 	case workspace.EdgeReactions:
@@ -78477,6 +83155,12 @@ func (m *WorkspaceMutation) ResetEdge(name string) error {
 		return nil
 	case workspace.EdgeDocuments:
 		m.ResetDocuments()
+		return nil
+	case workspace.EdgeDiscussions:
+		m.ResetDiscussions()
+		return nil
+	case workspace.EdgeDiscussionThreads:
+		m.ResetDiscussionThreads()
 		return nil
 	case workspace.EdgeComments:
 		m.ResetComments()

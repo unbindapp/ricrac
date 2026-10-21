@@ -23,7 +23,7 @@ func NewNotificationRepository(db *ent.Client) *NotificationRepository {
 
 func withAnswer(q *ent.NotificationQuery) *ent.NotificationQuery {
 	return q.WithActor().WithIssue(func(q *ent.IssueQuery) { q.WithTeam().WithState() }).
-		WithComment().WithProject().WithInitiative().WithDocument()
+		WithComment().WithProject().WithInitiative().WithDocument().WithDiscussion().WithDiscussionThread()
 }
 
 func newestFirst(q *ent.NotificationQuery) *ent.NotificationQuery {

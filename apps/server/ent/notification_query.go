@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"math"
 	"ricrac/ent/comment"
+	"ricrac/ent/discussion"
+	"ricrac/ent/discussionthread"
 	"ricrac/ent/document"
 	"ricrac/ent/initiative"
 	"ricrac/ent/issue"
@@ -28,20 +30,22 @@ import (
 // NotificationQuery is the builder for querying Notification entities.
 type NotificationQuery struct {
 	config
-	ctx              *QueryContext
-	order            []notification.OrderOption
-	inters           []Interceptor
-	predicates       []predicate.Notification
-	withWorkspace    *WorkspaceQuery
-	withUser         *UserQuery
-	withActor        *UserQuery
-	withIssue        *IssueQuery
-	withComment      *CommentQuery
-	withProject      *ProjectQuery
-	withInitiative   *InitiativeQuery
-	withDocument     *DocumentQuery
-	withStatusUpdate *StatusUpdateQuery
-	modifiers        []func(*sql.Selector)
+	ctx                  *QueryContext
+	order                []notification.OrderOption
+	inters               []Interceptor
+	predicates           []predicate.Notification
+	withWorkspace        *WorkspaceQuery
+	withUser             *UserQuery
+	withActor            *UserQuery
+	withIssue            *IssueQuery
+	withComment          *CommentQuery
+	withProject          *ProjectQuery
+	withInitiative       *InitiativeQuery
+	withDocument         *DocumentQuery
+	withStatusUpdate     *StatusUpdateQuery
+	withDiscussion       *DiscussionQuery
+	withDiscussionThread *DiscussionThreadQuery
+	modifiers            []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -276,6 +280,50 @@ func (_q *NotificationQuery) QueryStatusUpdate() *StatusUpdateQuery {
 	return query
 }
 
+// QueryDiscussion chains the current query on the "discussion" edge.
+func (_q *NotificationQuery) QueryDiscussion() *DiscussionQuery {
+	query := (&DiscussionClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(notification.Table, notification.FieldID, selector),
+			sqlgraph.To(discussion.Table, discussion.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, notification.DiscussionTable, notification.DiscussionColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDiscussionThread chains the current query on the "discussion_thread" edge.
+func (_q *NotificationQuery) QueryDiscussionThread() *DiscussionThreadQuery {
+	query := (&DiscussionThreadClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(notification.Table, notification.FieldID, selector),
+			sqlgraph.To(discussionthread.Table, discussionthread.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, notification.DiscussionThreadTable, notification.DiscussionThreadColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Notification entity from the query.
 // Returns a *NotFoundError when no Notification was found.
 func (_q *NotificationQuery) First(ctx context.Context) (*Notification, error) {
@@ -463,20 +511,22 @@ func (_q *NotificationQuery) Clone() *NotificationQuery {
 		return nil
 	}
 	return &NotificationQuery{
-		config:           _q.config,
-		ctx:              _q.ctx.Clone(),
-		order:            append([]notification.OrderOption{}, _q.order...),
-		inters:           append([]Interceptor{}, _q.inters...),
-		predicates:       append([]predicate.Notification{}, _q.predicates...),
-		withWorkspace:    _q.withWorkspace.Clone(),
-		withUser:         _q.withUser.Clone(),
-		withActor:        _q.withActor.Clone(),
-		withIssue:        _q.withIssue.Clone(),
-		withComment:      _q.withComment.Clone(),
-		withProject:      _q.withProject.Clone(),
-		withInitiative:   _q.withInitiative.Clone(),
-		withDocument:     _q.withDocument.Clone(),
-		withStatusUpdate: _q.withStatusUpdate.Clone(),
+		config:               _q.config,
+		ctx:                  _q.ctx.Clone(),
+		order:                append([]notification.OrderOption{}, _q.order...),
+		inters:               append([]Interceptor{}, _q.inters...),
+		predicates:           append([]predicate.Notification{}, _q.predicates...),
+		withWorkspace:        _q.withWorkspace.Clone(),
+		withUser:             _q.withUser.Clone(),
+		withActor:            _q.withActor.Clone(),
+		withIssue:            _q.withIssue.Clone(),
+		withComment:          _q.withComment.Clone(),
+		withProject:          _q.withProject.Clone(),
+		withInitiative:       _q.withInitiative.Clone(),
+		withDocument:         _q.withDocument.Clone(),
+		withStatusUpdate:     _q.withStatusUpdate.Clone(),
+		withDiscussion:       _q.withDiscussion.Clone(),
+		withDiscussionThread: _q.withDiscussionThread.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
 		path:      _q.path,
@@ -583,6 +633,28 @@ func (_q *NotificationQuery) WithStatusUpdate(opts ...func(*StatusUpdateQuery)) 
 	return _q
 }
 
+// WithDiscussion tells the query-builder to eager-load the nodes that are connected to
+// the "discussion" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *NotificationQuery) WithDiscussion(opts ...func(*DiscussionQuery)) *NotificationQuery {
+	query := (&DiscussionClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withDiscussion = query
+	return _q
+}
+
+// WithDiscussionThread tells the query-builder to eager-load the nodes that are connected to
+// the "discussion_thread" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *NotificationQuery) WithDiscussionThread(opts ...func(*DiscussionThreadQuery)) *NotificationQuery {
+	query := (&DiscussionThreadClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withDiscussionThread = query
+	return _q
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -661,7 +733,7 @@ func (_q *NotificationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	var (
 		nodes       = []*Notification{}
 		_spec       = _q.querySpec()
-		loadedTypes = [9]bool{
+		loadedTypes = [11]bool{
 			_q.withWorkspace != nil,
 			_q.withUser != nil,
 			_q.withActor != nil,
@@ -671,6 +743,8 @@ func (_q *NotificationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 			_q.withInitiative != nil,
 			_q.withDocument != nil,
 			_q.withStatusUpdate != nil,
+			_q.withDiscussion != nil,
+			_q.withDiscussionThread != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -745,6 +819,18 @@ func (_q *NotificationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if query := _q.withStatusUpdate; query != nil {
 		if err := _q.loadStatusUpdate(ctx, query, nodes, nil,
 			func(n *Notification, e *StatusUpdate) { n.Edges.StatusUpdate = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withDiscussion; query != nil {
+		if err := _q.loadDiscussion(ctx, query, nodes, nil,
+			func(n *Notification, e *Discussion) { n.Edges.Discussion = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withDiscussionThread; query != nil {
+		if err := _q.loadDiscussionThread(ctx, query, nodes, nil,
+			func(n *Notification, e *DiscussionThread) { n.Edges.DiscussionThread = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -1033,6 +1119,70 @@ func (_q *NotificationQuery) loadStatusUpdate(ctx context.Context, query *Status
 	}
 	return nil
 }
+func (_q *NotificationQuery) loadDiscussion(ctx context.Context, query *DiscussionQuery, nodes []*Notification, init func(*Notification), assign func(*Notification, *Discussion)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Notification)
+	for i := range nodes {
+		if nodes[i].DiscussionID == nil {
+			continue
+		}
+		fk := *nodes[i].DiscussionID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(discussion.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "discussion_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (_q *NotificationQuery) loadDiscussionThread(ctx context.Context, query *DiscussionThreadQuery, nodes []*Notification, init func(*Notification), assign func(*Notification, *DiscussionThread)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Notification)
+	for i := range nodes {
+		if nodes[i].DiscussionThreadID == nil {
+			continue
+		}
+		fk := *nodes[i].DiscussionThreadID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(discussionthread.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "discussion_thread_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 
 func (_q *NotificationQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := _q.querySpec()
@@ -1088,6 +1238,12 @@ func (_q *NotificationQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if _q.withStatusUpdate != nil {
 			_spec.Node.AddColumnOnce(notification.FieldStatusUpdateID)
+		}
+		if _q.withDiscussion != nil {
+			_spec.Node.AddColumnOnce(notification.FieldDiscussionID)
+		}
+		if _q.withDiscussionThread != nil {
+			_spec.Node.AddColumnOnce(notification.FieldDiscussionThreadID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {

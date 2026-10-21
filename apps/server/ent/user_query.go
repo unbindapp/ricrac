@@ -14,6 +14,9 @@ import (
 	"ricrac/ent/customer"
 	"ricrac/ent/customerneed"
 	"ricrac/ent/customview"
+	"ricrac/ent/discussion"
+	"ricrac/ent/discussionsubscriber"
+	"ricrac/ent/discussionthread"
 	"ricrac/ent/document"
 	"ricrac/ent/documentversion"
 	"ricrac/ent/entitylink"
@@ -61,62 +64,67 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	ctx                         *QueryContext
-	order                       []user.OrderOption
-	inters                      []Interceptor
-	predicates                  []predicate.User
-	withInvitations             *InvitationQuery
-	withAPIKeys                 *APIKeyQuery
-	withOauthClients            *OAuthClientQuery
-	withOauthGrants             *OAuthGrantQuery
-	withOauthCodes              *OAuthCodeQuery
-	withIssueLabels             *IssueLabelQuery
-	withProjectLabels           *ProjectLabelQuery
-	withProjectsByLead          *ProjectQuery
-	withProjectsByCreator       *ProjectQuery
-	withProjectRelations        *ProjectRelationQuery
-	withInitiativesByOwner      *InitiativeQuery
-	withInitiativesByCreator    *InitiativeQuery
-	withStatusUpdates           *StatusUpdateQuery
-	withEntityLinks             *EntityLinkQuery
-	withReleases                *ReleaseQuery
-	withReleaseNotes            *ReleaseNoteQuery
-	withIssuesByAssignee        *IssueQuery
-	withIssuesByCreator         *IssueQuery
-	withIssuesBySnoozedBy       *IssueQuery
-	withIssueRelations          *IssueRelationQuery
-	withIssueHistory            *IssueHistoryQuery
-	withAttachments             *AttachmentQuery
-	withFiles                   *FileQuery
-	withDocumentsByCreator      *DocumentQuery
-	withDocumentsByUpdatedBy    *DocumentQuery
-	withDocumentVersions        *DocumentVersionQuery
-	withCommentsByUser          *CommentQuery
-	withCommentsByResolvingUser *CommentQuery
-	withReactions               *ReactionQuery
-	withCustomers               *CustomerQuery
-	withCustomerNeeds           *CustomerNeedQuery
-	withCustomViews             *CustomViewQuery
-	withFavorites               *FavoriteQuery
-	withTemplates               *TemplateQuery
-	withNotificationsByUser     *NotificationQuery
-	withNotificationsByActor    *NotificationQuery
-	withWebhooks                *WebhookQuery
-	withAuditEntries            *AuditEntryQuery
-	withGithubInstallations     *GithubInstallationQuery
-	withSharedIssues            *IssueQuery
-	withSubscribedIssues        *IssueQuery
-	withMemberProjects          *ProjectQuery
-	withSubscribedProjects      *ProjectQuery
-	withTeams                   *TeamQuery
-	withWorkspaces              *WorkspaceQuery
-	withIssueShares             *IssueShareQuery
-	withIssueSubscribers        *IssueSubscriberQuery
-	withProjectMembers          *ProjectMemberQuery
-	withProjectSubscribers      *ProjectSubscriberQuery
-	withTeamMembers             *TeamMemberQuery
-	withWorkspaceMembers        *WorkspaceMemberQuery
-	modifiers                   []func(*sql.Selector)
+	ctx                                  *QueryContext
+	order                                []user.OrderOption
+	inters                               []Interceptor
+	predicates                           []predicate.User
+	withInvitations                      *InvitationQuery
+	withAPIKeys                          *APIKeyQuery
+	withOauthClients                     *OAuthClientQuery
+	withOauthGrants                      *OAuthGrantQuery
+	withOauthCodes                       *OAuthCodeQuery
+	withIssueLabels                      *IssueLabelQuery
+	withProjectLabels                    *ProjectLabelQuery
+	withProjectsByLead                   *ProjectQuery
+	withProjectsByCreator                *ProjectQuery
+	withProjectRelations                 *ProjectRelationQuery
+	withInitiativesByOwner               *InitiativeQuery
+	withInitiativesByCreator             *InitiativeQuery
+	withStatusUpdates                    *StatusUpdateQuery
+	withEntityLinks                      *EntityLinkQuery
+	withReleases                         *ReleaseQuery
+	withReleaseNotes                     *ReleaseNoteQuery
+	withIssuesByAssignee                 *IssueQuery
+	withIssuesByCreator                  *IssueQuery
+	withIssuesBySnoozedBy                *IssueQuery
+	withIssueRelations                   *IssueRelationQuery
+	withIssueHistory                     *IssueHistoryQuery
+	withAttachments                      *AttachmentQuery
+	withFiles                            *FileQuery
+	withDocumentsByCreator               *DocumentQuery
+	withDiscussionsByCreator             *DiscussionQuery
+	withDiscussionThreadsByCreator       *DiscussionThreadQuery
+	withDiscussionThreadsByResolvingUser *DiscussionThreadQuery
+	withDocumentsByUpdatedBy             *DocumentQuery
+	withDocumentVersions                 *DocumentVersionQuery
+	withCommentsByUser                   *CommentQuery
+	withCommentsByResolvingUser          *CommentQuery
+	withReactions                        *ReactionQuery
+	withCustomers                        *CustomerQuery
+	withCustomerNeeds                    *CustomerNeedQuery
+	withCustomViews                      *CustomViewQuery
+	withFavorites                        *FavoriteQuery
+	withTemplates                        *TemplateQuery
+	withNotificationsByUser              *NotificationQuery
+	withNotificationsByActor             *NotificationQuery
+	withWebhooks                         *WebhookQuery
+	withAuditEntries                     *AuditEntryQuery
+	withGithubInstallations              *GithubInstallationQuery
+	withSharedIssues                     *IssueQuery
+	withSubscribedIssues                 *IssueQuery
+	withMemberProjects                   *ProjectQuery
+	withSubscribedProjects               *ProjectQuery
+	withSubscribedDiscussions            *DiscussionQuery
+	withTeams                            *TeamQuery
+	withWorkspaces                       *WorkspaceQuery
+	withIssueShares                      *IssueShareQuery
+	withIssueSubscribers                 *IssueSubscriberQuery
+	withProjectMembers                   *ProjectMemberQuery
+	withProjectSubscribers               *ProjectSubscriberQuery
+	withDiscussionSubscribers            *DiscussionSubscriberQuery
+	withTeamMembers                      *TeamMemberQuery
+	withWorkspaceMembers                 *WorkspaceMemberQuery
+	modifiers                            []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -681,6 +689,72 @@ func (_q *UserQuery) QueryDocumentsByCreator() *DocumentQuery {
 	return query
 }
 
+// QueryDiscussionsByCreator chains the current query on the "discussions_by_creator" edge.
+func (_q *UserQuery) QueryDiscussionsByCreator() *DiscussionQuery {
+	query := (&DiscussionClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(discussion.Table, discussion.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.DiscussionsByCreatorTable, user.DiscussionsByCreatorColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDiscussionThreadsByCreator chains the current query on the "discussion_threads_by_creator" edge.
+func (_q *UserQuery) QueryDiscussionThreadsByCreator() *DiscussionThreadQuery {
+	query := (&DiscussionThreadClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(discussionthread.Table, discussionthread.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.DiscussionThreadsByCreatorTable, user.DiscussionThreadsByCreatorColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDiscussionThreadsByResolvingUser chains the current query on the "discussion_threads_by_resolving_user" edge.
+func (_q *UserQuery) QueryDiscussionThreadsByResolvingUser() *DiscussionThreadQuery {
+	query := (&DiscussionThreadClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(discussionthread.Table, discussionthread.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.DiscussionThreadsByResolvingUserTable, user.DiscussionThreadsByResolvingUserColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryDocumentsByUpdatedBy chains the current query on the "documents_by_updated_by" edge.
 func (_q *UserQuery) QueryDocumentsByUpdatedBy() *DocumentQuery {
 	query := (&DocumentClient{config: _q.config}).Query()
@@ -1099,6 +1173,28 @@ func (_q *UserQuery) QuerySubscribedProjects() *ProjectQuery {
 	return query
 }
 
+// QuerySubscribedDiscussions chains the current query on the "subscribed_discussions" edge.
+func (_q *UserQuery) QuerySubscribedDiscussions() *DiscussionQuery {
+	query := (&DiscussionClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(discussion.Table, discussion.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, user.SubscribedDiscussionsTable, user.SubscribedDiscussionsPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryTeams chains the current query on the "teams" edge.
 func (_q *UserQuery) QueryTeams() *TeamQuery {
 	query := (&TeamClient{config: _q.config}).Query()
@@ -1224,6 +1320,28 @@ func (_q *UserQuery) QueryProjectSubscribers() *ProjectSubscriberQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(projectsubscriber.Table, projectsubscriber.UserColumn),
 			sqlgraph.Edge(sqlgraph.O2M, true, user.ProjectSubscribersTable, user.ProjectSubscribersColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDiscussionSubscribers chains the current query on the "discussion_subscribers" edge.
+func (_q *UserQuery) QueryDiscussionSubscribers() *DiscussionSubscriberQuery {
+	query := (&DiscussionSubscriberClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(discussionsubscriber.Table, discussionsubscriber.UserColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.DiscussionSubscribersTable, user.DiscussionSubscribersColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -1462,62 +1580,67 @@ func (_q *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:                      _q.config,
-		ctx:                         _q.ctx.Clone(),
-		order:                       append([]user.OrderOption{}, _q.order...),
-		inters:                      append([]Interceptor{}, _q.inters...),
-		predicates:                  append([]predicate.User{}, _q.predicates...),
-		withInvitations:             _q.withInvitations.Clone(),
-		withAPIKeys:                 _q.withAPIKeys.Clone(),
-		withOauthClients:            _q.withOauthClients.Clone(),
-		withOauthGrants:             _q.withOauthGrants.Clone(),
-		withOauthCodes:              _q.withOauthCodes.Clone(),
-		withIssueLabels:             _q.withIssueLabels.Clone(),
-		withProjectLabels:           _q.withProjectLabels.Clone(),
-		withProjectsByLead:          _q.withProjectsByLead.Clone(),
-		withProjectsByCreator:       _q.withProjectsByCreator.Clone(),
-		withProjectRelations:        _q.withProjectRelations.Clone(),
-		withInitiativesByOwner:      _q.withInitiativesByOwner.Clone(),
-		withInitiativesByCreator:    _q.withInitiativesByCreator.Clone(),
-		withStatusUpdates:           _q.withStatusUpdates.Clone(),
-		withEntityLinks:             _q.withEntityLinks.Clone(),
-		withReleases:                _q.withReleases.Clone(),
-		withReleaseNotes:            _q.withReleaseNotes.Clone(),
-		withIssuesByAssignee:        _q.withIssuesByAssignee.Clone(),
-		withIssuesByCreator:         _q.withIssuesByCreator.Clone(),
-		withIssuesBySnoozedBy:       _q.withIssuesBySnoozedBy.Clone(),
-		withIssueRelations:          _q.withIssueRelations.Clone(),
-		withIssueHistory:            _q.withIssueHistory.Clone(),
-		withAttachments:             _q.withAttachments.Clone(),
-		withFiles:                   _q.withFiles.Clone(),
-		withDocumentsByCreator:      _q.withDocumentsByCreator.Clone(),
-		withDocumentsByUpdatedBy:    _q.withDocumentsByUpdatedBy.Clone(),
-		withDocumentVersions:        _q.withDocumentVersions.Clone(),
-		withCommentsByUser:          _q.withCommentsByUser.Clone(),
-		withCommentsByResolvingUser: _q.withCommentsByResolvingUser.Clone(),
-		withReactions:               _q.withReactions.Clone(),
-		withCustomers:               _q.withCustomers.Clone(),
-		withCustomerNeeds:           _q.withCustomerNeeds.Clone(),
-		withCustomViews:             _q.withCustomViews.Clone(),
-		withFavorites:               _q.withFavorites.Clone(),
-		withTemplates:               _q.withTemplates.Clone(),
-		withNotificationsByUser:     _q.withNotificationsByUser.Clone(),
-		withNotificationsByActor:    _q.withNotificationsByActor.Clone(),
-		withWebhooks:                _q.withWebhooks.Clone(),
-		withAuditEntries:            _q.withAuditEntries.Clone(),
-		withGithubInstallations:     _q.withGithubInstallations.Clone(),
-		withSharedIssues:            _q.withSharedIssues.Clone(),
-		withSubscribedIssues:        _q.withSubscribedIssues.Clone(),
-		withMemberProjects:          _q.withMemberProjects.Clone(),
-		withSubscribedProjects:      _q.withSubscribedProjects.Clone(),
-		withTeams:                   _q.withTeams.Clone(),
-		withWorkspaces:              _q.withWorkspaces.Clone(),
-		withIssueShares:             _q.withIssueShares.Clone(),
-		withIssueSubscribers:        _q.withIssueSubscribers.Clone(),
-		withProjectMembers:          _q.withProjectMembers.Clone(),
-		withProjectSubscribers:      _q.withProjectSubscribers.Clone(),
-		withTeamMembers:             _q.withTeamMembers.Clone(),
-		withWorkspaceMembers:        _q.withWorkspaceMembers.Clone(),
+		config:                               _q.config,
+		ctx:                                  _q.ctx.Clone(),
+		order:                                append([]user.OrderOption{}, _q.order...),
+		inters:                               append([]Interceptor{}, _q.inters...),
+		predicates:                           append([]predicate.User{}, _q.predicates...),
+		withInvitations:                      _q.withInvitations.Clone(),
+		withAPIKeys:                          _q.withAPIKeys.Clone(),
+		withOauthClients:                     _q.withOauthClients.Clone(),
+		withOauthGrants:                      _q.withOauthGrants.Clone(),
+		withOauthCodes:                       _q.withOauthCodes.Clone(),
+		withIssueLabels:                      _q.withIssueLabels.Clone(),
+		withProjectLabels:                    _q.withProjectLabels.Clone(),
+		withProjectsByLead:                   _q.withProjectsByLead.Clone(),
+		withProjectsByCreator:                _q.withProjectsByCreator.Clone(),
+		withProjectRelations:                 _q.withProjectRelations.Clone(),
+		withInitiativesByOwner:               _q.withInitiativesByOwner.Clone(),
+		withInitiativesByCreator:             _q.withInitiativesByCreator.Clone(),
+		withStatusUpdates:                    _q.withStatusUpdates.Clone(),
+		withEntityLinks:                      _q.withEntityLinks.Clone(),
+		withReleases:                         _q.withReleases.Clone(),
+		withReleaseNotes:                     _q.withReleaseNotes.Clone(),
+		withIssuesByAssignee:                 _q.withIssuesByAssignee.Clone(),
+		withIssuesByCreator:                  _q.withIssuesByCreator.Clone(),
+		withIssuesBySnoozedBy:                _q.withIssuesBySnoozedBy.Clone(),
+		withIssueRelations:                   _q.withIssueRelations.Clone(),
+		withIssueHistory:                     _q.withIssueHistory.Clone(),
+		withAttachments:                      _q.withAttachments.Clone(),
+		withFiles:                            _q.withFiles.Clone(),
+		withDocumentsByCreator:               _q.withDocumentsByCreator.Clone(),
+		withDiscussionsByCreator:             _q.withDiscussionsByCreator.Clone(),
+		withDiscussionThreadsByCreator:       _q.withDiscussionThreadsByCreator.Clone(),
+		withDiscussionThreadsByResolvingUser: _q.withDiscussionThreadsByResolvingUser.Clone(),
+		withDocumentsByUpdatedBy:             _q.withDocumentsByUpdatedBy.Clone(),
+		withDocumentVersions:                 _q.withDocumentVersions.Clone(),
+		withCommentsByUser:                   _q.withCommentsByUser.Clone(),
+		withCommentsByResolvingUser:          _q.withCommentsByResolvingUser.Clone(),
+		withReactions:                        _q.withReactions.Clone(),
+		withCustomers:                        _q.withCustomers.Clone(),
+		withCustomerNeeds:                    _q.withCustomerNeeds.Clone(),
+		withCustomViews:                      _q.withCustomViews.Clone(),
+		withFavorites:                        _q.withFavorites.Clone(),
+		withTemplates:                        _q.withTemplates.Clone(),
+		withNotificationsByUser:              _q.withNotificationsByUser.Clone(),
+		withNotificationsByActor:             _q.withNotificationsByActor.Clone(),
+		withWebhooks:                         _q.withWebhooks.Clone(),
+		withAuditEntries:                     _q.withAuditEntries.Clone(),
+		withGithubInstallations:              _q.withGithubInstallations.Clone(),
+		withSharedIssues:                     _q.withSharedIssues.Clone(),
+		withSubscribedIssues:                 _q.withSubscribedIssues.Clone(),
+		withMemberProjects:                   _q.withMemberProjects.Clone(),
+		withSubscribedProjects:               _q.withSubscribedProjects.Clone(),
+		withSubscribedDiscussions:            _q.withSubscribedDiscussions.Clone(),
+		withTeams:                            _q.withTeams.Clone(),
+		withWorkspaces:                       _q.withWorkspaces.Clone(),
+		withIssueShares:                      _q.withIssueShares.Clone(),
+		withIssueSubscribers:                 _q.withIssueSubscribers.Clone(),
+		withProjectMembers:                   _q.withProjectMembers.Clone(),
+		withProjectSubscribers:               _q.withProjectSubscribers.Clone(),
+		withDiscussionSubscribers:            _q.withDiscussionSubscribers.Clone(),
+		withTeamMembers:                      _q.withTeamMembers.Clone(),
+		withWorkspaceMembers:                 _q.withWorkspaceMembers.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
 		path:      _q.path,
@@ -1789,6 +1912,39 @@ func (_q *UserQuery) WithDocumentsByCreator(opts ...func(*DocumentQuery)) *UserQ
 	return _q
 }
 
+// WithDiscussionsByCreator tells the query-builder to eager-load the nodes that are connected to
+// the "discussions_by_creator" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithDiscussionsByCreator(opts ...func(*DiscussionQuery)) *UserQuery {
+	query := (&DiscussionClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withDiscussionsByCreator = query
+	return _q
+}
+
+// WithDiscussionThreadsByCreator tells the query-builder to eager-load the nodes that are connected to
+// the "discussion_threads_by_creator" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithDiscussionThreadsByCreator(opts ...func(*DiscussionThreadQuery)) *UserQuery {
+	query := (&DiscussionThreadClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withDiscussionThreadsByCreator = query
+	return _q
+}
+
+// WithDiscussionThreadsByResolvingUser tells the query-builder to eager-load the nodes that are connected to
+// the "discussion_threads_by_resolving_user" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithDiscussionThreadsByResolvingUser(opts ...func(*DiscussionThreadQuery)) *UserQuery {
+	query := (&DiscussionThreadClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withDiscussionThreadsByResolvingUser = query
+	return _q
+}
+
 // WithDocumentsByUpdatedBy tells the query-builder to eager-load the nodes that are connected to
 // the "documents_by_updated_by" edge. The optional arguments are used to configure the query builder of the edge.
 func (_q *UserQuery) WithDocumentsByUpdatedBy(opts ...func(*DocumentQuery)) *UserQuery {
@@ -1998,6 +2154,17 @@ func (_q *UserQuery) WithSubscribedProjects(opts ...func(*ProjectQuery)) *UserQu
 	return _q
 }
 
+// WithSubscribedDiscussions tells the query-builder to eager-load the nodes that are connected to
+// the "subscribed_discussions" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithSubscribedDiscussions(opts ...func(*DiscussionQuery)) *UserQuery {
+	query := (&DiscussionClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withSubscribedDiscussions = query
+	return _q
+}
+
 // WithTeams tells the query-builder to eager-load the nodes that are connected to
 // the "teams" edge. The optional arguments are used to configure the query builder of the edge.
 func (_q *UserQuery) WithTeams(opts ...func(*TeamQuery)) *UserQuery {
@@ -2061,6 +2228,17 @@ func (_q *UserQuery) WithProjectSubscribers(opts ...func(*ProjectSubscriberQuery
 		opt(query)
 	}
 	_q.withProjectSubscribers = query
+	return _q
+}
+
+// WithDiscussionSubscribers tells the query-builder to eager-load the nodes that are connected to
+// the "discussion_subscribers" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithDiscussionSubscribers(opts ...func(*DiscussionSubscriberQuery)) *UserQuery {
+	query := (&DiscussionSubscriberClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withDiscussionSubscribers = query
 	return _q
 }
 
@@ -2164,7 +2342,7 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = _q.querySpec()
-		loadedTypes = [51]bool{
+		loadedTypes = [56]bool{
 			_q.withInvitations != nil,
 			_q.withAPIKeys != nil,
 			_q.withOauthClients != nil,
@@ -2189,6 +2367,9 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			_q.withAttachments != nil,
 			_q.withFiles != nil,
 			_q.withDocumentsByCreator != nil,
+			_q.withDiscussionsByCreator != nil,
+			_q.withDiscussionThreadsByCreator != nil,
+			_q.withDiscussionThreadsByResolvingUser != nil,
 			_q.withDocumentsByUpdatedBy != nil,
 			_q.withDocumentVersions != nil,
 			_q.withCommentsByUser != nil,
@@ -2208,12 +2389,14 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			_q.withSubscribedIssues != nil,
 			_q.withMemberProjects != nil,
 			_q.withSubscribedProjects != nil,
+			_q.withSubscribedDiscussions != nil,
 			_q.withTeams != nil,
 			_q.withWorkspaces != nil,
 			_q.withIssueShares != nil,
 			_q.withIssueSubscribers != nil,
 			_q.withProjectMembers != nil,
 			_q.withProjectSubscribers != nil,
+			_q.withDiscussionSubscribers != nil,
 			_q.withTeamMembers != nil,
 			_q.withWorkspaceMembers != nil,
 		}
@@ -2407,6 +2590,31 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			return nil, err
 		}
 	}
+	if query := _q.withDiscussionsByCreator; query != nil {
+		if err := _q.loadDiscussionsByCreator(ctx, query, nodes,
+			func(n *User) { n.Edges.DiscussionsByCreator = []*Discussion{} },
+			func(n *User, e *Discussion) { n.Edges.DiscussionsByCreator = append(n.Edges.DiscussionsByCreator, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withDiscussionThreadsByCreator; query != nil {
+		if err := _q.loadDiscussionThreadsByCreator(ctx, query, nodes,
+			func(n *User) { n.Edges.DiscussionThreadsByCreator = []*DiscussionThread{} },
+			func(n *User, e *DiscussionThread) {
+				n.Edges.DiscussionThreadsByCreator = append(n.Edges.DiscussionThreadsByCreator, e)
+			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withDiscussionThreadsByResolvingUser; query != nil {
+		if err := _q.loadDiscussionThreadsByResolvingUser(ctx, query, nodes,
+			func(n *User) { n.Edges.DiscussionThreadsByResolvingUser = []*DiscussionThread{} },
+			func(n *User, e *DiscussionThread) {
+				n.Edges.DiscussionThreadsByResolvingUser = append(n.Edges.DiscussionThreadsByResolvingUser, e)
+			}); err != nil {
+			return nil, err
+		}
+	}
 	if query := _q.withDocumentsByUpdatedBy; query != nil {
 		if err := _q.loadDocumentsByUpdatedBy(ctx, query, nodes,
 			func(n *User) { n.Edges.DocumentsByUpdatedBy = []*Document{} },
@@ -2544,6 +2752,13 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			return nil, err
 		}
 	}
+	if query := _q.withSubscribedDiscussions; query != nil {
+		if err := _q.loadSubscribedDiscussions(ctx, query, nodes,
+			func(n *User) { n.Edges.SubscribedDiscussions = []*Discussion{} },
+			func(n *User, e *Discussion) { n.Edges.SubscribedDiscussions = append(n.Edges.SubscribedDiscussions, e) }); err != nil {
+			return nil, err
+		}
+	}
 	if query := _q.withTeams; query != nil {
 		if err := _q.loadTeams(ctx, query, nodes,
 			func(n *User) { n.Edges.Teams = []*Team{} },
@@ -2584,6 +2799,15 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			func(n *User) { n.Edges.ProjectSubscribers = []*ProjectSubscriber{} },
 			func(n *User, e *ProjectSubscriber) {
 				n.Edges.ProjectSubscribers = append(n.Edges.ProjectSubscribers, e)
+			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withDiscussionSubscribers; query != nil {
+		if err := _q.loadDiscussionSubscribers(ctx, query, nodes,
+			func(n *User) { n.Edges.DiscussionSubscribers = []*DiscussionSubscriber{} },
+			func(n *User, e *DiscussionSubscriber) {
+				n.Edges.DiscussionSubscribers = append(n.Edges.DiscussionSubscribers, e)
 			}); err != nil {
 			return nil, err
 		}
@@ -3388,6 +3612,105 @@ func (_q *UserQuery) loadDocumentsByCreator(ctx context.Context, query *Document
 	}
 	return nil
 }
+func (_q *UserQuery) loadDiscussionsByCreator(ctx context.Context, query *DiscussionQuery, nodes []*User, init func(*User), assign func(*User, *Discussion)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(discussion.FieldCreatorID)
+	}
+	query.Where(predicate.Discussion(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.DiscussionsByCreatorColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.CreatorID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "creator_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "creator_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *UserQuery) loadDiscussionThreadsByCreator(ctx context.Context, query *DiscussionThreadQuery, nodes []*User, init func(*User), assign func(*User, *DiscussionThread)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(discussionthread.FieldCreatorID)
+	}
+	query.Where(predicate.DiscussionThread(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.DiscussionThreadsByCreatorColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.CreatorID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "creator_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "creator_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *UserQuery) loadDiscussionThreadsByResolvingUser(ctx context.Context, query *DiscussionThreadQuery, nodes []*User, init func(*User), assign func(*User, *DiscussionThread)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(discussionthread.FieldResolvingUserID)
+	}
+	query.Where(predicate.DiscussionThread(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.DiscussionThreadsByResolvingUserColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ResolvingUserID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "resolving_user_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "resolving_user_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
 func (_q *UserQuery) loadDocumentsByUpdatedBy(ctx context.Context, query *DocumentQuery, nodes []*User, init func(*User), assign func(*User, *Document)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[uuid.UUID]*User)
@@ -4118,6 +4441,67 @@ func (_q *UserQuery) loadSubscribedProjects(ctx context.Context, query *ProjectQ
 	}
 	return nil
 }
+func (_q *UserQuery) loadSubscribedDiscussions(ctx context.Context, query *DiscussionQuery, nodes []*User, init func(*User), assign func(*User, *Discussion)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[uuid.UUID]*User)
+	nids := make(map[uuid.UUID]map[*User]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(user.SubscribedDiscussionsTable)
+		s.Join(joinT).On(s.C(discussion.FieldID), joinT.C(user.SubscribedDiscussionsPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(user.SubscribedDiscussionsPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(user.SubscribedDiscussionsPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(uuid.UUID)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := *values[0].(*uuid.UUID)
+				inValue := *values[1].(*uuid.UUID)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Discussion](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "subscribed_discussions" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
 func (_q *UserQuery) loadTeams(ctx context.Context, query *TeamQuery, nodes []*User, init func(*User), assign func(*User, *Team)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[uuid.UUID]*User)
@@ -4345,6 +4729,36 @@ func (_q *UserQuery) loadProjectSubscribers(ctx context.Context, query *ProjectS
 	}
 	query.Where(predicate.ProjectSubscriber(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(user.ProjectSubscribersColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.UserID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *UserQuery) loadDiscussionSubscribers(ctx context.Context, query *DiscussionSubscriberQuery, nodes []*User, init func(*User), assign func(*User, *DiscussionSubscriber)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(discussionsubscriber.FieldUserID)
+	}
+	query.Where(predicate.DiscussionSubscriber(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.DiscussionSubscribersColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

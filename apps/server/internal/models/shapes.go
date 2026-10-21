@@ -297,16 +297,18 @@ type CommentReaction struct {
 }
 
 type Comment struct {
-	ID            string            `json:"id"`
-	Body          string            `json:"body"`
-	User          *UserRef          `json:"user"`
-	QuotedText    *string           `json:"quotedText"`
-	Reactions     []CommentReaction `json:"reactions"`
-	CreatedAt     string            `json:"createdAt"`
-	UpdatedAt     string            `json:"updatedAt"`
-	EditedAt      *string           `json:"editedAt"`
-	ResolvedAt    *string           `json:"resolvedAt"`
-	ResolvingUser *UserRef          `json:"resolvingUser"`
+	ID               string            `json:"id"`
+	Body             string            `json:"body"`
+	User             *UserRef          `json:"user"`
+	QuotedText       *string           `json:"quotedText"`
+	SuggestedText    *string           `json:"suggestedText" doc:"On a document: the text suggested in place of quotedText."`
+	SuggestionStatus *string           `json:"suggestionStatus" doc:"For a suggestion: pending, accepted or rejected."`
+	Reactions        []CommentReaction `json:"reactions"`
+	CreatedAt        string            `json:"createdAt"`
+	UpdatedAt        string            `json:"updatedAt"`
+	EditedAt         *string           `json:"editedAt"`
+	ResolvedAt       *string           `json:"resolvedAt"`
+	ResolvingUser    *UserRef          `json:"resolvingUser"`
 }
 
 type CommentThread struct {
@@ -316,14 +318,16 @@ type CommentThread struct {
 
 type CommentDetail struct {
 	Comment
-	ParentID         *string        `json:"parentId"`
-	Issue            *IssueRef      `json:"issue"`
-	Project          *ProjectRef    `json:"project"`
-	Initiative       *InitiativeRef `json:"initiative"`
-	Document         *DocumentRef   `json:"document"`
-	ProjectMilestone *MilestoneRef  `json:"projectMilestone"`
-	StatusUpdate     *Ref           `json:"statusUpdate"`
-	URL              *string        `json:"url"`
+	ParentID         *string              `json:"parentId"`
+	Issue            *IssueRef            `json:"issue"`
+	Project          *ProjectRef          `json:"project"`
+	Initiative       *InitiativeRef       `json:"initiative"`
+	Document         *DocumentRef         `json:"document"`
+	ProjectMilestone *MilestoneRef        `json:"projectMilestone"`
+	StatusUpdate     *Ref                 `json:"statusUpdate"`
+	Discussion       *DiscussionRef       `json:"discussion"`
+	DiscussionThread *DiscussionThreadRef `json:"discussionThread"`
+	URL              *string              `json:"url"`
 }
 
 type DeletedComment struct {

@@ -15,6 +15,8 @@ import (
 	"ricrac/ent/customerstatus"
 	"ricrac/ent/customertier"
 	"ricrac/ent/customview"
+	"ricrac/ent/discussion"
+	"ricrac/ent/discussionthread"
 	"ricrac/ent/document"
 	"ricrac/ent/entitylink"
 	"ricrac/ent/favorite"
@@ -75,6 +77,8 @@ type WorkspaceQuery struct {
 	withAttachments         *AttachmentQuery
 	withFiles               *FileQuery
 	withDocuments           *DocumentQuery
+	withDiscussions         *DiscussionQuery
+	withDiscussionThreads   *DiscussionThreadQuery
 	withComments            *CommentQuery
 	withReactions           *ReactionQuery
 	withCustomerStatuses    *CustomerStatusQuery
@@ -495,6 +499,50 @@ func (_q *WorkspaceQuery) QueryDocuments() *DocumentQuery {
 			sqlgraph.From(workspace.Table, workspace.FieldID, selector),
 			sqlgraph.To(document.Table, document.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, workspace.DocumentsTable, workspace.DocumentsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDiscussions chains the current query on the "discussions" edge.
+func (_q *WorkspaceQuery) QueryDiscussions() *DiscussionQuery {
+	query := (&DiscussionClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(workspace.Table, workspace.FieldID, selector),
+			sqlgraph.To(discussion.Table, discussion.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, workspace.DiscussionsTable, workspace.DiscussionsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDiscussionThreads chains the current query on the "discussion_threads" edge.
+func (_q *WorkspaceQuery) QueryDiscussionThreads() *DiscussionThreadQuery {
+	query := (&DiscussionThreadClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(workspace.Table, workspace.FieldID, selector),
+			sqlgraph.To(discussionthread.Table, discussionthread.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, workspace.DiscussionThreadsTable, workspace.DiscussionThreadsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -1063,6 +1111,8 @@ func (_q *WorkspaceQuery) Clone() *WorkspaceQuery {
 		withAttachments:         _q.withAttachments.Clone(),
 		withFiles:               _q.withFiles.Clone(),
 		withDocuments:           _q.withDocuments.Clone(),
+		withDiscussions:         _q.withDiscussions.Clone(),
+		withDiscussionThreads:   _q.withDiscussionThreads.Clone(),
 		withComments:            _q.withComments.Clone(),
 		withReactions:           _q.withReactions.Clone(),
 		withCustomerStatuses:    _q.withCustomerStatuses.Clone(),
@@ -1270,6 +1320,28 @@ func (_q *WorkspaceQuery) WithDocuments(opts ...func(*DocumentQuery)) *Workspace
 		opt(query)
 	}
 	_q.withDocuments = query
+	return _q
+}
+
+// WithDiscussions tells the query-builder to eager-load the nodes that are connected to
+// the "discussions" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *WorkspaceQuery) WithDiscussions(opts ...func(*DiscussionQuery)) *WorkspaceQuery {
+	query := (&DiscussionClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withDiscussions = query
+	return _q
+}
+
+// WithDiscussionThreads tells the query-builder to eager-load the nodes that are connected to
+// the "discussion_threads" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *WorkspaceQuery) WithDiscussionThreads(opts ...func(*DiscussionThreadQuery)) *WorkspaceQuery {
+	query := (&DiscussionThreadClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withDiscussionThreads = query
 	return _q
 }
 
@@ -1527,7 +1599,7 @@ func (_q *WorkspaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Wo
 	var (
 		nodes       = []*Workspace{}
 		_spec       = _q.querySpec()
-		loadedTypes = [33]bool{
+		loadedTypes = [35]bool{
 			_q.withInvitations != nil,
 			_q.withOauthClients != nil,
 			_q.withTeams != nil,
@@ -1545,6 +1617,8 @@ func (_q *WorkspaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Wo
 			_q.withAttachments != nil,
 			_q.withFiles != nil,
 			_q.withDocuments != nil,
+			_q.withDiscussions != nil,
+			_q.withDiscussionThreads != nil,
 			_q.withComments != nil,
 			_q.withReactions != nil,
 			_q.withCustomerStatuses != nil,
@@ -1700,6 +1774,22 @@ func (_q *WorkspaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Wo
 		if err := _q.loadDocuments(ctx, query, nodes,
 			func(n *Workspace) { n.Edges.Documents = []*Document{} },
 			func(n *Workspace, e *Document) { n.Edges.Documents = append(n.Edges.Documents, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withDiscussions; query != nil {
+		if err := _q.loadDiscussions(ctx, query, nodes,
+			func(n *Workspace) { n.Edges.Discussions = []*Discussion{} },
+			func(n *Workspace, e *Discussion) { n.Edges.Discussions = append(n.Edges.Discussions, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withDiscussionThreads; query != nil {
+		if err := _q.loadDiscussionThreads(ctx, query, nodes,
+			func(n *Workspace) { n.Edges.DiscussionThreads = []*DiscussionThread{} },
+			func(n *Workspace, e *DiscussionThread) {
+				n.Edges.DiscussionThreads = append(n.Edges.DiscussionThreads, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
@@ -2318,6 +2408,66 @@ func (_q *WorkspaceQuery) loadDocuments(ctx context.Context, query *DocumentQuer
 	}
 	query.Where(predicate.Document(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(workspace.DocumentsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.WorkspaceID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "workspace_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *WorkspaceQuery) loadDiscussions(ctx context.Context, query *DiscussionQuery, nodes []*Workspace, init func(*Workspace), assign func(*Workspace, *Discussion)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Workspace)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(discussion.FieldWorkspaceID)
+	}
+	query.Where(predicate.Discussion(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(workspace.DiscussionsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.WorkspaceID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "workspace_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *WorkspaceQuery) loadDiscussionThreads(ctx context.Context, query *DiscussionThreadQuery, nodes []*Workspace, init func(*Workspace), assign func(*Workspace, *DiscussionThread)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Workspace)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(discussionthread.FieldWorkspaceID)
+	}
+	query.Where(predicate.DiscussionThread(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(workspace.DiscussionThreadsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

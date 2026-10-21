@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"ricrac/ent/customview"
 	"ricrac/ent/cycle"
+	"ricrac/ent/discussion"
 	"ricrac/ent/document"
 	"ricrac/ent/githubreposync"
 	"ricrac/ent/issue"
@@ -743,6 +744,21 @@ func (_c *TeamCreate) AddDocuments(v ...*Document) *TeamCreate {
 	return _c.AddDocumentIDs(ids...)
 }
 
+// AddDiscussionIDs adds the "discussions" edge to the Discussion entity by IDs.
+func (_c *TeamCreate) AddDiscussionIDs(ids ...uuid.UUID) *TeamCreate {
+	_c.mutation.AddDiscussionIDs(ids...)
+	return _c
+}
+
+// AddDiscussions adds the "discussions" edges to the Discussion entity.
+func (_c *TeamCreate) AddDiscussions(v ...*Discussion) *TeamCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddDiscussionIDs(ids...)
+}
+
 // AddCustomViewIDs adds the "custom_views" edge to the CustomView entity by IDs.
 func (_c *TeamCreate) AddCustomViewIDs(ids ...uuid.UUID) *TeamCreate {
 	_c.mutation.AddCustomViewIDs(ids...)
@@ -1290,6 +1306,22 @@ func (_c *TeamCreate) createSpec() (*Team, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(document.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.DiscussionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   team.DiscussionsTable,
+			Columns: []string{team.DiscussionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

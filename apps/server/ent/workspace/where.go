@@ -867,6 +867,52 @@ func HasDocumentsWith(preds ...predicate.Document) predicate.Workspace {
 	})
 }
 
+// HasDiscussions applies the HasEdge predicate on the "discussions" edge.
+func HasDiscussions() predicate.Workspace {
+	return predicate.Workspace(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, DiscussionsTable, DiscussionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDiscussionsWith applies the HasEdge predicate on the "discussions" edge with a given conditions (other predicates).
+func HasDiscussionsWith(preds ...predicate.Discussion) predicate.Workspace {
+	return predicate.Workspace(func(s *sql.Selector) {
+		step := newDiscussionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasDiscussionThreads applies the HasEdge predicate on the "discussion_threads" edge.
+func HasDiscussionThreads() predicate.Workspace {
+	return predicate.Workspace(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, DiscussionThreadsTable, DiscussionThreadsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDiscussionThreadsWith applies the HasEdge predicate on the "discussion_threads" edge with a given conditions (other predicates).
+func HasDiscussionThreadsWith(preds ...predicate.DiscussionThread) predicate.Workspace {
+	return predicate.Workspace(func(s *sql.Selector) {
+		step := newDiscussionThreadsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasComments applies the HasEdge predicate on the "comments" edge.
 func HasComments() predicate.Workspace {
 	return predicate.Workspace(func(s *sql.Selector) {

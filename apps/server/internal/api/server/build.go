@@ -13,6 +13,7 @@ import (
 	comment_service "ricrac/internal/services/comment"
 	customer_service "ricrac/internal/services/customer"
 	cycle_service "ricrac/internal/services/cycle"
+	discussion_service "ricrac/internal/services/discussion"
 	document_service "ricrac/internal/services/document"
 	email_service "ricrac/internal/services/email"
 	events_service "ricrac/internal/services/events"
@@ -68,6 +69,7 @@ func New(cfg config.Config, db *ent.Client, waker events_service.Waker) *Server 
 	srv.StateService = state_service.NewStateService(repo, srv.ResolveService, srv.EventsService, srv.IssueService, srv.TeamService)
 	srv.CycleService = cycle_service.NewCycleService(cfg, repo, srv.ResolveService, srv.EventsService)
 	srv.DocumentService = document_service.NewDocumentService(cfg, repo, srv.ResolveService, srv.EventsService)
+	srv.DiscussionService = discussion_service.NewDiscussionService(cfg, repo, srv.ResolveService, srv.EventsService)
 	srv.FavoriteService = favorite_service.NewFavoriteService(repo, srv.ResolveService)
 	srv.TemplateService = template_service.NewTemplateService(repo, srv.ResolveService, srv.EventsService, srv.AccessService, srv.Ops)
 	srv.CustomerService = customer_service.NewCustomerService(repo, srv.ResolveService, srv.EventsService)

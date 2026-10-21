@@ -12,6 +12,7 @@ export const GO_TO_KEYS = {
   views: "V",
   initiatives: "N",
   documents: "D",
+  forum: "F",
   settings: "S",
 } as const;
 
@@ -35,6 +36,7 @@ export const shortcutGroups: TShortcutGroup[] = [
       { label: "Views", keys: ["G", GO_TO_KEYS.views], then: true },
       { label: "Initiatives", keys: ["G", GO_TO_KEYS.initiatives], then: true },
       { label: "Documents", keys: ["G", GO_TO_KEYS.documents], then: true },
+      { label: "Forum", keys: ["G", GO_TO_KEYS.forum], then: true },
       { label: "Settings", keys: ["G", GO_TO_KEYS.settings], then: true },
     ],
   },

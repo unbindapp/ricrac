@@ -32,6 +32,7 @@ func (self *CommentRepository) Load(ctx context.Context, tx repository.TxInterfa
 	found, err := WithAnswer(self.base.Client(tx).Comment.Query()).Where(comment.ID(id)).
 		WithIssue(func(q *ent.IssueQuery) { q.WithTeam().WithState() }).
 		WithProject().WithInitiative().WithDocument().WithMilestone().WithWorkspace().
+		WithDiscussion().WithDiscussionThread(func(q *ent.DiscussionThreadQuery) { q.WithDiscussion() }).
 		Only(ctx)
 	if ent.IsNotFound(err) {
 		return nil, nil
@@ -112,6 +113,23 @@ func (self *CommentRepository) DocumentTitle(ctx context.Context, tx repository.
 		return "", err
 	}
 	return found.Title, nil
+}
+
+func (self *CommentRepository) DocumentContent(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (string, error) {
+	found, err := self.base.Client(tx).Document.Get(ctx, id)
+	if err != nil {
+		return "", err
+	}
+	return found.Content, nil
+}
+
+// DocumentCreator is who created the document, nil when they're gone.
+func (self *CommentRepository) DocumentCreator(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*uuid.UUID, error) {
+	found, err := self.base.Client(tx).Document.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return found.CreatorID, nil
 }
 
 // Milestone is the milestone with its project.

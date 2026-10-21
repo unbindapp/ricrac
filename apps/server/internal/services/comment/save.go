@@ -29,8 +29,9 @@ type SaveInput struct {
 	ID   *string `json:"id" doc:"Only to edit one of your comments: its id. Omit to create a comment."`
 	Body *string `json:"body" doc:"Markdown. Mention people with @displayName or @email; they are notified."`
 	targetInput
-	ParentID   *string `json:"parentId" doc:"The comment to reply to; the reply joins its thread."`
-	QuotedText *string `json:"quotedText" doc:"The passage of the document or description the comment is about."`
+	ParentID      *string `json:"parentId" doc:"The comment to reply to; the reply joins its thread."`
+	QuotedText    *string `json:"quotedText" doc:"The passage of the document or description the comment is about."`
+	SuggestedText *string `json:"suggestedText" doc:"With documentId and quotedText: text to put in place of the quoted passage, which must occur once in the document. accept_suggestion applies it."`
 }
 
 type IDInput struct {
@@ -43,7 +44,7 @@ func (self *CommentService) List(ctx context.Context, actor *auth.Actor, input *
 		return args.PageOf[models.CommentThread]{}, err
 	}
 	if target == nil {
-		return args.PageOf[models.CommentThread]{}, errdefs.BadRequest("Pass one of issueId, projectId, initiativeId, documentId, milestoneId or statusUpdateId")
+		return args.PageOf[models.CommentThread]{}, errdefs.BadRequest("Pass one of %s", targetNames)
 	}
 	page := args.Page{Limit: input.Limit, Cursor: input.Cursor}
 	offset, err := page.Offset()
@@ -71,7 +72,7 @@ func (self *CommentService) Save(ctx context.Context, actor *auth.Actor, input *
 		return models.CommentDetail{}, err
 	}
 	if input.ID != nil {
-		if target != nil || input.ParentID != nil || input.QuotedText != nil {
+		if target != nil || input.ParentID != nil || input.QuotedText != nil || input.SuggestedText != nil {
 			return models.CommentDetail{}, errdefs.BadRequest("Only the body of a comment can be changed")
 		}
 		return self.edit(ctx, actor, *input.ID, body)
@@ -96,25 +97,59 @@ func (self *CommentService) Save(ctx context.Context, actor *auth.Actor, input *
 		}
 	}
 	if target == nil {
-		return models.CommentDetail{}, errdefs.BadRequest("Pass what to comment on (issueId, projectId, initiativeId, documentId, milestoneId or statusUpdateId) or parentId")
+		return models.CommentDetail{}, errdefs.BadRequest("Pass what to comment on (%s) or parentId", targetNames)
 	}
 	var quoted *string
 	if input.QuotedText != nil && strings.TrimSpace(*input.QuotedText) != "" {
 		quoted = new(strings.TrimSpace(*input.QuotedText))
 	}
+	if input.SuggestedText != nil {
+		if err := self.checkSuggestion(ctx, *target, root, quoted); err != nil {
+			return models.CommentDetail{}, err
+		}
+	}
 	var value models.CommentDetail
 	err = self.repo.WithTx(ctx, func(tx repository.TxInterface) error {
-		_, value, err = self.Create(ctx, tx, actor, *target, root, body, quoted)
+		_, value, err = self.create(ctx, tx, actor, newComment{target: *target, root: root, body: body, quoted: quoted, suggested: input.SuggestedText})
 		return err
 	})
 	return value, err
 }
 
+// checkSuggestion refuses a suggestion that isn't a new thread on a document quoting a passage it
+// has once.
+func (self *CommentService) checkSuggestion(ctx context.Context, target Target, root *uuid.UUID, quoted *string) error {
+	if target.Column != "document_id" || root != nil {
+		return errdefs.BadRequest("Only a new comment on a document suggests text; pass documentId, quotedText and suggestedText")
+	}
+	if quoted == nil {
+		return errdefs.BadRequest("Pass quotedText: the passage suggestedText replaces")
+	}
+	content, err := self.repo.Comment().DocumentContent(ctx, nil, target.ID)
+	if err != nil {
+		return err
+	}
+	return args.CheckPassage(content, *quoted)
+}
+
 // Create adds a comment (a reply when root is set) by the actor, notifying and subscribing the
 // people it concerns.
 func (self *CommentService) Create(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, target Target, root *uuid.UUID, body string, quoted *string) (uuid.UUID, models.CommentDetail, error) {
+	return self.create(ctx, tx, actor, newComment{target: target, root: root, body: body, quoted: quoted})
+}
+
+type newComment struct {
+	target            Target
+	root              *uuid.UUID
+	body              string
+	quoted, suggested *string
+}
+
+func (self *CommentService) create(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, c newComment) (uuid.UUID, models.CommentDetail, error) {
+	target, root, body := c.target, c.root, c.body
 	id, err := self.repo.Comment().Create(ctx, tx, comment_repo.CreateInput{
-		Workspace: actor.Workspace, Column: target.Column, Target: target.ID, Root: root, User: actor.ActorID(), Body: body, Quoted: quoted,
+		Workspace: actor.Workspace, Column: target.Column, Target: target.ID, Root: root, User: actor.ActorID(), Body: body,
+		Quoted: c.quoted, Suggested: c.suggested,
 	})
 	if err != nil {
 		return uuid.Nil, models.CommentDetail{}, err
@@ -145,6 +180,10 @@ func (self *CommentService) Create(ctx context.Context, tx repository.TxInterfac
 	others := slices.DeleteFunc(audience, func(u uuid.UUID) bool {
 		return slices.Contains(mentioned, u) || slices.Contains(replied, u)
 	})
+	commented := fmt.Sprintf("%s commented on %s", name, about.label)
+	if c.suggested != nil {
+		about.kinds[0], commented = "documentSuggestion", fmt.Sprintf("%s suggested an edit to %s", name, about.label)
+	}
 	for _, n := range []struct {
 		users   []uuid.UUID
 		kind    string
@@ -152,7 +191,7 @@ func (self *CommentService) Create(ctx context.Context, tx repository.TxInterfac
 	}{
 		{mentioned, about.kinds[2], fmt.Sprintf("%s mentioned you in a comment on %s", name, about.label)},
 		{replied, about.kinds[1], fmt.Sprintf("%s replied to a thread on %s", name, about.label)},
-		{others, about.kinds[0], fmt.Sprintf("%s commented on %s", name, about.label)},
+		{others, about.kinds[0], commented},
 	} {
 		notice := about.notice
 		notice.Kind, notice.Summary, notice.Comment = n.kind, n.summary, &id
@@ -167,8 +206,9 @@ func (self *CommentService) Create(ctx context.Context, tx repository.TxInterfac
 	return id, value, self.events.Emit(ctx, tx, actor, "Comment", "create", value, nil, about.team)
 }
 
-// audience is who hears about a new comment besides the mentioned and the thread: an issue's
-// subscribers (subscribing the actor and the mentioned first) or a status update's author.
+// audience is who hears about a new comment besides the mentioned and the thread: an issue's or
+// discussion's subscribers (subscribing the actor and the mentioned first), a document's creator
+// or a status update's author.
 func (self *CommentService) audience(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, target Target, comment uuid.UUID, mentioned []uuid.UUID) ([]uuid.UUID, error) {
 	switch target.Column {
 	case "issue_id":
@@ -187,6 +227,18 @@ func (self *CommentService) audience(ctx context.Context, tx repository.TxInterf
 			return nil, err
 		}
 		return audience, self.events.QueueCommentForGitHub(ctx, tx, actor, target.ID, comment, "comment_created")
+	case "discussion_id", "discussion_thread_id":
+		discussion, err := self.discussionOf(ctx, tx, target)
+		if err != nil {
+			return nil, err
+		}
+		return self.discussionAudience(ctx, tx, actor, discussion, mentioned)
+	case "document_id":
+		creator, err := self.repo.Comment().DocumentCreator(ctx, tx, target.ID)
+		if err != nil || creator == nil {
+			return nil, err
+		}
+		return []uuid.UUID{*creator}, nil
 	case "status_update_id":
 		update, err := self.repo.Comment().StatusUpdate(ctx, tx, target.ID)
 		if err != nil || update == nil || update.UserID == nil {
@@ -195,6 +247,35 @@ func (self *CommentService) audience(ctx context.Context, tx repository.TxInterf
 		return []uuid.UUID{*update.UserID}, nil
 	}
 	return nil, nil
+}
+
+// discussionOf is the discussion a comment on a discussion or one of its threads is in.
+func (self *CommentService) discussionOf(ctx context.Context, tx repository.TxInterface, target Target) (uuid.UUID, error) {
+	if target.Column == "discussion_id" {
+		return target.ID, nil
+	}
+	thread, err := self.repo.Discussion().Thread(ctx, tx, target.ID)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	return thread.DiscussionID, nil
+}
+
+// discussionAudience subscribes the actor and the mentioned to the discussion, marks it active and
+// answers its subscribers.
+func (self *CommentService) discussionAudience(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, discussion uuid.UUID, mentioned []uuid.UUID) ([]uuid.UUID, error) {
+	users := slices.DeleteFunc(append([]uuid.UUID{actor.User}, mentioned...), func(u uuid.UUID) bool { return u == uuid.Nil })
+	if err := self.repo.Discussion().Subscribe(ctx, tx, discussion, users); err != nil {
+		return nil, err
+	}
+	now, err := self.repo.Now(ctx, tx)
+	if err != nil {
+		return nil, err
+	}
+	if err := self.repo.Discussion().Bump(ctx, tx, discussion, now); err != nil {
+		return nil, err
+	}
+	return self.repo.Discussion().SubscriberIDs(ctx, tx, discussion)
 }
 
 func (self *CommentService) edit(ctx context.Context, actor *auth.Actor, reference, body string) (models.CommentDetail, error) {
@@ -243,6 +324,15 @@ func (self *CommentService) Change(ctx context.Context, tx repository.TxInterfac
 	if err != nil {
 		return models.CommentDetail{}, err
 	}
+	if target.Column == "discussion_id" || target.Column == "discussion_thread_id" {
+		discussion, err := self.discussionOf(ctx, tx, target)
+		if err != nil {
+			return models.CommentDetail{}, err
+		}
+		if err := self.repo.Discussion().Subscribe(ctx, tx, discussion, mentioned); err != nil {
+			return models.CommentDetail{}, err
+		}
+	}
 	if target.Column == "issue_id" {
 		if err := self.events.Subscribe(ctx, tx, target.ID, mentioned); err != nil {
 			return models.CommentDetail{}, err
@@ -282,6 +372,7 @@ type about struct {
 func (self *CommentService) about(ctx context.Context, tx repository.TxInterface, target Target) (about, error) {
 	id := target.ID
 	projectKinds := [3]string{"projectNewComment", "projectCommentReply", "projectCommentMention"}
+	discussionKinds := [3]string{"discussionNewComment", "discussionCommentReply", "discussionCommentMention"}
 	switch target.Column {
 	case "issue_id":
 		name, err := self.repo.Issue().Identifier(ctx, tx, id)
@@ -306,6 +397,21 @@ func (self *CommentService) about(ctx context.Context, tx repository.TxInterface
 	case "document_id":
 		name, err := self.repo.Comment().DocumentTitle(ctx, tx, id)
 		return about{[3]string{"documentNewComment", "documentCommentReply", "documentCommentMention"}, name, events_service.Notice{Document: &id}, nil}, err
+	case "discussion_id":
+		discussion, err := self.repo.Discussion().Get(ctx, tx, id)
+		if err != nil {
+			return about{}, err
+		}
+		return about{discussionKinds, discussion.Title, events_service.Notice{Discussion: &id}, discussion.TeamID}, nil
+	case "discussion_thread_id":
+		thread, err := self.repo.Discussion().Thread(ctx, tx, id)
+		if err != nil {
+			return about{}, err
+		}
+		discussion := thread.Edges.Discussion
+		label := fmt.Sprintf("%s in %s", thread.Title, discussion.Title)
+		notice := events_service.Notice{Discussion: &discussion.ID, DiscussionThread: &id}
+		return about{discussionKinds, label, notice, discussion.TeamID}, nil
 	}
 	update, err := self.repo.Comment().StatusUpdate(ctx, tx, id)
 	if err != nil || update == nil {

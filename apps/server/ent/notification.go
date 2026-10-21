@@ -5,6 +5,8 @@ package ent
 import (
 	"fmt"
 	"ricrac/ent/comment"
+	"ricrac/ent/discussion"
+	"ricrac/ent/discussionthread"
 	"ricrac/ent/document"
 	"ricrac/ent/initiative"
 	"ricrac/ent/issue"
@@ -46,6 +48,10 @@ type Notification struct {
 	DocumentID *uuid.UUID `json:"document_id,omitempty"`
 	// StatusUpdateID holds the value of the "status_update_id" field.
 	StatusUpdateID *uuid.UUID `json:"status_update_id,omitempty"`
+	// DiscussionID holds the value of the "discussion_id" field.
+	DiscussionID *uuid.UUID `json:"discussion_id,omitempty"`
+	// DiscussionThreadID holds the value of the "discussion_thread_id" field.
+	DiscussionThreadID *uuid.UUID `json:"discussion_thread_id,omitempty"`
 	// Summary holds the value of the "summary" field.
 	Summary string `json:"summary,omitempty"`
 	// ReadAt holds the value of the "read_at" field.
@@ -84,9 +90,13 @@ type NotificationEdges struct {
 	Document *Document `json:"document,omitempty"`
 	// StatusUpdate holds the value of the status_update edge.
 	StatusUpdate *StatusUpdate `json:"status_update,omitempty"`
+	// Discussion holds the value of the discussion edge.
+	Discussion *Discussion `json:"discussion,omitempty"`
+	// DiscussionThread holds the value of the discussion_thread edge.
+	DiscussionThread *DiscussionThread `json:"discussion_thread,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [9]bool
+	loadedTypes [11]bool
 }
 
 // WorkspaceOrErr returns the Workspace value or an error if the edge
@@ -188,12 +198,34 @@ func (e NotificationEdges) StatusUpdateOrErr() (*StatusUpdate, error) {
 	return nil, &NotLoadedError{edge: "status_update"}
 }
 
+// DiscussionOrErr returns the Discussion value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e NotificationEdges) DiscussionOrErr() (*Discussion, error) {
+	if e.Discussion != nil {
+		return e.Discussion, nil
+	} else if e.loadedTypes[9] {
+		return nil, &NotFoundError{label: discussion.Label}
+	}
+	return nil, &NotLoadedError{edge: "discussion"}
+}
+
+// DiscussionThreadOrErr returns the DiscussionThread value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e NotificationEdges) DiscussionThreadOrErr() (*DiscussionThread, error) {
+	if e.DiscussionThread != nil {
+		return e.DiscussionThread, nil
+	} else if e.loadedTypes[10] {
+		return nil, &NotFoundError{label: discussionthread.Label}
+	}
+	return nil, &NotLoadedError{edge: "discussion_thread"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Notification) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case notification.FieldActorID, notification.FieldIssueID, notification.FieldCommentID, notification.FieldProjectID, notification.FieldInitiativeID, notification.FieldDocumentID, notification.FieldStatusUpdateID:
+		case notification.FieldActorID, notification.FieldIssueID, notification.FieldCommentID, notification.FieldProjectID, notification.FieldInitiativeID, notification.FieldDocumentID, notification.FieldStatusUpdateID, notification.FieldDiscussionID, notification.FieldDiscussionThreadID:
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case notification.FieldType, notification.FieldSummary:
 			values[i] = new(sql.NullString)
@@ -288,6 +320,20 @@ func (_m *Notification) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.StatusUpdateID = new(uuid.UUID)
 				*_m.StatusUpdateID = *value.S.(*uuid.UUID)
+			}
+		case notification.FieldDiscussionID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field discussion_id", values[i])
+			} else if value.Valid {
+				_m.DiscussionID = new(uuid.UUID)
+				*_m.DiscussionID = *value.S.(*uuid.UUID)
+			}
+		case notification.FieldDiscussionThreadID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field discussion_thread_id", values[i])
+			} else if value.Valid {
+				_m.DiscussionThreadID = new(uuid.UUID)
+				*_m.DiscussionThreadID = *value.S.(*uuid.UUID)
 			}
 		case notification.FieldSummary:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -387,6 +433,16 @@ func (_m *Notification) QueryStatusUpdate() *StatusUpdateQuery {
 	return NewNotificationClient(_m.config).QueryStatusUpdate(_m)
 }
 
+// QueryDiscussion queries the "discussion" edge of the Notification entity.
+func (_m *Notification) QueryDiscussion() *DiscussionQuery {
+	return NewNotificationClient(_m.config).QueryDiscussion(_m)
+}
+
+// QueryDiscussionThread queries the "discussion_thread" edge of the Notification entity.
+func (_m *Notification) QueryDiscussionThread() *DiscussionThreadQuery {
+	return NewNotificationClient(_m.config).QueryDiscussionThread(_m)
+}
+
 // Update returns a builder for updating this Notification.
 // Note that you need to call Notification.Unwrap() before calling this method if this Notification
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -451,6 +507,16 @@ func (_m *Notification) String() string {
 	builder.WriteString(", ")
 	if v := _m.StatusUpdateID; v != nil {
 		builder.WriteString("status_update_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.DiscussionID; v != nil {
+		builder.WriteString("discussion_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.DiscussionThreadID; v != nil {
+		builder.WriteString("discussion_thread_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")

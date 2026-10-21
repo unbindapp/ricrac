@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 
 	"ricrac/ent"
+	"ricrac/ent/discussion"
 	"ricrac/ent/document"
 	"ricrac/ent/email"
 	"ricrac/ent/file"
@@ -131,7 +132,10 @@ func (self *AutomationRepository) EmptyTrash(ctx context.Context, tx repository.
 	if _, err := client.Initiative.Delete().Where(initiative.TrashedAtLT(cutoff)).Exec(ctx); err != nil {
 		return err
 	}
-	_, err := client.Document.Delete().Where(document.TrashedAtLT(cutoff)).Exec(ctx)
+	if _, err := client.Document.Delete().Where(document.TrashedAtLT(cutoff)).Exec(ctx); err != nil {
+		return err
+	}
+	_, err := client.Discussion.Delete().Where(discussion.TrashedAtLT(cutoff)).Exec(ctx)
 	return err
 }
 

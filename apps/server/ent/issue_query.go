@@ -11,6 +11,7 @@ import (
 	"ricrac/ent/comment"
 	"ricrac/ent/customerneed"
 	"ricrac/ent/cycle"
+	"ricrac/ent/discussionthread"
 	"ricrac/ent/document"
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/issue"
@@ -64,6 +65,7 @@ type IssueQuery struct {
 	withAttachments                  *AttachmentQuery
 	withDocuments                    *DocumentQuery
 	withComments                     *CommentQuery
+	withDiscussionThreads            *DiscussionThreadQuery
 	withReactions                    *ReactionQuery
 	withCustomerNeeds                *CustomerNeedQuery
 	withNotifications                *NotificationQuery
@@ -480,6 +482,28 @@ func (_q *IssueQuery) QueryComments() *CommentQuery {
 			sqlgraph.From(issue.Table, issue.FieldID, selector),
 			sqlgraph.To(comment.Table, comment.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, issue.CommentsTable, issue.CommentsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDiscussionThreads chains the current query on the "discussion_threads" edge.
+func (_q *IssueQuery) QueryDiscussionThreads() *DiscussionThreadQuery {
+	query := (&DiscussionThreadClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(issue.Table, issue.FieldID, selector),
+			sqlgraph.To(discussionthread.Table, discussionthread.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, issue.DiscussionThreadsTable, issue.DiscussionThreadsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -960,6 +984,7 @@ func (_q *IssueQuery) Clone() *IssueQuery {
 		withAttachments:                  _q.withAttachments.Clone(),
 		withDocuments:                    _q.withDocuments.Clone(),
 		withComments:                     _q.withComments.Clone(),
+		withDiscussionThreads:            _q.withDiscussionThreads.Clone(),
 		withReactions:                    _q.withReactions.Clone(),
 		withCustomerNeeds:                _q.withCustomerNeeds.Clone(),
 		withNotifications:                _q.withNotifications.Clone(),
@@ -1163,6 +1188,17 @@ func (_q *IssueQuery) WithComments(opts ...func(*CommentQuery)) *IssueQuery {
 		opt(query)
 	}
 	_q.withComments = query
+	return _q
+}
+
+// WithDiscussionThreads tells the query-builder to eager-load the nodes that are connected to
+// the "discussion_threads" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *IssueQuery) WithDiscussionThreads(opts ...func(*DiscussionThreadQuery)) *IssueQuery {
+	query := (&DiscussionThreadClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withDiscussionThreads = query
 	return _q
 }
 
@@ -1376,7 +1412,7 @@ func (_q *IssueQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Issue,
 	var (
 		nodes       = []*Issue{}
 		_spec       = _q.querySpec()
-		loadedTypes = [29]bool{
+		loadedTypes = [30]bool{
 			_q.withWorkspace != nil,
 			_q.withTeam != nil,
 			_q.withState != nil,
@@ -1394,6 +1430,7 @@ func (_q *IssueQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Issue,
 			_q.withAttachments != nil,
 			_q.withDocuments != nil,
 			_q.withComments != nil,
+			_q.withDiscussionThreads != nil,
 			_q.withReactions != nil,
 			_q.withCustomerNeeds != nil,
 			_q.withNotifications != nil,
@@ -1539,6 +1576,13 @@ func (_q *IssueQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Issue,
 		if err := _q.loadComments(ctx, query, nodes,
 			func(n *Issue) { n.Edges.Comments = []*Comment{} },
 			func(n *Issue, e *Comment) { n.Edges.Comments = append(n.Edges.Comments, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withDiscussionThreads; query != nil {
+		if err := _q.loadDiscussionThreads(ctx, query, nodes,
+			func(n *Issue) { n.Edges.DiscussionThreads = []*DiscussionThread{} },
+			func(n *Issue, e *DiscussionThread) { n.Edges.DiscussionThreads = append(n.Edges.DiscussionThreads, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -2141,6 +2185,39 @@ func (_q *IssueQuery) loadComments(ctx context.Context, query *CommentQuery, nod
 	}
 	query.Where(predicate.Comment(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(issue.CommentsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.IssueID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "issue_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "issue_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *IssueQuery) loadDiscussionThreads(ctx context.Context, query *DiscussionThreadQuery, nodes []*Issue, init func(*Issue), assign func(*Issue, *DiscussionThread)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Issue)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(discussionthread.FieldIssueID)
+	}
+	query.Where(predicate.DiscussionThread(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(issue.DiscussionThreadsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

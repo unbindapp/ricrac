@@ -50,6 +50,78 @@ func (_m *DocumentServiceMock) EXPECT() *DocumentServiceMock_Expecter {
 	return &DocumentServiceMock_Expecter{mock: &_m.Mock}
 }
 
+// AcceptSuggestion provides a mock function for the type DocumentServiceMock
+func (_mock *DocumentServiceMock) AcceptSuggestion(ctx context.Context, actor *auth.Actor, input *document_service.SuggestionInput) (models.CommentDetail, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AcceptSuggestion")
+	}
+
+	var r0 models.CommentDetail
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *document_service.SuggestionInput) (models.CommentDetail, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *document_service.SuggestionInput) models.CommentDetail); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.CommentDetail)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *document_service.SuggestionInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// DocumentServiceMock_AcceptSuggestion_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AcceptSuggestion'
+type DocumentServiceMock_AcceptSuggestion_Call struct {
+	*mock.Call
+}
+
+// AcceptSuggestion is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *document_service.SuggestionInput
+func (_e *DocumentServiceMock_Expecter) AcceptSuggestion(ctx any, actor any, input any) *DocumentServiceMock_AcceptSuggestion_Call {
+	return &DocumentServiceMock_AcceptSuggestion_Call{Call: _e.mock.On("AcceptSuggestion", ctx, actor, input)}
+}
+
+func (_c *DocumentServiceMock_AcceptSuggestion_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *document_service.SuggestionInput)) *DocumentServiceMock_AcceptSuggestion_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *document_service.SuggestionInput
+		if args[2] != nil {
+			arg2 = args[2].(*document_service.SuggestionInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *DocumentServiceMock_AcceptSuggestion_Call) Return(commentDetail models.CommentDetail, err error) *DocumentServiceMock_AcceptSuggestion_Call {
+	_c.Call.Return(commentDetail, err)
+	return _c
+}
+
+func (_c *DocumentServiceMock_AcceptSuggestion_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *document_service.SuggestionInput) (models.CommentDetail, error)) *DocumentServiceMock_AcceptSuggestion_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Delete provides a mock function for the type DocumentServiceMock
 func (_mock *DocumentServiceMock) Delete(ctx context.Context, actor *auth.Actor, input *document_service.IDInput) (models.DocumentDetail, error) {
 	ret := _mock.Called(ctx, actor, input)
@@ -408,6 +480,78 @@ func (_c *DocumentServiceMock_ListVersions_Call) Return(documentVersionSummarys 
 }
 
 func (_c *DocumentServiceMock_ListVersions_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *document_service.IDInput) ([]models.DocumentVersionSummary, error)) *DocumentServiceMock_ListVersions_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// RejectSuggestion provides a mock function for the type DocumentServiceMock
+func (_mock *DocumentServiceMock) RejectSuggestion(ctx context.Context, actor *auth.Actor, input *document_service.SuggestionInput) (models.CommentDetail, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RejectSuggestion")
+	}
+
+	var r0 models.CommentDetail
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *document_service.SuggestionInput) (models.CommentDetail, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *document_service.SuggestionInput) models.CommentDetail); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.CommentDetail)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *document_service.SuggestionInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// DocumentServiceMock_RejectSuggestion_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RejectSuggestion'
+type DocumentServiceMock_RejectSuggestion_Call struct {
+	*mock.Call
+}
+
+// RejectSuggestion is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *document_service.SuggestionInput
+func (_e *DocumentServiceMock_Expecter) RejectSuggestion(ctx any, actor any, input any) *DocumentServiceMock_RejectSuggestion_Call {
+	return &DocumentServiceMock_RejectSuggestion_Call{Call: _e.mock.On("RejectSuggestion", ctx, actor, input)}
+}
+
+func (_c *DocumentServiceMock_RejectSuggestion_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *document_service.SuggestionInput)) *DocumentServiceMock_RejectSuggestion_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *document_service.SuggestionInput
+		if args[2] != nil {
+			arg2 = args[2].(*document_service.SuggestionInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *DocumentServiceMock_RejectSuggestion_Call) Return(commentDetail models.CommentDetail, err error) *DocumentServiceMock_RejectSuggestion_Call {
+	_c.Call.Return(commentDetail, err)
+	return _c
+}
+
+func (_c *DocumentServiceMock_RejectSuggestion_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *document_service.SuggestionInput) (models.CommentDetail, error)) *DocumentServiceMock_RejectSuggestion_Call {
 	_c.Call.Return(run)
 	return _c
 }

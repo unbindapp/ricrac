@@ -148,15 +148,18 @@ func (self *EventsService) Audit(ctx context.Context, tx repository.TxInterface,
 type Notice struct {
 	// issueAssignedToYou, issueMention, issueComment, issueCommentReply, issueStatusChanged,
 	// issueNewComment, issuePriorityChanged, issueBlocking, issueUnblocked, issueDue,
-	// issueCreated (triage), issueSubscribed, projectUpdateCreated, documentMention, ...
-	Kind         string
-	Summary      string
-	Issue        *uuid.UUID
-	Comment      *uuid.UUID
-	Project      *uuid.UUID
-	Initiative   *uuid.UUID
-	Document     *uuid.UUID
-	StatusUpdate *uuid.UUID
+	// issueCreated (triage), issueSubscribed, projectUpdateCreated, documentMention,
+	// discussionNewThread, ...
+	Kind             string
+	Summary          string
+	Issue            *uuid.UUID
+	Comment          *uuid.UUID
+	Project          *uuid.UUID
+	Initiative       *uuid.UUID
+	Document         *uuid.UUID
+	StatusUpdate     *uuid.UUID
+	Discussion       *uuid.UUID
+	DiscussionThread *uuid.UUID
 }
 
 // Notify notifies each of users once, except the actor, who doesn't need to hear about their
@@ -178,7 +181,8 @@ func (self *EventsService) Notify(ctx context.Context, tx repository.TxInterface
 		err = self.events().AddNotification(ctx, tx, events_repo.Notification{
 			Workspace: actor.Workspace, User: user, Actor: actor.ActorID(), Kind: notice.Kind, Summary: notice.Summary,
 			Issue: notice.Issue, Comment: notice.Comment, Project: notice.Project, Initiative: notice.Initiative,
-			Document: notice.Document, StatusUpdate: notice.StatusUpdate,
+			Document: notice.Document, StatusUpdate: notice.StatusUpdate, Discussion: notice.Discussion,
+			DiscussionThread: notice.DiscussionThread,
 		})
 		if err != nil {
 			return err

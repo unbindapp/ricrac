@@ -13,7 +13,7 @@ import { SectionTitle } from "@/components/layout/section-title";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { issueCommentsQuery } from "@/lib/queries/comments";
+import { commentsQuery } from "@/lib/queries/comments";
 import { issueHistoryQuery } from "@/lib/queries/issues";
 
 type TFeedItem =
@@ -24,7 +24,7 @@ type TFeedItem =
 export function IssueActivity({ issueId }: { issueId: string }) {
   const { workspace, canEdit } = useWorkspace();
   const history = useQuery(issueHistoryQuery(workspace.id, issueId));
-  const comments = useInfiniteQuery(issueCommentsQuery(workspace.id, issueId));
+  const comments = useInfiniteQuery(commentsQuery(workspace.id, { issueId }));
 
   const items = mergeFeed<TFeedItem>([
     {
@@ -70,7 +70,7 @@ export function IssueActivity({ issueId }: { issueId: string }) {
               {item.kind === "history" ? (
                 <HistoryLines entry={item.entry} />
               ) : (
-                <CommentThread thread={item.thread} issueId={issueId} />
+                <CommentThread thread={item.thread} target={{ issueId }} />
               )}
             </li>
           ))}
@@ -88,7 +88,7 @@ export function IssueActivity({ issueId }: { issueId: string }) {
           </Button>
         </div>
       )}
-      {canEdit && <CommentComposer issueId={issueId} />}
+      {canEdit && <CommentComposer target={{ issueId }} />}
     </section>
   );
 }

@@ -32,6 +32,10 @@ export type Comment = {
   reactions: CommentReaction[]
   resolvedAt: string | null
   resolvingUser: UserRef | null
+  /** On a document: the text suggested in place of quotedText. */
+  suggestedText: string | null
+  /** For a suggestion: pending, accepted or rejected. */
+  suggestionStatus: string | null
   updatedAt: string
   user: UserRef | null
 }
@@ -39,6 +43,8 @@ export type Comment = {
 export type CommentDetail = {
   body: string
   createdAt: string
+  discussion: DiscussionRef | null
+  discussionThread: DiscussionThreadRef | null
   document: DocumentRef | null
   editedAt: string | null
   id: string
@@ -52,6 +58,10 @@ export type CommentDetail = {
   resolvedAt: string | null
   resolvingUser: UserRef | null
   statusUpdate: Ref | null
+  /** On a document: the text suggested in place of quotedText. */
+  suggestedText: string | null
+  /** For a suggestion: pending, accepted or rejected. */
+  suggestionStatus: string | null
   updatedAt: string
   url: string | null
   user: UserRef | null
@@ -89,6 +99,10 @@ export type CommentThread = {
   replies: Comment[]
   resolvedAt: string | null
   resolvingUser: UserRef | null
+  /** On a document: the text suggested in place of quotedText. */
+  suggestedText: string | null
+  /** For a suggestion: pending, accepted or rejected. */
+  suggestionStatus: string | null
   updatedAt: string
   user: UserRef | null
 }
@@ -322,6 +336,10 @@ export type DeletedCustomerOption = {
   id: string
 }
 
+export type DeletedDiscussionThread = {
+  deleted: string
+}
+
 export type DeletedIssueLabel = {
   deleted: string
   removedFromIssues: number
@@ -396,6 +414,117 @@ export type DeletedTemplate = {
 export type DeletedWebhook = {
   deleted: boolean
   id: string
+}
+
+export type Discussion = {
+  /** Markdown; in lists only with includeBody. */
+  body?: string
+  closedAt: string | null
+  /** Comments on the discussion itself, not in its threads. */
+  commentCount: number
+  createdAt: string
+  creator: UserRef | null
+  id: string
+  lastActivityAt: string
+  openThreadCount: number
+  pinnedAt: string | null
+  slugId: string
+  /** The team it belongs to; only that team's members see it. Null for the whole workspace. */
+  team: TeamRef | null
+  threadCount: number
+  title: string
+  trashed: boolean
+  trashedAt: string | null
+  updatedAt: string
+  url: string
+}
+
+export type DiscussionDetail = {
+  /** Markdown; in lists only with includeBody. */
+  body?: string
+  closedAt: string | null
+  /** Comments on the discussion itself, not in its threads. */
+  commentCount: number
+  createdAt: string
+  creator: UserRef | null
+  id: string
+  lastActivityAt: string
+  openThreadCount: number
+  pinnedAt: string | null
+  slugId: string
+  subscribers: UserRef[]
+  /** The team it belongs to; only that team's members see it. Null for the whole workspace. */
+  team: TeamRef | null
+  threadCount: number
+  /** Oldest first. */
+  threads: DiscussionThread[]
+  title: string
+  trashed: boolean
+  trashedAt: string | null
+  updatedAt: string
+  url: string
+}
+
+export type DiscussionRef = {
+  id: string
+  slugId: string
+  title: string
+}
+
+export type DiscussionSearchHit = {
+  id: string
+  rank: number
+  /** The matching text, with matches in **bold**. */
+  snippet: string
+  /** For comments, the issue's. */
+  title: string
+  type: "discussion"
+  updatedAt: string
+  url: string
+}
+
+export type DiscussionThread = {
+  body: string
+  commentCount: number
+  createdAt: string
+  creator: UserRef | null
+  discussion: DiscussionRef
+  id: string
+  /** The issue tracking it, if any. */
+  issue: IssueRef | null
+  /** bug, design, question, idea, task or general. */
+  kind: string
+  resolvedAt: string | null
+  resolvingUser: UserRef | null
+  title: string
+  updatedAt: string
+  url: string
+}
+
+export type DiscussionThreadDetail = {
+  body: string
+  commentCount: number
+  /** Oldest first, each with its replies. */
+  comments: CommentThread[]
+  createdAt: string
+  creator: UserRef | null
+  discussion: DiscussionRef
+  id: string
+  /** The issue tracking it, if any. */
+  issue: IssueRef | null
+  /** bug, design, question, idea, task or general. */
+  kind: string
+  resolvedAt: string | null
+  resolvingUser: UserRef | null
+  title: string
+  updatedAt: string
+  url: string
+}
+
+export type DiscussionThreadRef = {
+  id: string
+  kind: string
+  title: string
 }
 
 export type Document = {
@@ -1024,6 +1153,8 @@ export type Notification = {
   archivedAt: string | null
   comment: NotificationComment | null
   createdAt: string
+  discussion: DiscussionRef | null
+  discussionThread: DiscussionThreadRef | null
   document: DocumentRef | null
   id: string
   initiative: InitiativeRef | null
@@ -1407,7 +1538,7 @@ export type SavedWebhook = {
 }
 
 export type SearchResults = {
-  nodes: (IssueSearchHit | ProjectSearchHit | DocumentSearchHit | InitiativeSearchHit | CommentSearchHit)[]
+  nodes: (IssueSearchHit | ProjectSearchHit | DocumentSearchHit | InitiativeSearchHit | DiscussionSearchHit | CommentSearchHit)[]
 }
 
 export type StateRef = {
@@ -2329,6 +2460,10 @@ export type ImportIssuesArgs = {
 export type ListCommentsArgs = {
   /** The endCursor of the previous page. */
   cursor?: string | null
+  /** Discussion id, slug, link or title. */
+  discussionId?: string | null
+  /** Discussion thread id. */
+  discussionThreadId?: string | null
   /** Document title, slug or id. */
   documentId?: string | null
   /** Initiative name, slug or id. */
@@ -2348,6 +2483,10 @@ export type ListCommentsArgs = {
 export type SaveCommentArgs = {
   /** Markdown. Mention people with @displayName or @email; they are notified. */
   body?: string | null
+  /** Discussion id, slug, link or title. */
+  discussionId?: string | null
+  /** Discussion thread id. */
+  discussionThreadId?: string | null
   /** Document title, slug or id. */
   documentId?: string | null
   /** Only to edit one of your comments: its id. Omit to create a comment. */
@@ -2366,6 +2505,8 @@ export type SaveCommentArgs = {
   quotedText?: string | null
   /** Status update id. */
   statusUpdateId?: string | null
+  /** With documentId and quotedText: text to put in place of the quoted passage, which must occur once in the document. accept_suggestion applies it. */
+  suggestedText?: string | null
 }
 
 export type DeleteCommentArgs = {
@@ -2995,6 +3136,140 @@ export type GetDocumentVersionArgs = {
   id: string
 }
 
+export type AcceptSuggestionArgs = {
+  /** The suggestion: its comment's id. */
+  id: string
+}
+
+export type RejectSuggestionArgs = {
+  /** The suggestion: its comment's id. */
+  id: string
+}
+
+export type ListDiscussionsArgs = {
+  /** Person who started the discussions (id, name, email or "me"). */
+  creator?: string | null
+  /** The endCursor of the previous page, to continue after it. */
+  cursor?: string | null
+  /** Include each discussion's body. */
+  includeBody?: boolean
+  includeTrashed?: boolean
+  /** How many to return, 50 by default, at most 250. */
+  limit?: number | null
+  /** Words to find in the title or body. */
+  query?: string | null
+  /** open (default), closed or all. */
+  status?: "open" | "closed" | "all" | null
+  /** Only the discussions of this team (key, name or id). */
+  team?: string | null
+}
+
+export type GetDiscussionArgs = {
+  id: string
+}
+
+export type SaveDiscussionArgs = {
+  /** People to subscribe: ids, names, emails or "me". */
+  addSubscribers?: string[]
+  /** Markdown. Mention people with @displayName or @email; they are notified and subscribed. */
+  body?: string | null
+  /** Close it once it is settled, or reopen it with false. Closed discussions still take comments and threads. */
+  closed?: boolean | null
+  /** Only to update a discussion: its id, slug, link or title. Omit to start one. */
+  id?: string | null
+  /** Edits to the current body instead of the whole text, applied in order, all or none. */
+  patch?: ({
+    new_string: string
+    old_string: string
+    op: "replace"
+    replace_all?: boolean
+  } | {
+    anchor: string
+    op: "insert_before"
+    text: string
+  } | {
+    anchor: string
+    op: "insert_after"
+    text: string
+  } | {
+    op: "prepend"
+    text: string
+  } | {
+    op: "append"
+    text: string
+  } | {
+    from: string
+    new_string: string
+    op: "replace_range"
+    to: string
+  })[]
+  /** Pin it to the top of the forum, or unpin it with false. */
+  pinned?: boolean | null
+  /** People to unsubscribe: ids, names, emails or "me". */
+  removeSubscribers?: string[]
+  /** The team it belongs to (key, name or id); only that team's members see it. null opens it to the whole workspace. */
+  team?: string | null
+  title?: string | null
+}
+
+export type DeleteDiscussionArgs = {
+  id: string
+}
+
+export type RestoreDiscussionArgs = {
+  id: string
+}
+
+export type GetDiscussionThreadArgs = {
+  id: string
+}
+
+export type SaveDiscussionThreadArgs = {
+  /** Markdown. Mention people with @displayName or @email; they are notified and subscribed to the discussion. */
+  body?: string | null
+  /** To start a thread: the discussion's id, slug, link or title. */
+  discussion?: string | null
+  /** Only to update a thread: its id. Omit to start one. */
+  id?: string | null
+  /** The issue tracking it (ENG-123, id or link); null unlinks it. */
+  issue?: string | null
+  /** What the thread is about; general by default. */
+  kind?: "bug" | "design" | "question" | "idea" | "task" | "general" | null
+  /** Edits to the current body instead of the whole text, applied in order, all or none. */
+  patch?: ({
+    new_string: string
+    old_string: string
+    op: "replace"
+    replace_all?: boolean
+  } | {
+    anchor: string
+    op: "insert_before"
+    text: string
+  } | {
+    anchor: string
+    op: "insert_after"
+    text: string
+  } | {
+    op: "prepend"
+    text: string
+  } | {
+    op: "append"
+    text: string
+  } | {
+    from: string
+    new_string: string
+    op: "replace_range"
+    to: string
+  })[]
+  /** Resolve the thread, or reopen it with false. */
+  resolved?: boolean | null
+  title?: string | null
+}
+
+export type DeleteDiscussionThreadArgs = {
+  id: string
+}
+
 export type ListCustomViewsArgs = {
   /** The endCursor of the previous page, to continue after it. */
   cursor?: string | null
@@ -3157,7 +3432,7 @@ export type SearchArgs = {
   query: string
   /** Only things of this team (key, name or id). */
   team?: string | null
-  /** What to search: issue, project, document, initiative, comment. All but comment by default. */
+  /** What to search: issue, project, document, initiative, discussion, comment. All but comment by default. */
   types?: string[]
 }
 
@@ -3702,6 +3977,19 @@ export interface Ops {
   restore_document: { args: RestoreDocumentArgs; result: DocumentDetail }
   list_document_versions: { args: ListDocumentVersionsArgs; result: DocumentVersionSummary[] }
   get_document_version: { args: GetDocumentVersionArgs; result: DocumentVersion }
+  accept_suggestion: { args: AcceptSuggestionArgs; result: CommentDetail }
+  reject_suggestion: { args: RejectSuggestionArgs; result: CommentDetail }
+  list_discussions: { args: ListDiscussionsArgs; result: {
+  nodes: Discussion[]
+  pageInfo: PageInfo
+} }
+  get_discussion: { args: GetDiscussionArgs; result: DiscussionDetail }
+  save_discussion: { args: SaveDiscussionArgs; result: DiscussionDetail }
+  delete_discussion: { args: DeleteDiscussionArgs; result: DiscussionDetail }
+  restore_discussion: { args: RestoreDiscussionArgs; result: DiscussionDetail }
+  get_discussion_thread: { args: GetDiscussionThreadArgs; result: DiscussionThreadDetail }
+  save_discussion_thread: { args: SaveDiscussionThreadArgs; result: DiscussionThreadDetail }
+  delete_discussion_thread: { args: DeleteDiscussionThreadArgs; result: DeletedDiscussionThread }
   list_custom_views: { args: ListCustomViewsArgs; result: {
   nodes: CustomView[]
   pageInfo: PageInfo

@@ -221,6 +221,87 @@ func (_c *CommentRepositoryMock_Create_Call) RunAndReturn(run func(ctx context.C
 	return _c
 }
 
+// Decide provides a mock function for the type CommentRepositoryMock
+func (_mock *CommentRepositoryMock) Decide(ctx context.Context, tx repository.TxInterface, id uuid.UUID, status string, by uuid.UUID, now time.Time) error {
+	ret := _mock.Called(ctx, tx, id, status, by, now)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Decide")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, string, uuid.UUID, time.Time) error); ok {
+		r0 = returnFunc(ctx, tx, id, status, by, now)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// CommentRepositoryMock_Decide_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Decide'
+type CommentRepositoryMock_Decide_Call struct {
+	*mock.Call
+}
+
+// Decide is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - status string
+//   - by uuid.UUID
+//   - now time.Time
+func (_e *CommentRepositoryMock_Expecter) Decide(ctx any, tx any, id any, status any, by any, now any) *CommentRepositoryMock_Decide_Call {
+	return &CommentRepositoryMock_Decide_Call{Call: _e.mock.On("Decide", ctx, tx, id, status, by, now)}
+}
+
+func (_c *CommentRepositoryMock_Decide_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, status string, by uuid.UUID, now time.Time)) *CommentRepositoryMock_Decide_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 string
+		if args[3] != nil {
+			arg3 = args[3].(string)
+		}
+		var arg4 uuid.UUID
+		if args[4] != nil {
+			arg4 = args[4].(uuid.UUID)
+		}
+		var arg5 time.Time
+		if args[5] != nil {
+			arg5 = args[5].(time.Time)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+			arg5,
+		)
+	})
+	return _c
+}
+
+func (_c *CommentRepositoryMock_Decide_Call) Return(err error) *CommentRepositoryMock_Decide_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *CommentRepositoryMock_Decide_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, status string, by uuid.UUID, now time.Time) error) *CommentRepositoryMock_Decide_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Delete provides a mock function for the type CommentRepositoryMock
 func (_mock *CommentRepositoryMock) Delete(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error {
 	ret := _mock.Called(ctx, tx, id)
@@ -343,6 +424,152 @@ func (_c *CommentRepositoryMock_DeleteReaction_Call) Return(err error) *CommentR
 }
 
 func (_c *CommentRepositoryMock_DeleteReaction_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error) *CommentRepositoryMock_DeleteReaction_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DocumentContent provides a mock function for the type CommentRepositoryMock
+func (_mock *CommentRepositoryMock) DocumentContent(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (string, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DocumentContent")
+	}
+
+	var r0 string
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) (string, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) string); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// CommentRepositoryMock_DocumentContent_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DocumentContent'
+type CommentRepositoryMock_DocumentContent_Call struct {
+	*mock.Call
+}
+
+// DocumentContent is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *CommentRepositoryMock_Expecter) DocumentContent(ctx any, tx any, id any) *CommentRepositoryMock_DocumentContent_Call {
+	return &CommentRepositoryMock_DocumentContent_Call{Call: _e.mock.On("DocumentContent", ctx, tx, id)}
+}
+
+func (_c *CommentRepositoryMock_DocumentContent_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *CommentRepositoryMock_DocumentContent_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *CommentRepositoryMock_DocumentContent_Call) Return(s string, err error) *CommentRepositoryMock_DocumentContent_Call {
+	_c.Call.Return(s, err)
+	return _c
+}
+
+func (_c *CommentRepositoryMock_DocumentContent_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (string, error)) *CommentRepositoryMock_DocumentContent_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DocumentCreator provides a mock function for the type CommentRepositoryMock
+func (_mock *CommentRepositoryMock) DocumentCreator(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*uuid.UUID, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DocumentCreator")
+	}
+
+	var r0 *uuid.UUID
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) (*uuid.UUID, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) *uuid.UUID); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// CommentRepositoryMock_DocumentCreator_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DocumentCreator'
+type CommentRepositoryMock_DocumentCreator_Call struct {
+	*mock.Call
+}
+
+// DocumentCreator is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *CommentRepositoryMock_Expecter) DocumentCreator(ctx any, tx any, id any) *CommentRepositoryMock_DocumentCreator_Call {
+	return &CommentRepositoryMock_DocumentCreator_Call{Call: _e.mock.On("DocumentCreator", ctx, tx, id)}
+}
+
+func (_c *CommentRepositoryMock_DocumentCreator_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *CommentRepositoryMock_DocumentCreator_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *CommentRepositoryMock_DocumentCreator_Call) Return(uUID *uuid.UUID, err error) *CommentRepositoryMock_DocumentCreator_Call {
+	_c.Call.Return(uUID, err)
+	return _c
+}
+
+func (_c *CommentRepositoryMock_DocumentCreator_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*uuid.UUID, error)) *CommentRepositoryMock_DocumentCreator_Call {
 	_c.Call.Return(run)
 	return _c
 }
