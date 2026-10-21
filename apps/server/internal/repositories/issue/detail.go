@@ -10,6 +10,7 @@ import (
 	"ricrac/ent/attachment"
 	"ricrac/ent/comment"
 	"ricrac/ent/document"
+	"ricrac/ent/githubissuelink"
 	"ricrac/ent/issue"
 	"ricrac/ent/issuehistory"
 	"ricrac/ent/issuerelation"
@@ -44,6 +45,15 @@ func (self *IssueRepository) Relations(ctx context.Context, tx repository.TxInte
 func (self *IssueRepository) Attachments(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.Attachment, error) {
 	return self.base.Client(tx).Attachment.Query().Where(attachment.IssueID(id)).WithCreator().
 		Order(attachment.ByCreatedAt()).All(ctx)
+}
+
+// GitHubIssue is the GitHub issue the issue syncs with and its repository, nil when none.
+func (self *IssueRepository) GitHubIssue(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.GithubIssueLink, error) {
+	found, err := self.base.Client(tx).GithubIssueLink.Query().Where(githubissuelink.ID(id)).WithRepoSync().Only(ctx)
+	if ent.IsNotFound(err) {
+		return nil, nil
+	}
+	return found, err
 }
 
 func (self *IssueRepository) Subscribers(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueSubscriber, error) {

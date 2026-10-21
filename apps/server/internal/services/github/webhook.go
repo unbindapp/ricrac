@@ -1,6 +1,7 @@
 package github_service
 
 import (
+	"cmp"
 	"context"
 	"encoding/json"
 	"errors"
@@ -158,7 +159,8 @@ func (h *hook) pullRequest(event *github.PullRequestEvent) error {
 		attachment: gitHubAttachment{
 			URL: pr.HTMLURL, Title: "#" + number + " " + pr.Title, SourceType: sourcePullRequest,
 			Metadata: M{"repo": event.Repository.FullName, "number": pr.Number, "state": state, "branch": pr.Head.Ref,
-				"author": pr.User.Login, "head_sha": pr.Head.SHA},
+				"author": pr.User.Login, "head_sha": pr.Head.SHA, "base": pr.Base.Ref, "summary": pr.Summary(),
+				"additions": pr.Additions, "deletions": pr.Deletions, "changed_files": pr.ChangedFiles, "merged_at": pr.MergedAt},
 		},
 		replaceURL: github.BranchURL(event.Repository, pr.Head.Ref),
 	}
@@ -187,8 +189,14 @@ func (h *hook) pullRequest(event *github.PullRequestEvent) error {
 	if opens {
 		plan.move = moveOpened
 	}
-	return h.link(github.References(pr.Head.Ref, pr.Title, pr.Body), func(ref github.Reference) linkPlan {
-		if state == github.StateMerged && ref.Closes {
+	found := mentions{
+		refs:          github.References(pr.Head.Ref, pr.Title, pr.Body),
+		numbers:       github.IssueNumbers(pr.Title, pr.Body),
+		repo:          event.Repository.FullName,
+		closesNumbers: pr.Base.Ref == event.Repository.DefaultBranch,
+	}
+	return h.link(found, func(closes bool) linkPlan {
+		if state == github.StateMerged && closes {
 			merged := plan
 			merged.move = moveMerged
 			return merged
@@ -211,7 +219,7 @@ func (h *hook) push(event *github.PushEvent) error {
 		move:                    moveOpened,
 		skipWithPullRequestFrom: branch,
 	}
-	failures := []error{h.link(github.References(branch), func(github.Reference) linkPlan { return plan })}
+	failures := []error{h.link(mentions{refs: github.References(branch)}, func(bool) linkPlan { return plan })}
 	for _, commit := range event.Commits {
 		failures = append(failures, h.linkCommit(event, branch, commit))
 	}
@@ -221,8 +229,14 @@ func (h *hook) push(event *github.PushEvent) error {
 // linkCommit links a commit to the issues its message mentions. One that says it fixes an issue
 // only closes it on the default branch, where the fix ships.
 func (h *hook) linkCommit(event *github.PushEvent, branch string, commit github.PushCommit) error {
-	refs := github.References("", commit.Message)
-	if commit.ID == "" || len(refs) == 0 {
+	closes := event.OnDefaultBranch()
+	found := mentions{
+		refs:          github.References("", commit.Message),
+		numbers:       github.IssueNumbers(commit.Message),
+		repo:          event.Repository.FullName,
+		closesNumbers: closes,
+	}
+	if commit.ID == "" || len(found.refs)+len(found.numbers) == 0 {
 		return nil
 	}
 	sha := commit.ShortSHA()
@@ -234,9 +248,8 @@ func (h *hook) linkCommit(event *github.PushEvent, branch string, commit github.
 		},
 		move: moveOpened,
 	}
-	closes := event.OnDefaultBranch()
-	return h.link(refs, func(ref github.Reference) linkPlan {
-		if !closes || !ref.Closes {
+	return h.link(found, func(closesIssue bool) linkPlan {
+		if !closes || !closesIssue {
 			return plan
 		}
 		closing := plan
@@ -246,29 +259,54 @@ func (h *hook) linkCommit(event *github.PushEvent, branch string, commit github.
 	})
 }
 
-// link applies a plan to each issue the references name, each in its own transaction.
-func (h *hook) link(refs []github.Reference, planFor func(github.Reference) linkPlan) error {
+// mentions is what a pull request, branch or commit names: Ricrac identifiers, and GitHub issues
+// synced with Ricrac (#123 is one of repo). A GitHub issue only moves when a closing phrase names
+// it, and only closes when the change reaches the default branch, as on GitHub.
+type mentions struct {
+	refs          []github.Reference
+	numbers       []github.IssueNumber
+	repo          string
+	closesNumbers bool
+}
+
+// link applies a plan to each issue mentioned, each in its own transaction.
+func (h *hook) link(found mentions, planFor func(closes bool) linkPlan) error {
 	type target struct {
-		issue uuid.UUID
-		ref   github.Reference
+		issue         uuid.UUID
+		closes, moves bool
 	}
 	var targets []target
-	for _, ref := range refs {
+	add := func(ids []uuid.UUID, closes, moves bool) {
+		for _, id := range ids {
+			if i := slices.IndexFunc(targets, func(t target) bool { return t.issue == id }); i >= 0 {
+				targets[i].closes = targets[i].closes || closes
+				targets[i].moves = targets[i].moves || moves
+				continue
+			}
+			targets = append(targets, target{id, closes, moves})
+		}
+	}
+	for _, ref := range found.refs {
 		ids, err := h.github().IssuesNamed(h.ctx, h.workspace, ref.Key, ref.Number, ref.Identifier())
 		if err != nil {
 			return err
 		}
-		for _, id := range ids {
-			if i := slices.IndexFunc(targets, func(t target) bool { return t.issue == id }); i >= 0 {
-				targets[i].ref.Closes = targets[i].ref.Closes || ref.Closes
-				continue
-			}
-			targets = append(targets, target{id, ref})
+		add(ids, ref.Closes, true)
+	}
+	for _, number := range found.numbers {
+		ids, err := h.github().IssuesSyncedAs(h.ctx, h.workspace, cmp.Or(number.Repo, found.repo), number.Number)
+		if err != nil {
+			return err
 		}
+		add(ids, number.Closes && found.closesNumbers, number.Closes)
 	}
 	var failures []error
 	for _, t := range targets {
-		if err := h.linkIssue(t.issue, planFor(t.ref)); err != nil {
+		plan := planFor(t.closes)
+		if !t.moves {
+			plan.move = stay
+		}
+		if err := h.linkIssue(t.issue, plan); err != nil {
 			slog.Warn("applying a GitHub event to an issue failed", "issue", t.issue, "err", err)
 			failures = append(failures, err)
 		}

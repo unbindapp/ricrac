@@ -71,3 +71,56 @@ func TestReferenceIdentifier(t *testing.T) {
 		t.Fatalf("got %s", got)
 	}
 }
+
+func number(repo string, n int, closes bool) IssueNumber {
+	return IssueNumber{Repo: repo, Number: n, Closes: closes}
+}
+
+func TestIssueNumbers(t *testing.T) {
+	cases := []struct {
+		name  string
+		texts []string
+		want  []IssueNumber
+	}{
+		{name: "closing a number", texts: []string{"Resolves #123"}, want: []IssueNumber{number("", 123, true)}},
+		{name: "closing a list", texts: []string{"fixes #1, #2 and #3"}, want: []IssueNumber{number("", 1, true), number("", 2, true), number("", 3, true)}},
+		{name: "closing another repository's issue", texts: []string{"Closes Unbindapp/Unbind#7"}, want: []IssueNumber{number("unbindapp/unbind", 7, true)}},
+		{name: "closing a link", texts: []string{"Fixes https://github.com/unbindapp/unbind/issues/1347"}, want: []IssueNumber{number("unbindapp/unbind", 1347, true)}},
+		{name: "mention", texts: []string{"Follow-up to #40."}, want: []IssueNumber{number("", 40, false)}},
+		{name: "mention in parentheses", texts: []string{"Cap frames (#41)"}, want: []IssueNumber{number("", 41, false)}},
+		{name: "closing phrase later in the text", texts: []string{"Touches #5\n\nresolved: #6"}, want: []IssueNumber{number("", 6, true), number("", 5, false)}},
+		{name: "the same issue twice", texts: []string{"#9", "fixes #9"}, want: []IssueNumber{number("", 9, true)}},
+		{name: "headings and entities", texts: []string{"## Summary\n&#123; abc#4 #12abc"}},
+		{name: "a pull request link is not an issue", texts: []string{"see https://github.com/unbindapp/unbind/pull/3"}},
+		{name: "zero", texts: []string{"#0"}},
+		{name: "identifiers are not numbers", texts: []string{"Fixes UNB-12"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := IssueNumbers(tc.texts...); !slices.Equal(got, tc.want) {
+				t.Fatalf("got %v, want %v", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestParseIssue(t *testing.T) {
+	cases := []struct {
+		value  string
+		repo   string
+		number int
+		ok     bool
+	}{
+		{"unbindapp/unbind#1347", "unbindapp/unbind", 1347, true},
+		{" https://github.com/UnbindApp/unbind/issues/12#issuecomment-1 ", "unbindapp/unbind", 12, true},
+		{"https://github.com/unbindapp/unbind/pull/12", "", 0, false},
+		{"#12", "", 0, false},
+		{"ENG-12", "", 0, false},
+	}
+	for _, tc := range cases {
+		repo, number, ok := ParseIssue(tc.value)
+		if repo != tc.repo || number != tc.number || ok != tc.ok {
+			t.Fatalf("%q: got %q %d %v", tc.value, repo, number, ok)
+		}
+	}
+}

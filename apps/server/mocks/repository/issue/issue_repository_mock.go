@@ -1384,6 +1384,80 @@ func (_c *IssueRepositoryMock_GetForUpdate_Call) RunAndReturn(run func(ctx conte
 	return _c
 }
 
+// GitHubIssue provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) GitHubIssue(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.GithubIssueLink, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GitHubIssue")
+	}
+
+	var r0 *ent.GithubIssueLink
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) (*ent.GithubIssueLink, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) *ent.GithubIssueLink); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ent.GithubIssueLink)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_GitHubIssue_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GitHubIssue'
+type IssueRepositoryMock_GitHubIssue_Call struct {
+	*mock.Call
+}
+
+// GitHubIssue is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) GitHubIssue(ctx any, tx any, id any) *IssueRepositoryMock_GitHubIssue_Call {
+	return &IssueRepositoryMock_GitHubIssue_Call{Call: _e.mock.On("GitHubIssue", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_GitHubIssue_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *IssueRepositoryMock_GitHubIssue_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_GitHubIssue_Call) Return(githubIssueLink *ent.GithubIssueLink, err error) *IssueRepositoryMock_GitHubIssue_Call {
+	_c.Call.Return(githubIssueLink, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_GitHubIssue_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.GithubIssueLink, error)) *IssueRepositoryMock_GitHubIssue_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // History provides a mock function for the type IssueRepositoryMock
 func (_mock *IssueRepositoryMock) History(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueHistory, error) {
 	ret := _mock.Called(ctx, tx, id)

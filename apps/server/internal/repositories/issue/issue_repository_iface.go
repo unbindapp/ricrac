@@ -21,6 +21,8 @@ type IssueRepositoryInterface interface {
 	Relations(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueRelation, error)
 	// Attachments is the issue's attachments, oldest first, with their creators.
 	Attachments(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.Attachment, error)
+	// GitHubIssue is the GitHub issue the issue syncs with and its repository, nil when none.
+	GitHubIssue(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.GithubIssueLink, error)
 	Subscribers(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueSubscriber, error)
 	Releases(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.IssueRelease, error)
 	// Documents is the issue's documents not in the trash.

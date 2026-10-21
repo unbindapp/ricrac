@@ -41,6 +41,11 @@ func (self *IssueService) Detail(ctx context.Context, actor *auth.Actor, id uuid
 	if detail.Relations, err = self.relations(ctx, tx, id); err != nil {
 		return models.IssueDetail{}, err
 	}
+	linked, err := self.repo.Issue().GitHubIssue(ctx, tx, id)
+	if err != nil {
+		return models.IssueDetail{}, err
+	}
+	detail.GitHub = models.GitHubIssueRefOf(linked)
 	attachments, err := self.repo.Issue().Attachments(ctx, tx, id)
 	if err != nil {
 		return models.IssueDetail{}, err

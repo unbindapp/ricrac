@@ -31,6 +31,14 @@ func IssueAttachmentOf(a *ent.Attachment) IssueAttachment {
 	}
 }
 
+// GitHubIssueRefOf needs the link's repository sync loaded.
+func GitHubIssueRefOf(l *ent.GithubIssueLink) *GitHubIssueRef {
+	if l == nil {
+		return nil
+	}
+	return &GitHubIssueRef{Repository: l.Edges.RepoSync.FullName, Number: l.GithubNumber, URL: l.GithubURL}
+}
+
 // HistoryEntryOf needs the entry's actor loaded.
 func HistoryEntryOf(h *ent.IssueHistory) HistoryEntry {
 	return HistoryEntry{Action: h.Action, Actor: UserRefOf(h.Edges.Actor), Changes: Object(h.Changes), CreatedAt: Time(h.CreatedAt)}

@@ -112,6 +112,8 @@ type GitHubRepositoryInterface interface {
 	// IssuesNamed is the workspace's issues (not in the trash) with this team key and number, or that
 	// had this identifier before.
 	IssuesNamed(ctx context.Context, workspace uuid.UUID, key string, number int, identifier string) ([]uuid.UUID, error)
+	// IssuesSyncedAs is the workspace's issues (not in the trash) synced with this GitHub issue.
+	IssuesSyncedAs(ctx context.Context, workspace uuid.UUID, repo string, number int) ([]uuid.UUID, error)
 	// HasPullRequestFrom says whether the issue has a pull request from this branch attached.
 	HasPullRequestFrom(ctx context.Context, tx repository.TxInterface, id uuid.UUID, sourceType, repo, branch string) (bool, error)
 	// AttachmentsAt is the issue's attachments with these URLs, in their order.

@@ -1,5 +1,7 @@
 import {
   BugIcon,
+  ChevronDownIcon,
+  ExternalLinkIcon,
   FileIcon,
   GitBranchIcon,
   GitCommitHorizontalIcon,
@@ -19,8 +21,13 @@ import { type FormEvent, useState } from "react";
 
 import type { IssueAttachment, IssueDetail } from "@/api/ops.gen";
 import { GithubIcon } from "@/components/icons/github";
-import { githubLinkOf, type TPullRequestState } from "@/components/issues/github-link";
+import {
+  githubLinkOf,
+  type TPullRequestState,
+  type TPullRequestStats,
+} from "@/components/issues/github-link";
 import { List, ListRow, ListRowText } from "@/components/layout/list";
+import { MarkdownView } from "@/components/shared/markdown-view";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,6 +35,7 @@ import { FileTrigger } from "@/components/ui/file-trigger";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "@/components/ui/toast";
+import { cn } from "@/components/ui/utils";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import {
   useAttachUploadMutation,
@@ -176,9 +184,11 @@ export function IssueAttachments({ issue }: { issue: IssueDetail }) {
 function AttachmentRow({ attachment, canEdit }: { attachment: IssueAttachment; canEdit: boolean }) {
   const { workspace } = useWorkspace();
   const { mutate: remove, isPending } = useDeleteAttachmentMutation(workspace.id);
+  const [isExpanded, setIsExpanded] = useState(false);
   const github = githubLinkOf(attachment);
-  const pullRequestState =
-    github?.kind === "pull_request" && github.state ? pullRequestStates[github.state] : null;
+  const pullRequest = github?.kind === "pull_request" ? github : null;
+  const pullRequestState = pullRequest?.state ? pullRequestStates[pullRequest.state] : null;
+  const canExpand = Boolean(pullRequest && (pullRequest.summary || pullRequest.stats));
   const title =
     github?.kind === "commit" ? (
       <>
@@ -188,16 +198,32 @@ function AttachmentRow({ attachment, canEdit }: { attachment: IssueAttachment; c
     ) : (
       attachment.title
     );
-  return (
+  const row = (
     <ListRow
       actions={
         <>
+          {pullRequest?.stats && <PullRequestSize stats={pullRequest.stats} />}
           {pullRequestState && (
             <Badge variant={pullRequestState.variant}>{pullRequestState.label}</Badge>
           )}
           <span className="text-muted-foreground text-xs">
             <RelativeTime value={attachment.createdAt} />
           </span>
+          {canExpand && (
+            <Button
+              variant="ghost"
+              size="icon"
+              forceMinSize={false}
+              className="size-6"
+              aria-label={isExpanded ? "Hide summary" : "Show summary"}
+              aria-expanded={isExpanded}
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              <ChevronDownIcon
+                className={cn("size-3.5 transition-transform", isExpanded && "rotate-180")}
+              />
+            </Button>
+          )}
           {canEdit && (
             <Button
               variant="ghost"
@@ -227,6 +253,62 @@ function AttachmentRow({ attachment, canEdit }: { attachment: IssueAttachment; c
         />
       </a>
     </ListRow>
+  );
+  if (!pullRequest || !isExpanded) return row;
+  return (
+    <>
+      {row}
+      <div
+        role="region"
+        aria-label={`Summary of ${attachment.title}`}
+        className="flex flex-col gap-2 border-b py-3 pr-3 pl-9 last:border-b-0"
+      >
+        {pullRequest.summary ? (
+          <div className="max-h-64 overflow-y-auto text-sm">
+            <MarkdownView markdown={pullRequest.summary} />
+          </div>
+        ) : (
+          <p className="text-muted-foreground text-sm">No description.</p>
+        )}
+        <div className="text-muted-foreground flex items-center gap-2 text-xs">
+          {pullRequest.base && (
+            <span className="flex items-center gap-1.5">
+              <GitBranchIcon className="size-3.5" />
+              Into <span className="font-mono">{pullRequest.base}</span>
+            </span>
+          )}
+          {pullRequest.base && pullRequest.stats && <span aria-hidden>·</span>}
+          {pullRequest.stats && (
+            <span>
+              {pullRequest.stats.changedFiles}{" "}
+              {pullRequest.stats.changedFiles === 1 ? "file" : "files"} changed
+            </span>
+          )}
+          <span className="flex-1" />
+          <a
+            href={attachment.url}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="flex items-center gap-1.5 has-hover:hover:underline"
+          >
+            <ExternalLinkIcon className="size-3.5" />
+            Open on GitHub
+          </a>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function PullRequestSize({ stats }: { stats: TPullRequestStats }) {
+  return (
+    <span
+      className="flex items-center gap-1 font-mono text-xs"
+      aria-label={`${stats.additions} additions, ${stats.deletions} deletions`}
+    >
+      <span className="text-success">+{stats.additions}</span>
+      <span className="text-destructive">−{stats.deletions}</span>
+    </span>
   );
 }
 

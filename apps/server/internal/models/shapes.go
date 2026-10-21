@@ -181,7 +181,8 @@ type IssueDetail struct {
 	Issue
 	Children     []IssueChild      `json:"children"`
 	Relations    IssueRelations    `json:"relations"`
-	Attachments  []IssueAttachment `json:"attachments"`
+	GitHub       *GitHubIssueRef   `json:"github" doc:"The GitHub issue it syncs with; null when none."`
+	Attachments  []IssueAttachment `json:"attachments" doc:"GitHub pull requests are sourceType github, their metadata has repo, number, state, author, branch, base, summary (the body), additions, deletions, changed_files and merged_at."`
 	Subscribers  []UserRef         `json:"subscribers"`
 	Releases     []ReleaseRef      `json:"releases"`
 	Documents    []DocumentRef     `json:"documents"`
@@ -207,6 +208,12 @@ type IssueRelations struct {
 	Related     []IssueRef `json:"related"`
 	DuplicateOf *IssueRef  `json:"duplicateOf"`
 	Duplicates  []IssueRef `json:"duplicates"`
+}
+
+type GitHubIssueRef struct {
+	Repository string `json:"repository" doc:"owner/name"`
+	Number     int    `json:"number"`
+	URL        string `json:"url"`
 }
 
 type IssueAttachment struct {
