@@ -437,6 +437,8 @@ var (
 		{Name: "slug_id", Type: field.TypeString, Size: 2147483647},
 		{Name: "title", Type: field.TypeString, Size: 2147483647},
 		{Name: "body", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "thumbnail_url", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "tags", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"postgres": "text[]"}},
 		{Name: "pinned_at", Type: field.TypeTime, Nullable: true},
 		{Name: "closed_at", Type: field.TypeTime, Nullable: true},
 		{Name: "trashed_at", Type: field.TypeTime, Nullable: true},
@@ -455,19 +457,19 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "discussions_teams_discussions",
-				Columns:    []*schema.Column{DiscussionsColumns[10]},
+				Columns:    []*schema.Column{DiscussionsColumns[12]},
 				RefColumns: []*schema.Column{TeamsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "discussions_users_discussions_by_creator",
-				Columns:    []*schema.Column{DiscussionsColumns[11]},
+				Columns:    []*schema.Column{DiscussionsColumns[13]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "discussions_workspaces_discussions",
-				Columns:    []*schema.Column{DiscussionsColumns[12]},
+				Columns:    []*schema.Column{DiscussionsColumns[14]},
 				RefColumns: []*schema.Column{WorkspacesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

@@ -76,6 +76,32 @@ func TestDiscussionsThreadsAndTheirNotifications(t *testing.T) {
 	eq(t, call(t, bob, "get_discussion", M{"id": "Q4 launch"}).At("threadCount").Num(), 0)
 }
 
+func TestDiscussionTagsAndThumbnails(t *testing.T) {
+	w := world(t)
+	bob := w.member("bob@acme.test", "Bob Jones", "member")
+	guest := w.member("gus@acme.test", "Gus Guest", "guest")
+	tagged := call(t, w.Ann, "save_discussion", M{"title": "Launch", "tags": []any{" Design ", "design", "Q4  plans"}, "thumbnailUrl": "https://cdn.test/cover.png"})
+	eqList(t, tagged.At("tags").Strings(), []string{"design", "q4 plans"}, "lowercased, spaces collapsed, duplicates dropped")
+	eq(t, tagged.At("thumbnailUrl").Str(), "https://cdn.test/cover.png")
+	call(t, w.Ann, "save_discussion", M{"title": "Hiring", "tags": []any{"design"}})
+	call(t, w.Ann, "save_discussion", M{"title": "Team only", "team": "ENG", "tags": []any{"secret"}})
+	untagged := call(t, w.Ann, "save_discussion", M{"title": "Lunch"})
+	eqList(t, untagged.At("tags").Strings(), []string{})
+	check(t, untagged.At("thumbnailUrl").IsNull(), untagged.JSON())
+
+	eqList(t, call(t, bob, "list_discussions", M{"tag": "Design"}).At("nodes").Strings("title"), []string{"Hiring", "Launch"})
+	eqList(t, call(t, guest, "list_discussion_tags", M{}).At("nodes").Strings("name"), []string{"design", "q4 plans"}, "the team's tags stay with the team")
+	eq(t, call(t, bob, "list_discussion_tags", M{}).At("nodes", 0, "count").Num(), 2)
+
+	retagged := call(t, bob, "save_discussion", M{"id": "Launch", "tags": []any{"launch"}})
+	eqList(t, retagged.At("tags").Strings(), []string{"launch"}, "anyone who can write tags a discussion")
+	eq(t, retagged.At("thumbnailUrl").Str(), "https://cdn.test/cover.png", "left out, the thumbnail stays")
+	contains(t, fails(t, bob, "save_discussion", M{"id": "Launch", "thumbnailUrl": nil}), "author")
+	cleared := call(t, w.Ann, "save_discussion", M{"id": "Launch", "thumbnailUrl": nil, "tags": []any{}})
+	check(t, cleared.At("thumbnailUrl").IsNull() && cleared.At("tags").Len() == 0, cleared.JSON())
+	contains(t, fails(t, w.Ann, "save_discussion", M{"id": "Lunch", "tags": []any{strings.Repeat("x", 33)}}), "longer")
+}
+
 func TestTeamDiscussionsStayWithTheTeam(t *testing.T) {
 	w := world(t)
 	guest := w.member("gus@acme.test", "Gus Guest", "guest")

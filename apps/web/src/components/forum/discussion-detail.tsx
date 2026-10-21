@@ -4,6 +4,7 @@ import {
   BellIcon,
   BellOffIcon,
   GlobeIcon,
+  ImageIcon,
   LockIcon,
   LockOpenIcon,
   MessagesSquareIcon,
@@ -11,17 +12,21 @@ import {
   PinOffIcon,
   UsersIcon,
 } from "lucide-react";
+import { useState } from "react";
 
-import type { DiscussionDetail as TDiscussionDetail } from "@/api/ops.gen";
-import { CommentsSection } from "@/components/forum/comments-section";
-import { DiscussionThreads } from "@/components/forum/discussion-threads";
+import type { Comment, DiscussionDetail as TDiscussionDetail } from "@/api/ops.gen";
+import { ChatComposer } from "@/components/forum/chat-message";
+import { ChatMessages } from "@/components/forum/chat-messages";
+import { DiscussionTagBadges, DiscussionTagsPicker } from "@/components/forum/discussion-tags";
 import { DiscussionTeamPicker } from "@/components/forum/discussion-team-picker";
+import { DiscussionThreads } from "@/components/forum/discussion-threads";
+import { NewThreadDialog } from "@/components/forum/new-thread-dialog";
+import { ThumbnailPicker } from "@/components/forum/thumbnail-picker";
 import { useCanRewrite } from "@/components/forum/use-can-rewrite";
+import { commentExcerpt } from "@/components/inbox/notifications";
+import { userName } from "@/components/issues/grouping";
 import { Breadcrumb, type TBreadcrumbItem } from "@/components/layout/breadcrumb";
-import { ErrorCard } from "@/components/layout/error-card";
-import { ListSkeleton } from "@/components/layout/list-skeleton";
-import { PageBar } from "@/components/layout/page-header";
-import { EntityNotFound } from "@/components/navigation/not-found-template";
+import { ChatLayout } from "@/components/layout/chat-layout";
 import { EntityMenu, toastTrashed } from "@/components/projects/entity-menu";
 import { AvatarStack } from "@/components/projects/people";
 import { AutosaveMarkdown } from "@/components/shared/autosave-markdown";
@@ -29,51 +34,43 @@ import { CopyLinkAction, HeaderAction, HeaderActions } from "@/components/shared
 import { InlineText } from "@/components/shared/inline-text";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { toast } from "@/components/ui/toast";
 import { SimpleTooltip } from "@/components/ui/tooltip";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import {
   DISCUSSION_TITLE_MAX_LENGTH,
-  discussionQuery,
   useDiscussionLifecycleMutation,
   useSaveDiscussionMutation,
 } from "@/lib/queries/discussions";
+import { messagePlaceholder, shorten } from "@/lib/helpers/chat";
 import { meQuery } from "@/lib/queries/me";
-import { isMissing } from "@/lib/queries/projects";
 
-type TProps = { slug: string; openThreadId?: string };
+const THREAD_TITLE_FROM_MESSAGE_LENGTH = 80;
 
-export function DiscussionDetail({ slug, openThreadId }: TProps) {
-  const { workspace } = useWorkspace();
-  const { data, isPending, error, refetch } = useQuery(discussionQuery(workspace.id, slug));
-  if (isPending) return <ListSkeleton rows={4} />;
-  if (error) {
-    if (isMissing(error)) {
-      return (
-        <EntityNotFound
-          Icon={MessagesSquareIcon}
-          description="Discussion not found. It was deleted, or you cannot see it."
-        />
-      );
-    }
-    return <ErrorCard message={error.message} onRetry={() => void refetch()} />;
-  }
-  return <DiscussionDetailContent key={data.id} discussion={data} openThreadId={openThreadId} />;
-}
-
-function DiscussionDetailContent({
-  discussion,
-  openThreadId,
-}: {
+type TProps = {
   discussion: TDiscussionDetail;
-  openThreadId?: string;
-}) {
+  /** On narrow screens the threads list sits in the page instead of beside it. */
+  showThreads: boolean;
+  openMessageId?: string;
+  onOpenMessage: (messageId: string) => void;
+};
+
+export function DiscussionDetail({
+  discussion,
+  showThreads,
+  openMessageId,
+  onOpenMessage,
+}: TProps) {
   const { workspace, canEdit } = useWorkspace();
   const canRewrite = useCanRewrite(discussion.creator);
   const { data: me } = useQuery(meQuery);
   const { mutate: save, mutateAsync: saveAsync } = useSaveDiscussionMutation(workspace.id);
   const { mutateAsync: changeLifecycle } = useDiscussionLifecycleMutation(workspace.id);
   const navigate = useNavigate();
+  const [splitFrom, setSplitFrom] = useState<Comment | null>(null);
+  const [isEditingThumbnail, setIsEditingThumbnail] = useState(false);
   const isPinned = Boolean(discussion.pinnedAt);
   const isClosed = Boolean(discussion.closedAt);
   const isSubscribed = discussion.subscribers.some((user) => user.id === me?.id);
@@ -102,49 +99,66 @@ function DiscussionDetailContent({
     { label: discussion.title },
   ];
 
+  const bar = (
+    <>
+      <div className="min-w-0 flex-1">
+        <Breadcrumb items={breadcrumb} />
+      </div>
+      <HeaderActions>
+        <CopyLinkAction url={discussion.url} />
+        {canEdit && (
+          <>
+            <HeaderAction
+              label={isSubscribed ? "Unsubscribe" : "Subscribe"}
+              onClick={() =>
+                save(
+                  isSubscribed
+                    ? { id: discussion.id, removeSubscribers: ["me"] }
+                    : { id: discussion.id, addSubscribers: ["me"] },
+                )
+              }
+            >
+              {isSubscribed ? <BellOffIcon className="size-4" /> : <BellIcon className="size-4" />}
+            </HeaderAction>
+            <HeaderAction
+              label={isPinned ? "Unpin" : "Pin to the top"}
+              onClick={() => save({ id: discussion.id, pinned: !isPinned })}
+            >
+              {isPinned ? <PinOffIcon className="size-4" /> : <PinIcon className="size-4" />}
+            </HeaderAction>
+            <HeaderAction
+              label={isClosed ? "Reopen discussion" : "Close discussion"}
+              onClick={() => save({ id: discussion.id, closed: !isClosed })}
+            >
+              {isClosed ? <LockOpenIcon className="size-4" /> : <LockIcon className="size-4" />}
+            </HeaderAction>
+          </>
+        )}
+        {canRewrite && (
+          <EntityMenu noun="discussion" onTrash={trash}>
+            <DropdownMenuItem onClick={() => setIsEditingThumbnail(true)}>
+              <ImageIcon className="size-4" />
+              Change thumbnail
+            </DropdownMenuItem>
+          </EntityMenu>
+        )}
+      </HeaderActions>
+    </>
+  );
+
   return (
-    <div className="flex w-full flex-col gap-6">
-      <PageBar>
-        <div className="min-w-0 flex-1">
-          <Breadcrumb items={breadcrumb} />
-        </div>
-        <HeaderActions>
-          <CopyLinkAction url={discussion.url} />
-          {canEdit && (
-            <>
-              <HeaderAction
-                label={isSubscribed ? "Unsubscribe" : "Subscribe"}
-                onClick={() =>
-                  save(
-                    isSubscribed
-                      ? { id: discussion.id, removeSubscribers: ["me"] }
-                      : { id: discussion.id, addSubscribers: ["me"] },
-                  )
-                }
-              >
-                {isSubscribed ? (
-                  <BellOffIcon className="size-4" />
-                ) : (
-                  <BellIcon className="size-4" />
-                )}
-              </HeaderAction>
-              <HeaderAction
-                label={isPinned ? "Unpin" : "Pin to the top"}
-                onClick={() => save({ id: discussion.id, pinned: !isPinned })}
-              >
-                {isPinned ? <PinOffIcon className="size-4" /> : <PinIcon className="size-4" />}
-              </HeaderAction>
-              <HeaderAction
-                label={isClosed ? "Reopen discussion" : "Close discussion"}
-                onClick={() => save({ id: discussion.id, closed: !isClosed })}
-              >
-                {isClosed ? <LockOpenIcon className="size-4" /> : <LockIcon className="size-4" />}
-              </HeaderAction>
-            </>
-          )}
-          {canRewrite && <EntityMenu noun="discussion" onTrash={trash} />}
-        </HeaderActions>
-      </PageBar>
+    <ChatLayout
+      bar={bar}
+      width="narrow"
+      composer={
+        canEdit && (
+          <ChatComposer
+            target={{ discussionId: discussion.id }}
+            placeholder={messagePlaceholder(discussion.title)}
+          />
+        )
+      }
+    >
       <div className="flex flex-col gap-2">
         <InlineText
           value={discussion.title}
@@ -170,6 +184,14 @@ function DiscussionDetailContent({
               )}
               {discussion.team?.name ?? "Whole workspace"}
             </span>
+          )}
+          {canEdit ? (
+            <DiscussionTagsPicker
+              value={discussion.tags}
+              onChange={(tags) => save({ id: discussion.id, tags })}
+            />
+          ) : (
+            <DiscussionTagBadges tags={discussion.tags} />
           )}
           {discussion.creator && (
             <span>
@@ -209,8 +231,49 @@ function DiscussionDetailContent({
           return saved.body ?? "";
         }}
       />
-      <DiscussionThreads discussion={discussion} openThreadId={openThreadId} />
-      <CommentsSection target={{ discussionId: discussion.id }} />
-    </div>
+      {showThreads && <DiscussionThreads discussion={discussion} variant="section" />}
+      <div className="border-t pt-2">
+        <ChatMessages
+          target={{ discussionId: discussion.id }}
+          threads={{ openId: openMessageId, onOpen: onOpenMessage }}
+          onNewThread={setSplitFrom}
+          empty={{
+            title: "No messages yet",
+            description: "Say what you think. Reply in a thread to keep a side topic together.",
+          }}
+        />
+      </div>
+      <NewThreadDialog
+        key={splitFrom?.id}
+        discussion={discussion}
+        open={Boolean(splitFrom)}
+        onOpenChange={(open) => {
+          if (!open) setSplitFrom(null);
+        }}
+        defaults={splitFrom ? threadFromMessage(splitFrom) : undefined}
+      />
+      <Dialog open={isEditingThumbnail} onOpenChange={setIsEditingThumbnail}>
+        <DialogContent className="w-xl max-w-full">
+          <DialogHeader>
+            <DialogTitle>Thumbnail</DialogTitle>
+          </DialogHeader>
+          <ThumbnailPicker
+            value={discussion.thumbnailUrl}
+            body={discussion.body ?? ""}
+            onChange={(thumbnailUrl) => save({ id: discussion.id, thumbnailUrl })}
+          />
+        </DialogContent>
+      </Dialog>
+    </ChatLayout>
   );
+}
+
+function threadFromMessage(message: Comment) {
+  const title = shorten(commentExcerpt(message.body), THREAD_TITLE_FROM_MESSAGE_LENGTH);
+  const author = message.user ? userName(message.user) : "A deleted user";
+  const quoted = message.body
+    .split("\n")
+    .map((line) => `> ${line}`.trimEnd())
+    .join("\n");
+  return { title, body: `${author} wrote:\n\n${quoted}\n\n` };
 }

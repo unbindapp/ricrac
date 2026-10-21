@@ -22,6 +22,7 @@ import (
 type ListInput struct {
 	Team           *string `json:"team" doc:"Only the discussions of this team (key, name or id)."`
 	Creator        *string `json:"creator" doc:"Person who started the discussions (id, name, email or \"me\")."`
+	Tag            *string `json:"tag" doc:"Only the discussions with this tag."`
 	Status         *string `json:"status" enum:"open,closed,all" doc:"open (default), closed or all."`
 	Query          *string `json:"query" doc:"Words to find in the title or body."`
 	IncludeTrashed bool    `json:"includeTrashed,omitempty"`
@@ -36,6 +37,8 @@ type SaveInput struct {
 	Body              *string               `json:"body" doc:"Markdown. Mention people with @displayName or @email; they are notified and subscribed."`
 	Patch             []args.TextEdit       `json:"patch" doc:"Edits to the current body instead of the whole text, applied in order, all or none."`
 	Team              args.Nullable[string] `json:"team" doc:"The team it belongs to (key, name or id); only that team's members see it. null opens it to the whole workspace."`
+	ThumbnailURL      args.Nullable[string] `json:"thumbnailUrl" doc:"Image URL the forum shows for it, such as an assetUrl from prepare_file_upload; null shows the first image in the body."`
+	Tags              []string              `json:"tags" doc:"All of its tags, replacing the ones it has; [] removes them. Lowercased, up to 10 of up to 32 characters."`
 	Pinned            *bool                 `json:"pinned" doc:"Pin it to the top of the forum, or unpin it with false."`
 	Closed            *bool                 `json:"closed" doc:"Close it once it is settled, or reopen it with false. Closed discussions still take comments and threads."`
 	AddSubscribers    []string              `json:"addSubscribers" doc:"People to subscribe: ids, names, emails or \"me\"."`
@@ -68,6 +71,10 @@ func (self *DiscussionService) List(ctx context.Context, actor *auth.Actor, inpu
 			return args.PageOf[models.Discussion]{}, err
 		}
 		filter.Creator = &creator
+	}
+	if input.Tag != nil {
+		tag := normalTag(*input.Tag)
+		filter.Tag = &tag
 	}
 	if query := strings.TrimSpace(utils.OrEmpty(input.Query)); query != "" {
 		filter.Query = &query
@@ -144,9 +151,14 @@ func (self *DiscussionService) create(ctx context.Context, tx repository.TxInter
 	if err != nil {
 		return uuid.Nil, err
 	}
+	tags, err := checkTags(input.Tags)
+	if err != nil {
+		return uuid.Nil, err
+	}
 	body := utils.OrEmpty(input.Body)
 	id, err := self.repo.Discussion().Create(ctx, tx, discussion_repo.CreateInput{
 		Workspace: actor.Workspace, SlugID: utils.SlugID(), Title: title, Body: body, Team: team, Creator: actor.User,
+		Thumbnail: utils.Trimmed(input.ThumbnailURL.Ptr()), Tags: tags,
 	})
 	if err != nil {
 		return uuid.Nil, err
@@ -165,10 +177,10 @@ func (self *DiscussionService) update(ctx context.Context, tx repository.TxInter
 	if err != nil {
 		return err
 	}
-	rewrites := input.Title != nil || input.Body != nil || input.Patch != nil || input.Team.Set
+	rewrites := input.Title != nil || input.Body != nil || input.Patch != nil || input.Team.Set || input.ThumbnailURL.Set
 	isAuthor := current.CreatorID != nil && *current.CreatorID == actor.User
 	if rewrites && !isAuthor && actor.Role < auth.Admin {
-		return errdefs.Forbidden("Only its author or a workspace admin can change a discussion's title, body or team")
+		return errdefs.Forbidden("Only its author or a workspace admin can change a discussion's title, body, thumbnail or team")
 	}
 	title := current.Title
 	if input.Title != nil {
@@ -198,6 +210,20 @@ func (self *DiscussionService) update(ctx context.Context, tx repository.TxInter
 			return err
 		}
 		if err := self.repo.Discussion().SetTeam(ctx, tx, id, team); err != nil {
+			return err
+		}
+	}
+	if input.ThumbnailURL.Set {
+		if err := self.repo.Discussion().SetThumbnail(ctx, tx, id, utils.Trimmed(input.ThumbnailURL.Ptr())); err != nil {
+			return err
+		}
+	}
+	if input.Tags != nil {
+		tags, err := checkTags(input.Tags)
+		if err != nil {
+			return err
+		}
+		if err := self.repo.Discussion().SetTags(ctx, tx, id, tags); err != nil {
 			return err
 		}
 	}
@@ -330,4 +356,51 @@ func (self *DiscussionService) Restore(ctx context.Context, actor *auth.Actor, i
 		return models.DiscussionDetail{}, err
 	}
 	return self.setTrashed(ctx, actor, id, false)
+}
+
+const (
+	maxTags      = 10
+	maxTagLength = 32
+)
+
+func normalTag(tag string) string {
+	return strings.ToLower(strings.Join(strings.Fields(tag), " "))
+}
+
+func checkTags(tags []string) ([]string, error) {
+	checked := []string{}
+	for _, tag := range tags {
+		tag = normalTag(tag)
+		if tag == "" || slices.Contains(checked, tag) {
+			continue
+		}
+		if len([]rune(tag)) > maxTagLength {
+			return nil, errdefs.BadRequest("tag %q is longer than %d characters", tag, maxTagLength)
+		}
+		checked = append(checked, tag)
+	}
+	if len(checked) > maxTags {
+		return nil, errdefs.BadRequest("A discussion takes up to %d tags", maxTags)
+	}
+	return checked, nil
+}
+
+type TagsInput struct {
+	args.Page
+}
+
+func (self *DiscussionService) Tags(ctx context.Context, actor *auth.Actor, input *TagsInput) (args.PageOf[models.DiscussionTag], error) {
+	teams, err := actor.TeamIDs(ctx)
+	if err != nil {
+		return args.PageOf[models.DiscussionTag]{}, err
+	}
+	offset, err := input.Offset()
+	if err != nil {
+		return args.PageOf[models.DiscussionTag]{}, err
+	}
+	tags, err := self.repo.Discussion().Tags(ctx, actor.Workspace, teams, input.Size()+1, offset)
+	if err != nil {
+		return args.PageOf[models.DiscussionTag]{}, err
+	}
+	return args.WrapOf(input.Page, tags)
 }

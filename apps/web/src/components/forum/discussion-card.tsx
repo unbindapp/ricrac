@@ -3,6 +3,7 @@ import { LockIcon, MessageSquareIcon, MessagesSquareIcon, PinIcon, SplitIcon } f
 import type { ReactNode } from "react";
 
 import type { Discussion } from "@/api/ops.gen";
+import { DiscussionTagBadges } from "@/components/forum/discussion-tags";
 import { commentExcerpt } from "@/components/inbox/notifications";
 import { PersonAvatar } from "@/components/projects/people";
 import { RelativeTime } from "@/components/shared/relative-time";
@@ -53,7 +54,7 @@ export function DiscussionCard({ discussion }: { discussion: Discussion }) {
       params={{ workspace: workspace.urlKey, slug: entitySlug(discussion) }}
       className="bg-card has-hover:hover:bg-card-hover has-hover:hover:border-muted-most-foreground focus-visible:ring-ring flex min-w-0 flex-col overflow-hidden rounded-lg border outline-hidden transition-colors focus-visible:ring-1"
     >
-      <DiscussionPreview body={discussion.body ?? ""} />
+      <DiscussionPreview body={discussion.body ?? ""} thumbnailUrl={discussion.thumbnailUrl} />
       <div className="flex flex-1 flex-col gap-3 p-4">
         <DiscussionTags discussion={discussion} />
         <h2 className="line-clamp-2 text-base leading-snug font-semibold">{discussion.title}</h2>
@@ -91,8 +92,10 @@ export function DiscussionCard({ discussion }: { discussion: Discussion }) {
   );
 }
 
-function DiscussionPreview({ body }: { body: string }) {
-  const embed = firstEmbed(body);
+const MAX_CARD_TAGS = 3;
+
+function DiscussionPreview({ body, thumbnailUrl }: { body: string; thumbnailUrl: string | null }) {
+  const embed = thumbnailUrl ? { url: thumbnailUrl, kind: "image" as const } : firstEmbed(body);
   if (embed?.kind === "image") {
     return (
       <div className="bg-muted aspect-video overflow-hidden border-b">
@@ -147,6 +150,7 @@ function DiscussionTags({ discussion }: { discussion: Discussion }) {
       <Badge variant="outline" className="text-muted-foreground">
         <span className="truncate">{discussion.team?.name ?? "Whole workspace"}</span>
       </Badge>
+      <DiscussionTagBadges tags={discussion.tags} max={MAX_CARD_TAGS} />
     </div>
   );
 }

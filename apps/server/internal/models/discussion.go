@@ -23,6 +23,8 @@ type Discussion struct {
 	Title           string   `json:"title"`
 	Body            Text     `json:"body,omitzero" doc:"Markdown; in lists only with includeBody."`
 	URL             string   `json:"url"`
+	ThumbnailURL    *string  `json:"thumbnailUrl" doc:"The image the forum shows for it; null shows the first image in the body."`
+	Tags            []string `json:"tags"`
 	Team            *TeamRef `json:"team" doc:"The team it belongs to; only that team's members see it. Null for the whole workspace."`
 	Creator         *UserRef `json:"creator"`
 	PinnedAt        *string  `json:"pinnedAt"`
@@ -41,6 +43,11 @@ type DiscussionDetail struct {
 	Discussion
 	Threads     []DiscussionThread `json:"threads" doc:"Oldest first."`
 	Subscribers []UserRef          `json:"subscribers"`
+}
+
+type DiscussionTag struct {
+	Name  string `json:"name"`
+	Count int    `json:"count" doc:"How many discussions have it."`
 }
 
 type DiscussionThread struct {
@@ -107,7 +114,7 @@ func DiscussionOf(d *ent.Discussion, publicURL string, counts DiscussionCounts, 
 	e := d.Edges
 	discussion := Discussion{
 		ID: ID(d.ID), SlugID: d.SlugID, Title: d.Title, URL: DiscussionURL(publicURL, e.Workspace.URLKey, d.Title, d.SlugID),
-		Team: TeamRefOf(e.Team), Creator: UserRefOf(e.Creator), PinnedAt: TimePtr(d.PinnedAt), ClosedAt: TimePtr(d.ClosedAt),
+		ThumbnailURL: d.ThumbnailURL, Tags: append([]string{}, d.Tags...), Team: TeamRefOf(e.Team), Creator: UserRefOf(e.Creator), PinnedAt: TimePtr(d.PinnedAt), ClosedAt: TimePtr(d.ClosedAt),
 		Trashed: d.TrashedAt != nil, TrashedAt: TimePtr(d.TrashedAt), ThreadCount: counts.Threads,
 		OpenThreadCount: counts.OpenThreads, CommentCount: counts.Comments, LastActivityAt: Time(d.LastActivityAt),
 		CreatedAt: Time(d.CreatedAt), UpdatedAt: Time(d.UpdatedAt),

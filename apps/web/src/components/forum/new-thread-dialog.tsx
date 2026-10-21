@@ -40,18 +40,38 @@ const kindItems = THREAD_KINDS.map((kind) => {
   return { value: kind, label, icon: <Icon className="text-muted-foreground size-4" /> };
 });
 
-type TProps = { discussion: DiscussionDetail; trigger: ReactElement };
+type TThreadDefaults = { title: string; body: string };
 
-export function NewThreadDialog({ discussion, trigger }: TProps) {
-  const [isOpen, setIsOpen] = useState(false);
+type TProps = {
+  discussion: DiscussionDetail;
+  trigger?: ReactElement;
+  /** Open it from code instead of a trigger. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  defaults?: TThreadDefaults;
+};
+
+export function NewThreadDialog({ discussion, trigger, open, onOpenChange, defaults }: TProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = open ?? internalOpen;
+  const setOpen = (next: boolean) => {
+    setInternalOpen(next);
+    onOpenChange?.(next);
+  };
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger render={trigger} />
+    <Dialog open={isOpen} onOpenChange={setOpen}>
+      {trigger && <DialogTrigger render={trigger} />}
       <DialogContent className="w-2xl max-w-full">
         <DialogHeader>
           <DialogTitle>New thread</DialogTitle>
         </DialogHeader>
-        {isOpen && <NewThreadForm discussion={discussion} onCreated={() => setIsOpen(false)} />}
+        {isOpen && (
+          <NewThreadForm
+            discussion={discussion}
+            defaults={defaults}
+            onCreated={() => setOpen(false)}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );
@@ -59,9 +79,11 @@ export function NewThreadDialog({ discussion, trigger }: TProps) {
 
 function NewThreadForm({
   discussion,
+  defaults,
   onCreated,
 }: {
   discussion: DiscussionDetail;
+  defaults?: TThreadDefaults;
   onCreated: () => void;
 }) {
   const { workspace } = useWorkspace();
@@ -69,10 +91,10 @@ function NewThreadForm({
   const { users } = useWorkspaceUsers();
   const uploads = useEditorUploads(workspace.id);
   const { mutateAsync: save } = useSaveDiscussionThreadMutation(workspace.id);
-  const [body, setBody] = useState("");
+  const [body, setBody] = useState(defaults?.body ?? "");
   const [issue, setIssue] = useState<IssueRef | null>(null);
   const form = useAppForm({
-    defaultValues: { kind: "general", title: "" },
+    defaultValues: { kind: "general", title: defaults?.title ?? "" },
     validators: { onSubmit: schema },
     onSubmit: async ({ value }) => {
       const { kind, title } = schema.parse(value);

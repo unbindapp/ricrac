@@ -16,6 +16,7 @@ type DiscussionServiceInterface interface {
 	Save(ctx context.Context, actor *auth.Actor, input *SaveInput) (models.DiscussionDetail, error)
 	Delete(ctx context.Context, actor *auth.Actor, input *IDInput) (models.DiscussionDetail, error)
 	Restore(ctx context.Context, actor *auth.Actor, input *IDInput) (models.DiscussionDetail, error)
+	Tags(ctx context.Context, actor *auth.Actor, input *TagsInput) (args.PageOf[models.DiscussionTag], error)
 	GetThread(ctx context.Context, actor *auth.Actor, input *IDInput) (models.DiscussionThreadDetail, error)
 	SaveThread(ctx context.Context, actor *auth.Actor, input *SaveThreadInput) (models.DiscussionThreadDetail, error)
 	DeleteThread(ctx context.Context, actor *auth.Actor, input *IDInput) (models.DeletedDiscussionThread, error)

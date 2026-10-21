@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { formatDate, formatRelative } from "./dates.ts";
+import { formatDate, formatDay, formatRelative } from "./dates.ts";
 
 const now = new Date("2026-03-10T12:00:00Z");
 
@@ -30,4 +30,12 @@ test("accepts ISO strings and timestamps", () => {
 
 test("absolute dates use MMM d, yyyy", () => {
   assert.equal(formatDate(new Date(2026, 0, 5, 12)), "Jan 5, 2026");
+});
+
+test("chat days read as today, yesterday, then dates", () => {
+  const noon = new Date(2026, 2, 10, 12);
+  assert.equal(formatDay(new Date(2026, 2, 10, 8), noon), "Today");
+  assert.equal(formatDay(new Date(2026, 2, 9, 23), noon), "Yesterday");
+  assert.equal(formatDay(new Date(2026, 2, 2, 9), noon), "Monday, March 2");
+  assert.equal(formatDay(new Date(2025, 11, 31, 9), noon), "December 31, 2025");
 });

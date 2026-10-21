@@ -4,6 +4,7 @@ package discussion
 
 import (
 	"ricrac/ent/predicate"
+	"ricrac/ent/schema/pgarray"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -74,6 +75,16 @@ func Title(v string) predicate.Discussion {
 // Body applies equality check predicate on the "body" field. It's identical to BodyEQ.
 func Body(v string) predicate.Discussion {
 	return predicate.Discussion(sql.FieldEQ(FieldBody, v))
+}
+
+// ThumbnailURL applies equality check predicate on the "thumbnail_url" field. It's identical to ThumbnailURLEQ.
+func ThumbnailURL(v string) predicate.Discussion {
+	return predicate.Discussion(sql.FieldEQ(FieldThumbnailURL, v))
+}
+
+// Tags applies equality check predicate on the "tags" field. It's identical to TagsEQ.
+func Tags(v pgarray.Text) predicate.Discussion {
+	return predicate.Discussion(sql.FieldEQ(FieldTags, v))
 }
 
 // TeamID applies equality check predicate on the "team_id" field. It's identical to TeamIDEQ.
@@ -339,6 +350,131 @@ func BodyEqualFold(v string) predicate.Discussion {
 // BodyContainsFold applies the ContainsFold predicate on the "body" field.
 func BodyContainsFold(v string) predicate.Discussion {
 	return predicate.Discussion(sql.FieldContainsFold(FieldBody, v))
+}
+
+// ThumbnailURLEQ applies the EQ predicate on the "thumbnail_url" field.
+func ThumbnailURLEQ(v string) predicate.Discussion {
+	return predicate.Discussion(sql.FieldEQ(FieldThumbnailURL, v))
+}
+
+// ThumbnailURLNEQ applies the NEQ predicate on the "thumbnail_url" field.
+func ThumbnailURLNEQ(v string) predicate.Discussion {
+	return predicate.Discussion(sql.FieldNEQ(FieldThumbnailURL, v))
+}
+
+// ThumbnailURLIn applies the In predicate on the "thumbnail_url" field.
+func ThumbnailURLIn(vs ...string) predicate.Discussion {
+	return predicate.Discussion(sql.FieldIn(FieldThumbnailURL, vs...))
+}
+
+// ThumbnailURLNotIn applies the NotIn predicate on the "thumbnail_url" field.
+func ThumbnailURLNotIn(vs ...string) predicate.Discussion {
+	return predicate.Discussion(sql.FieldNotIn(FieldThumbnailURL, vs...))
+}
+
+// ThumbnailURLGT applies the GT predicate on the "thumbnail_url" field.
+func ThumbnailURLGT(v string) predicate.Discussion {
+	return predicate.Discussion(sql.FieldGT(FieldThumbnailURL, v))
+}
+
+// ThumbnailURLGTE applies the GTE predicate on the "thumbnail_url" field.
+func ThumbnailURLGTE(v string) predicate.Discussion {
+	return predicate.Discussion(sql.FieldGTE(FieldThumbnailURL, v))
+}
+
+// ThumbnailURLLT applies the LT predicate on the "thumbnail_url" field.
+func ThumbnailURLLT(v string) predicate.Discussion {
+	return predicate.Discussion(sql.FieldLT(FieldThumbnailURL, v))
+}
+
+// ThumbnailURLLTE applies the LTE predicate on the "thumbnail_url" field.
+func ThumbnailURLLTE(v string) predicate.Discussion {
+	return predicate.Discussion(sql.FieldLTE(FieldThumbnailURL, v))
+}
+
+// ThumbnailURLContains applies the Contains predicate on the "thumbnail_url" field.
+func ThumbnailURLContains(v string) predicate.Discussion {
+	return predicate.Discussion(sql.FieldContains(FieldThumbnailURL, v))
+}
+
+// ThumbnailURLHasPrefix applies the HasPrefix predicate on the "thumbnail_url" field.
+func ThumbnailURLHasPrefix(v string) predicate.Discussion {
+	return predicate.Discussion(sql.FieldHasPrefix(FieldThumbnailURL, v))
+}
+
+// ThumbnailURLHasSuffix applies the HasSuffix predicate on the "thumbnail_url" field.
+func ThumbnailURLHasSuffix(v string) predicate.Discussion {
+	return predicate.Discussion(sql.FieldHasSuffix(FieldThumbnailURL, v))
+}
+
+// ThumbnailURLIsNil applies the IsNil predicate on the "thumbnail_url" field.
+func ThumbnailURLIsNil() predicate.Discussion {
+	return predicate.Discussion(sql.FieldIsNull(FieldThumbnailURL))
+}
+
+// ThumbnailURLNotNil applies the NotNil predicate on the "thumbnail_url" field.
+func ThumbnailURLNotNil() predicate.Discussion {
+	return predicate.Discussion(sql.FieldNotNull(FieldThumbnailURL))
+}
+
+// ThumbnailURLEqualFold applies the EqualFold predicate on the "thumbnail_url" field.
+func ThumbnailURLEqualFold(v string) predicate.Discussion {
+	return predicate.Discussion(sql.FieldEqualFold(FieldThumbnailURL, v))
+}
+
+// ThumbnailURLContainsFold applies the ContainsFold predicate on the "thumbnail_url" field.
+func ThumbnailURLContainsFold(v string) predicate.Discussion {
+	return predicate.Discussion(sql.FieldContainsFold(FieldThumbnailURL, v))
+}
+
+// TagsEQ applies the EQ predicate on the "tags" field.
+func TagsEQ(v pgarray.Text) predicate.Discussion {
+	return predicate.Discussion(sql.FieldEQ(FieldTags, v))
+}
+
+// TagsNEQ applies the NEQ predicate on the "tags" field.
+func TagsNEQ(v pgarray.Text) predicate.Discussion {
+	return predicate.Discussion(sql.FieldNEQ(FieldTags, v))
+}
+
+// TagsIn applies the In predicate on the "tags" field.
+func TagsIn(vs ...pgarray.Text) predicate.Discussion {
+	return predicate.Discussion(sql.FieldIn(FieldTags, vs...))
+}
+
+// TagsNotIn applies the NotIn predicate on the "tags" field.
+func TagsNotIn(vs ...pgarray.Text) predicate.Discussion {
+	return predicate.Discussion(sql.FieldNotIn(FieldTags, vs...))
+}
+
+// TagsGT applies the GT predicate on the "tags" field.
+func TagsGT(v pgarray.Text) predicate.Discussion {
+	return predicate.Discussion(sql.FieldGT(FieldTags, v))
+}
+
+// TagsGTE applies the GTE predicate on the "tags" field.
+func TagsGTE(v pgarray.Text) predicate.Discussion {
+	return predicate.Discussion(sql.FieldGTE(FieldTags, v))
+}
+
+// TagsLT applies the LT predicate on the "tags" field.
+func TagsLT(v pgarray.Text) predicate.Discussion {
+	return predicate.Discussion(sql.FieldLT(FieldTags, v))
+}
+
+// TagsLTE applies the LTE predicate on the "tags" field.
+func TagsLTE(v pgarray.Text) predicate.Discussion {
+	return predicate.Discussion(sql.FieldLTE(FieldTags, v))
+}
+
+// TagsIsNil applies the IsNil predicate on the "tags" field.
+func TagsIsNil() predicate.Discussion {
+	return predicate.Discussion(sql.FieldIsNull(FieldTags))
+}
+
+// TagsNotNil applies the NotNil predicate on the "tags" field.
+func TagsNotNil() predicate.Discussion {
+	return predicate.Discussion(sql.FieldNotNull(FieldTags))
 }
 
 // TeamIDEQ applies the EQ predicate on the "team_id" field.

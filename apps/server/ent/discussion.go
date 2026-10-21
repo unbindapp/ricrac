@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"ricrac/ent/discussion"
+	"ricrac/ent/schema/pgarray"
 	"ricrac/ent/team"
 	"ricrac/ent/user"
 	"ricrac/ent/workspace"
@@ -29,6 +30,10 @@ type Discussion struct {
 	Title string `json:"title,omitempty"`
 	// Body holds the value of the "body" field.
 	Body string `json:"body,omitempty"`
+	// ThumbnailURL holds the value of the "thumbnail_url" field.
+	ThumbnailURL *string `json:"thumbnail_url,omitempty"`
+	// Tags holds the value of the "tags" field.
+	Tags pgarray.Text `json:"tags,omitempty"`
 	// TeamID holds the value of the "team_id" field.
 	TeamID *uuid.UUID `json:"team_id,omitempty"`
 	// CreatorID holds the value of the "creator_id" field.
@@ -159,7 +164,9 @@ func (*Discussion) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case discussion.FieldTeamID, discussion.FieldCreatorID:
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case discussion.FieldSlugID, discussion.FieldTitle, discussion.FieldBody:
+		case discussion.FieldTags:
+			values[i] = new(pgarray.Text)
+		case discussion.FieldSlugID, discussion.FieldTitle, discussion.FieldBody, discussion.FieldThumbnailURL:
 			values[i] = new(sql.NullString)
 		case discussion.FieldPinnedAt, discussion.FieldClosedAt, discussion.FieldTrashedAt, discussion.FieldLastActivityAt, discussion.FieldCreatedAt, discussion.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -209,6 +216,19 @@ func (_m *Discussion) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field body", values[i])
 			} else if value.Valid {
 				_m.Body = value.String
+			}
+		case discussion.FieldThumbnailURL:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field thumbnail_url", values[i])
+			} else if value.Valid {
+				_m.ThumbnailURL = new(string)
+				*_m.ThumbnailURL = value.String
+			}
+		case discussion.FieldTags:
+			if value, ok := values[i].(*pgarray.Text); !ok {
+				return fmt.Errorf("unexpected type %T for field tags", values[i])
+			} else if value != nil {
+				_m.Tags = *value
 			}
 		case discussion.FieldTeamID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -350,6 +370,14 @@ func (_m *Discussion) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("body=")
 	builder.WriteString(_m.Body)
+	builder.WriteString(", ")
+	if v := _m.ThumbnailURL; v != nil {
+		builder.WriteString("thumbnail_url=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	builder.WriteString("tags=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Tags))
 	builder.WriteString(", ")
 	if v := _m.TeamID; v != nil {
 		builder.WriteString("team_id=")

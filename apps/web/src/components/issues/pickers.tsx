@@ -247,7 +247,7 @@ export function UserAvatar({
   size = "sm",
 }: {
   user: TAvatarUser;
-  size?: "xs" | "sm" | "md";
+  size?: "xs" | "sm" | "md" | "lg";
 }) {
   const looked = useAvatarUrl(user.avatarUrl === undefined ? user : null);
   return <Avatar id={user.id} name={userName(user)} src={user.avatarUrl ?? looked} size={size} />;

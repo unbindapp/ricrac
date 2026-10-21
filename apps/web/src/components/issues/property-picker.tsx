@@ -36,6 +36,8 @@ type TProps = {
   isPending?: boolean;
   emptyText?: string;
   searchPlaceholder?: string;
+  /** The search, when the picker controls it; pair it with onSearchChange. */
+  search?: string;
   onSearchChange?: (query: string) => void;
   disabled?: boolean;
   align?: "start" | "center" | "end";
@@ -58,6 +60,7 @@ export function PropertyPicker({
   isPending,
   emptyText = "No results",
   searchPlaceholder,
+  search,
   onSearchChange,
   disabled,
   align = "start",
@@ -95,6 +98,7 @@ export function PropertyPicker({
                 autoFocus
                 showSpinner={isPending}
                 placeholder={searchPlaceholder ?? `${label}…`}
+                value={search}
                 onValueChange={onSearchChange}
               />
               <ScrollArea className="max-h-72 min-h-0">

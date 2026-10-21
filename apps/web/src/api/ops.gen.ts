@@ -429,9 +429,12 @@ export type Discussion = {
   openThreadCount: number
   pinnedAt: string | null
   slugId: string
+  tags: string[]
   /** The team it belongs to; only that team's members see it. Null for the whole workspace. */
   team: TeamRef | null
   threadCount: number
+  /** The image the forum shows for it; null shows the first image in the body. */
+  thumbnailUrl: string | null
   title: string
   trashed: boolean
   trashedAt: string | null
@@ -453,11 +456,14 @@ export type DiscussionDetail = {
   pinnedAt: string | null
   slugId: string
   subscribers: UserRef[]
+  tags: string[]
   /** The team it belongs to; only that team's members see it. Null for the whole workspace. */
   team: TeamRef | null
   threadCount: number
   /** Oldest first. */
   threads: DiscussionThread[]
+  /** The image the forum shows for it; null shows the first image in the body. */
+  thumbnailUrl: string | null
   title: string
   trashed: boolean
   trashedAt: string | null
@@ -481,6 +487,12 @@ export type DiscussionSearchHit = {
   type: "discussion"
   updatedAt: string
   url: string
+}
+
+export type DiscussionTag = {
+  /** How many discussions have it. */
+  count: number
+  name: string
 }
 
 export type DiscussionThread = {
@@ -3162,8 +3174,17 @@ export type ListDiscussionsArgs = {
   query?: string | null
   /** open (default), closed or all. */
   status?: "open" | "closed" | "all" | null
+  /** Only the discussions with this tag. */
+  tag?: string | null
   /** Only the discussions of this team (key, name or id). */
   team?: string | null
+}
+
+export type ListDiscussionTagsArgs = {
+  /** The endCursor of the previous page, to continue after it. */
+  cursor?: string | null
+  /** How many to return, 50 by default, at most 250. */
+  limit?: number | null
 }
 
 export type GetDiscussionArgs = {
@@ -3209,8 +3230,12 @@ export type SaveDiscussionArgs = {
   pinned?: boolean | null
   /** People to unsubscribe: ids, names, emails or "me". */
   removeSubscribers?: string[]
+  /** All of its tags, replacing the ones it has; [] removes them. Lowercased, up to 10 of up to 32 characters. */
+  tags?: string[]
   /** The team it belongs to (key, name or id); only that team's members see it. null opens it to the whole workspace. */
   team?: string | null
+  /** Image URL the forum shows for it, such as an assetUrl from prepare_file_upload; null shows the first image in the body. */
+  thumbnailUrl?: string | null
   title?: string | null
 }
 
@@ -3983,6 +4008,10 @@ export interface Ops {
   reject_suggestion: { args: RejectSuggestionArgs; result: CommentDetail }
   list_discussions: { args: ListDiscussionsArgs; result: {
   nodes: Discussion[]
+  pageInfo: PageInfo
+} }
+  list_discussion_tags: { args: ListDiscussionTagsArgs; result: {
+  nodes: DiscussionTag[]
   pageInfo: PageInfo
 } }
   get_discussion: { args: GetDiscussionArgs; result: DiscussionDetail }

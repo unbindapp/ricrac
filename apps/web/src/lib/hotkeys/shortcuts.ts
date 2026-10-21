@@ -23,6 +23,7 @@ export const shortcutGroups: TShortcutGroup[] = [
       { label: "Open command panel", keys: ["Mod+K"] },
       { label: "Search", keys: ["/"] },
       { label: "New issue", keys: ["C"] },
+      { label: "Show or hide the sidebar", keys: ["["] },
       { label: "Keyboard shortcuts", keys: ["?"] },
     ],
   },

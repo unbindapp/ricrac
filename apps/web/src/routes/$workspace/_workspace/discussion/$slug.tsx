@@ -1,16 +1,28 @@
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
+import { MessagesSquareIcon } from "lucide-react";
 import { z } from "zod";
 
 import { DiscussionDetail } from "@/components/forum/discussion-detail";
+import { DiscussionThreads } from "@/components/forum/discussion-threads";
+import { MessageThreadPanel } from "@/components/forum/message-thread-panel";
 import { ThreadPanel } from "@/components/forum/thread-panel";
+import { ErrorCard } from "@/components/layout/error-card";
+import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { SplitView } from "@/components/layout/split-view";
+import { EntityNotFound } from "@/components/navigation/not-found-template";
 import { useDeviceSize } from "@/components/providers/device-size-provider";
+import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { discussionQuery } from "@/lib/queries/discussions";
+import { isMissing } from "@/lib/queries/projects";
 
 const searchSchema = z.object({
   /** The thread open beside the discussion. */
   thread: z.string().optional(),
+  /** The message whose replies are open beside the discussion. */
+  message: z.string().optional(),
 });
 
 export const Route = createFileRoute("/$workspace/_workspace/discussion/$slug")({
@@ -20,31 +32,73 @@ export const Route = createFileRoute("/$workspace/_workspace/discussion/$slug")(
 
 function DiscussionSlugPage() {
   const { slug } = Route.useParams();
-  const { thread } = Route.useSearch();
+  const { thread, message } = Route.useSearch();
   const navigate = Route.useNavigate();
+  const { workspace } = useWorkspace();
   const { size } = useDeviceSize();
+  const { data, isPending, error, refetch } = useQuery(discussionQuery(workspace.id, slug));
   const hasPanel = size === "lg" || size === "xl";
-  const closeThread = () =>
-    void navigate({ search: (prev) => ({ ...prev, thread: undefined }), replace: true });
+  const closePanel = () =>
+    void navigate({
+      search: (prev) => ({ ...prev, thread: undefined, message: undefined }),
+      replace: true,
+    });
+  const openMessage = (id: string) =>
+    void navigate({
+      search: (prev) => ({ ...prev, thread: undefined, message: id }),
+      replace: true,
+    });
 
-  if (thread && !hasPanel) {
+  if (isPending) {
     return (
       <PageContainer width="narrow">
-        <ThreadPanel key={thread} threadId={thread} onClose={closeThread} />
+        <ListSkeleton rows={4} />
       </PageContainer>
     );
   }
+  if (error) {
+    return (
+      <PageContainer width="narrow">
+        {isMissing(error) ? (
+          <EntityNotFound
+            Icon={MessagesSquareIcon}
+            description="Discussion not found. It was deleted, or you cannot see it."
+          />
+        ) : (
+          <ErrorCard message={error.message} onRetry={() => void refetch()} />
+        )}
+      </PageContainer>
+    );
+  }
+
+  const panel = thread ? (
+    <ThreadPanel key={thread} threadId={thread} onClose={closePanel} />
+  ) : message ? (
+    <MessageThreadPanel
+      key={message}
+      discussionId={data.id}
+      messageId={message}
+      onClose={closePanel}
+    />
+  ) : null;
+  if (panel && !hasPanel) return panel;
   return (
     <SplitView
-      storageKey="discussion-thread-width"
-      defaultAsideWidth={560}
+      storageKey="discussion-panel-width"
+      defaultAsideWidth={420}
       main={
-        <PageContainer width="narrow">
-          <DiscussionDetail key={slug} slug={slug} openThreadId={thread} />
-        </PageContainer>
+        <DiscussionDetail
+          key={data.id}
+          discussion={data}
+          showThreads={!hasPanel}
+          openMessageId={message}
+          onOpenMessage={openMessage}
+        />
       }
       aside={
-        thread ? <ThreadPanel key={thread} threadId={thread} onClose={closeThread} /> : undefined
+        hasPanel
+          ? (panel ?? <DiscussionThreads discussion={data} openThreadId={thread} variant="panel" />)
+          : undefined
       }
     />
   );

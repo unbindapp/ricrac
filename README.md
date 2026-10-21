@@ -39,9 +39,10 @@ operations and permissions.
   progress history.
 - **Documents** attached to projects, initiatives, teams, issues, cycles or releases, with
   version history, comments on passages in a sidebar and suggested edits to accept or reject.
-- **Forum** of discussions, for the workspace or one team, each with smaller threads for a bug,
-  a design check, a question, an idea or a task, which link to issues and get resolved.
-  Subscribers hear about new threads and comments.
+- **Forum** of discussions, for the workspace or one team, with tags to filter by and a
+  thumbnail, each a live chat whose messages take replies in their own thread, and with smaller
+  threads for a bug, a design check, a question, an idea or a task, which link to issues and get
+  resolved. Subscribers hear about new threads and comments.
 - **Custom views**, **favorites**, **templates** (issue templates with sub-issues, recurring
   issues on a schedule, project templates with milestones and issues, document templates), an **inbox** of notifications
   (read, archive, snooze), **customers** and customer requests, **releases** with pipelines,

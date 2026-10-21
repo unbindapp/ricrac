@@ -2,7 +2,9 @@ import { useNavigate } from "@tanstack/react-router";
 import { type ReactElement, useState } from "react";
 import { z } from "zod";
 
+import { DiscussionTagsPicker } from "@/components/forum/discussion-tags";
 import { DiscussionTeamPicker } from "@/components/forum/discussion-team-picker";
+import { ThumbnailPicker } from "@/components/forum/thumbnail-picker";
 import { useWorkspaceUsers } from "@/components/issues/picker-sources";
 import { MarkdownEditor } from "@/components/shared/markdown-editor";
 import { Button } from "@/components/ui/button";
@@ -57,6 +59,8 @@ function NewDiscussionForm({ defaultTeamId }: { defaultTeamId: string | null }) 
   const { mutateAsync: save } = useSaveDiscussionMutation(workspace.id);
   const [teamId, setTeamId] = useState(defaultTeamId);
   const [body, setBody] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const form = useAppForm({
     defaultValues: { title: "" },
     validators: { onSubmit: schema },
@@ -65,6 +69,8 @@ function NewDiscussionForm({ defaultTeamId }: { defaultTeamId: string | null }) 
         title: schema.parse(value).title,
         body,
         team: teamId,
+        tags,
+        thumbnailUrl,
       }).catch(() => null);
       if (!discussion) return;
       await navigate({
@@ -81,15 +87,23 @@ function NewDiscussionForm({ defaultTeamId }: { defaultTeamId: string | null }) 
           <field.TextField label="Title" placeholder="What do you want to talk about?" autoFocus />
         )}
       />
-      <div className="flex flex-col gap-1.5">
-        <span className="text-sm font-medium">Visible to</span>
-        <div className="flex">
-          <DiscussionTeamPicker
-            label="Visible to"
-            noneLabel="Whole workspace"
-            value={teamId}
-            onChange={setTeamId}
-          />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="flex min-w-0 flex-col gap-1.5">
+          <span className="text-sm font-medium">Visible to</span>
+          <div className="flex">
+            <DiscussionTeamPicker
+              label="Visible to"
+              noneLabel="Whole workspace"
+              value={teamId}
+              onChange={setTeamId}
+            />
+          </div>
+        </div>
+        <div className="flex min-w-0 flex-col gap-1.5">
+          <span className="text-sm font-medium">Tags</span>
+          <div className="flex">
+            <DiscussionTagsPicker value={tags} onChange={setTags} />
+          </div>
         </div>
       </div>
       <div className="flex flex-col gap-1.5">
@@ -103,6 +117,10 @@ function NewDiscussionForm({ defaultTeamId }: { defaultTeamId: string | null }) 
           {...uploads.editorProps}
           framed
         />
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <span className="text-sm font-medium">Thumbnail</span>
+        <ThumbnailPicker value={thumbnailUrl} onChange={setThumbnailUrl} body={body} />
       </div>
       <DialogFooter>
         <DialogClose

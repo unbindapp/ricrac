@@ -11,9 +11,14 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	oapi.Register(reg, oapi.Operation{
 		Name: "list_discussions", Access: auth.Read, Routes: []string{"GET /discussions"},
 		Description: "List the forum's discussions: pinned ones first, then the most recently active. Open ones by default; " +
-			"narrow by team, starter or words in the title or body. Each has its thread and comment counts; bodies are " +
+			"narrow by team, starter, tag or words in the title or body. Each has its thread and comment counts; bodies are " +
 			"left out unless includeBody is set.",
 	}, discussions.List)
+	oapi.Register(reg, oapi.Operation{
+		Name: "list_discussion_tags", Access: auth.Read, Routes: []string{"GET /discussion-tags"},
+		Description: "List the tags on the forum's discussions with how many have each, the most used first. Filter " +
+			"list_discussions by one with tag; set a discussion's tags with save_discussion.",
+	}, discussions.Tags)
 	oapi.Register(reg, oapi.Operation{
 		Name: "get_discussion", Access: auth.Read, Routes: []string{"GET /discussions/{id}"},
 		Description: "Read a discussion by id, slug, link or title: its Markdown body, its threads (bug, design, question, " +
@@ -23,9 +28,10 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	oapi.Register(reg, oapi.Operation{
 		Name: "save_discussion", Access: auth.Write, Routes: []string{"POST /discussions", "PATCH /discussions/{id}"},
 		Description: "Start a discussion in the forum (omit id; title is required) or update one (pass id). Use patch to edit " +
-			"part of the body. Pass team to keep it to a team's members. Pin, close, subscribe and unsubscribe people. " +
+			"part of the body. Pass team to keep it to a team's members. Tag it, give it a thumbnail, pin, close, subscribe " +
+			"and unsubscribe people. " +
 			"Starting, commenting and being mentioned subscribe you; subscribers hear about new threads and comments. " +
-			"Only the author or an admin changes the title, body or team.",
+			"Only the author or an admin changes the title, body, thumbnail or team.",
 	}, discussions.Save)
 	oapi.Register(reg, oapi.Operation{
 		Name: "delete_discussion", Access: auth.Write, Routes: []string{"DELETE /discussions/{id}"},

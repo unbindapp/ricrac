@@ -10,6 +10,7 @@ import (
 	"ricrac/ent/discussion"
 	"ricrac/ent/discussionthread"
 	"ricrac/ent/notification"
+	"ricrac/ent/schema/pgarray"
 	"ricrac/ent/team"
 	"ricrac/ent/user"
 	"ricrac/ent/workspace"
@@ -59,6 +60,26 @@ func (_c *DiscussionCreate) SetNillableBody(v *string) *DiscussionCreate {
 	if v != nil {
 		_c.SetBody(*v)
 	}
+	return _c
+}
+
+// SetThumbnailURL sets the "thumbnail_url" field.
+func (_c *DiscussionCreate) SetThumbnailURL(v string) *DiscussionCreate {
+	_c.mutation.SetThumbnailURL(v)
+	return _c
+}
+
+// SetNillableThumbnailURL sets the "thumbnail_url" field if the given value is not nil.
+func (_c *DiscussionCreate) SetNillableThumbnailURL(v *string) *DiscussionCreate {
+	if v != nil {
+		_c.SetThumbnailURL(*v)
+	}
+	return _c
+}
+
+// SetTags sets the "tags" field.
+func (_c *DiscussionCreate) SetTags(v pgarray.Text) *DiscussionCreate {
+	_c.mutation.SetTags(v)
 	return _c
 }
 
@@ -366,6 +387,14 @@ func (_c *DiscussionCreate) createSpec() (*Discussion, *sqlgraph.CreateSpec) {
 		_spec.SetField(discussion.FieldBody, field.TypeString, value)
 		_node.Body = value
 	}
+	if value, ok := _c.mutation.ThumbnailURL(); ok {
+		_spec.SetField(discussion.FieldThumbnailURL, field.TypeString, value)
+		_node.ThumbnailURL = &value
+	}
+	if value, ok := _c.mutation.Tags(); ok {
+		_spec.SetField(discussion.FieldTags, field.TypeOther, value)
+		_node.Tags = value
+	}
 	if value, ok := _c.mutation.PinnedAt(); ok {
 		_spec.SetField(discussion.FieldPinnedAt, field.TypeTime, value)
 		_node.PinnedAt = &value
@@ -608,6 +637,42 @@ func (u *DiscussionUpsert) UpdateBody() *DiscussionUpsert {
 // ClearBody clears the value of the "body" field.
 func (u *DiscussionUpsert) ClearBody() *DiscussionUpsert {
 	u.SetNull(discussion.FieldBody)
+	return u
+}
+
+// SetThumbnailURL sets the "thumbnail_url" field.
+func (u *DiscussionUpsert) SetThumbnailURL(v string) *DiscussionUpsert {
+	u.Set(discussion.FieldThumbnailURL, v)
+	return u
+}
+
+// UpdateThumbnailURL sets the "thumbnail_url" field to the value that was provided on create.
+func (u *DiscussionUpsert) UpdateThumbnailURL() *DiscussionUpsert {
+	u.SetExcluded(discussion.FieldThumbnailURL)
+	return u
+}
+
+// ClearThumbnailURL clears the value of the "thumbnail_url" field.
+func (u *DiscussionUpsert) ClearThumbnailURL() *DiscussionUpsert {
+	u.SetNull(discussion.FieldThumbnailURL)
+	return u
+}
+
+// SetTags sets the "tags" field.
+func (u *DiscussionUpsert) SetTags(v pgarray.Text) *DiscussionUpsert {
+	u.Set(discussion.FieldTags, v)
+	return u
+}
+
+// UpdateTags sets the "tags" field to the value that was provided on create.
+func (u *DiscussionUpsert) UpdateTags() *DiscussionUpsert {
+	u.SetExcluded(discussion.FieldTags)
+	return u
+}
+
+// ClearTags clears the value of the "tags" field.
+func (u *DiscussionUpsert) ClearTags() *DiscussionUpsert {
+	u.SetNull(discussion.FieldTags)
 	return u
 }
 
@@ -863,6 +928,48 @@ func (u *DiscussionUpsertOne) UpdateBody() *DiscussionUpsertOne {
 func (u *DiscussionUpsertOne) ClearBody() *DiscussionUpsertOne {
 	return u.Update(func(s *DiscussionUpsert) {
 		s.ClearBody()
+	})
+}
+
+// SetThumbnailURL sets the "thumbnail_url" field.
+func (u *DiscussionUpsertOne) SetThumbnailURL(v string) *DiscussionUpsertOne {
+	return u.Update(func(s *DiscussionUpsert) {
+		s.SetThumbnailURL(v)
+	})
+}
+
+// UpdateThumbnailURL sets the "thumbnail_url" field to the value that was provided on create.
+func (u *DiscussionUpsertOne) UpdateThumbnailURL() *DiscussionUpsertOne {
+	return u.Update(func(s *DiscussionUpsert) {
+		s.UpdateThumbnailURL()
+	})
+}
+
+// ClearThumbnailURL clears the value of the "thumbnail_url" field.
+func (u *DiscussionUpsertOne) ClearThumbnailURL() *DiscussionUpsertOne {
+	return u.Update(func(s *DiscussionUpsert) {
+		s.ClearThumbnailURL()
+	})
+}
+
+// SetTags sets the "tags" field.
+func (u *DiscussionUpsertOne) SetTags(v pgarray.Text) *DiscussionUpsertOne {
+	return u.Update(func(s *DiscussionUpsert) {
+		s.SetTags(v)
+	})
+}
+
+// UpdateTags sets the "tags" field to the value that was provided on create.
+func (u *DiscussionUpsertOne) UpdateTags() *DiscussionUpsertOne {
+	return u.Update(func(s *DiscussionUpsert) {
+		s.UpdateTags()
+	})
+}
+
+// ClearTags clears the value of the "tags" field.
+func (u *DiscussionUpsertOne) ClearTags() *DiscussionUpsertOne {
+	return u.Update(func(s *DiscussionUpsert) {
+		s.ClearTags()
 	})
 }
 
@@ -1309,6 +1416,48 @@ func (u *DiscussionUpsertBulk) UpdateBody() *DiscussionUpsertBulk {
 func (u *DiscussionUpsertBulk) ClearBody() *DiscussionUpsertBulk {
 	return u.Update(func(s *DiscussionUpsert) {
 		s.ClearBody()
+	})
+}
+
+// SetThumbnailURL sets the "thumbnail_url" field.
+func (u *DiscussionUpsertBulk) SetThumbnailURL(v string) *DiscussionUpsertBulk {
+	return u.Update(func(s *DiscussionUpsert) {
+		s.SetThumbnailURL(v)
+	})
+}
+
+// UpdateThumbnailURL sets the "thumbnail_url" field to the value that was provided on create.
+func (u *DiscussionUpsertBulk) UpdateThumbnailURL() *DiscussionUpsertBulk {
+	return u.Update(func(s *DiscussionUpsert) {
+		s.UpdateThumbnailURL()
+	})
+}
+
+// ClearThumbnailURL clears the value of the "thumbnail_url" field.
+func (u *DiscussionUpsertBulk) ClearThumbnailURL() *DiscussionUpsertBulk {
+	return u.Update(func(s *DiscussionUpsert) {
+		s.ClearThumbnailURL()
+	})
+}
+
+// SetTags sets the "tags" field.
+func (u *DiscussionUpsertBulk) SetTags(v pgarray.Text) *DiscussionUpsertBulk {
+	return u.Update(func(s *DiscussionUpsert) {
+		s.SetTags(v)
+	})
+}
+
+// UpdateTags sets the "tags" field to the value that was provided on create.
+func (u *DiscussionUpsertBulk) UpdateTags() *DiscussionUpsertBulk {
+	return u.Update(func(s *DiscussionUpsert) {
+		s.UpdateTags()
+	})
+}
+
+// ClearTags clears the value of the "tags" field.
+func (u *DiscussionUpsertBulk) ClearTags() *DiscussionUpsertBulk {
+	return u.Update(func(s *DiscussionUpsert) {
+		s.ClearTags()
 	})
 }
 

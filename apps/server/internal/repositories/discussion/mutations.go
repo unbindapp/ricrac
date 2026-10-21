@@ -9,6 +9,7 @@ import (
 	"ricrac/ent"
 	"ricrac/ent/discussionsubscriber"
 	"ricrac/ent/discussionthread"
+	"ricrac/ent/schema/pgarray"
 	repository "ricrac/internal/repositories"
 )
 
@@ -19,12 +20,14 @@ type CreateInput struct {
 	Body      string
 	Team      *uuid.UUID
 	Creator   uuid.UUID
+	Thumbnail *string
+	Tags      []string
 }
 
 func (self *DiscussionRepository) Create(ctx context.Context, tx repository.TxInterface, input CreateInput) (uuid.UUID, error) {
 	created, err := self.base.Client(tx).Discussion.Create().
 		SetWorkspaceID(input.Workspace).SetSlugID(input.SlugID).SetTitle(input.Title).SetBody(input.Body).
-		SetNillableTeamID(input.Team).SetCreatorID(input.Creator).Save(ctx)
+		SetNillableTeamID(input.Team).SetNillableThumbnailURL(input.Thumbnail).SetTags(pgarray.Text(input.Tags)).SetCreatorID(input.Creator).Save(ctx)
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -33,6 +36,18 @@ func (self *DiscussionRepository) Create(ctx context.Context, tx repository.TxIn
 
 func (self *DiscussionRepository) SetText(ctx context.Context, tx repository.TxInterface, id uuid.UUID, title, body string) error {
 	return self.base.Client(tx).Discussion.UpdateOneID(id).SetTitle(title).SetBody(body).Exec(ctx)
+}
+
+func (self *DiscussionRepository) SetThumbnail(ctx context.Context, tx repository.TxInterface, id uuid.UUID, url *string) error {
+	update := self.base.Client(tx).Discussion.UpdateOneID(id)
+	if url == nil {
+		return update.ClearThumbnailURL().Exec(ctx)
+	}
+	return update.SetThumbnailURL(*url).Exec(ctx)
+}
+
+func (self *DiscussionRepository) SetTags(ctx context.Context, tx repository.TxInterface, id uuid.UUID, tags []string) error {
+	return self.base.Client(tx).Discussion.UpdateOneID(id).SetTags(pgarray.Text(tags)).Exec(ctx)
 }
 
 func (self *DiscussionRepository) SetTeam(ctx context.Context, tx repository.TxInterface, id uuid.UUID, team *uuid.UUID) error {

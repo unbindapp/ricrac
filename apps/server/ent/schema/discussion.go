@@ -7,6 +7,8 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
+
+	"ricrac/ent/schema/pgarray"
 )
 
 type Discussion struct {
@@ -20,6 +22,8 @@ func (Discussion) Fields() []ent.Field {
 		field.Text("slug_id"),
 		field.Text("title"),
 		field.Text("body").Optional(),
+		field.Text("thumbnail_url").Optional().Nillable(),
+		field.Other("tags", pgarray.Text{}).SchemaType(textArray).Optional(),
 		field.UUID("team_id", uuid.UUID{}).Optional().Nillable(),
 		field.UUID("creator_id", uuid.UUID{}).Optional().Nillable(),
 		field.Time("pinned_at").Optional().Nillable(),
