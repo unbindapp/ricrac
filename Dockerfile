@@ -4,7 +4,7 @@ WORKDIR /app/apps/web
 COPY apps/web/package.json apps/web/bun.lock ./
 RUN bun install --frozen-lockfile
 COPY apps/web ./
-RUN bun run build
+RUN bun x vite build
 
 # ---------- server (embeds the web build) ----------
 FROM golang:1.27-alpine AS server
