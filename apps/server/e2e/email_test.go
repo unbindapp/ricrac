@@ -61,20 +61,19 @@ func TestUnreadNotificationsAreEmailedAsADigest(t *testing.T) {
 	sendEmails(t, w)
 	eq(t, len(box.sent), 0, "notifications wait a moment in case they're read")
 
-	w.exec("UPDATE notifications SET created_at = created_at - interval '3 minutes'")
+	w.exec("UPDATE notifications SET created_at = created_at - interval '6 minutes'")
 	w.exec("UPDATE notifications SET read_at = now() WHERE issue_id = (SELECT id FROM issues WHERE number = 2)")
 	sendEmails(t, w)
 	toBob := box.to("bob@acme.test")
 	eq(t, len(toBob), 1)
 	email := toBob[0]
-	eq(t, email.Subject, "2 unread notifications")
+	eq(t, email.Subject, "ENG-1 Fix login: Ann Smith assigned the issue to you (+1 more)")
 	contains(t, email.Text,
 		"You have 2 unread notifications in Acme.",
 		"ENG-1 Fix login",
 		"Ann Smith assigned the issue to you",
 		"Ann Smith moved the issue to In Progress",
 		"http://localhost:3000/acme/issue/ENG-1",
-		"http://localhost:3000/acme/inbox",
 	)
 	check(t, !strings.Contains(email.Text, "Billing"), "read notifications aren't emailed")
 	eq(t, len(box.to("cat@acme.test")), 0, "Cat turned emails off")
@@ -83,13 +82,57 @@ func TestUnreadNotificationsAreEmailedAsADigest(t *testing.T) {
 	eq(t, len(box.sent), 1, "each notification is emailed once")
 }
 
+func TestDigestsComeAtMostHourlyAndQuoteComments(t *testing.T) {
+	w := world(t)
+	box := &outbox{}
+	w.B.SetMailer(box)
+	w.member("bob@acme.test", "Bob Jones", "member")
+	age := func() { w.exec("UPDATE notifications SET created_at = created_at - interval '6 minutes'") }
+	call(t, w.Ann, "save_issue", M{"title": "Fix login", "assignee": "bob"})
+	age()
+	sendEmails(t, w)
+	eq(t, len(box.to("bob@acme.test")), 1)
+
+	call(t, w.Ann, "save_comment", M{"issueId": "ENG-1", "body": "Looks **good**, see [the doc](http://x.test/doc)"})
+	call(t, w.Ann, "save_comment", M{"issueId": "ENG-1", "body": "Also the logout button"})
+	age()
+	sendEmails(t, w)
+	eq(t, len(box.to("bob@acme.test")), 1, "comments wait for the hour since the last digest")
+
+	w.exec("UPDATE notifications SET emailed_at = emailed_at - interval '1 hour'")
+	sendEmails(t, w)
+	toBob := box.to("bob@acme.test")
+	eq(t, len(toBob), 2)
+	eq(t, toBob[1].Subject, "ENG-1 Fix login: Ann Smith commented (+1 more)")
+	contains(t, toBob[1].Text,
+		"Ann Smith commented\n    > Looks good, see the doc\n",
+		"Ann Smith commented\n    > Also the logout button\n",
+	)
+	check(t, !strings.Contains(toBob[1].Text, "inbox"), "the digest carries the comments, not a link to the inbox")
+}
+
+func TestDigestsLinkDiscussionThreads(t *testing.T) {
+	w := world(t)
+	box := &outbox{}
+	w.B.SetMailer(box)
+	bob := w.member("bob@acme.test", "Bob Jones", "member")
+	call(t, w.Ann, "save_discussion", M{"title": "Q4 launch", "body": "Plan it"})
+	thread := call(t, bob, "save_discussion_thread", M{"discussion": "Q4 launch", "kind": "bug", "title": "Button misaligned", "body": "Off by 2px"})
+	w.exec("UPDATE notifications SET created_at = created_at - interval '6 minutes'")
+	sendEmails(t, w)
+	toAnn := box.to("ann@acme.test")
+	eq(t, len(toAnn), 1)
+	eq(t, toAnn[0].Subject, "Button misaligned: Bob Jones started a thread")
+	contains(t, toAnn[0].Text, "    > Off by 2px\n", thread.At("url").Str())
+}
+
 func TestFailedEmailsAreRetried(t *testing.T) {
 	w := world(t)
 	box := &outbox{fail: true}
 	w.B.SetMailer(box)
 	w.member("bob@acme.test", "Bob Jones", "member")
 	call(t, w.Ann, "save_issue", M{"title": "Fix login", "assignee": "bob"})
-	w.exec("UPDATE notifications SET created_at = created_at - interval '3 minutes'")
+	w.exec("UPDATE notifications SET created_at = created_at - interval '6 minutes'")
 	sendEmails(t, w)
 	eq(t, len(box.sent), 0)
 	eqList(t, w.strings("SELECT error FROM emails"), []string{"smtp is down"})

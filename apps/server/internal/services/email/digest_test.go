@@ -1,6 +1,7 @@
 package email_service
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/google/uuid"
@@ -22,9 +23,9 @@ func TestDigestGathersNotificationsPerSubject(t *testing.T) {
 		n("issueStatusChanged", "ENG-1 moved to In Progress"),
 	}, "http://localhost:3000")
 	assert.Equal(t, "bob@acme.test", to)
-	assert.Equal(t, "2 unread notifications", content.Subject)
+	assert.Equal(t, "ENG-1 Fix login: Ann Smith assigned the issue to you (+1 more)", content.Subject)
 	assert.Equal(t, "You have 2 unread notifications in Acme.", content.Heading)
-	assert.Equal(t, "http://localhost:3000/acme/inbox", content.Button.URL)
+	assert.Empty(t, content.Button.URL)
 	assert.Len(t, content.Items, 1)
 	assert.Equal(t, "ENG-1", content.Items[0].Identifier)
 	assert.Equal(t, []string{"assigned the issue to you", "moved the issue to In Progress"},
@@ -49,6 +50,14 @@ func TestDigestOfManyWorkspacesLinksTheInstance(t *testing.T) {
 	content, _ := digest(batch, "http://localhost:3000")
 	assert.Equal(t, "You have 23 unread notifications.", content.Heading)
 	assert.Equal(t, "http://localhost:3000", content.Button.URL)
+	assert.Equal(t, "See all 23 in your inbox", content.Button.Label)
 	assert.Len(t, content.Items, digestMaxItems)
-	assert.Equal(t, "And 3 more in your inbox.", content.Note)
+}
+
+func TestExcerptIsTheStartOfTheMarkdownAsText(t *testing.T) {
+	assert.Equal(t, "Looks good, see the doc and [shot.png]\n\nShip it\n[image]",
+		excerpt("## Looks **good**, see [the doc](http://x/doc) and ![shot.png](http://x/a.png)\r\n\n\n\n> Ship `it`\n![](http://x/b.png)"))
+	long := excerpt(strings.Repeat("word ", 200))
+	assert.Len(t, []rune(long), excerptLength)
+	assert.True(t, strings.HasSuffix(long, "word…"))
 }

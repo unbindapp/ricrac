@@ -43,13 +43,13 @@ func (self *EmailRepository) Names(ctx context.Context, tx repository.TxInterfac
 	return inviter.Name, found.Name, nil
 }
 
-// PendingNotifications is the notifications created between after and before that are still
-// unread, unarchived, not snoozed and not emailed, of people who get emails, by person then
-// time, with what a digest shows of them. They stay locked until the transaction ends; ones
-// locked elsewhere are skipped.
-func (self *EmailRepository) PendingNotifications(ctx context.Context, tx repository.TxInterface, after, before time.Time) ([]*ent.Notification, error) {
+// PendingNotifications is the notifications created since after that are still unread,
+// unarchived, not snoozed and not emailed, of people who get emails, by person then time, with
+// what a digest shows of them. They stay locked until the transaction ends; ones locked elsewhere
+// are skipped.
+func (self *EmailRepository) PendingNotifications(ctx context.Context, tx repository.TxInterface, after time.Time) ([]*ent.Notification, error) {
 	return self.base.Client(tx).Notification.Query().
-		Where(notification.EmailedAtIsNil(), notification.CreatedAtLTE(before), notification.CreatedAtGT(after),
+		Where(notification.EmailedAtIsNil(), notification.CreatedAtGT(after),
 			notification.ReadAtIsNil(), notification.ArchivedAtIsNil(),
 			func(s *entsql.Selector) {
 				s.Where(repository.Raw(s.C(notification.FieldSnoozedUntil) + " IS NULL OR " + s.C(notification.FieldSnoozedUntil) + " <= now()"))
@@ -57,16 +57,34 @@ func (self *EmailRepository) PendingNotifications(ctx context.Context, tx reposi
 			notification.HasUserWith(user.EmailNotifications(true))).
 		Order(ent.Asc(notification.FieldUserID), ent.Asc(notification.FieldCreatedAt)).
 		ForUpdate(entsql.WithLockAction(entsql.SkipLocked), entsql.WithLockTables(notification.Table)).
-		WithUser().WithWorkspace().WithActor().
+		WithUser().WithWorkspace().WithActor().WithComment().WithStatusUpdate().
 		WithIssue(func(q *ent.IssueQuery) { q.WithTeam() }).
-		WithProject().WithInitiative().WithDocument().
+		WithProject().WithInitiative().WithDocument().WithDiscussion().
+		WithDiscussionThread(func(q *ent.DiscussionThreadQuery) { q.WithDiscussion() }).
 		All(ctx)
 }
 
-// MarkEmailed marks the notifications created until before as emailed.
-func (self *EmailRepository) MarkEmailed(ctx context.Context, tx repository.TxInterface, before, now time.Time) error {
-	_, err := self.base.Client(tx).Notification.Update().
-		Where(notification.EmailedAtIsNil(), notification.CreatedAtLTE(before)).SetEmailedAt(now).Save(ctx)
+// LastEmailed is when each of users was last emailed a digest, for those who ever were.
+func (self *EmailRepository) LastEmailed(ctx context.Context, tx repository.TxInterface, users []uuid.UUID) (map[uuid.UUID]time.Time, error) {
+	var rows []struct {
+		UserID uuid.UUID `json:"user_id"`
+		Max    time.Time `json:"max"`
+	}
+	err := self.base.Client(tx).Notification.Query().
+		Where(notification.UserIDIn(users...), notification.EmailedAtNotNil()).
+		GroupBy(notification.FieldUserID).Aggregate(ent.Max(notification.FieldEmailedAt)).Scan(ctx, &rows)
+	if err != nil {
+		return nil, err
+	}
+	last := make(map[uuid.UUID]time.Time, len(rows))
+	for _, row := range rows {
+		last[row.UserID] = row.Max
+	}
+	return last, nil
+}
+
+func (self *EmailRepository) MarkEmailed(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID, now time.Time) error {
+	_, err := self.base.Client(tx).Notification.Update().Where(notification.IDIn(ids...)).SetEmailedAt(now).Save(ctx)
 	return err
 }
 

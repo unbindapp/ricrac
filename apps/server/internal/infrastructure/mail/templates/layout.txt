@@ -4,7 +4,8 @@
 {{end}}{{range .Items}}
 {{if .Identifier}}{{.Identifier}} {{end}}{{.Title}}
 {{range .Lines}}    {{if .ActorName}}{{.ActorName}} {{end}}{{.Text}}
-{{end}}{{if .URL}}    {{.URL}}
+{{if .Excerpt}}{{range lines .Excerpt}}    > {{.}}
+{{end}}{{end}}{{end}}{{if .URL}}    {{.URL}}
 {{end}}{{end}}{{if .Button.URL}}
 {{.Button.Label}}
 {{.Button.URL}}

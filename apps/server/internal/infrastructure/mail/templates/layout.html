@@ -54,7 +54,8 @@ img { border: 0; outline: none; text-decoration: none; -ms-interpolation-mode: b
 {{if .Lines}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-top:8px;">
 {{range .Lines}}<tr><td width="20" valign="top" style="width:20px;padding:4px 10px 4px 0;vertical-align:top;">
 {{if .ActorName}}{{$color := avatarColor .ActorID}}<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate;"><tr><td width="20" height="20" align="center" valign="middle" bgcolor="{{$color}}" style="width:20px;height:20px;border-radius:10px;background-color:{{$color}};color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:9px;line-height:20px;font-weight:600;text-align:center;mso-line-height-rule:exactly;">{{.ActorInitials}}</td></tr></table>
-{{else}}&nbsp;{{end}}</td><td class="rr-body" valign="top" style="padding:4px 0;vertical-align:top;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:20px;color:#30353f;">{{if .ActorName}}<span class="rr-strong" style="font-weight:600;color:#0f131a;">{{.ActorName}}</span> {{end}}{{.Text}}</td></tr>
+{{else}}&nbsp;{{end}}</td><td class="rr-body" valign="top" style="padding:4px 0;vertical-align:top;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:20px;color:#30353f;">{{if .ActorName}}<span class="rr-strong" style="font-weight:600;color:#0f131a;">{{.ActorName}}</span> {{end}}{{.Text}}{{if .Excerpt}}
+<div class="rr-body rr-rule" style="margin-top:6px;padding:2px 0 2px 12px;border-left:2px solid #e2e4e9;font-size:14px;line-height:21px;color:#30353f;white-space:pre-line;">{{.Excerpt}}</div>{{end}}</td></tr>
 {{end}}</table>
 {{end}}</td></tr>
 {{end}}<tr><td class="rr-rule" style="border-top:1px solid #e2e4e9;font-size:0;line-height:0;">&nbsp;</td></tr>

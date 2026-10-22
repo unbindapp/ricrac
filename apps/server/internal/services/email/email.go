@@ -1,6 +1,6 @@
 // Package email_service queues emails in the transaction of the change that causes them and
 // sends them from a job, so they only go out when the change happened. Notifications become
-// digests: those still unread after a couple of minutes are gathered per person into one email.
+// digests: a person's unread ones are gathered into one email at most every digestInterval.
 package email_service
 
 import (
@@ -11,6 +11,8 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/google/uuid"
+
 	"ricrac/config"
 	"ricrac/internal/auth"
 	"ricrac/internal/infrastructure/mail"
@@ -19,9 +21,11 @@ import (
 )
 
 const (
-	digestDelay    = 2 * time.Minute
+	digestDelay    = 5 * time.Minute
+	digestInterval = time.Hour
 	digestMaxAge   = 24 * time.Hour
 	digestMaxItems = 20
+	excerptLength  = 400
 	sendAttempts   = 5
 )
 
@@ -115,38 +119,50 @@ func (self *EmailService) SendEmails(ctx context.Context) error {
 
 func (self *EmailService) queueDigests(ctx context.Context) error {
 	return self.repo.WithTx(ctx, func(tx repository.TxInterface) error {
-		cutoff := time.Now().Add(-digestDelay)
-		notifications, err := self.repo.Email().PendingNotifications(ctx, tx, time.Now().Add(-digestMaxAge), cutoff)
-		if err != nil {
+		notifications, err := self.repo.Email().PendingNotifications(ctx, tx, time.Now().Add(-digestMaxAge))
+		if err != nil || len(notifications) == 0 {
 			return err
 		}
-		var batch []notice
-		flush := func() error {
-			if len(batch) == 0 {
-				return nil
-			}
-			content, to := digest(batch, self.cfg.PublicURL)
-			batch = nil
-			return self.queue(ctx, tx, to, content)
-		}
+		var users []uuid.UUID
+		batches := map[uuid.UUID][]notice{}
 		for _, n := range notifications {
 			pending := noticeOf(n, self.cfg.PublicURL)
-			if len(batch) > 0 && batch[0].UserID != pending.UserID {
-				if err := flush(); err != nil {
-					return err
-				}
+			if _, seen := batches[pending.UserID]; !seen {
+				users = append(users, pending.UserID)
 			}
-			batch = append(batch, pending)
+			batches[pending.UserID] = append(batches[pending.UserID], pending)
 		}
-		if err := flush(); err != nil {
+		lastEmailed, err := self.repo.Email().LastEmailed(ctx, tx, users)
+		if err != nil {
 			return err
 		}
 		now, err := self.repo.Now(ctx, tx)
 		if err != nil {
 			return err
 		}
-		return self.repo.Email().MarkEmailed(ctx, tx, cutoff, now)
+		var emailed []uuid.UUID
+		for _, user := range users {
+			batch := batches[user]
+			if !digestDue(batch[0].CreatedAt, lastEmailed[user], now) {
+				continue
+			}
+			content, to := digest(batch, self.cfg.PublicURL)
+			if err := self.queue(ctx, tx, to, content); err != nil {
+				return err
+			}
+			for _, n := range batch {
+				emailed = append(emailed, n.ID)
+			}
+		}
+		if len(emailed) == 0 {
+			return nil
+		}
+		return self.repo.Email().MarkEmailed(ctx, tx, emailed, now)
 	})
+}
+
+func digestDue(oldest, lastEmailed, now time.Time) bool {
+	return now.Sub(oldest) >= digestDelay && now.Sub(lastEmailed) >= digestInterval
 }
 
 func (self *EmailService) sendQueued(ctx context.Context) error {

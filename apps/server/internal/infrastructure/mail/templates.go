@@ -22,13 +22,17 @@ var layoutFuncs = htmltemplate.FuncMap{
 	"preheaderSpacer": constHTML(strings.Repeat("&zwnj;&nbsp;", 90)),
 }
 
+func splitLines(text string) []string {
+	return strings.Split(text, "\n")
+}
+
 func constHTML(markup string) func() htmltemplate.HTML {
 	return func() htmltemplate.HTML { return htmltemplate.HTML(markup) }
 }
 
 var (
 	htmlTemplate = htmltemplate.Must(htmltemplate.New("layout.html").Funcs(layoutFuncs).ParseFS(templateFS, "templates/layout.html"))
-	textTemplate = texttemplate.Must(texttemplate.ParseFS(templateFS, "templates/layout.txt"))
+	textTemplate = texttemplate.Must(texttemplate.New("layout.txt").Funcs(texttemplate.FuncMap{"lines": splitLines}).ParseFS(templateFS, "templates/layout.txt"))
 	logoPNG      = mustRead("templates/" + logoName)
 )
 
@@ -65,6 +69,7 @@ type Line struct {
 	ActorName     string `json:"actorName,omitempty"`
 	ActorInitials string `json:"actorInitials,omitempty"`
 	Text          string `json:"text"`
+	Excerpt       string `json:"excerpt,omitempty"`
 }
 
 type Button struct {
