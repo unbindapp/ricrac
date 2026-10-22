@@ -18,7 +18,7 @@ import { meQuery } from "@/lib/queries/me";
 
 const title = "Connected GitHub account";
 const description =
-  "Pull requests, comments and assignments on GitHub show as yours, and issues assigned to you on GitHub are assigned to you here.";
+  "Your comments on synced issues post on GitHub as you. Pull requests, comments and assignments on GitHub show as yours, and issues assigned to you on GitHub are assigned to you here.";
 
 /** Links your GitHub account in profile settings. */
 export function GithubAccountSection() {
@@ -71,17 +71,29 @@ export function GithubAccountSection() {
       title={title}
       description={description}
       actions={
-        <ConfirmDialog
-          trigger={
-            <Button size="sm" variant="outline">
-              Disconnect
+        <>
+          {!me?.githubAuthorized && (
+            <Button
+              size="sm"
+              variant="outline"
+              render={<a href={githubAccountConnectHref(pathname)} />}
+            >
+              <GithubIcon />
+              Reconnect
             </Button>
-          }
-          title="Disconnect your GitHub account"
-          description={`GitHub activity of @${login} stops showing as yours. You can link it again any time.`}
-          confirmLabel="Disconnect GitHub account"
-          onConfirm={() => unlink()}
-        />
+          )}
+          <ConfirmDialog
+            trigger={
+              <Button size="sm" variant="outline">
+                Disconnect
+              </Button>
+            }
+            title="Disconnect your GitHub account"
+            description={`GitHub activity of @${login} stops showing as yours, and your comments post on GitHub as Ricrac. You can link it again any time.`}
+            confirmLabel="Disconnect GitHub account"
+            onConfirm={() => unlink()}
+          />
+        </>
       }
     >
       <div className="flex items-center gap-2 text-sm">
@@ -95,6 +107,11 @@ export function GithubAccountSection() {
           @{login}
         </a>
       </div>
+      {!me?.githubAuthorized && (
+        <p className="text-muted-foreground text-xs">
+          Reconnect so your comments post on GitHub as @{login} instead of Ricrac.
+        </p>
+      )}
     </SettingsSection>
   );
 }

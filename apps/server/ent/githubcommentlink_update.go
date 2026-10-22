@@ -86,6 +86,26 @@ func (_u *GithubCommentLinkUpdate) ClearPosted() *GithubCommentLinkUpdate {
 	return _u
 }
 
+// SetPostedAs sets the "posted_as" field.
+func (_u *GithubCommentLinkUpdate) SetPostedAs(v uuid.UUID) *GithubCommentLinkUpdate {
+	_u.mutation.SetPostedAs(v)
+	return _u
+}
+
+// SetNillablePostedAs sets the "posted_as" field if the given value is not nil.
+func (_u *GithubCommentLinkUpdate) SetNillablePostedAs(v *uuid.UUID) *GithubCommentLinkUpdate {
+	if v != nil {
+		_u.SetPostedAs(*v)
+	}
+	return _u
+}
+
+// ClearPostedAs clears the value of the "posted_as" field.
+func (_u *GithubCommentLinkUpdate) ClearPostedAs() *GithubCommentLinkUpdate {
+	_u.mutation.ClearPostedAs()
+	return _u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_u *GithubCommentLinkUpdate) SetCreatedAt(v time.Time) *GithubCommentLinkUpdate {
 	_u.mutation.SetCreatedAt(v)
@@ -186,6 +206,12 @@ func (_u *GithubCommentLinkUpdate) sqlSave(ctx context.Context) (_node int, err 
 	}
 	if _u.mutation.PostedCleared() {
 		_spec.ClearField(githubcommentlink.FieldPosted, field.TypeBool)
+	}
+	if value, ok := _u.mutation.PostedAs(); ok {
+		_spec.SetField(githubcommentlink.FieldPostedAs, field.TypeUUID, value)
+	}
+	if _u.mutation.PostedAsCleared() {
+		_spec.ClearField(githubcommentlink.FieldPostedAs, field.TypeUUID)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(githubcommentlink.FieldCreatedAt, field.TypeTime, value)
@@ -296,6 +322,26 @@ func (_u *GithubCommentLinkUpdateOne) SetNillablePosted(v *bool) *GithubCommentL
 // ClearPosted clears the value of the "posted" field.
 func (_u *GithubCommentLinkUpdateOne) ClearPosted() *GithubCommentLinkUpdateOne {
 	_u.mutation.ClearPosted()
+	return _u
+}
+
+// SetPostedAs sets the "posted_as" field.
+func (_u *GithubCommentLinkUpdateOne) SetPostedAs(v uuid.UUID) *GithubCommentLinkUpdateOne {
+	_u.mutation.SetPostedAs(v)
+	return _u
+}
+
+// SetNillablePostedAs sets the "posted_as" field if the given value is not nil.
+func (_u *GithubCommentLinkUpdateOne) SetNillablePostedAs(v *uuid.UUID) *GithubCommentLinkUpdateOne {
+	if v != nil {
+		_u.SetPostedAs(*v)
+	}
+	return _u
+}
+
+// ClearPostedAs clears the value of the "posted_as" field.
+func (_u *GithubCommentLinkUpdateOne) ClearPostedAs() *GithubCommentLinkUpdateOne {
+	_u.mutation.ClearPostedAs()
 	return _u
 }
 
@@ -429,6 +475,12 @@ func (_u *GithubCommentLinkUpdateOne) sqlSave(ctx context.Context) (_node *Githu
 	}
 	if _u.mutation.PostedCleared() {
 		_spec.ClearField(githubcommentlink.FieldPosted, field.TypeBool)
+	}
+	if value, ok := _u.mutation.PostedAs(); ok {
+		_spec.SetField(githubcommentlink.FieldPostedAs, field.TypeUUID, value)
+	}
+	if _u.mutation.PostedAsCleared() {
+		_spec.ClearField(githubcommentlink.FieldPostedAs, field.TypeUUID)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(githubcommentlink.FieldCreatedAt, field.TypeTime, value)

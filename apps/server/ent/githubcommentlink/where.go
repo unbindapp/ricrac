@@ -71,6 +71,11 @@ func Posted(v bool) predicate.GithubCommentLink {
 	return predicate.GithubCommentLink(sql.FieldEQ(FieldPosted, v))
 }
 
+// PostedAs applies equality check predicate on the "posted_as" field. It's identical to PostedAsEQ.
+func PostedAs(v uuid.UUID) predicate.GithubCommentLink {
+	return predicate.GithubCommentLink(sql.FieldEQ(FieldPostedAs, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.GithubCommentLink {
 	return predicate.GithubCommentLink(sql.FieldEQ(FieldCreatedAt, v))
@@ -154,6 +159,56 @@ func PostedIsNil() predicate.GithubCommentLink {
 // PostedNotNil applies the NotNil predicate on the "posted" field.
 func PostedNotNil() predicate.GithubCommentLink {
 	return predicate.GithubCommentLink(sql.FieldNotNull(FieldPosted))
+}
+
+// PostedAsEQ applies the EQ predicate on the "posted_as" field.
+func PostedAsEQ(v uuid.UUID) predicate.GithubCommentLink {
+	return predicate.GithubCommentLink(sql.FieldEQ(FieldPostedAs, v))
+}
+
+// PostedAsNEQ applies the NEQ predicate on the "posted_as" field.
+func PostedAsNEQ(v uuid.UUID) predicate.GithubCommentLink {
+	return predicate.GithubCommentLink(sql.FieldNEQ(FieldPostedAs, v))
+}
+
+// PostedAsIn applies the In predicate on the "posted_as" field.
+func PostedAsIn(vs ...uuid.UUID) predicate.GithubCommentLink {
+	return predicate.GithubCommentLink(sql.FieldIn(FieldPostedAs, vs...))
+}
+
+// PostedAsNotIn applies the NotIn predicate on the "posted_as" field.
+func PostedAsNotIn(vs ...uuid.UUID) predicate.GithubCommentLink {
+	return predicate.GithubCommentLink(sql.FieldNotIn(FieldPostedAs, vs...))
+}
+
+// PostedAsGT applies the GT predicate on the "posted_as" field.
+func PostedAsGT(v uuid.UUID) predicate.GithubCommentLink {
+	return predicate.GithubCommentLink(sql.FieldGT(FieldPostedAs, v))
+}
+
+// PostedAsGTE applies the GTE predicate on the "posted_as" field.
+func PostedAsGTE(v uuid.UUID) predicate.GithubCommentLink {
+	return predicate.GithubCommentLink(sql.FieldGTE(FieldPostedAs, v))
+}
+
+// PostedAsLT applies the LT predicate on the "posted_as" field.
+func PostedAsLT(v uuid.UUID) predicate.GithubCommentLink {
+	return predicate.GithubCommentLink(sql.FieldLT(FieldPostedAs, v))
+}
+
+// PostedAsLTE applies the LTE predicate on the "posted_as" field.
+func PostedAsLTE(v uuid.UUID) predicate.GithubCommentLink {
+	return predicate.GithubCommentLink(sql.FieldLTE(FieldPostedAs, v))
+}
+
+// PostedAsIsNil applies the IsNil predicate on the "posted_as" field.
+func PostedAsIsNil() predicate.GithubCommentLink {
+	return predicate.GithubCommentLink(sql.FieldIsNull(FieldPostedAs))
+}
+
+// PostedAsNotNil applies the NotNil predicate on the "posted_as" field.
+func PostedAsNotNil() predicate.GithubCommentLink {
+	return predicate.GithubCommentLink(sql.FieldNotNull(FieldPostedAs))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

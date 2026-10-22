@@ -41,6 +41,8 @@ type GithubOutbox struct {
 	Attempts int `json:"attempts,omitempty"`
 	// NextAttemptAt holds the value of the "next_attempt_at" field.
 	NextAttemptAt time.Time `json:"next_attempt_at,omitempty"`
+	// ActAs holds the value of the "act_as" field.
+	ActAs *uuid.UUID `json:"act_as,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -100,7 +102,7 @@ func (*GithubOutbox) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case githuboutbox.FieldIssueID, githuboutbox.FieldCommentID:
+		case githuboutbox.FieldIssueID, githuboutbox.FieldCommentID, githuboutbox.FieldActAs:
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case githuboutbox.FieldChanges:
 			values[i] = new([]byte)
@@ -192,6 +194,13 @@ func (_m *GithubOutbox) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.NextAttemptAt = value.Time
 			}
+		case githuboutbox.FieldActAs:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field act_as", values[i])
+			} else if value.Valid {
+				_m.ActAs = new(uuid.UUID)
+				*_m.ActAs = *value.S.(*uuid.UUID)
+			}
 		case githuboutbox.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -281,6 +290,11 @@ func (_m *GithubOutbox) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("next_attempt_at=")
 	builder.WriteString(_m.NextAttemptAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	if v := _m.ActAs; v != nil {
+		builder.WriteString("act_as=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

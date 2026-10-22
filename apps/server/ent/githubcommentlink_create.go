@@ -51,6 +51,20 @@ func (_c *GithubCommentLinkCreate) SetNillablePosted(v *bool) *GithubCommentLink
 	return _c
 }
 
+// SetPostedAs sets the "posted_as" field.
+func (_c *GithubCommentLinkCreate) SetPostedAs(v uuid.UUID) *GithubCommentLinkCreate {
+	_c.mutation.SetPostedAs(v)
+	return _c
+}
+
+// SetNillablePostedAs sets the "posted_as" field if the given value is not nil.
+func (_c *GithubCommentLinkCreate) SetNillablePostedAs(v *uuid.UUID) *GithubCommentLinkCreate {
+	if v != nil {
+		_c.SetPostedAs(*v)
+	}
+	return _c
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_c *GithubCommentLinkCreate) SetCreatedAt(v time.Time) *GithubCommentLinkCreate {
 	_c.mutation.SetCreatedAt(v)
@@ -162,6 +176,10 @@ func (_c *GithubCommentLinkCreate) createSpec() (*GithubCommentLink, *sqlgraph.C
 	if value, ok := _c.mutation.Posted(); ok {
 		_spec.SetField(githubcommentlink.FieldPosted, field.TypeBool, value)
 		_node.Posted = value
+	}
+	if value, ok := _c.mutation.PostedAs(); ok {
+		_spec.SetField(githubcommentlink.FieldPostedAs, field.TypeUUID, value)
+		_node.PostedAs = &value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(githubcommentlink.FieldCreatedAt, field.TypeTime, value)
@@ -284,6 +302,24 @@ func (u *GithubCommentLinkUpsert) ClearPosted() *GithubCommentLinkUpsert {
 	return u
 }
 
+// SetPostedAs sets the "posted_as" field.
+func (u *GithubCommentLinkUpsert) SetPostedAs(v uuid.UUID) *GithubCommentLinkUpsert {
+	u.Set(githubcommentlink.FieldPostedAs, v)
+	return u
+}
+
+// UpdatePostedAs sets the "posted_as" field to the value that was provided on create.
+func (u *GithubCommentLinkUpsert) UpdatePostedAs() *GithubCommentLinkUpsert {
+	u.SetExcluded(githubcommentlink.FieldPostedAs)
+	return u
+}
+
+// ClearPostedAs clears the value of the "posted_as" field.
+func (u *GithubCommentLinkUpsert) ClearPostedAs() *GithubCommentLinkUpsert {
+	u.SetNull(githubcommentlink.FieldPostedAs)
+	return u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (u *GithubCommentLinkUpsert) SetCreatedAt(v time.Time) *GithubCommentLinkUpsert {
 	u.Set(githubcommentlink.FieldCreatedAt, v)
@@ -403,6 +439,27 @@ func (u *GithubCommentLinkUpsertOne) UpdatePosted() *GithubCommentLinkUpsertOne 
 func (u *GithubCommentLinkUpsertOne) ClearPosted() *GithubCommentLinkUpsertOne {
 	return u.Update(func(s *GithubCommentLinkUpsert) {
 		s.ClearPosted()
+	})
+}
+
+// SetPostedAs sets the "posted_as" field.
+func (u *GithubCommentLinkUpsertOne) SetPostedAs(v uuid.UUID) *GithubCommentLinkUpsertOne {
+	return u.Update(func(s *GithubCommentLinkUpsert) {
+		s.SetPostedAs(v)
+	})
+}
+
+// UpdatePostedAs sets the "posted_as" field to the value that was provided on create.
+func (u *GithubCommentLinkUpsertOne) UpdatePostedAs() *GithubCommentLinkUpsertOne {
+	return u.Update(func(s *GithubCommentLinkUpsert) {
+		s.UpdatePostedAs()
+	})
+}
+
+// ClearPostedAs clears the value of the "posted_as" field.
+func (u *GithubCommentLinkUpsertOne) ClearPostedAs() *GithubCommentLinkUpsertOne {
+	return u.Update(func(s *GithubCommentLinkUpsert) {
+		s.ClearPostedAs()
 	})
 }
 
@@ -694,6 +751,27 @@ func (u *GithubCommentLinkUpsertBulk) UpdatePosted() *GithubCommentLinkUpsertBul
 func (u *GithubCommentLinkUpsertBulk) ClearPosted() *GithubCommentLinkUpsertBulk {
 	return u.Update(func(s *GithubCommentLinkUpsert) {
 		s.ClearPosted()
+	})
+}
+
+// SetPostedAs sets the "posted_as" field.
+func (u *GithubCommentLinkUpsertBulk) SetPostedAs(v uuid.UUID) *GithubCommentLinkUpsertBulk {
+	return u.Update(func(s *GithubCommentLinkUpsert) {
+		s.SetPostedAs(v)
+	})
+}
+
+// UpdatePostedAs sets the "posted_as" field to the value that was provided on create.
+func (u *GithubCommentLinkUpsertBulk) UpdatePostedAs() *GithubCommentLinkUpsertBulk {
+	return u.Update(func(s *GithubCommentLinkUpsert) {
+		s.UpdatePostedAs()
+	})
+}
+
+// ClearPostedAs clears the value of the "posted_as" field.
+func (u *GithubCommentLinkUpsertBulk) ClearPostedAs() *GithubCommentLinkUpsertBulk {
+	return u.Update(func(s *GithubCommentLinkUpsert) {
+		s.ClearPostedAs()
 	})
 }
 

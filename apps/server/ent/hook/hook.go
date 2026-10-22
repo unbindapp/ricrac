@@ -296,6 +296,18 @@ func (f GithubRepoSyncFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Val
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GithubRepoSyncMutation", m)
 }
 
+// The GithubUserTokenFunc type is an adapter to allow the use of ordinary
+// function as GithubUserToken mutator.
+type GithubUserTokenFunc func(context.Context, *ent.GithubUserTokenMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f GithubUserTokenFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.GithubUserTokenMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GithubUserTokenMutation", m)
+}
+
 // The InitiativeFunc type is an adapter to allow the use of ordinary
 // function as Initiative mutator.
 type InitiativeFunc func(context.Context, *ent.InitiativeMutation) (ent.Value, error)

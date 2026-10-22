@@ -19,6 +19,7 @@ func (GithubCommentLink) Fields() []ent.Field {
 		field.UUID("issue_id", uuid.UUID{}),
 		field.Int64("github_id"),
 		field.Bool("posted").Optional(),
+		field.UUID("posted_as", uuid.UUID{}).Optional().Nillable(),
 		field.Time("created_at").Optional(),
 	}
 }

@@ -18,6 +18,8 @@ const (
 	FieldGithubID = "github_id"
 	// FieldPosted holds the string denoting the posted field in the database.
 	FieldPosted = "posted"
+	// FieldPostedAs holds the string denoting the posted_as field in the database.
+	FieldPostedAs = "posted_as"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// EdgeIssue holds the string denoting the issue edge name in mutations.
@@ -41,6 +43,7 @@ var Columns = []string{
 	FieldIssueID,
 	FieldGithubID,
 	FieldPosted,
+	FieldPostedAs,
 	FieldCreatedAt,
 }
 
@@ -75,6 +78,11 @@ func ByGithubID(opts ...sql.OrderTermOption) OrderOption {
 // ByPosted orders the results by the posted field.
 func ByPosted(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPosted, opts...).ToFunc()
+}
+
+// ByPostedAs orders the results by the posted_as field.
+func ByPostedAs(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPostedAs, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

@@ -175,28 +175,64 @@ func (a *App) InstallationToken(ctx context.Context, installation int64) (string
 	return created.Token, nil
 }
 
+// UserToken is a user access token with its refresh token. Without token expiration on for the
+// app, it never expires and has no refresh token.
+type UserToken struct {
+	AccessToken    string
+	ExpiresAt      *time.Time
+	RefreshToken   *string
+	RefreshExpires *time.Time
+}
+
 // ExchangeCode turns the code GitHub sent to a callback into a user access token.
-func (a *App) ExchangeCode(ctx context.Context, code string) (string, error) {
-	form := url.Values{"client_id": {a.ClientID}, "client_secret": {a.ClientSecret}, "code": {code}}
+func (a *App) ExchangeCode(ctx context.Context, code string) (UserToken, error) {
+	return a.requestUserToken(ctx, url.Values{"code": {code}})
+}
+
+// RefreshUserToken trades a refresh token for a new user token; the old one stops working.
+func (a *App) RefreshUserToken(ctx context.Context, refreshToken string) (UserToken, error) {
+	return a.requestUserToken(ctx, url.Values{"grant_type": {"refresh_token"}, "refresh_token": {refreshToken}})
+}
+
+// ErrTokenRefused is GitHub turning down a code or refresh token.
+var ErrTokenRefused = errors.New("GitHub refused the code")
+
+func (a *App) requestUserToken(ctx context.Context, form url.Values) (UserToken, error) {
+	form.Set("client_id", a.ClientID)
+	form.Set("client_secret", a.ClientSecret)
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, a.WebURL+"/login/oauth/access_token", strings.NewReader(form.Encode()))
 	if err != nil {
-		return "", err
+		return UserToken{}, err
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", "ricrac")
 	var answer struct {
-		AccessToken      string `json:"access_token"`
-		Error            string `json:"error"`
-		ErrorDescription string `json:"error_description"`
+		AccessToken           string `json:"access_token"`
+		ExpiresIn             int64  `json:"expires_in"`
+		RefreshToken          string `json:"refresh_token"`
+		RefreshTokenExpiresIn int64  `json:"refresh_token_expires_in"`
+		Error                 string `json:"error"`
+		ErrorDescription      string `json:"error_description"`
 	}
+	sent := time.Now()
 	if _, err := a.send(req, &answer); err != nil {
-		return "", err
+		return UserToken{}, err
 	}
 	if answer.AccessToken == "" {
-		return "", fmt.Errorf("GitHub refused the code: %s %s", answer.Error, answer.ErrorDescription)
+		return UserToken{}, fmt.Errorf("%w: %s %s", ErrTokenRefused, answer.Error, answer.ErrorDescription)
 	}
-	return answer.AccessToken, nil
+	token := UserToken{AccessToken: answer.AccessToken}
+	if answer.ExpiresIn > 0 {
+		token.ExpiresAt = new(sent.Add(time.Duration(answer.ExpiresIn) * time.Second))
+	}
+	if answer.RefreshToken != "" {
+		token.RefreshToken = &answer.RefreshToken
+	}
+	if answer.RefreshTokenExpiresIn > 0 {
+		token.RefreshExpires = new(sent.Add(time.Duration(answer.RefreshTokenExpiresIn) * time.Second))
+	}
+	return token, nil
 }
 
 // APIError is an answer of GitHub other than 2xx.

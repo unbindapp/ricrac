@@ -35,6 +35,7 @@ import (
 	"ricrac/ent/githubissuelink"
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/githubreposync"
+	"ricrac/ent/githubusertoken"
 	"ricrac/ent/initiative"
 	"ricrac/ent/initiativeproject"
 	"ricrac/ent/invitation"
@@ -140,6 +141,8 @@ type Client struct {
 	GithubOutbox *GithubOutboxClient
 	// GithubRepoSync is the client for interacting with the GithubRepoSync builders.
 	GithubRepoSync *GithubRepoSyncClient
+	// GithubUserToken is the client for interacting with the GithubUserToken builders.
+	GithubUserToken *GithubUserTokenClient
 	// Initiative is the client for interacting with the Initiative builders.
 	Initiative *InitiativeClient
 	// InitiativeProject is the client for interacting with the InitiativeProject builders.
@@ -259,6 +262,7 @@ func (c *Client) init() {
 	c.GithubIssueLink = NewGithubIssueLinkClient(c.config)
 	c.GithubOutbox = NewGithubOutboxClient(c.config)
 	c.GithubRepoSync = NewGithubRepoSyncClient(c.config)
+	c.GithubUserToken = NewGithubUserTokenClient(c.config)
 	c.Initiative = NewInitiativeClient(c.config)
 	c.InitiativeProject = NewInitiativeProjectClient(c.config)
 	c.Invitation = NewInvitationClient(c.config)
@@ -417,6 +421,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		GithubIssueLink:      NewGithubIssueLinkClient(cfg),
 		GithubOutbox:         NewGithubOutboxClient(cfg),
 		GithubRepoSync:       NewGithubRepoSyncClient(cfg),
+		GithubUserToken:      NewGithubUserTokenClient(cfg),
 		Initiative:           NewInitiativeClient(cfg),
 		InitiativeProject:    NewInitiativeProjectClient(cfg),
 		Invitation:           NewInvitationClient(cfg),
@@ -502,6 +507,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		GithubIssueLink:      NewGithubIssueLinkClient(cfg),
 		GithubOutbox:         NewGithubOutboxClient(cfg),
 		GithubRepoSync:       NewGithubRepoSyncClient(cfg),
+		GithubUserToken:      NewGithubUserTokenClient(cfg),
 		Initiative:           NewInitiativeClient(cfg),
 		InitiativeProject:    NewInitiativeProjectClient(cfg),
 		Invitation:           NewInvitationClient(cfg),
@@ -578,15 +584,15 @@ func (c *Client) Use(hooks ...Hook) {
 		c.DiscussionSubscriber, c.DiscussionThread, c.Document, c.DocumentVersion,
 		c.Email, c.EntityLink, c.Favorite, c.File, c.GithubCommentLink,
 		c.GithubInstallation, c.GithubIssueLink, c.GithubOutbox, c.GithubRepoSync,
-		c.Initiative, c.InitiativeProject, c.Invitation, c.Issue, c.IssueHistory,
-		c.IssueLabel, c.IssueLabelLink, c.IssueRelation, c.IssueRelease, c.IssueShare,
-		c.IssueSubscriber, c.Notification, c.OAuthClient, c.OAuthCode, c.OAuthGrant,
-		c.OAuthToken, c.Project, c.ProjectLabel, c.ProjectLabelLink, c.ProjectMember,
-		c.ProjectMilestone, c.ProjectRelation, c.ProjectStatus, c.ProjectSubscriber,
-		c.ProjectTeam, c.Reaction, c.Release, c.ReleaseNote, c.ReleasePipeline,
-		c.ReleasePipelineTeam, c.ReleaseStage, c.SignInLink, c.StatusUpdate, c.Team,
-		c.TeamMember, c.Template, c.User, c.Webhook, c.WebhookDelivery,
-		c.WorkflowState, c.Workspace, c.WorkspaceMember,
+		c.GithubUserToken, c.Initiative, c.InitiativeProject, c.Invitation, c.Issue,
+		c.IssueHistory, c.IssueLabel, c.IssueLabelLink, c.IssueRelation,
+		c.IssueRelease, c.IssueShare, c.IssueSubscriber, c.Notification, c.OAuthClient,
+		c.OAuthCode, c.OAuthGrant, c.OAuthToken, c.Project, c.ProjectLabel,
+		c.ProjectLabelLink, c.ProjectMember, c.ProjectMilestone, c.ProjectRelation,
+		c.ProjectStatus, c.ProjectSubscriber, c.ProjectTeam, c.Reaction, c.Release,
+		c.ReleaseNote, c.ReleasePipeline, c.ReleasePipelineTeam, c.ReleaseStage,
+		c.SignInLink, c.StatusUpdate, c.Team, c.TeamMember, c.Template, c.User,
+		c.Webhook, c.WebhookDelivery, c.WorkflowState, c.Workspace, c.WorkspaceMember,
 	} {
 		n.Use(hooks...)
 	}
@@ -601,15 +607,15 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.DiscussionSubscriber, c.DiscussionThread, c.Document, c.DocumentVersion,
 		c.Email, c.EntityLink, c.Favorite, c.File, c.GithubCommentLink,
 		c.GithubInstallation, c.GithubIssueLink, c.GithubOutbox, c.GithubRepoSync,
-		c.Initiative, c.InitiativeProject, c.Invitation, c.Issue, c.IssueHistory,
-		c.IssueLabel, c.IssueLabelLink, c.IssueRelation, c.IssueRelease, c.IssueShare,
-		c.IssueSubscriber, c.Notification, c.OAuthClient, c.OAuthCode, c.OAuthGrant,
-		c.OAuthToken, c.Project, c.ProjectLabel, c.ProjectLabelLink, c.ProjectMember,
-		c.ProjectMilestone, c.ProjectRelation, c.ProjectStatus, c.ProjectSubscriber,
-		c.ProjectTeam, c.Reaction, c.Release, c.ReleaseNote, c.ReleasePipeline,
-		c.ReleasePipelineTeam, c.ReleaseStage, c.SignInLink, c.StatusUpdate, c.Team,
-		c.TeamMember, c.Template, c.User, c.Webhook, c.WebhookDelivery,
-		c.WorkflowState, c.Workspace, c.WorkspaceMember,
+		c.GithubUserToken, c.Initiative, c.InitiativeProject, c.Invitation, c.Issue,
+		c.IssueHistory, c.IssueLabel, c.IssueLabelLink, c.IssueRelation,
+		c.IssueRelease, c.IssueShare, c.IssueSubscriber, c.Notification, c.OAuthClient,
+		c.OAuthCode, c.OAuthGrant, c.OAuthToken, c.Project, c.ProjectLabel,
+		c.ProjectLabelLink, c.ProjectMember, c.ProjectMilestone, c.ProjectRelation,
+		c.ProjectStatus, c.ProjectSubscriber, c.ProjectTeam, c.Reaction, c.Release,
+		c.ReleaseNote, c.ReleasePipeline, c.ReleasePipelineTeam, c.ReleaseStage,
+		c.SignInLink, c.StatusUpdate, c.Team, c.TeamMember, c.Template, c.User,
+		c.Webhook, c.WebhookDelivery, c.WorkflowState, c.Workspace, c.WorkspaceMember,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -666,6 +672,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.GithubOutbox.mutate(ctx, m)
 	case *GithubRepoSyncMutation:
 		return c.GithubRepoSync.mutate(ctx, m)
+	case *GithubUserTokenMutation:
+		return c.GithubUserToken.mutate(ctx, m)
 	case *InitiativeMutation:
 		return c.Initiative.mutate(ctx, m)
 	case *InitiativeProjectMutation:
@@ -5431,6 +5439,139 @@ func (c *GithubRepoSyncClient) mutate(ctx context.Context, m *GithubRepoSyncMuta
 		return (&GithubRepoSyncDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown GithubRepoSync mutation op: %q", m.Op())
+	}
+}
+
+// GithubUserTokenClient is a client for the GithubUserToken schema.
+type GithubUserTokenClient struct {
+	config
+}
+
+// NewGithubUserTokenClient returns a client for the GithubUserToken from the given config.
+func NewGithubUserTokenClient(c config) *GithubUserTokenClient {
+	return &GithubUserTokenClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `githubusertoken.Hooks(f(g(h())))`.
+func (c *GithubUserTokenClient) Use(hooks ...Hook) {
+	c.hooks.GithubUserToken = append(c.hooks.GithubUserToken, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `githubusertoken.Intercept(f(g(h())))`.
+func (c *GithubUserTokenClient) Intercept(interceptors ...Interceptor) {
+	c.inters.GithubUserToken = append(c.inters.GithubUserToken, interceptors...)
+}
+
+// Create returns a builder for creating a GithubUserToken entity.
+func (c *GithubUserTokenClient) Create() *GithubUserTokenCreate {
+	mutation := newGithubUserTokenMutation(c.config, OpCreate)
+	return &GithubUserTokenCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of GithubUserToken entities.
+func (c *GithubUserTokenClient) CreateBulk(builders ...*GithubUserTokenCreate) *GithubUserTokenCreateBulk {
+	return &GithubUserTokenCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *GithubUserTokenClient) MapCreateBulk(slice any, setFunc func(*GithubUserTokenCreate, int)) *GithubUserTokenCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &GithubUserTokenCreateBulk{err: fmt.Errorf("calling to GithubUserTokenClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*GithubUserTokenCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &GithubUserTokenCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for GithubUserToken.
+func (c *GithubUserTokenClient) Update() *GithubUserTokenUpdate {
+	mutation := newGithubUserTokenMutation(c.config, OpUpdate)
+	return &GithubUserTokenUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *GithubUserTokenClient) UpdateOne(_m *GithubUserToken) *GithubUserTokenUpdateOne {
+	mutation := newGithubUserTokenMutation(c.config, OpUpdateOne, withGithubUserToken(_m))
+	return &GithubUserTokenUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *GithubUserTokenClient) UpdateOneID(id uuid.UUID) *GithubUserTokenUpdateOne {
+	mutation := newGithubUserTokenMutation(c.config, OpUpdateOne, withGithubUserTokenID(id))
+	return &GithubUserTokenUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for GithubUserToken.
+func (c *GithubUserTokenClient) Delete() *GithubUserTokenDelete {
+	mutation := newGithubUserTokenMutation(c.config, OpDelete)
+	return &GithubUserTokenDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *GithubUserTokenClient) DeleteOne(_m *GithubUserToken) *GithubUserTokenDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *GithubUserTokenClient) DeleteOneID(id uuid.UUID) *GithubUserTokenDeleteOne {
+	builder := c.Delete().Where(githubusertoken.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &GithubUserTokenDeleteOne{builder}
+}
+
+// Query returns a query builder for GithubUserToken.
+func (c *GithubUserTokenClient) Query() *GithubUserTokenQuery {
+	return &GithubUserTokenQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeGithubUserToken},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a GithubUserToken entity by its id.
+func (c *GithubUserTokenClient) Get(ctx context.Context, id uuid.UUID) (*GithubUserToken, error) {
+	return c.Query().Where(githubusertoken.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *GithubUserTokenClient) GetX(ctx context.Context, id uuid.UUID) *GithubUserToken {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *GithubUserTokenClient) Hooks() []Hook {
+	return c.hooks.GithubUserToken
+}
+
+// Interceptors returns the client interceptors.
+func (c *GithubUserTokenClient) Interceptors() []Interceptor {
+	return c.inters.GithubUserToken
+}
+
+func (c *GithubUserTokenClient) mutate(ctx context.Context, m *GithubUserTokenMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&GithubUserTokenCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&GithubUserTokenUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&GithubUserTokenUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&GithubUserTokenDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown GithubUserToken mutation op: %q", m.Op())
 	}
 }
 
@@ -15239,28 +15380,30 @@ type (
 		CustomerStatus, CustomerTier, Cycle, Discussion, DiscussionSubscriber,
 		DiscussionThread, Document, DocumentVersion, Email, EntityLink, Favorite, File,
 		GithubCommentLink, GithubInstallation, GithubIssueLink, GithubOutbox,
-		GithubRepoSync, Initiative, InitiativeProject, Invitation, Issue, IssueHistory,
-		IssueLabel, IssueLabelLink, IssueRelation, IssueRelease, IssueShare,
-		IssueSubscriber, Notification, OAuthClient, OAuthCode, OAuthGrant, OAuthToken,
-		Project, ProjectLabel, ProjectLabelLink, ProjectMember, ProjectMilestone,
-		ProjectRelation, ProjectStatus, ProjectSubscriber, ProjectTeam, Reaction,
-		Release, ReleaseNote, ReleasePipeline, ReleasePipelineTeam, ReleaseStage,
-		SignInLink, StatusUpdate, Team, TeamMember, Template, User, Webhook,
-		WebhookDelivery, WorkflowState, Workspace, WorkspaceMember []ent.Hook
+		GithubRepoSync, GithubUserToken, Initiative, InitiativeProject, Invitation,
+		Issue, IssueHistory, IssueLabel, IssueLabelLink, IssueRelation, IssueRelease,
+		IssueShare, IssueSubscriber, Notification, OAuthClient, OAuthCode, OAuthGrant,
+		OAuthToken, Project, ProjectLabel, ProjectLabelLink, ProjectMember,
+		ProjectMilestone, ProjectRelation, ProjectStatus, ProjectSubscriber,
+		ProjectTeam, Reaction, Release, ReleaseNote, ReleasePipeline,
+		ReleasePipelineTeam, ReleaseStage, SignInLink, StatusUpdate, Team, TeamMember,
+		Template, User, Webhook, WebhookDelivery, WorkflowState, Workspace,
+		WorkspaceMember []ent.Hook
 	}
 	inters struct {
 		APIKey, Attachment, AuditEntry, Comment, CustomView, Customer, CustomerNeed,
 		CustomerStatus, CustomerTier, Cycle, Discussion, DiscussionSubscriber,
 		DiscussionThread, Document, DocumentVersion, Email, EntityLink, Favorite, File,
 		GithubCommentLink, GithubInstallation, GithubIssueLink, GithubOutbox,
-		GithubRepoSync, Initiative, InitiativeProject, Invitation, Issue, IssueHistory,
-		IssueLabel, IssueLabelLink, IssueRelation, IssueRelease, IssueShare,
-		IssueSubscriber, Notification, OAuthClient, OAuthCode, OAuthGrant, OAuthToken,
-		Project, ProjectLabel, ProjectLabelLink, ProjectMember, ProjectMilestone,
-		ProjectRelation, ProjectStatus, ProjectSubscriber, ProjectTeam, Reaction,
-		Release, ReleaseNote, ReleasePipeline, ReleasePipelineTeam, ReleaseStage,
-		SignInLink, StatusUpdate, Team, TeamMember, Template, User, Webhook,
-		WebhookDelivery, WorkflowState, Workspace, WorkspaceMember []ent.Interceptor
+		GithubRepoSync, GithubUserToken, Initiative, InitiativeProject, Invitation,
+		Issue, IssueHistory, IssueLabel, IssueLabelLink, IssueRelation, IssueRelease,
+		IssueShare, IssueSubscriber, Notification, OAuthClient, OAuthCode, OAuthGrant,
+		OAuthToken, Project, ProjectLabel, ProjectLabelLink, ProjectMember,
+		ProjectMilestone, ProjectRelation, ProjectStatus, ProjectSubscriber,
+		ProjectTeam, Reaction, Release, ReleaseNote, ReleasePipeline,
+		ReleasePipelineTeam, ReleaseStage, SignInLink, StatusUpdate, Team, TeamMember,
+		Template, User, Webhook, WebhookDelivery, WorkflowState, Workspace,
+		WorkspaceMember []ent.Interceptor
 	}
 )
 

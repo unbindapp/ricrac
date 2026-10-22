@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 
 	"ricrac/ent"
+	"ricrac/ent/githubusertoken"
 	"ricrac/ent/user"
 	"ricrac/ent/workspace"
 	repository "ricrac/internal/repositories"
@@ -34,16 +35,26 @@ func (self *GitHubRepository) UserLogin(ctx context.Context, id uuid.UUID) (*str
 	return found.GithubLogin, nil
 }
 
-func (self *GitHubRepository) ClearUserLogin(ctx context.Context, id uuid.UUID) error {
-	return self.base.DB.User.Update().Where(user.ID(id)).ClearGithubLogin().Exec(ctx)
+// ClearUserLogin unlinks a user's GitHub account and forgets its token.
+func (self *GitHubRepository) ClearUserLogin(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error {
+	client := self.base.Client(tx)
+	if _, err := client.GithubUserToken.Delete().Where(githubusertoken.ID(id)).Exec(ctx); err != nil {
+		return err
+	}
+	return client.User.Update().Where(user.ID(id)).ClearGithubLogin().Exec(ctx)
 }
 
-// SetUserLogin links a GitHub login to a user, taking it from anyone who had it.
+// SetUserLogin links a GitHub login to a user, taking it and its token from anyone who had it.
 func (self *GitHubRepository) SetUserLogin(ctx context.Context, tx repository.TxInterface, id uuid.UUID, login string) error {
 	client := self.base.Client(tx)
-	err := client.User.Update().Where(user.GithubLogin(login), user.IDNEQ(id)).ClearGithubLogin().Exec(ctx)
+	previous, err := client.User.Query().Where(user.GithubLogin(login), user.IDNEQ(id)).IDs(ctx)
 	if err != nil {
 		return err
+	}
+	for _, other := range previous {
+		if err := self.ClearUserLogin(ctx, tx, other); err != nil {
+			return err
+		}
 	}
 	return client.User.Update().Where(user.ID(id)).SetGithubLogin(login).Exec(ctx)
 }

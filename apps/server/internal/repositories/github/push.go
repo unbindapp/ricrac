@@ -31,6 +31,8 @@ type OutboxEntry struct {
 	Attempts      int
 	Installation  int64
 	FullName      string
+	// The user a comment was posted as, to edit or delete it as them too.
+	ActAs *uuid.UUID
 }
 
 // DueOutbox is up to 50 queued changes due now, of installations that aren't suspended, oldest
@@ -48,7 +50,7 @@ func (self *GitHubRepository) DueOutbox(ctx context.Context) ([]OutboxEntry, err
 		entries[i] = OutboxEntry{
 			ID: row.ID, RepoSync: row.RepoSyncID, Number: row.GithubNumber, Issue: row.IssueID, Comment: row.CommentID,
 			GitHubComment: row.GithubCommentID, Kind: row.Kind, Changes: row.Changes, Attempts: row.Attempts,
-			Installation: row.Edges.RepoSync.InstallationID, FullName: row.Edges.RepoSync.FullName,
+			Installation: row.Edges.RepoSync.InstallationID, FullName: row.Edges.RepoSync.FullName, ActAs: row.ActAs,
 		}
 	}
 	return entries, nil
@@ -77,16 +79,17 @@ func (self *GitHubRepository) CommentWithAuthor(ctx context.Context, id uuid.UUI
 }
 
 // CommentPosted says whether a comment is linked to a GitHub comment.
-func (self *GitHubRepository) CommentPosted(ctx context.Context, id uuid.UUID) (bool, error) {
-	return self.base.DB.GithubCommentLink.Query().Where(githubcommentlink.ID(id)).Exist(ctx)
+func (self *GitHubRepository) CommentPosted(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (bool, error) {
+	return self.base.Client(tx).GithubCommentLink.Query().Where(githubcommentlink.ID(id)).Exist(ctx)
 }
 
-// LinkPostedComment links a comment the app posted on the linked GitHub issue.
-func (self *GitHubRepository) LinkPostedComment(ctx context.Context, commentID uuid.UUID, issueID *uuid.UUID, githubID int64) error {
-	_, err := self.base.DB.ExecContext(ctx,
-		`INSERT INTO github_comment_links (comment_id, issue_id, github_id, posted)
-		 SELECT $1, issue_id, $3, true FROM github_issue_links WHERE issue_id = $2 ON CONFLICT DO NOTHING`,
-		commentID, issueID, githubID)
+// LinkPostedComment links a comment the app posted on the linked GitHub issue, as postedAs or
+// as itself when nil.
+func (self *GitHubRepository) LinkPostedComment(ctx context.Context, tx repository.TxInterface, commentID uuid.UUID, issueID *uuid.UUID, githubID int64, postedAs *uuid.UUID) error {
+	_, err := self.base.Client(tx).ExecContext(ctx,
+		`INSERT INTO github_comment_links (comment_id, issue_id, github_id, posted, posted_as)
+		 SELECT $1, issue_id, $3, true, $4 FROM github_issue_links WHERE issue_id = $2 ON CONFLICT DO NOTHING`,
+		commentID, issueID, githubID, postedAs)
 	return err
 }
 

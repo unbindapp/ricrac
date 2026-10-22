@@ -727,16 +727,16 @@ func (_c *GitHubRepositoryMock_ChangeRepoSync_Call) RunAndReturn(run func(ctx co
 }
 
 // ClearUserLogin provides a mock function for the type GitHubRepositoryMock
-func (_mock *GitHubRepositoryMock) ClearUserLogin(ctx context.Context, id uuid.UUID) error {
-	ret := _mock.Called(ctx, id)
+func (_mock *GitHubRepositoryMock) ClearUserLogin(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error {
+	ret := _mock.Called(ctx, tx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ClearUserLogin")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) error); ok {
-		r0 = returnFunc(ctx, id)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, tx, id)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -750,24 +750,30 @@ type GitHubRepositoryMock_ClearUserLogin_Call struct {
 
 // ClearUserLogin is a helper method to define mock.On call
 //   - ctx context.Context
+//   - tx repository.TxInterface
 //   - id uuid.UUID
-func (_e *GitHubRepositoryMock_Expecter) ClearUserLogin(ctx any, id any) *GitHubRepositoryMock_ClearUserLogin_Call {
-	return &GitHubRepositoryMock_ClearUserLogin_Call{Call: _e.mock.On("ClearUserLogin", ctx, id)}
+func (_e *GitHubRepositoryMock_Expecter) ClearUserLogin(ctx any, tx any, id any) *GitHubRepositoryMock_ClearUserLogin_Call {
+	return &GitHubRepositoryMock_ClearUserLogin_Call{Call: _e.mock.On("ClearUserLogin", ctx, tx, id)}
 }
 
-func (_c *GitHubRepositoryMock_ClearUserLogin_Call) Run(run func(ctx context.Context, id uuid.UUID)) *GitHubRepositoryMock_ClearUserLogin_Call {
+func (_c *GitHubRepositoryMock_ClearUserLogin_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *GitHubRepositoryMock_ClearUserLogin_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 uuid.UUID
+		var arg1 repository.TxInterface
 		if args[1] != nil {
-			arg1 = args[1].(uuid.UUID)
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
 		}
 		run(
 			arg0,
 			arg1,
+			arg2,
 		)
 	})
 	return _c
@@ -778,14 +784,14 @@ func (_c *GitHubRepositoryMock_ClearUserLogin_Call) Return(err error) *GitHubRep
 	return _c
 }
 
-func (_c *GitHubRepositoryMock_ClearUserLogin_Call) RunAndReturn(run func(ctx context.Context, id uuid.UUID) error) *GitHubRepositoryMock_ClearUserLogin_Call {
+func (_c *GitHubRepositoryMock_ClearUserLogin_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error) *GitHubRepositoryMock_ClearUserLogin_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // CommentLinked provides a mock function for the type GitHubRepositoryMock
-func (_mock *GitHubRepositoryMock) CommentLinked(ctx context.Context, githubID int64) (bool, error) {
-	ret := _mock.Called(ctx, githubID)
+func (_mock *GitHubRepositoryMock) CommentLinked(ctx context.Context, tx repository.TxInterface, githubID int64) (bool, error) {
+	ret := _mock.Called(ctx, tx, githubID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CommentLinked")
@@ -793,16 +799,16 @@ func (_mock *GitHubRepositoryMock) CommentLinked(ctx context.Context, githubID i
 
 	var r0 bool
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int64) (bool, error)); ok {
-		return returnFunc(ctx, githubID)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, int64) (bool, error)); ok {
+		return returnFunc(ctx, tx, githubID)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int64) bool); ok {
-		r0 = returnFunc(ctx, githubID)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, int64) bool); ok {
+		r0 = returnFunc(ctx, tx, githubID)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, int64) error); ok {
-		r1 = returnFunc(ctx, githubID)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, int64) error); ok {
+		r1 = returnFunc(ctx, tx, githubID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -816,24 +822,30 @@ type GitHubRepositoryMock_CommentLinked_Call struct {
 
 // CommentLinked is a helper method to define mock.On call
 //   - ctx context.Context
+//   - tx repository.TxInterface
 //   - githubID int64
-func (_e *GitHubRepositoryMock_Expecter) CommentLinked(ctx any, githubID any) *GitHubRepositoryMock_CommentLinked_Call {
-	return &GitHubRepositoryMock_CommentLinked_Call{Call: _e.mock.On("CommentLinked", ctx, githubID)}
+func (_e *GitHubRepositoryMock_Expecter) CommentLinked(ctx any, tx any, githubID any) *GitHubRepositoryMock_CommentLinked_Call {
+	return &GitHubRepositoryMock_CommentLinked_Call{Call: _e.mock.On("CommentLinked", ctx, tx, githubID)}
 }
 
-func (_c *GitHubRepositoryMock_CommentLinked_Call) Run(run func(ctx context.Context, githubID int64)) *GitHubRepositoryMock_CommentLinked_Call {
+func (_c *GitHubRepositoryMock_CommentLinked_Call) Run(run func(ctx context.Context, tx repository.TxInterface, githubID int64)) *GitHubRepositoryMock_CommentLinked_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 int64
+		var arg1 repository.TxInterface
 		if args[1] != nil {
-			arg1 = args[1].(int64)
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 int64
+		if args[2] != nil {
+			arg2 = args[2].(int64)
 		}
 		run(
 			arg0,
 			arg1,
+			arg2,
 		)
 	})
 	return _c
@@ -844,14 +856,14 @@ func (_c *GitHubRepositoryMock_CommentLinked_Call) Return(b bool, err error) *Gi
 	return _c
 }
 
-func (_c *GitHubRepositoryMock_CommentLinked_Call) RunAndReturn(run func(ctx context.Context, githubID int64) (bool, error)) *GitHubRepositoryMock_CommentLinked_Call {
+func (_c *GitHubRepositoryMock_CommentLinked_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, githubID int64) (bool, error)) *GitHubRepositoryMock_CommentLinked_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // CommentPosted provides a mock function for the type GitHubRepositoryMock
-func (_mock *GitHubRepositoryMock) CommentPosted(ctx context.Context, id uuid.UUID) (bool, error) {
-	ret := _mock.Called(ctx, id)
+func (_mock *GitHubRepositoryMock) CommentPosted(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (bool, error) {
+	ret := _mock.Called(ctx, tx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CommentPosted")
@@ -859,16 +871,16 @@ func (_mock *GitHubRepositoryMock) CommentPosted(ctx context.Context, id uuid.UU
 
 	var r0 bool
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) (bool, error)); ok {
-		return returnFunc(ctx, id)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) (bool, error)); ok {
+		return returnFunc(ctx, tx, id)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) bool); ok {
-		r0 = returnFunc(ctx, id)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) bool); ok {
+		r0 = returnFunc(ctx, tx, id)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
-		r1 = returnFunc(ctx, id)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -882,24 +894,30 @@ type GitHubRepositoryMock_CommentPosted_Call struct {
 
 // CommentPosted is a helper method to define mock.On call
 //   - ctx context.Context
+//   - tx repository.TxInterface
 //   - id uuid.UUID
-func (_e *GitHubRepositoryMock_Expecter) CommentPosted(ctx any, id any) *GitHubRepositoryMock_CommentPosted_Call {
-	return &GitHubRepositoryMock_CommentPosted_Call{Call: _e.mock.On("CommentPosted", ctx, id)}
+func (_e *GitHubRepositoryMock_Expecter) CommentPosted(ctx any, tx any, id any) *GitHubRepositoryMock_CommentPosted_Call {
+	return &GitHubRepositoryMock_CommentPosted_Call{Call: _e.mock.On("CommentPosted", ctx, tx, id)}
 }
 
-func (_c *GitHubRepositoryMock_CommentPosted_Call) Run(run func(ctx context.Context, id uuid.UUID)) *GitHubRepositoryMock_CommentPosted_Call {
+func (_c *GitHubRepositoryMock_CommentPosted_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *GitHubRepositoryMock_CommentPosted_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 uuid.UUID
+		var arg1 repository.TxInterface
 		if args[1] != nil {
-			arg1 = args[1].(uuid.UUID)
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
 		}
 		run(
 			arg0,
 			arg1,
+			arg2,
 		)
 	})
 	return _c
@@ -910,7 +928,7 @@ func (_c *GitHubRepositoryMock_CommentPosted_Call) Return(b bool, err error) *Gi
 	return _c
 }
 
-func (_c *GitHubRepositoryMock_CommentPosted_Call) RunAndReturn(run func(ctx context.Context, id uuid.UUID) (bool, error)) *GitHubRepositoryMock_CommentPosted_Call {
+func (_c *GitHubRepositoryMock_CommentPosted_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (bool, error)) *GitHubRepositoryMock_CommentPosted_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1440,6 +1458,69 @@ func (_c *GitHubRepositoryMock_DeleteRepoSync_Call) RunAndReturn(run func(ctx co
 	return _c
 }
 
+// DeleteUserToken provides a mock function for the type GitHubRepositoryMock
+func (_mock *GitHubRepositoryMock) DeleteUserToken(ctx context.Context, tx repository.TxInterface, user uuid.UUID) error {
+	ret := _mock.Called(ctx, tx, user)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteUserToken")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, tx, user)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// GitHubRepositoryMock_DeleteUserToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteUserToken'
+type GitHubRepositoryMock_DeleteUserToken_Call struct {
+	*mock.Call
+}
+
+// DeleteUserToken is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - user uuid.UUID
+func (_e *GitHubRepositoryMock_Expecter) DeleteUserToken(ctx any, tx any, user any) *GitHubRepositoryMock_DeleteUserToken_Call {
+	return &GitHubRepositoryMock_DeleteUserToken_Call{Call: _e.mock.On("DeleteUserToken", ctx, tx, user)}
+}
+
+func (_c *GitHubRepositoryMock_DeleteUserToken_Call) Run(run func(ctx context.Context, tx repository.TxInterface, user uuid.UUID)) *GitHubRepositoryMock_DeleteUserToken_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_DeleteUserToken_Call) Return(err error) *GitHubRepositoryMock_DeleteUserToken_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_DeleteUserToken_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, user uuid.UUID) error) *GitHubRepositoryMock_DeleteUserToken_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // DueBackfills provides a mock function for the type GitHubRepositoryMock
 func (_mock *GitHubRepositoryMock) DueBackfills(ctx context.Context) ([]uuid.UUID, error) {
 	ret := _mock.Called(ctx)
@@ -1859,6 +1940,72 @@ func (_c *GitHubRepositoryMock_HasPullRequestFrom_Call) Return(b bool, err error
 }
 
 func (_c *GitHubRepositoryMock_HasPullRequestFrom_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, sourceType string, repo string, branch string) (bool, error)) *GitHubRepositoryMock_HasPullRequestFrom_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// HasUserToken provides a mock function for the type GitHubRepositoryMock
+func (_mock *GitHubRepositoryMock) HasUserToken(ctx context.Context, user uuid.UUID) (bool, error) {
+	ret := _mock.Called(ctx, user)
+
+	if len(ret) == 0 {
+		panic("no return value specified for HasUserToken")
+	}
+
+	var r0 bool
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) (bool, error)); ok {
+		return returnFunc(ctx, user)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) bool); ok {
+		r0 = returnFunc(ctx, user)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, user)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// GitHubRepositoryMock_HasUserToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'HasUserToken'
+type GitHubRepositoryMock_HasUserToken_Call struct {
+	*mock.Call
+}
+
+// HasUserToken is a helper method to define mock.On call
+//   - ctx context.Context
+//   - user uuid.UUID
+func (_e *GitHubRepositoryMock_Expecter) HasUserToken(ctx any, user any) *GitHubRepositoryMock_HasUserToken_Call {
+	return &GitHubRepositoryMock_HasUserToken_Call{Call: _e.mock.On("HasUserToken", ctx, user)}
+}
+
+func (_c *GitHubRepositoryMock_HasUserToken_Call) Run(run func(ctx context.Context, user uuid.UUID)) *GitHubRepositoryMock_HasUserToken_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_HasUserToken_Call) Return(b bool, err error) *GitHubRepositoryMock_HasUserToken_Call {
+	_c.Call.Return(b, err)
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_HasUserToken_Call) RunAndReturn(run func(ctx context.Context, user uuid.UUID) (bool, error)) *GitHubRepositoryMock_HasUserToken_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -2400,16 +2547,16 @@ func (_c *GitHubRepositoryMock_LabelsNamedOn_Call) RunAndReturn(run func(ctx con
 }
 
 // LinkPostedComment provides a mock function for the type GitHubRepositoryMock
-func (_mock *GitHubRepositoryMock) LinkPostedComment(ctx context.Context, commentID uuid.UUID, issueID *uuid.UUID, githubID int64) error {
-	ret := _mock.Called(ctx, commentID, issueID, githubID)
+func (_mock *GitHubRepositoryMock) LinkPostedComment(ctx context.Context, tx repository.TxInterface, commentID uuid.UUID, issueID *uuid.UUID, githubID int64, postedAs *uuid.UUID) error {
+	ret := _mock.Called(ctx, tx, commentID, issueID, githubID, postedAs)
 
 	if len(ret) == 0 {
 		panic("no return value specified for LinkPostedComment")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, *uuid.UUID, int64) error); ok {
-		r0 = returnFunc(ctx, commentID, issueID, githubID)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, *uuid.UUID, int64, *uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, tx, commentID, issueID, githubID, postedAs)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -2423,36 +2570,48 @@ type GitHubRepositoryMock_LinkPostedComment_Call struct {
 
 // LinkPostedComment is a helper method to define mock.On call
 //   - ctx context.Context
+//   - tx repository.TxInterface
 //   - commentID uuid.UUID
 //   - issueID *uuid.UUID
 //   - githubID int64
-func (_e *GitHubRepositoryMock_Expecter) LinkPostedComment(ctx any, commentID any, issueID any, githubID any) *GitHubRepositoryMock_LinkPostedComment_Call {
-	return &GitHubRepositoryMock_LinkPostedComment_Call{Call: _e.mock.On("LinkPostedComment", ctx, commentID, issueID, githubID)}
+//   - postedAs *uuid.UUID
+func (_e *GitHubRepositoryMock_Expecter) LinkPostedComment(ctx any, tx any, commentID any, issueID any, githubID any, postedAs any) *GitHubRepositoryMock_LinkPostedComment_Call {
+	return &GitHubRepositoryMock_LinkPostedComment_Call{Call: _e.mock.On("LinkPostedComment", ctx, tx, commentID, issueID, githubID, postedAs)}
 }
 
-func (_c *GitHubRepositoryMock_LinkPostedComment_Call) Run(run func(ctx context.Context, commentID uuid.UUID, issueID *uuid.UUID, githubID int64)) *GitHubRepositoryMock_LinkPostedComment_Call {
+func (_c *GitHubRepositoryMock_LinkPostedComment_Call) Run(run func(ctx context.Context, tx repository.TxInterface, commentID uuid.UUID, issueID *uuid.UUID, githubID int64, postedAs *uuid.UUID)) *GitHubRepositoryMock_LinkPostedComment_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 uuid.UUID
+		var arg1 repository.TxInterface
 		if args[1] != nil {
-			arg1 = args[1].(uuid.UUID)
+			arg1 = args[1].(repository.TxInterface)
 		}
-		var arg2 *uuid.UUID
+		var arg2 uuid.UUID
 		if args[2] != nil {
-			arg2 = args[2].(*uuid.UUID)
+			arg2 = args[2].(uuid.UUID)
 		}
-		var arg3 int64
+		var arg3 *uuid.UUID
 		if args[3] != nil {
-			arg3 = args[3].(int64)
+			arg3 = args[3].(*uuid.UUID)
+		}
+		var arg4 int64
+		if args[4] != nil {
+			arg4 = args[4].(int64)
+		}
+		var arg5 *uuid.UUID
+		if args[5] != nil {
+			arg5 = args[5].(*uuid.UUID)
 		}
 		run(
 			arg0,
 			arg1,
 			arg2,
 			arg3,
+			arg4,
+			arg5,
 		)
 	})
 	return _c
@@ -2463,7 +2622,7 @@ func (_c *GitHubRepositoryMock_LinkPostedComment_Call) Return(err error) *GitHub
 	return _c
 }
 
-func (_c *GitHubRepositoryMock_LinkPostedComment_Call) RunAndReturn(run func(ctx context.Context, commentID uuid.UUID, issueID *uuid.UUID, githubID int64) error) *GitHubRepositoryMock_LinkPostedComment_Call {
+func (_c *GitHubRepositoryMock_LinkPostedComment_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, commentID uuid.UUID, issueID *uuid.UUID, githubID int64, postedAs *uuid.UUID) error) *GitHubRepositoryMock_LinkPostedComment_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -2606,6 +2765,69 @@ func (_c *GitHubRepositoryMock_LinkedIssueCounts_Call) Return(uUIDToInt map[uuid
 }
 
 func (_c *GitHubRepositoryMock_LinkedIssueCounts_Call) RunAndReturn(run func(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]int, error)) *GitHubRepositoryMock_LinkedIssueCounts_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// LockIssueComments provides a mock function for the type GitHubRepositoryMock
+func (_mock *GitHubRepositoryMock) LockIssueComments(ctx context.Context, tx repository.TxInterface, issue uuid.UUID) error {
+	ret := _mock.Called(ctx, tx, issue)
+
+	if len(ret) == 0 {
+		panic("no return value specified for LockIssueComments")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, tx, issue)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// GitHubRepositoryMock_LockIssueComments_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LockIssueComments'
+type GitHubRepositoryMock_LockIssueComments_Call struct {
+	*mock.Call
+}
+
+// LockIssueComments is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - issue uuid.UUID
+func (_e *GitHubRepositoryMock_Expecter) LockIssueComments(ctx any, tx any, issue any) *GitHubRepositoryMock_LockIssueComments_Call {
+	return &GitHubRepositoryMock_LockIssueComments_Call{Call: _e.mock.On("LockIssueComments", ctx, tx, issue)}
+}
+
+func (_c *GitHubRepositoryMock_LockIssueComments_Call) Run(run func(ctx context.Context, tx repository.TxInterface, issue uuid.UUID)) *GitHubRepositoryMock_LockIssueComments_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_LockIssueComments_Call) Return(err error) *GitHubRepositoryMock_LockIssueComments_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_LockIssueComments_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, issue uuid.UUID) error) *GitHubRepositoryMock_LockIssueComments_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -3572,6 +3794,75 @@ func (_c *GitHubRepositoryMock_SaveInstallation_Call) RunAndReturn(run func(ctx 
 	return _c
 }
 
+// SaveUserToken provides a mock function for the type GitHubRepositoryMock
+func (_mock *GitHubRepositoryMock) SaveUserToken(ctx context.Context, tx repository.TxInterface, user uuid.UUID, token github_repo.SealedToken) error {
+	ret := _mock.Called(ctx, tx, user, token)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SaveUserToken")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, github_repo.SealedToken) error); ok {
+		r0 = returnFunc(ctx, tx, user, token)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// GitHubRepositoryMock_SaveUserToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SaveUserToken'
+type GitHubRepositoryMock_SaveUserToken_Call struct {
+	*mock.Call
+}
+
+// SaveUserToken is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - user uuid.UUID
+//   - token github_repo.SealedToken
+func (_e *GitHubRepositoryMock_Expecter) SaveUserToken(ctx any, tx any, user any, token any) *GitHubRepositoryMock_SaveUserToken_Call {
+	return &GitHubRepositoryMock_SaveUserToken_Call{Call: _e.mock.On("SaveUserToken", ctx, tx, user, token)}
+}
+
+func (_c *GitHubRepositoryMock_SaveUserToken_Call) Run(run func(ctx context.Context, tx repository.TxInterface, user uuid.UUID, token github_repo.SealedToken)) *GitHubRepositoryMock_SaveUserToken_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 github_repo.SealedToken
+		if args[3] != nil {
+			arg3 = args[3].(github_repo.SealedToken)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_SaveUserToken_Call) Return(err error) *GitHubRepositoryMock_SaveUserToken_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_SaveUserToken_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, user uuid.UUID, token github_repo.SealedToken) error) *GitHubRepositoryMock_SaveUserToken_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // SetSuspended provides a mock function for the type GitHubRepositoryMock
 func (_mock *GitHubRepositoryMock) SetSuspended(ctx context.Context, installation int64, suspended bool) error {
 	ret := _mock.Called(ctx, installation, suspended)
@@ -4176,6 +4467,74 @@ func (_c *GitHubRepositoryMock_UserLogin_Call) Return(s *string, err error) *Git
 }
 
 func (_c *GitHubRepositoryMock_UserLogin_Call) RunAndReturn(run func(ctx context.Context, id uuid.UUID) (*string, error)) *GitHubRepositoryMock_UserLogin_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UserToken provides a mock function for the type GitHubRepositoryMock
+func (_mock *GitHubRepositoryMock) UserToken(ctx context.Context, user uuid.UUID) (*github_repo.SealedToken, error) {
+	ret := _mock.Called(ctx, user)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UserToken")
+	}
+
+	var r0 *github_repo.SealedToken
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*github_repo.SealedToken, error)); ok {
+		return returnFunc(ctx, user)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) *github_repo.SealedToken); ok {
+		r0 = returnFunc(ctx, user)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*github_repo.SealedToken)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, user)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// GitHubRepositoryMock_UserToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UserToken'
+type GitHubRepositoryMock_UserToken_Call struct {
+	*mock.Call
+}
+
+// UserToken is a helper method to define mock.On call
+//   - ctx context.Context
+//   - user uuid.UUID
+func (_e *GitHubRepositoryMock_Expecter) UserToken(ctx any, user any) *GitHubRepositoryMock_UserToken_Call {
+	return &GitHubRepositoryMock_UserToken_Call{Call: _e.mock.On("UserToken", ctx, user)}
+}
+
+func (_c *GitHubRepositoryMock_UserToken_Call) Run(run func(ctx context.Context, user uuid.UUID)) *GitHubRepositoryMock_UserToken_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_UserToken_Call) Return(sealedToken *github_repo.SealedToken, err error) *GitHubRepositoryMock_UserToken_Call {
+	_c.Call.Return(sealedToken, err)
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_UserToken_Call) RunAndReturn(run func(ctx context.Context, user uuid.UUID) (*github_repo.SealedToken, error)) *GitHubRepositoryMock_UserToken_Call {
 	_c.Call.Return(run)
 	return _c
 }

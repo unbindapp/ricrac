@@ -172,7 +172,10 @@ func (self *GitHubService) Disconnect(ctx context.Context, actor *auth.Actor, in
 }
 
 func (self *GitHubService) DisconnectAccount(ctx context.Context, caller *auth.Caller, _ *NoInput) (models.GitHubAccount, error) {
-	if err := self.github().ClearUserLogin(ctx, caller.User); err != nil {
+	err := self.repo.WithTx(ctx, func(tx repository.TxInterface) error {
+		return self.github().ClearUserLogin(ctx, tx, caller.User)
+	})
+	if err != nil {
 		return models.GitHubAccount{}, err
 	}
 	return models.GitHubAccount{}, nil

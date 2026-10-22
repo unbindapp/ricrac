@@ -31,6 +31,7 @@ import (
 	"ricrac/ent/githubissuelink"
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/githubreposync"
+	"ricrac/ent/githubusertoken"
 	"ricrac/ent/initiative"
 	"ricrac/ent/initiativeproject"
 	"ricrac/ent/invitation"
@@ -116,6 +117,7 @@ const (
 	TypeGithubIssueLink      = "GithubIssueLink"
 	TypeGithubOutbox         = "GithubOutbox"
 	TypeGithubRepoSync       = "GithubRepoSync"
+	TypeGithubUserToken      = "GithubUserToken"
 	TypeInitiative           = "Initiative"
 	TypeInitiativeProject    = "InitiativeProject"
 	TypeInvitation           = "Invitation"
@@ -22809,6 +22811,7 @@ type GithubCommentLinkMutation struct {
 	github_id     *int64
 	addgithub_id  *int64
 	posted        *bool
+	posted_as     *uuid.UUID
 	created_at    *time.Time
 	clearedFields map[string]struct{}
 	issue         *uuid.UUID
@@ -23063,6 +23066,55 @@ func (m *GithubCommentLinkMutation) ResetPosted() {
 	delete(m.clearedFields, githubcommentlink.FieldPosted)
 }
 
+// SetPostedAs sets the "posted_as" field.
+func (m *GithubCommentLinkMutation) SetPostedAs(u uuid.UUID) {
+	m.posted_as = &u
+}
+
+// PostedAs returns the value of the "posted_as" field in the mutation.
+func (m *GithubCommentLinkMutation) PostedAs() (r uuid.UUID, exists bool) {
+	v := m.posted_as
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPostedAs returns the old "posted_as" field's value of the GithubCommentLink entity.
+// If the GithubCommentLink object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GithubCommentLinkMutation) OldPostedAs(ctx context.Context) (v *uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPostedAs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPostedAs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPostedAs: %w", err)
+	}
+	return oldValue.PostedAs, nil
+}
+
+// ClearPostedAs clears the value of the "posted_as" field.
+func (m *GithubCommentLinkMutation) ClearPostedAs() {
+	m.posted_as = nil
+	m.clearedFields[githubcommentlink.FieldPostedAs] = struct{}{}
+}
+
+// PostedAsCleared returns if the "posted_as" field was cleared in this mutation.
+func (m *GithubCommentLinkMutation) PostedAsCleared() bool {
+	_, ok := m.clearedFields[githubcommentlink.FieldPostedAs]
+	return ok
+}
+
+// ResetPostedAs resets all changes to the "posted_as" field.
+func (m *GithubCommentLinkMutation) ResetPostedAs() {
+	m.posted_as = nil
+	delete(m.clearedFields, githubcommentlink.FieldPostedAs)
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *GithubCommentLinkMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -23173,7 +23225,7 @@ func (m *GithubCommentLinkMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *GithubCommentLinkMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.issue != nil {
 		fields = append(fields, githubcommentlink.FieldIssueID)
 	}
@@ -23182,6 +23234,9 @@ func (m *GithubCommentLinkMutation) Fields() []string {
 	}
 	if m.posted != nil {
 		fields = append(fields, githubcommentlink.FieldPosted)
+	}
+	if m.posted_as != nil {
+		fields = append(fields, githubcommentlink.FieldPostedAs)
 	}
 	if m.created_at != nil {
 		fields = append(fields, githubcommentlink.FieldCreatedAt)
@@ -23200,6 +23255,8 @@ func (m *GithubCommentLinkMutation) Field(name string) (ent.Value, bool) {
 		return m.GithubID()
 	case githubcommentlink.FieldPosted:
 		return m.Posted()
+	case githubcommentlink.FieldPostedAs:
+		return m.PostedAs()
 	case githubcommentlink.FieldCreatedAt:
 		return m.CreatedAt()
 	}
@@ -23217,6 +23274,8 @@ func (m *GithubCommentLinkMutation) OldField(ctx context.Context, name string) (
 		return m.OldGithubID(ctx)
 	case githubcommentlink.FieldPosted:
 		return m.OldPosted(ctx)
+	case githubcommentlink.FieldPostedAs:
+		return m.OldPostedAs(ctx)
 	case githubcommentlink.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	}
@@ -23248,6 +23307,13 @@ func (m *GithubCommentLinkMutation) SetField(name string, value ent.Value) error
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPosted(v)
+		return nil
+	case githubcommentlink.FieldPostedAs:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPostedAs(v)
 		return nil
 	case githubcommentlink.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -23304,6 +23370,9 @@ func (m *GithubCommentLinkMutation) ClearedFields() []string {
 	if m.FieldCleared(githubcommentlink.FieldPosted) {
 		fields = append(fields, githubcommentlink.FieldPosted)
 	}
+	if m.FieldCleared(githubcommentlink.FieldPostedAs) {
+		fields = append(fields, githubcommentlink.FieldPostedAs)
+	}
 	if m.FieldCleared(githubcommentlink.FieldCreatedAt) {
 		fields = append(fields, githubcommentlink.FieldCreatedAt)
 	}
@@ -23324,6 +23393,9 @@ func (m *GithubCommentLinkMutation) ClearField(name string) error {
 	case githubcommentlink.FieldPosted:
 		m.ClearPosted()
 		return nil
+	case githubcommentlink.FieldPostedAs:
+		m.ClearPostedAs()
+		return nil
 	case githubcommentlink.FieldCreatedAt:
 		m.ClearCreatedAt()
 		return nil
@@ -23343,6 +23415,9 @@ func (m *GithubCommentLinkMutation) ResetField(name string) error {
 		return nil
 	case githubcommentlink.FieldPosted:
 		m.ResetPosted()
+		return nil
+	case githubcommentlink.FieldPostedAs:
+		m.ResetPostedAs()
 		return nil
 	case githubcommentlink.FieldCreatedAt:
 		m.ResetCreatedAt()
@@ -25393,6 +25468,7 @@ type GithubOutboxMutation struct {
 	attempts             *int
 	addattempts          *int
 	next_attempt_at      *time.Time
+	act_as               *uuid.UUID
 	created_at           *time.Time
 	clearedFields        map[string]struct{}
 	repo_sync            *uuid.UUID
@@ -25990,6 +26066,55 @@ func (m *GithubOutboxMutation) ResetNextAttemptAt() {
 	delete(m.clearedFields, githuboutbox.FieldNextAttemptAt)
 }
 
+// SetActAs sets the "act_as" field.
+func (m *GithubOutboxMutation) SetActAs(u uuid.UUID) {
+	m.act_as = &u
+}
+
+// ActAs returns the value of the "act_as" field in the mutation.
+func (m *GithubOutboxMutation) ActAs() (r uuid.UUID, exists bool) {
+	v := m.act_as
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActAs returns the old "act_as" field's value of the GithubOutbox entity.
+// If the GithubOutbox object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GithubOutboxMutation) OldActAs(ctx context.Context) (v *uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldActAs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldActAs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActAs: %w", err)
+	}
+	return oldValue.ActAs, nil
+}
+
+// ClearActAs clears the value of the "act_as" field.
+func (m *GithubOutboxMutation) ClearActAs() {
+	m.act_as = nil
+	m.clearedFields[githuboutbox.FieldActAs] = struct{}{}
+}
+
+// ActAsCleared returns if the "act_as" field was cleared in this mutation.
+func (m *GithubOutboxMutation) ActAsCleared() bool {
+	_, ok := m.clearedFields[githuboutbox.FieldActAs]
+	return ok
+}
+
+// ResetActAs resets all changes to the "act_as" field.
+func (m *GithubOutboxMutation) ResetActAs() {
+	m.act_as = nil
+	delete(m.clearedFields, githuboutbox.FieldActAs)
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *GithubOutboxMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -26154,7 +26279,7 @@ func (m *GithubOutboxMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *GithubOutboxMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.repo_sync != nil {
 		fields = append(fields, githuboutbox.FieldRepoSyncID)
 	}
@@ -26181,6 +26306,9 @@ func (m *GithubOutboxMutation) Fields() []string {
 	}
 	if m.next_attempt_at != nil {
 		fields = append(fields, githuboutbox.FieldNextAttemptAt)
+	}
+	if m.act_as != nil {
+		fields = append(fields, githuboutbox.FieldActAs)
 	}
 	if m.created_at != nil {
 		fields = append(fields, githuboutbox.FieldCreatedAt)
@@ -26211,6 +26339,8 @@ func (m *GithubOutboxMutation) Field(name string) (ent.Value, bool) {
 		return m.Attempts()
 	case githuboutbox.FieldNextAttemptAt:
 		return m.NextAttemptAt()
+	case githuboutbox.FieldActAs:
+		return m.ActAs()
 	case githuboutbox.FieldCreatedAt:
 		return m.CreatedAt()
 	}
@@ -26240,6 +26370,8 @@ func (m *GithubOutboxMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldAttempts(ctx)
 	case githuboutbox.FieldNextAttemptAt:
 		return m.OldNextAttemptAt(ctx)
+	case githuboutbox.FieldActAs:
+		return m.OldActAs(ctx)
 	case githuboutbox.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	}
@@ -26313,6 +26445,13 @@ func (m *GithubOutboxMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetNextAttemptAt(v)
+		return nil
+	case githuboutbox.FieldActAs:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActAs(v)
 		return nil
 	case githuboutbox.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -26408,6 +26547,9 @@ func (m *GithubOutboxMutation) ClearedFields() []string {
 	if m.FieldCleared(githuboutbox.FieldNextAttemptAt) {
 		fields = append(fields, githuboutbox.FieldNextAttemptAt)
 	}
+	if m.FieldCleared(githuboutbox.FieldActAs) {
+		fields = append(fields, githuboutbox.FieldActAs)
+	}
 	if m.FieldCleared(githuboutbox.FieldCreatedAt) {
 		fields = append(fields, githuboutbox.FieldCreatedAt)
 	}
@@ -26442,6 +26584,9 @@ func (m *GithubOutboxMutation) ClearField(name string) error {
 		return nil
 	case githuboutbox.FieldNextAttemptAt:
 		m.ClearNextAttemptAt()
+		return nil
+	case githuboutbox.FieldActAs:
+		m.ClearActAs()
 		return nil
 	case githuboutbox.FieldCreatedAt:
 		m.ClearCreatedAt()
@@ -26480,6 +26625,9 @@ func (m *GithubOutboxMutation) ResetField(name string) error {
 		return nil
 	case githuboutbox.FieldNextAttemptAt:
 		m.ResetNextAttemptAt()
+		return nil
+	case githuboutbox.FieldActAs:
+		m.ResetActAs()
 		return nil
 	case githuboutbox.FieldCreatedAt:
 		m.ResetCreatedAt()
@@ -28589,6 +28737,560 @@ func (m *GithubRepoSyncMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown GithubRepoSync edge %s", name)
+}
+
+// GithubUserTokenMutation represents an operation that mutates the GithubUserToken nodes in the graph.
+type GithubUserTokenMutation struct {
+	config
+	op                 Op
+	typ                string
+	id                 *uuid.UUID
+	access_token       *string
+	expires_at         *time.Time
+	refresh_token      *string
+	refresh_expires_at *time.Time
+	clearedFields      map[string]struct{}
+	done               bool
+	oldValue           func(context.Context) (*GithubUserToken, error)
+	predicates         []predicate.GithubUserToken
+}
+
+var _ ent.Mutation = (*GithubUserTokenMutation)(nil)
+
+// githubusertokenOption allows management of the mutation configuration using functional options.
+type githubusertokenOption func(*GithubUserTokenMutation)
+
+// newGithubUserTokenMutation creates new mutation for the GithubUserToken entity.
+func newGithubUserTokenMutation(c config, op Op, opts ...githubusertokenOption) *GithubUserTokenMutation {
+	m := &GithubUserTokenMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeGithubUserToken,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withGithubUserTokenID sets the ID field of the mutation.
+func withGithubUserTokenID(id uuid.UUID) githubusertokenOption {
+	return func(m *GithubUserTokenMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *GithubUserToken
+		)
+		m.oldValue = func(ctx context.Context) (*GithubUserToken, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().GithubUserToken.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withGithubUserToken sets the old GithubUserToken of the mutation.
+func withGithubUserToken(node *GithubUserToken) githubusertokenOption {
+	return func(m *GithubUserTokenMutation) {
+		m.oldValue = func(context.Context) (*GithubUserToken, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m GithubUserTokenMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m GithubUserTokenMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of GithubUserToken entities.
+func (m *GithubUserTokenMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *GithubUserTokenMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *GithubUserTokenMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().GithubUserToken.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetAccessToken sets the "access_token" field.
+func (m *GithubUserTokenMutation) SetAccessToken(s string) {
+	m.access_token = &s
+}
+
+// AccessToken returns the value of the "access_token" field in the mutation.
+func (m *GithubUserTokenMutation) AccessToken() (r string, exists bool) {
+	v := m.access_token
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccessToken returns the old "access_token" field's value of the GithubUserToken entity.
+// If the GithubUserToken object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GithubUserTokenMutation) OldAccessToken(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccessToken is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccessToken requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccessToken: %w", err)
+	}
+	return oldValue.AccessToken, nil
+}
+
+// ResetAccessToken resets all changes to the "access_token" field.
+func (m *GithubUserTokenMutation) ResetAccessToken() {
+	m.access_token = nil
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (m *GithubUserTokenMutation) SetExpiresAt(t time.Time) {
+	m.expires_at = &t
+}
+
+// ExpiresAt returns the value of the "expires_at" field in the mutation.
+func (m *GithubUserTokenMutation) ExpiresAt() (r time.Time, exists bool) {
+	v := m.expires_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExpiresAt returns the old "expires_at" field's value of the GithubUserToken entity.
+// If the GithubUserToken object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GithubUserTokenMutation) OldExpiresAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExpiresAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExpiresAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExpiresAt: %w", err)
+	}
+	return oldValue.ExpiresAt, nil
+}
+
+// ClearExpiresAt clears the value of the "expires_at" field.
+func (m *GithubUserTokenMutation) ClearExpiresAt() {
+	m.expires_at = nil
+	m.clearedFields[githubusertoken.FieldExpiresAt] = struct{}{}
+}
+
+// ExpiresAtCleared returns if the "expires_at" field was cleared in this mutation.
+func (m *GithubUserTokenMutation) ExpiresAtCleared() bool {
+	_, ok := m.clearedFields[githubusertoken.FieldExpiresAt]
+	return ok
+}
+
+// ResetExpiresAt resets all changes to the "expires_at" field.
+func (m *GithubUserTokenMutation) ResetExpiresAt() {
+	m.expires_at = nil
+	delete(m.clearedFields, githubusertoken.FieldExpiresAt)
+}
+
+// SetRefreshToken sets the "refresh_token" field.
+func (m *GithubUserTokenMutation) SetRefreshToken(s string) {
+	m.refresh_token = &s
+}
+
+// RefreshToken returns the value of the "refresh_token" field in the mutation.
+func (m *GithubUserTokenMutation) RefreshToken() (r string, exists bool) {
+	v := m.refresh_token
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRefreshToken returns the old "refresh_token" field's value of the GithubUserToken entity.
+// If the GithubUserToken object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GithubUserTokenMutation) OldRefreshToken(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRefreshToken is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRefreshToken requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRefreshToken: %w", err)
+	}
+	return oldValue.RefreshToken, nil
+}
+
+// ClearRefreshToken clears the value of the "refresh_token" field.
+func (m *GithubUserTokenMutation) ClearRefreshToken() {
+	m.refresh_token = nil
+	m.clearedFields[githubusertoken.FieldRefreshToken] = struct{}{}
+}
+
+// RefreshTokenCleared returns if the "refresh_token" field was cleared in this mutation.
+func (m *GithubUserTokenMutation) RefreshTokenCleared() bool {
+	_, ok := m.clearedFields[githubusertoken.FieldRefreshToken]
+	return ok
+}
+
+// ResetRefreshToken resets all changes to the "refresh_token" field.
+func (m *GithubUserTokenMutation) ResetRefreshToken() {
+	m.refresh_token = nil
+	delete(m.clearedFields, githubusertoken.FieldRefreshToken)
+}
+
+// SetRefreshExpiresAt sets the "refresh_expires_at" field.
+func (m *GithubUserTokenMutation) SetRefreshExpiresAt(t time.Time) {
+	m.refresh_expires_at = &t
+}
+
+// RefreshExpiresAt returns the value of the "refresh_expires_at" field in the mutation.
+func (m *GithubUserTokenMutation) RefreshExpiresAt() (r time.Time, exists bool) {
+	v := m.refresh_expires_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRefreshExpiresAt returns the old "refresh_expires_at" field's value of the GithubUserToken entity.
+// If the GithubUserToken object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GithubUserTokenMutation) OldRefreshExpiresAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRefreshExpiresAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRefreshExpiresAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRefreshExpiresAt: %w", err)
+	}
+	return oldValue.RefreshExpiresAt, nil
+}
+
+// ClearRefreshExpiresAt clears the value of the "refresh_expires_at" field.
+func (m *GithubUserTokenMutation) ClearRefreshExpiresAt() {
+	m.refresh_expires_at = nil
+	m.clearedFields[githubusertoken.FieldRefreshExpiresAt] = struct{}{}
+}
+
+// RefreshExpiresAtCleared returns if the "refresh_expires_at" field was cleared in this mutation.
+func (m *GithubUserTokenMutation) RefreshExpiresAtCleared() bool {
+	_, ok := m.clearedFields[githubusertoken.FieldRefreshExpiresAt]
+	return ok
+}
+
+// ResetRefreshExpiresAt resets all changes to the "refresh_expires_at" field.
+func (m *GithubUserTokenMutation) ResetRefreshExpiresAt() {
+	m.refresh_expires_at = nil
+	delete(m.clearedFields, githubusertoken.FieldRefreshExpiresAt)
+}
+
+// Where appends a list predicates to the GithubUserTokenMutation builder.
+func (m *GithubUserTokenMutation) Where(ps ...predicate.GithubUserToken) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the GithubUserTokenMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *GithubUserTokenMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.GithubUserToken, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *GithubUserTokenMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *GithubUserTokenMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (GithubUserToken).
+func (m *GithubUserTokenMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *GithubUserTokenMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.access_token != nil {
+		fields = append(fields, githubusertoken.FieldAccessToken)
+	}
+	if m.expires_at != nil {
+		fields = append(fields, githubusertoken.FieldExpiresAt)
+	}
+	if m.refresh_token != nil {
+		fields = append(fields, githubusertoken.FieldRefreshToken)
+	}
+	if m.refresh_expires_at != nil {
+		fields = append(fields, githubusertoken.FieldRefreshExpiresAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *GithubUserTokenMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case githubusertoken.FieldAccessToken:
+		return m.AccessToken()
+	case githubusertoken.FieldExpiresAt:
+		return m.ExpiresAt()
+	case githubusertoken.FieldRefreshToken:
+		return m.RefreshToken()
+	case githubusertoken.FieldRefreshExpiresAt:
+		return m.RefreshExpiresAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *GithubUserTokenMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case githubusertoken.FieldAccessToken:
+		return m.OldAccessToken(ctx)
+	case githubusertoken.FieldExpiresAt:
+		return m.OldExpiresAt(ctx)
+	case githubusertoken.FieldRefreshToken:
+		return m.OldRefreshToken(ctx)
+	case githubusertoken.FieldRefreshExpiresAt:
+		return m.OldRefreshExpiresAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown GithubUserToken field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *GithubUserTokenMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case githubusertoken.FieldAccessToken:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccessToken(v)
+		return nil
+	case githubusertoken.FieldExpiresAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExpiresAt(v)
+		return nil
+	case githubusertoken.FieldRefreshToken:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRefreshToken(v)
+		return nil
+	case githubusertoken.FieldRefreshExpiresAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRefreshExpiresAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown GithubUserToken field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *GithubUserTokenMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *GithubUserTokenMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *GithubUserTokenMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown GithubUserToken numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *GithubUserTokenMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(githubusertoken.FieldExpiresAt) {
+		fields = append(fields, githubusertoken.FieldExpiresAt)
+	}
+	if m.FieldCleared(githubusertoken.FieldRefreshToken) {
+		fields = append(fields, githubusertoken.FieldRefreshToken)
+	}
+	if m.FieldCleared(githubusertoken.FieldRefreshExpiresAt) {
+		fields = append(fields, githubusertoken.FieldRefreshExpiresAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *GithubUserTokenMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *GithubUserTokenMutation) ClearField(name string) error {
+	switch name {
+	case githubusertoken.FieldExpiresAt:
+		m.ClearExpiresAt()
+		return nil
+	case githubusertoken.FieldRefreshToken:
+		m.ClearRefreshToken()
+		return nil
+	case githubusertoken.FieldRefreshExpiresAt:
+		m.ClearRefreshExpiresAt()
+		return nil
+	}
+	return fmt.Errorf("unknown GithubUserToken nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *GithubUserTokenMutation) ResetField(name string) error {
+	switch name {
+	case githubusertoken.FieldAccessToken:
+		m.ResetAccessToken()
+		return nil
+	case githubusertoken.FieldExpiresAt:
+		m.ResetExpiresAt()
+		return nil
+	case githubusertoken.FieldRefreshToken:
+		m.ResetRefreshToken()
+		return nil
+	case githubusertoken.FieldRefreshExpiresAt:
+		m.ResetRefreshExpiresAt()
+		return nil
+	}
+	return fmt.Errorf("unknown GithubUserToken field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *GithubUserTokenMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *GithubUserTokenMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *GithubUserTokenMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *GithubUserTokenMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *GithubUserTokenMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *GithubUserTokenMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *GithubUserTokenMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown GithubUserToken unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *GithubUserTokenMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown GithubUserToken edge %s", name)
 }
 
 // InitiativeMutation represents an operation that mutates the Initiative nodes in the graph.

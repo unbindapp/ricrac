@@ -154,8 +154,8 @@ func (self *GitHubRepository) LabelsNamedOn(ctx context.Context, issueID uuid.UU
 }
 
 // CommentLinked says whether a GitHub comment is linked to a comment already.
-func (self *GitHubRepository) CommentLinked(ctx context.Context, githubID int64) (bool, error) {
-	return self.base.DB.GithubCommentLink.Query().Where(githubcommentlink.GithubID(githubID)).Exist(ctx)
+func (self *GitHubRepository) CommentLinked(ctx context.Context, tx repository.TxInterface, githubID int64) (bool, error) {
+	return self.base.Client(tx).GithubCommentLink.Query().Where(githubcommentlink.GithubID(githubID)).Exist(ctx)
 }
 
 // LinkedComment is the comment a GitHub comment is linked to.

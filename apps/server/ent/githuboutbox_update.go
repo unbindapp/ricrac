@@ -216,6 +216,26 @@ func (_u *GithubOutboxUpdate) ClearNextAttemptAt() *GithubOutboxUpdate {
 	return _u
 }
 
+// SetActAs sets the "act_as" field.
+func (_u *GithubOutboxUpdate) SetActAs(v uuid.UUID) *GithubOutboxUpdate {
+	_u.mutation.SetActAs(v)
+	return _u
+}
+
+// SetNillableActAs sets the "act_as" field if the given value is not nil.
+func (_u *GithubOutboxUpdate) SetNillableActAs(v *uuid.UUID) *GithubOutboxUpdate {
+	if v != nil {
+		_u.SetActAs(*v)
+	}
+	return _u
+}
+
+// ClearActAs clears the value of the "act_as" field.
+func (_u *GithubOutboxUpdate) ClearActAs() *GithubOutboxUpdate {
+	_u.mutation.ClearActAs()
+	return _u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_u *GithubOutboxUpdate) SetCreatedAt(v time.Time) *GithubOutboxUpdate {
 	_u.mutation.SetCreatedAt(v)
@@ -370,6 +390,12 @@ func (_u *GithubOutboxUpdate) sqlSave(ctx context.Context) (_node int, err error
 	}
 	if _u.mutation.NextAttemptAtCleared() {
 		_spec.ClearField(githuboutbox.FieldNextAttemptAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.ActAs(); ok {
+		_spec.SetField(githuboutbox.FieldActAs, field.TypeUUID, value)
+	}
+	if _u.mutation.ActAsCleared() {
+		_spec.ClearField(githuboutbox.FieldActAs, field.TypeUUID)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(githuboutbox.FieldCreatedAt, field.TypeTime, value)
@@ -667,6 +693,26 @@ func (_u *GithubOutboxUpdateOne) ClearNextAttemptAt() *GithubOutboxUpdateOne {
 	return _u
 }
 
+// SetActAs sets the "act_as" field.
+func (_u *GithubOutboxUpdateOne) SetActAs(v uuid.UUID) *GithubOutboxUpdateOne {
+	_u.mutation.SetActAs(v)
+	return _u
+}
+
+// SetNillableActAs sets the "act_as" field if the given value is not nil.
+func (_u *GithubOutboxUpdateOne) SetNillableActAs(v *uuid.UUID) *GithubOutboxUpdateOne {
+	if v != nil {
+		_u.SetActAs(*v)
+	}
+	return _u
+}
+
+// ClearActAs clears the value of the "act_as" field.
+func (_u *GithubOutboxUpdateOne) ClearActAs() *GithubOutboxUpdateOne {
+	_u.mutation.ClearActAs()
+	return _u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_u *GithubOutboxUpdateOne) SetCreatedAt(v time.Time) *GithubOutboxUpdateOne {
 	_u.mutation.SetCreatedAt(v)
@@ -851,6 +897,12 @@ func (_u *GithubOutboxUpdateOne) sqlSave(ctx context.Context) (_node *GithubOutb
 	}
 	if _u.mutation.NextAttemptAtCleared() {
 		_spec.ClearField(githuboutbox.FieldNextAttemptAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.ActAs(); ok {
+		_spec.SetField(githuboutbox.FieldActAs, field.TypeUUID, value)
+	}
+	if _u.mutation.ActAsCleared() {
+		_spec.ClearField(githuboutbox.FieldActAs, field.TypeUUID)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(githuboutbox.FieldCreatedAt, field.TypeTime, value)

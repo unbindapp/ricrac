@@ -30,6 +30,8 @@ const (
 	FieldAttempts = "attempts"
 	// FieldNextAttemptAt holds the string denoting the next_attempt_at field in the database.
 	FieldNextAttemptAt = "next_attempt_at"
+	// FieldActAs holds the string denoting the act_as field in the database.
+	FieldActAs = "act_as"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// EdgeRepoSync holds the string denoting the repo_sync edge name in mutations.
@@ -75,6 +77,7 @@ var Columns = []string{
 	FieldChanges,
 	FieldAttempts,
 	FieldNextAttemptAt,
+	FieldActAs,
 	FieldCreatedAt,
 }
 
@@ -134,6 +137,11 @@ func ByAttempts(opts ...sql.OrderTermOption) OrderOption {
 // ByNextAttemptAt orders the results by the next_attempt_at field.
 func ByNextAttemptAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldNextAttemptAt, opts...).ToFunc()
+}
+
+// ByActAs orders the results by the act_as field.
+func ByActAs(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldActAs, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

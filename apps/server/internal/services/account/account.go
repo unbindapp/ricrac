@@ -108,9 +108,14 @@ func (self *AccountService) Me(ctx context.Context, id uuid.UUID) (*models.Me, e
 	if err != nil {
 		return nil, err
 	}
+	authorized, err := self.repo.GitHub().HasUserToken(ctx, id)
+	if err != nil {
+		return nil, err
+	}
 	return &models.Me{
 		ID: id, Email: user.Email, Name: user.Name, DisplayName: user.DisplayName, AvatarURL: user.AvatarURL, GitHubLogin: user.GithubLogin,
-		Workspaces: models.NonNil(workspaces), Invitations: models.NonNil(invitations),
+		GitHubAuthorized: authorized,
+		Workspaces:       models.NonNil(workspaces), Invitations: models.NonNil(invitations),
 	}, nil
 }
 

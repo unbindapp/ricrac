@@ -88,7 +88,7 @@ func (self *GitHubService) connectInstallation(ctx context.Context, session Sess
 		slog.Warn("GitHub refused the installation's code", "err", err)
 		return "not_authorized"
 	}
-	installations, err := self.app.UserInstallations(ctx, token)
+	installations, err := self.app.UserInstallations(ctx, token.AccessToken)
 	if err != nil {
 		slog.Warn("listing the GitHub installations of the installer failed", "err", err)
 		return "github_failed"
@@ -114,9 +114,10 @@ func (self *GitHubService) connectInstallation(ctx context.Context, session Sess
 	return ""
 }
 
-// saveLogin links the GitHub account of a user token to user, taking it from anyone who had it.
-func (self *GitHubService) saveLogin(ctx context.Context, token string, user uuid.UUID) error {
-	raw, err := self.app.UserLogin(ctx, token)
+// saveLogin links the GitHub account of a user token to user, taking it from anyone who had it,
+// and keeps the token to post their comments as them.
+func (self *GitHubService) saveLogin(ctx context.Context, token github.UserToken, user uuid.UUID) error {
+	raw, err := self.app.UserLogin(ctx, token.AccessToken)
 	if err != nil {
 		return err
 	}
@@ -125,7 +126,10 @@ func (self *GitHubService) saveLogin(ctx context.Context, token string, user uui
 		return fmt.Errorf("%q isn't a GitHub login", raw)
 	}
 	return self.repo.WithTx(ctx, func(tx repository.TxInterface) error {
-		return self.github().SetUserLogin(ctx, tx, user, login)
+		if err := self.github().SetUserLogin(ctx, tx, user, login); err != nil {
+			return err
+		}
+		return self.github().SaveUserToken(ctx, tx, user, self.seal(token))
 	})
 }
 

@@ -89,7 +89,7 @@ organization's settings):
 | GitHub App name | Ricrac (or anything; its URL name is the slug) |
 | Homepage URL | `https://ricrac.example.com` |
 | Callback URL | `https://ricrac.example.com/api/github/setup`, and add `https://ricrac.example.com/api/github/callback` |
-| Expire user authorization tokens | either; Ricrac only uses a person's token once |
+| Expire user authorization tokens | either; Ricrac refreshes expiring tokens |
 | Request user authorization (OAuth) during installation | **on** |
 | Enable Device Flow | off |
 | Setup URL | `https://ricrac.example.com/api/github/setup` (GitHub greys it out while the option above is on and uses the callback URL; both work) |
@@ -133,14 +133,18 @@ Then, as a workspace admin:
    issues too. `list_github_repo_syncs` shows how the import went and the last error.
 
 Everyone else links their GitHub account from their settings (`/api/github/connect`), so their
-pull requests, comments and assignments on GitHub show as theirs.
+pull requests, comments and assignments on GitHub show as theirs and their comments in Ricrac post
+on GitHub as them. Ricrac keeps their token, encrypted with `SECRET_KEY`; changing the key forgets
+the tokens until people link their accounts again.
 
 ## What goes where
 
 - Changes made in Ricrac are queued in the same transaction and sent within seconds by a
   background job, with the installation's token. Failures are retried after 1, 5 and 30 minutes
   and 2 hours, then dropped; the last error shows on the repository sync.
-- Comments from Ricrac appear on GitHub as the app, starting with `**<name> on Ricrac**`.
+- Comments from Ricrac appear on GitHub as their author when they linked their GitHub account and
+  can comment on the repository. Otherwise they appear as the app, starting with
+  `**<name> on Ricrac**`.
 - Events caused by the app itself (its bot account) are ignored, and changes that came from
   GitHub aren't sent back, so nothing echoes.
 - Issue events older than what Ricrac already has (by GitHub's `updated_at`) are ignored.

@@ -62,6 +62,8 @@ type Tx struct {
 	GithubOutbox *GithubOutboxClient
 	// GithubRepoSync is the client for interacting with the GithubRepoSync builders.
 	GithubRepoSync *GithubRepoSyncClient
+	// GithubUserToken is the client for interacting with the GithubUserToken builders.
+	GithubUserToken *GithubUserTokenClient
 	// Initiative is the client for interacting with the Initiative builders.
 	Initiative *InitiativeClient
 	// InitiativeProject is the client for interacting with the InitiativeProject builders.
@@ -301,6 +303,7 @@ func (tx *Tx) init() {
 	tx.GithubIssueLink = NewGithubIssueLinkClient(tx.config)
 	tx.GithubOutbox = NewGithubOutboxClient(tx.config)
 	tx.GithubRepoSync = NewGithubRepoSyncClient(tx.config)
+	tx.GithubUserToken = NewGithubUserTokenClient(tx.config)
 	tx.Initiative = NewInitiativeClient(tx.config)
 	tx.InitiativeProject = NewInitiativeProjectClient(tx.config)
 	tx.Invitation = NewInvitationClient(tx.config)
