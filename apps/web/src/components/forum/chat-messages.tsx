@@ -3,13 +3,15 @@ import { useEffect } from "react";
 
 import type { Comment, CommentThread, UserRef } from "@/api/ops.gen";
 import { ChatDayDivider, ChatMessage } from "@/components/forum/chat-message";
-import { MessagesSquareIcon } from "@/components/icons";
+import { MessageSquareReplyIcon, MessagesSquareIcon } from "@/components/icons";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { chatRows } from "@/lib/helpers/chat";
 import { commentsQuery, type TCommentTarget } from "@/lib/queries/comments";
+import { useUiTheme } from "@/themes/ui-theme-provider";
 
 const SKELETON_MESSAGES = 3;
 
@@ -34,6 +36,7 @@ type TProps = {
 };
 
 export function ChatMessages({ target, threads: threadView, onNewThread, empty }: TProps) {
+  const { expandsReplies } = useUiTheme();
   const { threads, isPending, error, refetch } = useChatMessages(target);
   if (isPending) return <ChatSkeleton />;
   if (error) return <ErrorCard message={error.message} onRetry={() => void refetch()} />;
@@ -52,19 +55,63 @@ export function ChatMessages({ target, threads: threadView, onNewThread, empty }
           {row.kind === "day" ? (
             <ChatDayDivider date={row.date} />
           ) : (
-            <ChatMessage
-              message={row.message}
-              isContinuation={row.isContinuation}
-              replyTo={replyTo.has(row.message.id) ? replyTo.get(row.message.id) : undefined}
-              thread={
-                threadView && {
-                  replies: byId.get(row.message.id)?.replies ?? [],
-                  isOpen: threadView.openId === row.message.id,
-                  onOpen: () => threadView.onOpen(row.message.id),
+            <>
+              <ChatMessage
+                message={row.message}
+                isContinuation={row.isContinuation}
+                replyTo={replyTo.has(row.message.id) ? replyTo.get(row.message.id) : undefined}
+                thread={
+                  threadView && {
+                    replies: byId.get(row.message.id)?.replies ?? [],
+                    isOpen: threadView.openId === row.message.id,
+                    onOpen: () => threadView.onOpen(row.message.id),
+                  }
                 }
-              }
-              onNewThread={onNewThread && (() => onNewThread(row.message))}
-            />
+                onNewThread={onNewThread && (() => onNewThread(row.message))}
+              />
+              {threadView && expandsReplies && (
+                <MessageReplies
+                  replies={byId.get(row.message.id)?.replies ?? []}
+                  since={row.message.createdAt}
+                  onReply={() => threadView.onOpen(row.message.id)}
+                />
+              )}
+            </>
+          )}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+type TRepliesProps = { replies: Comment[]; since: string; onReply: () => void };
+
+function MessageReplies({ replies, since, onReply }: TRepliesProps) {
+  const { canEdit } = useWorkspace();
+  if (replies.length === 0) return null;
+  return (
+    <div className="ml-4 flex flex-col items-start gap-1 border-l-2 pl-5">
+      <ReplyList replies={replies} since={since} />
+      {canEdit && (
+        <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={onReply}>
+          <MessageSquareReplyIcon className="size-4" />
+          Reply
+        </Button>
+      )}
+    </div>
+  );
+}
+
+/** Replies to a message, with day dividers counted from the message they answer. */
+export function ReplyList({ replies, since }: { replies: Comment[]; since: string }) {
+  return (
+    <ol aria-label="Replies" className="flex w-full flex-col">
+      {chatRows(replies, since).map((row) => (
+        <li key={row.key} className="flex flex-col">
+          {row.kind === "day" ? (
+            <ChatDayDivider date={row.date} />
+          ) : (
+            <ChatMessage message={row.message} isContinuation={row.isContinuation} />
           )}
         </li>
       ))}

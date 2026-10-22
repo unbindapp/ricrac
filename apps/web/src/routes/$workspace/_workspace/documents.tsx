@@ -74,8 +74,8 @@ function DocumentsPage() {
                 label="Show"
                 value={view}
                 options={[
-                  { value: "all", label: "All" },
-                  { value: "trash", label: "Trash", icon: <Trash2Icon className="size-4" /> },
+                  { value: "all", label: "All", icon: FileTextIcon },
+                  { value: "trash", label: "Trash", icon: Trash2Icon },
                 ]}
                 onChange={(value) =>
                   void navigate({ search: { view: value === "trash" ? "trash" : undefined } })

@@ -1,4 +1,4 @@
-import { ArchiveIcon, type LucideIcon, Trash2Icon } from "@/components/icons";
+import { ArchiveIcon, CircleDotIcon, type LucideIcon, Trash2Icon } from "@/components/icons";
 import type { TProjectScope } from "@/components/projects/project-groups";
 import { EmptyState } from "@/components/layout/empty-state";
 import { FilterMenu } from "@/components/shared/filter-menu";
@@ -15,9 +15,9 @@ export function ScopeTabs({
       label="Show"
       value={scope}
       options={[
-        { value: "active", label: "Active" },
-        { value: "archived", label: "Archived", icon: <ArchiveIcon className="size-4" /> },
-        { value: "trash", label: "Trash", icon: <Trash2Icon className="size-4" /> },
+        { value: "active", label: "Active", icon: CircleDotIcon },
+        { value: "archived", label: "Archived", icon: ArchiveIcon },
+        { value: "trash", label: "Trash", icon: Trash2Icon },
       ]}
       onChange={onChange}
     />

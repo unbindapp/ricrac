@@ -9,6 +9,7 @@ import {
   type TFilterModel,
 } from "@/components/views/view-filter";
 import {
+  fieldIcons,
   fieldLabels,
   type TFilterOption,
   useFilterOptions,
@@ -18,6 +19,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -67,17 +70,21 @@ export function ViewFilterBar({ model, conditions, onChange, disabled }: TProps)
             }
           />
           <DropdownMenuContent align="start" className="w-44">
-            {unused.map((field) => (
-              <DropdownMenuItem
-                key={field}
-                onClick={() => {
-                  setJustAdded(field);
-                  onChange([...conditions, { field, op: "is", values: [] }]);
-                }}
-              >
-                {fieldLabels[field]}
-              </DropdownMenuItem>
-            ))}
+            {unused.map((field) => {
+              const Icon = fieldIcons[field];
+              return (
+                <DropdownMenuItem
+                  key={field}
+                  onClick={() => {
+                    setJustAdded(field);
+                    onChange([...conditions, { field, op: "is", values: [] }]);
+                  }}
+                >
+                  <Icon className="size-4" />
+                  {fieldLabels[field]}
+                </DropdownMenuItem>
+              );
+            })}
           </DropdownMenuContent>
         </DropdownMenu>
       )}
@@ -162,12 +169,16 @@ function ConditionChip({
             }
           />
           <DropdownMenuContent align="start" className="w-32">
-            <DropdownMenuItem onClick={() => onChange({ ...condition, op: "is" })}>
-              is
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onChange({ ...condition, op: "isNot" })}>
-              is not
-            </DropdownMenuItem>
+            <DropdownMenuRadioGroup
+              value={condition.op}
+              className="border-0 bg-transparent p-0"
+              onValueChange={(op) =>
+                onChange({ ...condition, op: op === "isNot" ? "isNot" : "is" })
+              }
+            >
+              <DropdownMenuRadioItem value="is">is</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="isNot">is not</DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (

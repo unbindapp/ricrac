@@ -4,7 +4,15 @@ import { zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
 
 import type { Team } from "@/api/ops.gen";
-import { CircleDotIcon, ListTodoIcon, PlusIcon, TriangleIcon } from "@/components/icons";
+import {
+  CircleDashedIcon,
+  CircleDotIcon,
+  LayersIcon,
+  ListTodoIcon,
+  type LucideIcon,
+  PlusIcon,
+  TriangleIcon,
+} from "@/components/icons";
 import {
   filtersFromSearch,
   filtersToSearch,
@@ -39,10 +47,10 @@ const STATE_TYPES: Record<TIssuesTab, TStateType[]> = {
   all: ["backlog", "unstarted", "started", "completed", "canceled"],
 };
 
-const TAB_LABELS: Record<TIssuesTab, string> = {
-  active: "Active",
-  backlog: "Backlog",
-  all: "All issues",
+const TAB_OPTIONS: Record<TIssuesTab, { label: string; icon: LucideIcon }> = {
+  active: { label: "Active", icon: CircleDotIcon },
+  backlog: { label: "Backlog", icon: CircleDashedIcon },
+  all: { label: "All issues", icon: LayersIcon },
 };
 
 function IssuesPage() {
@@ -107,7 +115,7 @@ function Issues({
       value={tab}
       options={TABS.map((item) => ({
         value: item,
-        label: TAB_LABELS[item],
+        ...TAB_OPTIONS[item],
         suffix: item !== "all" && counts[item] !== undefined && (
           <span className="text-xs font-normal opacity-75">{counts[item]}</span>
         ),

@@ -32,13 +32,7 @@ import {
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
 import { useNewProjectStore } from "@/components/projects/new-project-store";
 import type { TTheme } from "@/components/providers/themes";
-import {
-  searchHitContext,
-  searchHitHeadings,
-  searchHitLink,
-  SearchHitIcon,
-  Snippet,
-} from "@/components/search/search-hits";
+import { SearchHitGroups } from "@/components/search/search-hit-groups";
 import { useSearch } from "@/components/search/use-search";
 import { useInviteStore } from "@/components/settings/invite-store";
 import {
@@ -58,7 +52,6 @@ import { GO_TO_KEYS } from "@/lib/hotkeys/shortcuts";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 import { useHotkeySequenceScope } from "@/lib/hotkeys/use-hotkey-sequences";
 import { meQuery, signOut } from "@/lib/queries/me";
-import type { TSearchHit } from "@/lib/queries/search";
 
 type TShortcutDestination = keyof typeof GO_TO_KEYS;
 type TDestination = TShortcutDestination | "cycles";
@@ -308,7 +301,7 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
               Search failed: {search.error.message}
             </div>
           )}
-          <SearchGroups hits={search.hits} query={query} onOpen={go} />
+          <SearchHitGroups hits={search.hits} query={query} onOpen={go} />
           <ActionGroup heading="Create" actions={create} />
           <ActionGroup heading="Go to" actions={goTo} />
           <ActionGroup heading="Workspaces" actions={workspaces} />
@@ -317,61 +310,6 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
       </ScrollArea>
     </Command>
   );
-}
-
-const HIT_ORDER: TSearchHit["type"][] = [
-  "issue",
-  "project",
-  "initiative",
-  "document",
-  "discussion",
-  "comment",
-];
-
-function SearchGroups({
-  hits,
-  query,
-  onOpen,
-}: {
-  hits: TSearchHit[];
-  query: string;
-  onOpen: (link: LinkProps) => void;
-}) {
-  const { workspace } = useWorkspace();
-  return HIT_ORDER.map((type) => {
-    const ofType = hits.filter((hit) => hit.type === type);
-    if (ofType.length === 0) return null;
-    return (
-      <CommandGroup key={type} heading={searchHitHeadings[type]}>
-        {ofType.map((hit) => {
-          const context = searchHitContext(hit);
-          return (
-            <CommandItem
-              key={`${hit.type}-${hit.id}`}
-              value={`search-${hit.type}-${hit.id}`}
-              keywords={[query]}
-              onSelect={() => onOpen(searchHitLink(hit, workspace.urlKey))}
-            >
-              <SearchHitIcon hit={hit} />
-              {(hit.type === "issue" || hit.type === "comment") && (
-                <span className="text-muted-foreground shrink-0 font-mono text-xs">
-                  {hit.identifier}
-                </span>
-              )}
-              <span className="min-w-0 truncate">
-                {hit.type === "comment" ? <Snippet text={hit.snippet} /> : hit.title}
-              </span>
-              {context && (
-                <span className="text-muted-foreground ml-auto shrink-0 pl-2 text-xs">
-                  {context}
-                </span>
-              )}
-            </CommandItem>
-          );
-        })}
-      </CommandGroup>
-    );
-  });
 }
 
 function ActionGroup({ heading, actions }: { heading: string; actions: TAction[] }) {

@@ -8,6 +8,7 @@ import {
   CheckCheckIcon,
   EllipsisIcon,
   InboxIcon,
+  type LucideIcon,
   MailIcon,
 } from "@/components/icons";
 import { NotificationPane } from "@/components/inbox/notification-pane";
@@ -47,11 +48,11 @@ import {
 
 export const INBOX_FILTERS = ["inbox", "unread", "snoozed", "archived"] as const;
 
-const filterLabels: Record<TInboxFilter, string> = {
-  inbox: "All",
-  unread: "Unread",
-  snoozed: "Snoozed",
-  archived: "Archived",
+const filters: Record<TInboxFilter, { label: string; icon: LucideIcon }> = {
+  inbox: { label: "All", icon: InboxIcon },
+  unread: { label: "Unread", icon: MailIcon },
+  snoozed: { label: "Snoozed", icon: AlarmClockIcon },
+  archived: { label: "Archived", icon: ArchiveIcon },
 };
 
 const emptyStates = {
@@ -273,7 +274,7 @@ export function InboxView({ filter, selectedKey, onFilterChange, onSelect }: TPr
             value={filter}
             options={INBOX_FILTERS.map((value) => ({
               value,
-              label: filterLabels[value],
+              ...filters[value],
               suffix: value === "unread" && unread > 0 && (
                 <Badge variant="muted">{unread > 99 ? "99+" : unread}</Badge>
               ),

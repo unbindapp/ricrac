@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
 
-import { CheckIcon, ChevronDownIcon } from "@/components/icons";
+import { CheckIcon, ChevronDownIcon, type LucideIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,7 +13,7 @@ import {
 export type TFilterOption<T extends string> = {
   value: T;
   label: string;
-  icon?: ReactNode;
+  icon: LucideIcon;
   /** Shown after the label, like how many there are. */
   suffix?: ReactNode;
 };
@@ -38,7 +38,7 @@ export function FilterMenu<T extends string>({ label, value, options, onChange }
             aria-label={`${label}: ${current.label}`}
             className="dank:bg-secondary dank:text-secondary-foreground dank:has-hover:hover:bg-secondary/85 dank:has-hover:hover:text-secondary-foreground dank:active:bg-secondary/85 dank:border-0 w-fit"
           >
-            {current.icon}
+            <current.icon className="size-4" />
             <span>{current.label}</span>
             {current.suffix}
             <ChevronDownIcon className="size-4 transition-transform group-data-popup-open/button:rotate-180" />
@@ -54,7 +54,7 @@ export function FilterMenu<T extends string>({ label, value, options, onChange }
               className="dank:data-selected:bg-secondary dank:data-selected:text-secondary-foreground"
               onClick={() => onChange(option.value)}
             >
-              {option.icon}
+              <option.icon className="size-4" />
               <span className="min-w-0 flex-1 truncate">{option.label}</span>
               {option.suffix}
               {option.value === value && <CheckIcon className="size-4" />}

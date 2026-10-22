@@ -1,14 +1,15 @@
-import { Link, useLocation, useMatchRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { Link, useNavigate, useRouter, useSearch } from "@tanstack/react-router";
+import { Suspense, useEffect, useState } from "react";
 
 import { ArrowLeftIcon } from "@/components/icons";
+import { ListSkeleton } from "@/components/layout/list-skeleton";
 import type { TSettingsTab, TSettingsTabGroup } from "@/components/layout/settings-layout";
+import { SettingsGate } from "@/components/settings/settings-gate";
+import { useSettingsGroups } from "@/components/settings/settings-groups";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/ui/utils";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { useSettingsReturnHref } from "@/lib/stores/settings-return";
 import { SettingsWindow } from "@/themes/dank/settings-window";
-import type { TSettingsFrameProps } from "@/themes/types";
 
 const sectionBadges = [
   "bg-primary text-primary-foreground",
@@ -18,30 +19,33 @@ const sectionBadges = [
   "bg-wait text-wait-foreground",
 ];
 
-/** Settings in a window over the page; closing it goes back to where it opened. */
-export function DankSettingsFrame({ groups, children }: TSettingsFrameProps) {
-  const { workspace } = useWorkspace();
-  const returnHref = useSettingsReturnHref(workspace.urlKey);
+/** Settings in a window over the page, which stays mounted under it while it is open. */
+export function DankSettingsWindow() {
+  const settingsPath = useSearch({
+    from: "/$workspace/_workspace",
+    select: (search) => search.settings,
+  });
+  const [shownPath, setShownPath] = useState(settingsPath);
+  if (settingsPath && settingsPath !== shownPath) setShownPath(settingsPath);
   const navigate = useNavigate();
 
-  const close = () => {
-    if (returnHref) {
-      void navigate({ href: returnHref });
-      return;
-    }
-    void navigate({ to: "/$workspace", params: { workspace: workspace.urlKey } });
-  };
+  const close = () =>
+    void navigate({ to: ".", search: (prev) => ({ ...prev, settings: undefined }) });
 
   return (
-    <SettingsWindow onClose={close}>
-      <SettingsList groups={groups}>{children}</SettingsList>
+    <SettingsWindow isOpen={Boolean(settingsPath)} onClose={close}>
+      {shownPath && <SettingsList path={shownPath} />}
     </SettingsWindow>
   );
 }
 
-function useIsTabActive() {
-  const matchRoute = useMatchRoute();
-  return (tab: TSettingsTab) => Boolean(matchRoute({ ...tab.link, fuzzy: !tab.exact }));
+function settingsPathOf(tab: TSettingsTab) {
+  return String(tab.link.to).replace("/$workspace", "");
+}
+
+function isTabActive(tab: TSettingsTab, path: string) {
+  const tabPath = settingsPathOf(tab);
+  return path === tabPath || (!tab.exact && path.startsWith(`${tabPath}/`));
 }
 
 function sectionsOf(tabs: TSettingsTab[]) {
@@ -53,14 +57,20 @@ function sectionsOf(tabs: TSettingsTab[]) {
   }, []);
 }
 
-function SettingsList({ groups, children }: TSettingsFrameProps) {
-  const pathname = useLocation({ select: (location) => location.pathname });
-  const isTabActive = useIsTabActive();
-  const group = groups.find((item) => item.tabs.some(isTabActive)) ?? groups[0];
+function SettingsList({ path }: { path: string }) {
+  const router = useRouter();
+  const groups = useSettingsGroups();
+  useEffect(() => {
+    for (const tab of groups.flatMap((group) => group.tabs)) {
+      router.preloadRoute(tab.link).catch(() => undefined);
+    }
+  }, [router, groups]);
+  const group = groups.find((item) => item.tabs.some((tab) => isTabActive(tab, path))) ?? groups[0];
   const firstTab = group?.tabs[0];
   const [isListShown, setIsListShown] = useState(() =>
-    firstTab ? isTabActive({ ...firstTab, exact: true }) : false,
+    firstTab ? path === settingsPathOf(firstTab) : false,
   );
+  const [openedPath] = useState(path);
 
   return (
     <div
@@ -76,6 +86,7 @@ function SettingsList({ groups, children }: TSettingsFrameProps) {
                 <SettingsTabLink
                   key={tab.label}
                   tab={tab}
+                  isActive={isTabActive(tab, path)}
                   badge={sectionBadges[index % sectionBadges.length]}
                   onSelect={() => setIsListShown(false)}
                 />
@@ -85,10 +96,13 @@ function SettingsList({ groups, children }: TSettingsFrameProps) {
         </nav>
       </aside>
       <main
-        key={pathname}
+        key={path}
         className="bg-surface-container flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto group-data-[view=list]/settings:max-md:hidden"
       >
-        <div className="animate-in fade-in-0 slide-in-from-right-8 ease-emphasized mx-auto flex w-full max-w-3xl flex-col gap-2 px-4 pt-4 pb-16 duration-300 motion-reduce:animate-none md:px-8 md:pt-6">
+        <div
+          data-switched={path !== openedPath || undefined}
+          className="data-switched:animate-in data-switched:fade-in-0 data-switched:slide-in-from-right-8 ease-emphasized mx-auto flex w-full max-w-3xl flex-col gap-2 px-4 pt-4 pb-16 duration-300 motion-reduce:animate-none md:px-8 md:pt-6"
+        >
           <Button
             variant="ghost"
             size="icon"
@@ -98,11 +112,35 @@ function SettingsList({ groups, children }: TSettingsFrameProps) {
           >
             <ArrowLeftIcon className="size-5" />
           </Button>
-          {children}
+          <SettingsPage path={path} />
         </div>
       </main>
     </div>
   );
+}
+
+const WORKSPACE_SETTINGS_ROUTE = "/$workspace/_workspace/settings/_workspace-settings";
+const ADMIN_SETTINGS_ROUTE = "/$workspace/_workspace/settings/_workspace-settings/_admin";
+
+/** The settings route's page for a path, rendered here so the page under the window stays. */
+function SettingsPage({ path }: { path: string }) {
+  const router = useRouter();
+  const { workspace } = useWorkspace();
+  const [routes, , found] = router.getMatchedRoutes(`/${workspace.urlKey}${path}`);
+  const Page = found?.options.component;
+  if (!Page) return null;
+  const ids = routes.map((route) => route.id);
+  const page = (
+    <Suspense fallback={<ListSkeleton rows={4} />}>
+      <Page />
+    </Suspense>
+  );
+  if (ids.includes(ADMIN_SETTINGS_ROUTE))
+    return <SettingsGate access="admins">{page}</SettingsGate>;
+  if (ids.includes(WORKSPACE_SETTINGS_ROUTE)) {
+    return <SettingsGate access="members">{page}</SettingsGate>;
+  }
+  return page;
 }
 
 function GroupSwitcher({
@@ -135,17 +173,18 @@ function GroupSwitcher({
 
 type TTabLinkProps = {
   tab: TSettingsTab;
+  isActive: boolean;
   badge: string;
   onSelect: () => void;
 };
 
-function SettingsTabLink({ tab, badge, onSelect }: TTabLinkProps) {
+function SettingsTabLink({ tab, isActive, badge, onSelect }: TTabLinkProps) {
   return (
     <Link
       {...tab.link}
-      activeOptions={{ exact: tab.exact ?? false, includeSearch: false }}
+      data-current={isActive || undefined}
       onClick={onSelect}
-      className="group/tab bg-surface-container text-foreground has-hover:hover:bg-surface-container-high focus-visible:outline-primary data-[status=active]:bg-secondary data-[status=active]:text-secondary-foreground ease-emphasized flex items-center gap-4 rounded-[0.375rem] px-5 py-3 transition-[background-color,border-radius] duration-200 first:rounded-t-[1.5rem] last:rounded-b-[1.5rem] focus-visible:outline-2 focus-visible:-outline-offset-2 data-[status=active]:rounded-[1.5rem]"
+      className="group/tab bg-surface-container text-foreground has-hover:hover:bg-surface-container-high focus-visible:outline-primary data-current:bg-secondary data-current:text-secondary-foreground ease-emphasized flex items-center gap-4 rounded-[0.375rem] px-5 py-3 transition-[background-color,border-radius] duration-200 first:rounded-t-[1.5rem] last:rounded-b-[1.5rem] focus-visible:outline-2 focus-visible:-outline-offset-2 data-current:rounded-[1.5rem]"
     >
       <span
         className={cn(
@@ -157,7 +196,7 @@ function SettingsTabLink({ tab, badge, onSelect }: TTabLinkProps) {
       </span>
       <span className="flex min-w-0 flex-col gap-0.5">
         <span className="truncate text-base leading-tight font-medium">{tab.label}</span>
-        <span className="text-muted-foreground group-data-[status=active]/tab:text-secondary-foreground truncate text-sm">
+        <span className="text-muted-foreground group-data-current/tab:text-secondary-foreground truncate text-sm">
           {tab.description}
         </span>
       </span>

@@ -3,7 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
 
-import { UserCircleIcon } from "@/components/icons";
+import {
+  BellIcon,
+  CircleUserIcon,
+  type LucideIcon,
+  SquarePenIcon,
+  UserCircleIcon,
+} from "@/components/icons";
 import {
   filtersFromSearch,
   filtersToSearch,
@@ -19,10 +25,10 @@ import { meQuery } from "@/lib/queries/me";
 const TABS = ["assigned", "created", "subscribed"] as const;
 type TMyIssuesTab = (typeof TABS)[number];
 
-const tabLabels: Record<TMyIssuesTab, string> = {
-  assigned: "Assigned",
-  created: "Created",
-  subscribed: "Subscribed",
+const tabs: Record<TMyIssuesTab, { label: string; icon: LucideIcon }> = {
+  assigned: { label: "Assigned", icon: CircleUserIcon },
+  created: { label: "Created", icon: SquarePenIcon },
+  subscribed: { label: "Subscribed", icon: BellIcon },
 };
 
 const searchSchema = issueSearchSchema.extend({
@@ -95,7 +101,7 @@ function MyIssuesPage() {
         <FilterMenu
           label="Issues"
           value={tab}
-          options={TABS.map((item) => ({ value: item, label: tabLabels[item] }))}
+          options={TABS.map((item) => ({ value: item, ...tabs[item] }))}
           onChange={(value) => void navigate({ search: (prev) => ({ ...prev, tab: value }) })}
         />
       }

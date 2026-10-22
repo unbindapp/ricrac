@@ -7,11 +7,12 @@ import { Dialog, DialogClose, DialogOverlay, DialogPortal } from "@/components/u
 import { SimpleTooltip } from "@/components/ui/tooltip";
 
 type TProps = {
+  isOpen: boolean;
   onClose: () => void;
   children: ReactNode;
 };
 
-export function SettingsWindow({ onClose, children }: TProps) {
+export function SettingsWindow({ isOpen, onClose, children }: TProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const popupRef = useRef<HTMLDivElement>(null);
 
@@ -25,15 +26,18 @@ export function SettingsWindow({ onClose, children }: TProps) {
   };
 
   return (
-    <Dialog open disablePointerDismissal onOpenChange={handleOpenChange}>
+    <Dialog open={isOpen} disablePointerDismissal onOpenChange={handleOpenChange}>
       <DialogPortal>
-        <DialogOverlay onClick={onClose} />
+        <DialogOverlay
+          onClick={onClose}
+          className="ease-emphasized fill-mode-forwards duration-300 data-closed:duration-300 data-open:duration-300"
+        />
         <DialogPrimitive.Popup
           ref={popupRef}
           initialFocus={popupRef}
           data-slot="settings-window"
           data-fullscreen={isFullscreen ? "" : undefined}
-          className="bg-surface shadow-dialog shadow-shadow-color/shadow-opacity border-primary ease-emphasized data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 fixed inset-0 z-[1000] m-auto flex h-[min(1020px,calc(100dvh-48px))] w-[min(1100px,calc(100vw-48px))] flex-col overflow-hidden rounded-[1.75rem] border-2 outline-hidden transition-[width,height,border-radius] duration-300 data-fullscreen:size-full data-fullscreen:rounded-none data-fullscreen:border-0 max-md:size-full max-md:rounded-none max-md:border-0"
+          className="bg-surface shadow-dialog shadow-shadow-color/shadow-opacity border-primary ease-emphasized data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 fill-mode-forwards fixed inset-0 z-[1000] m-auto flex h-[min(1020px,calc(100dvh-48px))] w-[min(1100px,calc(100vw-48px))] flex-col overflow-hidden rounded-[1.75rem] border-2 outline-hidden transition-[width,height,border-radius] duration-300 data-fullscreen:size-full data-fullscreen:rounded-none data-fullscreen:border-0 max-md:size-full max-md:rounded-none max-md:border-0"
         >
           <header className="relative flex h-16 shrink-0 items-center justify-center px-4">
             <DialogPrimitive.Title className="text-lg font-medium">Settings</DialogPrimitive.Title>

@@ -1,5 +1,12 @@
-import { AlarmClockIcon, BellRingIcon } from "@/components/icons";
-import { snoozeOptions } from "@/components/inbox/snooze";
+import {
+  AlarmClockIcon,
+  BellRingIcon,
+  CalendarIcon,
+  ClockIcon,
+  type LucideIcon,
+  SunIcon,
+} from "@/components/icons";
+import { snoozeOptions, type TSnoozeOption } from "@/components/inbox/snooze";
 import { useNow } from "@/components/providers/now-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +20,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Kbd } from "@/components/ui/kbd";
 import { formatDateTime } from "@/lib/helpers/dates";
+
+const snoozeIcons: Record<TSnoozeOption["id"], LucideIcon> = {
+  hour: ClockIcon,
+  later: ClockIcon,
+  tomorrow: SunIcon,
+  "next-week": CalendarIcon,
+};
 
 type TProps = {
   open: boolean;
@@ -40,12 +54,18 @@ export function SnoozeMenu({ open, onOpenChange, onSnooze, onUnsnooze }: TProps)
             <span className="flex-1">Snooze until</span>
             <Kbd>H</Kbd>
           </DropdownMenuLabel>
-          {options.map((option) => (
-            <DropdownMenuItem key={option.id} onClick={() => onSnooze(option.until)}>
-              <span className="flex-1">{option.label}</span>
-              <span className="text-muted-foreground text-xs">{formatDateTime(option.until)}</span>
-            </DropdownMenuItem>
-          ))}
+          {options.map((option) => {
+            const Icon = snoozeIcons[option.id];
+            return (
+              <DropdownMenuItem key={option.id} onClick={() => onSnooze(option.until)}>
+                <Icon className="size-4" />
+                <span className="flex-1">{option.label}</span>
+                <span className="text-muted-foreground text-xs">
+                  {formatDateTime(option.until)}
+                </span>
+              </DropdownMenuItem>
+            );
+          })}
         </DropdownMenuGroup>
         {onUnsnooze && (
           <>

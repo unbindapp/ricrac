@@ -94,11 +94,15 @@ export function ThreadContextMenu({ discussion, thread, isOpen, children }: TPro
                       if (picked && picked !== kind) save({ id: thread.id, kind: picked });
                     }}
                   >
-                    {THREAD_KINDS.map((known) => (
-                      <DropdownMenuRadioItem key={known} value={known}>
-                        {threadKinds[known].label}
-                      </DropdownMenuRadioItem>
-                    ))}
+                    {THREAD_KINDS.map((known) => {
+                      const { label, icon: Icon } = threadKinds[known];
+                      return (
+                        <DropdownMenuRadioItem key={known} value={known}>
+                          <Icon className="size-4" />
+                          {label}
+                        </DropdownMenuRadioItem>
+                      );
+                    })}
                   </DropdownMenuRadioGroup>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>

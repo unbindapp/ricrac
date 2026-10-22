@@ -5,7 +5,7 @@ import { type ReactNode } from "react";
 import { z } from "zod";
 
 import type { WorkspaceUserDetail } from "@/api/ops.gen";
-import { MonitorIcon, MoonIcon, SunIcon } from "@/components/icons";
+import { LogOutIcon, MonitorIcon, MoonIcon, SunIcon } from "@/components/icons";
 import { GithubAccountSection } from "@/components/integrations/github-account-section";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
@@ -19,6 +19,7 @@ import { Switch } from "@/components/ui/switch";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { timezoneOptions } from "@/lib/helpers/timezones";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
+import { signOut } from "@/lib/queries/me";
 import { useUpdateUserMutation, workspaceMeQuery } from "@/lib/queries/users";
 import { useAccentHueStore } from "@/lib/stores/accent-hue";
 import { useUiTheme } from "@/themes/ui-theme-provider";
@@ -76,6 +77,7 @@ function AccountProfileSettingsPage() {
           <NotificationsSection me={me} />
           <GithubAccountSection />
           <AppearanceSection />
+          <SignOutSection me={me} />
         </>
       )}
     </SettingsPage>
@@ -166,6 +168,21 @@ function NotificationsSection({ me }: { me: WorkspaceUserDetail }) {
           disabled={isPending}
           onCheckedChange={(checked) => update({ id: "me", emailNotifications: checked })}
         />
+      }
+    />
+  );
+}
+
+function SignOutSection({ me }: { me: WorkspaceUserDetail }) {
+  return (
+    <SettingsSection
+      title="Sign out"
+      description={`Signed in as ${me.email}.`}
+      actions={
+        <Button variant="outline" size="sm" onClick={() => void signOut()}>
+          <LogOutIcon className="size-4" />
+          Sign out
+        </Button>
       }
     />
   );

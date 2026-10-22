@@ -1,7 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 
-import { BoxIcon, CalendarIcon, RefreshCwIcon, UserIcon } from "@/components/icons";
+import {
+  BoxIcon,
+  CalendarIcon,
+  CircleDashedIcon,
+  CircleDotIcon,
+  CircleUserIcon,
+  HeartIcon,
+  type LucideIcon,
+  RefreshCwIcon,
+  SignalHighIcon,
+  TagIcon,
+  UserIcon,
+  UserPenIcon,
+} from "@/components/icons";
 import { type TFilterField, ME, NONE } from "@/components/views/view-filter";
 import { Avatar } from "@/components/shared/avatar";
 import { PriorityIcon, priorityLabel, PRIORITIES } from "@/components/shared/priority-icon";
@@ -29,6 +42,22 @@ export const fieldLabels: Record<TFilterField, string> = {
   lead: "Lead",
   projectPriority: "Priority",
   health: "Health",
+};
+
+export const fieldIcons: Record<TFilterField, LucideIcon> = {
+  statusType: CircleDashedIcon,
+  status: CircleDotIcon,
+  assignee: CircleUserIcon,
+  creator: UserPenIcon,
+  priority: SignalHighIcon,
+  labels: TagIcon,
+  project: BoxIcon,
+  cycle: RefreshCwIcon,
+  dueDate: CalendarIcon,
+  projectStatus: CircleDotIcon,
+  lead: UserIcon,
+  projectPriority: SignalHighIcon,
+  health: HeartIcon,
 };
 
 const projectStatusTypes = ["backlog", "planned", "started", "paused", "completed", "canceled"];

@@ -149,13 +149,16 @@ function DialogContent({
             {!hideXButton && variant !== "styleless" && (
               <DialogPrimitive.Close
                 render={
-                  <Button variant="ghost" size="icon" className="text-muted-more-foreground">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Close"
+                    className="text-muted-foreground dank:top-3.5 dank:right-4 absolute top-3 right-3"
+                  >
                     <XIcon className="size-4" />
-                    <span className="sr-only">Close</span>
                   </Button>
                 }
-                className="focus-visible:ring-foreground text-muted-foreground absolute top-0 right-0 rounded-lg p-2 opacity-50 ring-1 ring-transparent focus-visible:outline-hidden active:opacity-100 disabled:pointer-events-none has-hover:hover:opacity-100"
-              ></DialogPrimitive.Close>
+              />
             )}
           </div>
         </DialogPrimitive.Popup>

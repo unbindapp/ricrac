@@ -1,5 +1,7 @@
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { zodValidator } from "@tanstack/zod-adapter";
+import { z } from "zod";
 
 import type { Me } from "@/api/account.gen";
 import { TeamsProvider } from "@/components/workspace/teams-provider";
@@ -14,7 +16,13 @@ function findWorkspace(me: Me | null, urlKey: string) {
   return me?.workspaces.find((workspace) => workspace.urlKey === urlKey.toLowerCase());
 }
 
+const searchSchema = z.object({
+  /** The settings page open in a window over this one, like /settings/members. */
+  settings: z.string().optional(),
+});
+
 export const Route = createFileRoute("/$workspace/_workspace")({
+  validateSearch: zodValidator(searchSchema),
   beforeLoad: async ({ context: { queryClient }, params }) => {
     const cached = await queryClient.ensureQueryData(meQuery);
     const me = findWorkspace(cached, params.workspace)

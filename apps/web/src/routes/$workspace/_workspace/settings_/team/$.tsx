@@ -16,7 +16,7 @@ function isMovedTeamPage(page: string): page is keyof typeof movedTeamPages {
   return Object.hasOwn(movedTeamPages, page);
 }
 
-export const Route = createFileRoute("/$workspace/_workspace/settings/team/$")({
+export const Route = createFileRoute("/$workspace/_workspace/settings_/team/$")({
   beforeLoad: ({ params }) => {
     const page = params._splat?.split("/")[1] ?? "";
     throw redirect({

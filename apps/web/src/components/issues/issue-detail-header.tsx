@@ -11,6 +11,8 @@ import {
   ArchiveRestoreIcon,
   BellIcon,
   BellOffIcon,
+  CalendarClockIcon,
+  CalendarIcon,
   CopyIcon,
   EllipsisIcon,
   FlameIcon,
@@ -59,9 +61,9 @@ const MORNING = { hours: 9, minutes: 0, seconds: 0, milliseconds: 0 };
 
 function snoozeOptions(now: Date) {
   return [
-    { label: "Tomorrow", until: set(addDays(now, 1), MORNING) },
-    { label: "Next week", until: set(nextMonday(now), MORNING) },
-    { label: "In a month", until: set(addMonths(now, 1), MORNING) },
+    { label: "Tomorrow", icon: SunIcon, until: set(addDays(now, 1), MORNING) },
+    { label: "Next week", icon: CalendarIcon, until: set(nextMonday(now), MORNING) },
+    { label: "In a month", icon: CalendarClockIcon, until: set(addMonths(now, 1), MORNING) },
   ];
 }
 
@@ -152,6 +154,7 @@ export function IssueDetailHeader({ issue, variant, onClose, onSetSla }: TProps)
                           key={option.label}
                           onClick={() => snooze(option.until.toISOString())}
                         >
+                          <option.icon className="size-4" />
                           <span className="flex-1">{option.label}</span>
                           <span className="text-muted-foreground text-xs">
                             {formatDateTime(option.until)}

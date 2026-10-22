@@ -1,5 +1,5 @@
-import { ChatComposer, ChatDayDivider, ChatMessage } from "@/components/forum/chat-message";
-import { ChatSkeleton, useChatMessages } from "@/components/forum/chat-messages";
+import { ChatComposer, ChatMessage } from "@/components/forum/chat-message";
+import { ChatSkeleton, ReplyList, useChatMessages } from "@/components/forum/chat-messages";
 import { ArrowLeftIcon, MessageSquareReplyIcon } from "@/components/icons";
 import { userName } from "@/components/issues/grouping";
 import { ChatLayout } from "@/components/layout/chat-layout";
@@ -9,7 +9,6 @@ import { PanelBar } from "@/components/layout/panel-bar";
 import { HeaderAction } from "@/components/shared/detail-actions";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { chatRows } from "@/lib/helpers/chat";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 
 type TProps = { discussionId: string; messageId: string; onBack: () => void };
@@ -83,17 +82,7 @@ export function MessageThreadPanel({ discussionId, messageId, onBack }: TProps) 
         <p className="text-muted-foreground pt-4 text-xs font-medium">
           {count === 0 ? "No replies yet" : `${count} ${count === 1 ? "reply" : "replies"}`}
         </p>
-        <ol aria-label="Replies" className="flex flex-col">
-          {chatRows(root.replies).map((row) => (
-            <li key={row.key} className="flex flex-col">
-              {row.kind === "day" ? (
-                <ChatDayDivider date={row.date} />
-              ) : (
-                <ChatMessage message={row.message} isContinuation={row.isContinuation} />
-              )}
-            </li>
-          ))}
-        </ol>
+        <ReplyList replies={root.replies} since={root.createdAt} />
       </div>
     );
   }

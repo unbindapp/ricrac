@@ -3,7 +3,7 @@ import { zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
 
 import type { Team } from "@/api/ops.gen";
-import { TriangleIcon } from "@/components/icons";
+import { AlarmClockIcon, InboxIcon, TriangleIcon } from "@/components/icons";
 import { filtersFromSearch, filtersToSearch, issueSearchSchema } from "@/components/issues/filters";
 import { IssuesView } from "@/components/issues/issues-view";
 import { TriageActions } from "@/components/issues/triage-actions";
@@ -79,8 +79,8 @@ function Triage({ team }: { team: Team }) {
           label="Show"
           value={tab ?? "inbox"}
           options={[
-            { value: "inbox", label: "To triage" },
-            { value: "snoozed", label: "Snoozed" },
+            { value: "inbox", label: "To triage", icon: InboxIcon },
+            { value: "snoozed", label: "Snoozed", icon: AlarmClockIcon },
           ]}
           onChange={(value) =>
             void navigate({
