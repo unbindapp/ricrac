@@ -19,8 +19,8 @@ import { appConfigQuery } from "@/lib/queries/me";
 const features: { icon: TIcon; heading: string; body: string }[] = [
   {
     icon: KanbanIcon,
-    heading: "Everything a team tracks",
-    body: "Teams, issues with sub-issues and relations, workflows, labels, projects with milestones and updates, initiatives, cycles, documents, views and templates.",
+    heading: "Everything you track",
+    body: "Issues with sub-issues and relations, workflows, labels, projects with milestones and updates, initiatives, cycles, documents, views and templates.",
   },
   {
     icon: BotIcon,
@@ -45,7 +45,7 @@ const features: { icon: TIcon; heading: string; body: string }[] = [
   {
     icon: UsersIcon,
     heading: "Your people stay in charge",
-    body: "Workspaces with owners, admins, members and guests, private teams, and control over every key and connected app.",
+    body: "Workspaces with owners, admins, members and guests, and control over every key and connected app.",
   },
 ];
 

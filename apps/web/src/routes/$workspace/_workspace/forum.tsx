@@ -235,7 +235,7 @@ function emptyState({
   return {
     icon: MessagesSquareIcon,
     title: "No discussions yet",
-    description: "Start one to talk through an idea, a design or a problem with your team.",
+    description: "Start one to talk through an idea, a design or a problem together.",
     action,
   };
 }

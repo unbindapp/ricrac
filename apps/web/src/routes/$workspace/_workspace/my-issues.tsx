@@ -52,7 +52,7 @@ const emptyTitles: Record<TMyIssuesTab, string> = {
 };
 
 const emptyDescriptions: Record<TMyIssuesTab, string> = {
-  assigned: "Issues assigned to you, across your teams, show up here.",
+  assigned: "Issues assigned to you show up here.",
   created: "Issues you create show up here.",
   subscribed:
     "Issues you follow (you created, were assigned or mentioned, or subscribed) show up here.",
