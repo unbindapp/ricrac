@@ -5,11 +5,12 @@ import { useState } from "react";
 import type { Team } from "@/api/ops.gen";
 import { CycleDialog, type TCycleDialogTarget } from "@/components/cycles/cycle-dialog";
 import { CycleList } from "@/components/cycles/cycle-list";
-import { PlusIcon, RefreshCwIcon, SettingsIcon } from "@/components/icons";
+import { RefreshCwIcon, SettingsIcon } from "@/components/icons";
 import { EmptyState } from "@/components/layout/empty-state";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
-import { Button, LinkButton } from "@/components/ui/button";
+import { CreateButton } from "@/components/layout/create-button";
+import { LinkButton } from "@/components/ui/button";
 import { SimpleTooltip } from "@/components/ui/tooltip";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { WorkspaceTeamGate } from "@/components/workspace/workspace-team-gate";
@@ -67,12 +68,7 @@ function Cycles({ team }: { team: Team }) {
                   </LinkButton>
                 </SimpleTooltip>
               )}
-              {canEdit && (
-                <Button size="sm" onClick={openNewCycle}>
-                  <PlusIcon className="size-4" />
-                  New cycle
-                </Button>
-              )}
+              {canEdit && <CreateButton size="sm" label="New cycle" onClick={openNewCycle} />}
             </>
           )
         }

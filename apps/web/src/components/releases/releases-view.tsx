@@ -18,6 +18,7 @@ import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageToolbar } from "@/components/layout/page-toolbar";
+import { CreateButton } from "@/components/layout/create-button";
 import { PipelineDialog } from "@/components/releases/pipeline-dialog";
 import { ReleaseDialog } from "@/components/releases/release-dialog";
 import { ReleaseStageIcon } from "@/components/releases/release-stage-icon";
@@ -104,17 +105,7 @@ export function ReleasesView({ pipeline: pipelineSlug, tab, onChange }: TProps) 
 
 function HeaderAction({ pipeline, tab }: { pipeline: ReleasePipeline; tab: TReleasesTab }) {
   if (tab === "notes") return <NewNotesButton pipeline={pipeline} />;
-  return (
-    <ReleaseDialog
-      pipeline={pipeline}
-      trigger={
-        <Button>
-          <PlusIcon className="size-4" />
-          New release
-        </Button>
-      }
-    />
-  );
+  return <ReleaseDialog pipeline={pipeline} trigger={<CreateButton label="New release" />} />;
 }
 
 function NewNotesButton({
@@ -138,13 +129,11 @@ function NewNotesButton({
           }),
       },
     );
+  if (variant === "default") {
+    return <CreateButton label="Write release notes" isPending={isPending} onClick={create} />;
+  }
   return (
-    <Button
-      variant={variant}
-      size={variant === "outline" ? "sm" : "default"}
-      isPending={isPending}
-      onClick={create}
-    >
+    <Button variant="outline" size="sm" isPending={isPending} onClick={create}>
       <PlusIcon className="size-4" />
       Write release notes
     </Button>

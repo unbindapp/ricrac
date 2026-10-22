@@ -18,6 +18,7 @@ import { ListStates } from "@/components/layout/list-states";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageToolbar } from "@/components/layout/page-toolbar";
+import { CreateButton } from "@/components/layout/create-button";
 import { inScope, scopeArgs, type TProjectScope } from "@/components/projects/project-groups";
 import { TrashedRow } from "@/components/projects/entity-menu";
 import { ScopeEmpty, ScopeTabs } from "@/components/projects/scope-tabs";
@@ -44,13 +45,14 @@ function InitiativesPage() {
   const newButton = (placement: "header" | "empty") => (
     <NewInitiativeDialog
       trigger={
-        <Button
-          size={placement === "header" ? "default" : "sm"}
-          variant={placement === "header" ? "default" : "outline"}
-        >
-          <PlusIcon className="size-4" />
-          New initiative
-        </Button>
+        placement === "header" ? (
+          <CreateButton label="New initiative" />
+        ) : (
+          <Button size="sm" variant="outline">
+            <PlusIcon className="size-4" />
+            New initiative
+          </Button>
+        )
       }
     />
   );

@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/layout/empty-state";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageToolbar } from "@/components/layout/page-toolbar";
+import { CreateButton } from "@/components/layout/create-button";
 import { useNewProjectStore } from "@/components/projects/new-project-store";
 import { ProjectBoard } from "@/components/projects/project-board";
 import type { TProjectScope } from "@/components/projects/project-groups";
@@ -68,14 +69,7 @@ export function ProjectsView({ title, breadcrumb, storageKey, filters }: TProps)
         title={title}
         icon={<BoxIcon />}
         breadcrumb={breadcrumb}
-        actions={
-          canEdit && (
-            <Button onClick={create}>
-              <PlusIcon className="size-4" />
-              New project
-            </Button>
-          )
-        }
+        actions={canEdit && <CreateButton label="New project" onClick={create} />}
         toolbar={
           <PageToolbar
             actions={

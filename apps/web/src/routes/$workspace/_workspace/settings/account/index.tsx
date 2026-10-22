@@ -196,6 +196,7 @@ function AccentField() {
   const { defaultAccentHue } = useUiTheme();
   const chosenHue = useAccentHueStore((state) => state.hue);
   const setHue = useAccentHueStore((state) => state.setHue);
+  const previewHue = useAccentHueStore((state) => state.previewHue);
   const hue = chosenHue ?? defaultAccentHue;
   return (
     <div className="flex flex-col gap-3">
@@ -212,9 +213,11 @@ function AccentField() {
         min={0}
         max={359}
         value={hue}
+        size="large"
         thumbLabel="Accent hue"
         trackStyle={{ background: hueGradient }}
-        onValueChange={(value) => setHue(value)}
+        onValueChange={(value) => previewHue(value)}
+        onValueCommitted={(value) => setHue(value)}
       />
       <div className="flex flex-wrap items-center gap-2">
         {accentPresets.map((preset) => (

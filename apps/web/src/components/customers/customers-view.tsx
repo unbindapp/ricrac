@@ -8,6 +8,7 @@ import { CustomerLogo, OptionDot, OptionLabel } from "@/components/customers/cus
 import { CustomerDialog } from "@/components/customers/customer-dialog";
 import { BuildingIcon, ListFilterIcon, PlusIcon, SearchXIcon } from "@/components/icons";
 import { PropertyPicker } from "@/components/issues/property-picker";
+import { CreateButton } from "@/components/layout/create-button";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
@@ -44,14 +45,18 @@ export function CustomersView() {
     refetch,
   } = useQuery(customersQuery(workspace.id, filters));
 
-  const newButton = (variant: "default" | "outline", size: "default" | "sm") =>
+  const newButton = (placement: "header" | "empty") =>
     canEdit && (
       <CustomerDialog
         trigger={
-          <Button variant={variant} size={size}>
-            <PlusIcon className="size-4" />
-            New customer
-          </Button>
+          placement === "header" ? (
+            <CreateButton label="New customer" />
+          ) : (
+            <Button variant="outline" size="sm">
+              <PlusIcon className="size-4" />
+              New customer
+            </Button>
+          )
         }
       />
     );
@@ -61,7 +66,7 @@ export function CustomersView() {
       <PageHeader
         title="Customers"
         icon={<BuildingIcon />}
-        actions={newButton("default", "default")}
+        actions={newButton("header")}
         toolbar={
           <PageToolbar>
             <Input
@@ -83,7 +88,7 @@ export function CustomersView() {
           icon={BuildingIcon}
           title="No customers yet"
           description="Customers tie the requests of the people you build for to issues and projects, so you can see who needs what."
-          action={newButton("outline", "sm")}
+          action={newButton("empty")}
         />
       )}
       {!isPending && !error && customers.length === 0 && isFiltered && (

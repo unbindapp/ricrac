@@ -1,6 +1,6 @@
 import type { Parent, PhrasingContent, Root, RootContent } from "mdast";
 import { createContext, use, useState } from "react";
-import ReactMarkdown, { defaultUrlTransform } from "react-markdown";
+import ReactMarkdown, { type Components, defaultUrlTransform } from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { MarkdownMedia } from "@/components/shared/markdown-media";
@@ -47,6 +47,27 @@ function urlTransform(url: string) {
   return defaultUrlTransform(url);
 }
 
+const components: Components = {
+  a: ({ href, children }) => {
+    if (href?.startsWith(MENTION_URL)) {
+      return <span data-type="mention">{children}</span>;
+    }
+    return (
+      <a href={href} target="_blank" rel="noreferrer noopener">
+        {children}
+      </a>
+    );
+  },
+  li: ({ node, children, ...props }) => (
+    <li {...props}>
+      <ItemOffset value={node?.position?.start.offset ?? null}>{children}</ItemOffset>
+    </li>
+  ),
+  input: ({ checked }) => <TaskInput checked={Boolean(checked)} />,
+  img: ({ src, alt }) =>
+    typeof src === "string" && src ? <MarkdownMedia src={src} alt={alt} /> : null,
+};
+
 export function MarkdownView({ markdown, onChange }: TProps) {
   const [toggled, setToggled] = useState<{ from: string; to: string } | null>(null);
   const shown = toggled?.from === markdown ? toggled.to : markdown;
@@ -62,26 +83,7 @@ export function MarkdownView({ markdown, onChange }: TProps) {
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkMentions]}
           urlTransform={urlTransform}
-          components={{
-            a: ({ href, children }) => {
-              if (href?.startsWith(MENTION_URL)) {
-                return <span data-type="mention">{children}</span>;
-              }
-              return (
-                <a href={href} target="_blank" rel="noreferrer noopener">
-                  {children}
-                </a>
-              );
-            },
-            li: ({ node, children, ...props }) => (
-              <li {...props}>
-                <ItemOffset value={node?.position?.start.offset ?? null}>{children}</ItemOffset>
-              </li>
-            ),
-            input: ({ checked }) => <TaskInput checked={Boolean(checked)} />,
-            img: ({ src, alt }) =>
-              typeof src === "string" && src ? <MarkdownMedia src={src} alt={alt} /> : null,
-          }}
+          components={components}
         >
           {shown}
         </ReactMarkdown>

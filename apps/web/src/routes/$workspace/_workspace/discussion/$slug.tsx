@@ -6,6 +6,7 @@ import { z } from "zod";
 import { DiscussionDetail } from "@/components/forum/discussion-detail";
 import { MainChatPanel } from "@/components/forum/main-chat";
 import { MessageThreadPanel } from "@/components/forum/message-thread-panel";
+import { ThreadDrawer } from "@/components/forum/thread-drawer";
 import { ThreadPanel } from "@/components/forum/thread-panel";
 import { MessagesSquareIcon } from "@/components/icons";
 import { ErrorCard } from "@/components/layout/error-card";
@@ -17,6 +18,7 @@ import { useDeviceSize } from "@/components/providers/device-size-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { discussionQuery } from "@/lib/queries/discussions";
 import { isMissing } from "@/lib/queries/projects";
+import { useUiTheme } from "@/themes/ui-theme-provider";
 
 const searchSchema = z.object({
   /** The thread open beside the discussion. */
@@ -36,6 +38,7 @@ function DiscussionSlugPage() {
   const navigate = Route.useNavigate();
   const { workspace } = useWorkspace();
   const { size } = useDeviceSize();
+  const { threads } = useUiTheme();
   const { data, isPending, error, refetch } = useQuery(discussionQuery(workspace.id, slug));
   const hasPanel = size === "lg" || size === "xl";
   const backToMainChat = () =>
@@ -81,35 +84,28 @@ function DiscussionSlugPage() {
       onBack={backToMainChat}
     />
   ) : null;
-  if (!hasPanel) {
-    return (
-      threadPanel ?? (
-        <DiscussionDetail
-          key={data.id}
-          discussion={data}
-          chat="inline"
-          onOpenMessage={openMessage}
-        />
-      )
-    );
-  }
-  return (
-    <SplitView
-      main={
-        <DiscussionDetail
-          key={data.id}
-          discussion={data}
-          chat="aside"
-          openThreadId={thread}
-          openMessageId={message}
-          onOpenMessage={openMessage}
-        />
-      }
-      aside={
-        threadPanel ?? (
-          <MainChatPanel discussion={data} openMessageId={message} onOpenMessage={openMessage} />
-        )
-      }
+  const detail = (chat: "inline" | "aside") => (
+    <DiscussionDetail
+      key={data.id}
+      discussion={data}
+      chat={chat}
+      openThreadId={thread}
+      openMessageId={message}
+      onOpenMessage={openMessage}
     />
   );
+  const mainChat = (
+    <MainChatPanel discussion={data} openMessageId={message} onOpenMessage={openMessage} />
+  );
+
+  if (threads === "drawer") {
+    return (
+      <>
+        {hasPanel ? <SplitView main={detail("aside")} aside={mainChat} /> : detail("inline")}
+        <ThreadDrawer onClose={backToMainChat}>{threadPanel}</ThreadDrawer>
+      </>
+    );
+  }
+  if (!hasPanel) return threadPanel ?? detail("inline");
+  return <SplitView main={detail("aside")} aside={threadPanel ?? mainChat} />;
 }

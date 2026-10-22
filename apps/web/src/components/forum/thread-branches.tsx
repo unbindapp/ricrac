@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import type { DiscussionDetail, DiscussionThread } from "@/api/ops.gen";
 import { NewThreadDialog } from "@/components/forum/new-thread-dialog";
 import { threadKindOf, threadKinds } from "@/components/forum/thread-kinds";
+import { ThreadContextMenu } from "@/components/forum/thread-menu";
 import {
   CircleCheckIcon,
   CircleDotIcon,
@@ -76,15 +77,22 @@ export function ThreadBranches({ discussion, openThreadId, isMainChatOpen }: TPr
             <MainChatRow discussion={discussion} width={graph.width} isOpen={isMainChatOpen} />
           </li>
           {graph.rows.map((row) => (
-            <li key={`${row.kind}-${row.thread.id}`}>
-              <BranchRow
-                discussion={discussion}
-                row={row}
-                width={graph.width}
-                openThreadId={openThreadId}
-                isMainChatOpen={isMainChatOpen}
-              />
-            </li>
+            <ThreadContextMenu
+              key={`${row.kind}-${row.thread.id}`}
+              discussion={discussion}
+              thread={row.thread}
+              isOpen={row.thread.id === openThreadId}
+            >
+              <li className="data-popup-open:bg-muted">
+                <BranchRow
+                  discussion={discussion}
+                  row={row}
+                  width={graph.width}
+                  openThreadId={openThreadId}
+                  isMainChatOpen={isMainChatOpen}
+                />
+              </li>
+            </ThreadContextMenu>
           ))}
           <li>
             <NowRow

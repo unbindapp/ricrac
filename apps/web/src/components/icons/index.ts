@@ -113,6 +113,7 @@ import {
   ListChecksIcon as LucideListChecksIcon,
   ListFilterIcon as LucideListFilterIcon,
   ListIcon as LucideListIcon,
+  ListIndentDecreaseIcon as LucideListIndentDecreaseIcon,
   ListOrderedIcon as LucideListOrderedIcon,
   ListTodoIcon as LucideListTodoIcon,
   ListTreeIcon as LucideListTreeIcon,
@@ -392,6 +393,10 @@ export const LinkIcon = /* @__PURE__ */ themedIcon(LucideLinkIcon, "LinkIcon");
 export const ListChecksIcon = /* @__PURE__ */ themedIcon(LucideListChecksIcon, "ListChecksIcon");
 export const ListFilterIcon = /* @__PURE__ */ themedIcon(LucideListFilterIcon, "ListFilterIcon");
 export const ListIcon = /* @__PURE__ */ themedIcon(LucideListIcon, "ListIcon");
+export const ListIndentDecreaseIcon = /* @__PURE__ */ themedIcon(
+  LucideListIndentDecreaseIcon,
+  "ListIndentDecreaseIcon",
+);
 export const ListOrderedIcon = /* @__PURE__ */ themedIcon(LucideListOrderedIcon, "ListOrderedIcon");
 export const ListTodoIcon = /* @__PURE__ */ themedIcon(LucideListTodoIcon, "ListTodoIcon");
 export const ListTreeIcon = /* @__PURE__ */ themedIcon(LucideListTreeIcon, "ListTreeIcon");

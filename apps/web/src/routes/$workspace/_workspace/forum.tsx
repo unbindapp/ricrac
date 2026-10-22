@@ -20,6 +20,7 @@ import { ListStates } from "@/components/layout/list-states";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageToolbar } from "@/components/layout/page-toolbar";
+import { CreateButton } from "@/components/layout/create-button";
 import { TrashedRow } from "@/components/projects/entity-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -69,13 +70,14 @@ function ForumPage() {
   const newButton = (placement: "header" | "empty") => (
     <NewDiscussionDialog
       trigger={
-        <Button
-          size={placement === "header" ? "default" : "sm"}
-          variant={placement === "header" ? "default" : "outline"}
-        >
-          <PlusIcon className="size-4" />
-          New discussion
-        </Button>
+        placement === "header" ? (
+          <CreateButton label="New discussion" />
+        ) : (
+          <Button size="sm" variant="outline">
+            <PlusIcon className="size-4" />
+            New discussion
+          </Button>
+        )
       }
     />
   );

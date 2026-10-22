@@ -14,7 +14,7 @@ export function EmptyState({ icon: Icon, title, description, action }: TProps) {
   return (
     <div
       data-slot="empty-state"
-      className="flex w-full flex-col items-center justify-center gap-2 px-4 py-12 text-center"
+      className="dank:flex-1 flex w-full flex-col items-center justify-center gap-2 px-4 py-12 text-center"
     >
       <div className="bg-muted text-muted-foreground dank:hidden flex size-10 items-center justify-center rounded-full">
         <Icon className="size-5" />

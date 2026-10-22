@@ -1,7 +1,3 @@
-import { PanelLeftCloseIcon } from "@/components/icons";
-import { SidebarToggleTooltip } from "@/components/layout/sidebar-button";
-import { Button } from "@/components/ui/button";
-import { Sidebar } from "@/components/workspace/sidebar";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 import { useRememberSettingsReturn } from "@/lib/stores/settings-return";
 import { SIDEBAR_HOTKEY } from "@/lib/stores/sidebar";
@@ -14,31 +10,27 @@ export function DankNavigation() {
   useHotkeyScope([{ hotkey: SIDEBAR_HOTKEY, callback: toggle }]);
   useRememberSettingsReturn();
   return (
-    <aside className="hidden shrink-0 md:flex">
-      {isExpanded ? (
-        <div className="flex w-64">
-          <Sidebar hideButton={<CollapseToRailButton />} />
-        </div>
-      ) : (
-        <NavigationRail />
-      )}
+    <aside
+      data-expanded={isExpanded || undefined}
+      className="ease-emphasized hidden w-24 shrink-0 overflow-hidden transition-[width] duration-300 data-expanded:w-64 md:flex"
+    >
+      <NavigationRail
+        isExpanded={isExpanded}
+        menuLabel={isExpanded ? "Collapse navigation" : "Expand navigation"}
+        onMenu={toggle}
+      />
     </aside>
   );
 }
 
-function CollapseToRailButton() {
-  const toggle = useNavigationStore((state) => state.toggle);
+/** The expanded rail, modal over the page on narrow screens. */
+export function DankNavigationDrawer({ onNavigate }: { onNavigate: () => void }) {
   return (
-    <SidebarToggleTooltip label="Collapse to rail" side="right">
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label="Collapse to rail"
-        className="text-muted-foreground"
-        onClick={toggle}
-      >
-        <PanelLeftCloseIcon className="size-4" />
-      </Button>
-    </SidebarToggleTooltip>
+    <NavigationRail
+      isExpanded
+      menuLabel="Close navigation"
+      onMenu={onNavigate}
+      onNavigate={onNavigate}
+    />
   );
 }
