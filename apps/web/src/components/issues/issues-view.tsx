@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import type { Issue } from "@/api/ops.gen";
 
-import { BookmarkPlusIcon, PlusIcon } from "@/components/icons";
+import { BookmarkPlusIcon } from "@/components/icons";
 import { DisplayOptions, useDisplaySettings } from "@/components/issues/display-options";
 import type { DisplaySettings } from "@/components/issues/display";
 import { issueFilterOf, type ListIssuesFilters, mergeFilters } from "@/components/issues/filters";
@@ -18,6 +18,7 @@ import type { TBreadcrumbItem } from "@/components/layout/breadcrumb";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageToolbar } from "@/components/layout/page-toolbar";
+import { CreateButton } from "@/components/layout/create-button";
 import { Button } from "@/components/ui/button";
 import { useSaveViewDialog } from "@/components/views/save-view-dialog";
 import { useWorkspaceTeam } from "@/components/workspace/teams-provider";
@@ -125,12 +126,7 @@ export function IssuesView({
             icon={icon}
             breadcrumb={breadcrumb}
             actions={
-              canEdit && (
-                <Button size="sm" onClick={() => openNewIssue()}>
-                  <PlusIcon className="size-4" />
-                  New issue
-                </Button>
-              )
+              canEdit && <CreateButton size="sm" label="New issue" onClick={() => openNewIssue()} />
             }
             toolbar={toolbar}
           />

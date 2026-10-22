@@ -1,7 +1,9 @@
-import { createContext, type ReactNode, useContext, useEffect, useRef } from "react";
+import { createContext, type ReactNode, useContext, useEffect, useRef, useState } from "react";
 
+import { PageSlotsContext } from "@/components/layout/page-container";
 import { PageBar } from "@/components/layout/page-header";
 import { cn } from "@/components/ui/utils";
+import { useUiTheme } from "@/themes/ui-theme-provider";
 
 const NEAR_END_PX = 96;
 
@@ -32,6 +34,8 @@ export function ChatLayout({
   composer,
   startAtEnd = true,
 }: TProps) {
+  const { separatesBars } = useUiTheme();
+  const [barSlot, setBarSlot] = useState<HTMLElement | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const isAtEndRef = useRef(startAtEnd);
@@ -66,24 +70,41 @@ export function ChatLayout({
 
   return (
     <ChatScrollContext value={{ scrollToEnd }}>
-      <div data-slot="chat-layout" className="flex min-h-0 w-full flex-1 flex-col">
+      <div
+        data-slot="chat-layout"
+        className="dank:gap-2 dank:bg-sidebar flex min-h-0 w-full flex-1 flex-col"
+      >
+        {bar && separatesBars && (
+          <div
+            ref={setBarSlot}
+            className="bg-background shrink-0 overflow-hidden rounded-lg empty:hidden"
+          />
+        )}
         {bar && (
-          <div className="shrink-0 px-4 pt-4">
-            <PageBar>{bar}</PageBar>
-          </div>
+          <PageSlotsContext value={{ bar: separatesBars ? barSlot : null, fab: null }}>
+            {separatesBars ? (
+              <PageBar>{bar}</PageBar>
+            ) : (
+              <div className="shrink-0 px-4 pt-4">
+                <PageBar>{bar}</PageBar>
+              </div>
+            )}
+          </PageSlotsContext>
         )}
         {header}
-        <div
-          ref={scrollRef}
-          data-width="narrow"
-          onScroll={onScroll}
-          className="group/page flex min-h-0 flex-1 flex-col overflow-y-auto"
-        >
-          <div ref={contentRef} className={cn(column, "flex flex-col gap-6 py-6")}>
-            {children}
+        <div className="dank:rounded-lg dank:bg-background flex min-h-0 flex-1 flex-col overflow-hidden">
+          <div
+            ref={scrollRef}
+            data-width="narrow"
+            onScroll={onScroll}
+            className="group/page flex min-h-0 flex-1 flex-col overflow-y-auto"
+          >
+            <div ref={contentRef} className={cn(column, "flex flex-col gap-6 py-6")}>
+              {children}
+            </div>
           </div>
+          {composer && <div className={cn(column, "shrink-0 pb-4")}>{composer}</div>}
         </div>
-        {composer && <div className={cn(column, "shrink-0 pb-4")}>{composer}</div>}
       </div>
     </ChatScrollContext>
   );

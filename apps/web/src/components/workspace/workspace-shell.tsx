@@ -10,7 +10,6 @@ import { NewProjectDialog } from "@/components/projects/new-project-dialog";
 import { InviteMemberDialog } from "@/components/settings/invite-member-dialog";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
-import { Sidebar } from "@/components/workspace/sidebar";
 import { WorkspaceIcon } from "@/components/workspace/workspace-icon";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
@@ -47,13 +46,14 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
 }
 
 function MobileNavDrawer() {
+  const { NavigationDrawer } = useUiTheme();
   const isOpen = useMobileNavStore((state) => state.isOpen);
   const setOpen = useMobileNavStore((state) => state.setOpen);
   return (
     <Drawer direction="left" open={isOpen} onOpenChange={setOpen}>
-      <DrawerContent className="w-72 max-w-full">
+      <DrawerContent className="dank:w-80 w-72 max-w-full">
         <DrawerTitle className="sr-only">Navigation</DrawerTitle>
-        <Sidebar onNavigate={() => setOpen(false)} />
+        <NavigationDrawer onNavigate={() => setOpen(false)} />
       </DrawerContent>
     </Drawer>
   );

@@ -16,9 +16,17 @@ export type TUiTheme = {
   Navigation: ComponentType;
   /** True while the navigation is hidden and pages offer a button to show it. */
   useIsNavigationHidden: () => boolean;
+  /** The navigation in the drawer on narrow screens. */
+  NavigationDrawer: ComponentType<{ onNavigate: () => void }>;
   /** Frames the settings pages with their tabs. */
   SettingsFrame: ComponentType<TSettingsFrameProps>;
   icons: "lucide" | "symbols";
+  /** Where a page's button for creating its things goes: its header, or floating bottom right. */
+  createButton: "header" | "fab";
+  /** Page and panel bars sit on their own surface, apart from what scrolls under them. */
+  separatesBars: boolean;
+  /** Discussion threads open beside the main chat, or in a drawer over it. */
+  threads: "panel" | "drawer";
   /** The accent hue until someone picks their own; the theme's CSS sets the same --accent-hue. */
   defaultAccentHue: number;
   /** Fetches what the theme needs before it shows, like its icon set. */

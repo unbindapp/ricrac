@@ -111,6 +111,7 @@
   "ListChecksIcon": "checklist",
   "ListFilterIcon": "filter_list",
   "ListIcon": "list",
+  "ListIndentDecreaseIcon": "menu_open",
   "ListOrderedIcon": "format_list_numbered",
   "ListTodoIcon": "list_alt_check",
   "ListTreeIcon": "account_tree",

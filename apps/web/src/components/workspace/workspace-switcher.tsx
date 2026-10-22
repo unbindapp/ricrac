@@ -32,11 +32,12 @@ import { meQuery, signOut } from "@/lib/queries/me";
 
 type TProps = {
   onNavigate?: () => void;
-  /** Only the workspace's icon, for a navigation rail. */
+  /** The workspace's big icon, for a navigation rail; named beside it when the rail is expanded. */
   compact?: boolean;
+  isNamed?: boolean;
 };
 
-export function WorkspaceSwitcher({ onNavigate, compact }: TProps) {
+export function WorkspaceSwitcher({ onNavigate, compact, isNamed }: TProps) {
   const { workspace, isAdmin, canEdit } = useWorkspace();
   const openInvite = useInviteStore((state) => state.setOpen);
   const { data: me } = useQuery(meQuery);
@@ -58,11 +59,21 @@ export function WorkspaceSwitcher({ onNavigate, compact }: TProps) {
             compact ? (
               <Button
                 variant="ghost"
-                size="icon"
+                size={isNamed ? "default" : "icon"}
                 aria-label="Switch workspace"
-                className="size-10 p-0"
+                className={
+                  isNamed
+                    ? "dank:h-10 dank:pr-4 dank:pl-0 h-10 max-w-full justify-start gap-3 p-0 pr-3 text-base"
+                    : "size-10 p-0"
+                }
               >
                 <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} size="lg" />
+                {isNamed && (
+                  <>
+                    <span className="min-w-0 truncate">{workspace.name}</span>
+                    <ChevronDownIcon className="text-muted-foreground size-4" />
+                  </>
+                )}
               </Button>
             ) : (
               <Button

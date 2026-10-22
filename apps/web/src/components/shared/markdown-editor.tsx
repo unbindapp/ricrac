@@ -436,7 +436,7 @@ export function MarkdownEditor({
           <div
             data-framed={framed || undefined}
             data-sticky={hasAutosave || undefined}
-            className="bg-background data-framed:bg-input mb-2 border-b pb-1 data-framed:mb-0 data-framed:rounded-t-md data-framed:px-1 data-framed:pt-1 data-sticky:sticky data-sticky:top-11 data-sticky:z-20 group-data-[width=narrow]/page:data-sticky:top-0"
+            className="bg-background data-framed:bg-input mb-2 border-b pb-1 data-framed:mb-0 data-framed:rounded-t-md data-framed:px-1 data-framed:pt-1 data-sticky:sticky data-sticky:top-11 data-sticky:z-20 group-data-[bar=apart]/page:data-sticky:top-0 group-data-[width=narrow]/page:data-sticky:top-0"
           >
             <EditorToolbar
               editor={editor}

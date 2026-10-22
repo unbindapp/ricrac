@@ -1,10 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
-import { LayersIcon, PlusIcon } from "@/components/icons";
+import { LayersIcon } from "@/components/icons";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
-import { Button } from "@/components/ui/button";
+import { CreateButton } from "@/components/layout/create-button";
 import { ViewDialog } from "@/components/views/view-dialog";
 import { ViewList } from "@/components/views/view-list";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
@@ -25,14 +25,7 @@ function ViewsPage() {
       <PageHeader
         title="Views"
         icon={<LayersIcon />}
-        actions={
-          create && (
-            <Button onClick={create}>
-              <PlusIcon className="size-4" />
-              New view
-            </Button>
-          )
-        }
+        actions={create && <CreateButton label="New view" onClick={create} />}
       />
       <ViewList onCreate={create} />
       <ViewDialog

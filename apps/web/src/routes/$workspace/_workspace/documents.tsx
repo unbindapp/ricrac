@@ -15,6 +15,7 @@ import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageToolbar } from "@/components/layout/page-toolbar";
+import { CreateButton } from "@/components/layout/create-button";
 import { TrashedRow } from "@/components/projects/entity-menu";
 import { EntityIcon } from "@/components/shared/entity-icon";
 import { Button } from "@/components/ui/button";
@@ -48,13 +49,14 @@ function DocumentsPage() {
   const newButton = (placement: "header" | "empty") => (
     <NewDocumentDialog
       trigger={
-        <Button
-          size={placement === "header" ? "default" : "sm"}
-          variant={placement === "header" ? "default" : "outline"}
-        >
-          <PlusIcon className="size-4" />
-          New document
-        </Button>
+        placement === "header" ? (
+          <CreateButton label="New document" />
+        ) : (
+          <Button size="sm" variant="outline">
+            <PlusIcon className="size-4" />
+            New document
+          </Button>
+        )
       }
     />
   );

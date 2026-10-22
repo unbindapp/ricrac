@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import type { Comment, UserRef } from "@/api/ops.gen";
 import {
+  CopyIcon,
   CornerDownRightIcon,
   EllipsisIcon,
   MessageSquareReplyIcon,
@@ -24,13 +25,22 @@ import { MarkdownView } from "@/components/shared/markdown-view";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Button } from "@/components/ui/button";
 import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuTrigger,
+  keepNativeMenu,
+} from "@/components/ui/context-menu";
+import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { toast } from "@/components/ui/toast";
 import { SimpleTooltip } from "@/components/ui/tooltip";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { useCopyToClipboard } from "@/lib/hooks/use-copy";
 import { formatDateTime, formatDay, formatMessageTime, formatTime } from "@/lib/helpers/dates";
 import {
   type TCommentTarget,
@@ -71,137 +81,172 @@ export function ChatMessage({
   const reactions = groupReactions(message.reactions, me?.id);
   const react = (emoji: string, reacted: boolean) =>
     toggleReaction({ commentId: message.id, emoji, reacted });
+  const { copyToClipboard } = useCopyToClipboard();
   const replyCount = thread?.replies.length ?? 0;
+  const canStartThread = canEdit && Boolean(onNewThread);
+  const canChange = isAuthor && canEdit;
+  const canDelete = isAuthor || isAdmin;
+
+  const actionItems = (
+    <>
+      {canStartThread && (
+        <DropdownMenuItem onClick={onNewThread}>
+          <SplitIcon className="size-4" />
+          New thread from message
+        </DropdownMenuItem>
+      )}
+      {canChange && (
+        <DropdownMenuItem onClick={() => setIsEditing(true)}>
+          <PencilIcon className="size-4" />
+          Edit
+        </DropdownMenuItem>
+      )}
+      {canDelete && (
+        <DropdownMenuItem className="text-destructive" onClick={() => setIsDeleting(true)}>
+          <Trash2Icon className="size-4" />
+          Delete
+        </DropdownMenuItem>
+      )}
+    </>
+  );
 
   return (
-    <article
-      id={`comment-${message.id}`}
-      aria-label={`Message from ${authorName}`}
-      data-continuation={isContinuation || undefined}
-      data-current={thread?.isOpen || undefined}
-      className="group/message group/reactable has-hover:hover:bg-foreground/2-10 data-current:bg-primary/1-10 relative -mx-2 flex gap-3 rounded-md px-2 py-1 not-data-continuation:mt-2"
-    >
-      <div className="flex w-8 shrink-0 justify-center">
-        {isContinuation ? (
-          <SimpleTooltip content={formatDateTime(message.createdAt)}>
-            <time
-              dateTime={message.createdAt}
-              className="text-muted-foreground pt-0.5 text-xs whitespace-nowrap opacity-0 group-hover/message:opacity-100"
-            >
-              {formatTime(message.createdAt)}
-            </time>
-          </SimpleTooltip>
-        ) : (
-          message.user && <UserAvatar user={message.user} size="lg" />
-        )}
-      </div>
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
-        {!isContinuation && (
-          <header className="flex min-w-0 items-baseline gap-2">
-            <span className="truncate text-sm font-semibold">{authorName}</span>
-            <MessageTime value={message.createdAt} />
-          </header>
-        )}
-        {replyTo !== undefined && (
-          <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
-            <CornerDownRightIcon className="size-3.5" />
-            Replying to {replyTo ? userName(replyTo) : "a deleted user"}
-          </span>
-        )}
-        {isEditing ? (
-          <MessageEditor
-            message={message}
-            onDone={() => setIsEditing(false)}
-            onSave={(body) => saveComment({ id: message.id, body })}
+    <ContextMenu disabled={isEditing}>
+      <ContextMenuTrigger
+        render={
+          <article
+            id={`comment-${message.id}`}
+            aria-label={`Message from ${authorName}`}
+            data-continuation={isContinuation || undefined}
+            data-current={thread?.isOpen || undefined}
+            className="group/message group/reactable has-hover:hover:bg-foreground/2-10 data-current:bg-primary/1-10 data-popup-open:bg-foreground/2-10 relative -mx-2 flex gap-3 rounded-md px-2 py-1 not-data-continuation:mt-2"
           />
-        ) : (
-          <div className="rr-chat flex min-w-0 flex-col">
-            <MarkdownView
-              markdown={message.body}
-              onChange={
-                canEdit && isAuthor ? (body) => saveComment({ id: message.id, body }) : undefined
-              }
-            />
-            {message.editedAt && <span className="text-muted-foreground text-xs">(edited)</span>}
-          </div>
-        )}
-        {reactions.length > 0 && (
-          <ReactionBar reactions={reactions} disabled={!canEdit} onToggle={react} revealOnHover />
-        )}
-        {thread && replyCount > 0 && <ThreadChip replies={thread.replies} onOpen={thread.onOpen} />}
-      </div>
-      {!isEditing && (canEdit || isAdmin) && (
-        <div className="bg-popover absolute -top-4 right-2 flex items-center rounded-md border p-0.5 opacity-0 shadow-sm group-hover/message:opacity-100 focus-within:opacity-100 has-data-popup-open:opacity-100">
-          {canEdit && <AddReactionButton reactions={reactions} onToggle={react} />}
-          {canEdit && thread && (
-            <SimpleTooltip content={replyCount > 0 ? "Open thread" : "Reply in thread"}>
-              <Button
-                variant="ghost"
-                size="icon"
-                forceMinSize={false}
-                aria-label={replyCount > 0 ? "Open thread" : "Reply in thread"}
-                className="size-7"
-                onClick={thread.onOpen}
+        }
+      >
+        <div className="flex w-8 shrink-0 justify-center">
+          {isContinuation ? (
+            <SimpleTooltip content={formatDateTime(message.createdAt)}>
+              <time
+                dateTime={message.createdAt}
+                className="text-muted-foreground pt-0.5 text-xs whitespace-nowrap opacity-0 group-hover/message:opacity-100"
               >
-                <MessageSquareReplyIcon className="text-muted-foreground size-4" />
-              </Button>
+                {formatTime(message.createdAt)}
+              </time>
             </SimpleTooltip>
-          )}
-          {(isAuthor || isAdmin || (canEdit && onNewThread)) && (
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    forceMinSize={false}
-                    aria-label="Message actions"
-                    className="size-7"
-                  >
-                    <EllipsisIcon className="text-muted-foreground size-4" />
-                  </Button>
-                }
-              />
-              <DropdownMenuContent align="end" className="w-56">
-                {canEdit && onNewThread && (
-                  <DropdownMenuItem onClick={onNewThread}>
-                    <SplitIcon className="size-4" />
-                    New thread from message
-                  </DropdownMenuItem>
-                )}
-                {isAuthor && canEdit && (
-                  <DropdownMenuItem onClick={() => setIsEditing(true)}>
-                    <PencilIcon className="size-4" />
-                    Edit
-                  </DropdownMenuItem>
-                )}
-                {(isAuthor || isAdmin) && (
-                  <DropdownMenuItem
-                    className="text-destructive"
-                    onClick={() => setIsDeleting(true)}
-                  >
-                    <Trash2Icon className="size-4" />
-                    Delete
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+          ) : (
+            message.user && <UserAvatar user={message.user} size="lg" />
           )}
         </div>
-      )}
-      <ConfirmDialog
-        open={isDeleting}
-        onOpenChange={setIsDeleting}
-        title="Delete message"
-        description={
-          replyCount > 0
-            ? "The message and its thread are deleted for everyone."
-            : "The message is deleted for everyone."
-        }
-        confirmLabel="Delete message"
-        onConfirm={() => deleteComment(message.id)}
-      />
-    </article>
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          {!isContinuation && (
+            <header className="flex min-w-0 items-baseline gap-2">
+              <span className="truncate text-sm font-semibold">{authorName}</span>
+              <MessageTime value={message.createdAt} />
+            </header>
+          )}
+          {replyTo !== undefined && (
+            <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
+              <CornerDownRightIcon className="size-3.5" />
+              Replying to {replyTo ? userName(replyTo) : "a deleted user"}
+            </span>
+          )}
+          {isEditing ? (
+            <MessageEditor
+              message={message}
+              onDone={() => setIsEditing(false)}
+              onSave={(body) => saveComment({ id: message.id, body })}
+            />
+          ) : (
+            <div className="rr-chat flex min-w-0 flex-col" onContextMenu={keepNativeMenu}>
+              <MarkdownView
+                markdown={message.body}
+                onChange={
+                  canEdit && isAuthor ? (body) => saveComment({ id: message.id, body }) : undefined
+                }
+              />
+              {message.editedAt && <span className="text-muted-foreground text-xs">(edited)</span>}
+            </div>
+          )}
+          {reactions.length > 0 && (
+            <ReactionBar reactions={reactions} disabled={!canEdit} onToggle={react} revealOnHover />
+          )}
+          {thread && replyCount > 0 && (
+            <ThreadChip replies={thread.replies} onOpen={thread.onOpen} />
+          )}
+        </div>
+        {!isEditing && (canEdit || isAdmin) && (
+          <div className="bg-popover absolute -top-4 right-2 flex items-center rounded-md border p-0.5 opacity-0 shadow-sm group-hover/message:opacity-100 focus-within:opacity-100 has-data-popup-open:opacity-100">
+            {canEdit && <AddReactionButton reactions={reactions} onToggle={react} />}
+            {canEdit && thread && (
+              <SimpleTooltip content={replyCount > 0 ? "Open thread" : "Reply in thread"}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  forceMinSize={false}
+                  aria-label={replyCount > 0 ? "Open thread" : "Reply in thread"}
+                  className="size-7"
+                  onClick={thread.onOpen}
+                >
+                  <MessageSquareReplyIcon className="text-muted-foreground size-4" />
+                </Button>
+              </SimpleTooltip>
+            )}
+            {(canStartThread || canChange || canDelete) && (
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      forceMinSize={false}
+                      aria-label="Message actions"
+                      className="size-7"
+                    >
+                      <EllipsisIcon className="text-muted-foreground size-4" />
+                    </Button>
+                  }
+                />
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuGroup>{actionItems}</DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
+        )}
+        <ConfirmDialog
+          open={isDeleting}
+          onOpenChange={setIsDeleting}
+          title="Delete message"
+          description={
+            replyCount > 0
+              ? "The message and its thread are deleted for everyone."
+              : "The message is deleted for everyone."
+          }
+          confirmLabel="Delete message"
+          onConfirm={() => deleteComment(message.id)}
+        />
+      </ContextMenuTrigger>
+      <ContextMenuContent className="w-56">
+        <DropdownMenuGroup>
+          {canEdit && thread && (
+            <DropdownMenuItem onClick={thread.onOpen}>
+              <MessageSquareReplyIcon className="size-4" />
+              {replyCount > 0 ? "Open thread" : "Reply in thread"}
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuItem
+            onClick={() => {
+              copyToClipboard(message.body);
+              toast.add({ type: "success", title: "Text copied" });
+            }}
+          >
+            <CopyIcon className="size-4" />
+            Copy text
+          </DropdownMenuItem>
+          {actionItems}
+        </DropdownMenuGroup>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 }
 
