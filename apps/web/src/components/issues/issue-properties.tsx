@@ -1,7 +1,20 @@
 import { type ReactNode, useState } from "react";
 
 import type { UserRef } from "@/api/ops.gen";
-import { PlusIcon } from "@/components/icons";
+import {
+  BoxIcon,
+  CalendarIcon,
+  CircleDotIcon,
+  CircleUserIcon,
+  CornerLeftUpIcon,
+  DiamondIcon,
+  type LucideIcon,
+  PlusIcon,
+  RefreshCwIcon,
+  RulerIcon,
+  SignalHighIcon,
+  TagIcon,
+} from "@/components/icons";
 import { applyPatch, type TIssueDraft, type TIssuePatch } from "@/components/issues/issue-draft";
 import { useCycles, useTeamDetail } from "@/components/issues/picker-sources";
 import {
@@ -105,10 +118,17 @@ export function IssueProperties({
     onOpenChange: (open: boolean) => setOpenProperty(open ? property : null),
   });
 
-  const fields: { property: TPropertyKey; label: string; node: ReactNode; hidden?: boolean }[] = [
+  const fields: {
+    property: TPropertyKey;
+    label: string;
+    icon: LucideIcon;
+    node: ReactNode;
+    hidden?: boolean;
+  }[] = [
     {
       property: "state",
       label: "Status",
+      icon: CircleDotIcon,
       node: (
         <StatePicker
           teamId={teamId}
@@ -121,6 +141,7 @@ export function IssueProperties({
     {
       property: "priority",
       label: "Priority",
+      icon: SignalHighIcon,
       node: (
         <PriorityPicker
           priority={draft.priority}
@@ -132,6 +153,7 @@ export function IssueProperties({
     {
       property: "assignee",
       label: "Assignee",
+      icon: CircleUserIcon,
       node: (
         <AssigneePicker
           assignee={draft.assignee}
@@ -143,6 +165,7 @@ export function IssueProperties({
     {
       property: "labels",
       label: "Labels",
+      icon: TagIcon,
       node: (
         <LabelsPicker
           teamId={teamId}
@@ -155,6 +178,7 @@ export function IssueProperties({
     {
       property: "project",
       label: "Project",
+      icon: BoxIcon,
       node: (
         <ProjectPicker
           teamId={teamId}
@@ -167,6 +191,7 @@ export function IssueProperties({
     {
       property: "milestone",
       label: "Milestone",
+      icon: DiamondIcon,
       hidden: !draft.project,
       node: (
         <MilestonePicker
@@ -180,6 +205,7 @@ export function IssueProperties({
     {
       property: "cycle",
       label: "Cycle",
+      icon: RefreshCwIcon,
       hidden: !cyclesEnabled,
       node: (
         <CyclePicker
@@ -193,6 +219,7 @@ export function IssueProperties({
     {
       property: "estimate",
       label: "Estimate",
+      icon: RulerIcon,
       hidden: !estimatesEnabled,
       node: (
         <EstimatePicker
@@ -206,6 +233,7 @@ export function IssueProperties({
     {
       property: "due_date",
       label: "Due date",
+      icon: CalendarIcon,
       node: (
         <DueDatePicker
           dueDate={draft.dueDate}
@@ -217,6 +245,7 @@ export function IssueProperties({
     {
       property: "parent",
       label: "Parent",
+      icon: CornerLeftUpIcon,
       node: (
         <ParentPicker
           issueId={issueId}
@@ -264,6 +293,7 @@ export function IssueProperties({
                     key={field.property}
                     onClick={() => setOpenProperty(field.property)}
                   >
+                    <field.icon className="size-4" />
                     {field.label}
                   </DropdownMenuItem>
                 ))}

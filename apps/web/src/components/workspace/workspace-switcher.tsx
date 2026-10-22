@@ -30,14 +30,7 @@ import { WorkspaceIcon } from "@/components/workspace/workspace-icon";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { meQuery, signOut } from "@/lib/queries/me";
 
-type TProps = {
-  onNavigate?: () => void;
-  /** The workspace's big icon, for a navigation rail; named beside it when the rail is expanded. */
-  compact?: boolean;
-  isNamed?: boolean;
-};
-
-export function WorkspaceSwitcher({ onNavigate, compact, isNamed }: TProps) {
+export function WorkspaceSwitcher({ onNavigate }: { onNavigate?: () => void }) {
   const { workspace, isAdmin, canEdit } = useWorkspace();
   const openInvite = useInviteStore((state) => state.setOpen);
   const { data: me } = useQuery(meQuery);
@@ -56,42 +49,21 @@ export function WorkspaceSwitcher({ onNavigate, compact, isNamed }: TProps) {
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
-            compact ? (
-              <Button
-                variant="ghost"
-                size={isNamed ? "default" : "icon"}
-                aria-label="Switch workspace"
-                className={
-                  isNamed
-                    ? "dank:h-10 dank:pr-4 dank:pl-0 h-10 max-w-full justify-start gap-3 p-0 pr-3 text-base"
-                    : "size-10 p-0"
-                }
-              >
-                <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} size="lg" />
-                {isNamed && (
-                  <>
-                    <span className="min-w-0 truncate">{workspace.name}</span>
-                    <ChevronDownIcon className="text-muted-foreground size-4" />
-                  </>
-                )}
-              </Button>
-            ) : (
-              <Button
-                variant="ghost"
-                size="sm"
-                forceMinSize={false}
-                aria-label="Switch workspace"
-                className="h-8 min-w-0 flex-1 justify-start px-1.5"
-              >
-                <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} />
-                <span className="min-w-0 truncate">{workspace.name}</span>
-                <ChevronDownIcon className="text-muted-foreground size-3.5" />
-                <span className="flex-1" />
-              </Button>
-            )
+            <Button
+              variant="ghost"
+              size="sm"
+              forceMinSize={false}
+              aria-label="Switch workspace"
+              className="h-8 min-w-0 flex-1 justify-start px-1.5"
+            >
+              <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} />
+              <span className="min-w-0 truncate">{workspace.name}</span>
+              <ChevronDownIcon className="text-muted-foreground size-3.5" />
+              <span className="flex-1" />
+            </Button>
           }
         />
-        <DropdownMenuContent className="w-64" side={compact ? "right" : "bottom"}>
+        <DropdownMenuContent className="w-64">
           <DropdownMenuGroup>
             <DropdownMenuLabel>{me?.email}</DropdownMenuLabel>
             {me?.workspaces.map((item) => (

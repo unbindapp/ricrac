@@ -19,7 +19,7 @@ import { useUiTheme } from "@/themes/ui-theme-provider";
 export function WorkspaceShell({ children }: { children: ReactNode }) {
   const { canEdit } = useWorkspace();
   const openNewIssue = useNewIssueStore((state) => state.open);
-  const { Navigation, useIsNavigationHidden } = useUiTheme();
+  const { Navigation, TopBar, useIsNavigationHidden } = useUiTheme();
   const isNavigationHidden = useIsNavigationHidden();
 
   useHotkeyScope([{ hotkey: "C", callback: () => openNewIssue(), enabled: canEdit }]);
@@ -30,8 +30,9 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
       className="group/shell bg-sidebar flex h-svh w-full overflow-hidden"
     >
       <Navigation />
-      <div className="flex min-w-0 flex-1 flex-col md:py-2 md:pr-2 md:group-data-sidebar-collapsed/shell:pl-2">
+      <div className="flex min-w-0 flex-1 flex-col md:gap-2 md:py-2 md:pr-2 md:group-data-sidebar-collapsed/shell:pl-2">
         <FallbackMobileBar />
+        {TopBar && <TopBar />}
         <main className="bg-background dank:border-0 flex min-h-0 flex-1 flex-col overflow-hidden has-data-[slot=split-view]:border-0 has-data-[slot=split-view]:bg-transparent md:rounded-lg md:border">
           {children}
         </main>

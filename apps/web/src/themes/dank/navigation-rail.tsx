@@ -17,7 +17,6 @@ import {
   MessagesSquareIcon,
   RefreshCwIcon,
   RocketIcon,
-  SearchIcon,
   SettingsIcon,
   SquarePenIcon,
   TargetIcon,
@@ -42,7 +41,6 @@ import { SimpleTooltip } from "@/components/ui/tooltip";
 import { cn } from "@/components/ui/utils";
 import { useWorkspaceTeam } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
 
 type TDestination = {
   label: string;
@@ -65,7 +63,6 @@ export function NavigationRail({ isExpanded, menuLabel, onMenu, onNavigate }: TR
   const { workspace, canEdit, isAdmin } = useWorkspace();
   const team = useWorkspaceTeam();
   const openNewIssue = useNewIssueStore((state) => state.open);
-  const openCommandPanel = useCommandPanelStore((state) => state.setOpen);
   const unread = useInboxUnreadCount();
   const params = { workspace: workspace.urlKey };
   const MenuToggleIcon = isExpanded ? ListIndentDecreaseIcon : MenuIcon;
@@ -110,9 +107,6 @@ export function NavigationRail({ isExpanded, menuLabel, onMenu, onNavigate }: TR
             <MenuToggleIcon className="size-5" />
           </Button>
         </SidebarToggleTooltip>
-        <div className="ml-2 flex h-10 max-w-full min-w-0">
-          <WorkspaceSwitcher compact isNamed={isExpanded} onNavigate={onNavigate} />
-        </div>
         {canEdit && (
           <SimpleTooltip content={isExpanded ? undefined : "New issue"} side="right">
             <Button
@@ -155,15 +149,6 @@ export function NavigationRail({ isExpanded, menuLabel, onMenu, onNavigate }: TR
         </div>
       </ScrollArea>
       <div className="flex w-full flex-col gap-1 pt-2 pb-3">
-        <RailButton
-          label="Search"
-          icon={SearchIcon}
-          isExpanded={isExpanded}
-          onClick={() => {
-            onNavigate?.();
-            openCommandPanel(true);
-          }}
-        />
         <RailLink
           label="Settings"
           icon={SettingsIcon}

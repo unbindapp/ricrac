@@ -21,14 +21,15 @@ export type TChatRow<T extends TMessage> =
   | { kind: "message"; key: string; message: T; isContinuation: boolean };
 
 /**
- * Messages with a divider before each new day; a message from the same person a few minutes
- * after the one before continues it.
+ * Messages with a divider before each new day, counting from `since` when they follow another
+ * message; a message from the same person a few minutes after the one before continues it.
  */
-export function chatRows<T extends TMessage>(messages: T[]): TChatRow<T>[] {
+export function chatRows<T extends TMessage>(messages: T[], since?: string): TChatRow<T>[] {
   const rows: TChatRow<T>[] = [];
   let previous: T | undefined;
   for (const message of messages) {
-    const isNewDay = !previous || !isSameDay(previous.createdAt, message.createdAt);
+    const lastDay = previous?.createdAt ?? since;
+    const isNewDay = !lastDay || !isSameDay(lastDay, message.createdAt);
     if (isNewDay) rows.push({ kind: "day", key: `day-${message.id}`, date: message.createdAt });
     rows.push({
       kind: "message",

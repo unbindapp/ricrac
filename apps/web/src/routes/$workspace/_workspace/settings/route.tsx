@@ -10,6 +10,7 @@ import {
   FileStackIcon,
   GitPullRequestIcon,
   KeySquareIcon,
+  MailIcon,
   PlugIcon,
   RefreshCwIcon,
   RocketIcon,
@@ -55,6 +56,12 @@ function accountTabs(workspace: string): TSettingsTab[] {
       description: "MCP server and apps you allowed",
       icon: BlocksIcon,
       link: { to: "/$workspace/settings/account/connected-apps", params },
+    },
+    {
+      label: "Invitations",
+      description: "Invite people, join other workspaces",
+      icon: MailIcon,
+      link: { to: "/$workspace/settings/account/invitations", params },
     },
   ];
 }

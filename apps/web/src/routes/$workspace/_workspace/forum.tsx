@@ -14,7 +14,16 @@ import {
 import { DiscussionTagFilter } from "@/components/forum/discussion-tags";
 import { NewDiscussionDialog } from "@/components/forum/new-discussion-dialog";
 import { useCanRewrite } from "@/components/forum/use-can-rewrite";
-import { MessagesSquareIcon, PlusIcon, SearchIcon, Trash2Icon } from "@/components/icons";
+import {
+  LayersIcon,
+  LockIcon,
+  LockOpenIcon,
+  type LucideIcon,
+  MessagesSquareIcon,
+  PlusIcon,
+  SearchIcon,
+  Trash2Icon,
+} from "@/components/icons";
 import { List } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { PageContainer } from "@/components/layout/page-container";
@@ -43,11 +52,11 @@ export const Route = createFileRoute("/$workspace/_workspace/forum")({
   component: ForumPage,
 });
 
-const viewLabels: Record<TForumView, string> = {
-  open: "Open",
-  closed: "Closed",
-  all: "All",
-  trash: "Trash",
+const views: Record<TForumView, { label: string; icon: LucideIcon }> = {
+  open: { label: "Open", icon: LockOpenIcon },
+  closed: { label: "Closed", icon: LockIcon },
+  all: { label: "All", icon: LayersIcon },
+  trash: { label: "Trash", icon: Trash2Icon },
 };
 
 function ForumPage() {
@@ -94,11 +103,7 @@ function ForumPage() {
               <FilterMenu
                 label="Show"
                 value={status}
-                options={VIEWS.map((value) => ({
-                  value,
-                  label: viewLabels[value],
-                  icon: value === "trash" ? <Trash2Icon className="size-4" /> : undefined,
-                }))}
+                options={VIEWS.map((value) => ({ value, ...views[value] }))}
                 onChange={(value) =>
                   void navigate({
                     search: (prev) => ({ ...prev, status: value !== "open" ? value : undefined }),

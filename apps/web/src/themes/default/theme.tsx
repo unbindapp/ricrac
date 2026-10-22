@@ -19,6 +19,6 @@ export const defaultTheme: TUiTheme = {
   icons: "lucide",
   createButton: "header",
   separatesBars: false,
-  threads: "panel",
+  expandsReplies: false,
   defaultAccentHue: DEFAULT_ACCENT_HUE,
 };

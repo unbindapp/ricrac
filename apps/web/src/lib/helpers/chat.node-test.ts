@@ -37,6 +37,15 @@ test("chatRows starts every day with a divider", () => {
   assert.deepEqual(shape(rows), ["day", "1", "day", "2"]);
 });
 
+test("chatRows counts days from the message replies answer", () => {
+  const replies = [
+    message("2", "2026-10-20T10:05:00", bob),
+    message("3", "2026-10-21T09:00:00", bob),
+  ];
+  assert.deepEqual(shape(chatRows(replies, "2026-10-20T10:00:00")), ["2", "day", "3"]);
+  assert.deepEqual(shape(chatRows(replies, "2026-10-19T10:00:00")), ["day", "2", "day", "3"]);
+});
+
 test("shorten cuts long text with an ellipsis", () => {
   assert.equal(shorten("Short", 10), "Short");
   assert.equal(shorten("Invite email marked as spam", 12), "Invite emai…");

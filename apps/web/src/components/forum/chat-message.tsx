@@ -50,6 +50,7 @@ import {
 } from "@/lib/queries/comments";
 import { meQuery } from "@/lib/queries/me";
 import { useEditorUploads } from "@/lib/queries/uploads";
+import { useUiTheme } from "@/themes/ui-theme-provider";
 
 type TMessageProps = {
   message: Comment;
@@ -70,6 +71,7 @@ export function ChatMessage({
   onNewThread,
 }: TMessageProps) {
   const { workspace, canEdit, isAdmin } = useWorkspace();
+  const { expandsReplies } = useUiTheme();
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { data: me } = useQuery(meQuery);
@@ -170,7 +172,7 @@ export function ChatMessage({
           {reactions.length > 0 && (
             <ReactionBar reactions={reactions} disabled={!canEdit} onToggle={react} revealOnHover />
           )}
-          {thread && replyCount > 0 && (
+          {thread && replyCount > 0 && !expandsReplies && (
             <ThreadChip replies={thread.replies} onOpen={thread.onOpen} />
           )}
         </div>
