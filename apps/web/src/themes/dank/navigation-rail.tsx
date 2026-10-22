@@ -56,10 +56,21 @@ type TRailProps = {
   onMenu: () => void;
   /** Called after a destination is picked, like closing the drawer the rail is in. */
   onNavigate?: () => void;
+  /** Lists the inbox, my issues and settings, which the top bar holds on wide screens. */
+  hasAccountLinks?: boolean;
 };
 
+const showWhenExpanded =
+  "ease-emphasized opacity-0 transition-opacity duration-100 group-data-expanded/rail-root:opacity-100 group-data-expanded/rail-root:duration-300";
+
 /** Material 3's navigation rail: collapsed to icons, or expanded with labels beside them. */
-export function NavigationRail({ isExpanded, menuLabel, onMenu, onNavigate }: TRailProps) {
+export function NavigationRail({
+  isExpanded,
+  menuLabel,
+  onMenu,
+  onNavigate,
+  hasAccountLinks = false,
+}: TRailProps) {
   const { workspace, canEdit, isAdmin } = useWorkspace();
   const team = useWorkspaceTeam();
   const openNewIssue = useNewIssueStore((state) => state.open);
@@ -68,8 +79,19 @@ export function NavigationRail({ isExpanded, menuLabel, onMenu, onNavigate }: TR
   const MenuToggleIcon = isExpanded ? ListIndentDecreaseIcon : MenuIcon;
 
   const destinations: TDestination[] = [
-    { label: "Inbox", icon: InboxIcon, link: { to: "/$workspace/inbox", params }, unread },
-    { label: "My issues", icon: UserCircleIcon, link: { to: "/$workspace/my-issues", params } },
+    {
+      label: "Inbox",
+      icon: InboxIcon,
+      link: { to: "/$workspace/inbox", params },
+      unread,
+      isHidden: !hasAccountLinks,
+    },
+    {
+      label: "My issues",
+      icon: UserCircleIcon,
+      link: { to: "/$workspace/my-issues", params },
+      isHidden: !hasAccountLinks,
+    },
     { label: "Issues", icon: CircleDotIcon, link: { to: "/$workspace/issues", params } },
     {
       label: "Triage",
@@ -93,7 +115,7 @@ export function NavigationRail({ isExpanded, menuLabel, onMenu, onNavigate }: TR
     <nav
       aria-label="Workspace"
       data-expanded={isExpanded || undefined}
-      className="group/rail-root bg-sidebar flex h-full w-24 flex-col data-expanded:w-full"
+      className="group/rail-root bg-sidebar flex h-full w-full flex-col"
     >
       <div className="flex flex-col items-start gap-3 px-5 pt-3 pb-4">
         <SidebarToggleTooltip label={menuLabel} side="right">
@@ -111,19 +133,22 @@ export function NavigationRail({ isExpanded, menuLabel, onMenu, onNavigate }: TR
           <SimpleTooltip content={isExpanded ? undefined : "New issue"} side="right">
             <Button
               variant="tonal"
-              size={isExpanded ? "default" : "icon"}
-              aria-label={isExpanded ? undefined : "New issue"}
-              className={cn(
-                "dank:rounded-[1rem] dank:active:rounded-[0.75rem] size-14",
-                isExpanded && "dank:h-14 dank:pr-5 dank:pl-4.5 w-auto gap-3 text-base",
-              )}
+              aria-label="New issue"
+              className="dank:h-14 dank:rounded-[1rem] dank:px-4.5 dank:active:rounded-[0.75rem] flex items-center gap-0 text-base"
               onClick={() => {
                 onNavigate?.();
                 openNewIssue();
               }}
             >
               <SquarePenIcon className="size-5" />
-              {isExpanded && "New issue"}
+              <span
+                className={cn(
+                  showWhenExpanded,
+                  "max-w-0 overflow-hidden whitespace-nowrap transition-[max-width,margin,opacity] group-data-expanded/rail-root:ml-3 group-data-expanded/rail-root:max-w-40",
+                )}
+              >
+                New issue
+              </span>
             </Button>
           </SimpleTooltip>
         )}
@@ -133,43 +158,39 @@ export function NavigationRail({ isExpanded, menuLabel, onMenu, onNavigate }: TR
           {destinations
             .filter((destination) => !destination.isHidden)
             .map((destination) => (
-              <RailLink
-                key={destination.label}
-                {...destination}
-                isExpanded={isExpanded}
-                onNavigate={onNavigate}
-              />
+              <RailLink key={destination.label} {...destination} onNavigate={onNavigate} />
             ))}
           <MoreMenu isExpanded={isExpanded} onNavigate={onNavigate} />
           {isExpanded && (
-            <div className="flex flex-col px-3 pt-3 pb-2">
+            <div className="animate-in fade-in-0 flex flex-col px-3 pt-3 pb-2 duration-300">
               <SidebarFavorites onNavigate={onNavigate} />
             </div>
           )}
         </div>
       </ScrollArea>
-      <div className="flex w-full flex-col gap-1 pt-2 pb-3">
-        <RailLink
-          label="Settings"
-          icon={SettingsIcon}
-          isExpanded={isExpanded}
-          onNavigate={onNavigate}
-          link={{
-            to: isAdmin ? "/$workspace/settings" : "/$workspace/settings/account",
-            params,
-          }}
-        />
-      </div>
+      {hasAccountLinks && (
+        <div className="flex w-full flex-col gap-1 pt-2 pb-3">
+          <RailLink
+            label="Settings"
+            icon={SettingsIcon}
+            onNavigate={onNavigate}
+            link={{
+              to: isAdmin ? "/$workspace/settings" : "/$workspace/settings/account",
+              params,
+            }}
+          />
+        </div>
+      )}
     </nav>
   );
 }
 
 const railItemClassName =
-  "group/rail text-muted-foreground has-hover:hover:text-foreground focus-visible:text-foreground data-[status=active]:text-secondary-foreground data-popup-open:text-foreground flex h-14 w-full flex-col items-center justify-center gap-1 text-xs font-medium outline-hidden select-none group-data-expanded/rail-root:flex-row group-data-expanded/rail-root:justify-start";
+  "group/rail text-muted-foreground has-hover:hover:text-foreground focus-visible:text-foreground data-[status=active]:text-secondary-foreground data-popup-open:text-foreground relative flex h-14 w-full items-start px-5 font-medium outline-hidden select-none";
 
 function RailIndicator({ children }: { children: ReactNode }) {
   return (
-    <span className="group-has-hover/rail:group-hover/rail:bg-accent group-focus-visible/rail:ring-primary group-data-[status=active]/rail:bg-secondary group-data-popup-open/rail:bg-accent relative flex h-8 w-14 shrink-0 items-center justify-center rounded-full transition-colors group-focus-visible/rail:ring-2 group-data-expanded/rail-root:mx-5 group-data-expanded/rail-root:h-14 group-data-expanded/rail-root:w-auto group-data-expanded/rail-root:flex-1 group-data-expanded/rail-root:justify-start group-data-expanded/rail-root:gap-3 group-data-expanded/rail-root:pr-5 group-data-expanded/rail-root:pl-4.5">
+    <span className="group-has-hover/rail:group-hover/rail:bg-accent group-focus-visible/rail:ring-primary group-data-[status=active]/rail:bg-secondary group-data-popup-open/rail:bg-accent ease-emphasized mt-0.5 flex h-8 w-full items-center overflow-hidden rounded-full pl-4.5 transition-[height,margin,background-color] duration-300 group-focus-visible/rail:ring-2 group-data-expanded/rail-root:mt-0 group-data-expanded/rail-root:h-14">
       {children}
     </span>
   );
@@ -184,14 +205,23 @@ function RailIcon({ icon: Icon, isActive }: { icon: LucideIcon; isActive?: boole
   );
 }
 
-function RailLabel({ label, isExpanded }: { label: string; isExpanded: boolean }) {
-  if (isExpanded) return <span className="min-w-0 flex-1 truncate text-left text-sm">{label}</span>;
-  return <span className="max-w-full truncate px-1">{label}</span>;
+function RailLabels({ label }: { label: string }) {
+  return (
+    <>
+      <span className={cn(showWhenExpanded, "ml-3 text-sm whitespace-nowrap")}>{label}</span>
+      <span
+        aria-hidden
+        className="ease-emphasized pointer-events-none absolute top-9.5 left-0 w-24 truncate px-1 text-center text-xs transition-opacity delay-100 duration-200 group-data-expanded/rail-root:opacity-0 group-data-expanded/rail-root:delay-0 group-data-expanded/rail-root:duration-100"
+      >
+        {label}
+      </span>
+    </>
+  );
 }
 
-type TRailLinkProps = TDestination & { isExpanded: boolean; onNavigate?: () => void };
+type TRailLinkProps = Omit<TDestination, "isHidden"> & { onNavigate?: () => void };
 
-function RailLink({ label, icon, link, unread = 0, isExpanded, onNavigate }: TRailLinkProps) {
+function RailLink({ label, icon, link, unread = 0, onNavigate }: TRailLinkProps) {
   return (
     <Link
       {...link}
@@ -200,14 +230,11 @@ function RailLink({ label, icon, link, unread = 0, isExpanded, onNavigate }: TRa
       onClick={onNavigate}
     >
       {({ isActive }) => (
-        <>
-          <RailIndicator>
-            <RailIcon icon={icon} isActive={isActive} />
-            {isExpanded && <RailLabel label={label} isExpanded />}
-            {unread > 0 && <RailBadge count={unread} isExpanded={isExpanded} />}
-          </RailIndicator>
-          {!isExpanded && <RailLabel label={label} isExpanded={false} />}
-        </>
+        <RailIndicator>
+          <RailIcon icon={icon} isActive={isActive} />
+          <RailLabels label={label} />
+          {unread > 0 && <RailBadge count={unread} />}
+        </RailIndicator>
       )}
     </Link>
   );
@@ -216,31 +243,28 @@ function RailLink({ label, icon, link, unread = 0, isExpanded, onNavigate }: TRa
 function RailButton({
   label,
   icon,
-  isExpanded,
   ...props
-}: ComponentProps<typeof Button> & { label: string; icon: LucideIcon; isExpanded: boolean }) {
+}: ComponentProps<typeof Button> & { label: string; icon: LucideIcon }) {
   return (
     <Button
       variant="ghost"
       forceMinSize={false}
       {...props}
-      className={`${railItemClassName} dank:h-14 dank:px-0 dank:active:rounded-none h-14 rounded-none px-0 active:rounded-none active:bg-transparent has-hover:hover:bg-transparent`}
+      className={`${railItemClassName} dank:h-14 dank:px-5 dank:active:rounded-none h-14 gap-0 rounded-none px-5 active:rounded-none active:bg-transparent has-hover:hover:bg-transparent`}
     >
       <RailIndicator>
         <RailIcon icon={icon} />
-        {isExpanded && <RailLabel label={label} isExpanded />}
+        <RailLabels label={label} />
       </RailIndicator>
-      {!isExpanded && <RailLabel label={label} isExpanded={false} />}
     </Button>
   );
 }
 
-function RailBadge({ count, isExpanded }: { count: number; isExpanded: boolean }) {
+function RailBadge({ count }: { count: number }) {
   return (
     <span
       aria-label={`${count} unread`}
-      data-expanded={isExpanded || undefined}
-      className="bg-destructive text-destructive-foreground absolute top-0 right-2 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-xs leading-none tabular-nums data-expanded:static data-expanded:h-5 data-expanded:min-w-5"
+      className="bg-destructive text-destructive-foreground mr-5 ml-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs leading-none tabular-nums"
     >
       {count > 99 ? "99+" : count}
     </span>
@@ -269,9 +293,7 @@ function MoreMenu({ isExpanded, onNavigate }: { isExpanded: boolean; onNavigate?
   ];
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        render={<RailButton label="More" icon={EllipsisIcon} isExpanded={isExpanded} />}
-      />
+      <DropdownMenuTrigger render={<RailButton label="More" icon={EllipsisIcon} />} />
       <DropdownMenuContent side={isExpanded ? "bottom" : "right"} className="w-56">
         <DropdownMenuGroup>
           {pages

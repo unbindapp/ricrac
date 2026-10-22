@@ -28,6 +28,7 @@ export function DankNavigationDrawer({ onNavigate }: { onNavigate: () => void })
   return (
     <NavigationRail
       isExpanded
+      hasAccountLinks
       menuLabel="Close navigation"
       onMenu={onNavigate}
       onNavigate={onNavigate}

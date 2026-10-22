@@ -121,6 +121,7 @@ function DialogContent({
   animate,
   children,
   hideXButton,
+  headerActions,
   avoidKeyboard,
   layer,
   ...props
@@ -128,6 +129,8 @@ function DialogContent({
   TDialogContentVariants & {
     classNameInnerWrapper?: string;
     hideXButton?: boolean;
+    /** Icon buttons in the top right corner, beside the close button. */
+    headerActions?: React.ReactNode;
     avoidKeyboard?: boolean;
     layer?: keyof typeof dialogLayerVariants;
   }) {
@@ -146,19 +149,24 @@ function DialogContent({
         >
           <div className={cn("flex w-full flex-col gap-4", classNameInnerWrapper)}>
             {children}
-            {!hideXButton && variant !== "styleless" && (
-              <DialogPrimitive.Close
-                render={
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label="Close"
-                    className="text-muted-foreground dank:top-3.5 dank:right-4 absolute top-3 right-3"
-                  >
-                    <XIcon className="size-4" />
-                  </Button>
-                }
-              />
+            {(headerActions || (!hideXButton && variant !== "styleless")) && (
+              <div className="dank:top-3.5 dank:right-4 absolute top-3 right-3 flex items-center gap-1">
+                {headerActions}
+                {!hideXButton && variant !== "styleless" && (
+                  <DialogPrimitive.Close
+                    render={
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Close"
+                        className="text-muted-foreground"
+                      >
+                        <XIcon className="size-4" />
+                      </Button>
+                    }
+                  />
+                )}
+              </div>
             )}
           </div>
         </DialogPrimitive.Popup>

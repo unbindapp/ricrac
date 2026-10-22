@@ -370,7 +370,7 @@ function UploadingMedia({ id }: { id: string }) {
   );
 }
 
-function UploadBar({ percent }: { percent: number }) {
+export function UploadBar({ percent }: { percent: number }) {
   return (
     <span
       role="progressbar"

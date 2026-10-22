@@ -27,6 +27,7 @@ import {
   type TPullRequestStats,
 } from "@/components/issues/github-link";
 import { List, ListRow, ListRowText } from "@/components/layout/list";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { MarkdownView } from "@/components/shared/markdown-view";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Badge } from "@/components/ui/badge";
@@ -183,7 +184,7 @@ export function IssueAttachments({ issue }: { issue: IssueDetail }) {
 
 function AttachmentRow({ attachment, canEdit }: { attachment: IssueAttachment; canEdit: boolean }) {
   const { workspace } = useWorkspace();
-  const { mutate: remove, isPending } = useDeleteAttachmentMutation(workspace.id);
+  const { mutateAsync: remove, isPending } = useDeleteAttachmentMutation(workspace.id);
   const [isExpanded, setIsExpanded] = useState(false);
   const github = githubLinkOf(attachment);
   const pullRequest = github?.kind === "pull_request" ? github : null;
@@ -225,17 +226,24 @@ function AttachmentRow({ attachment, canEdit }: { attachment: IssueAttachment; c
             </Button>
           )}
           {canEdit && (
-            <Button
-              variant="ghost"
-              size="icon"
-              forceMinSize={false}
-              className="size-6"
-              aria-label={`Remove ${attachment.title}`}
-              isPending={isPending}
-              onClick={() => remove(attachment.id)}
-            >
-              <XIcon className="size-3.5" />
-            </Button>
+            <ConfirmDialog
+              trigger={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  forceMinSize={false}
+                  className="size-6"
+                  aria-label={`Remove ${attachment.title}`}
+                  isPending={isPending}
+                >
+                  <XIcon className="size-3.5" />
+                </Button>
+              }
+              title="Remove attachment"
+              description={`${attachment.title} is removed from the issue.`}
+              confirmLabel="Remove attachment"
+              onConfirm={() => remove(attachment.id)}
+            />
           )}
         </>
       }
