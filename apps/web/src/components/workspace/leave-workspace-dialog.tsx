@@ -19,7 +19,7 @@ export function LeaveWorkspaceDialog({
       open={isOpen}
       onOpenChange={onOpenChange}
       title={`Leave ${workspace.name}`}
-      description="You lose access to its teams and issues until someone invites you again."
+      description="You lose access to its issues and projects until someone invites you again."
       confirmLabel="Leave workspace"
       onConfirm={async () => {
         await leave();

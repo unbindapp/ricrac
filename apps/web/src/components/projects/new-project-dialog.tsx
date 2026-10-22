@@ -1,7 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
-import type { TeamRef } from "@/api/ops.gen";
 import {
   type TNewProjectDefaults,
   useNewProjectStore,
@@ -19,11 +18,9 @@ import {
   ProjectLabelsPicker,
   ProjectPriorityPicker,
   ProjectStatusPicker,
-  TeamsPicker,
   useProjectStatuses,
 } from "@/components/projects/project-pickers";
 import { MarkdownField } from "@/components/shared/markdown-editor";
-import { NoTeamsNotice } from "@/components/shared/no-teams-notice";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -33,8 +30,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useTeams } from "@/components/workspace/teams-provider";
-import { useTeamFromRoute } from "@/components/workspace/use-team-from-route";
+import { useWorkspaceTeam } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { useEditorUploads } from "@/lib/queries/uploads";
 import { entitySlug } from "@/lib/helpers/entity-slug";
@@ -58,14 +54,6 @@ export function NewProjectDialog() {
   );
 }
 
-function useInitialTeams(defaults: TNewProjectDefaults): TeamRef[] {
-  const { teams, myTeams } = useTeams();
-  const routeTeam = useTeamFromRoute();
-  const id = [defaults.teamId, routeTeam?.id, myTeams[0]?.id, teams[0]?.id].find(Boolean);
-  const team = teams.find((candidate) => candidate.id === id);
-  return team ? [{ id: team.id, key: team.key, name: team.name }] : [];
-}
-
 type TPlannedDate = { date: string | null; resolution: TResolution };
 
 const noDate: TPlannedDate = { date: null, resolution: "day" };
@@ -79,20 +67,12 @@ function NewProjectForm({
 }) {
   const { workspace } = useWorkspace();
   const navigate = useNavigate();
-  const { teams: allTeams, isPending: isTeamsPending } = useTeams();
+  const team = useWorkspaceTeam();
   const { statuses } = useProjectStatuses();
   const { users } = useWorkspaceUserList();
   const mentionUsers = useMentionUsers();
   const uploads = useEditorUploads(workspace.id);
   const labelsById = useProjectLabelsById();
-  const initialTeams = useInitialTeams(defaults);
-  const [pickedTeamIds, setTeamIds] = useState<string[] | null>(null);
-  const teams = pickedTeamIds
-    ? allTeams
-        .filter((team) => pickedTeamIds.includes(team.id))
-        .map((team) => ({ id: team.id, key: team.key, name: team.name }))
-    : initialTeams;
-  const hasNoTeams = !isTeamsPending && allTeams.length === 0;
   const [statusId, setStatusId] = useState<string | undefined>(defaults.statusId);
   const [leadId, setLeadId] = useState<string | null>(null);
   const [memberIds, setMemberIds] = useState<string[]>([]);
@@ -117,7 +97,7 @@ function NewProjectForm({
         name: parsed.name,
         summary: parsed.summary || undefined,
         description: description.trim() || undefined,
-        setTeams: teams.map((team) => team.id),
+        setTeams: team ? [team.id] : undefined,
         state: status?.id,
         lead: leadId ?? undefined,
         addMembers: memberIds.length > 0 ? memberIds : undefined,
@@ -139,7 +119,6 @@ function NewProjectForm({
 
   return (
     <form className="flex flex-col gap-4" onSubmit={submitHandler(form)} noValidate>
-      {hasNoTeams && <NoTeamsNotice entity="Projects" onNavigate={onClose} />}
       <form.AppField name="name" children={(field) => <field.TextField label="Name" autoFocus />} />
       <form.AppField
         name="summary"
@@ -157,7 +136,6 @@ function NewProjectForm({
       />
       <div className="flex flex-wrap items-center gap-2">
         <ProjectStatusPicker appearance="compact" status={status} onChange={setStatusId} />
-        <TeamsPicker appearance="compact" teams={teams} onChange={setTeamIds} />
         <PersonPicker
           role="Lead"
           appearance="compact"
@@ -189,9 +167,6 @@ function NewProjectForm({
         />
       </div>
       <DialogFooter className="items-center">
-        {!hasNoTeams && teams.length === 0 && (
-          <p className="text-muted-foreground mr-auto text-sm">Pick at least one team.</p>
-        )}
         <DialogClose
           render={
             <Button type="button" variant="outline" size="sm">
@@ -200,7 +175,7 @@ function NewProjectForm({
           }
         />
         <form.AppForm>
-          <form.SubmitButton size="sm" disabled={teams.length === 0}>
+          <form.SubmitButton size="sm" disabled={!team}>
             Create project
           </form.SubmitButton>
         </form.AppForm>

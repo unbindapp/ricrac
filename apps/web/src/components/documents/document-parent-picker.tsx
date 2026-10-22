@@ -5,8 +5,8 @@ import type { TDocumentParent } from "@/components/documents/use-create-document
 import { InitiativeIcon } from "@/components/initiatives/initiative-status";
 import { PropertyPicker, type TPickerOption } from "@/components/issues/property-picker";
 import { ProjectIcon } from "@/components/shared/project-icon";
-import { TeamIcon } from "@/components/shared/team-icon";
-import { useTeams } from "@/components/workspace/teams-provider";
+import { WorkspaceIcon } from "@/components/workspace/workspace-icon";
+import { useWorkspaceTeam } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { initiativesQuery } from "@/lib/queries/initiatives";
 import { projectsQuery } from "@/lib/queries/projects";
@@ -26,7 +26,7 @@ function parentFromValue(value: string): TDocumentParent | null {
   return null;
 }
 
-/** Picks where a document lives: one of the workspace's teams, projects or initiatives. */
+/** Picks where a document lives: the workspace itself, one of its projects or initiatives. */
 export function DocumentParentPicker({
   label,
   value,
@@ -39,18 +39,20 @@ export function DocumentParentPicker({
   trigger: ReactElement;
 }) {
   const { workspace } = useWorkspace();
-  const { teams } = useTeams();
+  const team = useWorkspaceTeam();
   const projects = useQuery(projectsQuery(workspace.id));
   const initiatives = useQuery(initiativesQuery(workspace.id));
   const options: TPickerOption[] = [
-    ...teams.map((team) => ({
-      value: `team:${team.id}`,
-      label: team.name,
-      description: team.key,
-      keywords: [team.key],
-      group: "Teams",
-      icon: <TeamIcon teamKey={team.key} icon={team.icon} color={team.color} size="sm" />,
-    })),
+    ...(team
+      ? [
+          {
+            value: `team:${team.id}`,
+            label: workspace.name,
+            keywords: ["workspace"],
+            icon: <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} />,
+          },
+        ]
+      : []),
     ...(projects.data ?? []).map((project) => ({
       value: `project:${project.id}`,
       label: project.name,
@@ -68,7 +70,7 @@ export function DocumentParentPicker({
   return (
     <PropertyPicker
       label={label}
-      searchPlaceholder="Find a team, project or initiative…"
+      searchPlaceholder="Find a project or initiative…"
       options={options}
       value={current ? [current] : []}
       isPending={projects.isPending || initiatives.isPending}

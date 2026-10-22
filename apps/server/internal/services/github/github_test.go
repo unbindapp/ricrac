@@ -130,8 +130,6 @@ func (suite *GitHubServiceSuite) TestWebhooksNeedTheSecretsSignature() {
 func (suite *GitHubServiceSuite) TestSyncsKeepTheirRepository() {
 	_, err := suite.service.SaveRepoSync(suite.Ctx, suite.actor, &SaveRepoSyncInput{ID: new("x"), Repository: new("acme/other")})
 	suite.Equal("A sync's repository can't change; delete it and sync the other repository", errdefs.As(err).Message)
-	_, err = suite.service.SaveRepoSync(suite.Ctx, suite.actor, &SaveRepoSyncInput{Repository: new("acme/api")})
-	suite.Equal("Pass repository and team to sync a repository", errdefs.As(err).Message)
 }
 
 func (suite *GitHubServiceSuite) TestEditsOnGitHubChangeOnlyWhatDiffers() {

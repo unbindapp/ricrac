@@ -267,6 +267,21 @@ func GithubPrMergedStateID(v uuid.UUID) predicate.Team {
 	return predicate.Team(sql.FieldEQ(FieldGithubPrMergedStateID, v))
 }
 
+// PreviousKeys applies equality check predicate on the "previous_keys" field. It's identical to PreviousKeysEQ.
+func PreviousKeys(v pgarray.Text) predicate.Team {
+	return predicate.Team(sql.FieldEQ(FieldPreviousKeys, v))
+}
+
+// PreviousNames applies equality check predicate on the "previous_names" field. It's identical to PreviousNamesEQ.
+func PreviousNames(v pgarray.Text) predicate.Team {
+	return predicate.Team(sql.FieldEQ(FieldPreviousNames, v))
+}
+
+// MergedTeamIds applies equality check predicate on the "merged_team_ids" field. It's identical to MergedTeamIdsEQ.
+func MergedTeamIds(v pgarray.UUID) predicate.Team {
+	return predicate.Team(sql.FieldEQ(FieldMergedTeamIds, v))
+}
+
 // WorkspaceIDEQ applies the EQ predicate on the "workspace_id" field.
 func WorkspaceIDEQ(v uuid.UUID) predicate.Team {
 	return predicate.Team(sql.FieldEQ(FieldWorkspaceID, v))
@@ -2085,6 +2100,156 @@ func GithubPrMergedStateIDIsNil() predicate.Team {
 // GithubPrMergedStateIDNotNil applies the NotNil predicate on the "github_pr_merged_state_id" field.
 func GithubPrMergedStateIDNotNil() predicate.Team {
 	return predicate.Team(sql.FieldNotNull(FieldGithubPrMergedStateID))
+}
+
+// PreviousKeysEQ applies the EQ predicate on the "previous_keys" field.
+func PreviousKeysEQ(v pgarray.Text) predicate.Team {
+	return predicate.Team(sql.FieldEQ(FieldPreviousKeys, v))
+}
+
+// PreviousKeysNEQ applies the NEQ predicate on the "previous_keys" field.
+func PreviousKeysNEQ(v pgarray.Text) predicate.Team {
+	return predicate.Team(sql.FieldNEQ(FieldPreviousKeys, v))
+}
+
+// PreviousKeysIn applies the In predicate on the "previous_keys" field.
+func PreviousKeysIn(vs ...pgarray.Text) predicate.Team {
+	return predicate.Team(sql.FieldIn(FieldPreviousKeys, vs...))
+}
+
+// PreviousKeysNotIn applies the NotIn predicate on the "previous_keys" field.
+func PreviousKeysNotIn(vs ...pgarray.Text) predicate.Team {
+	return predicate.Team(sql.FieldNotIn(FieldPreviousKeys, vs...))
+}
+
+// PreviousKeysGT applies the GT predicate on the "previous_keys" field.
+func PreviousKeysGT(v pgarray.Text) predicate.Team {
+	return predicate.Team(sql.FieldGT(FieldPreviousKeys, v))
+}
+
+// PreviousKeysGTE applies the GTE predicate on the "previous_keys" field.
+func PreviousKeysGTE(v pgarray.Text) predicate.Team {
+	return predicate.Team(sql.FieldGTE(FieldPreviousKeys, v))
+}
+
+// PreviousKeysLT applies the LT predicate on the "previous_keys" field.
+func PreviousKeysLT(v pgarray.Text) predicate.Team {
+	return predicate.Team(sql.FieldLT(FieldPreviousKeys, v))
+}
+
+// PreviousKeysLTE applies the LTE predicate on the "previous_keys" field.
+func PreviousKeysLTE(v pgarray.Text) predicate.Team {
+	return predicate.Team(sql.FieldLTE(FieldPreviousKeys, v))
+}
+
+// PreviousKeysIsNil applies the IsNil predicate on the "previous_keys" field.
+func PreviousKeysIsNil() predicate.Team {
+	return predicate.Team(sql.FieldIsNull(FieldPreviousKeys))
+}
+
+// PreviousKeysNotNil applies the NotNil predicate on the "previous_keys" field.
+func PreviousKeysNotNil() predicate.Team {
+	return predicate.Team(sql.FieldNotNull(FieldPreviousKeys))
+}
+
+// PreviousNamesEQ applies the EQ predicate on the "previous_names" field.
+func PreviousNamesEQ(v pgarray.Text) predicate.Team {
+	return predicate.Team(sql.FieldEQ(FieldPreviousNames, v))
+}
+
+// PreviousNamesNEQ applies the NEQ predicate on the "previous_names" field.
+func PreviousNamesNEQ(v pgarray.Text) predicate.Team {
+	return predicate.Team(sql.FieldNEQ(FieldPreviousNames, v))
+}
+
+// PreviousNamesIn applies the In predicate on the "previous_names" field.
+func PreviousNamesIn(vs ...pgarray.Text) predicate.Team {
+	return predicate.Team(sql.FieldIn(FieldPreviousNames, vs...))
+}
+
+// PreviousNamesNotIn applies the NotIn predicate on the "previous_names" field.
+func PreviousNamesNotIn(vs ...pgarray.Text) predicate.Team {
+	return predicate.Team(sql.FieldNotIn(FieldPreviousNames, vs...))
+}
+
+// PreviousNamesGT applies the GT predicate on the "previous_names" field.
+func PreviousNamesGT(v pgarray.Text) predicate.Team {
+	return predicate.Team(sql.FieldGT(FieldPreviousNames, v))
+}
+
+// PreviousNamesGTE applies the GTE predicate on the "previous_names" field.
+func PreviousNamesGTE(v pgarray.Text) predicate.Team {
+	return predicate.Team(sql.FieldGTE(FieldPreviousNames, v))
+}
+
+// PreviousNamesLT applies the LT predicate on the "previous_names" field.
+func PreviousNamesLT(v pgarray.Text) predicate.Team {
+	return predicate.Team(sql.FieldLT(FieldPreviousNames, v))
+}
+
+// PreviousNamesLTE applies the LTE predicate on the "previous_names" field.
+func PreviousNamesLTE(v pgarray.Text) predicate.Team {
+	return predicate.Team(sql.FieldLTE(FieldPreviousNames, v))
+}
+
+// PreviousNamesIsNil applies the IsNil predicate on the "previous_names" field.
+func PreviousNamesIsNil() predicate.Team {
+	return predicate.Team(sql.FieldIsNull(FieldPreviousNames))
+}
+
+// PreviousNamesNotNil applies the NotNil predicate on the "previous_names" field.
+func PreviousNamesNotNil() predicate.Team {
+	return predicate.Team(sql.FieldNotNull(FieldPreviousNames))
+}
+
+// MergedTeamIdsEQ applies the EQ predicate on the "merged_team_ids" field.
+func MergedTeamIdsEQ(v pgarray.UUID) predicate.Team {
+	return predicate.Team(sql.FieldEQ(FieldMergedTeamIds, v))
+}
+
+// MergedTeamIdsNEQ applies the NEQ predicate on the "merged_team_ids" field.
+func MergedTeamIdsNEQ(v pgarray.UUID) predicate.Team {
+	return predicate.Team(sql.FieldNEQ(FieldMergedTeamIds, v))
+}
+
+// MergedTeamIdsIn applies the In predicate on the "merged_team_ids" field.
+func MergedTeamIdsIn(vs ...pgarray.UUID) predicate.Team {
+	return predicate.Team(sql.FieldIn(FieldMergedTeamIds, vs...))
+}
+
+// MergedTeamIdsNotIn applies the NotIn predicate on the "merged_team_ids" field.
+func MergedTeamIdsNotIn(vs ...pgarray.UUID) predicate.Team {
+	return predicate.Team(sql.FieldNotIn(FieldMergedTeamIds, vs...))
+}
+
+// MergedTeamIdsGT applies the GT predicate on the "merged_team_ids" field.
+func MergedTeamIdsGT(v pgarray.UUID) predicate.Team {
+	return predicate.Team(sql.FieldGT(FieldMergedTeamIds, v))
+}
+
+// MergedTeamIdsGTE applies the GTE predicate on the "merged_team_ids" field.
+func MergedTeamIdsGTE(v pgarray.UUID) predicate.Team {
+	return predicate.Team(sql.FieldGTE(FieldMergedTeamIds, v))
+}
+
+// MergedTeamIdsLT applies the LT predicate on the "merged_team_ids" field.
+func MergedTeamIdsLT(v pgarray.UUID) predicate.Team {
+	return predicate.Team(sql.FieldLT(FieldMergedTeamIds, v))
+}
+
+// MergedTeamIdsLTE applies the LTE predicate on the "merged_team_ids" field.
+func MergedTeamIdsLTE(v pgarray.UUID) predicate.Team {
+	return predicate.Team(sql.FieldLTE(FieldMergedTeamIds, v))
+}
+
+// MergedTeamIdsIsNil applies the IsNil predicate on the "merged_team_ids" field.
+func MergedTeamIdsIsNil() predicate.Team {
+	return predicate.Team(sql.FieldIsNull(FieldMergedTeamIds))
+}
+
+// MergedTeamIdsNotNil applies the NotNil predicate on the "merged_team_ids" field.
+func MergedTeamIdsNotNil() predicate.Team {
+	return predicate.Team(sql.FieldNotNull(FieldMergedTeamIds))
 }
 
 // HasWorkspace applies the HasEdge predicate on the "workspace" edge.

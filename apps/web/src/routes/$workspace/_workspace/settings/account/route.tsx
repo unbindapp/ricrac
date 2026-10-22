@@ -36,7 +36,7 @@ function AccountSettingsLayout() {
   return (
     <SettingsLayout
       title="Account"
-      switcher={<SettingsSectionSwitcher current={{ kind: "account" }} />}
+      switcher={<SettingsSectionSwitcher current="account" />}
       groups={[tabs]}
     >
       <Outlet />

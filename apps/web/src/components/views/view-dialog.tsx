@@ -18,26 +18,21 @@ import {
   type TFilterModel,
 } from "@/components/views/view-filter";
 import { ViewFilterBar } from "@/components/views/view-filter-bar";
-import { useTeams } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
 import { type TFilter, type TView, useSaveViewMutation } from "@/lib/queries/views";
-
-const ALL_TEAMS = "all";
 
 const viewFormSchema = z.object({
   name: z.string().trim().min(1, "Name is required.").max(80, "Keep the name under 80 characters."),
   description: z.string().trim().max(500, "Keep the description under 500 characters."),
   icon: z.string(),
   color: z.string(),
-  team: z.string(),
   shared: z.boolean(),
 });
 
 /** A new view: what it lists and, when saved from a list, the filter it starts from. */
 export type TViewDraft = {
   model: TFilterModel;
-  team?: string | null;
   filter?: TFilter;
   display?: Record<string, unknown>;
 };
@@ -85,7 +80,6 @@ function ViewForm({
   onDone: (view: TView) => void;
 }) {
   const { workspace } = useWorkspace();
-  const { teams } = useTeams();
   const { mutateAsync: saveView } = useSaveViewMutation(workspace.id);
   const view = target.mode === "edit" ? target.view : null;
   const draft = target.mode === "create" ? target.draft : null;
@@ -93,10 +87,6 @@ function ViewForm({
     view?.model === "project" ? "project" : (draft?.model ?? "issue"),
   );
   const [conditions, setConditions] = useState<TCondition[]>([]);
-  const teamItems = [
-    { value: ALL_TEAMS, label: "All teams" },
-    ...teams.map((team) => ({ value: team.id, label: team.name })),
-  ];
 
   const form = useAppForm({
     defaultValues: {
@@ -104,7 +94,6 @@ function ViewForm({
       description: view?.description ?? "",
       icon: view?.icon ?? "",
       color: view?.color ?? "",
-      team: view?.team?.id ?? draft?.team ?? ALL_TEAMS,
       shared: view?.shared ?? false,
     },
     validators: { onSubmit: viewFormSchema },
@@ -115,7 +104,6 @@ function ViewForm({
         description: parsed.description || null,
         icon: parsed.icon || null,
         color: parsed.color || null,
-        team: parsed.team === ALL_TEAMS ? null : parsed.team,
         shared: parsed.shared,
       };
       if (view) {
@@ -164,20 +152,6 @@ function ViewForm({
         <form.AppField name="icon" children={(field) => <field.IconField label="Icon" />} />
         <form.AppField name="color" children={(field) => <field.ColorField label="Color" />} />
       </div>
-      <form.AppField
-        name="team"
-        children={(field) => (
-          <field.SelectField
-            label="Teams"
-            description={
-              model === "issue"
-                ? "All teams lets the filter span teams; a team keeps the view to its issues."
-                : "A team keeps the view to its projects."
-            }
-            items={teamItems}
-          />
-        )}
-      />
       {!view && !draft?.filter && (
         <div className="flex flex-col gap-1.5">
           <span className="text-sm font-medium">Filters</span>

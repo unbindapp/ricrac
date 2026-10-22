@@ -37826,6 +37826,7 @@ type IssueLabelMutation struct {
 	retired_at       *time.Time
 	created_at       *time.Time
 	updated_at       *time.Time
+	merged_ids       *pgarray.UUID
 	clearedFields    map[string]struct{}
 	workspace        *uuid.UUID
 	clearedworkspace bool
@@ -38499,6 +38500,55 @@ func (m *IssueLabelMutation) ResetUpdatedAt() {
 	delete(m.clearedFields, issuelabel.FieldUpdatedAt)
 }
 
+// SetMergedIds sets the "merged_ids" field.
+func (m *IssueLabelMutation) SetMergedIds(pg pgarray.UUID) {
+	m.merged_ids = &pg
+}
+
+// MergedIds returns the value of the "merged_ids" field in the mutation.
+func (m *IssueLabelMutation) MergedIds() (r pgarray.UUID, exists bool) {
+	v := m.merged_ids
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMergedIds returns the old "merged_ids" field's value of the IssueLabel entity.
+// If the IssueLabel object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IssueLabelMutation) OldMergedIds(ctx context.Context) (v pgarray.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMergedIds is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMergedIds requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMergedIds: %w", err)
+	}
+	return oldValue.MergedIds, nil
+}
+
+// ClearMergedIds clears the value of the "merged_ids" field.
+func (m *IssueLabelMutation) ClearMergedIds() {
+	m.merged_ids = nil
+	m.clearedFields[issuelabel.FieldMergedIds] = struct{}{}
+}
+
+// MergedIdsCleared returns if the "merged_ids" field was cleared in this mutation.
+func (m *IssueLabelMutation) MergedIdsCleared() bool {
+	_, ok := m.clearedFields[issuelabel.FieldMergedIds]
+	return ok
+}
+
+// ResetMergedIds resets all changes to the "merged_ids" field.
+func (m *IssueLabelMutation) ResetMergedIds() {
+	m.merged_ids = nil
+	delete(m.clearedFields, issuelabel.FieldMergedIds)
+}
+
 // ClearWorkspace clears the "workspace" edge to the Workspace entity.
 func (m *IssueLabelMutation) ClearWorkspace() {
 	m.clearedworkspace = true
@@ -38749,7 +38799,7 @@ func (m *IssueLabelMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *IssueLabelMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.workspace != nil {
 		fields = append(fields, issuelabel.FieldWorkspaceID)
 	}
@@ -38786,6 +38836,9 @@ func (m *IssueLabelMutation) Fields() []string {
 	if m.updated_at != nil {
 		fields = append(fields, issuelabel.FieldUpdatedAt)
 	}
+	if m.merged_ids != nil {
+		fields = append(fields, issuelabel.FieldMergedIds)
+	}
 	return fields
 }
 
@@ -38818,6 +38871,8 @@ func (m *IssueLabelMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case issuelabel.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case issuelabel.FieldMergedIds:
+		return m.MergedIds()
 	}
 	return nil, false
 }
@@ -38851,6 +38906,8 @@ func (m *IssueLabelMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldCreatedAt(ctx)
 	case issuelabel.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case issuelabel.FieldMergedIds:
+		return m.OldMergedIds(ctx)
 	}
 	return nil, fmt.Errorf("unknown IssueLabel field %s", name)
 }
@@ -38944,6 +39001,13 @@ func (m *IssueLabelMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUpdatedAt(v)
 		return nil
+	case issuelabel.FieldMergedIds:
+		v, ok := value.(pgarray.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMergedIds(v)
+		return nil
 	}
 	return fmt.Errorf("unknown IssueLabel field %s", name)
 }
@@ -39001,6 +39065,9 @@ func (m *IssueLabelMutation) ClearedFields() []string {
 	if m.FieldCleared(issuelabel.FieldUpdatedAt) {
 		fields = append(fields, issuelabel.FieldUpdatedAt)
 	}
+	if m.FieldCleared(issuelabel.FieldMergedIds) {
+		fields = append(fields, issuelabel.FieldMergedIds)
+	}
 	return fields
 }
 
@@ -39041,6 +39108,9 @@ func (m *IssueLabelMutation) ClearField(name string) error {
 		return nil
 	case issuelabel.FieldUpdatedAt:
 		m.ClearUpdatedAt()
+		return nil
+	case issuelabel.FieldMergedIds:
+		m.ClearMergedIds()
 		return nil
 	}
 	return fmt.Errorf("unknown IssueLabel nullable field %s", name)
@@ -39085,6 +39155,9 @@ func (m *IssueLabelMutation) ResetField(name string) error {
 		return nil
 	case issuelabel.FieldUpdatedAt:
 		m.ResetUpdatedAt()
+		return nil
+	case issuelabel.FieldMergedIds:
+		m.ResetMergedIds()
 		return nil
 	}
 	return fmt.Errorf("unknown IssueLabel field %s", name)
@@ -64390,6 +64463,9 @@ type TeamMutation struct {
 	archived_at                      *time.Time
 	created_at                       *time.Time
 	updated_at                       *time.Time
+	previous_keys                    *pgarray.Text
+	previous_names                   *pgarray.Text
+	merged_team_ids                  *pgarray.UUID
 	clearedFields                    map[string]struct{}
 	workspace                        *uuid.UUID
 	clearedworkspace                 bool
@@ -66765,6 +66841,153 @@ func (m *TeamMutation) ResetGithubPrMergedStateID() {
 	delete(m.clearedFields, team.FieldGithubPrMergedStateID)
 }
 
+// SetPreviousKeys sets the "previous_keys" field.
+func (m *TeamMutation) SetPreviousKeys(pg pgarray.Text) {
+	m.previous_keys = &pg
+}
+
+// PreviousKeys returns the value of the "previous_keys" field in the mutation.
+func (m *TeamMutation) PreviousKeys() (r pgarray.Text, exists bool) {
+	v := m.previous_keys
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPreviousKeys returns the old "previous_keys" field's value of the Team entity.
+// If the Team object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TeamMutation) OldPreviousKeys(ctx context.Context) (v pgarray.Text, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPreviousKeys is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPreviousKeys requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPreviousKeys: %w", err)
+	}
+	return oldValue.PreviousKeys, nil
+}
+
+// ClearPreviousKeys clears the value of the "previous_keys" field.
+func (m *TeamMutation) ClearPreviousKeys() {
+	m.previous_keys = nil
+	m.clearedFields[team.FieldPreviousKeys] = struct{}{}
+}
+
+// PreviousKeysCleared returns if the "previous_keys" field was cleared in this mutation.
+func (m *TeamMutation) PreviousKeysCleared() bool {
+	_, ok := m.clearedFields[team.FieldPreviousKeys]
+	return ok
+}
+
+// ResetPreviousKeys resets all changes to the "previous_keys" field.
+func (m *TeamMutation) ResetPreviousKeys() {
+	m.previous_keys = nil
+	delete(m.clearedFields, team.FieldPreviousKeys)
+}
+
+// SetPreviousNames sets the "previous_names" field.
+func (m *TeamMutation) SetPreviousNames(pg pgarray.Text) {
+	m.previous_names = &pg
+}
+
+// PreviousNames returns the value of the "previous_names" field in the mutation.
+func (m *TeamMutation) PreviousNames() (r pgarray.Text, exists bool) {
+	v := m.previous_names
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPreviousNames returns the old "previous_names" field's value of the Team entity.
+// If the Team object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TeamMutation) OldPreviousNames(ctx context.Context) (v pgarray.Text, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPreviousNames is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPreviousNames requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPreviousNames: %w", err)
+	}
+	return oldValue.PreviousNames, nil
+}
+
+// ClearPreviousNames clears the value of the "previous_names" field.
+func (m *TeamMutation) ClearPreviousNames() {
+	m.previous_names = nil
+	m.clearedFields[team.FieldPreviousNames] = struct{}{}
+}
+
+// PreviousNamesCleared returns if the "previous_names" field was cleared in this mutation.
+func (m *TeamMutation) PreviousNamesCleared() bool {
+	_, ok := m.clearedFields[team.FieldPreviousNames]
+	return ok
+}
+
+// ResetPreviousNames resets all changes to the "previous_names" field.
+func (m *TeamMutation) ResetPreviousNames() {
+	m.previous_names = nil
+	delete(m.clearedFields, team.FieldPreviousNames)
+}
+
+// SetMergedTeamIds sets the "merged_team_ids" field.
+func (m *TeamMutation) SetMergedTeamIds(pg pgarray.UUID) {
+	m.merged_team_ids = &pg
+}
+
+// MergedTeamIds returns the value of the "merged_team_ids" field in the mutation.
+func (m *TeamMutation) MergedTeamIds() (r pgarray.UUID, exists bool) {
+	v := m.merged_team_ids
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMergedTeamIds returns the old "merged_team_ids" field's value of the Team entity.
+// If the Team object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TeamMutation) OldMergedTeamIds(ctx context.Context) (v pgarray.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMergedTeamIds is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMergedTeamIds requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMergedTeamIds: %w", err)
+	}
+	return oldValue.MergedTeamIds, nil
+}
+
+// ClearMergedTeamIds clears the value of the "merged_team_ids" field.
+func (m *TeamMutation) ClearMergedTeamIds() {
+	m.merged_team_ids = nil
+	m.clearedFields[team.FieldMergedTeamIds] = struct{}{}
+}
+
+// MergedTeamIdsCleared returns if the "merged_team_ids" field was cleared in this mutation.
+func (m *TeamMutation) MergedTeamIdsCleared() bool {
+	_, ok := m.clearedFields[team.FieldMergedTeamIds]
+	return ok
+}
+
+// ResetMergedTeamIds resets all changes to the "merged_team_ids" field.
+func (m *TeamMutation) ResetMergedTeamIds() {
+	m.merged_team_ids = nil
+	delete(m.clearedFields, team.FieldMergedTeamIds)
+}
+
 // ClearWorkspace clears the "workspace" edge to the Workspace entity.
 func (m *TeamMutation) ClearWorkspace() {
 	m.clearedworkspace = true
@@ -67771,7 +67994,7 @@ func (m *TeamMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TeamMutation) Fields() []string {
-	fields := make([]string, 0, 42)
+	fields := make([]string, 0, 45)
 	if m.workspace != nil {
 		fields = append(fields, team.FieldWorkspaceID)
 	}
@@ -67898,6 +68121,15 @@ func (m *TeamMutation) Fields() []string {
 	if m.github_pr_merged_state != nil {
 		fields = append(fields, team.FieldGithubPrMergedStateID)
 	}
+	if m.previous_keys != nil {
+		fields = append(fields, team.FieldPreviousKeys)
+	}
+	if m.previous_names != nil {
+		fields = append(fields, team.FieldPreviousNames)
+	}
+	if m.merged_team_ids != nil {
+		fields = append(fields, team.FieldMergedTeamIds)
+	}
 	return fields
 }
 
@@ -67990,6 +68222,12 @@ func (m *TeamMutation) Field(name string) (ent.Value, bool) {
 		return m.GithubPrOpenedStateID()
 	case team.FieldGithubPrMergedStateID:
 		return m.GithubPrMergedStateID()
+	case team.FieldPreviousKeys:
+		return m.PreviousKeys()
+	case team.FieldPreviousNames:
+		return m.PreviousNames()
+	case team.FieldMergedTeamIds:
+		return m.MergedTeamIds()
 	}
 	return nil, false
 }
@@ -68083,6 +68321,12 @@ func (m *TeamMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldGithubPrOpenedStateID(ctx)
 	case team.FieldGithubPrMergedStateID:
 		return m.OldGithubPrMergedStateID(ctx)
+	case team.FieldPreviousKeys:
+		return m.OldPreviousKeys(ctx)
+	case team.FieldPreviousNames:
+		return m.OldPreviousNames(ctx)
+	case team.FieldMergedTeamIds:
+		return m.OldMergedTeamIds(ctx)
 	}
 	return nil, fmt.Errorf("unknown Team field %s", name)
 }
@@ -68386,6 +68630,27 @@ func (m *TeamMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetGithubPrMergedStateID(v)
 		return nil
+	case team.FieldPreviousKeys:
+		v, ok := value.(pgarray.Text)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPreviousKeys(v)
+		return nil
+	case team.FieldPreviousNames:
+		v, ok := value.(pgarray.Text)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPreviousNames(v)
+		return nil
+	case team.FieldMergedTeamIds:
+		v, ok := value.(pgarray.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMergedTeamIds(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Team field %s", name)
 }
@@ -68644,6 +68909,15 @@ func (m *TeamMutation) ClearedFields() []string {
 	if m.FieldCleared(team.FieldGithubPrMergedStateID) {
 		fields = append(fields, team.FieldGithubPrMergedStateID)
 	}
+	if m.FieldCleared(team.FieldPreviousKeys) {
+		fields = append(fields, team.FieldPreviousKeys)
+	}
+	if m.FieldCleared(team.FieldPreviousNames) {
+		fields = append(fields, team.FieldPreviousNames)
+	}
+	if m.FieldCleared(team.FieldMergedTeamIds) {
+		fields = append(fields, team.FieldMergedTeamIds)
+	}
 	return fields
 }
 
@@ -68774,6 +69048,15 @@ func (m *TeamMutation) ClearField(name string) error {
 		return nil
 	case team.FieldGithubPrMergedStateID:
 		m.ClearGithubPrMergedStateID()
+		return nil
+	case team.FieldPreviousKeys:
+		m.ClearPreviousKeys()
+		return nil
+	case team.FieldPreviousNames:
+		m.ClearPreviousNames()
+		return nil
+	case team.FieldMergedTeamIds:
+		m.ClearMergedTeamIds()
 		return nil
 	}
 	return fmt.Errorf("unknown Team nullable field %s", name)
@@ -68908,6 +69191,15 @@ func (m *TeamMutation) ResetField(name string) error {
 		return nil
 	case team.FieldGithubPrMergedStateID:
 		m.ResetGithubPrMergedStateID()
+		return nil
+	case team.FieldPreviousKeys:
+		m.ResetPreviousKeys()
+		return nil
+	case team.FieldPreviousNames:
+		m.ResetPreviousNames()
+		return nil
+	case team.FieldMergedTeamIds:
+		m.ResetMergedTeamIds()
 		return nil
 	}
 	return fmt.Errorf("unknown Team field %s", name)
@@ -78419,6 +78711,7 @@ type WorkflowStateMutation struct {
 	archived_at                            *time.Time
 	created_at                             *time.Time
 	updated_at                             *time.Time
+	merged_ids                             *pgarray.UUID
 	clearedFields                          map[string]struct{}
 	team                                   *uuid.UUID
 	clearedteam                            bool
@@ -78942,6 +79235,55 @@ func (m *WorkflowStateMutation) ResetUpdatedAt() {
 	delete(m.clearedFields, workflowstate.FieldUpdatedAt)
 }
 
+// SetMergedIds sets the "merged_ids" field.
+func (m *WorkflowStateMutation) SetMergedIds(pg pgarray.UUID) {
+	m.merged_ids = &pg
+}
+
+// MergedIds returns the value of the "merged_ids" field in the mutation.
+func (m *WorkflowStateMutation) MergedIds() (r pgarray.UUID, exists bool) {
+	v := m.merged_ids
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMergedIds returns the old "merged_ids" field's value of the WorkflowState entity.
+// If the WorkflowState object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WorkflowStateMutation) OldMergedIds(ctx context.Context) (v pgarray.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMergedIds is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMergedIds requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMergedIds: %w", err)
+	}
+	return oldValue.MergedIds, nil
+}
+
+// ClearMergedIds clears the value of the "merged_ids" field.
+func (m *WorkflowStateMutation) ClearMergedIds() {
+	m.merged_ids = nil
+	m.clearedFields[workflowstate.FieldMergedIds] = struct{}{}
+}
+
+// MergedIdsCleared returns if the "merged_ids" field was cleared in this mutation.
+func (m *WorkflowStateMutation) MergedIdsCleared() bool {
+	_, ok := m.clearedFields[workflowstate.FieldMergedIds]
+	return ok
+}
+
+// ResetMergedIds resets all changes to the "merged_ids" field.
+func (m *WorkflowStateMutation) ResetMergedIds() {
+	m.merged_ids = nil
+	delete(m.clearedFields, workflowstate.FieldMergedIds)
+}
+
 // ClearTeam clears the "team" edge to the Team entity.
 func (m *WorkflowStateMutation) ClearTeam() {
 	m.clearedteam = true
@@ -79273,7 +79615,7 @@ func (m *WorkflowStateMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *WorkflowStateMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.team != nil {
 		fields = append(fields, workflowstate.FieldTeamID)
 	}
@@ -79301,6 +79643,9 @@ func (m *WorkflowStateMutation) Fields() []string {
 	if m.updated_at != nil {
 		fields = append(fields, workflowstate.FieldUpdatedAt)
 	}
+	if m.merged_ids != nil {
+		fields = append(fields, workflowstate.FieldMergedIds)
+	}
 	return fields
 }
 
@@ -79327,6 +79672,8 @@ func (m *WorkflowStateMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case workflowstate.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case workflowstate.FieldMergedIds:
+		return m.MergedIds()
 	}
 	return nil, false
 }
@@ -79354,6 +79701,8 @@ func (m *WorkflowStateMutation) OldField(ctx context.Context, name string) (ent.
 		return m.OldCreatedAt(ctx)
 	case workflowstate.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case workflowstate.FieldMergedIds:
+		return m.OldMergedIds(ctx)
 	}
 	return nil, fmt.Errorf("unknown WorkflowState field %s", name)
 }
@@ -79426,6 +79775,13 @@ func (m *WorkflowStateMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUpdatedAt(v)
 		return nil
+	case workflowstate.FieldMergedIds:
+		v, ok := value.(pgarray.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMergedIds(v)
+		return nil
 	}
 	return fmt.Errorf("unknown WorkflowState field %s", name)
 }
@@ -79483,6 +79839,9 @@ func (m *WorkflowStateMutation) ClearedFields() []string {
 	if m.FieldCleared(workflowstate.FieldUpdatedAt) {
 		fields = append(fields, workflowstate.FieldUpdatedAt)
 	}
+	if m.FieldCleared(workflowstate.FieldMergedIds) {
+		fields = append(fields, workflowstate.FieldMergedIds)
+	}
 	return fields
 }
 
@@ -79508,6 +79867,9 @@ func (m *WorkflowStateMutation) ClearField(name string) error {
 		return nil
 	case workflowstate.FieldUpdatedAt:
 		m.ClearUpdatedAt()
+		return nil
+	case workflowstate.FieldMergedIds:
+		m.ClearMergedIds()
 		return nil
 	}
 	return fmt.Errorf("unknown WorkflowState nullable field %s", name)
@@ -79543,6 +79905,9 @@ func (m *WorkflowStateMutation) ResetField(name string) error {
 		return nil
 	case workflowstate.FieldUpdatedAt:
 		m.ResetUpdatedAt()
+		return nil
+	case workflowstate.FieldMergedIds:
+		m.ResetMergedIds()
 		return nil
 	}
 	return fmt.Errorf("unknown WorkflowState field %s", name)

@@ -22,11 +22,10 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	}, issues.Get)
 	oapi.Register(reg, oapi.Operation{
 		Name: "save_issue", Access: auth.Write, Routes: []string{"POST /issues", "PATCH /issues/{id}"},
-		Description: "Create an issue (omit id; team and title are required unless a template or parent provides them) or update " +
+		Description: "Create an issue (omit id; title is required unless a template provides it; team is optional) or update " +
 			"one (pass id). Omitted fields stay as they are; null clears a field. People are given as id, name, email or " +
 			"\"me\"; states as name, type or id; labels, projects, cycles and milestones as name or id. Use patch to edit " +
-			"part of the description without resending it. Moving an issue to another team gives it a new identifier; " +
-			"the old one keeps working. Returns the issue as get_issue does, with relations and sub-issues.",
+			"part of the description without resending it. Earlier identifiers of an issue keep working. Returns the issue as get_issue does, with relations and sub-issues.",
 	}, issues.Save)
 	oapi.Register(reg, oapi.Operation{
 		Name: "update_issues", Access: auth.Write, Routes: []string{"PATCH /issues"},
@@ -58,7 +57,7 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	}, issues.History)
 	oapi.Register(reg, oapi.Operation{
 		Name: "share_issue", Access: auth.Write, Routes: []string{"POST /issues/{id}/shares"},
-		Description: "Give a workspace member who can't see the issue's team (a guest, or someone outside a private team) access " +
+		Description: "Give a workspace member who can't see the workspace's issues (a guest) access " +
 			"to this one issue. Only when the user asks to share it.",
 	}, issues.Share)
 	oapi.Register(reg, oapi.Operation{
@@ -71,7 +70,7 @@ func RegisterImportHandlers(srv *server.Server, reg *oapi.Registry) {
 	oapi.Register(reg, oapi.Operation{
 		Name: "import_issues", Access: auth.Write, Routes: []string{"POST /issues/import"},
 		Description: "Import issues from another tracker in one go (workspace admins). An issue can keep its number, so ENG-42 " +
-			"stays ENG-42 (the number must be free in the team; gaps are fine), along with its creator, dates, status, " +
+			"stays ENG-42 (the number must be free; gaps are fine), along with its creator, dates, status, " +
 			"labels, assignee, project, links, subscribers and comments with their authors and dates. Issues point at " +
 			"each other (parent, relatedTo, blocks, blockedBy, duplicateOf) by identifier, within the import or already " +
 			"in Ricrac. Pass the issues inline, or upload them as a JSON file with prepare_file_upload and pass its " +

@@ -12,7 +12,6 @@ import {
   ProjectLabelsPicker,
   ProjectPriorityPicker,
   ProjectStatusPicker,
-  TeamsPicker,
 } from "@/components/projects/project-pickers";
 import { Separator } from "@/components/ui/separator";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
@@ -74,13 +73,6 @@ export function ProjectProperties({ project }: { project: ProjectDetail }) {
                 removeMembers: current.filter((id) => !ids.includes(id)),
               });
             }}
-          />
-        </PropertyRow>
-        <PropertyRow label="Teams">
-          <TeamsPicker
-            teams={project.teams}
-            disabled={disabled}
-            onChange={(setTeams) => update({ setTeams })}
           />
         </PropertyRow>
         <PropertyRow label="Start">

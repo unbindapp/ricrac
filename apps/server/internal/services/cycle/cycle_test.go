@@ -48,17 +48,14 @@ func (suite *CycleServiceSuite) TestFirstCycleStartsOnTheStartDay() {
 	}
 }
 
-func (suite *CycleServiceSuite) TestCreatingNeedsATeamAndDates() {
+func (suite *CycleServiceSuite) TestCreatingNeedsDates() {
+	suite.resolve.EXPECT().TeamOrDefault(mock.Anything, suite.actor, (*string)(nil)).Return(suite.team, nil)
 	_, err := suite.service.Save(suite.Ctx, suite.actor, &SaveInput{StartsAt: new("2026-10-12")})
-	suite.Equal("Name the team of the new cycle", errdefs.As(err).Message)
-
-	suite.resolve.EXPECT().Team(mock.Anything, suite.actor, "ENG").Return(suite.team, nil)
-	_, err = suite.service.Save(suite.Ctx, suite.actor, &SaveInput{Team: new("ENG"), StartsAt: new("2026-10-12")})
 	suite.Equal("startsAt and endsAt are required to create a cycle", errdefs.As(err).Message)
 }
 
 func (suite *CycleServiceSuite) TestTeamsWithoutCyclesGetNone() {
-	suite.resolve.EXPECT().Team(mock.Anything, suite.actor, "ENG").Return(suite.team, nil)
+	suite.resolve.EXPECT().TeamOrDefault(mock.Anything, suite.actor, mock.Anything).Return(suite.team, nil)
 	suite.MockCycleRepo.EXPECT().TeamUsesCycles(mock.Anything, mock.Anything, suite.team).Return(false, nil)
 	_, err := suite.service.Save(suite.Ctx, suite.actor, &SaveInput{Team: new("ENG"), StartsAt: new("2026-10-12"), EndsAt: new("2026-10-26")})
 	suite.Equal("This team doesn't use cycles; turn them on with save_team (cyclesEnabled) first", errdefs.As(err).Message)

@@ -18,17 +18,19 @@ type M = map[string]any
 
 const Version = "0.1.0"
 
-const Instructions = `Ricrac is an issue tracker for agents: a workspace has teams; teams have issues (identifiers like ENG-123), workflow statuses (triage, backlog, unstarted, started, completed, canceled), labels, cycles and templates; projects (with milestones, status updates and documents) span teams and roll up into initiatives. There are also comments (on documents they can annotate a passage or suggest an edit), a forum of discussions with smaller threads (bugs, design checks, questions), attachments, custom views, favorites, an inbox of notifications, customers, releases and webhooks.
+const Instructions = `Ricrac is an issue tracker for agents: a workspace has issues (identifiers like ENG-123, ENG being the workspace's issue prefix), workflow statuses (triage, backlog, unstarted, started, completed, canceled), labels, cycles and templates; projects (with milestones, status updates and documents) roll up into initiatives. There are also comments (on documents they can annotate a passage or suggest an edit), a forum of discussions with smaller threads (bugs, design checks, questions), attachments, custom views, favorites, an inbox of notifications, customers, releases and webhooks.
 
-Referencing things: wherever a tool takes a person, team, status, label, project, cycle or milestone you may pass a name, key or identifier instead of an id. People also take an email or "me". Issues take their identifier (ENG-123), id or link. Errors list the valid options when a name doesn't match.
+Referencing things: wherever a tool takes a person, status, label, project, cycle or milestone you may pass a name, key or identifier instead of an id. People also take an email or "me". Issues take their identifier (ENG-123, or one they had before), id or link. Errors list the valid options when a name doesn't match.
+
+Teams: a workspace has one team, which holds its issue prefix, statuses, labels, cycles and settings (get_team, save_team). Arguments named team are optional and default to it; keys, names and ids of teams from before still work.
 
 Writing: descriptions, comments, documents and updates are Markdown; write literal newlines, not escape sequences. Mention people with @displayName or @email: they are notified and subscribed. To change part of a long description or document, pass ` + "`patch`" + ` edits instead of resending it all. Show screenshots and recordings by uploading them with prepare_file_upload and embedding the returned markdown: ` + "`![shot.png](assetUrl)`" + ` shows an image and ` + "`![demo.mp4](assetUrl)`" + ` plays a video (mp4, webm, mov, m4v, ogv).
 
 Workspaces: a connection may reach several workspaces; list_workspaces lists them. When it reaches more than one, every tool takes a ` + "`workspace`" + ` argument (the URL key, like "acme") naming the one to act in. Identifiers like ENG-123 and names are only unique within a workspace; Ricrac links already name theirs.
 
-Saving: save_* tools create when you omit ` + "`id`" + ` and update when you pass it; omitted fields stay as they are and null clears a field. List tools page with ` + "`limit` and `cursor`" + ` (pass pageInfo.endCursor). Start with get_workspace or list_teams to learn the teams and their keys, and list_issue_statuses for a team's workflow.
+Saving: save_* tools create when you omit ` + "`id`" + ` and update when you pass it; omitted fields stay as they are and null clears a field. List tools page with ` + "`limit` and `cursor`" + ` (pass pageInfo.endCursor). Start with get_workspace to learn the workspace and its issue prefix, and list_issue_statuses for its workflow.
 
-More operations: the tools listed cover everyday work. Everything else (webhooks, customers, releases, favorites, templates and views management, team and member administration, archiving, sharing, ...) is found with find_operations and run with call_operation.`
+More operations: the tools listed cover everyday work. Everything else (webhooks, customers, releases, favorites, templates and views management, workspace settings and members, archiving, sharing, ...) is found with find_operations and run with call_operation.`
 
 type Handler struct {
 	cfg config.Config

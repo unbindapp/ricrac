@@ -59,7 +59,7 @@ func (self *WorkspaceService) ListInvitations(ctx context.Context, actor *auth.A
 type InviteInput struct {
 	Email string   `json:"email" doc:"Their email address; they sign in with the Google account of this email."`
 	Role  *string  `json:"role" doc:"member (default), admin (only admins invite admins) or guest."`
-	Teams []string `json:"teams" doc:"Teams they join (keys, names or ids). Required for guests."`
+	Teams []string `json:"teams" doc:"Optional: everyone joins the workspace's team. Guests see only the teams named here, the workspace's team by default (keys, names or ids)."`
 }
 
 func validEmail(email string) bool {
@@ -108,7 +108,11 @@ func (self *WorkspaceService) Invite(ctx context.Context, actor *auth.Actor, inp
 		}
 	}
 	if role == auth.Guest && len(teams) == 0 {
-		return models.Invitation{}, errdefs.BadRequest("Guests only see their teams; name at least one in teams")
+		team, err := self.resolve.DefaultTeam(ctx, actor)
+		if err != nil {
+			return models.Invitation{}, err
+		}
+		teams = append(teams, team)
 	}
 	var value models.Invitation
 	err = self.repo.WithTx(ctx, func(tx repository.TxInterface) error {

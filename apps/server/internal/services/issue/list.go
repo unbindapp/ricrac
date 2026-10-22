@@ -214,7 +214,11 @@ func (self *IssueService) List(ctx context.Context, actor *auth.Actor, input *Li
 	if err != nil {
 		return args.PageOf[models.Issue]{}, err
 	}
-	filter, err := CompileFilter(M{"and": parts}, actor.User)
+	named, err := self.resolve.CurrentNames(ctx, actor, M{"and": parts})
+	if err != nil {
+		return args.PageOf[models.Issue]{}, err
+	}
+	filter, err := CompileFilter(named, actor.User)
 	if err != nil {
 		return args.PageOf[models.Issue]{}, err
 	}

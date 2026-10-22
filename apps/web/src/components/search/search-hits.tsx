@@ -63,11 +63,11 @@ export function SearchHitIcon({ hit }: { hit: TSearchHit }) {
   }
 }
 
-/** Where a hit sits: its team, project or status. */
+/** Where a hit sits: its status or project. */
 export function searchHitContext(hit: TSearchHit) {
   switch (hit.type) {
     case "issue":
-      return hit.team.name;
+      return hit.state.name;
     case "project":
       return hit.status.name;
     case "document":

@@ -595,6 +595,24 @@ func (_c *TeamCreate) SetNillableGithubPrMergedStateID(v *uuid.UUID) *TeamCreate
 	return _c
 }
 
+// SetPreviousKeys sets the "previous_keys" field.
+func (_c *TeamCreate) SetPreviousKeys(v pgarray.Text) *TeamCreate {
+	_c.mutation.SetPreviousKeys(v)
+	return _c
+}
+
+// SetPreviousNames sets the "previous_names" field.
+func (_c *TeamCreate) SetPreviousNames(v pgarray.Text) *TeamCreate {
+	_c.mutation.SetPreviousNames(v)
+	return _c
+}
+
+// SetMergedTeamIds sets the "merged_team_ids" field.
+func (_c *TeamCreate) SetMergedTeamIds(v pgarray.UUID) *TeamCreate {
+	_c.mutation.SetMergedTeamIds(v)
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *TeamCreate) SetID(v uuid.UUID) *TeamCreate {
 	_c.mutation.SetID(v)
@@ -1098,6 +1116,18 @@ func (_c *TeamCreate) createSpec() (*Team, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(team.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if value, ok := _c.mutation.PreviousKeys(); ok {
+		_spec.SetField(team.FieldPreviousKeys, field.TypeOther, value)
+		_node.PreviousKeys = value
+	}
+	if value, ok := _c.mutation.PreviousNames(); ok {
+		_spec.SetField(team.FieldPreviousNames, field.TypeOther, value)
+		_node.PreviousNames = value
+	}
+	if value, ok := _c.mutation.MergedTeamIds(); ok {
+		_spec.SetField(team.FieldMergedTeamIds, field.TypeOther, value)
+		_node.MergedTeamIds = value
 	}
 	if nodes := _c.mutation.WorkspaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -2285,6 +2315,60 @@ func (u *TeamUpsert) ClearGithubPrMergedStateID() *TeamUpsert {
 	return u
 }
 
+// SetPreviousKeys sets the "previous_keys" field.
+func (u *TeamUpsert) SetPreviousKeys(v pgarray.Text) *TeamUpsert {
+	u.Set(team.FieldPreviousKeys, v)
+	return u
+}
+
+// UpdatePreviousKeys sets the "previous_keys" field to the value that was provided on create.
+func (u *TeamUpsert) UpdatePreviousKeys() *TeamUpsert {
+	u.SetExcluded(team.FieldPreviousKeys)
+	return u
+}
+
+// ClearPreviousKeys clears the value of the "previous_keys" field.
+func (u *TeamUpsert) ClearPreviousKeys() *TeamUpsert {
+	u.SetNull(team.FieldPreviousKeys)
+	return u
+}
+
+// SetPreviousNames sets the "previous_names" field.
+func (u *TeamUpsert) SetPreviousNames(v pgarray.Text) *TeamUpsert {
+	u.Set(team.FieldPreviousNames, v)
+	return u
+}
+
+// UpdatePreviousNames sets the "previous_names" field to the value that was provided on create.
+func (u *TeamUpsert) UpdatePreviousNames() *TeamUpsert {
+	u.SetExcluded(team.FieldPreviousNames)
+	return u
+}
+
+// ClearPreviousNames clears the value of the "previous_names" field.
+func (u *TeamUpsert) ClearPreviousNames() *TeamUpsert {
+	u.SetNull(team.FieldPreviousNames)
+	return u
+}
+
+// SetMergedTeamIds sets the "merged_team_ids" field.
+func (u *TeamUpsert) SetMergedTeamIds(v pgarray.UUID) *TeamUpsert {
+	u.Set(team.FieldMergedTeamIds, v)
+	return u
+}
+
+// UpdateMergedTeamIds sets the "merged_team_ids" field to the value that was provided on create.
+func (u *TeamUpsert) UpdateMergedTeamIds() *TeamUpsert {
+	u.SetExcluded(team.FieldMergedTeamIds)
+	return u
+}
+
+// ClearMergedTeamIds clears the value of the "merged_team_ids" field.
+func (u *TeamUpsert) ClearMergedTeamIds() *TeamUpsert {
+	u.SetNull(team.FieldMergedTeamIds)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -3254,6 +3338,69 @@ func (u *TeamUpsertOne) UpdateGithubPrMergedStateID() *TeamUpsertOne {
 func (u *TeamUpsertOne) ClearGithubPrMergedStateID() *TeamUpsertOne {
 	return u.Update(func(s *TeamUpsert) {
 		s.ClearGithubPrMergedStateID()
+	})
+}
+
+// SetPreviousKeys sets the "previous_keys" field.
+func (u *TeamUpsertOne) SetPreviousKeys(v pgarray.Text) *TeamUpsertOne {
+	return u.Update(func(s *TeamUpsert) {
+		s.SetPreviousKeys(v)
+	})
+}
+
+// UpdatePreviousKeys sets the "previous_keys" field to the value that was provided on create.
+func (u *TeamUpsertOne) UpdatePreviousKeys() *TeamUpsertOne {
+	return u.Update(func(s *TeamUpsert) {
+		s.UpdatePreviousKeys()
+	})
+}
+
+// ClearPreviousKeys clears the value of the "previous_keys" field.
+func (u *TeamUpsertOne) ClearPreviousKeys() *TeamUpsertOne {
+	return u.Update(func(s *TeamUpsert) {
+		s.ClearPreviousKeys()
+	})
+}
+
+// SetPreviousNames sets the "previous_names" field.
+func (u *TeamUpsertOne) SetPreviousNames(v pgarray.Text) *TeamUpsertOne {
+	return u.Update(func(s *TeamUpsert) {
+		s.SetPreviousNames(v)
+	})
+}
+
+// UpdatePreviousNames sets the "previous_names" field to the value that was provided on create.
+func (u *TeamUpsertOne) UpdatePreviousNames() *TeamUpsertOne {
+	return u.Update(func(s *TeamUpsert) {
+		s.UpdatePreviousNames()
+	})
+}
+
+// ClearPreviousNames clears the value of the "previous_names" field.
+func (u *TeamUpsertOne) ClearPreviousNames() *TeamUpsertOne {
+	return u.Update(func(s *TeamUpsert) {
+		s.ClearPreviousNames()
+	})
+}
+
+// SetMergedTeamIds sets the "merged_team_ids" field.
+func (u *TeamUpsertOne) SetMergedTeamIds(v pgarray.UUID) *TeamUpsertOne {
+	return u.Update(func(s *TeamUpsert) {
+		s.SetMergedTeamIds(v)
+	})
+}
+
+// UpdateMergedTeamIds sets the "merged_team_ids" field to the value that was provided on create.
+func (u *TeamUpsertOne) UpdateMergedTeamIds() *TeamUpsertOne {
+	return u.Update(func(s *TeamUpsert) {
+		s.UpdateMergedTeamIds()
+	})
+}
+
+// ClearMergedTeamIds clears the value of the "merged_team_ids" field.
+func (u *TeamUpsertOne) ClearMergedTeamIds() *TeamUpsertOne {
+	return u.Update(func(s *TeamUpsert) {
+		s.ClearMergedTeamIds()
 	})
 }
 
@@ -4393,6 +4540,69 @@ func (u *TeamUpsertBulk) UpdateGithubPrMergedStateID() *TeamUpsertBulk {
 func (u *TeamUpsertBulk) ClearGithubPrMergedStateID() *TeamUpsertBulk {
 	return u.Update(func(s *TeamUpsert) {
 		s.ClearGithubPrMergedStateID()
+	})
+}
+
+// SetPreviousKeys sets the "previous_keys" field.
+func (u *TeamUpsertBulk) SetPreviousKeys(v pgarray.Text) *TeamUpsertBulk {
+	return u.Update(func(s *TeamUpsert) {
+		s.SetPreviousKeys(v)
+	})
+}
+
+// UpdatePreviousKeys sets the "previous_keys" field to the value that was provided on create.
+func (u *TeamUpsertBulk) UpdatePreviousKeys() *TeamUpsertBulk {
+	return u.Update(func(s *TeamUpsert) {
+		s.UpdatePreviousKeys()
+	})
+}
+
+// ClearPreviousKeys clears the value of the "previous_keys" field.
+func (u *TeamUpsertBulk) ClearPreviousKeys() *TeamUpsertBulk {
+	return u.Update(func(s *TeamUpsert) {
+		s.ClearPreviousKeys()
+	})
+}
+
+// SetPreviousNames sets the "previous_names" field.
+func (u *TeamUpsertBulk) SetPreviousNames(v pgarray.Text) *TeamUpsertBulk {
+	return u.Update(func(s *TeamUpsert) {
+		s.SetPreviousNames(v)
+	})
+}
+
+// UpdatePreviousNames sets the "previous_names" field to the value that was provided on create.
+func (u *TeamUpsertBulk) UpdatePreviousNames() *TeamUpsertBulk {
+	return u.Update(func(s *TeamUpsert) {
+		s.UpdatePreviousNames()
+	})
+}
+
+// ClearPreviousNames clears the value of the "previous_names" field.
+func (u *TeamUpsertBulk) ClearPreviousNames() *TeamUpsertBulk {
+	return u.Update(func(s *TeamUpsert) {
+		s.ClearPreviousNames()
+	})
+}
+
+// SetMergedTeamIds sets the "merged_team_ids" field.
+func (u *TeamUpsertBulk) SetMergedTeamIds(v pgarray.UUID) *TeamUpsertBulk {
+	return u.Update(func(s *TeamUpsert) {
+		s.SetMergedTeamIds(v)
+	})
+}
+
+// UpdateMergedTeamIds sets the "merged_team_ids" field to the value that was provided on create.
+func (u *TeamUpsertBulk) UpdateMergedTeamIds() *TeamUpsertBulk {
+	return u.Update(func(s *TeamUpsert) {
+		s.UpdateMergedTeamIds()
+	})
+}
+
+// ClearMergedTeamIds clears the value of the "merged_team_ids" field.
+func (u *TeamUpsertBulk) ClearMergedTeamIds() *TeamUpsertBulk {
+	return u.Update(func(s *TeamUpsert) {
+		s.ClearMergedTeamIds()
 	})
 }
 

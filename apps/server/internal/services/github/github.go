@@ -90,7 +90,7 @@ type DisconnectInput struct {
 type SaveRepoSyncInput struct {
 	ID            *string               `json:"id" doc:"Only to change a sync: its id or the repository (owner/name). Omit to create one."`
 	Repository    *string               `json:"repository" doc:"The repository as owner/name or GitHub id, among list_github_repositories. Required to create."`
-	Team          *string               `json:"team" doc:"Team key, name or id whose issues the repository's are. Required to create."`
+	Team          *string               `json:"team" doc:"Optional: the workspace's team by default. Its key, name or id. The team whose issues the repository's are."`
 	Project       args.Nullable[string] `json:"project" doc:"Project name, slug or id issues from GitHub join; null for none."`
 	Backfill      *bool                 `json:"backfill" doc:"Import the repository's existing issues and comments: on create unless false; true imports again."`
 	IncludeClosed *bool                 `json:"includeClosed" doc:"The import includes closed issues too (default false)."`

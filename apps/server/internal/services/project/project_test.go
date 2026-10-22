@@ -67,11 +67,6 @@ func (suite *ProjectServiceSuite) TestUnknownLabelsListTheOptions() {
 	suite.Equal(`No project label "Q4". Options: Team/Platform, Q3.`, errdefs.As(err).Message)
 }
 
-func (suite *ProjectServiceSuite) TestNewProjectsNeedATeam() {
-	_, err := suite.service.Save(suite.Ctx, suite.actor, &SaveInput{Name: new("Launch")})
-	suite.Equal("A project needs at least one team; pass setTeams or addTeams", errdefs.As(err).Message)
-}
-
 func (suite *ProjectServiceSuite) TestGuestsCantCreateProjects() {
 	guest := auth.NewActor(uuid.New(), suite.actor.Workspace, auth.Guest, auth.EveryAccess, nil, nil)
 	_, err := suite.service.Save(suite.Ctx, guest, &SaveInput{Name: new("Launch"), AddTeams: []string{"ENG"}})

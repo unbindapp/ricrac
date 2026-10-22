@@ -1,5 +1,3 @@
-import { useQueries } from "@tanstack/react-query";
-
 import { CircleUserIcon } from "@/components/icons/symbols.gen";
 import { type TFilterField, UNASSIGNED } from "@/components/issues/filters";
 import { cycleName, PRIORITY_ORDER, userName } from "@/components/issues/grouping";
@@ -7,6 +5,7 @@ import {
   useCycles,
   useLabels,
   useProjects,
+  useTeamStates,
   useWorkspaceUsers,
 } from "@/components/issues/picker-sources";
 import { LabelDot, UserAvatar } from "@/components/issues/pickers";
@@ -15,32 +14,18 @@ import { CycleIcon } from "@/components/shared/cycle-icon";
 import { PriorityIcon, priorityLabel } from "@/components/shared/priority-icon";
 import { ProjectIcon } from "@/components/shared/project-icon";
 import { StateIcon } from "@/components/shared/state-icon";
-import { useTeams } from "@/components/workspace/teams-provider";
-import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { teamQuery } from "@/lib/queries/teams";
 
-/** The values each filter offers: the team's when the page has one, else those of your teams. */
 export function useFilterOptions(teamId: string | undefined) {
-  const { workspace } = useWorkspace();
-  const { teams, myTeams } = useTeams();
   const { users } = useWorkspaceUsers();
   const { labels } = useLabels(teamId);
   const { projects } = useProjects(teamId);
   const { cycles, enabled: cyclesEnabled } = useCycles(teamId);
 
-  const scopedTeams = teamId ? teams.filter((team) => team.id === teamId) : myTeams;
-  const details = useQueries({
-    queries: scopedTeams.map((team) => teamQuery(workspace.id, team.id)),
-  });
-  const stateOptions: TPickerOption[] = details.flatMap(({ data: team }) =>
-    (team?.states ?? []).map((state) => ({
-      value: state.id,
-      label: state.name,
-      group: scopedTeams.length > 1 ? team?.name : undefined,
-      keywords: team ? [team.key] : [],
-      icon: <StateIcon type={state.type} color={state.color} name={state.name} />,
-    })),
-  );
+  const stateOptions: TPickerOption[] = useTeamStates(teamId).map((state) => ({
+    value: state.id,
+    label: state.name,
+    icon: <StateIcon type={state.type} color={state.color} name={state.name} />,
+  }));
   const userOptions: TPickerOption[] = users.map((user) => ({
     value: user.id,
     label: userName(user),

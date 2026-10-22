@@ -9,12 +9,10 @@ type TSaveViewArgs = {
   /** The list's filter, in the filter language of list_issues. */
   filter: TFilter;
   display?: Record<string, unknown>;
-  /** The team (id or key) the list is of, if any. */
-  team?: string | null;
 };
 
 /** Saves what an issue list shows as a view, then opens it. */
-export function useSaveViewDialog({ filter, display, team }: TSaveViewArgs): {
+export function useSaveViewDialog({ filter, display }: TSaveViewArgs): {
   openSaveView: () => void;
   saveViewDialog: ReactNode;
 } {
@@ -23,7 +21,7 @@ export function useSaveViewDialog({ filter, display, team }: TSaveViewArgs): {
   const [isOpen, setIsOpen] = useState(false);
   const saveViewDialog = (
     <ViewDialog
-      target={isOpen ? { mode: "create", draft: { model: "issue", filter, display, team } } : null}
+      target={isOpen ? { mode: "create", draft: { model: "issue", filter, display } } : null}
       onClose={() => setIsOpen(false)}
       onSaved={(view) =>
         void navigate({

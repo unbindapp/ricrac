@@ -1,6 +1,6 @@
 # Ricrac
 
-The issue tracker for people and agents. Ricrac has teams, issues, workflows, projects,
+The issue tracker for people and agents. Ricrac has workspaces, issues, workflows, projects,
 initiatives, cycles and the rest. People work in it through the web app (sign in with Google or
 with a link emailed to any address): lists and boards, an inbox, a command panel and keyboard
 shortcuts. Agents work in it through an MCP server and a REST API, with the same workspaces,
@@ -12,15 +12,17 @@ operations and permissions.
   audit log.
 - **Email**: invitations, and digests of notifications still unread after a couple of minutes
   (each person can turn them off).
-- **Teams** with keys (ENG), private teams, sub-teams, members, and settings: estimates
+- **One team per workspace**, holding its issue prefix (ENG in ENG-123) and settings: estimates
   (exponential, Fibonacci, linear, t-shirt), cycles, triage with responsibility rotations,
-  auto-archive, auto-close, and auto-closing parents and sub-issues.
-- **Workflow statuses** per team (triage, backlog, unstarted, started, completed, canceled).
-- **Issues** with identifiers (ENG-123, still resolvable after a move to another team), Markdown
+  auto-archive, auto-close, and auto-closing parents and sub-issues. Everyone but guests is on it;
+  guests see its issues once added to it, or the issues shared with them. Team arguments are optional and default to it; the keys,
+  names and ids of teams merged into it keep working.
+- **Workflow statuses** (triage, backlog, unstarted, started, completed, canceled).
+- **Issues** with identifiers (ENG-123, still resolvable after the prefix changes), Markdown
   descriptions with partial patches, status, priority, estimate, assignee, labels (with
   single- or multi-select groups), project and milestone, cycle, due date, SLA, snoozing,
   sub-issues, relations (blocks, blocked by, related, duplicate), link attachments and uploaded
-  files, subscribers, sharing with people outside the team, history, archive and trash,
+  files, subscribers, sharing with guests, history, archive and trash,
   changes to many issues at once, and imports from other trackers that keep issue numbers,
   dates, authors and comments.
 - **Writing** in Markdown everywhere (descriptions, documents, comments, updates, release notes)
@@ -32,14 +34,14 @@ operations and permissions.
   and full-text search.
 - **Comments** in threads with replies, resolving and reactions, on issues, projects,
   initiatives, documents, milestones, status updates and discussions. **@mentions** notify people.
-- **Projects** across teams, with statuses, lead, members, labels, dates, priority, milestones,
+- **Projects** with statuses, lead, members, labels, dates, priority, milestones,
   dependencies, links, status updates with health, and progress.
 - **Initiatives** grouping projects, with sub-initiatives and status updates.
 - **Cycles**, created and completed automatically, with rollover of unfinished issues and daily
   progress history.
-- **Documents** attached to projects, initiatives, teams, issues, cycles or releases, with
+- **Documents** attached to projects, initiatives, the team, issues, cycles or releases, with
   version history, comments on passages in a sidebar and suggested edits to accept or reject.
-- **Forum** of discussions, for the workspace or one team, with tags to filter by and a
+- **Forum** of discussions, with tags to filter by and a
   thumbnail, each a live chat whose messages take replies in their own thread, and with smaller
   threads for a bug, a design check, a question, an idea or a task, which link to issues and get
   resolved. Subscribers hear about new threads and comments.
@@ -50,7 +52,7 @@ operations and permissions.
 - **GitHub**, as a GitHub App admins install on their repositories: pull requests, branches and
   commits that mention ENG-123 are attached to the issue and move it (opened, then done when a
   pull request that fixes it merges or a fixing commit lands on the default branch), and
-  repositories synced with a team keep their issues and comments in step both ways. See
+  synced repositories keep their issues and comments in step both ways. See
   [docs/github-app.md](docs/github-app.md).
 
 ## Connecting agents

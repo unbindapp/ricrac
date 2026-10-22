@@ -73,7 +73,8 @@ type AccountRepositoryInterface interface {
 	DropWorkspaceAccess(ctx context.Context, tx repository.TxInterface, workspaceID uuid.UUID, user *uuid.UUID) error
 	// TakeInvitation deletes the user's unexpired invitation and returns it, nil when there's none.
 	TakeInvitation(ctx context.Context, tx repository.TxInterface, id, user uuid.UUID) (*TakenInvitation, error)
-	// Join makes the user an active member of the workspace with role, and of the teams.
+	// Join makes the user an active member of the workspace with role, and of the teams; everyone but
+	// a guest joins the workspace's team too.
 	Join(ctx context.Context, tx repository.TxInterface, workspaceID, user uuid.UUID, role string, teams []uuid.UUID) error
 	// DeclineInvitation deletes the invitation when it is the user's.
 	DeclineInvitation(ctx context.Context, id, user uuid.UUID) error

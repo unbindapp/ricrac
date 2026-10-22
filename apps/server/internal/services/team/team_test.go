@@ -67,15 +67,17 @@ func (suite *TeamServiceSuite) TestTheDefaultEstimateStaysOnTheScale() {
 }
 
 func (suite *TeamServiceSuite) TestTheLastMemberCantLeaveAPrivateTeam() {
-	suite.resolve.EXPECT().Team(mock.Anything, suite.actor, "ENG").Return(suite.team, nil)
+	suite.resolve.EXPECT().TeamOrDefault(mock.Anything, suite.actor, new("ENG")).Return(suite.team, nil)
 	suite.MockTeamRepo.EXPECT().Lock(mock.Anything, mock.Anything, suite.team).Return(nil)
+	suite.MockTeamRepo.EXPECT().Unarchived(mock.Anything, mock.Anything, suite.actor.Workspace).
+		Return([]*ent.Team{{ID: uuid.New()}, {ID: suite.team}}, nil)
 	suite.MockTeamRepo.EXPECT().Membership(mock.Anything, mock.Anything, suite.team, suite.actor.User).
 		Return(team_repo.Membership{Private: true, Member: true}, nil)
 	suite.MockTeamRepo.EXPECT().RemoveMembers(mock.Anything, mock.Anything, suite.team, []uuid.UUID{suite.actor.User}).Return(nil)
 	suite.MockTeamRepo.EXPECT().DropFromTriage(mock.Anything, mock.Anything, suite.team, []uuid.UUID{suite.actor.User}).Return(nil)
 	suite.MockTeamRepo.EXPECT().Get(mock.Anything, mock.Anything, suite.team).Return(&ent.Team{ID: suite.team, Private: true}, nil)
 	suite.MockTeamRepo.EXPECT().MemberCounts(mock.Anything, mock.Anything, []uuid.UUID{suite.team}).Return(map[uuid.UUID]int{}, nil)
-	_, err := suite.service.Leave(suite.Ctx, suite.actor, &IDInput{ID: "ENG"})
+	_, err := suite.service.Leave(suite.Ctx, suite.actor, &IDInput{ID: new("ENG")})
 	suite.Equal("You're the last member of this private team; add someone else or delete the team", errdefs.As(err).Message)
 }
 

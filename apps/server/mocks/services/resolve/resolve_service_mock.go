@@ -350,6 +350,80 @@ func (_c *ResolveServiceMock_CanSeeIssue_Call) RunAndReturn(run func(ctx context
 	return _c
 }
 
+// CurrentNames provides a mock function for the type ResolveServiceMock
+func (_mock *ResolveServiceMock) CurrentNames(ctx context.Context, actor *auth.Actor, filter any) (any, error) {
+	ret := _mock.Called(ctx, actor, filter)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CurrentNames")
+	}
+
+	var r0 any
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, any) (any, error)); ok {
+		return returnFunc(ctx, actor, filter)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, any) any); ok {
+		r0 = returnFunc(ctx, actor, filter)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(any)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, any) error); ok {
+		r1 = returnFunc(ctx, actor, filter)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// ResolveServiceMock_CurrentNames_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CurrentNames'
+type ResolveServiceMock_CurrentNames_Call struct {
+	*mock.Call
+}
+
+// CurrentNames is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - filter any
+func (_e *ResolveServiceMock_Expecter) CurrentNames(ctx any, actor any, filter any) *ResolveServiceMock_CurrentNames_Call {
+	return &ResolveServiceMock_CurrentNames_Call{Call: _e.mock.On("CurrentNames", ctx, actor, filter)}
+}
+
+func (_c *ResolveServiceMock_CurrentNames_Call) Run(run func(ctx context.Context, actor *auth.Actor, filter any)) *ResolveServiceMock_CurrentNames_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 any
+		if args[2] != nil {
+			arg2 = args[2].(any)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *ResolveServiceMock_CurrentNames_Call) Return(anyMoqParam any, err error) *ResolveServiceMock_CurrentNames_Call {
+	_c.Call.Return(anyMoqParam, err)
+	return _c
+}
+
+func (_c *ResolveServiceMock_CurrentNames_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, filter any) (any, error)) *ResolveServiceMock_CurrentNames_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CustomView provides a mock function for the type ResolveServiceMock
 func (_mock *ResolveServiceMock) CustomView(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error) {
 	ret := _mock.Called(ctx, actor, value)
@@ -574,6 +648,74 @@ func (_c *ResolveServiceMock_Cycle_Call) Return(uUID uuid.UUID, err error) *Reso
 }
 
 func (_c *ResolveServiceMock_Cycle_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, team *uuid.UUID, value string) (uuid.UUID, error)) *ResolveServiceMock_Cycle_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DefaultTeam provides a mock function for the type ResolveServiceMock
+func (_mock *ResolveServiceMock) DefaultTeam(ctx context.Context, actor *auth.Actor) (uuid.UUID, error) {
+	ret := _mock.Called(ctx, actor)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DefaultTeam")
+	}
+
+	var r0 uuid.UUID
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor) (uuid.UUID, error)); ok {
+		return returnFunc(ctx, actor)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor) uuid.UUID); ok {
+		r0 = returnFunc(ctx, actor)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor) error); ok {
+		r1 = returnFunc(ctx, actor)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// ResolveServiceMock_DefaultTeam_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DefaultTeam'
+type ResolveServiceMock_DefaultTeam_Call struct {
+	*mock.Call
+}
+
+// DefaultTeam is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+func (_e *ResolveServiceMock_Expecter) DefaultTeam(ctx any, actor any) *ResolveServiceMock_DefaultTeam_Call {
+	return &ResolveServiceMock_DefaultTeam_Call{Call: _e.mock.On("DefaultTeam", ctx, actor)}
+}
+
+func (_c *ResolveServiceMock_DefaultTeam_Call) Run(run func(ctx context.Context, actor *auth.Actor)) *ResolveServiceMock_DefaultTeam_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *ResolveServiceMock_DefaultTeam_Call) Return(uUID uuid.UUID, err error) *ResolveServiceMock_DefaultTeam_Call {
+	_c.Call.Return(uUID, err)
+	return _c
+}
+
+func (_c *ResolveServiceMock_DefaultTeam_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor) (uuid.UUID, error)) *ResolveServiceMock_DefaultTeam_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1996,6 +2138,80 @@ func (_c *ResolveServiceMock_Team_Call) Return(uUID uuid.UUID, err error) *Resol
 }
 
 func (_c *ResolveServiceMock_Team_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error)) *ResolveServiceMock_Team_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// TeamOrDefault provides a mock function for the type ResolveServiceMock
+func (_mock *ResolveServiceMock) TeamOrDefault(ctx context.Context, actor *auth.Actor, value *string) (uuid.UUID, error) {
+	ret := _mock.Called(ctx, actor, value)
+
+	if len(ret) == 0 {
+		panic("no return value specified for TeamOrDefault")
+	}
+
+	var r0 uuid.UUID
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *string) (uuid.UUID, error)); ok {
+		return returnFunc(ctx, actor, value)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *string) uuid.UUID); ok {
+		r0 = returnFunc(ctx, actor, value)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *string) error); ok {
+		r1 = returnFunc(ctx, actor, value)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// ResolveServiceMock_TeamOrDefault_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TeamOrDefault'
+type ResolveServiceMock_TeamOrDefault_Call struct {
+	*mock.Call
+}
+
+// TeamOrDefault is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - value *string
+func (_e *ResolveServiceMock_Expecter) TeamOrDefault(ctx any, actor any, value any) *ResolveServiceMock_TeamOrDefault_Call {
+	return &ResolveServiceMock_TeamOrDefault_Call{Call: _e.mock.On("TeamOrDefault", ctx, actor, value)}
+}
+
+func (_c *ResolveServiceMock_TeamOrDefault_Call) Run(run func(ctx context.Context, actor *auth.Actor, value *string)) *ResolveServiceMock_TeamOrDefault_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *string
+		if args[2] != nil {
+			arg2 = args[2].(*string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *ResolveServiceMock_TeamOrDefault_Call) Return(uUID uuid.UUID, err error) *ResolveServiceMock_TeamOrDefault_Call {
+	_c.Call.Return(uUID, err)
+	return _c
+}
+
+func (_c *ResolveServiceMock_TeamOrDefault_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, value *string) (uuid.UUID, error)) *ResolveServiceMock_TeamOrDefault_Call {
 	_c.Call.Return(run)
 	return _c
 }

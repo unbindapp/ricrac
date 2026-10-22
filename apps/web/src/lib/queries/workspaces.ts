@@ -21,9 +21,9 @@ export const workspaceRoleLabels: Record<TWorkspaceRole, string> = {
 
 export const workspaceRoleDescriptions: Record<TWorkspaceRole, string> = {
   owner: "Everything admins do, and can delete the workspace.",
-  admin: "Manages members, teams and settings.",
+  admin: "Manages members and settings.",
   member: "Creates and edits issues, projects and documents.",
-  guest: "Only sees the teams they are added to.",
+  guest: "Read-only, and only sees issues once invited to them.",
 };
 
 /** The role a summary from /api/me carries, as the operations type it. */

@@ -53,7 +53,7 @@ func TestListsAndReadsMembers(t *testing.T) {
 	eq(t, all.At("nodes", 0, "role").Str(), "owner")
 	eq(t, all.At("nodes", 0, "teams", 0, "key").Str(), "ENG")
 	eq(t, call(t, bob, "list_users", M{"query": "lee"}).At("nodes", 0, "email").Str(), "cat@acme.test")
-	eq(t, call(t, bob, "list_users", M{"team": "ENG"}).At("nodes").Len(), 1, "only Ann is in ENG")
+	eq(t, call(t, bob, "list_users", M{"team": "ENG"}).At("nodes").Len(), 2, "everyone but the guest is in ENG")
 	eq(t, call(t, bob, "list_users", M{"limit": 2}).At("pageInfo", "hasNextPage").Bool(), true)
 
 	me := call(t, bob, "get_user", M{"id": "me"})
@@ -130,8 +130,9 @@ func TestInvitations(t *testing.T) {
 	check(t, invited.At("expiresAt").Str() > invited.At("createdAt").Str())
 
 	contains(t, fails(t, bob, "invite_user", M{"email": "eve@else.test", "role": "admin"}), "admins")
-	contains(t, fails(t, bob, "invite_user", M{"email": "gus@else.test", "role": "guest"}), "teams")
-	guest := call(t, bob, "invite_user", M{"email": "gus@else.test", "role": "guest", "teams": []any{"ENG"}})
+	guest := call(t, bob, "invite_user", M{"email": "gus@else.test", "role": "guest"})
+	eqList(t, guest.At("teams").Strings("key"), []string{"ENG"}, "guests see the workspace's team by default")
+	guest = call(t, bob, "invite_user", M{"email": "gus@else.test", "role": "guest", "teams": []any{"ENG"}})
 	eq(t, guest.At("teams", 0, "key").Str(), "ENG")
 	contains(t, fails(t, bob, "invite_user", M{"email": "ann@acme.test"}), "already a member")
 	contains(t, fails(t, bob, "invite_user", M{"email": "nope"}), "isn't an email")

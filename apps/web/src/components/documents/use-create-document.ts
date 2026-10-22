@@ -4,7 +4,7 @@ import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { entitySlug } from "@/lib/helpers/entity-slug";
 import { UNTITLED_DOCUMENT, useSaveDocumentMutation } from "@/lib/queries/documents";
 
-/** Where a document lives: exactly one of these, by id (or key for a team). */
+/** Where a document lives: exactly one of these, by id; a team parent is the workspace's own. */
 export type TDocumentParent =
   { project: string } | { initiative: string } | { team: string } | { issue: string };
 

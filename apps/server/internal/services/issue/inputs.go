@@ -3,7 +3,7 @@ package issue_service
 import "ricrac/internal/common/args"
 
 type ListInput struct {
-	Team               *string `json:"team" doc:"Team key, name or id."`
+	Team               *string `json:"team" doc:"Optional team key, name or id."`
 	IncludeSubTeams    bool    `json:"includeSubTeams,omitempty" doc:"With team: also issues of its sub-teams."`
 	Assignee           *string `json:"assignee" doc:"Person (id, name, email or \"me\"), or \"null\" for unassigned issues."`
 	Creator            *string `json:"creator" doc:"Person who created the issues (id, name, email or \"me\")."`
@@ -42,7 +42,7 @@ type LinkInput struct {
 
 type SaveInput struct {
 	ID                *string                `json:"id" doc:"Only to update an issue: its identifier (ENG-123), id or link. Omit to create one."`
-	Team              *string                `json:"team" doc:"Team key, name or id. Required to create (unless parentId or the template sets it); changing it moves the issue."`
+	Team              *string                `json:"team" doc:"Optional: the workspace's team by default (or the parent's, or the template's). Its key, name or id."`
 	Title             *string                `json:"title"`
 	Description       *string                `json:"description" doc:"Markdown. Mention people with @displayName or @email; they are notified and subscribed."`
 	Patch             []args.TextEdit        `json:"patch" doc:"Edits to the current description instead of the whole text, applied in order, all or none."`

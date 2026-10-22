@@ -2,7 +2,6 @@ import { create } from "zustand";
 
 export type TNewProjectDefaults = {
   statusId?: string;
-  teamId?: string;
   initiativeId?: string;
 };
 

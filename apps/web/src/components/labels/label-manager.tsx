@@ -24,47 +24,36 @@ import { labelsQuery, labelTree, type TLabel, type TLabelNode } from "@/lib/quer
 const SEARCH_THRESHOLD = 12;
 
 type TProps = {
-  /** The team whose labels to manage; null for the workspace labels. */
-  team: { id: string; name: string } | null;
   canEdit: boolean;
   title: string;
   description?: ReactNode;
 };
 
-const inScope = (label: TLabel, teamId: string | null) => (label.team?.id ?? null) === teamId;
-
-/** The labels of the scope as groups with their labels; a team's labels also show in workspace groups. */
-function scopedTree(labels: TLabel[], teamId: string | null, showRetired: boolean, query: string) {
-  const visible = (label: TLabel) =>
+/** Groups with their labels, keeping a group whose labels match even when it doesn't. */
+function visibleTree(labels: TLabel[], showRetired: boolean, query: string) {
+  const isVisible = (label: TLabel) =>
     (showRetired || !label.retiredAt) && label.name.toLowerCase().includes(query);
   return labelTree(labels).flatMap((node): TLabelNode[] => {
-    const own = inScope(node, teamId);
-    if (!node.isGroup) return own && visible(node) ? [node] : [];
-    const children = node.labels.filter((child) => inScope(child, teamId) && visible(child));
-    const groupMatches = own && (showRetired || !node.retiredAt);
-    if (!groupMatches && children.length === 0) return [];
-    if (query && !node.name.toLowerCase().includes(query) && children.length === 0) return [];
-    return [{ ...node, labels: children }];
+    if (!node.isGroup) return isVisible(node) ? [node] : [];
+    const children = node.labels.filter(isVisible);
+    if (children.length > 0 || isVisible(node)) return [{ ...node, labels: children }];
+    return [];
   });
 }
 
-export function LabelManager({ team, canEdit, title, description }: TProps) {
+export function LabelManager({ canEdit, title, description }: TProps) {
   const { workspace } = useWorkspace();
-  const teamId = team?.id ?? null;
   const { data, isPending, error, refetch } = useQuery(
-    labelsQuery(workspace.id, { team: teamId, includeRetired: true }),
+    labelsQuery(workspace.id, { includeRetired: true }),
   );
   const [showRetired, setShowRetired] = useState(false);
   const [query, setQuery] = useState("");
   const [dialog, setDialog] = useState<TLabelDialogTarget | null>(null);
 
   const labels = data ?? [];
-  const own = labels.filter((label) => inScope(label, teamId));
-  const retiredCount = own.filter((label) => label.retiredAt).length;
-  const tree = scopedTree(labels, teamId, showRetired, query.trim().toLowerCase());
-  const groups = labels.filter(
-    (label) => label.isGroup && !label.retiredAt && (inScope(label, teamId) || !label.team),
-  );
+  const retiredCount = labels.filter((label) => label.retiredAt).length;
+  const tree = visibleTree(labels, showRetired, query.trim().toLowerCase());
+  const groups = labels.filter((label) => label.isGroup && !label.retiredAt);
   const open = (target: TLabelDialogTarget) => setDialog(target);
 
   const createButtons = canEdit && (
@@ -79,7 +68,7 @@ export function LabelManager({ team, canEdit, title, description }: TProps) {
       </Button>
     </>
   );
-  const actions = own.length > 0 && (
+  const actions = labels.length > 0 && (
     <>
       {retiredCount > 0 && (
         <Button
@@ -102,7 +91,7 @@ export function LabelManager({ team, canEdit, title, description }: TProps) {
         isPending={isPending}
         error={error}
         onRetry={() => void refetch()}
-        isEmpty={own.length === 0}
+        isEmpty={labels.length === 0}
         empty={{
           icon: TagIcon,
           title: "No labels yet",
@@ -112,7 +101,7 @@ export function LabelManager({ team, canEdit, title, description }: TProps) {
           action: createButtons,
         }}
       >
-        {own.length > SEARCH_THRESHOLD && (
+        {labels.length > SEARCH_THRESHOLD && (
           <div className="relative max-w-xs">
             <SearchIcon className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
             <Input
@@ -130,13 +119,7 @@ export function LabelManager({ team, canEdit, title, description }: TProps) {
           <List>
             {tree.map((node) =>
               node.isGroup ? (
-                <GroupRows
-                  key={node.id}
-                  group={node}
-                  teamId={teamId}
-                  canEdit={canEdit}
-                  onOpen={open}
-                />
+                <GroupRows key={node.id} group={node} canEdit={canEdit} onOpen={open} />
               ) : (
                 <LabelRow key={node.id} label={node} canEdit={canEdit} onOpen={open} />
               ),
@@ -144,7 +127,7 @@ export function LabelManager({ team, canEdit, title, description }: TProps) {
           </List>
         )}
       </ListStates>
-      <LabelDialog target={dialog} onClose={() => setDialog(null)} team={team} groups={groups} />
+      <LabelDialog target={dialog} onClose={() => setDialog(null)} groups={groups} />
     </SettingsSection>
   );
 }
@@ -154,13 +137,8 @@ type TRowProps = {
   onOpen: (target: TLabelDialogTarget) => void;
 };
 
-function GroupRows({
-  group,
-  teamId,
-  ...props
-}: { group: TLabelNode; teamId: string | null } & TRowProps) {
+function GroupRows({ group, ...props }: { group: TLabelNode } & TRowProps) {
   const [isOpen, setIsOpen] = useState(true);
-  const isOwn = inScope(group, teamId);
   const count = group.labels.length;
   return (
     <>
@@ -183,15 +161,12 @@ function GroupRows({
           </Button>
         }
         meta={
-          <>
-            <Badge variant="muted">
-              {group.groupType === "multiSelect" ? "Multi select" : "Single select"}
-            </Badge>
-            {!isOwn && <span className="text-muted-foreground text-xs">Workspace group</span>}
-          </>
+          <Badge variant="muted">
+            {group.groupType === "multiSelect" ? "Multi select" : "Single select"}
+          </Badge>
         }
         trailing={`${count} ${count === 1 ? "label" : "labels"}`}
-        menu={props.canEdit && isOwn && <LabelRowMenu label={group} onOpen={props.onOpen} />}
+        menu={props.canEdit && <LabelRowMenu label={group} onOpen={props.onOpen} />}
       />
       {isOpen &&
         group.labels.map((child) => <LabelRow key={child.id} label={child} nested {...props} />)}

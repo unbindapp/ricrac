@@ -213,11 +213,15 @@ func (w *World) actor(user, workspace uuid.UUID) *Actor {
 	return &Actor{w: w, User: user, Workspace: workspace}
 }
 
-// member adds someone to the workspace with role (member, admin or guest).
+// member adds someone to the workspace with role (member, admin or guest), and to its team
+// unless they're a guest, as joining does.
 func (w *World) member(email, name, role string) *Actor {
 	w.t.Helper()
 	user := w.addUser(email, name)
 	w.exec("INSERT INTO workspace_members (workspace_id, user_id, role) VALUES ($1, $2, $3)", w.Workspace, user, role)
+	if role != "guest" {
+		w.exec("INSERT INTO team_members (team_id, user_id) SELECT id, $2 FROM teams WHERE workspace_id = $1 AND archived_at IS NULL", w.Workspace, user)
+	}
 	return w.actor(user, w.Workspace)
 }
 

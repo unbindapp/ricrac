@@ -39,6 +39,14 @@ func (self *WorkspaceRepository) SetRole(ctx context.Context, tx repository.TxIn
 	return err
 }
 
+// JoinTeam adds the user to the workspace's team.
+func (self *WorkspaceRepository) JoinTeam(ctx context.Context, tx repository.TxInterface, id, user uuid.UUID) error {
+	_, err := self.base.Client(tx).ExecContext(ctx,
+		`INSERT INTO team_members (team_id, user_id) SELECT t.id, $2 FROM teams t WHERE t.workspace_id = $1 AND t.archived_at IS NULL
+		 ON CONFLICT DO NOTHING`, id, user)
+	return err
+}
+
 func (self *WorkspaceRepository) SetUserName(ctx context.Context, tx repository.TxInterface, user uuid.UUID, name string) error {
 	return self.base.Client(tx).User.UpdateOneID(user).SetName(name).Exec(ctx)
 }

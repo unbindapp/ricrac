@@ -4,6 +4,7 @@ package issuelabel
 
 import (
 	"ricrac/ent/predicate"
+	"ricrac/ent/schema/pgarray"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -114,6 +115,11 @@ func CreatedAt(v time.Time) predicate.IssueLabel {
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.IssueLabel {
 	return predicate.IssueLabel(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// MergedIds applies equality check predicate on the "merged_ids" field. It's identical to MergedIdsEQ.
+func MergedIds(v pgarray.UUID) predicate.IssueLabel {
+	return predicate.IssueLabel(sql.FieldEQ(FieldMergedIds, v))
 }
 
 // WorkspaceIDEQ applies the EQ predicate on the "workspace_id" field.
@@ -674,6 +680,56 @@ func UpdatedAtIsNil() predicate.IssueLabel {
 // UpdatedAtNotNil applies the NotNil predicate on the "updated_at" field.
 func UpdatedAtNotNil() predicate.IssueLabel {
 	return predicate.IssueLabel(sql.FieldNotNull(FieldUpdatedAt))
+}
+
+// MergedIdsEQ applies the EQ predicate on the "merged_ids" field.
+func MergedIdsEQ(v pgarray.UUID) predicate.IssueLabel {
+	return predicate.IssueLabel(sql.FieldEQ(FieldMergedIds, v))
+}
+
+// MergedIdsNEQ applies the NEQ predicate on the "merged_ids" field.
+func MergedIdsNEQ(v pgarray.UUID) predicate.IssueLabel {
+	return predicate.IssueLabel(sql.FieldNEQ(FieldMergedIds, v))
+}
+
+// MergedIdsIn applies the In predicate on the "merged_ids" field.
+func MergedIdsIn(vs ...pgarray.UUID) predicate.IssueLabel {
+	return predicate.IssueLabel(sql.FieldIn(FieldMergedIds, vs...))
+}
+
+// MergedIdsNotIn applies the NotIn predicate on the "merged_ids" field.
+func MergedIdsNotIn(vs ...pgarray.UUID) predicate.IssueLabel {
+	return predicate.IssueLabel(sql.FieldNotIn(FieldMergedIds, vs...))
+}
+
+// MergedIdsGT applies the GT predicate on the "merged_ids" field.
+func MergedIdsGT(v pgarray.UUID) predicate.IssueLabel {
+	return predicate.IssueLabel(sql.FieldGT(FieldMergedIds, v))
+}
+
+// MergedIdsGTE applies the GTE predicate on the "merged_ids" field.
+func MergedIdsGTE(v pgarray.UUID) predicate.IssueLabel {
+	return predicate.IssueLabel(sql.FieldGTE(FieldMergedIds, v))
+}
+
+// MergedIdsLT applies the LT predicate on the "merged_ids" field.
+func MergedIdsLT(v pgarray.UUID) predicate.IssueLabel {
+	return predicate.IssueLabel(sql.FieldLT(FieldMergedIds, v))
+}
+
+// MergedIdsLTE applies the LTE predicate on the "merged_ids" field.
+func MergedIdsLTE(v pgarray.UUID) predicate.IssueLabel {
+	return predicate.IssueLabel(sql.FieldLTE(FieldMergedIds, v))
+}
+
+// MergedIdsIsNil applies the IsNil predicate on the "merged_ids" field.
+func MergedIdsIsNil() predicate.IssueLabel {
+	return predicate.IssueLabel(sql.FieldIsNull(FieldMergedIds))
+}
+
+// MergedIdsNotNil applies the NotNil predicate on the "merged_ids" field.
+func MergedIdsNotNil() predicate.IssueLabel {
+	return predicate.IssueLabel(sql.FieldNotNull(FieldMergedIds))
 }
 
 // HasWorkspace applies the HasEdge predicate on the "workspace" edge.

@@ -13,13 +13,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  ALL_TEAMS,
   RESOURCE_GROUPS,
   resourceLabel,
   toSaveArgs,
   webhookFormSchema,
 } from "@/components/webhooks/webhook-form";
-import { useTeams } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { submitHandler, useAppForm, useFieldError } from "@/lib/hooks/use-app-form";
 import { type TWebhook, useSaveWebhookMutation } from "@/lib/queries/webhooks";
@@ -63,18 +61,12 @@ function WebhookForm({
   onDone: (saved: SavedWebhook) => void;
 }) {
   const { workspace } = useWorkspace();
-  const { teams } = useTeams();
   const { mutateAsync: saveWebhook } = useSaveWebhookMutation(workspace.id);
-  const teamItems = [
-    { value: ALL_TEAMS, label: "Every team" },
-    ...teams.map((team) => ({ value: team.id, label: team.name })),
-  ];
   const form = useAppForm({
     defaultValues: {
       url: webhook?.url ?? "",
       label: webhook?.label ?? "",
       resourceTypes: webhook?.resourceTypes ?? ["Issue", "Comment"],
-      team: webhook?.team?.id ?? ALL_TEAMS,
       enabled: webhook?.enabled ?? true,
     },
     validators: { onSubmit: webhookFormSchema },
@@ -98,18 +90,12 @@ function WebhookForm({
           />
         )}
       />
-      <div className="grid grid-cols-2 gap-4">
-        <form.AppField
-          name="label"
-          children={(field) => (
-            <field.TextField label="Label" placeholder="Optional" autoComplete="off" />
-          )}
-        />
-        <form.AppField
-          name="team"
-          children={(field) => <field.SelectField label="Changes in" items={teamItems} />}
-        />
-      </div>
+      <form.AppField
+        name="label"
+        children={(field) => (
+          <field.TextField label="Label" placeholder="Optional" autoComplete="off" />
+        )}
+      />
       <form.Field name="resourceTypes" children={(field) => <ResourceTypesField field={field} />} />
       {webhook && (
         <form.AppField

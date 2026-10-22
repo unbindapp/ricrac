@@ -67,6 +67,16 @@ func TeamKey(name string) string {
 	return strings.ToUpper(string(key))
 }
 
+// WorkspaceTeamKey is the key of a workspace's team from its URL key: acme-corp is AC, unbind is
+// UNB. Leading digits are dropped, since a key starts with a letter.
+func WorkspaceTeamKey(urlKey string) string {
+	key := strings.TrimLeft(TeamKey(strings.ReplaceAll(urlKey, "-", " ")), "0123456789")
+	if key == "" {
+		return "TEAM"
+	}
+	return key
+}
+
 // CheckURLKey checks a workspace URL key: 2 to 32 lowercase letters, digits and dashes, not a
 // path the server uses.
 func CheckURLKey(key string) (string, error) {

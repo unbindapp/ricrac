@@ -174,7 +174,7 @@ function DocumentsEmpty({
     <EmptyState
       icon={FileTextIcon}
       title="No documents yet"
-      description="Write specs, notes and decisions next to the team, project or initiative they belong to."
+      description="Write specs, notes and decisions next to the project or initiative they belong to."
       action={action}
     />
   );

@@ -105,6 +105,12 @@ type Team struct {
 	GithubPrOpenedStateID *uuid.UUID `json:"github_pr_opened_state_id,omitempty"`
 	// GithubPrMergedStateID holds the value of the "github_pr_merged_state_id" field.
 	GithubPrMergedStateID *uuid.UUID `json:"github_pr_merged_state_id,omitempty"`
+	// PreviousKeys holds the value of the "previous_keys" field.
+	PreviousKeys pgarray.Text `json:"previous_keys,omitempty"`
+	// PreviousNames holds the value of the "previous_names" field.
+	PreviousNames pgarray.Text `json:"previous_names,omitempty"`
+	// MergedTeamIds holds the value of the "merged_team_ids" field.
+	MergedTeamIds pgarray.UUID `json:"merged_team_ids,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TeamQuery when eager-loading is set.
 	Edges        TeamEdges `json:"edges"`
@@ -401,7 +407,9 @@ func (*Team) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case team.FieldParentID, team.FieldAutoCloseStateID, team.FieldDefaultIssueStateID, team.FieldDefaultTemplateMemberID, team.FieldDefaultTemplateNonMemberID, team.FieldDefaultProjectTemplateID, team.FieldGithubPrOpenedStateID, team.FieldGithubPrMergedStateID:
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case team.FieldTriageResponsibleIds:
+		case team.FieldPreviousKeys, team.FieldPreviousNames:
+			values[i] = new(pgarray.Text)
+		case team.FieldTriageResponsibleIds, team.FieldMergedTeamIds:
 			values[i] = new(pgarray.UUID)
 		case team.FieldPrivate, team.FieldEstimateAllowZero, team.FieldEstimateExtended, team.FieldCyclesEnabled, team.FieldCycleAutoAddStarted, team.FieldCycleAutoAddCompleted, team.FieldCycleRollover, team.FieldTriageEnabled, team.FieldRequirePriorityToLeaveTriage, team.FieldAutoCloseParentIssues, team.FieldAutoCloseChildIssues:
 			values[i] = new(sql.NullBool)
@@ -704,6 +712,24 @@ func (_m *Team) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.GithubPrMergedStateID = new(uuid.UUID)
 				*_m.GithubPrMergedStateID = *value.S.(*uuid.UUID)
+			}
+		case team.FieldPreviousKeys:
+			if value, ok := values[i].(*pgarray.Text); !ok {
+				return fmt.Errorf("unexpected type %T for field previous_keys", values[i])
+			} else if value != nil {
+				_m.PreviousKeys = *value
+			}
+		case team.FieldPreviousNames:
+			if value, ok := values[i].(*pgarray.Text); !ok {
+				return fmt.Errorf("unexpected type %T for field previous_names", values[i])
+			} else if value != nil {
+				_m.PreviousNames = *value
+			}
+		case team.FieldMergedTeamIds:
+			if value, ok := values[i].(*pgarray.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field merged_team_ids", values[i])
+			} else if value != nil {
+				_m.MergedTeamIds = *value
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -1020,6 +1046,15 @@ func (_m *Team) String() string {
 		builder.WriteString("github_pr_merged_state_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
+	builder.WriteString(", ")
+	builder.WriteString("previous_keys=")
+	builder.WriteString(fmt.Sprintf("%v", _m.PreviousKeys))
+	builder.WriteString(", ")
+	builder.WriteString("previous_names=")
+	builder.WriteString(fmt.Sprintf("%v", _m.PreviousNames))
+	builder.WriteString(", ")
+	builder.WriteString("merged_team_ids=")
+	builder.WriteString(fmt.Sprintf("%v", _m.MergedTeamIds))
 	builder.WriteByte(')')
 	return builder.String()
 }

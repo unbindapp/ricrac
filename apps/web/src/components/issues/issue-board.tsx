@@ -69,7 +69,7 @@ function columnId(groupKey: string) {
 
 type TGroupMove = { patch: TIssuePatch; changes: TIssueChanges } | "unsupported";
 
-/** What dropping an issue into a column changes; another team's status column can't take it. */
+/** What dropping an issue into a column changes. */
 function groupMove(group: TIssueGroup, issue: Issue): TGroupMove {
   const meta = group.meta;
   const plain = (patch: TIssuePatch) => ({ patch, changes: patchToChanges(patch, issue.labels) });
@@ -92,13 +92,12 @@ function groupMove(group: TIssueGroup, issue: Issue): TGroupMove {
     case "none":
     case "label":
     case "parent":
-    case "team":
       return "unsupported";
   }
 }
 
 export function IssueBoard(props: TIssueBoardProps) {
-  const { query, issues, groups, display, fixedTeamId, isLoadingMore } = useIssueCollection({
+  const { query, issues, groups, display, isLoadingMore } = useIssueCollection({
     ...props,
     display: { group_by: "state", ...props.display },
   });
@@ -123,7 +122,6 @@ export function IssueBoard(props: TIssueBoardProps) {
       groups={groups}
       properties={display.properties}
       isManualOrder={display.order_by === "manual"}
-      fixedTeamId={fixedTeamId}
     />
   );
 }
@@ -132,12 +130,10 @@ function Board({
   groups,
   properties,
   isManualOrder,
-  fixedTeamId,
 }: {
   groups: TIssueGroup[];
   properties: DisplaySettings["properties"];
   isManualOrder: boolean;
-  fixedTeamId: string | undefined;
 }) {
   const { workspace, canEdit } = useWorkspace();
   const { mutate: updateIssue } = useUpdateIssueMutation(workspace.id);
@@ -215,13 +211,7 @@ function Board({
     >
       <div className="flex w-full min-w-0 flex-1 items-start gap-3 overflow-x-auto pb-2">
         {groups.map((group) => (
-          <BoardColumn
-            key={group.key}
-            group={group}
-            properties={properties}
-            canEdit={canEdit}
-            fixedTeamId={fixedTeamId}
-          />
+          <BoardColumn key={group.key} group={group} properties={properties} canEdit={canEdit} />
         ))}
       </div>
       <DragOverlay>
@@ -237,12 +227,10 @@ function BoardColumn({
   group,
   properties,
   canEdit,
-  fixedTeamId,
 }: {
   group: TIssueGroup;
   properties: DisplaySettings["properties"];
   canEdit: boolean;
-  fixedTeamId: string | undefined;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: columnId(group.key) });
   const openNewIssue = useNewIssueStore((state) => state.open);
@@ -263,11 +251,7 @@ function BoardColumn({
             variant="ghost"
             size="icon"
             aria-label={`New issue in ${group.label}`}
-            onClick={() =>
-              openNewIssue(
-                newIssueDefaultsForGroup(group, fixedTeamId ? { teamId: fixedTeamId } : {}),
-              )
-            }
+            onClick={() => openNewIssue(newIssueDefaultsForGroup(group))}
           >
             <PlusIcon className="size-4" />
           </Button>

@@ -116,11 +116,6 @@ export function WebhookRow({ webhook, onEdit, onSecret }: TProps) {
             {typesSummary(webhook.resourceTypes)}
           </span>
         </SimpleTooltip>
-        {webhook.team && (
-          <Badge variant="outline" className="hidden sm:inline-flex">
-            {webhook.team.key}
-          </Badge>
-        )}
         <SimpleTooltip content="Send a test ping">
           <Button
             variant="ghost"

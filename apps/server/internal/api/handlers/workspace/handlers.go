@@ -15,8 +15,8 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	}, workspaces.List)
 	oapi.Register(reg, oapi.Operation{
 		Name: "get_workspace", Access: auth.Read, Routes: []string{"GET /workspace"},
-		Description: "The workspace: its name, URL key and link, your role, the teams you can see (key, name, private) and " +
-			"how many members and issues it has.",
+		Description: "The workspace: its name, URL key and link, your role, its team (whose key is the issue prefix, ENG in " +
+			"ENG-123) and how many members and issues it has.",
 	}, workspaces.Get)
 	oapi.Register(reg, oapi.Operation{
 		Name: "update_workspace", Access: auth.AdminAccess, Routes: []string{"PATCH /workspace"},
@@ -41,7 +41,7 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	}, workspaces.UpdateUser)
 	oapi.Register(reg, oapi.Operation{
 		Name: "remove_user", Access: auth.AdminAccess, Routes: []string{"DELETE /users/{id}"},
-		Description: "Remove a member from the workspace (admins only): they lose access and leave all teams; their issues, " +
+		Description: "Remove a member from the workspace (admins only): they lose access and leave its team; their issues, " +
 			"comments and history stay. The last owner can't be removed. Invite them again to bring them back.",
 	}, workspaces.RemoveUser)
 	oapi.Register(reg, oapi.Operation{
@@ -50,8 +50,9 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	}, workspaces.ListInvitations)
 	oapi.Register(reg, oapi.Operation{
 		Name: "invite_user", Access: auth.Write, Routes: []string{"POST /invitations"},
-		Description: "Invite someone by email. role is member (default), admin (only admins invite admins) or guest; teams " +
-			"(keys, names or ids) are the teams they join, required for guests, who only see those teams. The " +
+		Description: "Invite someone by email. role is member (default), admin (only admins invite admins) or guest. Everyone " +
+			"but guests joins the workspace's team; guests see only the issues of the teams in teams (optional, the " +
+			"workspace's team by default) and those shared with them. The " +
 			"invitation expires in 14 days; inviting the same email again renews it. They accept it in the dashboard.",
 	}, workspaces.Invite)
 	oapi.Register(reg, oapi.Operation{

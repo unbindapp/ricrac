@@ -44,7 +44,7 @@ func NewTeamService(cfg config.Config, repo repositories.RepositoriesInterface, 
 }
 
 type IDInput struct {
-	ID string `json:"id"`
+	ID *string `json:"id" doc:"Optional: the workspace's team by default. Its key, name or id."`
 }
 
 func (self *TeamService) stats(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, ids []uuid.UUID) (map[uuid.UUID]models.TeamStats, error) {
@@ -147,7 +147,7 @@ func (self *TeamService) List(ctx context.Context, actor *auth.Actor, input *Lis
 }
 
 func (self *TeamService) Get(ctx context.Context, actor *auth.Actor, input *IDInput) (models.TeamDetail, error) {
-	team, err := self.resolve.Team(ctx, actor, input.ID)
+	team, err := self.resolve.TeamOrDefault(ctx, actor, input.ID)
 	if err != nil {
 		return models.TeamDetail{}, err
 	}
@@ -191,13 +191,14 @@ func (self *TeamService) FindState(ctx context.Context, tx repository.TxInterfac
 	return uuid.Nil, errdefs.BadRequest("The team has no status %q. Options: %s.", value, strings.Join(resolve_service.TypedNames(rows), ", "))
 }
 
-// findTeam is a team by id, key or name; admins also find private teams they aren't in.
-func (self *TeamService) findTeam(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error) {
-	visible, err := self.resolve.Team(ctx, actor, value)
-	if err == nil || actor.Role < auth.Admin {
+// findTeam is a team by id, key or name (the workspace's when nil); admins also find private teams
+// they aren't in.
+func (self *TeamService) findTeam(ctx context.Context, actor *auth.Actor, value *string) (uuid.UUID, error) {
+	visible, err := self.resolve.TeamOrDefault(ctx, actor, value)
+	if err == nil || actor.Role < auth.Admin || value == nil {
 		return visible, err
 	}
-	found, ok, findErr := self.repo.Team().FindUnarchived(ctx, actor.Workspace, strings.TrimSpace(value))
+	found, ok, findErr := self.repo.Team().FindUnarchived(ctx, actor.Workspace, strings.TrimSpace(*value))
 	if findErr != nil {
 		return uuid.Nil, findErr
 	}
@@ -205,6 +206,15 @@ func (self *TeamService) findTeam(ctx context.Context, actor *auth.Actor, value 
 		return visible, err
 	}
 	return found, nil
+}
+
+// isWorkspaceTeam says whether team is the workspace's team: its only unarchived one.
+func (self *TeamService) isWorkspaceTeam(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, team uuid.UUID) (bool, error) {
+	teams, err := self.repo.Team().Unarchived(ctx, tx, actor.Workspace)
+	if err != nil {
+		return false, err
+	}
+	return len(teams) == 1 && teams[0].ID == team, nil
 }
 
 func inRange(value, low, high int, what string) (int, error) {

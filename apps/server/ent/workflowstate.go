@@ -4,6 +4,7 @@ package ent
 
 import (
 	"fmt"
+	"ricrac/ent/schema/pgarray"
 	"ricrac/ent/team"
 	"ricrac/ent/workflowstate"
 	"strings"
@@ -37,6 +38,8 @@ type WorkflowState struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// MergedIds holds the value of the "merged_ids" field.
+	MergedIds pgarray.UUID `json:"merged_ids,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WorkflowStateQuery when eager-loading is set.
 	Edges        WorkflowStateEdges `json:"edges"`
@@ -123,6 +126,8 @@ func (*WorkflowState) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case workflowstate.FieldMergedIds:
+			values[i] = new(pgarray.UUID)
 		case workflowstate.FieldPosition:
 			values[i] = new(sql.NullFloat64)
 		case workflowstate.FieldName, workflowstate.FieldType, workflowstate.FieldColor, workflowstate.FieldDescription:
@@ -207,6 +212,12 @@ func (_m *WorkflowState) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				_m.UpdatedAt = value.Time
+			}
+		case workflowstate.FieldMergedIds:
+			if value, ok := values[i].(*pgarray.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field merged_ids", values[i])
+			} else if value != nil {
+				_m.MergedIds = *value
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -304,6 +315,9 @@ func (_m *WorkflowState) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("merged_ids=")
+	builder.WriteString(fmt.Sprintf("%v", _m.MergedIds))
 	builder.WriteByte(')')
 	return builder.String()
 }

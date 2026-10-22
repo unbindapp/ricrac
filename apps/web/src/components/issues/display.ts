@@ -1,7 +1,7 @@
 export type TIssueLayout = "list" | "board";
 export type TShowCompleted = "all" | "past_week" | "none";
 export type TGroupBy =
-  "state" | "assignee" | "priority" | "project" | "cycle" | "label" | "parent" | "team" | "none";
+  "state" | "assignee" | "priority" | "project" | "cycle" | "label" | "parent" | "none";
 export type TOrderBy = "manual" | "priority" | "updated_at" | "created_at" | "due_date" | "title";
 export type TIssueProperty =
   | "priority"
@@ -48,7 +48,6 @@ export const GROUP_BY_OPTIONS: { value: TGroupBy; label: string }[] = [
   { value: "cycle", label: "Cycle" },
   { value: "label", label: "Label" },
   { value: "parent", label: "Parent issue" },
-  { value: "team", label: "Team" },
   { value: "none", label: "No grouping" },
 ];
 

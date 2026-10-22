@@ -46,7 +46,7 @@ func (self *IssueService) Import(ctx context.Context, actor *auth.Actor, input *
 	if len(issues) == 0 || len(issues) > maxImportIssues {
 		return models.ImportedIssues{}, errdefs.BadRequest("Import 1 to %d issues at a time", maxImportIssues)
 	}
-	team, err := self.resolve.Team(ctx, actor, input.Team)
+	team, err := self.resolve.TeamOrDefault(ctx, actor, input.Team)
 	if err != nil {
 		return models.ImportedIssues{}, err
 	}
@@ -536,7 +536,7 @@ func (self *IssueService) connectImported(ctx context.Context, tx repository.TxI
 }
 
 type ImportInput struct {
-	Team   string        `json:"team" doc:"Team key, name or id the issues go to."`
+	Team   *string       `json:"team" doc:"Optional: the workspace's team by default. Its key, name or id. The team the issues go to."`
 	Issues []ImportIssue `json:"issues" doc:"The issues, at most 2000. Pass these or fileId."`
 	FileID *string       `json:"fileId" doc:"A JSON file from prepare_file_upload holding the issues as an array, or as {\"issues\": [...]}."`
 	DryRun bool          `json:"dryRun,omitempty" doc:"Check everything and report what would be imported, without importing."`

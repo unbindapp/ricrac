@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { type ReactElement, useState } from "react";
 
-import type { InitiativeRef, ProjectLabelRef, ProjectStatusRef, TeamRef } from "@/api/ops.gen";
+import type { InitiativeRef, ProjectLabelRef, ProjectStatusRef } from "@/api/ops.gen";
 import {
   CalendarIcon,
   ChevronLeftIcon,
@@ -9,7 +9,6 @@ import {
   CircleDashedIcon,
   TagIcon,
   TargetIcon,
-  UsersIcon,
   XIcon,
 } from "@/components/icons/symbols.gen";
 import { PickerTrigger, type TPickerAppearance } from "@/components/projects/picker-trigger";
@@ -26,11 +25,9 @@ import { EntityIcon } from "@/components/shared/entity-icon";
 import { LabelChip } from "@/components/shared/label-chip";
 import { PRIORITIES, PriorityIcon, priorityLabel } from "@/components/shared/priority-icon";
 import { ProjectIcon } from "@/components/shared/project-icon";
-import { TeamIcon } from "@/components/shared/team-icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useTeams } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { initiativesQuery } from "@/lib/queries/initiatives";
 import { projectLabelsQuery, projectsQuery, projectStatusesQuery } from "@/lib/queries/projects";
@@ -115,51 +112,6 @@ export function ProjectPriorityPicker({
           icon={<PriorityIcon priority={priority} />}
           text={isSet || appearance === "row" ? priorityLabel(priority) : "Priority"}
           muted={!isSet}
-        />
-      }
-    />
-  );
-}
-
-export function TeamsPicker({
-  teams,
-  onChange,
-  appearance = "row",
-  disabled,
-}: TControl & { teams: TeamRef[]; onChange: (keys: string[]) => void }) {
-  const { teams: available, isPending } = useTeams();
-  const options: TPickerOption[] = available.map((team) => ({
-    value: team.id,
-    label: team.name,
-    description: team.key,
-    keywords: [team.key],
-    icon: <TeamIcon teamKey={team.key} icon={team.icon} color={team.color} size="sm" />,
-  }));
-  const first = available.find((team) => team.id === teams[0]?.id);
-  return (
-    <PropertyPicker
-      label="Change teams"
-      multiple
-      options={options}
-      value={teams.map((team) => team.id)}
-      isPending={isPending}
-      disabled={disabled}
-      onChange={(ids) => {
-        if (ids.length > 0) onChange(ids);
-      }}
-      trigger={
-        <PickerTrigger
-          appearance={appearance}
-          label="Change teams"
-          icon={
-            teams[0] ? (
-              <TeamIcon teamKey={teams[0].key} icon={first?.icon} color={first?.color} size="sm" />
-            ) : (
-              <UsersIcon className="text-muted-foreground size-4" />
-            )
-          }
-          text={teams.length === 0 ? "Teams" : teams.map((team) => team.name).join(", ")}
-          muted={teams.length === 0}
         />
       }
     />

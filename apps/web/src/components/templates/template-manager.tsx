@@ -56,26 +56,22 @@ const KINDS: { kind: TTemplateKind; title: string; icon: TIcon; about: string }[
 ];
 
 type TProps = {
-  /** Only this team's templates; null for all of them. */
-  team: { id: string; name: string } | null;
   canEdit: boolean;
 };
 
 /** A section per kind of template; kinds without templates collapse to a create button. */
-export function TemplateManager({ team, canEdit }: TProps) {
+export function TemplateManager({ canEdit }: TProps) {
   const { workspace } = useWorkspace();
   const { data, isPending, error, refetch } = useQuery(templatesQuery(workspace.id));
   const [dialog, setDialog] = useState<TTemplateDialogTarget | null>(null);
   if (isPending) return <ListSkeleton rows={4} />;
   if (error) return <ErrorCard message={error.message} onRetry={() => void refetch()} />;
-  const templates = data.filter((template) => !team || template.team?.id === team.id);
-  const create = (kind: TTemplateKind) =>
-    setDialog({ mode: "create", kind, team: team?.id ?? null });
+  const create = (kind: TTemplateKind) => setDialog({ mode: "create", kind });
 
   return (
     <>
       {KINDS.map(({ kind, title, icon, about }) => {
-        const ofKind = templates.filter((template) => template.type === kind);
+        const ofKind = data.filter((template) => template.type === kind);
         return (
           <SettingsSection
             key={kind}
@@ -101,7 +97,6 @@ export function TemplateManager({ team, canEdit }: TProps) {
                     key={template.id}
                     template={template}
                     icon={icon}
-                    showTeam={!team}
                     canEdit={canEdit}
                     onEdit={() => setDialog({ mode: "edit", template })}
                   />
@@ -111,9 +106,7 @@ export function TemplateManager({ team, canEdit }: TProps) {
           </SettingsSection>
         );
       })}
-      {templates.length === 0 && !canEdit && (
-        <EmptyState icon={FileTextIcon} title="No templates yet" />
-      )}
+      {data.length === 0 && !canEdit && <EmptyState icon={FileTextIcon} title="No templates yet" />}
       <TemplateDialog target={dialog} onClose={() => setDialog(null)} />
     </>
   );
@@ -122,13 +115,11 @@ export function TemplateManager({ team, canEdit }: TProps) {
 function TemplateRow({
   template,
   icon: Icon,
-  showTeam,
   canEdit,
   onEdit,
 }: {
   template: TTemplate;
   icon: TIcon;
-  showTeam: boolean;
   canEdit: boolean;
   onEdit: () => void;
 }) {
@@ -160,7 +151,6 @@ function TemplateRow({
           </Badge>
         </SimpleTooltip>
       )}
-      {showTeam && template.team && <Badge variant="outline">{template.team.key}</Badge>}
       {canEdit && (
         <DropdownMenu>
           <DropdownMenuTrigger

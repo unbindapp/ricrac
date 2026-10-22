@@ -54,8 +54,6 @@ type IssueRepositoryInterface interface {
 	List(ctx context.Context, query ListQuery) ([]uuid.UUID, error)
 	// SubTeams is the team and the teams under it, at any depth.
 	SubTeams(ctx context.Context, teamID uuid.UUID) ([]uuid.UUID, error)
-	// TeamsByKey is the unarchived teams among ids, by key.
-	TeamsByKey(ctx context.Context, ids []uuid.UUID) ([]*ent.Team, error)
 	// View is a custom view's model, filter and team.
 	View(ctx context.Context, id uuid.UUID) (*ent.CustomView, error)
 	// Load is the issues with what their answer shows, in the order of ids.

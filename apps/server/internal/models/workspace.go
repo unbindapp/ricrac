@@ -26,7 +26,7 @@ type Workspace struct {
 	URL         string          `json:"url"`
 	CreatedAt   string          `json:"createdAt"`
 	Role        string          `json:"role" enum:"owner,admin,member,guest" doc:"Your role."`
-	Teams       []WorkspaceTeam `json:"teams" doc:"The teams you can see."`
+	Teams       []WorkspaceTeam `json:"teams" doc:"The workspace's team (a workspace has one), when you can see it; its key is the issue prefix."`
 	MemberCount int             `json:"memberCount"`
 	IssueCount  int             `json:"issueCount" doc:"Issues of the teams you can see, trashed ones left out."`
 }
