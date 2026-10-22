@@ -1,4 +1,4 @@
-import { CheckIcon } from "@/components/icons/symbols.gen";
+import { CheckIcon } from "@/components/icons";
 import { ErrorCard } from "@/components/layout/error-card";
 import {
   DropdownMenu,
@@ -107,7 +107,10 @@ export default function DropdownSelect({
                     <p className="min-w-0 shrink leading-tight">{item.label}</p>
                     {ItemSuffix && <ItemSuffix value={item.value} />}
                   </div>
-                  <CheckIcon className="ml-auto size-4 opacity-0 group-data-checked/item:opacity-100" />
+                  <CheckIcon
+                    strokeWidth={2.5}
+                    className="ml-auto size-4 opacity-0 group-data-checked/item:opacity-100"
+                  />
                 </DropdownMenuItem>
               ))}
           </DropdownMenuGroup>

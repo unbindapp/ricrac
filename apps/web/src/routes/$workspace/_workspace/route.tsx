@@ -6,6 +6,7 @@ import { TeamsProvider } from "@/components/workspace/teams-provider";
 import { WorkspaceProvider } from "@/components/workspace/workspace-provider";
 import { WorkspaceShell } from "@/components/workspace/workspace-shell";
 import { landingWorkspace, useRememberWorkspace } from "@/lib/last-workspace";
+import { UiThemeProvider } from "@/themes/ui-theme-provider";
 import { meQuery } from "@/lib/queries/me";
 import { workspaceQuery, workspaceRole } from "@/lib/queries/workspaces";
 
@@ -40,11 +41,13 @@ function WorkspaceLayout() {
 
   return (
     <WorkspaceProvider workspace={workspace} role={workspaceRole(summary)}>
-      <TeamsProvider>
-        <WorkspaceShell>
-          <Outlet />
-        </WorkspaceShell>
-      </TeamsProvider>
+      <UiThemeProvider themeId={workspace.theme} workspaceUrlKey={workspace.urlKey}>
+        <TeamsProvider>
+          <WorkspaceShell>
+            <Outlet />
+          </WorkspaceShell>
+        </TeamsProvider>
+      </UiThemeProvider>
     </WorkspaceProvider>
   );
 }

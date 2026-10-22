@@ -85,7 +85,7 @@ func (self *StateService) value(ctx context.Context, tx repository.TxInterface, 
 // Archived statuses are found by id.
 func (self *StateService) find(ctx context.Context, actor *auth.Actor, value string, team *string) (uuid.UUID, uuid.UUID, error) {
 	if id, ok := utils.AsUUID(value); ok {
-		teamOf, found, err := self.repo.State().TeamOf(ctx, actor.Workspace, id)
+		state, teamOf, found, err := self.repo.State().Owned(ctx, actor.Workspace, id)
 		if err != nil {
 			return uuid.Nil, uuid.Nil, err
 		}
@@ -99,12 +99,9 @@ func (self *StateService) find(ctx context.Context, actor *auth.Actor, value str
 		if !visible {
 			return uuid.Nil, uuid.Nil, errdefs.NotFound("No status %s", id)
 		}
-		return id, teamOf, nil
+		return state, teamOf, nil
 	}
-	if team == nil {
-		return uuid.Nil, uuid.Nil, errdefs.BadRequest("Name the team too, or pass the status's id")
-	}
-	teamID, err := self.resolve.Team(ctx, actor, *team)
+	teamID, err := self.resolve.TeamOrDefault(ctx, actor, team)
 	if err != nil {
 		return uuid.Nil, uuid.Nil, err
 	}
@@ -177,13 +174,13 @@ func (self *StateService) typeOf(ctx context.Context, tx repository.TxInterface,
 }
 
 type ListInput struct {
-	Team            string `json:"team" doc:"Team key, name or id."`
-	IncludeArchived bool   `json:"includeArchived,omitempty" doc:"Also list archived statuses."`
+	Team            *string `json:"team" doc:"Optional: the workspace's team by default. Its key, name or id."`
+	IncludeArchived bool    `json:"includeArchived,omitempty" doc:"Also list archived statuses."`
 	args.Page
 }
 
 func (self *StateService) List(ctx context.Context, actor *auth.Actor, input *ListInput) (args.PageOf[models.IssueStatus], error) {
-	team, err := self.resolve.Team(ctx, actor, input.Team)
+	team, err := self.resolve.TeamOrDefault(ctx, actor, input.Team)
 	if err != nil {
 		return args.PageOf[models.IssueStatus]{}, err
 	}
@@ -205,8 +202,8 @@ func (self *StateService) List(ctx context.Context, actor *auth.Actor, input *Li
 }
 
 type GetInput struct {
-	ID   string  `json:"id" doc:"The status's id, or its name or type together with team."`
-	Team *string `json:"team" doc:"Team key, name or id, when id is a name or type."`
+	ID   string  `json:"id" doc:"The status's id, name or type."`
+	Team *string `json:"team" doc:"Optional: the workspace's team by default. Its key, name or id."`
 }
 
 func (self *StateService) Get(ctx context.Context, actor *auth.Actor, input *GetInput) (models.IssueStatus, error) {

@@ -30,6 +30,8 @@ type Workspace struct {
 	DefaultTeamSettings jsontext.Value `json:"default_team_settings,omitempty"`
 	// ProjectUpdateReminderDay holds the value of the "project_update_reminder_day" field.
 	ProjectUpdateReminderDay *string `json:"project_update_reminder_day,omitempty"`
+	// Theme holds the value of the "theme" field.
+	Theme string `json:"theme,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -439,7 +441,7 @@ func (*Workspace) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case workspace.FieldDefaultTeamSettings:
 			values[i] = new([]byte)
-		case workspace.FieldName, workspace.FieldURLKey, workspace.FieldLogoURL, workspace.FieldProjectUpdateReminderDay:
+		case workspace.FieldName, workspace.FieldURLKey, workspace.FieldLogoURL, workspace.FieldProjectUpdateReminderDay, workspace.FieldTheme:
 			values[i] = new(sql.NullString)
 		case workspace.FieldCreatedAt, workspace.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -499,6 +501,12 @@ func (_m *Workspace) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.ProjectUpdateReminderDay = new(string)
 				*_m.ProjectUpdateReminderDay = value.String
+			}
+		case workspace.FieldTheme:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field theme", values[i])
+			} else if value.Valid {
+				_m.Theme = value.String
 			}
 		case workspace.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -741,6 +749,9 @@ func (_m *Workspace) String() string {
 		builder.WriteString("project_update_reminder_day=")
 		builder.WriteString(*v)
 	}
+	builder.WriteString(", ")
+	builder.WriteString("theme=")
+	builder.WriteString(_m.Theme)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

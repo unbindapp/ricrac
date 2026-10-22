@@ -41,9 +41,10 @@ type CreateWorkspace struct {
 	Name string `json:"name"`
 	// Lowercase letters, digits and dashes, used in links.
 	URLKey string `json:"urlKey"`
-	// The first team; named after the workspace when left out.
+	// The workspace's team, named after the workspace when left out.
 	TeamName *string `json:"teamName"`
-	TeamKey  *string `json:"teamKey"`
+	// The issue prefix (ENG in ENG-123); from teamName when given, else from the URL key.
+	TeamKey *string `json:"teamKey"`
 }
 
 type DeleteWorkspace struct {
@@ -148,11 +149,11 @@ func (self *AccountService) CreateWorkspace(ctx context.Context, user uuid.UUID,
 	if err != nil {
 		return models.WorkspaceSummary{}, err
 	}
-	teamName := name
+	teamName, teamKey := name, seed_service.WorkspaceTeamKey(urlKey)
 	if input.TeamName != nil && strings.TrimSpace(*input.TeamName) != "" {
 		teamName = strings.TrimSpace(*input.TeamName)
+		teamKey = seed_service.TeamKey(teamName)
 	}
-	teamKey := seed_service.TeamKey(teamName)
 	if input.TeamKey != nil {
 		teamKey = *input.TeamKey
 	}
@@ -178,7 +179,7 @@ func (self *AccountService) CreateWorkspace(ctx context.Context, user uuid.UUID,
 		if _, err := self.seed.CreateTeam(ctx, tx, id, user, teamName, teamKey); err != nil {
 			return err
 		}
-		summary = models.WorkspaceSummary{ID: id, Name: name, URLKey: urlKey, Role: "owner"}
+		summary = models.WorkspaceSummary{ID: id, Name: name, URLKey: urlKey, Role: "owner", Theme: "default"}
 		return nil
 	})
 	return summary, err

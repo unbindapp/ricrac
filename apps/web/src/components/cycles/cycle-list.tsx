@@ -13,7 +13,7 @@ import {
   pointsText,
   type TCycleStatus,
 } from "@/components/cycles/cycle-status";
-import { RefreshCwIcon } from "@/components/icons/symbols.gen";
+import { RefreshCwIcon } from "@/components/icons";
 import { List } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { SectionTitle } from "@/components/layout/section-title";
@@ -59,14 +59,13 @@ export function CycleList({ team }: { team: Team }) {
     >
       <div className="flex w-full flex-col gap-6">
         {current.map((cycle) => (
-          <CurrentCycleCard key={cycle.id} cycle={cycle} team={team} />
+          <CurrentCycleCard key={cycle.id} cycle={cycle} />
         ))}
-        {upcoming.length > 0 && <CycleSection title="Upcoming" cycles={upcoming} team={team} />}
+        {upcoming.length > 0 && <CycleSection title="Upcoming" cycles={upcoming} />}
         {past.length > 0 && (
           <CycleSection
             title="Completed"
             cycles={past}
-            team={team}
             actions={
               archivedCount > 0 && (
                 <Button
@@ -87,7 +86,7 @@ export function CycleList({ team }: { team: Team }) {
   );
 }
 
-function CurrentCycleCard({ cycle, team }: { cycle: Cycle; team: Team }) {
+function CurrentCycleCard({ cycle }: { cycle: Cycle }) {
   const { workspace } = useWorkspace();
   const left = daysLeft(cycle);
   return (
@@ -97,8 +96,8 @@ function CurrentCycleCard({ cycle, team }: { cycle: Cycle; team: Team }) {
         <div className="flex w-full flex-wrap items-center gap-2">
           <CycleIcon progress={cycle.progress} status="active" className="size-4" />
           <Link
-            to="/$workspace/team/$key/cycle/$number"
-            params={{ workspace: workspace.urlKey, key: team.key, number: String(cycle.number) }}
+            to="/$workspace/cycle/$number"
+            params={{ workspace: workspace.urlKey, number: String(cycle.number) }}
             className="truncate text-sm font-medium hover:underline"
           >
             {cycleName(cycle)}
@@ -183,12 +182,10 @@ function Stat({
 function CycleSection({
   title,
   cycles,
-  team,
   actions,
 }: {
   title: string;
   cycles: Cycle[];
-  team: Team;
   actions?: ReactNode;
 }) {
   return (
@@ -196,21 +193,21 @@ function CycleSection({
       <SectionTitle title={title} actions={actions} />
       <List>
         {cycles.map((cycle) => (
-          <CycleRow key={cycle.id} cycle={cycle} team={team} />
+          <CycleRow key={cycle.id} cycle={cycle} />
         ))}
       </List>
     </section>
   );
 }
 
-function CycleRow({ cycle, team }: { cycle: Cycle; team: Team }) {
+function CycleRow({ cycle }: { cycle: Cycle }) {
   const { workspace } = useWorkspace();
   const status = cycleStatus(cycle);
   const hasIssues = cycle.scope.issues > 0;
   return (
     <Link
-      to="/$workspace/team/$key/cycle/$number"
-      params={{ workspace: workspace.urlKey, key: team.key, number: String(cycle.number) }}
+      to="/$workspace/cycle/$number"
+      params={{ workspace: workspace.urlKey, number: String(cycle.number) }}
       role="listitem"
       className="has-hover:hover:bg-accent focus-visible:bg-accent flex h-9 w-full items-center gap-2 border-b px-3 text-sm outline-hidden last:border-b-0"
     >

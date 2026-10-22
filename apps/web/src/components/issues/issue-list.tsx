@@ -10,7 +10,7 @@ import {
 } from "react";
 
 import type { Issue } from "@/api/ops.gen";
-import { ListTodoIcon, PlusIcon } from "@/components/icons/symbols.gen";
+import { ListTodoIcon, PlusIcon } from "@/components/icons";
 import { BulkActionBar } from "@/components/issues/bulk-action-bar";
 import type { DisplaySettings } from "@/components/issues/display";
 import type { ListIssuesFilters } from "@/components/issues/filters";
@@ -64,8 +64,7 @@ function findScrollParent(element: HTMLElement | null): HTMLElement | null {
 }
 
 export function IssueList(props: TIssueListProps) {
-  const { query, issues, groups, display, fixedTeamId, isLoadingMore, isCapped } =
-    useIssueCollection(props);
+  const { query, issues, groups, display, isLoadingMore, isCapped } = useIssueCollection(props);
   const { canEdit } = useWorkspace();
   const openNewIssue = useNewIssueStore((state) => state.open);
 
@@ -82,11 +81,7 @@ export function IssueList(props: TIssueListProps) {
           description="Issues that match these filters show up here."
           action={
             canEdit && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => openNewIssue(fixedTeamId ? { teamId: fixedTeamId } : undefined)}
-              >
+              <Button size="sm" variant="outline" onClick={() => openNewIssue()}>
                 <PlusIcon className="size-4" />
                 New issue
               </Button>
@@ -104,7 +99,6 @@ export function IssueList(props: TIssueListProps) {
         showHeaders={display.group_by !== "none"}
         nestSubIssues={display.nest_sub_issues}
         properties={display.properties}
-        fixedTeamId={fixedTeamId}
         rowActions={props.rowActions}
       />
       {isLoadingMore && <p className="text-muted-foreground text-xs">Loading more issues…</p>}
@@ -123,7 +117,6 @@ type TVirtualProps = {
   showHeaders: boolean;
   nestSubIssues: boolean;
   properties: DisplaySettings["properties"];
-  fixedTeamId: string | undefined;
   rowActions?: (issue: Issue) => ReactNode;
 };
 
@@ -133,7 +126,6 @@ function VirtualIssueList({
   showHeaders,
   nestSubIssues: shouldNest,
   properties,
-  fixedTeamId,
   rowActions,
 }: TVirtualProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -271,7 +263,6 @@ function VirtualIssueList({
   };
 
   const selectedIssues = issues.filter((issue) => selectedIds.includes(issue.id));
-  const baseDefaults = fixedTeamId ? { teamId: fixedTeamId } : {};
 
   return (
     <>
@@ -299,7 +290,7 @@ function VirtualIssueList({
                       }
                       onCreate={
                         canEdit
-                          ? () => openNewIssue(newIssueDefaultsForGroup(item.group, baseDefaults))
+                          ? () => openNewIssue(newIssueDefaultsForGroup(item.group))
                           : undefined
                       }
                     />

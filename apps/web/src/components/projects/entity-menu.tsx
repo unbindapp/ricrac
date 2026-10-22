@@ -7,7 +7,7 @@ import {
   HistoryIcon,
   Trash2Icon,
   UndoIcon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Button } from "@/components/ui/button";
 import {

@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 import type { DocumentDetail } from "@/api/ops.gen";
-import { HistoryIcon } from "@/components/icons/symbols.gen";
+import { HistoryIcon } from "@/components/icons";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";

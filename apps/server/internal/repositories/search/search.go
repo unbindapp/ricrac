@@ -83,11 +83,12 @@ func issueSQL() string {
 			a.base || '/' || w.url_key || '/issue/' || t.key || '-' || i.number AS url,
 			left(ts_headline('english', coalesce(nullif(i.description, ''), i.title), a.ts, %s), 200) AS snippet,
 			ts_rank(i.search, a.ts) AS rank, i.updated_at, NULL::uuid AS ref, NULL::uuid AS ref2, NULL::text AS status,
-			coalesce(upper(t.key) = a.key AND i.number = a.num, false) AS exact,
+			coalesce(upper(t.key) = a.key AND i.number = a.num OR a.key || '-' || a.num = ANY(i.previous_identifiers), false) AS exact,
 			(i.title ILIKE a.pattern OR to_tsvector('simple', i.title) @@ a.ts) AS title_match
 		 FROM a, issues i JOIN teams t ON t.id = i.team_id JOIN workspaces w ON w.id = i.workspace_id
 		 WHERE %s AND (a.archived OR i.archived_at IS NULL) AND (a.team IS NULL OR i.team_id = a.team)
-		 AND (i.search @@ a.ts OR i.title ILIKE a.pattern OR (upper(t.key) = a.key AND i.number = a.num))`,
+		 AND (i.search @@ a.ts OR i.title ILIKE a.pattern OR (upper(t.key) = a.key AND i.number = a.num)
+			OR a.key || '-' || a.num = ANY(i.previous_identifiers))`,
 		searchHeadline, issueVisible("i"))
 }
 

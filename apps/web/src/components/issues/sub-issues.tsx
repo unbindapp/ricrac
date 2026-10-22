@@ -1,5 +1,5 @@
 import type { IssueDetail } from "@/api/ops.gen";
-import { ListTreeIcon, PlusIcon } from "@/components/icons/symbols.gen";
+import { ListTreeIcon, PlusIcon } from "@/components/icons";
 import { useIsPeekable, useIssuePeek } from "@/components/issues/issue-peek";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
 import {
@@ -54,7 +54,6 @@ export function AddSubIssueMenu({
       ]}
       onOption={() =>
         openNewIssue({
-          teamId: issue.team.id,
           draft: {
             parent: toIssueRef(issue),
             project: issue.project,

@@ -14,6 +14,7 @@ type ResolveRepositoryInterface interface {
 	Members(ctx context.Context, workspace uuid.UUID) ([]Member, error)
 	// Teams is the unarchived teams among ids, by name.
 	Teams(ctx context.Context, ids []uuid.UUID) ([]Keyed, error)
+	Aliases(ctx context.Context, workspace uuid.UUID) (Aliases, error)
 	// States is the team's unarchived workflow states, in their order.
 	States(ctx context.Context, teamID uuid.UUID) ([]Typed, error)
 	// ProjectStatuses is the workspace's unarchived project statuses, in their order.

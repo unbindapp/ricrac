@@ -6,7 +6,7 @@ import {
   type TDocumentParent,
   useCreateDocument,
 } from "@/components/documents/use-create-document";
-import { PlusIcon } from "@/components/icons/symbols.gen";
+import { PlusIcon } from "@/components/icons";
 import { ErrorCard } from "@/components/layout/error-card";
 import { List } from "@/components/layout/list";
 import { ListSkeleton } from "@/components/layout/list-skeleton";

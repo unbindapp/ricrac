@@ -922,6 +922,42 @@ func (_u *TeamUpdate) ClearGithubPrMergedStateID() *TeamUpdate {
 	return _u
 }
 
+// SetPreviousKeys sets the "previous_keys" field.
+func (_u *TeamUpdate) SetPreviousKeys(v pgarray.Text) *TeamUpdate {
+	_u.mutation.SetPreviousKeys(v)
+	return _u
+}
+
+// ClearPreviousKeys clears the value of the "previous_keys" field.
+func (_u *TeamUpdate) ClearPreviousKeys() *TeamUpdate {
+	_u.mutation.ClearPreviousKeys()
+	return _u
+}
+
+// SetPreviousNames sets the "previous_names" field.
+func (_u *TeamUpdate) SetPreviousNames(v pgarray.Text) *TeamUpdate {
+	_u.mutation.SetPreviousNames(v)
+	return _u
+}
+
+// ClearPreviousNames clears the value of the "previous_names" field.
+func (_u *TeamUpdate) ClearPreviousNames() *TeamUpdate {
+	_u.mutation.ClearPreviousNames()
+	return _u
+}
+
+// SetMergedTeamIds sets the "merged_team_ids" field.
+func (_u *TeamUpdate) SetMergedTeamIds(v pgarray.UUID) *TeamUpdate {
+	_u.mutation.SetMergedTeamIds(v)
+	return _u
+}
+
+// ClearMergedTeamIds clears the value of the "merged_team_ids" field.
+func (_u *TeamUpdate) ClearMergedTeamIds() *TeamUpdate {
+	_u.mutation.ClearMergedTeamIds()
+	return _u
+}
+
 // SetWorkspace sets the "workspace" edge to the Workspace entity.
 func (_u *TeamUpdate) SetWorkspace(v *Workspace) *TeamUpdate {
 	return _u.SetWorkspaceID(v.ID)
@@ -1822,6 +1858,24 @@ func (_u *TeamUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(team.FieldUpdatedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.PreviousKeys(); ok {
+		_spec.SetField(team.FieldPreviousKeys, field.TypeOther, value)
+	}
+	if _u.mutation.PreviousKeysCleared() {
+		_spec.ClearField(team.FieldPreviousKeys, field.TypeOther)
+	}
+	if value, ok := _u.mutation.PreviousNames(); ok {
+		_spec.SetField(team.FieldPreviousNames, field.TypeOther, value)
+	}
+	if _u.mutation.PreviousNamesCleared() {
+		_spec.ClearField(team.FieldPreviousNames, field.TypeOther)
+	}
+	if value, ok := _u.mutation.MergedTeamIds(); ok {
+		_spec.SetField(team.FieldMergedTeamIds, field.TypeOther, value)
+	}
+	if _u.mutation.MergedTeamIdsCleared() {
+		_spec.ClearField(team.FieldMergedTeamIds, field.TypeOther)
 	}
 	if _u.mutation.WorkspaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -3571,6 +3625,42 @@ func (_u *TeamUpdateOne) ClearGithubPrMergedStateID() *TeamUpdateOne {
 	return _u
 }
 
+// SetPreviousKeys sets the "previous_keys" field.
+func (_u *TeamUpdateOne) SetPreviousKeys(v pgarray.Text) *TeamUpdateOne {
+	_u.mutation.SetPreviousKeys(v)
+	return _u
+}
+
+// ClearPreviousKeys clears the value of the "previous_keys" field.
+func (_u *TeamUpdateOne) ClearPreviousKeys() *TeamUpdateOne {
+	_u.mutation.ClearPreviousKeys()
+	return _u
+}
+
+// SetPreviousNames sets the "previous_names" field.
+func (_u *TeamUpdateOne) SetPreviousNames(v pgarray.Text) *TeamUpdateOne {
+	_u.mutation.SetPreviousNames(v)
+	return _u
+}
+
+// ClearPreviousNames clears the value of the "previous_names" field.
+func (_u *TeamUpdateOne) ClearPreviousNames() *TeamUpdateOne {
+	_u.mutation.ClearPreviousNames()
+	return _u
+}
+
+// SetMergedTeamIds sets the "merged_team_ids" field.
+func (_u *TeamUpdateOne) SetMergedTeamIds(v pgarray.UUID) *TeamUpdateOne {
+	_u.mutation.SetMergedTeamIds(v)
+	return _u
+}
+
+// ClearMergedTeamIds clears the value of the "merged_team_ids" field.
+func (_u *TeamUpdateOne) ClearMergedTeamIds() *TeamUpdateOne {
+	_u.mutation.ClearMergedTeamIds()
+	return _u
+}
+
 // SetWorkspace sets the "workspace" edge to the Workspace entity.
 func (_u *TeamUpdateOne) SetWorkspace(v *Workspace) *TeamUpdateOne {
 	return _u.SetWorkspaceID(v.ID)
@@ -4501,6 +4591,24 @@ func (_u *TeamUpdateOne) sqlSave(ctx context.Context) (_node *Team, err error) {
 	}
 	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(team.FieldUpdatedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.PreviousKeys(); ok {
+		_spec.SetField(team.FieldPreviousKeys, field.TypeOther, value)
+	}
+	if _u.mutation.PreviousKeysCleared() {
+		_spec.ClearField(team.FieldPreviousKeys, field.TypeOther)
+	}
+	if value, ok := _u.mutation.PreviousNames(); ok {
+		_spec.SetField(team.FieldPreviousNames, field.TypeOther, value)
+	}
+	if _u.mutation.PreviousNamesCleared() {
+		_spec.ClearField(team.FieldPreviousNames, field.TypeOther)
+	}
+	if value, ok := _u.mutation.MergedTeamIds(); ok {
+		_spec.SetField(team.FieldMergedTeamIds, field.TypeOther, value)
+	}
+	if _u.mutation.MergedTeamIdsCleared() {
+		_spec.ClearField(team.FieldMergedTeamIds, field.TypeOther)
 	}
 	if _u.mutation.WorkspaceCleared() {
 		edge := &sqlgraph.EdgeSpec{

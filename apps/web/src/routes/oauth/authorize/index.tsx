@@ -12,7 +12,7 @@ import {
   pickWorkspaceMessage,
   type TAccess,
 } from "@/components/api-key/helpers";
-import { CheckIcon, CircleAlertIcon } from "@/components/icons/symbols.gen";
+import { CheckIcon, CircleAlertIcon } from "@/components/icons";
 import { AuthShell } from "@/components/layout/auth-shell";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";

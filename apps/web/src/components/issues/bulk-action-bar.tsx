@@ -1,5 +1,5 @@
 import type { Issue } from "@/api/ops.gen";
-import { ArchiveIcon, CircleDashedIcon, Trash2Icon, XIcon } from "@/components/icons/symbols.gen";
+import { ArchiveIcon, CircleDashedIcon, Trash2Icon, XIcon } from "@/components/icons";
 import { patchToOptimistic, type TIssuePatch } from "@/components/issues/issue-draft";
 import {
   AssigneePicker,

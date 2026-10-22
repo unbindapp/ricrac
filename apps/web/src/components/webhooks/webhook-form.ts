@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-export const ALL_TEAMS = "all";
-
 /** What a webhook can receive, grouped as the form shows them (save_webhook's resourceTypes). */
 export const RESOURCE_GROUPS: { label: string; types: string[] }[] = [
   {
@@ -19,7 +17,7 @@ export const RESOURCE_GROUPS: { label: string; types: string[] }[] = [
       "InitiativeUpdate",
     ],
   },
-  { label: "Teams", types: ["Cycle", "Team", "WorkflowState", "Document"] },
+  { label: "Planning", types: ["Cycle", "WorkflowState", "Team", "Document"] },
   {
     label: "Customers and releases",
     types: ["Customer", "CustomerNeed", "Release", "ReleasePipeline", "ReleaseNote"],
@@ -28,8 +26,11 @@ export const RESOURCE_GROUPS: { label: string; types: string[] }[] = [
 
 export const RESOURCE_TYPES = RESOURCE_GROUPS.flatMap((group) => group.types);
 
+const resourceLabels: Record<string, string> = { Team: "Issue settings" };
+
 /** "IssueLabel" as "Issue label". */
 export function resourceLabel(type: string) {
+  if (Object.hasOwn(resourceLabels, type)) return resourceLabels[type];
   const words = type.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
@@ -50,7 +51,6 @@ export const webhookFormSchema = z.object({
   resourceTypes: z
     .array(z.enum(RESOURCE_TYPES as [string, ...string[]]))
     .min(1, "Pick at least one thing to receive."),
-  team: z.string(),
   enabled: z.boolean(),
 });
 
@@ -62,7 +62,6 @@ export function toSaveArgs(values: TWebhookFormValues) {
     url: values.url.trim(),
     label: values.label.trim() || null,
     resourceTypes: values.resourceTypes,
-    team: values.team === ALL_TEAMS ? null : values.team,
     enabled: values.enabled,
   };
 }

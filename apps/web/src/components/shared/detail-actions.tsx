@@ -8,7 +8,7 @@ import {
   LinkIcon,
   Trash2Icon,
   UndoIcon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

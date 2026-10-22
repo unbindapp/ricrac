@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import type { Issue } from "@/api/ops.gen";
 
-import { BookmarkPlusIcon, PlusIcon } from "@/components/icons/symbols.gen";
+import { BookmarkPlusIcon, PlusIcon } from "@/components/icons";
 import { DisplayOptions, useDisplaySettings } from "@/components/issues/display-options";
 import type { DisplaySettings } from "@/components/issues/display";
 import { issueFilterOf, type ListIssuesFilters, mergeFilters } from "@/components/issues/filters";
@@ -20,6 +20,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { PageToolbar } from "@/components/layout/page-toolbar";
 import { Button } from "@/components/ui/button";
 import { useSaveViewDialog } from "@/components/views/save-view-dialog";
+import { useWorkspaceTeam } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 
 type TProps = {
@@ -59,17 +60,17 @@ export function IssuesView({
   rowActions,
 }: TProps) {
   const { workspace, canEdit } = useWorkspace();
+  const workspaceTeamId = useWorkspaceTeam()?.id;
   const { display, setDisplay, reset, isDefault } = useDisplaySettings(storageKey, defaultDisplay);
   const effectiveFilters = mergeFilters(filters, fixedFilters);
-  const defaults = useFilterDefaults(effectiveFilters, teamId, newIssueStateType);
+  const defaults = useFilterDefaults(
+    effectiveFilters,
+    teamId ?? workspaceTeamId,
+    newIssueStateType,
+  );
   const { openSaveView, saveViewDialog } = useSaveViewDialog({
-    filter:
-      issueFilterOf({
-        ...effectiveFilters,
-        team_ids: teamId ? undefined : effectiveFilters.team_ids,
-      }) ?? {},
+    filter: issueFilterOf({ ...effectiveFilters, team_ids: undefined }) ?? {},
     display,
-    team: teamId ?? null,
   });
   const openNewIssue = useNewIssueStore((state) => state.open);
   useNewIssueContext(defaults);
@@ -81,7 +82,6 @@ export function IssuesView({
     display,
     emptyState,
   };
-  const teamDefaults = teamId ? { teamId } : undefined;
 
   const toolbar = (
     <PageToolbar
@@ -105,7 +105,7 @@ export function IssuesView({
       <IssueFilters
         filters={filters}
         onChange={onFiltersChange}
-        teamId={teamId}
+        teamId={teamId ?? workspaceTeamId}
         hiddenFields={hiddenFilterFields}
       />
     </PageToolbar>
@@ -126,7 +126,7 @@ export function IssuesView({
             breadcrumb={breadcrumb}
             actions={
               canEdit && (
-                <Button size="sm" onClick={() => openNewIssue(teamDefaults)}>
+                <Button size="sm" onClick={() => openNewIssue()}>
                   <PlusIcon className="size-4" />
                   New issue
                 </Button>

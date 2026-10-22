@@ -5,7 +5,7 @@ import { type MouseEvent, useRef } from "react";
 
 import { favoriteTarget } from "@/components/favorites/favorite-target";
 import { reorderedPosition, sortableStyle, useSortSensors } from "@/components/favorites/sortable";
-import { FolderIcon, XIcon } from "@/components/icons/symbols.gen";
+import { FolderIcon, XIcon } from "@/components/icons";
 import { Button, LinkButton } from "@/components/ui/button";
 import {
   SidebarCollapsible,
@@ -137,7 +137,7 @@ function FavoriteItem({ favorite, onNavigate }: { favorite: TFavorite } & TProps
         size="sm"
         forceMinSize={false}
         onClick={onNavigate}
-        className={`${sidebarItemClassName} ${sidebarActiveItemClassName} pr-8`}
+        className={`${sidebarItemClassName} ${sidebarActiveItemClassName} pr-8 dank:pr-8`}
       >
         <span className="text-muted-foreground flex size-4 shrink-0 items-center justify-center">
           {target.icon}

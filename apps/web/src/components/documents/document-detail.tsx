@@ -12,11 +12,7 @@ import { linkedThreadId, threadAnnotations } from "@/components/documents/docume
 import { FavoriteButton } from "@/components/favorites/favorite-button";
 import { useDocumentParent } from "@/components/documents/document-parent";
 import { DocumentParentPicker } from "@/components/documents/document-parent-picker";
-import {
-  FileTextIcon,
-  FolderInputIcon,
-  MessageSquareTextIcon,
-} from "@/components/icons/symbols.gen";
+import { FileTextIcon, FolderInputIcon, MessageSquareTextIcon } from "@/components/icons";
 import { AutosaveMarkdown } from "@/components/shared/autosave-markdown";
 import { VersionHistoryDialog } from "@/components/documents/version-history";
 import { PageContainer } from "@/components/layout/page-container";

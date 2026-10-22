@@ -31,6 +31,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldMergedIds holds the string denoting the merged_ids field in the database.
+	FieldMergedIds = "merged_ids"
 	// EdgeTeam holds the string denoting the team edge name in mutations.
 	EdgeTeam = "team"
 	// EdgeTeamsByAutoCloseState holds the string denoting the teams_by_auto_close_state edge name in mutations.
@@ -101,6 +103,7 @@ var Columns = []string{
 	FieldArchivedAt,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldMergedIds,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -169,6 +172,11 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByUpdatedAt orders the results by the updated_at field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByMergedIds orders the results by the merged_ids field.
+func ByMergedIds(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMergedIds, opts...).ToFunc()
 }
 
 // ByTeamField orders the results by team field.

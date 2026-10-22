@@ -60,7 +60,7 @@ type TProps = {
   /** Shown when projects exist but none match the query. */
   noMatches?: ReactNode;
   /** Defaults for the project created from a group's + button. */
-  createDefaults?: { teamId?: string; initiativeId?: string };
+  createDefaults?: { initiativeId?: string };
 };
 
 export function ProjectList({

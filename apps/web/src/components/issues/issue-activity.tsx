@@ -1,8 +1,8 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 
 import type { CommentThread as TCommentThread, HistoryEntry } from "@/api/ops.gen";
+import { BotIcon } from "@/components/icons";
 import { GithubIcon } from "@/components/icons/github";
-import { BotIcon } from "@/components/icons/symbols.gen";
 import { mergeFeed } from "@/components/issues/activity-feed";
 import { describeEntry, historyActorOf } from "@/components/issues/activity-text";
 import { CommentComposer, CommentThread } from "@/components/issues/comment-thread";

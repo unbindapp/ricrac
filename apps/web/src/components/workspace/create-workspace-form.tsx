@@ -1,7 +1,12 @@
 import type { WorkspaceSummary } from "@/api/account.gen";
-import { slugify } from "@/lib/helpers/identifiers";
+import { deriveTeamKey, sanitizeTeamKey, slugify } from "@/lib/helpers/identifiers";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
+import { TeamFormSchema } from "@/lib/queries/teams";
 import { useCreateWorkspaceMutation, WorkspaceFormSchema } from "@/lib/queries/workspaces";
+
+const CreateWorkspaceSchema = WorkspaceFormSchema.extend({
+  issuePrefix: TeamFormSchema.shape.key,
+});
 
 export function CreateWorkspaceForm({
   onCreated,
@@ -10,10 +15,11 @@ export function CreateWorkspaceForm({
 }) {
   const { mutateAsync: create } = useCreateWorkspaceMutation();
   const form = useAppForm({
-    defaultValues: { name: "", urlKey: "" },
-    validators: { onSubmit: WorkspaceFormSchema },
+    defaultValues: { name: "", urlKey: "", issuePrefix: "" },
+    validators: { onSubmit: CreateWorkspaceSchema },
     onSubmit: async ({ value }) => {
-      const workspace = await create(WorkspaceFormSchema.parse(value));
+      const { name, urlKey, issuePrefix } = CreateWorkspaceSchema.parse(value);
+      const workspace = await create({ name, urlKey, teamName: name, teamKey: issuePrefix });
       onCreated(workspace);
     },
   });
@@ -24,8 +30,12 @@ export function CreateWorkspaceForm({
         name="name"
         listeners={{
           onChange: ({ value }) => {
-            if (form.getFieldMeta("urlKey")?.isDirty) return;
-            form.setFieldValue("urlKey", slugify(value), { dontUpdateMeta: true });
+            if (!form.getFieldMeta("urlKey")?.isDirty) {
+              form.setFieldValue("urlKey", slugify(value), { dontUpdateMeta: true });
+            }
+            if (!form.getFieldMeta("issuePrefix")?.isDirty) {
+              form.setFieldValue("issuePrefix", deriveTeamKey(value), { dontUpdateMeta: true });
+            }
           },
         }}
         children={(field) => <field.TextField label="Name" placeholder="Acme" autoFocus />}
@@ -37,6 +47,17 @@ export function CreateWorkspaceForm({
             label="URL"
             description={`${window.location.host}/${field.state.value || "…"}`}
             transform={(value) => value.toLowerCase()}
+          />
+        )}
+      />
+      <form.AppField
+        name="issuePrefix"
+        children={(field) => (
+          <field.TextField
+            label="Issue prefix"
+            description={`Issues are named like ${field.state.value || "…"}-123.`}
+            transform={sanitizeTeamKey}
+            className="font-mono"
           />
         )}
       />

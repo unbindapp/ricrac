@@ -12,7 +12,7 @@ import {
   Maximize2Icon,
   PaperclipIcon,
   Trash2Icon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import { usePendingUpload } from "@/components/shared/editor/uploads";
 import { MediaFrame, MediaLightbox, MediaVideo } from "@/components/shared/markdown-media";
 import { Button } from "@/components/ui/button";

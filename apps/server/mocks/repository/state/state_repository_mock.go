@@ -1018,6 +1018,94 @@ func (_c *StateRepositoryMock_NextPosition_Call) RunAndReturn(run func(ctx conte
 	return _c
 }
 
+// Owned provides a mock function for the type StateRepositoryMock
+func (_mock *StateRepositoryMock) Owned(ctx context.Context, workspace uuid.UUID, id uuid.UUID) (uuid.UUID, uuid.UUID, bool, error) {
+	ret := _mock.Called(ctx, workspace, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Owned")
+	}
+
+	var r0 uuid.UUID
+	var r1 uuid.UUID
+	var r2 bool
+	var r3 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) (uuid.UUID, uuid.UUID, bool, error)); ok {
+		return returnFunc(ctx, workspace, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) uuid.UUID); ok {
+		r0 = returnFunc(ctx, workspace, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID) uuid.UUID); ok {
+		r1 = returnFunc(ctx, workspace, id)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(2).(func(context.Context, uuid.UUID, uuid.UUID) bool); ok {
+		r2 = returnFunc(ctx, workspace, id)
+	} else {
+		r2 = ret.Get(2).(bool)
+	}
+	if returnFunc, ok := ret.Get(3).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
+		r3 = returnFunc(ctx, workspace, id)
+	} else {
+		r3 = ret.Error(3)
+	}
+	return r0, r1, r2, r3
+}
+
+// StateRepositoryMock_Owned_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Owned'
+type StateRepositoryMock_Owned_Call struct {
+	*mock.Call
+}
+
+// Owned is a helper method to define mock.On call
+//   - ctx context.Context
+//   - workspace uuid.UUID
+//   - id uuid.UUID
+func (_e *StateRepositoryMock_Expecter) Owned(ctx any, workspace any, id any) *StateRepositoryMock_Owned_Call {
+	return &StateRepositoryMock_Owned_Call{Call: _e.mock.On("Owned", ctx, workspace, id)}
+}
+
+func (_c *StateRepositoryMock_Owned_Call) Run(run func(ctx context.Context, workspace uuid.UUID, id uuid.UUID)) *StateRepositoryMock_Owned_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *StateRepositoryMock_Owned_Call) Return(uUID uuid.UUID, uUID1 uuid.UUID, b bool, err error) *StateRepositoryMock_Owned_Call {
+	_c.Call.Return(uUID, uUID1, b, err)
+	return _c
+}
+
+func (_c *StateRepositoryMock_Owned_Call) RunAndReturn(run func(ctx context.Context, workspace uuid.UUID, id uuid.UUID) (uuid.UUID, uuid.UUID, bool, error)) *StateRepositoryMock_Owned_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // SetColor provides a mock function for the type StateRepositoryMock
 func (_mock *StateRepositoryMock) SetColor(ctx context.Context, tx repository.TxInterface, id uuid.UUID, color string) error {
 	ret := _mock.Called(ctx, tx, id, color)
@@ -1359,86 +1447,6 @@ func (_c *StateRepositoryMock_SetType_Call) Return(err error) *StateRepositoryMo
 }
 
 func (_c *StateRepositoryMock_SetType_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, kind string) error) *StateRepositoryMock_SetType_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// TeamOf provides a mock function for the type StateRepositoryMock
-func (_mock *StateRepositoryMock) TeamOf(ctx context.Context, workspace uuid.UUID, id uuid.UUID) (uuid.UUID, bool, error) {
-	ret := _mock.Called(ctx, workspace, id)
-
-	if len(ret) == 0 {
-		panic("no return value specified for TeamOf")
-	}
-
-	var r0 uuid.UUID
-	var r1 bool
-	var r2 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) (uuid.UUID, bool, error)); ok {
-		return returnFunc(ctx, workspace, id)
-	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) uuid.UUID); ok {
-		r0 = returnFunc(ctx, workspace, id)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(uuid.UUID)
-		}
-	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID) bool); ok {
-		r1 = returnFunc(ctx, workspace, id)
-	} else {
-		r1 = ret.Get(1).(bool)
-	}
-	if returnFunc, ok := ret.Get(2).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
-		r2 = returnFunc(ctx, workspace, id)
-	} else {
-		r2 = ret.Error(2)
-	}
-	return r0, r1, r2
-}
-
-// StateRepositoryMock_TeamOf_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TeamOf'
-type StateRepositoryMock_TeamOf_Call struct {
-	*mock.Call
-}
-
-// TeamOf is a helper method to define mock.On call
-//   - ctx context.Context
-//   - workspace uuid.UUID
-//   - id uuid.UUID
-func (_e *StateRepositoryMock_Expecter) TeamOf(ctx any, workspace any, id any) *StateRepositoryMock_TeamOf_Call {
-	return &StateRepositoryMock_TeamOf_Call{Call: _e.mock.On("TeamOf", ctx, workspace, id)}
-}
-
-func (_c *StateRepositoryMock_TeamOf_Call) Run(run func(ctx context.Context, workspace uuid.UUID, id uuid.UUID)) *StateRepositoryMock_TeamOf_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 context.Context
-		if args[0] != nil {
-			arg0 = args[0].(context.Context)
-		}
-		var arg1 uuid.UUID
-		if args[1] != nil {
-			arg1 = args[1].(uuid.UUID)
-		}
-		var arg2 uuid.UUID
-		if args[2] != nil {
-			arg2 = args[2].(uuid.UUID)
-		}
-		run(
-			arg0,
-			arg1,
-			arg2,
-		)
-	})
-	return _c
-}
-
-func (_c *StateRepositoryMock_TeamOf_Call) Return(uUID uuid.UUID, b bool, err error) *StateRepositoryMock_TeamOf_Call {
-	_c.Call.Return(uUID, b, err)
-	return _c
-}
-
-func (_c *StateRepositoryMock_TeamOf_Call) RunAndReturn(run func(ctx context.Context, workspace uuid.UUID, id uuid.UUID) (uuid.UUID, bool, error)) *StateRepositoryMock_TeamOf_Call {
 	_c.Call.Return(run)
 	return _c
 }

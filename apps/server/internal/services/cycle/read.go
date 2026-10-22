@@ -14,7 +14,7 @@ import (
 var singleKinds = map[string]bool{"all": false, "current": true, "previous": true, "next": true, "upcoming": false, "completed": false}
 
 func (self *CycleService) List(ctx context.Context, actor *auth.Actor, input *ListInput) (args.PageOf[models.Cycle], error) {
-	team, err := self.resolve.Team(ctx, actor, input.Team)
+	team, err := self.resolve.TeamOrDefault(ctx, actor, input.Team)
 	if err != nil {
 		return args.PageOf[models.Cycle]{}, err
 	}

@@ -29,6 +29,10 @@ func (self *WorkspaceRepository) SetLogoURL(ctx context.Context, tx repository.T
 	return update.SetLogoURL(*logo).Exec(ctx)
 }
 
+func (self *WorkspaceRepository) SetTheme(ctx context.Context, tx repository.TxInterface, id uuid.UUID, theme string) error {
+	return self.base.Client(tx).Workspace.UpdateOneID(id).SetTheme(theme).Exec(ctx)
+}
+
 func (self *WorkspaceRepository) Touch(ctx context.Context, tx repository.TxInterface, id uuid.UUID, now time.Time) error {
 	return self.base.Client(tx).Workspace.UpdateOneID(id).SetUpdatedAt(now).Exec(ctx)
 }
@@ -36,6 +40,14 @@ func (self *WorkspaceRepository) Touch(ctx context.Context, tx repository.TxInte
 func (self *WorkspaceRepository) SetRole(ctx context.Context, tx repository.TxInterface, id, user uuid.UUID, role string) error {
 	_, err := self.base.Client(tx).WorkspaceMember.Update().
 		Where(workspacemember.WorkspaceID(id), workspacemember.UserID(user)).SetRole(role).Save(ctx)
+	return err
+}
+
+// JoinTeam adds the user to the workspace's team.
+func (self *WorkspaceRepository) JoinTeam(ctx context.Context, tx repository.TxInterface, id, user uuid.UUID) error {
+	_, err := self.base.Client(tx).ExecContext(ctx,
+		`INSERT INTO team_members (team_id, user_id) SELECT t.id, $2 FROM teams t WHERE t.workspace_id = $1 AND t.archived_at IS NULL
+		 ON CONFLICT DO NOTHING`, id, user)
 	return err
 }
 

@@ -42,7 +42,7 @@ func NewViewService(cfg config.Config, repo repositories.RepositoriesInterface, 
 type ListInput struct {
 	Query  *string `json:"query" doc:"Words in the name or description."`
 	Model  *string `json:"model" doc:"issue, project or initiative."`
-	Team   *string `json:"team" doc:"Team key, name or id: that team's views."`
+	Team   *string `json:"team" doc:"Optional team key, name or id: that team's views."`
 	Shared *bool   `json:"shared" doc:"true: only views shared with the workspace; false: only the caller's personal views."`
 	args.Page
 }
@@ -60,7 +60,7 @@ type SaveInput struct {
 	Model       *string               `json:"model" doc:"What the view lists: issue (default), project or initiative. Only when creating."`
 	Filter      any                   `json:"filter" doc:"The view's filter object. For issue views, the filter language of list_issues: Fields: id, number, title, description, priority, estimate, dueDate, createdAt, updatedAt, startedAt, completedAt, canceledAt, archivedAt, state {id,name,type}, team {id,key,name}, assignee / creator {id,email,name,displayName,isMe}, labels {some|every|none: {id,name,parent}}, project {id,name,slugId}, cycle {id,number,name,isActive}, and, or. Comparators: eq, neq, in, nin, lt, lte, gt, gte, contains, startsWith, endsWith, null. Example: {\"assignee\": {\"isMe\": {\"eq\": true}}, \"state\": {\"type\": {\"in\": [\"started\", \"unstarted\"]}}}"`
 	Display     any                   `json:"display" doc:"How to show it, e.g. {\"groupBy\": \"state\", \"orderBy\": \"priority\"}."`
-	Team        args.Nullable[string] `json:"team" doc:"Team key, name or id the view belongs to (its issues are that team's); null makes it workspace-wide."`
+	Team        args.Nullable[string] `json:"team" doc:"Optional team key, name or id the view belongs to (its issues are that team's); null makes it workspace-wide."`
 	Shared      *bool                 `json:"shared" doc:"Share the view with the workspace (default false: only the caller sees it)."`
 }
 

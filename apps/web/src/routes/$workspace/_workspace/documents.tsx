@@ -7,7 +7,7 @@ import { z } from "zod";
 import type { Document } from "@/api/ops.gen";
 import { DocumentRow } from "@/components/documents/document-row";
 import { NewDocumentDialog } from "@/components/documents/new-document-dialog";
-import { FileTextIcon, PlusIcon, SearchIcon, Trash2Icon } from "@/components/icons/symbols.gen";
+import { FileTextIcon, PlusIcon, SearchIcon, Trash2Icon } from "@/components/icons";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { List } from "@/components/layout/list";
@@ -174,7 +174,7 @@ function DocumentsEmpty({
     <EmptyState
       icon={FileTextIcon}
       title="No documents yet"
-      description="Write specs, notes and decisions next to the team, project or initiative they belong to."
+      description="Write specs, notes and decisions next to the project or initiative they belong to."
       action={action}
     />
   );

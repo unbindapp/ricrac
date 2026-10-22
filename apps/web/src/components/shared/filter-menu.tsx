@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
 
-import { CheckIcon, ChevronDownIcon } from "@/components/icons/symbols.gen";
+import { CheckIcon, ChevronDownIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -33,10 +33,10 @@ export function FilterMenu<T extends string>({ label, value, options, onChange }
       <DropdownMenuTrigger
         render={
           <Button
-            variant="secondary"
+            variant="outline"
             size="sm"
             aria-label={`${label}: ${current.label}`}
-            className="w-fit"
+            className="dank:bg-secondary dank:text-secondary-foreground dank:has-hover:hover:bg-secondary/85 dank:has-hover:hover:text-secondary-foreground dank:active:bg-secondary/85 dank:border-0 w-fit"
           >
             {current.icon}
             <span>{current.label}</span>
@@ -51,7 +51,7 @@ export function FilterMenu<T extends string>({ label, value, options, onChange }
             <DropdownMenuItem
               key={option.value}
               data-selected={option.value === value || undefined}
-              className="data-selected:bg-secondary data-selected:text-secondary-foreground"
+              className="dank:data-selected:bg-secondary dank:data-selected:text-secondary-foreground"
               onClick={() => onChange(option.value)}
             >
               {option.icon}

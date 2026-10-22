@@ -4,6 +4,7 @@ package workflowstate
 
 import (
 	"ricrac/ent/predicate"
+	"ricrac/ent/schema/pgarray"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -99,6 +100,11 @@ func CreatedAt(v time.Time) predicate.WorkflowState {
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.WorkflowState {
 	return predicate.WorkflowState(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// MergedIds applies equality check predicate on the "merged_ids" field. It's identical to MergedIdsEQ.
+func MergedIds(v pgarray.UUID) predicate.WorkflowState {
+	return predicate.WorkflowState(sql.FieldEQ(FieldMergedIds, v))
 }
 
 // TeamIDEQ applies the EQ predicate on the "team_id" field.
@@ -579,6 +585,56 @@ func UpdatedAtIsNil() predicate.WorkflowState {
 // UpdatedAtNotNil applies the NotNil predicate on the "updated_at" field.
 func UpdatedAtNotNil() predicate.WorkflowState {
 	return predicate.WorkflowState(sql.FieldNotNull(FieldUpdatedAt))
+}
+
+// MergedIdsEQ applies the EQ predicate on the "merged_ids" field.
+func MergedIdsEQ(v pgarray.UUID) predicate.WorkflowState {
+	return predicate.WorkflowState(sql.FieldEQ(FieldMergedIds, v))
+}
+
+// MergedIdsNEQ applies the NEQ predicate on the "merged_ids" field.
+func MergedIdsNEQ(v pgarray.UUID) predicate.WorkflowState {
+	return predicate.WorkflowState(sql.FieldNEQ(FieldMergedIds, v))
+}
+
+// MergedIdsIn applies the In predicate on the "merged_ids" field.
+func MergedIdsIn(vs ...pgarray.UUID) predicate.WorkflowState {
+	return predicate.WorkflowState(sql.FieldIn(FieldMergedIds, vs...))
+}
+
+// MergedIdsNotIn applies the NotIn predicate on the "merged_ids" field.
+func MergedIdsNotIn(vs ...pgarray.UUID) predicate.WorkflowState {
+	return predicate.WorkflowState(sql.FieldNotIn(FieldMergedIds, vs...))
+}
+
+// MergedIdsGT applies the GT predicate on the "merged_ids" field.
+func MergedIdsGT(v pgarray.UUID) predicate.WorkflowState {
+	return predicate.WorkflowState(sql.FieldGT(FieldMergedIds, v))
+}
+
+// MergedIdsGTE applies the GTE predicate on the "merged_ids" field.
+func MergedIdsGTE(v pgarray.UUID) predicate.WorkflowState {
+	return predicate.WorkflowState(sql.FieldGTE(FieldMergedIds, v))
+}
+
+// MergedIdsLT applies the LT predicate on the "merged_ids" field.
+func MergedIdsLT(v pgarray.UUID) predicate.WorkflowState {
+	return predicate.WorkflowState(sql.FieldLT(FieldMergedIds, v))
+}
+
+// MergedIdsLTE applies the LTE predicate on the "merged_ids" field.
+func MergedIdsLTE(v pgarray.UUID) predicate.WorkflowState {
+	return predicate.WorkflowState(sql.FieldLTE(FieldMergedIds, v))
+}
+
+// MergedIdsIsNil applies the IsNil predicate on the "merged_ids" field.
+func MergedIdsIsNil() predicate.WorkflowState {
+	return predicate.WorkflowState(sql.FieldIsNull(FieldMergedIds))
+}
+
+// MergedIdsNotNil applies the NotNil predicate on the "merged_ids" field.
+func MergedIdsNotNil() predicate.WorkflowState {
+	return predicate.WorkflowState(sql.FieldNotNull(FieldMergedIds))
 }
 
 // HasTeam applies the HasEdge predicate on the "team" edge.

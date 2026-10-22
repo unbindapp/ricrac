@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"ricrac/ent/issue"
 	"ricrac/ent/issuelabel"
+	"ricrac/ent/schema/pgarray"
 	"ricrac/ent/team"
 	"ricrac/ent/user"
 	"ricrac/ent/workspace"
@@ -169,6 +170,12 @@ func (_c *IssueLabelCreate) SetNillableUpdatedAt(v *time.Time) *IssueLabelCreate
 	if v != nil {
 		_c.SetUpdatedAt(*v)
 	}
+	return _c
+}
+
+// SetMergedIds sets the "merged_ids" field.
+func (_c *IssueLabelCreate) SetMergedIds(v pgarray.UUID) *IssueLabelCreate {
+	_c.mutation.SetMergedIds(v)
 	return _c
 }
 
@@ -358,6 +365,10 @@ func (_c *IssueLabelCreate) createSpec() (*IssueLabel, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(issuelabel.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if value, ok := _c.mutation.MergedIds(); ok {
+		_spec.SetField(issuelabel.FieldMergedIds, field.TypeOther, value)
+		_node.MergedIds = value
 	}
 	if nodes := _c.mutation.WorkspaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -709,6 +720,24 @@ func (u *IssueLabelUpsert) ClearUpdatedAt() *IssueLabelUpsert {
 	return u
 }
 
+// SetMergedIds sets the "merged_ids" field.
+func (u *IssueLabelUpsert) SetMergedIds(v pgarray.UUID) *IssueLabelUpsert {
+	u.Set(issuelabel.FieldMergedIds, v)
+	return u
+}
+
+// UpdateMergedIds sets the "merged_ids" field to the value that was provided on create.
+func (u *IssueLabelUpsert) UpdateMergedIds() *IssueLabelUpsert {
+	u.SetExcluded(issuelabel.FieldMergedIds)
+	return u
+}
+
+// ClearMergedIds clears the value of the "merged_ids" field.
+func (u *IssueLabelUpsert) ClearMergedIds() *IssueLabelUpsert {
+	u.SetNull(issuelabel.FieldMergedIds)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -985,6 +1014,27 @@ func (u *IssueLabelUpsertOne) UpdateUpdatedAt() *IssueLabelUpsertOne {
 func (u *IssueLabelUpsertOne) ClearUpdatedAt() *IssueLabelUpsertOne {
 	return u.Update(func(s *IssueLabelUpsert) {
 		s.ClearUpdatedAt()
+	})
+}
+
+// SetMergedIds sets the "merged_ids" field.
+func (u *IssueLabelUpsertOne) SetMergedIds(v pgarray.UUID) *IssueLabelUpsertOne {
+	return u.Update(func(s *IssueLabelUpsert) {
+		s.SetMergedIds(v)
+	})
+}
+
+// UpdateMergedIds sets the "merged_ids" field to the value that was provided on create.
+func (u *IssueLabelUpsertOne) UpdateMergedIds() *IssueLabelUpsertOne {
+	return u.Update(func(s *IssueLabelUpsert) {
+		s.UpdateMergedIds()
+	})
+}
+
+// ClearMergedIds clears the value of the "merged_ids" field.
+func (u *IssueLabelUpsertOne) ClearMergedIds() *IssueLabelUpsertOne {
+	return u.Update(func(s *IssueLabelUpsert) {
+		s.ClearMergedIds()
 	})
 }
 
@@ -1431,6 +1481,27 @@ func (u *IssueLabelUpsertBulk) UpdateUpdatedAt() *IssueLabelUpsertBulk {
 func (u *IssueLabelUpsertBulk) ClearUpdatedAt() *IssueLabelUpsertBulk {
 	return u.Update(func(s *IssueLabelUpsert) {
 		s.ClearUpdatedAt()
+	})
+}
+
+// SetMergedIds sets the "merged_ids" field.
+func (u *IssueLabelUpsertBulk) SetMergedIds(v pgarray.UUID) *IssueLabelUpsertBulk {
+	return u.Update(func(s *IssueLabelUpsert) {
+		s.SetMergedIds(v)
+	})
+}
+
+// UpdateMergedIds sets the "merged_ids" field to the value that was provided on create.
+func (u *IssueLabelUpsertBulk) UpdateMergedIds() *IssueLabelUpsertBulk {
+	return u.Update(func(s *IssueLabelUpsert) {
+		s.UpdateMergedIds()
+	})
+}
+
+// ClearMergedIds clears the value of the "merged_ids" field.
+func (u *IssueLabelUpsertBulk) ClearMergedIds() *IssueLabelUpsertBulk {
+	return u.Update(func(s *IssueLabelUpsert) {
+		s.ClearMergedIds()
 	})
 }
 

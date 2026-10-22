@@ -64,6 +64,6 @@ func (suite *WorkspaceServiceSuite) TestInvitationsCheckEmailAndRole() {
 	suite.Equal(`"not an email" isn't an email address`, errdefs.As(err).Message)
 	_, err = suite.service.Invite(suite.Ctx, member, &InviteInput{Email: "new@acme.test", Role: new("admin")})
 	suite.Equal("Only admins can invite admins", errdefs.As(err).Message)
-	_, err = suite.service.Invite(suite.Ctx, member, &InviteInput{Email: "new@acme.test", Role: new("guest")})
-	suite.Equal("Guests only see their teams; name at least one in teams", errdefs.As(err).Message)
+	_, err = suite.service.Invite(suite.Ctx, member, &InviteInput{Email: "new@acme.test", Role: new("owner")})
+	suite.Equal(`role is member, admin or guest, not "owner"`, errdefs.As(err).Message)
 }

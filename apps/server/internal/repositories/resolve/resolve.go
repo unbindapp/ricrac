@@ -62,9 +62,12 @@ func (self *ResolveRepository) Members(ctx context.Context, workspace uuid.UUID)
 }
 
 type Keyed struct {
-	ID   uuid.UUID
-	Key  string
-	Name string
+	ID            uuid.UUID
+	Key           string
+	Name          string
+	PreviousKeys  []string
+	PreviousNames []string
+	MergedIDs     []uuid.UUID
 }
 
 // Teams is the unarchived teams among ids, by name.
@@ -75,15 +78,54 @@ func (self *ResolveRepository) Teams(ctx context.Context, ids []uuid.UUID) ([]Ke
 	}
 	rows := make([]Keyed, len(teams))
 	for i, t := range teams {
-		rows[i] = Keyed{ID: t.ID, Key: t.Key, Name: t.Name}
+		rows[i] = Keyed{ID: t.ID, Key: t.Key, Name: t.Name, PreviousKeys: t.PreviousKeys, PreviousNames: t.PreviousNames, MergedIDs: t.MergedTeamIds}
 	}
 	return rows, nil
 }
 
+// Aliases is what the workspace's teams, statuses and labels were also called: the ids of those
+// merged into them (lowercase), and the earlier keys (uppercase) and names (lowercase) of teams.
+type Aliases struct {
+	IDs   map[string]string
+	Keys  map[string]string
+	Names map[string]string
+}
+
+func (self *ResolveRepository) Aliases(ctx context.Context, workspace uuid.UUID) (Aliases, error) {
+	aliases := Aliases{IDs: map[string]string{}, Keys: map[string]string{}, Names: map[string]string{}}
+	rows, err := self.base.DB.QueryContext(ctx,
+		`SELECT 'id', unnest(merged_team_ids)::text, id::text FROM teams WHERE workspace_id = $1
+		 UNION ALL SELECT 'key', upper(unnest(previous_keys)), key FROM teams WHERE workspace_id = $1 AND archived_at IS NULL
+		 UNION ALL SELECT 'name', lower(unnest(previous_names)), name FROM teams WHERE workspace_id = $1 AND archived_at IS NULL
+		 UNION ALL SELECT 'id', unnest(s.merged_ids)::text, s.id::text FROM workflow_states s JOIN teams t ON t.id = s.team_id
+		 	WHERE t.workspace_id = $1
+		 UNION ALL SELECT 'id', unnest(merged_ids)::text, id::text FROM issue_labels WHERE workspace_id = $1`, workspace)
+	if err != nil {
+		return aliases, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var kind, alias, current string
+		if err := rows.Scan(&kind, &alias, &current); err != nil {
+			return aliases, err
+		}
+		switch kind {
+		case "key":
+			aliases.Keys[alias] = current
+		case "name":
+			aliases.Names[alias] = current
+		default:
+			aliases.IDs[alias] = current
+		}
+	}
+	return aliases, rows.Err()
+}
+
 type Typed struct {
-	ID   uuid.UUID
-	Name string
-	Type string
+	ID        uuid.UUID
+	Name      string
+	Type      string
+	MergedIDs []uuid.UUID
 }
 
 // States is the team's unarchived workflow states, in their order.
@@ -96,7 +138,7 @@ func (self *ResolveRepository) States(ctx context.Context, teamID uuid.UUID) ([]
 	}
 	rows := make([]Typed, len(states))
 	for i, s := range states {
-		rows[i] = Typed{ID: s.ID, Name: s.Name, Type: s.Type}
+		rows[i] = Typed{ID: s.ID, Name: s.Name, Type: s.Type, MergedIDs: s.MergedIds}
 	}
 	return rows, nil
 }
@@ -168,17 +210,18 @@ func (self *ResolveRepository) IssueVisible(ctx context.Context, id uuid.UUID, t
 }
 
 type LabelRow struct {
-	ID      uuid.UUID
-	Name    string
-	Parent  *string
-	TeamID  *uuid.UUID
-	IsGroup bool
+	ID        uuid.UUID
+	Name      string
+	Parent    *string
+	TeamID    *uuid.UUID
+	IsGroup   bool
+	MergedIDs []uuid.UUID
 }
 
 func labelRows(labels []*ent.IssueLabel) []LabelRow {
 	rows := make([]LabelRow, len(labels))
 	for i, l := range labels {
-		rows[i] = LabelRow{ID: l.ID, Name: l.Name, TeamID: l.TeamID, IsGroup: l.IsGroup}
+		rows[i] = LabelRow{ID: l.ID, Name: l.Name, TeamID: l.TeamID, IsGroup: l.IsGroup, MergedIDs: l.MergedIds}
 		if l.Edges.Parent != nil {
 			rows[i].Parent = &l.Edges.Parent.Name
 		}

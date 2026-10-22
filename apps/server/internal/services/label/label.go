@@ -4,6 +4,7 @@ package label_service
 
 import (
 	"context"
+	"slices"
 	"strings"
 
 	"github.com/google/uuid"
@@ -30,7 +31,7 @@ func NewLabelService(repo repositories.RepositoriesInterface, resolve resolve_se
 }
 
 type ListInput struct {
-	Team           *string `json:"team" doc:"Team key, name or id: its labels and the workspace labels."`
+	Team           *string `json:"team" doc:"Optional team key, name or id: its labels and the workspace labels. All labels by default."`
 	IncludeRetired bool    `json:"includeRetired,omitempty" doc:"Also list retired labels."`
 	Query          *string `json:"query" doc:"Part of a label's name."`
 	args.Page
@@ -38,12 +39,12 @@ type ListInput struct {
 
 type LabelInput struct {
 	ID   string  `json:"id" doc:"The label's id or name (Group/Label for a label in a group)."`
-	Team *string `json:"team" doc:"Team key, name or id, to pick between labels of the same name."`
+	Team *string `json:"team" doc:"Optional team key, name or id, to pick between labels of the same name."`
 }
 
 type SaveInput struct {
 	ID          *string               `json:"id" doc:"Only to change a label: its id or name (Group/Label for a label in a group). Omit to create one."`
-	Team        *string               `json:"team" doc:"Team key, name or id. On create, makes it a team label (omit for a workspace label); on update, picks between labels of the same name."`
+	Team        *string               `json:"team" doc:"Optional team key, name or id. On create, makes it a team label (omit for a workspace label); on update, picks between labels of the same name."`
 	Name        *string               `json:"name" doc:"Required to create."`
 	Color       *string               `json:"color" doc:"Hex color like #eb5757; picked for you on create when omitted."`
 	Description args.Nullable[string] `json:"description" doc:"Null clears it."`
@@ -81,7 +82,7 @@ func (self *LabelService) values(ctx context.Context, tx repository.TxInterface,
 }
 
 // find is a label the caller can see (retired ones too) by id, name or Group/Name. With a team,
-// its labels and the workspace labels are searched and the team's label wins a tie.
+// its labels and the workspace labels are searched; a team's label wins a tie.
 func (self *LabelService) find(ctx context.Context, actor *auth.Actor, value string, team *uuid.UUID) (uuid.UUID, error) {
 	var teams []uuid.UUID
 	if team != nil {
@@ -99,7 +100,7 @@ func (self *LabelService) find(ctx context.Context, actor *auth.Actor, value str
 	value = strings.TrimSpace(value)
 	if id, ok := asUUID(value); ok {
 		for _, r := range rows {
-			if r.ID == id {
+			if r.ID == id || slices.Contains(r.MergedIDs, id) {
 				return r.ID, nil
 			}
 		}
@@ -111,7 +112,7 @@ func (self *LabelService) find(ctx context.Context, actor *auth.Actor, value str
 			continue
 		}
 		matches = append(matches, r.ID)
-		if team != nil && r.TeamID != nil && *r.TeamID == *team {
+		if r.TeamID != nil && (team == nil || *r.TeamID == *team) {
 			teamMatches = append(teamMatches, r.ID)
 		}
 	}

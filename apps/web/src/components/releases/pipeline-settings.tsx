@@ -25,7 +25,7 @@ import {
   PlusIcon,
   Trash2Icon,
   WorkflowIcon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { List } from "@/components/layout/list";
@@ -82,13 +82,10 @@ export function PipelineSettings() {
 }
 
 function pipelineSummary(pipeline: ReleasePipeline) {
-  const parts = [
+  return [
     pipeline.type === "continuous" ? "Every deploy is a release" : "Releases are planned ahead",
     `${pipeline.releaseCount} ${pipeline.releaseCount === 1 ? "release" : "releases"}`,
-  ];
-  const teams = pipeline.teams ?? [];
-  parts.push(teams.length > 0 ? `Only ${teams.map((team) => team.name).join(", ")}` : "All teams");
-  return parts.join(" · ");
+  ].join(" · ");
 }
 
 function PipelineSection({ pipeline }: { pipeline: ReleasePipeline }) {

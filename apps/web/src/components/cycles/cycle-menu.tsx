@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import type { Cycle } from "@/api/ops.gen";
-import { ArchiveIcon, EllipsisIcon, PencilIcon } from "@/components/icons/symbols.gen";
+import { ArchiveIcon, EllipsisIcon, PencilIcon } from "@/components/icons";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import {

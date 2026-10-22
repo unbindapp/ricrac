@@ -1,4 +1,4 @@
-import type { TIcon } from "@/components/icons/symbols.gen";
+import type { LucideIcon } from "@/components/icons";
 import { LinkButton } from "@/components/ui/button";
 
 type TProps = {
@@ -6,7 +6,7 @@ type TProps = {
   description: string;
   buttonText: string;
   buttonTo: string;
-  Icon: TIcon;
+  Icon: LucideIcon;
 };
 
 export default function NotFoundTemplate({
@@ -32,7 +32,7 @@ export default function NotFoundTemplate({
   );
 }
 
-export function EntityNotFound({ Icon, description }: { Icon: TIcon; description: string }) {
+export function EntityNotFound({ Icon, description }: { Icon: LucideIcon; description: string }) {
   return (
     <NotFoundTemplate
       code={404}

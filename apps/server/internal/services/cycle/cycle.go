@@ -32,21 +32,21 @@ func NewCycleService(cfg config.Config, repo repositories.RepositoriesInterface,
 }
 
 type ListInput struct {
-	Team            string  `json:"team" doc:"Team key, name or id."`
+	Team            *string `json:"team" doc:"Optional: the workspace's team by default. Its key, name or id."`
 	Type            *string `json:"type" doc:"current, previous, next, upcoming, completed or all (default)."`
 	IncludeArchived bool    `json:"includeArchived,omitempty"`
 	args.Page
 }
 
 type GetInput struct {
-	ID            string  `json:"id" doc:"The cycle's id, or its number, name or \"current\" / \"next\" / \"previous\" (with team)."`
-	Team          *string `json:"team" doc:"Team key, name or id, when id isn't the cycle's id."`
+	ID            string  `json:"id" doc:"The cycle's id, number, name or \"current\" / \"next\" / \"previous\"."`
+	Team          *string `json:"team" doc:"Optional: the workspace's team by default. Its key, name or id."`
 	IncludeIssues *bool   `json:"includeIssues" doc:"List the cycle's issues (default true)."`
 }
 
 type SaveInput struct {
-	ID          *string               `json:"id" doc:"Only to update a cycle: its id (or number / name with team). Omit to create one."`
-	Team        *string               `json:"team" doc:"Team key, name or id. Required to create."`
+	ID          *string               `json:"id" doc:"Only to update a cycle: its id, number or name. Omit to create one."`
+	Team        *string               `json:"team" doc:"Optional: the workspace's team by default. Its key, name or id."`
 	Name        args.Nullable[string] `json:"name" doc:"Null clears it (the cycle is then shown as \"Cycle <number>\")."`
 	Description args.Nullable[string] `json:"description"`
 	StartsAt    *string               `json:"startsAt" doc:"ISO 8601 date or time (a date starts at 00:00 UTC). Required to create."`
@@ -54,8 +54,8 @@ type SaveInput struct {
 }
 
 type ArchiveInput struct {
-	ID   string  `json:"id" doc:"The cycle's id, or its number or name (with team)."`
-	Team *string `json:"team" doc:"Team key, name or id, when id isn't the cycle's id."`
+	ID   string  `json:"id" doc:"The cycle's id, number or name."`
+	Team *string `json:"team" doc:"Optional: the workspace's team by default. Its key, name or id."`
 }
 
 func (self *CycleService) values(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) ([]models.Cycle, error) {

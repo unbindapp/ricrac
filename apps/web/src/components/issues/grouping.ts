@@ -5,7 +5,6 @@ import type {
   LabelRef,
   ProjectRef,
   StateRef,
-  TeamRef,
   UserRef,
 } from "@/api/ops.gen";
 import type { TGroupBy, TIssueLayout, TOrderBy } from "./display.ts";
@@ -48,8 +47,7 @@ export type TGroupMeta =
   | { kind: "project"; project: ProjectRef | null }
   | { kind: "cycle"; cycle: CycleRef | null }
   | { kind: "label"; label: LabelRef | null }
-  | { kind: "parent"; parent: IssueRef | null }
-  | { kind: "team"; team: TeamRef };
+  | { kind: "parent"; parent: IssueRef | null };
 
 export type TIssueGroup = {
   key: string;
@@ -203,15 +201,6 @@ function seedsFor(
         },
       ];
     }
-    case "team":
-      return [
-        {
-          key: issue.team.id,
-          label: issue.team.name,
-          meta: { kind: "team", team: issue.team },
-          rank: issue.team.name.toLowerCase(),
-        },
-      ];
   }
 }
 

@@ -10,7 +10,7 @@ import {
   MessageSquareIcon,
   PlusIcon,
   SplitIcon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import { EmptyState } from "@/components/layout/empty-state";
 import { SectionTitle } from "@/components/layout/section-title";
 import { RelativeTime } from "@/components/shared/relative-time";

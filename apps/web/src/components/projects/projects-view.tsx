@@ -1,13 +1,7 @@
 import { useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
-import {
-  BoxIcon,
-  LayoutGridIcon,
-  ListIcon,
-  PlusIcon,
-  SearchIcon,
-} from "@/components/icons/symbols.gen";
+import { BoxIcon, LayoutGridIcon, ListIcon, PlusIcon, SearchIcon } from "@/components/icons";
 import type { TBreadcrumbItem } from "@/components/layout/breadcrumb";
 import { EmptyState } from "@/components/layout/empty-state";
 import { PageContainer } from "@/components/layout/page-container";
@@ -31,17 +25,15 @@ type TProps = {
   breadcrumb?: TBreadcrumbItem[];
   storageKey: string;
   filters: TProjectListArgs;
-  /** The team the page is about, picked for new projects. */
-  teamId?: string;
 };
 
-export function ProjectsView({ title, breadcrumb, storageKey, filters, teamId }: TProps) {
+export function ProjectsView({ title, breadcrumb, storageKey, filters }: TProps) {
   const { canEdit } = useWorkspace();
   const openNewProject = useNewProjectStore((state) => state.open);
   const [layout, setLayout] = useLocalStorage<TLayout>(`projects-layout:${storageKey}`, "list");
   const [query, setQuery] = useState("");
   const [scope, setScope] = useState<TProjectScope>("active");
-  const create = () => openNewProject({ teamId });
+  const create = () => openNewProject();
   const empty =
     scope !== "active" ? (
       <ScopeEmpty scope={scope} noun="project" />
@@ -49,7 +41,7 @@ export function ProjectsView({ title, breadcrumb, storageKey, filters, teamId }:
       <EmptyState
         icon={BoxIcon}
         title="No projects yet"
-        description="Projects group issues from one or more teams toward a goal, with milestones and status updates."
+        description="Projects group issues toward a goal, with milestones and status updates."
         action={
           canEdit && (
             <Button size="sm" variant="outline" onClick={create}>
@@ -67,7 +59,7 @@ export function ProjectsView({ title, breadcrumb, storageKey, filters, teamId }:
       description={`Nothing matches “${query.trim()}”.`}
     />
   );
-  const listProps = { filters, query, scope, empty, noMatches, createDefaults: { teamId } };
+  const listProps = { filters, query, scope, empty, noMatches };
   const isBoard = layout === "board" && scope === "active";
 
   return (

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"ricrac/ent/issue"
+	"ricrac/ent/schema/pgarray"
 	"ricrac/ent/team"
 	"ricrac/ent/workflowstate"
 	"time"
@@ -109,6 +110,12 @@ func (_c *WorkflowStateCreate) SetNillableUpdatedAt(v *time.Time) *WorkflowState
 	if v != nil {
 		_c.SetUpdatedAt(*v)
 	}
+	return _c
+}
+
+// SetMergedIds sets the "merged_ids" field.
+func (_c *WorkflowStateCreate) SetMergedIds(v pgarray.UUID) *WorkflowStateCreate {
+	_c.mutation.SetMergedIds(v)
 	return _c
 }
 
@@ -334,6 +341,10 @@ func (_c *WorkflowStateCreate) createSpec() (*WorkflowState, *sqlgraph.CreateSpe
 	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(workflowstate.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if value, ok := _c.mutation.MergedIds(); ok {
+		_spec.SetField(workflowstate.FieldMergedIds, field.TypeOther, value)
+		_node.MergedIds = value
 	}
 	if nodes := _c.mutation.TeamIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -622,6 +633,24 @@ func (u *WorkflowStateUpsert) ClearUpdatedAt() *WorkflowStateUpsert {
 	return u
 }
 
+// SetMergedIds sets the "merged_ids" field.
+func (u *WorkflowStateUpsert) SetMergedIds(v pgarray.UUID) *WorkflowStateUpsert {
+	u.Set(workflowstate.FieldMergedIds, v)
+	return u
+}
+
+// UpdateMergedIds sets the "merged_ids" field to the value that was provided on create.
+func (u *WorkflowStateUpsert) UpdateMergedIds() *WorkflowStateUpsert {
+	u.SetExcluded(workflowstate.FieldMergedIds)
+	return u
+}
+
+// ClearMergedIds clears the value of the "merged_ids" field.
+func (u *WorkflowStateUpsert) ClearMergedIds() *WorkflowStateUpsert {
+	u.SetNull(workflowstate.FieldMergedIds)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -828,6 +857,27 @@ func (u *WorkflowStateUpsertOne) UpdateUpdatedAt() *WorkflowStateUpsertOne {
 func (u *WorkflowStateUpsertOne) ClearUpdatedAt() *WorkflowStateUpsertOne {
 	return u.Update(func(s *WorkflowStateUpsert) {
 		s.ClearUpdatedAt()
+	})
+}
+
+// SetMergedIds sets the "merged_ids" field.
+func (u *WorkflowStateUpsertOne) SetMergedIds(v pgarray.UUID) *WorkflowStateUpsertOne {
+	return u.Update(func(s *WorkflowStateUpsert) {
+		s.SetMergedIds(v)
+	})
+}
+
+// UpdateMergedIds sets the "merged_ids" field to the value that was provided on create.
+func (u *WorkflowStateUpsertOne) UpdateMergedIds() *WorkflowStateUpsertOne {
+	return u.Update(func(s *WorkflowStateUpsert) {
+		s.UpdateMergedIds()
+	})
+}
+
+// ClearMergedIds clears the value of the "merged_ids" field.
+func (u *WorkflowStateUpsertOne) ClearMergedIds() *WorkflowStateUpsertOne {
+	return u.Update(func(s *WorkflowStateUpsert) {
+		s.ClearMergedIds()
 	})
 }
 
@@ -1204,6 +1254,27 @@ func (u *WorkflowStateUpsertBulk) UpdateUpdatedAt() *WorkflowStateUpsertBulk {
 func (u *WorkflowStateUpsertBulk) ClearUpdatedAt() *WorkflowStateUpsertBulk {
 	return u.Update(func(s *WorkflowStateUpsert) {
 		s.ClearUpdatedAt()
+	})
+}
+
+// SetMergedIds sets the "merged_ids" field.
+func (u *WorkflowStateUpsertBulk) SetMergedIds(v pgarray.UUID) *WorkflowStateUpsertBulk {
+	return u.Update(func(s *WorkflowStateUpsert) {
+		s.SetMergedIds(v)
+	})
+}
+
+// UpdateMergedIds sets the "merged_ids" field to the value that was provided on create.
+func (u *WorkflowStateUpsertBulk) UpdateMergedIds() *WorkflowStateUpsertBulk {
+	return u.Update(func(s *WorkflowStateUpsert) {
+		s.UpdateMergedIds()
+	})
+}
+
+// ClearMergedIds clears the value of the "merged_ids" field.
+func (u *WorkflowStateUpsertBulk) ClearMergedIds() *WorkflowStateUpsertBulk {
+	return u.Update(func(s *WorkflowStateUpsert) {
+		s.ClearMergedIds()
 	})
 }
 

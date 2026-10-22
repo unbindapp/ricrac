@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import type { CycleIssue, StateRef } from "@/api/ops.gen";
 import { pointsText } from "@/components/cycles/cycle-status";
-import { ChevronRightIcon, CircleDotIcon } from "@/components/icons/symbols.gen";
+import { ChevronRightIcon, CircleDotIcon } from "@/components/icons";
 import { EmptyState } from "@/components/layout/empty-state";
 import { List } from "@/components/layout/list";
 import { Avatar } from "@/components/shared/avatar";
@@ -42,7 +42,7 @@ export function CycleIssues({ issues }: { issues: CycleIssue[] }) {
       <EmptyState
         icon={CircleDotIcon}
         title="No issues in this cycle yet"
-        description="Add issues to the cycle from an issue's properties, or let started issues join it on their own in team settings."
+        description="Add issues to the cycle from an issue's properties, or let started issues join it on their own in cycle settings."
       />
     );
   }

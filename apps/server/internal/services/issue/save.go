@@ -266,42 +266,16 @@ func (self *IssueService) Create(ctx context.Context, tx repository.TxInterface,
 	return id, self.events.Emit(ctx, tx, actor, "Issue", "create", value, nil, &team)
 }
 
-// newIssueTeam is the team named, else the parent's, else the caller's only team.
+// newIssueTeam is the team named, else the parent's, else the workspace's.
 func (self *IssueService) newIssueTeam(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, named *string, parent *uuid.UUID) (uuid.UUID, error) {
-	switch {
-	case named != nil:
-		return self.resolve.Team(ctx, actor, *named)
-	case parent != nil:
-		row, err := self.repo.Issue().Get(ctx, tx, *parent)
-		if err != nil {
-			return uuid.Nil, err
-		}
-		return row.TeamID, nil
+	if named != nil || parent == nil {
+		return self.resolve.TeamOrDefault(ctx, actor, named)
 	}
-	return self.onlyTeam(ctx, actor)
-}
-
-// onlyTeam is the team to use when none was named: the caller's only team.
-func (self *IssueService) onlyTeam(ctx context.Context, actor *auth.Actor) (uuid.UUID, error) {
-	visible, err := actor.TeamIDs(ctx)
+	row, err := self.repo.Issue().Get(ctx, tx, *parent)
 	if err != nil {
 		return uuid.Nil, err
 	}
-	teams, err := self.repo.Issue().TeamsByKey(ctx, visible)
-	if err != nil {
-		return uuid.Nil, err
-	}
-	switch len(teams) {
-	case 1:
-		return teams[0].ID, nil
-	case 0:
-		return uuid.Nil, errdefs.BadRequest("There are no teams yet; create one with save_team")
-	}
-	keys := make([]string, len(teams))
-	for i, t := range teams {
-		keys[i] = t.Key
-	}
-	return uuid.Nil, errdefs.BadRequest("Name the team: %s", strings.Join(keys, ", "))
+	return row.TeamID, nil
 }
 
 func (self *IssueService) routeToTriage(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, issue, team uuid.UUID) error {

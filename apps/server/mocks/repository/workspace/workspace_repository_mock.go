@@ -925,6 +925,75 @@ func (_c *WorkspaceRepositoryMock_IssueCount_Call) RunAndReturn(run func(ctx con
 	return _c
 }
 
+// JoinTeam provides a mock function for the type WorkspaceRepositoryMock
+func (_mock *WorkspaceRepositoryMock) JoinTeam(ctx context.Context, tx repository.TxInterface, id uuid.UUID, user uuid.UUID) error {
+	ret := _mock.Called(ctx, tx, id, user)
+
+	if len(ret) == 0 {
+		panic("no return value specified for JoinTeam")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, tx, id, user)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// WorkspaceRepositoryMock_JoinTeam_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'JoinTeam'
+type WorkspaceRepositoryMock_JoinTeam_Call struct {
+	*mock.Call
+}
+
+// JoinTeam is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - user uuid.UUID
+func (_e *WorkspaceRepositoryMock_Expecter) JoinTeam(ctx any, tx any, id any, user any) *WorkspaceRepositoryMock_JoinTeam_Call {
+	return &WorkspaceRepositoryMock_JoinTeam_Call{Call: _e.mock.On("JoinTeam", ctx, tx, id, user)}
+}
+
+func (_c *WorkspaceRepositoryMock_JoinTeam_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, user uuid.UUID)) *WorkspaceRepositoryMock_JoinTeam_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *WorkspaceRepositoryMock_JoinTeam_Call) Return(err error) *WorkspaceRepositoryMock_JoinTeam_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *WorkspaceRepositoryMock_JoinTeam_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, user uuid.UUID) error) *WorkspaceRepositoryMock_JoinTeam_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ListInvitations provides a mock function for the type WorkspaceRepositoryMock
 func (_mock *WorkspaceRepositoryMock) ListInvitations(ctx context.Context, id uuid.UUID, limit int64, offset int64) ([]uuid.UUID, error) {
 	ret := _mock.Called(ctx, id, limit, offset)
@@ -1742,6 +1811,75 @@ func (_c *WorkspaceRepositoryMock_SetRole_Call) Return(err error) *WorkspaceRepo
 }
 
 func (_c *WorkspaceRepositoryMock_SetRole_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, user uuid.UUID, role string) error) *WorkspaceRepositoryMock_SetRole_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SetTheme provides a mock function for the type WorkspaceRepositoryMock
+func (_mock *WorkspaceRepositoryMock) SetTheme(ctx context.Context, tx repository.TxInterface, id uuid.UUID, theme string) error {
+	ret := _mock.Called(ctx, tx, id, theme)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetTheme")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, string) error); ok {
+		r0 = returnFunc(ctx, tx, id, theme)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// WorkspaceRepositoryMock_SetTheme_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetTheme'
+type WorkspaceRepositoryMock_SetTheme_Call struct {
+	*mock.Call
+}
+
+// SetTheme is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - theme string
+func (_e *WorkspaceRepositoryMock_Expecter) SetTheme(ctx any, tx any, id any, theme any) *WorkspaceRepositoryMock_SetTheme_Call {
+	return &WorkspaceRepositoryMock_SetTheme_Call{Call: _e.mock.On("SetTheme", ctx, tx, id, theme)}
+}
+
+func (_c *WorkspaceRepositoryMock_SetTheme_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, theme string)) *WorkspaceRepositoryMock_SetTheme_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 string
+		if args[3] != nil {
+			arg3 = args[3].(string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *WorkspaceRepositoryMock_SetTheme_Call) Return(err error) *WorkspaceRepositoryMock_SetTheme_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *WorkspaceRepositoryMock_SetTheme_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, theme string) error) *WorkspaceRepositoryMock_SetTheme_Call {
 	_c.Call.Return(run)
 	return _c
 }

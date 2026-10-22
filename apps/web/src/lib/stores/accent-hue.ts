@@ -4,31 +4,36 @@ import { ACCENT_HUE_KEY, accentHueOf } from "@/components/providers/themes";
 
 function storedHue() {
   try {
-    return accentHueOf(localStorage.getItem(ACCENT_HUE_KEY));
+    const stored = localStorage.getItem(ACCENT_HUE_KEY);
+    return stored ? accentHueOf(stored) : null;
   } catch {
-    return accentHueOf(null);
+    return null;
   }
 }
 
-function applyHue(hue: number) {
-  document.documentElement.style.setProperty("--accent-hue", String(hue));
+function applyHue(hue: number | null) {
+  const root = document.documentElement;
+  if (hue === null) root.style.removeProperty("--accent-hue");
+  else root.style.setProperty("--accent-hue", String(hue));
   try {
-    localStorage.setItem(ACCENT_HUE_KEY, String(hue));
+    if (hue === null) localStorage.removeItem(ACCENT_HUE_KEY);
+    else localStorage.setItem(ACCENT_HUE_KEY, String(hue));
   } catch {
     return;
   }
 }
 
 type TAccentHueStore = {
-  hue: number;
-  setHue: (hue: number) => void;
+  /** Null keeps the workspace theme's own hue. */
+  hue: number | null;
+  setHue: (hue: number | null) => void;
 };
 
 /** The hue the theme's accent colors are built from, saved in this browser. */
 export const useAccentHueStore = create<TAccentHueStore>((set) => ({
   hue: storedHue(),
   setHue: (hue) => {
-    const next = accentHueOf(String(hue));
+    const next = hue === null ? null : accentHueOf(String(hue));
     applyHue(next);
     set({ hue: next });
   },

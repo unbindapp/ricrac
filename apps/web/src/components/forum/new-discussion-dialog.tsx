@@ -3,7 +3,6 @@ import { type ReactElement, useState } from "react";
 import { z } from "zod";
 
 import { DiscussionTagsPicker } from "@/components/forum/discussion-tags";
-import { DiscussionTeamPicker } from "@/components/forum/discussion-team-picker";
 import { ThumbnailPicker } from "@/components/forum/thumbnail-picker";
 import { useWorkspaceUsers } from "@/components/issues/picker-sources";
 import { MarkdownEditor } from "@/components/shared/markdown-editor";
@@ -36,7 +35,7 @@ type TProps = {
   defaultTeamId?: string | null;
 };
 
-export function NewDiscussionDialog({ trigger, defaultTeamId = null }: TProps) {
+export function NewDiscussionDialog({ trigger }: TProps) {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -45,19 +44,18 @@ export function NewDiscussionDialog({ trigger, defaultTeamId = null }: TProps) {
         <DialogHeader>
           <DialogTitle>New discussion</DialogTitle>
         </DialogHeader>
-        {isOpen && <NewDiscussionForm defaultTeamId={defaultTeamId} />}
+        {isOpen && <NewDiscussionForm />}
       </DialogContent>
     </Dialog>
   );
 }
 
-function NewDiscussionForm({ defaultTeamId }: { defaultTeamId: string | null }) {
+function NewDiscussionForm() {
   const { workspace } = useWorkspace();
   const navigate = useNavigate();
   const { users } = useWorkspaceUsers();
   const uploads = useEditorUploads(workspace.id);
   const { mutateAsync: save } = useSaveDiscussionMutation(workspace.id);
-  const [teamId, setTeamId] = useState(defaultTeamId);
   const [body, setBody] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
@@ -68,7 +66,6 @@ function NewDiscussionForm({ defaultTeamId }: { defaultTeamId: string | null }) 
       const discussion = await save({
         title: schema.parse(value).title,
         body,
-        team: teamId,
         tags,
         thumbnailUrl,
       }).catch(() => null);
@@ -87,23 +84,10 @@ function NewDiscussionForm({ defaultTeamId }: { defaultTeamId: string | null }) 
           <field.TextField label="Title" placeholder="What do you want to talk about?" autoFocus />
         )}
       />
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="flex min-w-0 flex-col gap-1.5">
-          <span className="text-sm font-medium">Visible to</span>
-          <div className="flex">
-            <DiscussionTeamPicker
-              label="Visible to"
-              noneLabel="Whole workspace"
-              value={teamId}
-              onChange={setTeamId}
-            />
-          </div>
-        </div>
-        <div className="flex min-w-0 flex-col gap-1.5">
-          <span className="text-sm font-medium">Tags</span>
-          <div className="flex">
-            <DiscussionTagsPicker value={tags} onChange={setTags} />
-          </div>
+      <div className="flex min-w-0 flex-col gap-1.5">
+        <span className="text-sm font-medium">Tags</span>
+        <div className="flex">
+          <DiscussionTagsPicker value={tags} onChange={setTags} />
         </div>
       </div>
       <div className="flex flex-col gap-1.5">

@@ -4,9 +4,9 @@ import { CopyButton } from "@/components/shared/copy-button";
 
 const FIELDS: [string, string][] = [
   ["title", "Required. Everything else is optional."],
-  ["number", "Keeps the identifier: 42 becomes ENG-42. Must be free in the team; gaps are fine."],
+  ["number", "Keeps the identifier: 42 becomes ENG-42. Must be free; gaps are fine."],
   ["description", "Markdown, kept as is."],
-  ["state", "A status name or type of the team (In Progress, started). The default otherwise."],
+  ["state", "A status name or type (In Progress, started). The default otherwise."],
   ["priority", "0 none, 1 urgent, 2 high, 3 medium, 4 low."],
   ["assignee, creator", "Email, name or id of a workspace member. The creator is you otherwise."],
   ["labels", "Label names; Group/Label for a label in a group."],
@@ -15,7 +15,7 @@ const FIELDS: [string, string][] = [
   ["relatedTo, blocks, blockedBy, duplicateOf", "Identifiers of other issues."],
   ["createdAt, updatedAt, startedAt, completedAt, canceledAt, archivedAt", "ISO 8601 dates."],
   ["dueDate", "YYYY-MM-DD."],
-  ["estimate, sortOrder", "Numbers on the team's scale and board."],
+  ["estimate, sortOrder", "Numbers on the estimate scale and board."],
   ["links", "Attachments: [{ url, title, subtitle }]."],
   ["subscribers", "People to keep in the loop."],
   ["comments", "Oldest first: [{ author, body, createdAt }]."],
@@ -37,7 +37,7 @@ export function ImportFormat() {
         ))}
       </dl>
       <div className="relative">
-        <pre className="bg-muted overflow-x-auto font-code rounded-md p-3 text-xs leading-relaxed">
+        <pre className="bg-muted dank:font-code overflow-x-auto rounded-md p-3 font-mono text-xs leading-relaxed">
           {EXAMPLE_IMPORT}
         </pre>
         <div className="absolute top-2 right-2">

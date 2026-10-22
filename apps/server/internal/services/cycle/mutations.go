@@ -80,10 +80,7 @@ func (self *CycleService) checkNoOverlap(ctx context.Context, tx repository.TxIn
 }
 
 func (self *CycleService) create(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, input *SaveInput) (uuid.UUID, error) {
-	if input.Team == nil {
-		return uuid.Nil, errdefs.BadRequest("Name the team of the new cycle")
-	}
-	team, err := self.resolve.Team(ctx, actor, *input.Team)
+	team, err := self.resolve.TeamOrDefault(ctx, actor, input.Team)
 	if err != nil {
 		return uuid.Nil, err
 	}

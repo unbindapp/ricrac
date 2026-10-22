@@ -239,6 +239,11 @@ func (self *WorkspaceService) changeRole(ctx context.Context, tx repository.TxIn
 	if err := self.repo.Workspace().SetRole(ctx, tx, actor.Workspace, user, role.String()); err != nil {
 		return err
 	}
+	if role != auth.Guest {
+		if err := self.repo.Workspace().JoinTeam(ctx, tx, actor.Workspace, user); err != nil {
+			return err
+		}
+	}
 	return self.events.Audit(ctx, tx, actor, "member.roleChanged", M{"user": user, "from": old.String(), "to": role.String()})
 }
 

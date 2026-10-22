@@ -7,13 +7,13 @@ import {
   CircleDashedIcon,
   CircleUserIcon,
   ListFilterIcon,
+  type LucideIcon,
   RefreshCwIcon,
   SignalHighIcon,
   TagIcon,
-  type TIcon,
   UserPenIcon,
   XIcon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import {
   activeFilterFields,
   clearFilterField,
@@ -30,7 +30,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-const fieldIcons: Record<TFilterField, TIcon> = {
+const fieldIcons: Record<TFilterField, LucideIcon> = {
   status: CircleDashedIcon,
   assignee: CircleUserIcon,
   creator: UserPenIcon,

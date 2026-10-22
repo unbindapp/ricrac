@@ -6,7 +6,6 @@ export type TFilterOp = "is" | "isNot";
 export type TFilter = Record<string, unknown>;
 
 export type TIssueField =
-  | "team"
   | "statusType"
   | "status"
   | "assignee"
@@ -17,7 +16,7 @@ export type TIssueField =
   | "cycle"
   | "dueDate";
 
-export type TProjectField = "projectStatus" | "lead" | "projectTeam" | "projectPriority" | "health";
+export type TProjectField = "projectStatus" | "lead" | "projectPriority" | "health";
 
 export type TFilterField = TIssueField | TProjectField;
 
@@ -30,7 +29,6 @@ export const ME = "me";
 
 export const FIELDS: Record<TFilterModel, TFilterField[]> = {
   issue: [
-    "team",
     "statusType",
     "status",
     "assignee",
@@ -41,7 +39,7 @@ export const FIELDS: Record<TFilterModel, TFilterField[]> = {
     "cycle",
     "dueDate",
   ],
-  project: ["projectStatus", "lead", "projectTeam", "projectPriority", "health"],
+  project: ["projectStatus", "lead", "projectPriority", "health"],
 };
 
 /** Fields that only take "is". */
@@ -66,7 +64,7 @@ function strings(value: unknown): string[] | null {
   return Array.isArray(value) && value.every((item) => typeof item === "string") ? value : null;
 }
 
-/** {key: {sub: {in|nin: values}}}, e.g. {team: {key: {in: ["ENG"]}}}. */
+/** {key: {sub: {in|nin: values}}}, e.g. {state: {type: {in: ["started"]}}}. */
 function listCodec(key: string, sub: string | null, asNumbers = false): TCodec {
   const wrap = (inner: TFilter) => ({ [key]: sub ? { [sub]: inner } : inner });
   return {
@@ -211,8 +209,9 @@ const dueDateCodec: TCodec = {
   },
 };
 
+const workspaceTeamCodec = listCodec("team", "key");
+
 const CODECS: Record<TFilterField, TCodec> = {
-  team: listCodec("team", "key"),
   statusType: listCodec("state", "type"),
   status: listCodec("state", "name"),
   assignee: nullableCodec("assignee", byId, parseById),
@@ -224,7 +223,6 @@ const CODECS: Record<TFilterField, TCodec> = {
   dueDate: dueDateCodec,
   projectStatus: listCodec("status", "type"),
   lead: nullableCodec("lead", byId, parseById),
-  projectTeam: listCodec("team", "key"),
   projectPriority: listCodec("priority", null, true),
   health: listCodec("health", null),
 };
@@ -238,7 +236,10 @@ export function conditionsToFilter(conditions: TCondition[]): TFilter {
   return { and: clauses };
 }
 
-/** The conditions a filter stands for, or null when the builder can't show it (a hand-written filter). */
+/**
+ * The conditions a filter stands for, or null when the builder can't show it (a hand-written filter).
+ * Team clauses of older views are left out: a workspace has one team.
+ */
 export function filterToConditions(filter: TFilter, model: TFilterModel): TCondition[] | null {
   if (Object.keys(filter).length === 0) return [];
   const parts = only(filter)?.[0] === "and" ? filter.and : [filter];
@@ -248,6 +249,7 @@ export function filterToConditions(filter: TFilter, model: TFilterModel): TCondi
   );
   const conditions: TCondition[] = [];
   for (const clause of clauses) {
+    if (workspaceTeamCodec.decode(clause)) continue;
     const field = FIELDS[model].find((candidate) => CODECS[candidate].decode(clause));
     if (!field) return null;
     const decoded = CODECS[field].decode(clause);

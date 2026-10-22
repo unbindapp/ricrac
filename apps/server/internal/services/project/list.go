@@ -137,7 +137,11 @@ func (self *ProjectService) List(ctx context.Context, actor *auth.Actor, input *
 		filter.Conditions = append(filter.Conditions, conditions...)
 	}
 	if input.Filter != nil {
-		condition, err := project_repo.Filter(input.Filter, actor.User)
+		named, err := self.resolve.CurrentNames(ctx, actor, input.Filter)
+		if err != nil {
+			return none, err
+		}
+		condition, err := project_repo.Filter(named, actor.User)
 		if err != nil {
 			return none, err
 		}
@@ -173,7 +177,11 @@ func (self *ProjectService) viewConditions(ctx context.Context, actor *auth.Acto
 			return nil, err
 		}
 	}
-	condition, err := project_repo.Filter(stored, actor.User)
+	named, err := self.resolve.CurrentNames(ctx, actor, stored)
+	if err != nil {
+		return nil, err
+	}
+	condition, err := project_repo.Filter(named, actor.User)
 	if err != nil {
 		return nil, err
 	}

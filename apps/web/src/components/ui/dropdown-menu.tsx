@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Menu as MenuPrimitive } from "@base-ui/react/menu";
 
-import { CheckIcon, ChevronRightIcon, CircleIcon } from "@/components/icons/symbols.gen";
+import { CheckIcon, ChevronRightIcon, CircleIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/ui/utils";
 import { cva, VariantProps } from "class-variance-authority";
@@ -215,7 +215,7 @@ function DropdownMenuCheckboxItem({
     >
       <span className="border-muted-more-foreground group-data-checked/checkbox:bg-foreground group-data-checked/checkbox:text-background group-data-checked/checkbox:border-foreground absolute left-2 flex size-4 shrink-0 items-center justify-center rounded-sm border p-px">
         <MenuPrimitive.CheckboxItemIndicator className="size-full">
-          <CheckIcon className="size-full" />
+          <CheckIcon strokeWidth={3} className="size-full" />
         </MenuPrimitive.CheckboxItemIndicator>
       </span>
       {children}
@@ -252,7 +252,7 @@ function DropdownMenuRadioItem({
       {!hideIndicator && (
         <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
           <MenuPrimitive.RadioItemIndicator>
-            <CircleIcon filled className="h-2 w-2" />
+            <CircleIcon className="h-2 w-2 fill-current" />
           </MenuPrimitive.RadioItemIndicator>
         </span>
       )}

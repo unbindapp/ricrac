@@ -7,7 +7,7 @@ import {
   LayoutGridIcon,
   ListIcon,
   SlidersHorizontalIcon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import {
   defaultOrderFor,
   GROUP_BY_OPTIONS,

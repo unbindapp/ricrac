@@ -33,7 +33,7 @@ export const teamStatusesQuery = (workspaceId: string, team: string) =>
     queryFn: () => callAll(workspaceId, "list_issue_statuses", { team }),
   });
 
-/** Teams show up in the workspace (its team list) and in people's teams, so all three refresh. */
+/** The team's settings show up in the workspace and on people, so all three refresh. */
 function useInvalidateTeams(workspaceId: string) {
   const queryClient = useQueryClient();
   return () =>
@@ -48,34 +48,7 @@ export function useSaveTeamMutation(workspaceId: string) {
   const invalidate = useInvalidateTeams(workspaceId);
   return useMutation({
     mutationFn: (args: OpArgs<"save_team">) => call(workspaceId, "save_team", args),
-    meta: { errorTitle: "Could not save team" },
-    onSuccess: invalidate,
-  });
-}
-
-export function useDeleteTeamMutation(workspaceId: string) {
-  const invalidate = useInvalidateTeams(workspaceId);
-  return useMutation({
-    mutationFn: (team: string) => call(workspaceId, "delete_team", { id: team }),
-    meta: { errorTitle: "Could not delete team" },
-    onSuccess: invalidate,
-  });
-}
-
-export function useJoinTeamMutation(workspaceId: string) {
-  const invalidate = useInvalidateTeams(workspaceId);
-  return useMutation({
-    mutationFn: (team: string) => call(workspaceId, "join_team", { id: team }),
-    meta: { errorTitle: "Could not join team" },
-    onSuccess: invalidate,
-  });
-}
-
-export function useLeaveTeamMutation(workspaceId: string) {
-  const invalidate = useInvalidateTeams(workspaceId);
-  return useMutation({
-    mutationFn: (team: string) => call(workspaceId, "leave_team", { id: team }),
-    meta: { errorTitle: "Could not leave team" },
+    meta: { errorTitle: "Could not save settings" },
     onSuccess: invalidate,
   });
 }

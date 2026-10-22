@@ -11,7 +11,7 @@ import {
   Trash2Icon,
   UndoIcon,
   XIcon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import { userName } from "@/components/issues/grouping";
 import { UserAvatar } from "@/components/issues/pickers";
 import { AddReactionButton, groupReactions, ReactionBar } from "@/components/issues/reaction-bar";

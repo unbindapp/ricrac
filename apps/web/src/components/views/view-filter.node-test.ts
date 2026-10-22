@@ -5,14 +5,14 @@ import { conditionsToFilter, filterToConditions, NONE, type TCondition } from ".
 
 test("conditions become an and of filter language clauses", () => {
   const conditions: TCondition[] = [
-    { field: "team", op: "is", values: ["ENG", "DES"] },
+    { field: "statusType", op: "is", values: ["started", "unstarted"] },
     { field: "priority", op: "isNot", values: ["0", "4"] },
     { field: "labels", op: "is", values: ["label-1"] },
     { field: "assignee", op: "is", values: ["me"] },
   ];
   assert.deepEqual(conditionsToFilter(conditions), {
     and: [
-      { team: { key: { in: ["ENG", "DES"] } } },
+      { state: { type: { in: ["started", "unstarted"] } } },
       { priority: { nin: [0, 4] } },
       { labels: { some: { id: { in: ["label-1"] } } } },
       { assignee: { id: { in: ["me"] } } },
@@ -21,7 +21,7 @@ test("conditions become an and of filter language clauses", () => {
 });
 
 test("empty conditions are left out and no conditions is no filter", () => {
-  assert.deepEqual(conditionsToFilter([{ field: "team", op: "is", values: [] }]), {});
+  assert.deepEqual(conditionsToFilter([{ field: "priority", op: "is", values: [] }]), {});
 });
 
 test("is not keeps the empty ones; none picks them", () => {
@@ -38,7 +38,6 @@ test("is not keeps the empty ones; none picks them", () => {
 
 test("every condition the builder makes reads back the same", () => {
   const cases: TCondition[] = [
-    { field: "team", op: "isNot", values: ["ENG"] },
     { field: "statusType", op: "is", values: ["started", "unstarted"] },
     { field: "status", op: "is", values: ["In Review"] },
     { field: "assignee", op: "is", values: ["u1", NONE] },
@@ -66,15 +65,17 @@ test("every condition the builder makes reads back the same", () => {
 test("filters the builder can't show come back as null", () => {
   assert.equal(filterToConditions({ title: { contains: "crash" } }, "issue"), null);
   assert.equal(filterToConditions({ or: [{ priority: { eq: 1 } }] }, "issue"), null);
-  assert.deepEqual(filterToConditions({ team: { key: { in: ["ENG"] } } }, "issue"), [
-    { field: "team", op: "is", values: ["ENG"] },
-  ]);
   assert.deepEqual(filterToConditions({}, "issue"), []);
+});
+
+test("team clauses of older views are left out", () => {
+  assert.deepEqual(filterToConditions({ team: { key: { in: ["ENG"] } } }, "issue"), []);
   assert.deepEqual(
     filterToConditions({ priority: { in: [1, 2] }, team: { key: { in: ["ENG"] } } }, "issue"),
-    [
-      { field: "priority", op: "is", values: ["1", "2"] },
-      { field: "team", op: "is", values: ["ENG"] },
-    ],
+    [{ field: "priority", op: "is", values: ["1", "2"] }],
+  );
+  assert.deepEqual(
+    filterToConditions({ and: [{ team: { key: { nin: ["ENG"] } } }] }, "project"),
+    [],
   );
 });

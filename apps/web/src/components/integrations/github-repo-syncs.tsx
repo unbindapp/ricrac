@@ -1,17 +1,15 @@
 import type { GitHubRepoSync } from "@/api/ops.gen";
+import { FolderSyncIcon, PencilIcon, PlusIcon, Trash2Icon } from "@/components/icons";
 import { GithubIcon } from "@/components/icons/github";
-import { FolderSyncIcon, PencilIcon, PlusIcon, Trash2Icon } from "@/components/icons/symbols.gen";
 import { GithubRepoSyncDialog } from "@/components/integrations/github-repo-sync-dialog";
 import { EmptyState } from "@/components/layout/empty-state";
 import { List, ListRow } from "@/components/layout/list";
 import { SettingsSection } from "@/components/layout/settings-section";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { RelativeTime } from "@/components/shared/relative-time";
-import { TeamIcon } from "@/components/shared/team-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SimpleTooltip } from "@/components/ui/tooltip";
-import { useTeams } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { importSummary } from "@/lib/helpers/github-sync";
 import { useDeleteGithubRepoSyncMutation } from "@/lib/queries/github";
@@ -37,7 +35,7 @@ export function GithubRepoSyncs({ repoSyncs }: { repoSyncs: GitHubRepoSync[] }) 
         <EmptyState
           icon={FolderSyncIcon}
           title="No synced repositories yet"
-          description="Sync a repository to bring its GitHub issues into a team. Pull requests link to issues without a sync."
+          description="Sync a repository to bring its GitHub issues into Ricrac. Pull requests link to issues without a sync."
           action={addButton}
         />
       ) : (
@@ -53,9 +51,7 @@ export function GithubRepoSyncs({ repoSyncs }: { repoSyncs: GitHubRepoSync[] }) 
 
 function RepoSyncRow({ repoSync }: { repoSync: GitHubRepoSync }) {
   const { workspace } = useWorkspace();
-  const { teams } = useTeams();
   const { mutateAsync: remove } = useDeleteGithubRepoSyncMutation(workspace.id);
-  const team = teams.find((item) => item.id === repoSync.team.id);
   const name = repoSync.repository.fullName;
 
   return (
@@ -102,12 +98,12 @@ function RepoSyncRow({ repoSync }: { repoSync: GitHubRepoSync }) {
       >
         {name}
       </a>
-      <span className="text-muted-foreground flex min-w-0 items-center gap-1.5 text-xs">
-        <span aria-hidden>→</span>
-        <TeamIcon teamKey={repoSync.team.key} icon={team?.icon} color={team?.color} size="sm" />
-        <span className="truncate">{repoSync.team.name}</span>
-        {repoSync.project && <span className="truncate">· {repoSync.project.name}</span>}
-      </span>
+      {repoSync.project && (
+        <span className="text-muted-foreground flex min-w-0 items-center gap-1.5 text-xs">
+          <span aria-hidden>→</span>
+          <span className="truncate">{repoSync.project.name}</span>
+        </span>
+      )}
     </ListRow>
   );
 }

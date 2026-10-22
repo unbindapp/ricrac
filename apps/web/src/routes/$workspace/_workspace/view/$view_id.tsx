@@ -3,13 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
 import { FavoriteButton } from "@/components/favorites/favorite-button";
-import {
-  BoxIcon,
-  BracesIcon,
-  GlobeIcon,
-  LayersIcon,
-  LockIcon,
-} from "@/components/icons/symbols.gen";
+import { BoxIcon, BracesIcon, GlobeIcon, LayersIcon, LockIcon } from "@/components/icons";
 import type { TBreadcrumbItem } from "@/components/layout/breadcrumb";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
@@ -77,7 +71,6 @@ function SavedView({ view, breadcrumb }: { view: TView; breadcrumb: TBreadcrumbI
   const draftFilter = draft ? conditionsToFilter(draft) : view.filter;
   const isDirty =
     !!saved && JSON.stringify(draftFilter) !== JSON.stringify(conditionsToFilter(saved));
-  const team = view.team?.id ?? null;
 
   const toolbar = (
     <PageToolbar
@@ -104,7 +97,7 @@ function SavedView({ view, breadcrumb }: { view: TView; breadcrumb: TBreadcrumbI
           >
             <Badge variant="outline">
               {view.shared ? <GlobeIcon /> : <LockIcon />}
-              {view.team ? view.team.name : "All teams"}
+              {view.shared ? "Shared" : "Private"}
             </Badge>
           </SimpleTooltip>
         </>
@@ -166,9 +159,9 @@ function SavedView({ view, breadcrumb }: { view: TView; breadcrumb: TBreadcrumbI
           description="This view lists initiatives; list_initiatives shows them."
         />
       ) : model === "project" ? (
-        <ViewProjects team={team} filter={draftFilter} />
+        <ViewProjects filter={draftFilter} />
       ) : (
-        <ViewIssues team={team} filter={draftFilter} />
+        <ViewIssues filter={draftFilter} />
       )}
       <ViewFilterJsonDialog
         view={isEditingJson ? view : null}

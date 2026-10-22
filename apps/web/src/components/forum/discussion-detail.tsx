@@ -4,7 +4,6 @@ import { useState } from "react";
 
 import type { DiscussionDetail as TDiscussionDetail } from "@/api/ops.gen";
 import { DiscussionTagBadges, DiscussionTagsPicker } from "@/components/forum/discussion-tags";
-import { DiscussionTeamPicker } from "@/components/forum/discussion-team-picker";
 import { MainChatComposer, MainChatMessages } from "@/components/forum/main-chat";
 import { ThreadBranches } from "@/components/forum/thread-branches";
 import { ThumbnailPicker } from "@/components/forum/thumbnail-picker";
@@ -12,15 +11,13 @@ import { useCanRewrite } from "@/components/forum/use-can-rewrite";
 import {
   BellIcon,
   BellOffIcon,
-  GlobeIcon,
   ImageIcon,
   LockIcon,
   LockOpenIcon,
   MessagesSquareIcon,
   PinIcon,
   PinOffIcon,
-  UsersIcon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import { Breadcrumb, type TBreadcrumbItem } from "@/components/layout/breadcrumb";
 import { ChatLayout } from "@/components/layout/chat-layout";
 import { PageContainer } from "@/components/layout/page-container";
@@ -154,23 +151,6 @@ export function DiscussionDetail({
           onSave={(title) => save({ id: discussion.id, title })}
         />
         <div className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">
-          {canRewrite ? (
-            <DiscussionTeamPicker
-              label="Visible to"
-              noneLabel="Whole workspace"
-              value={discussion.team?.id ?? null}
-              onChange={(team) => save({ id: discussion.id, team })}
-            />
-          ) : (
-            <span className="flex items-center gap-1.5">
-              {discussion.team ? (
-                <UsersIcon className="size-3.5" />
-              ) : (
-                <GlobeIcon className="size-3.5" />
-              )}
-              {discussion.team?.name ?? "Whole workspace"}
-            </span>
-          )}
           {canEdit ? (
             <DiscussionTagsPicker
               value={discussion.tags}

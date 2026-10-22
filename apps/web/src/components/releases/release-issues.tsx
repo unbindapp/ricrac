@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
 
 import type { ReleaseDetail, ReleaseIssue } from "@/api/ops.gen";
-import { CircleDotIcon, PlusIcon, XIcon } from "@/components/icons/symbols.gen";
+import { CircleDotIcon, PlusIcon, XIcon } from "@/components/icons";
 import { PropertyPicker } from "@/components/issues/property-picker";
 import { EmptyState } from "@/components/layout/empty-state";
 import { SectionTitle } from "@/components/layout/section-title";

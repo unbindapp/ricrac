@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { CustomerNeedDialog } from "@/components/customers/customer-need-dialog";
 import { CustomerNeedList } from "@/components/customers/customer-need-list";
-import { PlusIcon } from "@/components/icons/symbols.gen";
+import { PlusIcon } from "@/components/icons";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { SectionTitle } from "@/components/layout/section-title";

@@ -9,7 +9,7 @@ import {
   EllipsisIcon,
   InboxIcon,
   MailIcon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import { NotificationPane } from "@/components/inbox/notification-pane";
 import { NotificationRow } from "@/components/inbox/notification-row";
 import {

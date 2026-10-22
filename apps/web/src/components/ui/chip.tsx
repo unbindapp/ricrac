@@ -1,4 +1,4 @@
-import { LoaderIcon } from "@/components/icons/symbols.gen";
+import { LoaderIcon } from "@/components/icons";
 import { cn } from "@/components/ui/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import type { FC, ReactNode } from "react";

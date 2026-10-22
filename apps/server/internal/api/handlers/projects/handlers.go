@@ -10,7 +10,7 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	projects := srv.ProjectService
 	oapi.Register(reg, oapi.Operation{
 		Name: "list_projects", Access: auth.Read, Routes: []string{"GET /projects"},
-		Description: "List projects in teams you can see, most recently updated first. Narrow with team, status (name or type: " +
+		Description: "List projects, most recently updated first. Narrow with status (name or type: " +
 			"backlog, planned, started, paused, completed, canceled), lead (\"me\"), member, initiative, label, health, " +
 			"priority, query, or a saved project view (customView). Archived and trashed projects are left out unless " +
 			"asked for; descriptions unless includeDescription is set. Each project has its progress: completed issues " +
@@ -24,7 +24,7 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	}, projects.Get)
 	oapi.Register(reg, oapi.Operation{
 		Name: "save_project", Access: auth.Write, Routes: []string{"POST /projects", "PATCH /projects/{id}"},
-		Description: "Create a project (omit id; name and at least one team via setTeams or addTeams are required) or update one " +
+		Description: "Create a project (omit id; name is required; teams default to the workspace's team) or update one " +
 			"(pass id). Omitted fields stay as they are; null clears a field. People are given as id, name, email or " +
 			"\"me\"; the status (state) as name, type or id. Use patch to edit part of the description. A project template " +
 			"(create only) adds its milestones and issues. A new lead is notified; so are people @mentioned in the " +

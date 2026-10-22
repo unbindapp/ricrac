@@ -1,6 +1,6 @@
 import { type ReactElement, type ReactNode, useState } from "react";
 
-import { CheckIcon } from "@/components/icons/symbols.gen";
+import { CheckIcon } from "@/components/icons";
 import {
   Command,
   CommandEmpty,

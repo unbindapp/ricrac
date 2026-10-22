@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
 import type { Initiative } from "@/api/ops.gen";
-import { ChevronRightIcon, PlusIcon, TargetIcon } from "@/components/icons/symbols.gen";
+import { ChevronRightIcon, PlusIcon, TargetIcon } from "@/components/icons";
 import { InitiativeListHeader, InitiativeRow } from "@/components/initiatives/initiative-row";
 import {
   INITIATIVE_STATUSES,

@@ -27,7 +27,7 @@ import {
   PencilIcon,
   PlusIcon,
   Trash2Icon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import { List } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { SettingsSection } from "@/components/layout/settings-section";

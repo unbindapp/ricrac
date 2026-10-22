@@ -23,9 +23,9 @@ import (
 )
 
 type SaveInput struct {
-	ID                           *string                `json:"id" doc:"Only to change a team: its key, name or id. Omit to create one."`
+	ID                           *string                `json:"id" doc:"The workspace's team: its key, name or id. A workspace has one team, so omitting it (creating another) fails."`
 	Name                         *string                `json:"name" doc:"Required to create."`
-	Key                          *string                `json:"key" doc:"1 to 7 letters and digits starting with a letter, like ENG. Defaults to the name's initials."`
+	Key                          *string                `json:"key" doc:"The issue prefix: 1 to 7 letters and digits starting with a letter, like ENG. Issues are renamed; their old identifiers and the old key keep working."`
 	Description                  args.Nullable[string]  `json:"description" doc:"Null clears it."`
 	Icon                         args.Nullable[string]  `json:"icon" doc:"An emoji or icon name; null clears it."`
 	Color                        args.Nullable[string]  `json:"color" doc:"Hex color like #5e6ad2; null clears it."`
@@ -58,8 +58,8 @@ type SaveInput struct {
 	DefaultIssueState            *string                `json:"defaultIssueState" doc:"The status new issues start in (a backlog or unstarted status: name or id)."`
 	GitHubPROpenedState          args.Nullable[string]  `json:"githubPrOpenedState" doc:"The status issues move to when a GitHub pull request or branch mentioning them opens (name or id); null for the first started status."`
 	GitHubPRMergedState          args.Nullable[string]  `json:"githubPrMergedState" doc:"The status issues move to when a pull request that fixes them merges (name or id); null for the first completed status."`
-	AddMembers                   []string               `json:"addMembers" doc:"People to add to the team: id, name, email or \"me\"."`
-	RemoveMembers                []string               `json:"removeMembers" doc:"People to take off the team."`
+	AddMembers                   []string               `json:"addMembers" doc:"Guests to let see the workspace's issues (everyone else is a member already): id, name, email or \"me\"."`
+	RemoveMembers                []string               `json:"removeMembers" doc:"Guests to take off the team; other people leave it by leaving the workspace."`
 }
 
 func (self *TeamService) Save(ctx context.Context, actor *auth.Actor, input *SaveInput) (models.TeamDetail, error) {
@@ -118,6 +118,14 @@ func (self *TeamService) Save(ctx context.Context, actor *auth.Actor, input *Sav
 }
 
 func (self *TeamService) create(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, input *SaveInput) (uuid.UUID, error) {
+	existing, err := self.repo.Team().Unarchived(ctx, tx, actor.Workspace)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	if len(existing) > 0 {
+		return uuid.Nil, errdefs.BadRequest("A workspace has one team, and this one has %s (%s); change it with save_team and id %q instead",
+			existing[0].Key, existing[0].Name, existing[0].Key)
+	}
 	name, err := utils.NonEmpty(utils.OrEmpty(input.Name), "name")
 	if err != nil {
 		return uuid.Nil, err
@@ -362,7 +370,7 @@ func (self *TeamService) rename(ctx context.Context, tx repository.TxInterface, 
 		if err := self.checkNameFree(ctx, tx, actor, &team, name); err != nil {
 			return err
 		}
-		if err := self.set(ctx, tx, team, func(u *ent.TeamUpdateOne) { u.SetName(name) }); err != nil {
+		if err := self.changeName(ctx, tx, team, name); err != nil {
 			return err
 		}
 	}
@@ -376,8 +384,21 @@ func (self *TeamService) rename(ctx context.Context, tx repository.TxInterface, 
 	return self.changeKey(ctx, tx, actor, team, key)
 }
 
+// changeName renames the team, keeping its old name in previous_names.
+func (self *TeamService) changeName(ctx context.Context, tx repository.TxInterface, team uuid.UUID, name string) error {
+	current, err := self.repo.Team().Get(ctx, tx, team)
+	if err != nil || current.Name == name {
+		return err
+	}
+	previous := slices.DeleteFunc(slices.Clone(current.PreviousNames), func(n string) bool {
+		return strings.EqualFold(n, name) || strings.EqualFold(n, current.Name)
+	})
+	previous = append(previous, current.Name)
+	return self.set(ctx, tx, team, func(u *ent.TeamUpdateOne) { u.SetName(name).SetPreviousNames(previous) })
+}
+
 // changeKey gives the team a new key. Every issue keeps its old identifier in
-// previous_identifiers.
+// previous_identifiers, and the team its old key in previous_keys.
 func (self *TeamService) changeKey(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, team uuid.UUID, key string) error {
 	current, err := self.repo.Team().Get(ctx, tx, team)
 	if err != nil {
@@ -392,7 +413,11 @@ func (self *TeamService) changeKey(ctx context.Context, tx repository.TxInterfac
 	if err := self.repo.Team().RenameIssues(ctx, tx, team, current.Key); err != nil {
 		return err
 	}
-	return self.set(ctx, tx, team, func(u *ent.TeamUpdateOne) { u.SetKey(key) })
+	previous := slices.DeleteFunc(slices.Clone(current.PreviousKeys), func(k string) bool {
+		return strings.EqualFold(k, key) || strings.EqualFold(k, current.Key)
+	})
+	previous = append(previous, current.Key)
+	return self.set(ctx, tx, team, func(u *ent.TeamUpdateOne) { u.SetKey(key).SetPreviousKeys(previous) })
 }
 
 func (self *TeamService) setParent(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, team uuid.UUID, reference *string) error {
@@ -484,10 +509,29 @@ func (self *TeamService) members(ctx context.Context, tx repository.TxInterface,
 	if err != nil {
 		return err
 	}
+	if err := self.checkCanRemove(ctx, tx, actor, team, users); err != nil {
+		return err
+	}
 	if err := self.repo.Team().RemoveMembers(ctx, tx, team, users); err != nil {
 		return err
 	}
 	return self.repo.Team().DropFromTriage(ctx, tx, team, users)
+}
+
+// checkCanRemove keeps everyone but guests on the workspace's team.
+func (self *TeamService) checkCanRemove(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, team uuid.UUID, users []uuid.UUID) error {
+	only, err := self.isWorkspaceTeam(ctx, tx, actor, team)
+	if err != nil || !only {
+		return err
+	}
+	staying, err := self.repo.Team().InWorkspace(ctx, tx, team, users)
+	if err != nil {
+		return err
+	}
+	if len(staying) > 0 {
+		return errdefs.BadRequest("Everyone in the workspace but guests is on its team; remove %s from the workspace instead", strings.Join(staying, ", "))
+	}
+	return nil
 }
 
 func (self *TeamService) triage(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, team uuid.UUID, input *SaveInput) error {

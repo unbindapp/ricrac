@@ -3,6 +3,7 @@ package workspace_service
 
 import (
 	"context"
+	"slices"
 	"strings"
 	"unicode/utf8"
 
@@ -87,7 +88,10 @@ type UpdateInput struct {
 	Name    *string               `json:"name" doc:"1 to 80 characters."`
 	URLKey  *string               `json:"urlKey" doc:"2 to 32 lowercase letters, digits and dashes; must not be taken by another workspace."`
 	LogoURL args.Nullable[string] `json:"logoUrl" doc:"Image URL; null removes the logo."`
+	Theme   *string               `json:"theme" enum:"default,dank" doc:"The look of the web app for everyone in the workspace."`
 }
+
+var themes = []string{"default", "dank"}
 
 func sameText(a, b *string) bool {
 	if a == nil || b == nil {
@@ -143,6 +147,17 @@ func (self *WorkspaceService) Update(ctx context.Context, actor *auth.Actor, inp
 			if !sameText(logo, was.LogoURL) {
 				changes["logoUrl"] = M{"from": was.LogoURL, "to": logo}
 				if err := self.repo.Workspace().SetLogoURL(ctx, tx, actor.Workspace, logo); err != nil {
+					return err
+				}
+			}
+		}
+		if input.Theme != nil {
+			if !slices.Contains(themes, *input.Theme) {
+				return errdefs.BadRequest("theme %q isn't one of %s", *input.Theme, strings.Join(themes, ", "))
+			}
+			if *input.Theme != was.Theme {
+				changes["theme"] = M{"from": was.Theme, "to": *input.Theme}
+				if err := self.repo.Workspace().SetTheme(ctx, tx, actor.Workspace, *input.Theme); err != nil {
 					return err
 				}
 			}

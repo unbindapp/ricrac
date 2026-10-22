@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"net/http/httptest"
 	"testing"
 )
 
@@ -40,6 +41,26 @@ func TestReadsAndUpdatesTheWorkspace(t *testing.T) {
 	contains(t, fails(t, bob, "get_audit_log", M{}), "admins")
 }
 
+func TestSetsTheWorkspaceTheme(t *testing.T) {
+	w := world(t)
+	bob := w.member("bob@acme.test", "Bob Jones", "member")
+	eq(t, call(t, bob, "get_workspace", M{}).At("theme").Str(), "default")
+
+	contains(t, fails(t, bob, "update_workspace", M{"theme": "dank"}), "admins")
+	contains(t, fails(t, w.Ann, "update_workspace", M{"theme": "neon"}), "theme")
+	eq(t, call(t, w.Ann, "update_workspace", M{"theme": "dank"}).At("theme").Str(), "dank")
+	eq(t, call(t, bob, "get_workspace", M{}).At("theme").Str(), "dank")
+
+	req := httptest.NewRequest("GET", "/api/me", nil)
+	req.Header.Set("Cookie", w.session(bob.User))
+	_, me := send(w.Router, req)
+	eq(t, me.At("workspaces", 0, "theme").Str(), "dank")
+
+	log := call(t, w.Ann, "get_audit_log", M{"type": "workspace.updated"})
+	eq(t, log.At("nodes").Len(), 1)
+	eq(t, log.At("nodes", 0, "metadata", "theme").JSON(), `{"from":"default","to":"dank"}`)
+}
+
 func TestListsAndReadsMembers(t *testing.T) {
 	w := world(t)
 	bob := w.member("bob@acme.test", "Bob Jones", "member")
@@ -53,7 +74,7 @@ func TestListsAndReadsMembers(t *testing.T) {
 	eq(t, all.At("nodes", 0, "role").Str(), "owner")
 	eq(t, all.At("nodes", 0, "teams", 0, "key").Str(), "ENG")
 	eq(t, call(t, bob, "list_users", M{"query": "lee"}).At("nodes", 0, "email").Str(), "cat@acme.test")
-	eq(t, call(t, bob, "list_users", M{"team": "ENG"}).At("nodes").Len(), 1, "only Ann is in ENG")
+	eq(t, call(t, bob, "list_users", M{"team": "ENG"}).At("nodes").Len(), 2, "everyone but the guest is in ENG")
 	eq(t, call(t, bob, "list_users", M{"limit": 2}).At("pageInfo", "hasNextPage").Bool(), true)
 
 	me := call(t, bob, "get_user", M{"id": "me"})
@@ -130,8 +151,9 @@ func TestInvitations(t *testing.T) {
 	check(t, invited.At("expiresAt").Str() > invited.At("createdAt").Str())
 
 	contains(t, fails(t, bob, "invite_user", M{"email": "eve@else.test", "role": "admin"}), "admins")
-	contains(t, fails(t, bob, "invite_user", M{"email": "gus@else.test", "role": "guest"}), "teams")
-	guest := call(t, bob, "invite_user", M{"email": "gus@else.test", "role": "guest", "teams": []any{"ENG"}})
+	guest := call(t, bob, "invite_user", M{"email": "gus@else.test", "role": "guest"})
+	eqList(t, guest.At("teams").Strings("key"), []string{"ENG"}, "guests see the workspace's team by default")
+	guest = call(t, bob, "invite_user", M{"email": "gus@else.test", "role": "guest", "teams": []any{"ENG"}})
 	eq(t, guest.At("teams", 0, "key").Str(), "ENG")
 	contains(t, fails(t, bob, "invite_user", M{"email": "ann@acme.test"}), "already a member")
 	contains(t, fails(t, bob, "invite_user", M{"email": "nope"}), "isn't an email")

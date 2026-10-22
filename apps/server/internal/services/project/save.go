@@ -33,7 +33,7 @@ type SaveInput struct {
 	Priority             *int                  `json:"priority" doc:"0 none, 1 urgent, 2 high, 3 medium, 4 low."`
 	Lead                 args.Nullable[string] `json:"lead" doc:"Person (id, name, email or \"me\"); null removes the lead."`
 	LeadTeam             args.Nullable[string] `json:"leadTeam" doc:"One of the project's teams (key, name or id) that leads it; null clears it."`
-	AddTeams             []string              `json:"addTeams" doc:"Teams (keys, names or ids) to add."`
+	AddTeams             []string              `json:"addTeams" doc:"Teams (keys, names or ids) to add. A new project gets the workspace's team when no team is named."`
 	RemoveTeams          []string              `json:"removeTeams"`
 	SetTeams             []string              `json:"setTeams" doc:"Replace all teams with these. A project keeps at least one team."`
 	AddMembers           []string              `json:"addMembers" doc:"People to add as members (they are subscribed)."`
@@ -198,12 +198,12 @@ func (self *ProjectService) create(ctx context.Context, tx repository.TxInterfac
 	if err != nil {
 		return uuid.Nil, nil, err
 	}
-	teams := input.SetTeams
-	if teams == nil {
-		teams = input.AddTeams
-	}
-	if len(teams) == 0 {
-		return uuid.Nil, nil, errdefs.BadRequest("A project needs at least one team; pass setTeams or addTeams")
+	if len(input.SetTeams) == 0 && len(input.AddTeams) == 0 {
+		team, err := self.resolve.DefaultTeam(ctx, actor)
+		if err != nil {
+			return uuid.Nil, nil, err
+		}
+		input.SetTeams, input.AddTeams = nil, []string{team.String()}
 	}
 	var status uuid.UUID
 	if input.State != nil {

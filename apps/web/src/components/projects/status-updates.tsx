@@ -3,12 +3,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "@tanstack/react-router";
 
 import type { Comment, StatusUpdate } from "@/api/ops.gen";
-import {
-  MessageSquareIcon,
-  PencilIcon,
-  PenLineIcon,
-  Trash2Icon,
-} from "@/components/icons/symbols.gen";
+import { MessageSquareIcon, PencilIcon, PenLineIcon, Trash2Icon } from "@/components/icons";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { SectionTitle } from "@/components/layout/section-title";

@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
 import type { Milestone, ProjectDetail } from "@/api/ops.gen";
-import { DiamondIcon, PencilIcon, PlusIcon, Trash2Icon } from "@/components/icons/symbols.gen";
+import { DiamondIcon, PencilIcon, PlusIcon, Trash2Icon } from "@/components/icons";
 import { List } from "@/components/layout/list";
 import { SectionTitle } from "@/components/layout/section-title";
 import { MilestoneDialog } from "@/components/projects/milestone-dialog";
@@ -70,9 +70,8 @@ function MilestoneRow({
       className="group/row has-hover:hover:bg-accent flex h-9 w-full items-center gap-3 border-b px-3 text-sm last:border-b-0"
     >
       <DiamondIcon
-        filled={isDone}
         data-done={isDone || undefined}
-        className="text-muted-foreground data-done:text-primary size-3.5 shrink-0"
+        className="text-muted-foreground data-done:fill-primary data-done:text-primary size-3.5 shrink-0"
       />
       <Link
         to="/$workspace/project/$slug/issues"

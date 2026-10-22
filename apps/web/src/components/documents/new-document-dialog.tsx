@@ -7,10 +7,9 @@ import {
   type TDocumentParent,
   useCreateDocument,
 } from "@/components/documents/use-create-document";
-import { ChevronDownIcon } from "@/components/icons/symbols.gen";
+import { ChevronDownIcon } from "@/components/icons";
 import { InitiativeIcon } from "@/components/initiatives/initiative-status";
 import { ProjectIcon } from "@/components/shared/project-icon";
-import { TeamIcon } from "@/components/shared/team-icon";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,7 +20,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useTeams } from "@/components/workspace/teams-provider";
+import { useWorkspaceTeam } from "@/components/workspace/teams-provider";
+import { WorkspaceIcon } from "@/components/workspace/workspace-icon";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
 import { DOCUMENT_TITLE_MAX_LENGTH, UNTITLED_DOCUMENT } from "@/lib/queries/documents";
@@ -48,11 +48,9 @@ export function NewDocumentDialog({ trigger }: { trigger: ReactElement }) {
 }
 
 function NewDocumentForm() {
-  const { myTeams, teams } = useTeams();
-  const firstTeam = myTeams[0] ?? teams[0];
-  const [parent, setParent] = useState<TDocumentParent | null>(
-    firstTeam ? { team: firstTeam.id } : null,
-  );
+  const team = useWorkspaceTeam();
+  const [pickedParent, setParent] = useState<TDocumentParent | null>(null);
+  const parent = pickedParent ?? (team ? { team: team.id } : null);
   const { create } = useCreateDocument();
   const form = useAppForm({
     defaultValues: { title: "" },
@@ -104,18 +102,14 @@ function NewDocumentForm() {
 
 function ParentLabel({ parent }: { parent: TDocumentParent | null }) {
   const { workspace } = useWorkspace();
-  const { teams } = useTeams();
   const projects = useQuery(projectsQuery(workspace.id));
   const initiatives = useQuery(initiativesQuery(workspace.id));
-  if (!parent)
-    return <span className="text-muted-foreground">Pick a team, project or initiative</span>;
+  if (!parent) return <span className="text-muted-foreground">Pick where it goes</span>;
   if ("team" in parent) {
-    const team = teams.find((item) => item.id === parent.team);
-    if (!team) return null;
     return (
       <>
-        <TeamIcon teamKey={team.key} icon={team.icon} color={team.color} size="sm" />
-        <span className="truncate">{team.name}</span>
+        <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} />
+        <span className="truncate">{workspace.name}</span>
       </>
     );
   }

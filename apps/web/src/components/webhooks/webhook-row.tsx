@@ -13,7 +13,7 @@ import {
   PlayIcon,
   SendIcon,
   Trash2Icon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Badge } from "@/components/ui/badge";
@@ -116,11 +116,6 @@ export function WebhookRow({ webhook, onEdit, onSecret }: TProps) {
             {typesSummary(webhook.resourceTypes)}
           </span>
         </SimpleTooltip>
-        {webhook.team && (
-          <Badge variant="outline" className="hidden sm:inline-flex">
-            {webhook.team.key}
-          </Badge>
-        )}
         <SimpleTooltip content="Send a test ping">
           <Button
             variant="ghost"

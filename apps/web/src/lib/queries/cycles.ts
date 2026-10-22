@@ -4,7 +4,6 @@ import type { Cycle, CycleDetail, CycleRef } from "@/api/ops.gen";
 import { queryKeyFavorites } from "@/lib/queries/favorites";
 import { queryKeyTeams } from "@/lib/queries/teams";
 import { call, callAll, type OpArgs } from "@/lib/server/client";
-import { isApiError } from "@/lib/server/errors";
 
 export type TCycle = Cycle;
 export type TCycleDetail = CycleDetail;
@@ -32,7 +31,6 @@ export const cycleQuery = (workspaceId: string, team: string, number: number) =>
   queryOptions({
     queryKey: queryKeyCycles.detail(workspaceId, team, number),
     queryFn: () => call(workspaceId, "get_cycle", { id: String(number), team }),
-    retry: (failureCount, error) => !isApiError(error, 404) && failureCount < 3,
   });
 
 function useInvalidateCycles(workspaceId: string) {

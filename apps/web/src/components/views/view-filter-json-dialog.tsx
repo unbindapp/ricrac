@@ -27,9 +27,9 @@ export function ViewFilterJsonDialog({ view, onClose }: TProps) {
         <DialogHeader>
           <DialogTitle>Edit filter as JSON</DialogTitle>
           <DialogDescription>
-            The filter language of the API: fields like title, priority, state, team, assignee,
-            labels, dueDate, with comparators like eq, in, contains and lt, combined with and / or.
-            The server checks it when you save.
+            The filter language of the API: fields like title, priority, state, assignee, labels,
+            dueDate, with comparators like eq, in, contains and lt, combined with and / or. The
+            server checks it when you save.
           </DialogDescription>
         </DialogHeader>
         {view && <JsonForm key={view.id} view={view} onDone={onClose} />}
