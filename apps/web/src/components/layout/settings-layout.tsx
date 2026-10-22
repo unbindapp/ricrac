@@ -1,7 +1,7 @@
 import { type LinkProps, useLocation } from "@tanstack/react-router";
 import { ReactNode, useEffect, useRef } from "react";
-import type { LucideIcon } from "lucide-react";
 
+import type { LucideIcon } from "@/components/icons";
 import { SidebarButton } from "@/components/layout/sidebar-button";
 import { LinkButton } from "@/components/ui/button";
 
@@ -10,10 +10,15 @@ export type TSettingsTab = {
   icon: LucideIcon;
   link: LinkProps;
   exact?: boolean;
+  description?: string;
+  /** Tabs of one section sit together where a theme sets sections apart. */
+  section?: string;
+  destructive?: boolean;
 };
 
 export type TSettingsTabGroup = {
   title: string;
+  icon: LucideIcon;
   tabs: TSettingsTab[];
 };
 

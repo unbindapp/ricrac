@@ -221,12 +221,15 @@
   --color-top-loader: var(--top-loader);
   --color-barrier: var(--barrier);
 
+  --font-mono: var(--font-mono);
+  --font-sans: var(--font-sans);
+}
+
+/* Not inline, so a theme can set its own radius scale. */
+@theme {
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-xs: calc(var(--radius) - 6px);
   --radius-xxs: calc(var(--radius) - 8px);
-
-  --font-mono: var(--font-mono);
-  --font-sans: var(--font-sans);
 }

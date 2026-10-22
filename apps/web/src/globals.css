@@ -4,7 +4,11 @@
 
 @import "./styles/tokens.css";
 
+@import "./themes/dank/dank.css";
+
 @custom-variant dark (&:is(.dark *));
+
+@custom-variant dank (&:where([data-ui-theme="dank"], [data-ui-theme="dank"] *));
 
 @custom-variant has-hover {
   @media (hover: hover) {

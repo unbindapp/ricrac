@@ -1,7 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { type ReactNode, useState } from "react";
-import { ChevronRightIcon, FolderPlusIcon, PlusIcon, SearchIcon, TagIcon } from "lucide-react";
 
+import {
+  ChevronRightIcon,
+  FolderPlusIcon,
+  PlusIcon,
+  SearchIcon,
+  TagIcon,
+} from "@/components/icons";
 import { LabelDialog, type TLabelDialogTarget } from "@/components/labels/label-dialog";
 import { LabelRowMenu } from "@/components/labels/label-row-menu";
 import { EmptyState } from "@/components/layout/empty-state";

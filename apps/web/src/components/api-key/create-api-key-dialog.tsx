@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { z } from "zod";
-import { PlusIcon } from "lucide-react";
 
 import type { CreatedAPIKey } from "@/api/account.gen";
 import { WorkspaceAccessList } from "@/components/api-key/access-fields";
@@ -16,6 +15,7 @@ import {
   type TAccess,
   type TScopeLevel,
 } from "@/components/api-key/helpers";
+import { PlusIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

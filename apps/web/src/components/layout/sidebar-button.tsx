@@ -1,7 +1,7 @@
 import { formatForDisplay } from "@tanstack/react-hotkeys";
-import { PanelLeftCloseIcon, PanelLeftIcon } from "lucide-react";
 import type { ReactElement } from "react";
 
+import { PanelLeftCloseIcon, PanelLeftIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Kbd } from "@/components/ui/kbd";
 import { SimpleTooltip } from "@/components/ui/tooltip";
@@ -54,9 +54,18 @@ export function HideSidebarButton() {
   );
 }
 
-function SidebarToggleTooltip({ label, children }: { label: string; children: ReactElement }) {
+export function SidebarToggleTooltip({
+  label,
+  side,
+  children,
+}: {
+  label: string;
+  side?: "right";
+  children: ReactElement;
+}) {
   return (
     <SimpleTooltip
+      side={side}
       content={
         <span className="flex items-center gap-1.5">
           {label}

@@ -2,9 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
-import { CircleDotIcon, ListTodoIcon, PlusIcon, TriangleIcon } from "lucide-react";
 
 import type { Team } from "@/api/ops.gen";
+import { CircleDotIcon, ListTodoIcon, PlusIcon, TriangleIcon } from "@/components/icons";
 import {
   filtersFromSearch,
   filtersToSearch,

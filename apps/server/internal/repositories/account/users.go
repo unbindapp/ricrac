@@ -57,6 +57,7 @@ func (self *AccountRepository) summaries(ctx context.Context, tx repository.TxIn
 		URLKey  string    `json:"url_key"`
 		Role    string    `json:"role"`
 		LogoURL *string   `json:"logo_url"`
+		Theme   string    `json:"theme"`
 	}
 	query := self.base.Client(tx).Workspace.Query().Modify(func(s *entsql.Selector) {
 		members := entsql.Table(workspacemember.Table)
@@ -69,14 +70,14 @@ func (self *AccountRepository) summaries(ctx context.Context, tx repository.TxIn
 			s.OrderBy(s.C(workspace.FieldName))
 		}
 		s.Select(s.C(workspace.FieldID), s.C(workspace.FieldName), s.C(workspace.FieldURLKey), members.C(workspacemember.FieldRole),
-			s.C(workspace.FieldLogoURL))
+			s.C(workspace.FieldLogoURL), s.C(workspace.FieldTheme))
 	})
 	if err := query.Scan(ctx, &rows); err != nil {
 		return nil, err
 	}
 	summaries := make([]models.WorkspaceSummary, len(rows))
 	for i, row := range rows {
-		summaries[i] = models.WorkspaceSummary{ID: row.ID, Name: row.Name, URLKey: row.URLKey, Role: row.Role, LogoURL: row.LogoURL}
+		summaries[i] = models.WorkspaceSummary{ID: row.ID, Name: row.Name, URLKey: row.URLKey, Role: row.Role, LogoURL: row.LogoURL, Theme: row.Theme}
 	}
 	return summaries, nil
 }

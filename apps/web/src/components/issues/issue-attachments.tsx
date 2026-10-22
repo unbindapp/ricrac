@@ -1,4 +1,6 @@
 import { type FormEvent, useState } from "react";
+
+import type { IssueAttachment, IssueDetail } from "@/api/ops.gen";
 import {
   BugIcon,
   ChevronDownIcon,
@@ -10,16 +12,14 @@ import {
   HashIcon,
   ImageIcon,
   LinkIcon,
+  type LucideIcon,
   NotebookTextIcon,
   PaperclipIcon,
   PenToolIcon,
-  type LucideIcon,
   UploadIcon,
   VideoIcon,
   XIcon,
-} from "lucide-react";
-
-import type { IssueAttachment, IssueDetail } from "@/api/ops.gen";
+} from "@/components/icons";
 import { GithubIcon } from "@/components/icons/github";
 import {
   githubLinkOf,

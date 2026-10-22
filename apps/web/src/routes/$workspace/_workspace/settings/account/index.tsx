@@ -3,9 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useTheme } from "next-themes";
 import { type ReactNode } from "react";
 import { z } from "zod";
-import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
 
 import type { WorkspaceUserDetail } from "@/api/ops.gen";
+import { MonitorIcon, MoonIcon, SunIcon } from "@/components/icons";
 import { GithubAccountSection } from "@/components/integrations/github-account-section";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
@@ -21,6 +21,7 @@ import { timezoneOptions } from "@/lib/helpers/timezones";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
 import { useUpdateUserMutation, workspaceMeQuery } from "@/lib/queries/users";
 import { useAccentHueStore } from "@/lib/stores/accent-hue";
+import { useUiTheme } from "@/themes/ui-theme-provider";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/account/")({
   component: AccountProfileSettingsPage,
@@ -192,15 +193,17 @@ function ThemeField({ theme, onChange }: { theme: string; onChange: (theme: stri
 }
 
 function AccentField() {
-  const hue = useAccentHueStore((state) => state.hue);
+  const { defaultAccentHue } = useUiTheme();
+  const chosenHue = useAccentHueStore((state) => state.hue);
   const setHue = useAccentHueStore((state) => state.setHue);
+  const hue = chosenHue ?? defaultAccentHue;
   return (
     <div className="flex flex-col gap-3">
       <div className="flex min-h-8 items-center gap-2">
         <span className="flex-1 text-sm font-medium">Accent color</span>
         <span className="text-muted-foreground text-xs tabular-nums">{hue}°</span>
-        {hue !== DEFAULT_ACCENT_HUE && (
-          <Button variant="ghost" size="sm" onClick={() => setHue(DEFAULT_ACCENT_HUE)}>
+        {chosenHue !== null && (
+          <Button variant="ghost" size="sm" onClick={() => setHue(null)}>
             Reset
           </Button>
         )}

@@ -4,7 +4,6 @@ import { zodValidator } from "@tanstack/zod-adapter";
 import { type ReactNode, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import { z } from "zod";
-import { MessagesSquareIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react";
 
 import type { Discussion } from "@/api/ops.gen";
 import {
@@ -15,6 +14,7 @@ import {
 import { DiscussionTagFilter } from "@/components/forum/discussion-tags";
 import { NewDiscussionDialog } from "@/components/forum/new-discussion-dialog";
 import { useCanRewrite } from "@/components/forum/use-can-rewrite";
+import { MessagesSquareIcon, PlusIcon, SearchIcon, Trash2Icon } from "@/components/icons";
 import { List } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { PageContainer } from "@/components/layout/page-container";

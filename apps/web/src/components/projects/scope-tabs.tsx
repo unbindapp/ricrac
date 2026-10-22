@@ -1,4 +1,4 @@
-import { ArchiveIcon, type LucideIcon, Trash2Icon } from "lucide-react";
+import { ArchiveIcon, type LucideIcon, Trash2Icon } from "@/components/icons";
 import type { TProjectScope } from "@/components/projects/project-groups";
 import { EmptyState } from "@/components/layout/empty-state";
 import { FilterMenu } from "@/components/shared/filter-menu";

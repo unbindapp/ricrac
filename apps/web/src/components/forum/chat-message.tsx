@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+
+import type { Comment, UserRef } from "@/api/ops.gen";
 import {
   CornerDownRightIcon,
   EllipsisIcon,
@@ -8,9 +10,7 @@ import {
   SendHorizontalIcon,
   SplitIcon,
   Trash2Icon,
-} from "lucide-react";
-
-import type { Comment, UserRef } from "@/api/ops.gen";
+} from "@/components/icons";
 import { userName } from "@/components/issues/grouping";
 import { useWorkspaceUsers } from "@/components/issues/picker-sources";
 import { UserAvatar } from "@/components/issues/pickers";

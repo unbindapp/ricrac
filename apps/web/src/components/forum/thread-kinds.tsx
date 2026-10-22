@@ -2,11 +2,11 @@ import {
   BugIcon,
   CircleHelpIcon,
   LightbulbIcon,
+  type LucideIcon,
   MessageCircleIcon,
   PaletteIcon,
   SquareCheckBigIcon,
-  type LucideIcon,
-} from "lucide-react";
+} from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
 import type { TThreadKind } from "@/lib/queries/discussions";
 

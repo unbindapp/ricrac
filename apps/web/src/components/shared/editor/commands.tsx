@@ -1,6 +1,7 @@
 import { Extension, type Editor, type Range } from "@tiptap/core";
 import { PluginKey } from "@tiptap/pm/state";
 import { Suggestion } from "@tiptap/suggestion";
+
 import {
   AtSignIcon,
   CodeSquareIcon,
@@ -12,15 +13,14 @@ import {
   ListChecksIcon,
   ListIcon,
   ListOrderedIcon,
+  type LucideIcon,
   MinusIcon,
   PaperclipIcon,
   PilcrowIcon,
   SmileIcon,
   TableIcon,
   TextQuoteIcon,
-  type LucideIcon,
-} from "lucide-react";
-
+} from "@/components/icons";
 import {
   suggestionRenderer,
   type TSuggestionSink,

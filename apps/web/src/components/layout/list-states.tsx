@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import { LucideIcon } from "lucide-react";
 
+import { LucideIcon } from "@/components/icons";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";

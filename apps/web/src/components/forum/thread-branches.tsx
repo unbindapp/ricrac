@@ -1,16 +1,16 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+
+import type { DiscussionDetail, DiscussionThread } from "@/api/ops.gen";
+import { NewThreadDialog } from "@/components/forum/new-thread-dialog";
+import { threadKindOf, threadKinds } from "@/components/forum/thread-kinds";
 import {
   CircleCheckIcon,
   CircleDotIcon,
   MessageSquareIcon,
   PlusIcon,
   SplitIcon,
-} from "lucide-react";
-
-import type { DiscussionDetail, DiscussionThread } from "@/api/ops.gen";
-import { NewThreadDialog } from "@/components/forum/new-thread-dialog";
-import { threadKindOf, threadKinds } from "@/components/forum/thread-kinds";
+} from "@/components/icons";
 import { EmptyState } from "@/components/layout/empty-state";
 import { SectionTitle } from "@/components/layout/section-title";
 import { RelativeTime } from "@/components/shared/relative-time";

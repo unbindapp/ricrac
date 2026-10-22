@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { type ReactNode } from "react";
-import { BoxIcon } from "lucide-react";
 
 import type { ProjectDetail } from "@/api/ops.gen";
+import { BoxIcon } from "@/components/icons";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PageContainer } from "@/components/layout/page-container";

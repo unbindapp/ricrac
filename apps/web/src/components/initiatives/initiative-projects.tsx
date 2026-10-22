@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { PlusIcon } from "lucide-react";
 
 import type { InitiativeDetail, InitiativeProject, SubInitiative } from "@/api/ops.gen";
+import { PlusIcon } from "@/components/icons";
 import { InitiativeStatusIcon } from "@/components/initiatives/initiative-status";
 import { NewInitiativeDialog } from "@/components/initiatives/new-initiative-dialog";
 import { List } from "@/components/layout/list";

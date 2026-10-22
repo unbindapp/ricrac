@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { BracesIcon, EllipsisIcon, LinkIcon, PencilIcon, Trash2Icon } from "lucide-react";
 
+import { BracesIcon, EllipsisIcon, LinkIcon, PencilIcon, Trash2Icon } from "@/components/icons";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import {

@@ -18,4 +18,6 @@
   if (storedHue && isFinite(hue)) {
     document.documentElement.style.setProperty("--accent-hue", String(((Math.round(hue) % 360) + 360) % 360));
   }
+  var uiTheme = stored("ricrac:ui-theme:" + location.pathname.split("/")[1]);
+  if (uiTheme) document.documentElement.dataset.uiTheme = uiTheme;
 })();

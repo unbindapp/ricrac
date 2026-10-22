@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ChevronRightIcon, CircleDotIcon, DiamondIcon, PlusIcon } from "lucide-react";
 
 import type { Issue, ProjectDetail, StateRef } from "@/api/ops.gen";
+import { ChevronRightIcon, CircleDotIcon, DiamondIcon, PlusIcon } from "@/components/icons";
 import { useNewIssueContext, useNewIssueStore } from "@/components/issues/new-issue-store";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";

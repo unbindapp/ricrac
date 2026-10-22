@@ -179,7 +179,7 @@ func (self *AccountService) CreateWorkspace(ctx context.Context, user uuid.UUID,
 		if _, err := self.seed.CreateTeam(ctx, tx, id, user, teamName, teamKey); err != nil {
 			return err
 		}
-		summary = models.WorkspaceSummary{ID: id, Name: name, URLKey: urlKey, Role: "owner"}
+		summary = models.WorkspaceSummary{ID: id, Name: name, URLKey: urlKey, Role: "owner", Theme: "default"}
 		return nil
 	})
 	return summary, err

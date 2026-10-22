@@ -1848,6 +1848,8 @@ export type Workspace = {
   role: "owner" | "admin" | "member" | "guest"
   /** The workspace's team (a workspace has one), when you can see it; its key is the issue prefix. */
   teams: WorkspaceTeam[]
+  /** The look of the web app for everyone in the workspace. */
+  theme: "default" | "dank"
   url: string
   urlKey: string
 }
@@ -1910,6 +1912,8 @@ export type UpdateWorkspaceArgs = {
   logoUrl?: string | null
   /** 1 to 80 characters. */
   name?: string | null
+  /** The look of the web app for everyone in the workspace. */
+  theme?: "default" | "dank" | null
   /** 2 to 32 lowercase letters, digits and dashes; must not be taken by another workspace. */
   urlKey?: string | null
 }

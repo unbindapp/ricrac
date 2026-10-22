@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { MessagesSquareIcon } from "lucide-react";
 
 import type { Comment, DiscussionDetail } from "@/api/ops.gen";
 import { ChatComposer } from "@/components/forum/chat-message";
 import { ChatMessages } from "@/components/forum/chat-messages";
 import { NewThreadDialog } from "@/components/forum/new-thread-dialog";
+import { MessagesSquareIcon } from "@/components/icons";
 import { commentExcerpt } from "@/components/inbox/notifications";
 import { userName } from "@/components/issues/grouping";
 import { ChatLayout } from "@/components/layout/chat-layout";
