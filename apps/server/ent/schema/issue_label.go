@@ -7,6 +7,8 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
+
+	"ricrac/ent/schema/pgarray"
 )
 
 type IssueLabel struct {
@@ -28,6 +30,7 @@ func (IssueLabel) Fields() []ent.Field {
 		field.Time("retired_at").Optional().Nillable(),
 		field.Time("created_at").Optional(),
 		field.Time("updated_at").Optional(),
+		field.Other("merged_ids", pgarray.UUID{}).SchemaType(uuidArray).Optional(),
 	}
 }
 

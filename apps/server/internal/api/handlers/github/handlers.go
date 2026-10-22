@@ -20,7 +20,7 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	oapi.Register(reg, oapi.Operation{
 		Name: "get_github_integration", Access: auth.Read, Routes: []string{"GET /github"},
 		Description: "Read the workspace's GitHub connection: whether this server has a GitHub App, the GitHub accounts it is " +
-			"installed on (with the last webhook event), the repositories whose issues sync with a team, and your " +
+			"installed on (with the last webhook event), the repositories whose issues sync, and your " +
 			"linked GitHub login.",
 	}, gh.Get)
 	oapi.Register(reg, oapi.Operation{
@@ -36,18 +36,18 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	}, gh.Disconnect)
 	oapi.Register(reg, oapi.Operation{
 		Name: "list_github_repositories", Access: auth.AdminAccess, Routes: []string{"GET /github/repositories"},
-		Description: "List the repositories the GitHub App was given, and which of them sync with a team. Admins only.",
+		Description: "List the repositories the GitHub App was given, and which of them sync. Admins only.",
 	}, gh.ListRepositories)
 	oapi.Register(reg, oapi.Operation{
 		Name: "list_github_repo_syncs", Access: auth.Read, Routes: []string{"GET /github/repo-syncs"},
-		Description: "List the repositories whose issues sync with a team, with how the import of their existing issues went " +
+		Description: "List the repositories whose issues sync, with how the import of their existing issues went " +
 			"and the last error.",
 	}, gh.ListRepoSyncs)
 	oapi.Register(reg, oapi.Operation{
 		Name: "save_github_repo_sync", Access: auth.AdminAccess, Routes: []string{"POST /github/repo-syncs", "PATCH /github/repo-syncs/{id}"},
-		Description: "Sync a repository's issues with a team (omit id; repository and team are required) or change a sync (pass " +
-			"id). Issues opened, edited, labeled, assigned, closed or commented on GitHub become Ricrac issues of the " +
-			"team (and project, if set), and changes made in Ricrac to them go back to GitHub. Authors and assignees " +
+		Description: "Sync a repository's issues (omit id; repository is required, team is optional) or change a sync (pass " +
+			"id). Issues opened, edited, labeled, assigned, closed or commented on GitHub become Ricrac issues " +
+			"(of the project, if set), and changes made in Ricrac to them go back to GitHub. Authors and assignees " +
 			"map to people through their linked GitHub login. Creating a sync imports the repository's existing " +
 			"issues unless backfill is false; backfill true imports them again. Admins only.",
 	}, gh.SaveRepoSync)

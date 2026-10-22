@@ -290,8 +290,7 @@ func TestRecurringTemplatesCreateIssuesOnSchedule(t *testing.T) {
 	next := call(t, w.Ann, "get_template", M{"id": "Weekly triage"})
 	nextRun, err := time.Parse(time.RFC3339Nano, next.At("nextRunAt").Str())
 	check(t, err == nil && nextRun.After(time.Now()), "the next run is ahead: ", next.At("nextRunAt").Str())
-	teamless := fails(t, w.Ann, "save_template", M{"name": "x", "type": "issue", "data": M{}, "recurrence": M{"every": 1, "unit": "day"}})
-	contains(t, teamless, "team")
+	call(t, w.Ann, "save_template", M{"name": "x", "type": "issue", "data": M{}, "recurrence": M{"every": 1, "unit": "day"}})
 	stopped := call(t, w.Ann, "save_template", M{"id": template.At("id").V, "recurrence": nil})
 	check(t, stopped.At("nextRunAt").IsNull())
 }

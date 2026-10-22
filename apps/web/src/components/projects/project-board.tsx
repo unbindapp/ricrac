@@ -51,7 +51,7 @@ type TProps = {
   query?: string;
   empty: ReactNode;
   noMatches?: ReactNode;
-  createDefaults?: { teamId?: string; initiativeId?: string };
+  createDefaults?: { initiativeId?: string };
 };
 
 export function ProjectBoard({ filters, query, empty, noMatches = null, createDefaults }: TProps) {

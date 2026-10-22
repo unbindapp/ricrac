@@ -37,6 +37,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldMergedIds holds the string denoting the merged_ids field in the database.
+	FieldMergedIds = "merged_ids"
 	// EdgeWorkspace holds the string denoting the workspace edge name in mutations.
 	EdgeWorkspace = "workspace"
 	// EdgeTeam holds the string denoting the team edge name in mutations.
@@ -111,6 +113,7 @@ var Columns = []string{
 	FieldRetiredAt,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldMergedIds,
 }
 
 var (
@@ -200,6 +203,11 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByUpdatedAt orders the results by the updated_at field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByMergedIds orders the results by the merged_ids field.
+func ByMergedIds(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMergedIds, opts...).ToFunc()
 }
 
 // ByWorkspaceField orders the results by workspace field.

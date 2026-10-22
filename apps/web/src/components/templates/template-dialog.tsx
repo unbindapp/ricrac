@@ -8,7 +8,6 @@ import { ErrorCard } from "@/components/layout/error-card";
 import { Avatar } from "@/components/shared/avatar";
 import { PriorityIcon, priorityLabel, PRIORITIES } from "@/components/shared/priority-icon";
 import { StateIcon } from "@/components/shared/state-icon";
-import { TeamIcon } from "@/components/shared/team-icon";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -31,14 +30,13 @@ import {
 } from "@/components/templates/template-data";
 import { Field, MultiPicker, SimpleSelect } from "@/components/templates/template-fields";
 import type { TFilterOption } from "@/components/views/use-filter-options";
-import { useTeams } from "@/components/workspace/teams-provider";
+import { useWorkspaceTeam } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { labelsQuery } from "@/lib/queries/labels";
 import { teamStatusesQuery } from "@/lib/queries/teams";
 import { templateQuery, type TTemplate, useSaveTemplateMutation } from "@/lib/queries/templates";
 import { usersQuery } from "@/lib/queries/users";
 
-const WORKSPACE = "workspace";
 const kindNames: Record<TTemplateKind, string> = {
   issue: "issue",
   project: "project",
@@ -46,8 +44,7 @@ const kindNames: Record<TTemplateKind, string> = {
 };
 
 export type TTemplateDialogTarget =
-  | { mode: "create"; kind: TTemplateKind; team: string | null }
-  | { mode: "edit"; template: TTemplate };
+  { mode: "create"; kind: TTemplateKind } | { mode: "edit"; template: TTemplate };
 
 type TProps = {
   target: TTemplateDialogTarget | null;
@@ -73,12 +70,7 @@ export function TemplateDialog({ target, onClose }: TProps) {
           </DialogDescription>
         </DialogHeader>
         {target?.mode === "create" && (
-          <TemplateForm
-            kind={target.kind}
-            template={null}
-            initialTeam={target.team}
-            onDone={onClose}
-          />
+          <TemplateForm kind={target.kind} template={null} onDone={onClose} />
         )}
         {target?.mode === "edit" && <EditTemplate template={target.template} onDone={onClose} />}
       </DialogContent>
@@ -98,14 +90,14 @@ function EditTemplate({ template, onDone }: { template: TTemplate; onDone: () =>
       </div>
     );
   }
-  return (
-    <TemplateForm
-      kind={data.type}
-      template={data}
-      initialTeam={data.team?.id ?? null}
-      onDone={onDone}
-    />
-  );
+  return <TemplateForm kind={data.type} template={data} onDone={onDone} />;
+}
+
+/** Issue templates belong to the workspace's team so they can recur; others keep theirs. */
+function templateTeam(kind: TTemplateKind, template: TemplateDetail | null, teamId?: string) {
+  if (kind === "issue" && teamId) return { team: teamId };
+  if (template) return {};
+  return { team: null };
 }
 
 function localDateTime(value: string | null | undefined) {
@@ -115,20 +107,17 @@ function localDateTime(value: string | null | undefined) {
 function TemplateForm({
   kind,
   template,
-  initialTeam,
   onDone,
 }: {
   kind: TTemplateKind;
   template: TemplateDetail | null;
-  initialTeam: string | null;
   onDone: () => void;
 }) {
   const { workspace } = useWorkspace();
-  const { teams } = useTeams();
+  const team = useWorkspaceTeam();
   const { mutate: saveTemplate, isPending } = useSaveTemplateMutation(workspace.id);
   const [name, setName] = useState(template?.name ?? "");
   const [about, setAbout] = useState(template?.description ?? "");
-  const [team, setTeam] = useState(initialTeam ?? WORKSPACE);
   const [draft, setDraft] = useState<TTemplateDraft>(() =>
     draftFromData(kind, template?.data ?? {}),
   );
@@ -137,14 +126,12 @@ function TemplateForm({
   const [unit, setUnit] = useState<string>(template?.recurrence?.unit ?? "week");
   const [startsAt, setStartsAt] = useState(localDateTime(template?.recurrence?.startsAt));
   const [error, setError] = useState<string | null>(null);
-  const teamId = team === WORKSPACE ? null : team;
   const edit = (patch: Partial<TTemplateDraft>) =>
     setDraft((current) => ({ ...current, ...patch }));
 
   const submit = () => {
     if (!name.trim()) return setError("Give the template a name.");
     const everyNumber = Number(every);
-    if (repeats && !teamId) return setError("Recurring issues need a team: pick one above.");
     if (repeats && !(Number.isInteger(everyNumber) && everyNumber > 0)) {
       return setError("Repeat every 1 or more.");
     }
@@ -158,7 +145,7 @@ function TemplateForm({
     const fields = {
       name: name.trim(),
       description: about.trim() || null,
-      team: teamId,
+      ...templateTeam(kind, template, team?.id),
       data: dataFromDraft(kind, draft, template?.data ?? {}),
       ...(kind === "issue" && recurrence !== undefined ? { recurrence } : {}),
     };
@@ -166,15 +153,6 @@ function TemplateForm({
       onSuccess: onDone,
     });
   };
-
-  const teamItems: TFilterOption[] = [
-    { value: WORKSPACE, label: "Every team" },
-    ...teams.map((item) => ({
-      value: item.id,
-      label: item.name,
-      icon: <TeamIcon teamKey={item.key} icon={item.icon} color={item.color} size="sm" />,
-    })),
-  ];
 
   return (
     <form
@@ -186,31 +164,24 @@ function TemplateForm({
       }}
     >
       <div className="flex flex-col gap-6">
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Template name">
-            {(id) => (
-              <Input
-                id={id}
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                placeholder={
-                  kind === "issue"
-                    ? "Bug report"
-                    : kind === "project"
-                      ? "Feature launch"
-                      : "Postmortem"
-                }
-                autoFocus
-                autoComplete="off"
-              />
-            )}
-          </Field>
-          <Field label="For">
-            {(id) => (
-              <SimpleSelect id={id} label="For" items={teamItems} value={team} onChange={setTeam} />
-            )}
-          </Field>
-        </div>
+        <Field label="Template name">
+          {(id) => (
+            <Input
+              id={id}
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder={
+                kind === "issue"
+                  ? "Bug report"
+                  : kind === "project"
+                    ? "Feature launch"
+                    : "Postmortem"
+              }
+              autoFocus
+              autoComplete="off"
+            />
+          )}
+        </Field>
         <Field label="What it's for">
           {(id) => (
             <Input
@@ -227,7 +198,7 @@ function TemplateForm({
             kind === "issue" ? "New issues" : kind === "project" ? "New projects" : "New documents"
           }
         >
-          {kind === "issue" && <IssueFields draft={draft} edit={edit} teamId={teamId} />}
+          {kind === "issue" && <IssueFields draft={draft} edit={edit} teamId={team?.id} />}
           {kind === "project" && <ProjectFields draft={draft} edit={edit} />}
           {kind === "document" && <DocumentFields draft={draft} edit={edit} />}
         </Section>
@@ -279,7 +250,7 @@ function TemplateForm({
                   {template?.nextRunAt
                     ? `Next one ${format(new Date(template.nextRunAt), "EEE, MMM d 'at' HH:mm")}. `
                     : ""}
-                  Issues are created in the template's team, by whoever made the template.
+                  Issues are created by whoever made the template.
                 </p>
               </div>
             ) : (
@@ -360,10 +331,10 @@ function usePeople(noneLabel: string, withMe: boolean): TFilterOption[] {
   ];
 }
 
-function IssueFields({ draft, edit, teamId }: TFieldsProps & { teamId: string | null }) {
+function IssueFields({ draft, edit, teamId }: TFieldsProps & { teamId: string | undefined }) {
   const { workspace } = useWorkspace();
   const people = usePeople("Nobody", true);
-  const { data: labels = [] } = useQuery(labelsQuery(workspace.id, { team: teamId }));
+  const { data: labels = [] } = useQuery(labelsQuery(workspace.id));
   const { data: statuses = [] } = useQuery({
     ...teamStatusesQuery(workspace.id, teamId ?? ""),
     enabled: !!teamId,
@@ -378,10 +349,9 @@ function IssueFields({ draft, edit, teamId }: TFieldsProps & { teamId: string | 
           <span className="size-2.5 rounded-full" style={{ backgroundColor: label.color }} />
         </span>
       ),
-      hint: label.team?.key,
     }));
   const statusItems: TFilterOption[] = [
-    { value: "", label: "Team's default" },
+    { value: "", label: "Default" },
     ...statuses.map((state) => ({
       value: state.name,
       label: state.name,
@@ -438,21 +408,15 @@ function IssueFields({ draft, edit, teamId }: TFieldsProps & { teamId: string | 
           )}
         </Field>
         <Field label="Status">
-          {(id) =>
-            teamId ? (
-              <SimpleSelect
-                id={id}
-                label="Status"
-                items={statusItems}
-                value={draft.state}
-                onChange={(state) => edit({ state })}
-              />
-            ) : (
-              <p id={id} className="text-muted-foreground flex h-9 items-center text-sm">
-                Pick a team first
-              </p>
-            )
-          }
+          {(id) => (
+            <SimpleSelect
+              id={id}
+              label="Status"
+              items={statusItems}
+              value={draft.state}
+              onChange={(state) => edit({ state })}
+            />
+          )}
         </Field>
       </div>
       <Field label="Labels">
@@ -498,13 +462,7 @@ function IssueFields({ draft, edit, teamId }: TFieldsProps & { teamId: string | 
 }
 
 function ProjectFields({ draft, edit }: TFieldsProps) {
-  const { teams } = useTeams();
   const people = usePeople("No lead", false);
-  const teamOptions = teams.map((team) => ({
-    value: team.key,
-    label: team.name,
-    icon: <TeamIcon teamKey={team.key} icon={team.icon} color={team.color} size="sm" />,
-  }));
   const milestoneItems: TFilterOption[] = [
     { value: "", label: "No milestone" },
     ...draft.milestones
@@ -574,18 +532,6 @@ function ProjectFields({ draft, edit }: TFieldsProps) {
           )}
         </Field>
       </div>
-      <Field label="Teams">
-        {(id) => (
-          <MultiPicker
-            id={id}
-            label="Teams"
-            options={teamOptions}
-            values={draft.teams}
-            onChange={(values) => edit({ teams: values })}
-            placeholder="The team creating the project"
-          />
-        )}
-      </Field>
       <ListEditor
         title="Milestones"
         addLabel="Add milestone"

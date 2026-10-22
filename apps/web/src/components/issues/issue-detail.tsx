@@ -22,7 +22,6 @@ import { AttachMenu, IssueAttachments } from "@/components/issues/issue-attachme
 import { IssueDetailHeader } from "@/components/issues/issue-detail-header";
 import { draftFromIssue } from "@/components/issues/issue-draft";
 import { IssueProperties } from "@/components/issues/issue-properties";
-import { useNewIssueContext } from "@/components/issues/new-issue-store";
 import {
   AddRelationPicker,
   hasRelations,
@@ -137,7 +136,6 @@ function IssueDetailContent({
   const reactions = groupReactions(issue.reactions, me?.id);
   const react = (emoji: string, reacted: boolean) =>
     toggleReaction({ issueId: issue.id, emoji, reacted });
-  useNewIssueContext({ teamId: issue.team.id }, !isPeek);
   const properties = (
     <IssueProperties
       teamId={issue.team.id}

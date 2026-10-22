@@ -112,7 +112,8 @@ func (self *AccountRepository) TakeInvitation(ctx context.Context, tx repository
 	return &taken, rows.Err()
 }
 
-// Join makes the user an active member of the workspace with role, and of the teams.
+// Join makes the user an active member of the workspace with role, and of the teams; everyone but
+// a guest joins the workspace's team too.
 func (self *AccountRepository) Join(ctx context.Context, tx repository.TxInterface, workspaceID, user uuid.UUID, role string, teams []uuid.UUID) error {
 	client := self.base.Client(tx)
 	_, err := client.ExecContext(ctx,
@@ -123,7 +124,9 @@ func (self *AccountRepository) Join(ctx context.Context, tx repository.TxInterfa
 		return err
 	}
 	_, err = client.ExecContext(ctx,
-		"INSERT INTO team_members (team_id, user_id) SELECT unnest($1::uuid[]), $2 ON CONFLICT DO NOTHING", teams, user)
+		`INSERT INTO team_members (team_id, user_id)
+		 SELECT t.id, $2 FROM teams t WHERE t.workspace_id = $3 AND (t.id = ANY($1::uuid[]) OR $4::text <> 'guest' AND t.archived_at IS NULL)
+		 ON CONFLICT DO NOTHING`, teams, user, workspaceID, role)
 	return err
 }
 

@@ -71,14 +71,9 @@ func (suite *StateServiceSuite) TestTheDefaultStatusStaysBacklogOrUnstarted() {
 	suite.Equal("The team's default status must stay a backlog or unstarted status", errdefs.As(err).Message)
 }
 
-func (suite *StateServiceSuite) TestNamesNeedATeam() {
-	_, _, err := suite.service.find(suite.Ctx, suite.actor, "Done", nil)
-	suite.Equal("Name the team too, or pass the status's id", errdefs.As(err).Message)
-}
-
 func (suite *StateServiceSuite) TestDeletingAStatusWithIssuesNeedsATarget() {
 	state := uuid.New()
-	suite.MockStateRepo.EXPECT().TeamOf(mock.Anything, suite.actor.Workspace, state).Return(suite.team, true, nil)
+	suite.MockStateRepo.EXPECT().Owned(mock.Anything, suite.actor.Workspace, state).Return(state, suite.team, true, nil)
 	suite.teams.EXPECT().RequireCanEdit(mock.Anything, mock.Anything, suite.actor, suite.team).Return(nil)
 	suite.MockStateRepo.EXPECT().GetForUpdate(mock.Anything, mock.Anything, state).Return(&ent.WorkflowState{
 		ID: state, Name: "Review", Type: "started", Edges: ent.WorkflowStateEdges{Team: &ent.Team{ID: suite.team}},

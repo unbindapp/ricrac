@@ -5,12 +5,10 @@ import { CircleCheckIcon, FileJsonIcon, UploadIcon, XIcon } from "@/components/i
 import { parseIssuesJson, type TParsedIssues } from "@/components/import/parse-issues";
 import { ErrorCard } from "@/components/layout/error-card";
 import { SettingsSection } from "@/components/layout/settings-section";
-import { TeamIcon } from "@/components/shared/team-icon";
-import { Field, SimpleSelect } from "@/components/templates/template-fields";
 import { Button, LinkButton } from "@/components/ui/button";
 import { FileTrigger } from "@/components/ui/file-trigger";
 import { Textarea } from "@/components/ui/textarea";
-import { useTeams } from "@/components/workspace/teams-provider";
+import { useWorkspaceTeam } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { useImportIssuesMutation } from "@/lib/queries/imports";
 
@@ -27,12 +25,10 @@ function sourceSummary(parsed: TParsedIssues) {
   return parts.join(", ");
 }
 
-/** Pick a file (or paste JSON) and a team, check it, then import. */
+/** Pick a file (or paste JSON), check it, then import. */
 export function IssueImport() {
   const { workspace } = useWorkspace();
-  const { teams, myTeams } = useTeams();
-  const [picked, setTeam] = useState<string | null>(null);
-  const team = picked ?? myTeams[0]?.id ?? teams[0]?.id ?? "";
+  const team = useWorkspaceTeam();
   const [source, setSource] = useState<TSource | null>(null);
   const [isPasting, setIsPasting] = useState(false);
   const [pasted, setPasted] = useState("");
@@ -41,7 +37,6 @@ export function IssueImport() {
   const [checked, setChecked] = useState<ImportedIssues | null>(null);
   const [imported, setImported] = useState<ImportedIssues | null>(null);
   const run = useImportIssuesMutation(workspace.id);
-  const teamOf = teams.find((item) => item.id === team);
 
   const reset = () => {
     setChecked(null);
@@ -69,29 +64,23 @@ export function IssueImport() {
   const start = (dryRun: boolean) => {
     if (!source || !team) return;
     run.mutate(
-      { team, issues: source.parsed.issues, dryRun },
+      { team: team.id, issues: source.parsed.issues, dryRun },
       { onSuccess: (result) => (dryRun ? setChecked(result) : setImported(result)) },
     );
   };
 
-  const teamItems = teams.map((item) => ({
-    value: item.id,
-    label: item.name,
-    icon: <TeamIcon teamKey={item.key} icon={item.icon} color={item.color} size="sm" />,
-  }));
-
-  if (imported && teamOf) {
+  if (imported) {
     return (
       <SettingsSection title="Imported">
         <div className="flex items-start gap-3">
           <CircleCheckIcon className="text-success mt-0.5 size-5 shrink-0" />
           <div className="flex flex-col gap-1 text-sm">
             <p className="font-medium">
-              {plural(imported.imported, "issue")} and {plural(imported.comments, "comment")} are in{" "}
-              {teamOf.name}.
+              {plural(imported.imported, "issue")} and {plural(imported.comments, "comment")} are
+              in.
             </p>
             <p className="text-muted-foreground">
-              {rangeText(imported.identifiers)} The team's next issue is {imported.nextIdentifier}.
+              {rangeText(imported.identifiers)} The next issue is {imported.nextIdentifier}.
             </p>
           </div>
         </div>
@@ -107,12 +96,12 @@ export function IssueImport() {
             Import more
           </Button>
           <LinkButton
-            to="/$workspace/team/$key/issues"
-            params={{ workspace: workspace.urlKey, key: teamOf.key }}
+            to="/$workspace/issues"
+            params={{ workspace: workspace.urlKey }}
             variant="ghost"
             size="sm"
           >
-            Open {teamOf.name} issues
+            Open issues
           </LinkButton>
         </div>
       </SettingsSection>
@@ -124,20 +113,6 @@ export function IssueImport() {
       title="Import issues"
       description="Issues keep their numbers, dates, people, labels and comments. Check first: nothing changes until you import."
     >
-      <Field label="Into team">
-        {(id) => (
-          <SimpleSelect
-            id={id}
-            label="Into team"
-            items={teamItems}
-            value={team}
-            onChange={(value) => {
-              setTeam(value);
-              reset();
-            }}
-          />
-        )}
-      </Field>
       {isPasting ? (
         <div className="flex flex-col gap-2">
           <Textarea
@@ -211,18 +186,16 @@ export function IssueImport() {
       )}
       {readError && <ErrorCard title="Can't read these issues" message={readError} />}
       {run.error && <ErrorCard title="Ricrac can't import this" message={run.error.message} />}
-      {checked && teamOf && (
+      {checked && (
         <div className="bg-success/1-10 border-success/5-10 flex items-start gap-3 rounded-lg border p-3">
           <CircleCheckIcon className="text-success mt-0.5 size-4 shrink-0" />
           <div className="flex flex-col gap-1 text-sm">
             <p className="font-medium">
               Ready: {plural(checked.imported, "issue")}, {plural(checked.comments, "comment")}
-              {checked.relations ? ` and ${plural(checked.relations, "relation")}` : ""} into{" "}
-              {teamOf.name}.
+              {checked.relations ? ` and ${plural(checked.relations, "relation")}` : ""}.
             </p>
             <p className="text-muted-foreground">
-              {rangeText(checked.identifiers)} The team's next issue will be{" "}
-              {checked.nextIdentifier}.
+              {rangeText(checked.identifiers)} The next issue will be {checked.nextIdentifier}.
             </p>
           </div>
         </div>

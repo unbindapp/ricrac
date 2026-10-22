@@ -8,7 +8,6 @@ import (
 
 	"github.com/google/uuid"
 
-	"ricrac/ent"
 	"ricrac/internal/auth"
 	"ricrac/internal/common/errdefs"
 	"ricrac/internal/common/utils"
@@ -111,13 +110,6 @@ func (self *TemplateService) apply(ctx context.Context, tx repository.TxInterfac
 			return err
 		}
 	}
-	saved, err := self.repo.Template().Get(ctx, tx, id)
-	if err != nil {
-		return err
-	}
-	if teamless(saved) {
-		return errdefs.BadRequest("A recurring template needs a team (team, or data.team)")
-	}
 	now, err := self.repo.Now(ctx, tx)
 	if err != nil {
 		return err
@@ -147,17 +139,6 @@ func (self *TemplateService) setRecurrence(ctx context.Context, tx repository.Tx
 		return err
 	}
 	return self.repo.Template().SetRecurrence(ctx, tx, id, stored, &starts)
-}
-
-// teamless says whether the template recurs without saying which team its issues go to.
-func teamless(t *ent.Template) bool {
-	if len(t.Recurrence) == 0 || string(t.Recurrence) == "null" || t.TeamID != nil {
-		return false
-	}
-	var data models.M
-	_ = json.Unmarshal(t.Data, &data)
-	_, named := data["team"]
-	return !named
 }
 
 func (self *TemplateService) Delete(ctx context.Context, actor *auth.Actor, input *DeleteInput) (models.DeletedTemplate, error) {

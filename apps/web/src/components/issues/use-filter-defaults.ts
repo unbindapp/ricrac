@@ -64,5 +64,5 @@ export function useFilterDefaults(
       endsAt: cycle.endsAt,
     };
   }
-  return { teamId, draft };
+  return { draft };
 }

@@ -1846,7 +1846,7 @@ export type Workspace = {
   name: string
   /** Your role. */
   role: "owner" | "admin" | "member" | "guest"
-  /** The teams you can see. */
+  /** The workspace's team (a workspace has one), when you can see it; its key is the issue prefix. */
   teams: WorkspaceTeam[]
   url: string
   urlKey: string
@@ -1962,7 +1962,7 @@ export type InviteUserArgs = {
   email: string
   /** member (default), admin (only admins invite admins) or guest. */
   role?: string | null
-  /** Teams they join (keys, names or ids). Required for guests. */
+  /** Optional: everyone joins the workspace's team. Guests see only the teams named here, the workspace's team by default (keys, names or ids). */
   teams?: string[]
 }
 
@@ -1993,11 +1993,12 @@ export type ListTeamsArgs = {
 }
 
 export type GetTeamArgs = {
-  id: string
+  /** Optional: the workspace's team by default. Its key, name or id. */
+  id?: string | null
 }
 
 export type SaveTeamArgs = {
-  /** People to add to the team: id, name, email or "me". */
+  /** Guests to let see the workspace's issues (everyone else is a member already): id, name, email or "me". */
   addMembers?: string[]
   /** Archive closed issues after 1, 3, 6, 9 or 12 months; null turns it off. */
   autoArchiveMonths?: number | null
@@ -2042,9 +2043,9 @@ export type SaveTeamArgs = {
   githubPrOpenedState?: string | null
   /** An emoji or icon name; null clears it. */
   icon?: string | null
-  /** Only to change a team: its key, name or id. Omit to create one. */
+  /** The workspace's team: its key, name or id. A workspace has one team, so omitting it (creating another) fails. */
   id?: string | null
-  /** 1 to 7 letters and digits starting with a letter, like ENG. Defaults to the name's initials. */
+  /** The issue prefix: 1 to 7 letters and digits starting with a letter, like ENG. Issues are renamed; their old identifiers and the old key keep working. */
   key?: string | null
   /** Required to create. */
   name?: string | null
@@ -2052,7 +2053,7 @@ export type SaveTeamArgs = {
   parent?: string | null
   /** Private teams and their issues are only visible to their members. */
   private?: boolean | null
-  /** People to take off the team. */
+  /** Guests to take off the team; other people leave it by leaving the workspace. */
   removeMembers?: string[]
   /** Issues need a priority before they can leave triage. */
   requirePriorityToLeaveTriage?: boolean | null
@@ -2073,20 +2074,23 @@ export type SaveTeamArgs = {
 }
 
 export type DeleteTeamArgs = {
-  id: string
+  /** Optional: the workspace's team by default. Its key, name or id. */
+  id?: string | null
 }
 
 export type JoinTeamArgs = {
-  id: string
+  /** Optional: the workspace's team by default. Its key, name or id. */
+  id?: string | null
 }
 
 export type LeaveTeamArgs = {
-  id: string
+  /** Optional: the workspace's team by default. Its key, name or id. */
+  id?: string | null
 }
 
 export type GetTriageResponsibilityArgs = {
-  /** Team key, name or id. */
-  id: string
+  /** Optional: the workspace's team by default. Its key, name or id. */
+  id?: string | null
   /** How many upcoming shifts to list, 10 by default, at most 100. */
   limit?: number | null
   /** Only this person's shifts: id, name, email or "me". */
@@ -2100,14 +2104,14 @@ export type ListIssueStatusesArgs = {
   includeArchived?: boolean
   /** How many to return, 50 by default, at most 250. */
   limit?: number | null
-  /** Team key, name or id. */
-  team: string
+  /** Optional: the workspace's team by default. Its key, name or id. */
+  team?: string | null
 }
 
 export type GetIssueStatusArgs = {
-  /** The status's id, or its name or type together with team. */
+  /** The status's id, name or type. */
   id: string
-  /** Team key, name or id, when id is a name or type. */
+  /** Optional: the workspace's team by default. Its key, name or id. */
   team?: string | null
 }
 
@@ -2116,24 +2120,24 @@ export type SaveIssueStatusArgs = {
   color?: string | null
   /** Null clears it. */
   description?: string | null
-  /** Only to change a status: its id, or its name with team. Omit to create one. */
+  /** Only to change a status: its id or name. Omit to create one. */
   id?: string | null
-  /** Required to create; unique within the team. */
+  /** Required to create; unique in the workflow. */
   name?: string | null
   /** Order within its type on the board; lower comes first. New statuses go last. */
   position?: number | null
-  /** Team key, name or id. Required to create. */
+  /** Optional: the workspace's team by default. Its key, name or id. */
   team?: string | null
   /** triage, backlog, unstarted, started, completed or canceled. Required to create; changes only while no issues are in the status. */
   type?: string | null
 }
 
 export type DeleteIssueStatusArgs = {
-  /** The status's id, or its name with team. */
+  /** The status's id or name. */
   id: string
-  /** Status (name, type or id, same team) to move its issues to. Required when issues are in it or when it is the team's default or auto-close status. */
+  /** Status (name, type or id) to move its issues to. Required when issues are in it or when it is the default or auto-close status. */
   moveIssuesTo?: string | null
-  /** Team key, name or id, when id is a name. */
+  /** Optional: the workspace's team by default. Its key, name or id. */
   team?: string | null
 }
 
@@ -2146,14 +2150,14 @@ export type ListIssueLabelsArgs = {
   limit?: number | null
   /** Part of a label's name. */
   query?: string | null
-  /** Team key, name or id: its labels and the workspace labels. */
+  /** Optional team key, name or id: its labels and the workspace labels. All labels by default. */
   team?: string | null
 }
 
 export type GetIssueLabelArgs = {
   /** The label's id or name (Group/Label for a label in a group). */
   id: string
-  /** Team key, name or id, to pick between labels of the same name. */
+  /** Optional team key, name or id, to pick between labels of the same name. */
   team?: string | null
 }
 
@@ -2172,28 +2176,28 @@ export type SaveIssueLabelArgs = {
   name?: string | null
   /** The group (name or id) to put the label in; null takes it out of its group. A team label's group is a workspace group or a group of the same team. */
   parent?: string | null
-  /** Team key, name or id. On create, makes it a team label (omit for a workspace label); on update, picks between labels of the same name. */
+  /** Optional team key, name or id. On create, makes it a team label (omit for a workspace label); on update, picks between labels of the same name. */
   team?: string | null
 }
 
 export type RetireIssueLabelArgs = {
   /** The label's id or name (Group/Label for a label in a group). */
   id: string
-  /** Team key, name or id, to pick between labels of the same name. */
+  /** Optional team key, name or id, to pick between labels of the same name. */
   team?: string | null
 }
 
 export type RestoreIssueLabelArgs = {
   /** The label's id or name (Group/Label for a label in a group). */
   id: string
-  /** Team key, name or id, to pick between labels of the same name. */
+  /** Optional team key, name or id, to pick between labels of the same name. */
   team?: string | null
 }
 
 export type DeleteIssueLabelArgs = {
   /** The label's id or name (Group/Label for a label in a group). */
   id: string
-  /** Team key, name or id, to pick between labels of the same name. */
+  /** Optional team key, name or id, to pick between labels of the same name. */
   team?: string | null
 }
 
@@ -2242,7 +2246,7 @@ export type ListIssuesArgs = {
   state?: string | null
   /** Person subscribed to the issues (id, name, email or "me"). */
   subscriber?: string | null
-  /** Team key, name or id. */
+  /** Optional team key, name or id. */
   team?: string | null
   /** Updated after: ISO 8601 date/time or a duration like -P1W. */
   updatedAt?: string | null
@@ -2343,7 +2347,7 @@ export type SaveIssueArgs = {
   state?: string | null
   /** Position among its parent's sub-issues. */
   subIssueSortOrder?: number | null
-  /** Team key, name or id. Required to create (unless parentId or the template sets it); changing it moves the issue. */
+  /** Optional: the workspace's team by default (or the parent's, or the template's). Its key, name or id. */
   team?: string | null
   /** Issue template name or id, applied on create: it fills in fields and sub-issues the arguments don't set. */
   template?: string | null
@@ -2465,8 +2469,8 @@ export type ImportIssuesArgs = {
     /** ISO 8601; the latest of its other dates when left out. */
     updatedAt?: string | null
   })[]
-  /** Team key, name or id the issues go to. */
-  team: string
+  /** Optional: the workspace's team by default. Its key, name or id. The team the issues go to. */
+  team?: string | null
 }
 
 export type ListCommentsArgs = {
@@ -2656,7 +2660,7 @@ export type SaveProjectArgs = {
   addLabels?: string[]
   /** People to add as members (they are subscribed). */
   addMembers?: string[]
-  /** Teams (keys, names or ids) to add. */
+  /** Teams (keys, names or ids) to add. A new project gets the workspace's team when no team is named. */
   addTeams?: string[]
   /** Projects blocking this one (added). */
   blockedBy?: string[]
@@ -3010,18 +3014,18 @@ export type ListCyclesArgs = {
   includeArchived?: boolean
   /** How many to return, 50 by default, at most 250. */
   limit?: number | null
-  /** Team key, name or id. */
-  team: string
+  /** Optional: the workspace's team by default. Its key, name or id. */
+  team?: string | null
   /** current, previous, next, upcoming, completed or all (default). */
   type?: string | null
 }
 
 export type GetCycleArgs = {
-  /** The cycle's id, or its number, name or "current" / "next" / "previous" (with team). */
+  /** The cycle's id, number, name or "current" / "next" / "previous". */
   id: string
   /** List the cycle's issues (default true). */
   includeIssues?: boolean | null
-  /** Team key, name or id, when id isn't the cycle's id. */
+  /** Optional: the workspace's team by default. Its key, name or id. */
   team?: string | null
 }
 
@@ -3029,20 +3033,20 @@ export type SaveCycleArgs = {
   description?: string | null
   /** ISO 8601 date or time, after startsAt. Required to create. */
   endsAt?: string | null
-  /** Only to update a cycle: its id (or number / name with team). Omit to create one. */
+  /** Only to update a cycle: its id, number or name. Omit to create one. */
   id?: string | null
   /** Null clears it (the cycle is then shown as "Cycle <number>"). */
   name?: string | null
   /** ISO 8601 date or time (a date starts at 00:00 UTC). Required to create. */
   startsAt?: string | null
-  /** Team key, name or id. Required to create. */
+  /** Optional: the workspace's team by default. Its key, name or id. */
   team?: string | null
 }
 
 export type ArchiveCycleArgs = {
-  /** The cycle's id, or its number or name (with team). */
+  /** The cycle's id, number or name. */
   id: string
-  /** Team key, name or id, when id isn't the cycle's id. */
+  /** Optional: the workspace's team by default. Its key, name or id. */
   team?: string | null
 }
 
@@ -3308,7 +3312,7 @@ export type ListCustomViewsArgs = {
   query?: string | null
   /** true: only views shared with the workspace; false: only the caller's personal views. */
   shared?: boolean | null
-  /** Team key, name or id: that team's views. */
+  /** Optional team key, name or id: that team's views. */
   team?: string | null
 }
 
@@ -3332,7 +3336,7 @@ export type SaveCustomViewArgs = {
   name?: string | null
   /** Share the view with the workspace (default false: only the caller sees it). */
   shared?: boolean | null
-  /** Team key, name or id the view belongs to (its issues are that team's); null makes it workspace-wide. */
+  /** Optional team key, name or id the view belongs to (its issues are that team's); null makes it workspace-wide. */
   team?: string | null
 }
 
@@ -3376,7 +3380,7 @@ export type ListTemplatesArgs = {
   cursor?: string | null
   /** How many to return, 50 by default, at most 250. */
   limit?: number | null
-  /** Team key, name or id: the team's templates and the workspace-wide ones. */
+  /** Optional team key, name or id: the team's templates and the workspace-wide ones. All by default. */
   team?: string | null
   /** issue, project or document. */
   type?: string | null
@@ -3404,7 +3408,7 @@ first one. null stops it. */
     startsAt?: string | null
     unit: string
   } | null
-  /** Team key, name or id the template belongs to; null makes it workspace-wide. */
+  /** Optional team key, name or id the template belongs to; null makes it workspace-wide. */
   team?: string | null
   /** issue, project or document. Required to create; can't change. */
   type?: string | null
@@ -3848,7 +3852,7 @@ export type SaveGithubRepoSyncArgs = {
   project?: string | null
   /** The repository as owner/name or GitHub id, among list_github_repositories. Required to create. */
   repository?: string | null
-  /** Team key, name or id whose issues the repository's are. Required to create. */
+  /** Optional: the workspace's team by default. Its key, name or id. The team whose issues the repository's are. */
   team?: string | null
 }
 

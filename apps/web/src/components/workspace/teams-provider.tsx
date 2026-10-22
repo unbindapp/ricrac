@@ -6,14 +6,11 @@ import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { teamsQuery } from "@/lib/queries/teams";
 
 type TTeamsContext = {
-  /** The teams you can see. */
-  teams: Team[];
-  /** The teams you are a member of. */
-  myTeams: Team[];
+  /** The workspace's one team, which holds its issues, statuses, labels and cycles. */
+  team: Team | undefined;
   isPending: boolean;
   error: Error | null;
   refetch: () => void;
-  teamByKey: (key: string) => Team | undefined;
 };
 
 const TeamsContext = createContext<TTeamsContext | null>(null);
@@ -24,13 +21,10 @@ export function TeamsProvider({ children }: { children: ReactNode }) {
   const value = useMemo<TTeamsContext>(() => {
     const teams = data ?? [];
     return {
-      teams,
-      myTeams: teams.filter((team) => team.isMember),
+      team: teams.find((team) => !team.archivedAt) ?? teams[0],
       isPending,
       error,
       refetch: () => void refetch(),
-      teamByKey: (key: string) =>
-        teams.find((team) => team.key.toLowerCase() === key.toLowerCase()),
     };
   }, [data, isPending, error, refetch]);
   return <TeamsContext.Provider value={value}>{children}</TeamsContext.Provider>;
@@ -40,4 +34,9 @@ export function useTeams() {
   const context = useContext(TeamsContext);
   if (!context) throw new Error("useTeams must be used within a TeamsProvider");
   return context;
+}
+
+/** The workspace's team; undefined only while it loads or when it failed to. */
+export function useWorkspaceTeam() {
+  return useTeams().team;
 }

@@ -1,149 +1,56 @@
-import { useNavigate } from "@tanstack/react-router";
-import { ReactNode } from "react";
+import { Link, type LinkProps } from "@tanstack/react-router";
 
-import type { Team } from "@/api/ops.gen";
-import { BuildingIcon, CheckIcon, ChevronDownIcon, UserIcon } from "@/components/icons/symbols.gen";
-import { TeamIcon } from "@/components/shared/team-icon";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useTeams } from "@/components/workspace/teams-provider";
+import { BuildingIcon, type TIcon, UserIcon } from "@/components/icons/symbols.gen";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 
-export type TSettingsSection =
-  { kind: "account" } | { kind: "workspace" } | { kind: "team"; key: string };
+export type TSettingsSection = "account" | "workspace";
 
 type TProps = {
   current: TSettingsSection;
 };
 
 export function SettingsSectionSwitcher({ current }: TProps) {
-  const { workspace, isAdmin, canEdit } = useWorkspace();
-  const { teams, teamByKey } = useTeams();
-  const navigate = useNavigate();
+  const { workspace, canEdit } = useWorkspace();
+  if (!canEdit) return null;
   const params = { workspace: workspace.urlKey };
-  const currentTeam = current.kind === "team" ? teamByKey(current.key) : undefined;
-  const listedTeams = canEdit
-    ? teams.filter((team) => team.isMember || team.id === currentTeam?.id)
-    : [];
-
-  const open = (section: TSettingsSection) => {
-    switch (section.kind) {
-      case "account":
-        void navigate({ to: "/$workspace/settings/account", params });
-        return;
-      case "workspace":
-        void navigate({ to: "/$workspace/settings", params });
-        return;
-      case "team":
-        void navigate({
-          to: "/$workspace/settings/team/$key",
-          params: { ...params, key: section.key },
-        });
-        return;
-    }
-  };
-
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <Button
-            variant="ghost"
-            aria-label="Switch settings section"
-            className="border-primary bg-surface-container has-hover:hover:bg-surface-container-high data-popup-open:bg-surface-container-high h-14 w-full shrink-0 justify-start gap-3 rounded-full border-2 px-5 text-base"
-          >
-            <SectionIcon section={current} team={currentTeam} />
-            <span className="min-w-0 flex-1 truncate text-left">
-              {sectionLabel(current, currentTeam)}
-            </span>
-            <ChevronDownIcon className="text-muted-foreground size-5" />
-          </Button>
-        }
+    <nav
+      aria-label="Settings sections"
+      className="bg-surface-container-highest grid h-14 shrink-0 grid-cols-2 gap-1 rounded-full p-1"
+    >
+      <SectionLink
+        link={{ to: "/$workspace/settings/account", params }}
+        icon={UserIcon}
+        label="Account"
+        isCurrent={current === "account"}
       />
-      <DropdownMenuContent className="w-72">
-        <DropdownMenuGroup>
-          <SectionItem
-            isCurrent={current.kind === "account"}
-            onClick={() => open({ kind: "account" })}
-          >
-            <UserIcon className="size-4" />
-            Account
-          </SectionItem>
-          {isAdmin && (
-            <SectionItem
-              isCurrent={current.kind === "workspace"}
-              onClick={() => open({ kind: "workspace" })}
-            >
-              <BuildingIcon className="size-4" />
-              Workspace
-            </SectionItem>
-          )}
-        </DropdownMenuGroup>
-        {listedTeams.length > 0 && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuLabel>Teams</DropdownMenuLabel>
-              {listedTeams.map((team) => (
-                <SectionItem
-                  key={team.id}
-                  isCurrent={team.id === currentTeam?.id}
-                  onClick={() => open({ kind: "team", key: team.key })}
-                >
-                  <TeamIcon teamKey={team.key} icon={team.icon} color={team.color} size="sm" />
-                  {team.name}
-                </SectionItem>
-              ))}
-            </DropdownMenuGroup>
-          </>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      <SectionLink
+        link={{ to: "/$workspace/settings", params }}
+        icon={BuildingIcon}
+        label="Workspace"
+        isCurrent={current === "workspace"}
+      />
+    </nav>
   );
 }
 
-type TSectionItemProps = {
+type TSectionLinkProps = {
+  link: LinkProps;
+  icon: TIcon;
+  label: string;
   isCurrent: boolean;
-  onClick: () => void;
-  children: ReactNode;
 };
 
-function SectionItem({ isCurrent, onClick, children }: TSectionItemProps) {
+function SectionLink({ link, icon: Icon, label, isCurrent }: TSectionLinkProps) {
   return (
-    <DropdownMenuItem onClick={onClick}>
-      {children}
-      <span className="flex-1" />
-      {isCurrent && <CheckIcon className="size-4" />}
-    </DropdownMenuItem>
+    <Link
+      {...link}
+      aria-current={isCurrent || undefined}
+      data-current={isCurrent || undefined}
+      className="text-muted-foreground has-hover:hover:bg-surface-container-high has-hover:hover:text-foreground data-current:bg-secondary data-current:text-secondary-foreground focus-visible:outline-primary ease-emphasized flex items-center justify-center gap-2 rounded-full text-base font-medium transition-colors duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2"
+    >
+      <Icon className="size-5" />
+      {label}
+    </Link>
   );
-}
-
-function SectionIcon({ section, team }: { section: TSettingsSection; team?: Team }) {
-  switch (section.kind) {
-    case "account":
-      return <UserIcon className="text-primary size-5" />;
-    case "workspace":
-      return <BuildingIcon className="text-primary size-5" />;
-    case "team":
-      return <TeamIcon teamKey={section.key} icon={team?.icon} color={team?.color} />;
-  }
-}
-
-function sectionLabel(section: TSettingsSection, team?: Team) {
-  switch (section.kind) {
-    case "account":
-      return "Account";
-    case "workspace":
-      return "Workspace";
-    case "team":
-      return team?.name ?? section.key;
-  }
 }

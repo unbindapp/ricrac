@@ -17,10 +17,8 @@ import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { SettingsSection } from "@/components/layout/settings-section";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { RelativeTime } from "@/components/shared/relative-time";
-import { TeamIcon } from "@/components/shared/team-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button, LinkButton } from "@/components/ui/button";
-import { useTeams } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { githubEventLabel } from "@/lib/helpers/github-sync";
 import {
@@ -30,7 +28,7 @@ import {
 } from "@/lib/queries/github";
 
 const description =
-  "Pull requests, branches and commits that mention an issue like ENG-123 link to it and move it through the workflow. Synced repositories keep their issues in step with a team.";
+  "Pull requests, branches and commits that mention an issue by its identifier link to it and move it through the workflow. Synced repositories keep their issues in step with Ricrac.";
 
 export function GithubSettings() {
   const { workspace } = useWorkspace();
@@ -78,7 +76,7 @@ function GithubNotConnected() {
         <Feature
           icon={RefreshCwIcon}
           title="Sync GitHub issues"
-          text="Keep a repository's issues and comments in step with a team, both ways."
+          text="Keep a repository's issues and comments in step with Ricrac, both ways."
         />
       </ul>
     </SettingsSection>
@@ -196,33 +194,20 @@ function InstallationRow({ installation }: { installation: GitHubInstallation })
 
 function PullRequestStatuses() {
   const { workspace } = useWorkspace();
-  const { teams } = useTeams();
-  if (teams.length === 0) return null;
   return (
     <SettingsSection
       title="Pull request statuses"
-      description="Each team picks the statuses its issues move to when pull requests open and merge."
-    >
-      <List>
-        {teams.map((team) => (
-          <ListRow
-            key={team.id}
-            actions={
-              <LinkButton
-                to="/$workspace/settings/team/$key/github"
-                params={{ workspace: workspace.urlKey, key: team.key }}
-                variant="ghost"
-                size="sm"
-              >
-                Configure
-              </LinkButton>
-            }
-          >
-            <TeamIcon teamKey={team.key} icon={team.icon} color={team.color} size="sm" />
-            <span className="truncate">{team.name}</span>
-          </ListRow>
-        ))}
-      </List>
-    </SettingsSection>
+      description="The statuses issues move to when pull requests open and merge."
+      actions={
+        <LinkButton
+          to="/$workspace/settings/github"
+          params={{ workspace: workspace.urlKey }}
+          variant="outline"
+          size="sm"
+        >
+          Configure
+        </LinkButton>
+      }
+    />
   );
 }

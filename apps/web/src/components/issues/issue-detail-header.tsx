@@ -42,8 +42,6 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { teamCrumb } from "@/components/workspace/team-crumb";
-import { useTeams } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { formatDateTime } from "@/lib/helpers/dates";
 import { useIssueSubscriptionMutation, useUpdateIssueMutation } from "@/lib/queries/issues";
@@ -69,10 +67,8 @@ function snoozeOptions(now: Date) {
 
 export function IssueDetailHeader({ issue, variant, onClose, onSetSla }: TProps) {
   const { workspace, canEdit } = useWorkspace();
-  const { teams } = useTeams();
   const { data: me } = useQuery(meQuery);
   const now = useNow();
-  const team = teams.find((item) => item.id === issue.team.id);
   const { copyLink, copyBranch, copyIdentifier } = useCopyIssue();
   const lifecycle = useIssueLifecycle();
   const openPage = useOpenIssuePage();
@@ -96,7 +92,10 @@ export function IssueDetailHeader({ issue, variant, onClose, onSetSla }: TProps)
         <Breadcrumb
           items={[
             ...(variant === "page" ? [{ label: workspace.name }] : []),
-            team ? teamCrumb(team, workspace.urlKey) : { label: issue.team.name },
+            {
+              label: "Issues",
+              link: { to: "/$workspace/issues", params: { workspace: workspace.urlKey } },
+            },
             { label: issue.identifier },
           ]}
         />

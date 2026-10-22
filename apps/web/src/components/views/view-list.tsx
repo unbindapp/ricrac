@@ -32,8 +32,7 @@ export function ViewList({ onCreate }: { onCreate?: () => void }) {
       empty={{
         icon: LayersIcon,
         title: "No views yet",
-        description:
-          "A view saves a filter of issues or projects, across teams if you like, and keeps it up to date.",
+        description: "A view saves a filter of issues or projects and keeps it up to date.",
         action: onCreate && (
           <Button size="sm" variant="outline" onClick={onCreate}>
             <PlusIcon className="size-4" />
@@ -84,7 +83,6 @@ function ViewRow({ view }: { view: TView }) {
         )}
       </Link>
       {isProjects && <Badge variant="muted">Projects</Badge>}
-      {view.team && <Badge variant="outline">{view.team.key}</Badge>}
       {view.shared && view.owner && (
         <Avatar id={view.owner.id} name={view.owner.displayName} size="sm" />
       )}

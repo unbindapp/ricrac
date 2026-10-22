@@ -27,12 +27,12 @@ const TYPE_ORDER: TStateType[] = [
   "canceled",
 ];
 
-type TProps = { team: string | null; filter: TFilter };
+type TProps = { filter: TFilter };
 
-/** The issues a view's filter matches, by status type so views across teams line up. */
-export function ViewIssues({ team, filter }: TProps) {
+/** The issues a view's filter matches, by status type. */
+export function ViewIssues({ filter }: TProps) {
   const { workspace } = useWorkspace();
-  const query = useInfiniteQuery(viewIssuesQuery(workspace.id, team, filter));
+  const query = useInfiniteQuery(viewIssuesQuery(workspace.id, filter));
   if (query.isPending) return <ListSkeleton />;
   if (query.error) {
     return <ErrorCard message={query.error.message} onRetry={() => void query.refetch()} />;
@@ -129,9 +129,9 @@ function IssueRow({ issue }: { issue: Issue }) {
 }
 
 /** The projects a project view's filter matches. */
-export function ViewProjects({ team, filter }: TProps) {
+export function ViewProjects({ filter }: TProps) {
   const { workspace } = useWorkspace();
-  const query = useInfiniteQuery(viewProjectsQuery(workspace.id, team, filter));
+  const query = useInfiniteQuery(viewProjectsQuery(workspace.id, filter));
   if (query.isPending) return <ListSkeleton />;
   if (query.error) {
     return <ErrorCard message={query.error.message} onRetry={() => void query.refetch()} />;

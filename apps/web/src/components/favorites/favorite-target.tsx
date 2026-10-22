@@ -9,13 +9,17 @@ import type {
   IssueRef,
   LabelRef,
   ProjectRef,
-  TeamRef,
 } from "@/api/ops.gen";
 import { cycleStatus } from "@/components/cycles/cycle-status";
-import { BoxIcon, FileTextIcon, LayersIcon, TargetIcon } from "@/components/icons/symbols.gen";
+import {
+  BoxIcon,
+  FileTextIcon,
+  LayersIcon,
+  ListTodoIcon,
+  TargetIcon,
+} from "@/components/icons/symbols.gen";
 import { CycleIcon } from "@/components/shared/cycle-icon";
 import { StateIcon } from "@/components/shared/state-icon";
-import { TeamIcon } from "@/components/shared/team-icon";
 import { cycleName } from "@/lib/queries/cycles";
 import type { TFavorite } from "@/lib/queries/favorites";
 
@@ -57,11 +61,11 @@ export function favoriteTarget(workspace: string, favorite: TFavorite): TFavorit
     case "cycle": {
       const cycle = favorite.target as FavoriteCycle;
       return {
-        label: `${cycle.team.key} · ${cycleName(cycle)}`,
+        label: cycleName(cycle),
         icon: <CycleIcon status={cycleStatus(cycle)} className="size-4" />,
         link: {
-          to: "/$workspace/team/$key/cycle/$number",
-          params: { workspace, key: cycle.team.key, number: String(cycle.number) },
+          to: "/$workspace/cycle/$number",
+          params: { workspace, number: String(cycle.number) },
         },
       };
     }
@@ -97,14 +101,12 @@ export function favoriteTarget(workspace: string, favorite: TFavorite): TFavorit
         },
       };
     }
-    case "team": {
-      const team = favorite.target as TeamRef;
+    case "team":
       return {
-        label: team.name,
-        icon: <TeamIcon teamKey={team.key} size="sm" />,
-        link: { to: "/$workspace/team/$key/issues", params: { workspace, key: team.key } },
+        label: "Issues",
+        icon: <ListTodoIcon className="size-4" />,
+        link: { to: "/$workspace/issues", params: { workspace } },
       };
-    }
   }
   return null;
 }

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"ricrac/ent/issue"
 	"ricrac/ent/predicate"
+	"ricrac/ent/schema/pgarray"
 	"ricrac/ent/team"
 	"ricrac/ent/workflowstate"
 	"time"
@@ -186,6 +187,18 @@ func (_u *WorkflowStateUpdate) SetNillableUpdatedAt(v *time.Time) *WorkflowState
 // ClearUpdatedAt clears the value of the "updated_at" field.
 func (_u *WorkflowStateUpdate) ClearUpdatedAt() *WorkflowStateUpdate {
 	_u.mutation.ClearUpdatedAt()
+	return _u
+}
+
+// SetMergedIds sets the "merged_ids" field.
+func (_u *WorkflowStateUpdate) SetMergedIds(v pgarray.UUID) *WorkflowStateUpdate {
+	_u.mutation.SetMergedIds(v)
+	return _u
+}
+
+// ClearMergedIds clears the value of the "merged_ids" field.
+func (_u *WorkflowStateUpdate) ClearMergedIds() *WorkflowStateUpdate {
+	_u.mutation.ClearMergedIds()
 	return _u
 }
 
@@ -476,6 +489,12 @@ func (_u *WorkflowStateUpdate) sqlSave(ctx context.Context) (_node int, err erro
 	}
 	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(workflowstate.FieldUpdatedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.MergedIds(); ok {
+		_spec.SetField(workflowstate.FieldMergedIds, field.TypeOther, value)
+	}
+	if _u.mutation.MergedIdsCleared() {
+		_spec.ClearField(workflowstate.FieldMergedIds, field.TypeOther)
 	}
 	if _u.mutation.TeamCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -910,6 +929,18 @@ func (_u *WorkflowStateUpdateOne) ClearUpdatedAt() *WorkflowStateUpdateOne {
 	return _u
 }
 
+// SetMergedIds sets the "merged_ids" field.
+func (_u *WorkflowStateUpdateOne) SetMergedIds(v pgarray.UUID) *WorkflowStateUpdateOne {
+	_u.mutation.SetMergedIds(v)
+	return _u
+}
+
+// ClearMergedIds clears the value of the "merged_ids" field.
+func (_u *WorkflowStateUpdateOne) ClearMergedIds() *WorkflowStateUpdateOne {
+	_u.mutation.ClearMergedIds()
+	return _u
+}
+
 // SetTeam sets the "team" edge to the Team entity.
 func (_u *WorkflowStateUpdateOne) SetTeam(v *Team) *WorkflowStateUpdateOne {
 	return _u.SetTeamID(v.ID)
@@ -1227,6 +1258,12 @@ func (_u *WorkflowStateUpdateOne) sqlSave(ctx context.Context) (_node *WorkflowS
 	}
 	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(workflowstate.FieldUpdatedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.MergedIds(); ok {
+		_spec.SetField(workflowstate.FieldMergedIds, field.TypeOther, value)
+	}
+	if _u.mutation.MergedIdsCleared() {
+		_spec.ClearField(workflowstate.FieldMergedIds, field.TypeOther)
 	}
 	if _u.mutation.TeamCleared() {
 		edge := &sqlgraph.EdgeSpec{

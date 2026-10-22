@@ -17,12 +17,19 @@ func (self *TeamService) Delete(ctx context.Context, actor *auth.Actor, input *I
 	if err := actor.RequireMember(); err != nil {
 		return models.DeletedTeam{}, err
 	}
-	team, err := self.resolve.Team(ctx, actor, input.ID)
+	team, err := self.resolve.TeamOrDefault(ctx, actor, input.ID)
 	if err != nil {
 		return models.DeletedTeam{}, err
 	}
 	var key string
 	err = self.repo.WithTx(ctx, func(tx repository.TxInterface) error {
+		only, err := self.isWorkspaceTeam(ctx, tx, actor, team)
+		if err != nil {
+			return err
+		}
+		if only {
+			return errdefs.BadRequest("This is the workspace's team, which holds its issues, statuses and labels; it can't be deleted. Change it with save_team, or delete the workspace")
+		}
 		if actor.Role < auth.Admin {
 			m, err := self.repo.Team().Membership(ctx, tx, team, actor.User)
 			if err != nil {
@@ -86,7 +93,7 @@ func (self *TeamService) Join(ctx context.Context, actor *auth.Actor, input *IDI
 }
 
 func (self *TeamService) Leave(ctx context.Context, actor *auth.Actor, input *IDInput) (models.LeftTeam, error) {
-	team, err := self.resolve.Team(ctx, actor, input.ID)
+	team, err := self.resolve.TeamOrDefault(ctx, actor, input.ID)
 	if err != nil {
 		return models.LeftTeam{}, err
 	}
@@ -94,6 +101,13 @@ func (self *TeamService) Leave(ctx context.Context, actor *auth.Actor, input *ID
 	err = self.repo.WithTx(ctx, func(tx repository.TxInterface) error {
 		if err := self.repo.Team().Lock(ctx, tx, team); err != nil {
 			return err
+		}
+		only, err := self.isWorkspaceTeam(ctx, tx, actor, team)
+		if err != nil {
+			return err
+		}
+		if only {
+			return errdefs.BadRequest("Everyone in the workspace is on its team; leave the workspace instead")
 		}
 		m, err := self.repo.Team().Membership(ctx, tx, team, actor.User)
 		if err != nil {
@@ -128,7 +142,7 @@ func (self *TeamService) Leave(ctx context.Context, actor *auth.Actor, input *ID
 }
 
 type TriageInput struct {
-	ID    string  `json:"id" doc:"Team key, name or id."`
+	ID    *string `json:"id" doc:"Optional: the workspace's team by default. Its key, name or id."`
 	Limit *int    `json:"limit" doc:"How many upcoming shifts to list, 10 by default, at most 100."`
 	User  *string `json:"user" doc:"Only this person's shifts: id, name, email or \"me\"."`
 }
@@ -158,7 +172,7 @@ func shifts(people []uuid.UUID, weeks int, start, today time.Time, limit int, on
 }
 
 func (self *TeamService) TriageResponsibility(ctx context.Context, actor *auth.Actor, input *TriageInput) (models.TriageResponsibility, error) {
-	team, err := self.resolve.Team(ctx, actor, input.ID)
+	team, err := self.resolve.TeamOrDefault(ctx, actor, input.ID)
 	if err != nil {
 		return models.TriageResponsibility{}, err
 	}

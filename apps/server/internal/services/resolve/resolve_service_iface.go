@@ -15,10 +15,18 @@ type ResolveServiceInterface interface {
 	// before the @, first name, or "me".
 	User(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error)
 	Users(ctx context.Context, actor *auth.Actor, values []string) ([]uuid.UUID, error)
-	// Team is a team the caller can see, by id, key or name.
+	// Team is a team the caller can see, by id, key or name, or by the id, key or name of a team that
+	// was merged into it or a key or name it had before.
 	Team(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error)
 	// OptionalTeam resolves a team when one is named.
 	OptionalTeam(ctx context.Context, actor *auth.Actor, value *string) (*uuid.UUID, error)
+	// DefaultTeam is the workspace's team, for arguments that name none.
+	DefaultTeam(ctx context.Context, actor *auth.Actor) (uuid.UUID, error)
+	// TeamOrDefault is the team named, or the workspace's team when value is nil or blank.
+	TeamOrDefault(ctx context.Context, actor *auth.Actor, value *string) (uuid.UUID, error)
+	// CurrentNames rewrites what a filter calls a team, status or label by an earlier name to what
+	// it is called now: the ids of those merged into others, and the earlier keys and names of teams.
+	CurrentNames(ctx context.Context, actor *auth.Actor, filter any) (any, error)
 	// State is a workflow state of the team, by id, name or type (the first of that type).
 	State(ctx context.Context, actor *auth.Actor, team uuid.UUID, value string) (uuid.UUID, error)
 	// Issue is an issue the caller can see, by id, identifier (current or earlier) or link. Trashed
@@ -27,8 +35,8 @@ type ResolveServiceInterface interface {
 	// CanSeeIssue says whether the issue is in a team the caller sees or shared with them.
 	CanSeeIssue(ctx context.Context, actor *auth.Actor, issue uuid.UUID) (bool, error)
 	Issues(ctx context.Context, actor *auth.Actor, values []string) ([]uuid.UUID, error)
-	// Labels is issue labels by id or name, among the workspace's labels and the team's. A child of
-	// a group can be named Group/Child.
+	// Labels is issue labels by id or name, among the workspace's labels and the team's (the
+	// workspace's team when nil). A child of a group can be named Group/Child.
 	Labels(ctx context.Context, actor *auth.Actor, team *uuid.UUID, values []string) ([]uuid.UUID, error)
 	// Project is a project by id, slug, link or name.
 	Project(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error)

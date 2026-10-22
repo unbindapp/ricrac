@@ -25,7 +25,7 @@ function CreateWorkspace() {
       title={invitations.length > 0 ? "Join or create a workspace" : "Create a workspace"}
       description={
         hasWorkspaces
-          ? "Workspaces hold teams, projects and issues."
+          ? "Workspaces hold issues, projects and docs."
           : "You aren't in a workspace yet. Create one, or ask someone to invite you."
       }
       footer={

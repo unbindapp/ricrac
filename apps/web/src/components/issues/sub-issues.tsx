@@ -54,7 +54,6 @@ export function AddSubIssueMenu({
       ]}
       onOption={() =>
         openNewIssue({
-          teamId: issue.team.id,
           draft: {
             parent: toIssueRef(issue),
             project: issue.project,

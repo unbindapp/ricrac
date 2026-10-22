@@ -9,6 +9,7 @@ import { ShortcutsDialog } from "@/components/command-panel/shortcuts-dialog";
 import {
   BoxIcon,
   CheckIcon,
+  CircleDotIcon,
   FileTextIcon,
   InboxIcon,
   KeyboardIcon,
@@ -18,14 +19,15 @@ import {
   MessagesSquareIcon,
   MonitorIcon,
   MoonIcon,
+  RefreshCwIcon,
   SettingsIcon,
   SquarePenIcon,
   SunIcon,
   TargetIcon,
   TriangleAlertIcon,
+  TriangleIcon,
   UserCircleIcon,
   UserPlusIcon,
-  UsersRoundIcon,
 } from "@/components/icons/symbols.gen";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
 import { useNewProjectStore } from "@/components/projects/new-project-store";
@@ -38,9 +40,7 @@ import {
   Snippet,
 } from "@/components/search/search-hits";
 import { useSearch } from "@/components/search/use-search";
-import { useCreateTeamStore } from "@/components/settings/create-team-store";
 import { useInviteStore } from "@/components/settings/invite-store";
-import { TeamIcon } from "@/components/shared/team-icon";
 import {
   Command,
   CommandEmpty,
@@ -51,7 +51,7 @@ import {
 } from "@/components/ui/command";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useTeams } from "@/components/workspace/teams-provider";
+import { useWorkspaceTeam } from "@/components/workspace/teams-provider";
 import { WorkspaceIcon } from "@/components/workspace/workspace-icon";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { GO_TO_KEYS } from "@/lib/hotkeys/shortcuts";
@@ -60,14 +60,18 @@ import { useHotkeySequenceScope } from "@/lib/hotkeys/use-hotkey-sequences";
 import { meQuery, signOut } from "@/lib/queries/me";
 import type { TSearchHit } from "@/lib/queries/search";
 
-type TDestination = keyof typeof GO_TO_KEYS;
+type TShortcutDestination = keyof typeof GO_TO_KEYS;
+type TDestination = TShortcutDestination | "cycles";
+
+const shortcutDestinations = Object.keys(GO_TO_KEYS) as TShortcutDestination[];
 
 /** The pages G then a letter, and the panel's Go to group, lead to. */
 function useDestinations(): Record<
   TDestination,
-  { label: string; icon: ReactNode; link: LinkProps }
+  { label: string; icon: ReactNode; link: LinkProps; isHidden?: boolean }
 > {
-  const { workspace, isAdmin } = useWorkspace();
+  const { workspace, canEdit, isAdmin } = useWorkspace();
+  const team = useWorkspaceTeam();
   const params = { workspace: workspace.urlKey };
   return {
     inbox: { label: "Inbox", icon: <InboxIcon />, link: { to: "/$workspace/inbox", params } },
@@ -77,9 +81,26 @@ function useDestinations(): Record<
       link: { to: "/$workspace/my-issues", params },
     },
     issues: {
-      label: "All issues",
-      icon: <ListTodoIcon />,
+      label: "Issues",
+      icon: <CircleDotIcon />,
       link: { to: "/$workspace/issues", params },
+    },
+    backlog: {
+      label: "Backlog",
+      icon: <ListTodoIcon />,
+      link: { to: "/$workspace/issues", params, search: { tab: "backlog" } },
+    },
+    triage: {
+      label: "Triage",
+      icon: <TriangleIcon />,
+      link: { to: "/$workspace/triage", params },
+      isHidden: !team?.triageEnabled,
+    },
+    cycles: {
+      label: "Cycles",
+      icon: <RefreshCwIcon />,
+      link: { to: "/$workspace/cycles", params },
+      isHidden: !team?.cyclesEnabled,
     },
     projects: {
       label: "Projects",
@@ -91,6 +112,7 @@ function useDestinations(): Record<
       label: "Initiatives",
       icon: <TargetIcon />,
       link: { to: "/$workspace/initiatives", params },
+      isHidden: !canEdit,
     },
     documents: {
       label: "Documents",
@@ -128,7 +150,7 @@ export function CommandPanel() {
     modal: true,
   });
   useHotkeySequenceScope(
-    (Object.keys(GO_TO_KEYS) as TDestination[]).map((destination) => ({
+    shortcutDestinations.map((destination) => ({
       sequence: ["G", GO_TO_KEYS[destination]],
       callback: () => void navigate(destinations[destination].link),
     })),
@@ -167,11 +189,9 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
   const navigate = useNavigate();
   const { theme: currentTheme, setTheme } = useTheme();
   const { workspace, canEdit } = useWorkspace();
-  const { myTeams } = useTeams();
   const { data: me } = useQuery(meQuery);
   const openNewIssue = useNewIssueStore((state) => state.open);
   const openNewProject = useNewProjectStore((state) => state.open);
-  const openCreateTeam = useCreateTeamStore((state) => state.setOpen);
   const openInvite = useInviteStore((state) => state.setOpen);
   const setShortcutsOpen = useCommandPanelStore((state) => state.setShortcutsOpen);
   const destinations = useDestinations();
@@ -204,13 +224,6 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
           run: run(() => openNewProject()),
         },
         {
-          id: "new-team",
-          label: "New team",
-          icon: <UsersRoundIcon />,
-          keywords: ["create", "add"],
-          run: run(() => openCreateTeam(true)),
-        },
-        {
           id: "invite",
           label: "Invite people",
           icon: <UserPlusIcon />,
@@ -220,31 +233,20 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
       ]
     : [];
 
-  const goTo: TAction[] = (Object.keys(GO_TO_KEYS) as TDestination[])
-    .filter((destination) => canEdit || destination !== "initiatives")
+  const goTo: TAction[] = (Object.keys(destinations) as TDestination[])
+    .filter((destination) => !destinations[destination].isHidden)
     .map((destination) => {
       const { label, icon, link } = destinations[destination];
+      const key = destination === "cycles" ? undefined : GO_TO_KEYS[destination];
       return {
         id: `go-${destination}`,
         label: `Go to ${label.toLowerCase()}`,
         icon,
         keywords: ["navigate", "open"],
-        shortcut: { keys: ["G", GO_TO_KEYS[destination]], then: true },
+        shortcut: key ? { keys: ["G", key], then: true } : undefined,
         run: () => go(link),
       };
     });
-
-  const teams: TAction[] = myTeams.map((team) => ({
-    id: `team-${team.id}`,
-    label: `${team.name} issues`,
-    keywords: [team.key, "team"],
-    icon: <TeamIcon teamKey={team.key} icon={team.icon} color={team.color} size="sm" />,
-    run: () =>
-      go({
-        to: "/$workspace/team/$key/issues",
-        params: { workspace: workspace.urlKey, key: team.key },
-      }),
-  }));
 
   const workspaces: TAction[] = (me?.workspaces ?? [])
     .filter((item) => item.id !== workspace.id)
@@ -309,7 +311,6 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
           <SearchGroups hits={search.hits} query={query} onOpen={go} />
           <ActionGroup heading="Create" actions={create} />
           <ActionGroup heading="Go to" actions={goTo} />
-          <ActionGroup heading="Teams" actions={teams} />
           <ActionGroup heading="Workspaces" actions={workspaces} />
           <ActionGroup heading="Preferences" actions={preferences} />
         </CommandList>

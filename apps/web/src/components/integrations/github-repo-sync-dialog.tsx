@@ -7,7 +7,6 @@ import { GithubIcon } from "@/components/icons/github";
 import { LockIcon } from "@/components/icons/symbols.gen";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ProjectIcon } from "@/components/shared/project-icon";
-import { TeamIcon } from "@/components/shared/team-icon";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,7 +19,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useTeams } from "@/components/workspace/teams-provider";
+import { useWorkspaceTeam } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { submitHandler, type TSelectFieldItem, useAppForm } from "@/lib/hooks/use-app-form";
 import { projectOptionsQuery } from "@/lib/queries/entity-options";
@@ -30,7 +29,6 @@ const NO_PROJECT = "none";
 
 const formSchema = z.object({
   repository: z.string().min(1, "Pick a repository."),
-  team: z.string().min(1, "Pick a team."),
   project: z.string(),
   includeClosed: z.boolean(),
   backfill: z.boolean(),
@@ -48,7 +46,7 @@ export function GithubRepoSyncDialog({ trigger, repoSync }: TProps) {
         <DialogHeader>
           <DialogTitle>{repoSync ? repoSync.repository.fullName : "Sync a repository"}</DialogTitle>
           <DialogDescription>
-            Issues opened on GitHub become issues of the team, and changes made in Ricrac go back to
+            Issues opened on GitHub become issues here, and changes made in Ricrac go back to
             GitHub.
           </DialogDescription>
         </DialogHeader>
@@ -60,7 +58,7 @@ export function GithubRepoSyncDialog({ trigger, repoSync }: TProps) {
 
 function RepoSyncForm({ repoSync, onDone }: { repoSync?: GitHubRepoSync; onDone: () => void }) {
   const { workspace } = useWorkspace();
-  const { teams } = useTeams();
+  const team = useWorkspaceTeam();
   const repositories = useQuery({ ...githubRepositoriesQuery(workspace.id), enabled: !repoSync });
   const { data: projects = [] } = useQuery(projectOptionsQuery(workspace.id));
   const { mutateAsync: save } = useSaveGithubRepoSyncMutation(workspace.id);
@@ -68,7 +66,6 @@ function RepoSyncForm({ repoSync, onDone }: { repoSync?: GitHubRepoSync; onDone:
   const form = useAppForm({
     defaultValues: {
       repository: repoSync?.repository.fullName ?? "",
-      team: repoSync?.team.id ?? teams[0]?.id ?? "",
       project: repoSync?.project?.id ?? NO_PROJECT,
       includeClosed: repoSync?.backfill?.includeClosed ?? false,
       backfill: !repoSync,
@@ -76,13 +73,18 @@ function RepoSyncForm({ repoSync, onDone }: { repoSync?: GitHubRepoSync; onDone:
     validators: { onSubmit: formSchema },
     onSubmit: async ({ value }) => {
       const project = value.project === NO_PROJECT ? null : value.project;
-      const fields = { team: value.team, project, includeClosed: value.includeClosed };
+      const fields = { project, includeClosed: value.includeClosed };
       if (repoSync) {
         await save({ id: repoSync.id, ...fields, backfill: value.backfill || undefined });
         onDone();
         return;
       }
-      await save({ repository: value.repository, ...fields, backfill: value.backfill });
+      await save({
+        repository: value.repository,
+        team: team?.id,
+        ...fields,
+        backfill: value.backfill,
+      });
       onDone();
     },
   });
@@ -98,11 +100,6 @@ function RepoSyncForm({ repoSync, onDone }: { repoSync?: GitHubRepoSync; onDone:
         <GithubIcon className="text-muted-foreground" />
       ),
     }));
-  const teamItems: TSelectFieldItem[] = teams.map((team) => ({
-    value: team.id,
-    label: team.name,
-    icon: <TeamIcon teamKey={team.key} icon={team.icon} color={team.color} size="sm" />,
-  }));
   const projectItems: TSelectFieldItem[] = [
     { value: NO_PROJECT, label: "No project" },
     ...projects.map((project) => ({
@@ -136,16 +133,6 @@ function RepoSyncForm({ repoSync, onDone }: { repoSync?: GitHubRepoSync; onDone:
           />
         </RepositoryField>
       )}
-      <form.AppField
-        name="team"
-        children={(field) => (
-          <field.SelectField
-            label="Team"
-            description="Issues from GitHub join this team."
-            items={teamItems}
-          />
-        )}
-      />
       <form.AppField
         name="project"
         children={(field) => (

@@ -17,8 +17,7 @@ export const queryKeyReleases = {
 export const pipelinesQuery = (workspaceId: string) =>
   queryOptions({
     queryKey: queryKeyReleases.pipelines(workspaceId),
-    queryFn: () =>
-      callAll(workspaceId, "list_release_pipelines", { includeStages: true, includeTeams: true }),
+    queryFn: () => callAll(workspaceId, "list_release_pipelines", { includeStages: true }),
   });
 
 export const releasesQuery = (workspaceId: string, pipeline: string) =>

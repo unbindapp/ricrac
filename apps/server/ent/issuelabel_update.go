@@ -9,6 +9,7 @@ import (
 	"ricrac/ent/issue"
 	"ricrac/ent/issuelabel"
 	"ricrac/ent/predicate"
+	"ricrac/ent/schema/pgarray"
 	"ricrac/ent/team"
 	"ricrac/ent/user"
 	"ricrac/ent/workspace"
@@ -256,6 +257,18 @@ func (_u *IssueLabelUpdate) ClearUpdatedAt() *IssueLabelUpdate {
 	return _u
 }
 
+// SetMergedIds sets the "merged_ids" field.
+func (_u *IssueLabelUpdate) SetMergedIds(v pgarray.UUID) *IssueLabelUpdate {
+	_u.mutation.SetMergedIds(v)
+	return _u
+}
+
+// ClearMergedIds clears the value of the "merged_ids" field.
+func (_u *IssueLabelUpdate) ClearMergedIds() *IssueLabelUpdate {
+	_u.mutation.ClearMergedIds()
+	return _u
+}
+
 // SetWorkspace sets the "workspace" edge to the Workspace entity.
 func (_u *IssueLabelUpdate) SetWorkspace(v *Workspace) *IssueLabelUpdate {
 	return _u.SetWorkspaceID(v.ID)
@@ -471,6 +484,12 @@ func (_u *IssueLabelUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 	}
 	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(issuelabel.FieldUpdatedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.MergedIds(); ok {
+		_spec.SetField(issuelabel.FieldMergedIds, field.TypeOther, value)
+	}
+	if _u.mutation.MergedIdsCleared() {
+		_spec.ClearField(issuelabel.FieldMergedIds, field.TypeOther)
 	}
 	if _u.mutation.WorkspaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -922,6 +941,18 @@ func (_u *IssueLabelUpdateOne) ClearUpdatedAt() *IssueLabelUpdateOne {
 	return _u
 }
 
+// SetMergedIds sets the "merged_ids" field.
+func (_u *IssueLabelUpdateOne) SetMergedIds(v pgarray.UUID) *IssueLabelUpdateOne {
+	_u.mutation.SetMergedIds(v)
+	return _u
+}
+
+// ClearMergedIds clears the value of the "merged_ids" field.
+func (_u *IssueLabelUpdateOne) ClearMergedIds() *IssueLabelUpdateOne {
+	_u.mutation.ClearMergedIds()
+	return _u
+}
+
 // SetWorkspace sets the "workspace" edge to the Workspace entity.
 func (_u *IssueLabelUpdateOne) SetWorkspace(v *Workspace) *IssueLabelUpdateOne {
 	return _u.SetWorkspaceID(v.ID)
@@ -1167,6 +1198,12 @@ func (_u *IssueLabelUpdateOne) sqlSave(ctx context.Context) (_node *IssueLabel, 
 	}
 	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(issuelabel.FieldUpdatedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.MergedIds(); ok {
+		_spec.SetField(issuelabel.FieldMergedIds, field.TypeOther, value)
+	}
+	if _u.mutation.MergedIdsCleared() {
+		_spec.ClearField(issuelabel.FieldMergedIds, field.TypeOther)
 	}
 	if _u.mutation.WorkspaceCleared() {
 		edge := &sqlgraph.EdgeSpec{

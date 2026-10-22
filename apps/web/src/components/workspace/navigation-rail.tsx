@@ -1,4 +1,4 @@
-import { Link, type LinkProps, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, type LinkProps, useNavigate } from "@tanstack/react-router";
 import { type ComponentProps, type ReactNode } from "react";
 
 import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
@@ -11,20 +11,21 @@ import {
   InboxIcon,
   KeyboardIcon,
   LayersIcon,
-  ListTodoIcon,
   MenuIcon,
   MessagesSquareIcon,
+  RefreshCwIcon,
   RocketIcon,
   SearchIcon,
   SettingsIcon,
   SquarePenIcon,
   TargetIcon,
   type TIcon,
+  TriangleIcon,
+  UserCircleIcon,
 } from "@/components/icons/symbols.gen";
 import { useInboxUnreadCount } from "@/components/inbox/inbox-unread-badge";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
 import { SidebarToggleTooltip } from "@/components/layout/sidebar-button";
-import { TeamIcon } from "@/components/shared/team-icon";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -36,7 +37,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SimpleTooltip } from "@/components/ui/tooltip";
-import { useTeams } from "@/components/workspace/teams-provider";
+import { useWorkspaceTeam } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
 import { useSidebarStore } from "@/lib/stores/sidebar";
@@ -52,22 +53,34 @@ type TDestination = {
 /** The Material 3 navigation rail: the main destinations, with the rest in menus. */
 export function NavigationRail() {
   const { workspace, canEdit, isAdmin } = useWorkspace();
+  const team = useWorkspaceTeam();
   const openNewIssue = useNewIssueStore((state) => state.open);
   const openCommandPanel = useCommandPanelStore((state) => state.setOpen);
   const expand = useSidebarStore((state) => state.toggle);
   const unread = useInboxUnreadCount();
   const params = { workspace: workspace.urlKey };
 
-  const personal: TDestination[] = [
+  const destinations: TDestination[] = [
     {
       label: "Inbox",
       icon: InboxIcon,
       link: { to: "/$workspace/inbox", params },
       badge: unread > 0 && <RailBadge count={unread} />,
     },
-    { label: "My issues", icon: CircleDotIcon, link: { to: "/$workspace/my-issues", params } },
-  ];
-  const shared: TDestination[] = [
+    { label: "My issues", icon: UserCircleIcon, link: { to: "/$workspace/my-issues", params } },
+    { label: "Issues", icon: CircleDotIcon, link: { to: "/$workspace/issues", params } },
+    {
+      label: "Triage",
+      icon: TriangleIcon,
+      link: { to: "/$workspace/triage", params },
+      isHidden: !team?.triageEnabled,
+    },
+    {
+      label: "Cycles",
+      icon: RefreshCwIcon,
+      link: { to: "/$workspace/cycles", params },
+      isHidden: !team?.cyclesEnabled,
+    },
     { label: "Projects", icon: BoxIcon, link: { to: "/$workspace/projects", params } },
     { label: "Views", icon: LayersIcon, link: { to: "/$workspace/views", params } },
     { label: "Docs", icon: FileTextIcon, link: { to: "/$workspace/documents", params } },
@@ -105,13 +118,11 @@ export function NavigationRail() {
       </div>
       <ScrollArea className="min-h-0 w-full flex-1" classNameViewport="flex flex-col items-center">
         <div className="flex w-full flex-col items-center gap-1">
-          {personal.map((destination) => (
-            <RailLink key={destination.label} {...destination} />
-          ))}
-          <TeamLinks />
-          {shared.map((destination) => (
-            <RailLink key={destination.label} {...destination} />
-          ))}
+          {destinations
+            .filter((destination) => !destination.isHidden)
+            .map((destination) => (
+              <RailLink key={destination.label} {...destination} />
+            ))}
           <MoreMenu />
         </div>
       </ScrollArea>
@@ -194,30 +205,6 @@ function RailBadge({ count }: { count: number }) {
   );
 }
 
-function TeamLinks() {
-  const { workspace } = useWorkspace();
-  const { myTeams } = useTeams();
-  const pathname = useRouterState({ select: (state) => state.location.pathname });
-  return myTeams.map((team) => {
-    const isActive = pathname.startsWith(`/${workspace.urlKey}/team/${team.key}/`);
-    return (
-      <Link
-        key={team.id}
-        to="/$workspace/team/$key/issues"
-        params={{ workspace: workspace.urlKey, key: team.key }}
-        data-status={isActive ? "active" : undefined}
-        aria-current={isActive ? "page" : undefined}
-        className={railItemClassName}
-      >
-        <RailIndicator>
-          <TeamIcon teamKey={team.key} icon={team.icon} color={team.color} />
-        </RailIndicator>
-        <span className="max-w-full truncate px-1">{team.name}</span>
-      </Link>
-    );
-  });
-}
-
 function MoreMenu() {
   const { workspace, canEdit } = useWorkspace();
   const openShortcuts = useCommandPanelStore((state) => state.setShortcutsOpen);
@@ -237,7 +224,6 @@ function MoreMenu() {
       isHidden: !canEdit,
     },
     { label: "Releases", icon: RocketIcon, link: { to: "/$workspace/releases", params } },
-    { label: "All issues", icon: ListTodoIcon, link: { to: "/$workspace/issues", params } },
   ];
   return (
     <DropdownMenu>

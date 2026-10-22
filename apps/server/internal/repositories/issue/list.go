@@ -2,6 +2,7 @@ package issue_repo
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"entgo.io/ent/dialect"
@@ -87,7 +88,7 @@ func (self *IssueRepository) List(ctx context.Context, query ListQuery) ([]uuid.
 		}).IDs(ctx)
 }
 
-// searchFor finds the words, or the issue an identifier names.
+// searchFor finds the words, or the issue an identifier (current or earlier) names.
 func searchFor(i, query string) *entsql.Predicate {
 	key, number, ok := utils.ParseIdentifier(query)
 	if !ok {
@@ -95,6 +96,7 @@ func searchFor(i, query string) *entsql.Predicate {
 	}
 	q := &SQL{}
 	q.Push("((upper(t.key) = ").Bind(key).Push(" AND " + i + ".number = ").Bind(number).Push(") OR ")
+	q.Bind(fmt.Sprintf("%s-%d", key, number)).Push(" = ANY(" + i + ".previous_identifiers) OR ")
 	q.Append(Search(i, query)).Push(")")
 	return q.Condition().On(i)
 }
@@ -104,11 +106,6 @@ func (self *IssueRepository) SubTeams(ctx context.Context, teamID uuid.UUID) ([]
 	return scanAll[uuid.UUID](ctx, self.base.DB,
 		`WITH RECURSIVE tree AS (SELECT id FROM teams WHERE id = $1
 		 UNION SELECT t.id FROM teams t JOIN tree ON t.parent_id = tree.id) SELECT id FROM tree`, teamID)
-}
-
-// TeamsByKey is the unarchived teams among ids, by key.
-func (self *IssueRepository) TeamsByKey(ctx context.Context, ids []uuid.UUID) ([]*ent.Team, error) {
-	return self.base.DB.Team.Query().Where(team.IDIn(ids...), team.ArchivedAtIsNil()).Order(team.ByKey()).All(ctx)
 }
 
 // View is a custom view's model, filter and team.

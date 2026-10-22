@@ -235,6 +235,12 @@ func (self *TeamRepository) FindUnarchived(ctx context.Context, workspace uuid.U
 	return ids[0], true, nil
 }
 
+// Unarchived is the workspace's unarchived teams, the oldest first.
+func (self *TeamRepository) Unarchived(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID) ([]*ent.Team, error) {
+	return self.base.Client(tx).Team.Query().Where(team.WorkspaceID(workspace), team.ArchivedAtIsNil()).
+		Order(ent.Asc(team.FieldCreatedAt), ent.Asc(team.FieldID)).All(ctx)
+}
+
 // KeyTakenBy is the name of another unarchived team of the workspace with the key.
 func (self *TeamRepository) KeyTakenBy(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, key string, except *uuid.UUID) (string, bool, error) {
 	query := self.base.Client(tx).Team.Query().
@@ -287,6 +293,28 @@ func (self *TeamRepository) Blind(ctx context.Context, tx repository.TxInterface
 		 JOIN workspace_members m ON m.workspace_id = t.workspace_id AND m.user_id = u.id
 		 WHERE u.id = ANY($2) AND NOT ((NOT t.private AND m.role <> 'guest')
 			OR EXISTS (SELECT 1 FROM team_members tm WHERE tm.team_id = t.id AND tm.user_id = u.id))`, id, users)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var names []string
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			return nil, err
+		}
+		names = append(names, name)
+	}
+	return names, rows.Err()
+}
+
+// InWorkspace is the names of users who are active members of the team's workspace other than
+// guests.
+func (self *TeamRepository) InWorkspace(ctx context.Context, tx repository.TxInterface, id uuid.UUID, users []uuid.UUID) ([]string, error) {
+	rows, err := self.base.Client(tx).QueryContext(ctx,
+		`SELECT u.name FROM users u JOIN teams t ON t.id = $1
+		 JOIN workspace_members m ON m.workspace_id = t.workspace_id AND m.user_id = u.id
+		 WHERE u.id = ANY($2) AND m.active AND m.role <> 'guest' ORDER BY u.name`, id, users)
 	if err != nil {
 		return nil, err
 	}

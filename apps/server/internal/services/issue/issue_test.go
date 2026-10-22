@@ -54,16 +54,6 @@ func (suite *IssueServiceSuite) TestBulkChangesAreChecked() {
 	suite.Equal("changes can't have an id or a template", suite.message(err))
 }
 
-func (suite *IssueServiceSuite) TestNewIssuesNeedATeamWhenThereAreSeveral() {
-	suite.MockIssueRepo.EXPECT().TeamsByKey(mock.Anything, suite.teams).
-		Return([]*ent.Team{{ID: suite.teams[0], Key: "ENG"}, {ID: suite.teams[1], Key: "OPS"}}, nil).Once()
-	suite.MockIssueRepo.EXPECT().TeamsByKey(mock.Anything, suite.teams).Return(nil, nil).Once()
-	_, err := suite.service.onlyTeam(suite.Ctx, suite.actor)
-	suite.Equal("Name the team: ENG, OPS", suite.message(err))
-	_, err = suite.service.onlyTeam(suite.Ctx, suite.actor)
-	suite.Equal("There are no teams yet; create one with save_team", suite.message(err))
-}
-
 func (suite *IssueServiceSuite) TestLabelsAreReplacedOrAddedNotBoth() {
 	err := suite.service.applyLabels(suite.Ctx, nil, suite.actor, &ent.Issue{}, SaveInput{Labels: []string{"Bug"}, AddLabels: []string{"UI"}}, M{})
 	suite.Equal("Pass either labels or addLabels/removeLabels, not both", suite.message(err))
