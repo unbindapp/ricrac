@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import {
   ArchiveIcon,
   ArchiveRestoreIcon,
@@ -7,7 +6,8 @@ import {
   InboxIcon,
   MailIcon,
   MailOpenIcon,
-} from "@/components/icons/symbols.gen";
+} from "lucide-react";
+
 import {
   NotificationTargetIcon,
   notificationTypeIcon,

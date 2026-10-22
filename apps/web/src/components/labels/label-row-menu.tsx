@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import {
   ArchiveIcon,
   ArchiveRestoreIcon,
@@ -7,7 +6,8 @@ import {
   PencilIcon,
   PlusIcon,
   Trash2Icon,
-} from "@/components/icons/symbols.gen";
+} from "lucide-react";
+
 import type { TLabelDialogTarget } from "@/components/labels/label-dialog";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Button } from "@/components/ui/button";

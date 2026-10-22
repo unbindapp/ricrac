@@ -1,4 +1,4 @@
-import { CheckIcon, CopyIcon } from "@/components/icons/symbols.gen";
+import { CheckIcon, CopyIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCopyToClipboard } from "@/lib/hooks/use-copy";
 

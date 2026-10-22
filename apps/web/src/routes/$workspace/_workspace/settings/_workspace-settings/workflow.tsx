@@ -17,14 +17,9 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { GripVerticalIcon, PencilIcon, PlusIcon, WorkflowIcon } from "lucide-react";
 
 import type { IssueStatus, Team } from "@/api/ops.gen";
-import {
-  GripVerticalIcon,
-  PencilIcon,
-  PlusIcon,
-  WorkflowIcon,
-} from "@/components/icons/symbols.gen";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { List } from "@/components/layout/list";

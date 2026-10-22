@@ -1,13 +1,13 @@
 import type { LinkProps } from "@tanstack/react-router";
 import { Fragment } from "react";
-
 import {
   BoxIcon,
   FileTextIcon,
   MessageSquareIcon,
   MessagesSquareIcon,
   TargetIcon,
-} from "@/components/icons/symbols.gen";
+} from "lucide-react";
+
 import { StateIcon } from "@/components/shared/state-icon";
 import type { TSearchHit } from "@/lib/queries/search";
 

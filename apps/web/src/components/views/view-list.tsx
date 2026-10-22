@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { BoxIcon, LayersIcon, PlusIcon } from "lucide-react";
 
 import { FavoriteButton } from "@/components/favorites/favorite-button";
-import { BoxIcon, LayersIcon, PlusIcon } from "@/components/icons/symbols.gen";
 import { List } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { SectionTitle } from "@/components/layout/section-title";

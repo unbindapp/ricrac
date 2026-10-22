@@ -1,7 +1,4 @@
 import type { LinkProps } from "@tanstack/react-router";
-
-import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
-import { SidebarFavorites } from "@/components/favorites/sidebar-favorites";
 import {
   BoxIcon,
   BuildingIcon,
@@ -17,10 +14,13 @@ import {
   SettingsIcon,
   SquarePenIcon,
   TargetIcon,
-  type TIcon,
+  type LucideIcon,
   TriangleIcon,
   UserCircleIcon,
-} from "@/components/icons/symbols.gen";
+} from "lucide-react";
+
+import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
+import { SidebarFavorites } from "@/components/favorites/sidebar-favorites";
 import { InboxUnreadBadge } from "@/components/inbox/inbox-unread-badge";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
 import { HideSidebarButton } from "@/components/layout/sidebar-button";
@@ -35,7 +35,7 @@ type TProps = {
   onNavigate?: () => void;
 };
 
-type TNavDestination = { label: string; icon: TIcon; link: LinkProps; isHidden?: boolean };
+type TNavDestination = { label: string; icon: LucideIcon; link: LinkProps; isHidden?: boolean };
 
 export function Sidebar({ onNavigate }: TProps) {
   const { workspace, canEdit } = useWorkspace();
@@ -59,16 +59,14 @@ export function Sidebar({ onNavigate }: TProps) {
     },
     { label: "Projects", icon: BoxIcon, link: { to: "/$workspace/projects", params } },
     { label: "Views", icon: LayersIcon, link: { to: "/$workspace/views", params } },
-    { label: "Documents", icon: FileTextIcon, link: { to: "/$workspace/documents", params } },
-    { label: "Forum", icon: MessagesSquareIcon, link: { to: "/$workspace/forum", params } },
-  ];
-  const more: TNavDestination[] = [
     {
       label: "Initiatives",
       icon: TargetIcon,
       link: { to: "/$workspace/initiatives", params },
       isHidden: !canEdit,
     },
+    { label: "Documents", icon: FileTextIcon, link: { to: "/$workspace/documents", params } },
+    { label: "Forum", icon: MessagesSquareIcon, link: { to: "/$workspace/forum", params } },
     {
       label: "Customers",
       icon: BuildingIcon,
@@ -96,10 +94,9 @@ export function Sidebar({ onNavigate }: TProps) {
         </Button>
         {canEdit && (
           <Button
-            variant="tonal"
+            variant="outline"
             size="icon"
             aria-label="New issue"
-            className="rounded-md"
             onClick={() => {
               onNavigate?.();
               openNewIssue();
@@ -129,9 +126,6 @@ export function Sidebar({ onNavigate }: TProps) {
           </div>
           <SidebarSection title="Workspace">
             <NavItems items={destinations} onNavigate={onNavigate} />
-          </SidebarSection>
-          <SidebarSection title="More" defaultOpen={false}>
-            <NavItems items={more} onNavigate={onNavigate} />
           </SidebarSection>
           <SidebarFavorites onNavigate={onNavigate} />
         </nav>

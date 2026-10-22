@@ -1,10 +1,10 @@
 import * as React from "react";
 import { type Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { Command as CommandPrimitive } from "cmdk";
-import { LoaderIcon, SearchIcon } from "@/components/icons/symbols.gen";
 import { cn } from "@/components/ui/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cva, VariantProps } from "class-variance-authority";
+import { LoaderIcon, SearchIcon } from "lucide-react";
 
 const commandVariants = cva(
   "flex h-full w-full flex-col overflow-hidden rounded-lg focus:outline-hidden",

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
+import { ArchiveIcon, ArchiveRestoreIcon } from "lucide-react";
 
-import { ArchiveIcon, ArchiveRestoreIcon } from "@/components/icons/symbols.gen";
 import {
   NotificationTargetIcon,
   notificationTypeIcon,

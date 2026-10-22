@@ -1,7 +1,7 @@
 import { type DragEvent, useState } from "react";
+import { CircleCheckIcon, FileJsonIcon, UploadIcon, XIcon } from "lucide-react";
 
 import type { ImportedIssues } from "@/api/ops.gen";
-import { CircleCheckIcon, FileJsonIcon, UploadIcon, XIcon } from "@/components/icons/symbols.gen";
 import { parseIssuesJson, type TParsedIssues } from "@/components/import/parse-issues";
 import { ErrorCard } from "@/components/layout/error-card";
 import { SettingsSection } from "@/components/layout/settings-section";

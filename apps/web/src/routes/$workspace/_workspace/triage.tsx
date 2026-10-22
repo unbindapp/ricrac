@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
+import { TriangleIcon } from "lucide-react";
 
 import type { Team } from "@/api/ops.gen";
-import { TriangleIcon } from "@/components/icons/symbols.gen";
 import { filtersFromSearch, filtersToSearch, issueSearchSchema } from "@/components/issues/filters";
 import { IssuesView } from "@/components/issues/issues-view";
 import { TriageActions } from "@/components/issues/triage-actions";

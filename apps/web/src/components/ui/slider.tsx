@@ -1,5 +1,4 @@
 import { Slider as SliderPrimitive } from "@base-ui/react/slider";
-
 import type * as React from "react";
 
 import { cn } from "@/components/ui/utils";
@@ -67,11 +66,11 @@ function Slider<Value extends number | readonly number[]>({
           data-slot="slider-track"
           data-painted={trackStyle ? true : undefined}
           style={trackStyle}
-          className="bg-secondary group-data-staged/root:bg-change/5-10 relative grow rounded-full select-none data-[orientation=horizontal]:h-4 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-4"
+          className="bg-border group-data-staged/root:bg-change/5-10 relative grow overflow-hidden rounded-full select-none data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5"
         >
           <SliderPrimitive.Indicator
             data-slot="slider-range"
-            className="bg-primary group-data-staged/root:bg-change rounded-full select-none in-data-painted:opacity-0 data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full"
+            className="bg-primary group-data-staged/root:bg-change select-none in-data-painted:hidden data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full"
           />
         </SliderPrimitive.Track>
         {Array.from({ length: _values.length }, (_, index) => (
@@ -79,7 +78,7 @@ function Slider<Value extends number | readonly number[]>({
             data-slot="slider-thumb"
             key={index}
             getAriaLabel={thumbLabel ? () => thumbLabel : undefined}
-            className="bg-primary group-data-staged/root:bg-change group-has-data-painted/slider:bg-foreground ease-emphasized has-focus-visible:outline-primary block h-11 w-1 shrink-0 rounded-full ring-6 ring-[color:var(--slider-gap,var(--color-card))] transition-[width] duration-200 select-none group-active/slider:w-0.5 active:cursor-grabbing disabled:pointer-events-none disabled:opacity-50 has-focus-visible:outline-2 has-focus-visible:outline-offset-4 data-[orientation=vertical]:h-1 data-[orientation=vertical]:w-11"
+            className="bg-foreground shadow-shadow-color/shadow-opacity group-active/slider:ring-foreground/8-10 active:ring-foreground/8-10 ring-foreground/7-10 group-data-staged/root:bg-change group-data-staged/root:ring-change/7-10 group-data-staged/root:active:ring-change/8-10 group-data-staged/root:group-active/slider:ring-change/8-10 block size-4 shrink-0 rounded-full shadow-md transition-[color,box-shadow] select-none group-active/slider:ring-4 active:cursor-grabbing active:ring-4 disabled:pointer-events-none disabled:opacity-50 has-hover:group-hover/slider:ring-6 has-hover:group-hover/slider:group-active/slider:ring-4 has-focus-visible:ring-6"
           />
         ))}
       </SliderPrimitive.Control>

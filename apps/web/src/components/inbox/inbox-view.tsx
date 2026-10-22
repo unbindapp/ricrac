@@ -1,7 +1,6 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-
 import {
   AlarmClockIcon,
   ArchiveIcon,
@@ -9,7 +8,8 @@ import {
   EllipsisIcon,
   InboxIcon,
   MailIcon,
-} from "@/components/icons/symbols.gen";
+} from "lucide-react";
+
 import { NotificationPane } from "@/components/inbox/notification-pane";
 import { NotificationRow } from "@/components/inbox/notification-row";
 import {

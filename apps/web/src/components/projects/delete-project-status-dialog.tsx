@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { Trash2Icon } from "lucide-react";
 
 import type { ProjectStatus } from "@/api/ops.gen";
-import { Trash2Icon } from "@/components/icons/symbols.gen";
 import { ProjectStatusIcon } from "@/components/projects/project-status-icon";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Button } from "@/components/ui/button";

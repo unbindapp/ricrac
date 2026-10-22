@@ -1,8 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-
-import { GoogleSignInButton, SignInNotConfigured } from "@/components/auth/sign-in";
-import { Logo } from "@/components/icons/logo";
 import {
   BotIcon,
   CableIcon,
@@ -10,13 +7,16 @@ import {
   MailIcon,
   MonitorIcon,
   RepeatIcon,
-  type TIcon,
+  type LucideIcon,
   UsersIcon,
-} from "@/components/icons/symbols.gen";
+} from "lucide-react";
+
+import { GoogleSignInButton, SignInNotConfigured } from "@/components/auth/sign-in";
+import { Logo } from "@/components/icons/logo";
 import { Button, LinkButton } from "@/components/ui/button";
 import { appConfigQuery } from "@/lib/queries/me";
 
-const features: { icon: TIcon; heading: string; body: string }[] = [
+const features: { icon: LucideIcon; heading: string; body: string }[] = [
   {
     icon: KanbanIcon,
     heading: "Everything you track",

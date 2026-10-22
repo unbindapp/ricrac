@@ -8,9 +8,9 @@ import {
   useRef,
   useState,
 } from "react";
+import { ListTodoIcon, PlusIcon } from "lucide-react";
 
 import type { Issue } from "@/api/ops.gen";
-import { ListTodoIcon, PlusIcon } from "@/components/icons/symbols.gen";
 import { BulkActionBar } from "@/components/issues/bulk-action-bar";
 import type { DisplaySettings } from "@/components/issues/display";
 import type { ListIssuesFilters } from "@/components/issues/filters";

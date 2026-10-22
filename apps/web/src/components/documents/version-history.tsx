@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { HistoryIcon } from "lucide-react";
 
 import type { DocumentDetail } from "@/api/ops.gen";
-import { HistoryIcon } from "@/components/icons/symbols.gen";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";

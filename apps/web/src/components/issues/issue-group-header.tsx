@@ -1,4 +1,4 @@
-import { ChevronRightIcon, PlusIcon } from "@/components/icons/symbols.gen";
+import { ChevronRightIcon, PlusIcon } from "lucide-react";
 import { GroupIcon } from "@/components/issues/group-icon";
 import type { TIssueGroup } from "@/components/issues/grouping";
 import { Button } from "@/components/ui/button";

@@ -1,6 +1,6 @@
 import { type ReactNode, useState } from "react";
+import { DownloadIcon, ExternalLinkIcon } from "lucide-react";
 
-import { DownloadIcon, ExternalLinkIcon } from "@/components/icons/symbols.gen";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { embedKind, mediaLayout, type TMediaLayout } from "@/lib/helpers/media";

@@ -1,6 +1,6 @@
+import { BoxIcon, Trash2Icon } from "lucide-react";
 import type { ConnectedApp } from "@/api/account.gen";
 import { AccessBadge } from "@/components/api-key/api-key-row";
-import { BoxIcon, Trash2Icon } from "@/components/icons/symbols.gen";
 import { ListRow, ListRowText } from "@/components/layout/list";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { RelativeTime } from "@/components/shared/relative-time";

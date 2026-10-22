@@ -1,6 +1,6 @@
 import { type ReactNode, useId } from "react";
+import { ChevronsUpDownIcon } from "lucide-react";
 
-import { ChevronsUpDownIcon } from "@/components/icons/symbols.gen";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {

@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
+import { BookmarkPlusIcon, PlusIcon } from "lucide-react";
 
 import type { Issue } from "@/api/ops.gen";
 
-import { BookmarkPlusIcon, PlusIcon } from "@/components/icons/symbols.gen";
 import { DisplayOptions, useDisplaySettings } from "@/components/issues/display-options";
 import type { DisplaySettings } from "@/components/issues/display";
 import { issueFilterOf, type ListIssuesFilters, mergeFilters } from "@/components/issues/filters";

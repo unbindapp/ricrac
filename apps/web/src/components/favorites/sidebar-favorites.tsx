@@ -2,14 +2,13 @@ import { closestCenter, DndContext, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useQuery } from "@tanstack/react-query";
 import { type MouseEvent, useRef } from "react";
+import { FolderIcon, XIcon } from "lucide-react";
 
 import { favoriteTarget } from "@/components/favorites/favorite-target";
 import { reorderedPosition, sortableStyle, useSortSensors } from "@/components/favorites/sortable";
-import { FolderIcon, XIcon } from "@/components/icons/symbols.gen";
 import { Button, LinkButton } from "@/components/ui/button";
 import {
   SidebarCollapsible,
-  sidebarActiveItemClassName,
   sidebarItemClassName,
   SidebarSection,
 } from "@/components/workspace/sidebar-nav";
@@ -137,7 +136,7 @@ function FavoriteItem({ favorite, onNavigate }: { favorite: TFavorite } & TProps
         size="sm"
         forceMinSize={false}
         onClick={onNavigate}
-        className={`${sidebarItemClassName} ${sidebarActiveItemClassName} pr-8`}
+        className={`${sidebarItemClassName} data-[status=active]:bg-accent pr-8`}
       >
         <span className="text-muted-foreground flex size-4 shrink-0 items-center justify-center">
           {target.icon}

@@ -1,5 +1,5 @@
+import { MailIcon } from "lucide-react";
 import type { PendingInvitation, WorkspaceSummary } from "@/api/account.gen";
-import { MailIcon } from "@/components/icons/symbols.gen";
 import { List, ListRow, ListRowText } from "@/components/layout/list";
 import { Button } from "@/components/ui/button";
 import {

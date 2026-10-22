@@ -104,11 +104,10 @@ dnd-kit drags, cmdk is the command panel.
   `text-xl font-semibold` via `PageHeader`, section title `text-base font-semibold`, body
   `text-sm`, secondary `text-sm text-muted-foreground`, captions and identifiers `text-xs`,
   identifiers `font-mono`. Buttons only from `components/ui/button`, sizes `sm|default|icon`.
-  Icons are Material Symbols Rounded from `components/icons/symbols.gen` (add a name to
-  `symbol-map.json`, then `bun run symbols`), `size-4` (`size-3.5` in `text-xs`, `size-5` in
-  headers), `filled` for the solid glyph. No arbitrary Tailwind values, no raw
-  `<button>`/`<input>`. Every list has skeleton, error and empty states; every mutation failure
-  toasts; icon-only buttons have `aria-label`. `bun run lint` enforces the mechanical parts.
+  Icons lucide `size-4` (`size-3.5` in `text-xs`, `size-5` in headers). No arbitrary Tailwind
+  values, no raw `<button>`/`<input>`. Every list has skeleton, error and empty states; every
+  mutation failure toasts; icon-only buttons have `aria-label`. `bun run lint` enforces the
+  mechanical parts.
 
 ## Conventions
 

@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { type ReactElement, useState } from "react";
 import { z } from "zod";
+import { LockIcon } from "lucide-react";
 
 import type { GitHubRepoSync } from "@/api/ops.gen";
 import { GithubIcon } from "@/components/icons/github";
-import { LockIcon } from "@/components/icons/symbols.gen";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ProjectIcon } from "@/components/shared/project-icon";
 import { Button } from "@/components/ui/button";

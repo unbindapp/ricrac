@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { type ReactNode, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
+import { BoxIcon, BuildingIcon, CircleDotIcon } from "lucide-react";
 
 import { CustomerLogo } from "@/components/customers/customer-badges";
-import { BoxIcon, BuildingIcon, CircleDotIcon } from "@/components/icons/symbols.gen";
 import { PropertyPicker } from "@/components/issues/property-picker";
 import { ProjectIcon } from "@/components/shared/project-icon";
 import { StateIcon } from "@/components/shared/state-icon";

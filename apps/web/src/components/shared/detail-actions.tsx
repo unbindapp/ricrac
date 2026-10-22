@@ -1,5 +1,4 @@
 import { type ReactNode } from "react";
-
 import {
   ArchiveIcon,
   ArchiveRestoreIcon,
@@ -8,7 +7,8 @@ import {
   LinkIcon,
   Trash2Icon,
   UndoIcon,
-} from "@/components/icons/symbols.gen";
+} from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

@@ -1,8 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-
-import type { Comment, CommentThread } from "@/api/ops.gen";
-import { DocumentCommentComposer } from "@/components/documents/document-comment-composer";
 import {
   CheckCircle2Icon,
   CheckIcon,
@@ -11,7 +8,10 @@ import {
   Trash2Icon,
   UndoIcon,
   XIcon,
-} from "@/components/icons/symbols.gen";
+} from "lucide-react";
+
+import type { Comment, CommentThread } from "@/api/ops.gen";
+import { DocumentCommentComposer } from "@/components/documents/document-comment-composer";
 import { userName } from "@/components/issues/grouping";
 import { UserAvatar } from "@/components/issues/pickers";
 import { AddReactionButton, groupReactions, ReactionBar } from "@/components/issues/reaction-bar";

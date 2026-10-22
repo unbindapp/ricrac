@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { HashIcon, PlusIcon, TagIcon } from "lucide-react";
 
-import { HashIcon, PlusIcon, TagIcon } from "@/components/icons/symbols.gen";
 import { NONE_KEY } from "@/components/issues/grouping";
 import { PickerTrigger, type TPickerAppearance } from "@/components/issues/pickers";
 import { PropertyPicker, type TPickerOption } from "@/components/issues/property-picker";

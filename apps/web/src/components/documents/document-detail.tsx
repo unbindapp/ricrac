@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { FileTextIcon, FolderInputIcon, MessageSquareTextIcon } from "lucide-react";
 
 import type { DocumentDetail as TDocumentDetail } from "@/api/ops.gen";
 import {
@@ -12,11 +13,6 @@ import { linkedThreadId, threadAnnotations } from "@/components/documents/docume
 import { FavoriteButton } from "@/components/favorites/favorite-button";
 import { useDocumentParent } from "@/components/documents/document-parent";
 import { DocumentParentPicker } from "@/components/documents/document-parent-picker";
-import {
-  FileTextIcon,
-  FolderInputIcon,
-  MessageSquareTextIcon,
-} from "@/components/icons/symbols.gen";
 import { AutosaveMarkdown } from "@/components/shared/autosave-markdown";
 import { VersionHistoryDialog } from "@/components/documents/version-history";
 import { PageContainer } from "@/components/layout/page-container";

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { RefreshCwIcon } from "lucide-react";
 
 import type { CycleDetail, Team } from "@/api/ops.gen";
 import { CycleDialog } from "@/components/cycles/cycle-dialog";
@@ -14,7 +15,6 @@ import {
   daysLeft,
 } from "@/components/cycles/cycle-status";
 import { FavoriteButton } from "@/components/favorites/favorite-button";
-import { RefreshCwIcon } from "@/components/icons/symbols.gen";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
@@ -60,9 +60,7 @@ function Cycle({ team }: { team: Team }) {
       return <ErrorCard message={error.message} onRetry={() => void refetch()} />;
     }
     if (!isValidNumber || error) {
-      return (
-        <EntityNotFound Icon={RefreshCwIcon} description={`There is no cycle ${number}.`} />
-      );
+      return <EntityNotFound Icon={RefreshCwIcon} description={`There is no cycle ${number}.`} />;
     }
     if (isPending) return <ListSkeleton />;
     return <CycleBody cycle={cycle} />;

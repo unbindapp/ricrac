@@ -1,4 +1,4 @@
-import { ArchiveIcon, type TIcon, Trash2Icon } from "@/components/icons/symbols.gen";
+import { ArchiveIcon, type LucideIcon, Trash2Icon } from "lucide-react";
 import type { TProjectScope } from "@/components/projects/project-groups";
 import { EmptyState } from "@/components/layout/empty-state";
 import { FilterMenu } from "@/components/shared/filter-menu";
@@ -24,7 +24,7 @@ export function ScopeTabs({
   );
 }
 
-const scopeEmpty: Record<Exclude<TProjectScope, "active">, { icon: TIcon; title: string }> = {
+const scopeEmpty: Record<Exclude<TProjectScope, "active">, { icon: LucideIcon; title: string }> = {
   archived: { icon: ArchiveIcon, title: "No archived {noun}s yet" },
   trash: { icon: Trash2Icon, title: "No trashed {noun}s yet" },
 };

@@ -1,7 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { type ReactElement, useState } from "react";
-
-import type { InitiativeRef, ProjectLabelRef, ProjectStatusRef } from "@/api/ops.gen";
 import {
   CalendarIcon,
   ChevronLeftIcon,
@@ -10,7 +8,9 @@ import {
   TagIcon,
   TargetIcon,
   XIcon,
-} from "@/components/icons/symbols.gen";
+} from "lucide-react";
+
+import type { InitiativeRef, ProjectLabelRef, ProjectStatusRef } from "@/api/ops.gen";
 import { PickerTrigger, type TPickerAppearance } from "@/components/projects/picker-trigger";
 import { PropertyPicker, type TPickerOption } from "@/components/issues/property-picker";
 import {
