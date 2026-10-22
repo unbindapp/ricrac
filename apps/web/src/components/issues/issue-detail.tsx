@@ -5,7 +5,6 @@ import { type ReactNode, useEffect, useState } from "react";
 import type { IssueDetail as TIssueDetail } from "@/api/ops.gen";
 import { CustomerNeedDialog } from "@/components/customers/customer-need-dialog";
 import { CustomerNeedsSection } from "@/components/customers/customer-needs-section";
-import { GithubIcon } from "@/components/icons/github";
 import {
   ArchiveIcon,
   CheckIcon,
@@ -16,13 +15,13 @@ import {
   TriangleIcon,
   UserPlusIcon,
   XIcon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
+import { GithubIcon } from "@/components/icons/github";
 import { IssueActivity } from "@/components/issues/issue-activity";
 import { AttachMenu, IssueAttachments } from "@/components/issues/issue-attachments";
 import { IssueDetailHeader } from "@/components/issues/issue-detail-header";
 import { draftFromIssue } from "@/components/issues/issue-draft";
 import { IssueProperties } from "@/components/issues/issue-properties";
-import { useNewIssueContext } from "@/components/issues/new-issue-store";
 import {
   AddRelationPicker,
   hasRelations,
@@ -137,7 +136,6 @@ function IssueDetailContent({
   const reactions = groupReactions(issue.reactions, me?.id);
   const react = (emoji: string, reacted: boolean) =>
     toggleReaction({ issueId: issue.id, emoji, reacted });
-  useNewIssueContext({ teamId: issue.team.id }, !isPeek);
   const properties = (
     <IssueProperties
       teamId={issue.team.id}

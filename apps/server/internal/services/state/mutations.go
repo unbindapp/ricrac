@@ -18,9 +18,9 @@ import (
 )
 
 type SaveInput struct {
-	ID          *string               `json:"id" doc:"Only to change a status: its id, or its name with team. Omit to create one."`
-	Team        *string               `json:"team" doc:"Team key, name or id. Required to create."`
-	Name        *string               `json:"name" doc:"Required to create; unique within the team."`
+	ID          *string               `json:"id" doc:"Only to change a status: its id or name. Omit to create one."`
+	Team        *string               `json:"team" doc:"Optional: the workspace's team by default. Its key, name or id."`
+	Name        *string               `json:"name" doc:"Required to create; unique in the workflow."`
 	Type        *string               `json:"type" doc:"triage, backlog, unstarted, started, completed or canceled. Required to create; changes only while no issues are in the status."`
 	Color       *string               `json:"color" doc:"Hex color like #f2c94c; defaults to the type's color."`
 	Description args.Nullable[string] `json:"description" doc:"Null clears it."`
@@ -49,8 +49,8 @@ func (self *StateService) Save(ctx context.Context, actor *auth.Actor, input *Sa
 				return err
 			}
 		} else {
-			if team, err = self.resolve.Team(ctx, actor, utils.OrEmpty(input.Team)); err != nil {
-				return errdefs.BadRequest("team is required to create a status. %s", errdefs.As(err).Message)
+			if team, err = self.resolve.TeamOrDefault(ctx, actor, input.Team); err != nil {
+				return err
 			}
 			if err := self.teams.RequireCanEdit(ctx, tx, actor, team); err != nil {
 				return err
@@ -211,9 +211,9 @@ func (self *StateService) changeType(ctx context.Context, tx repository.TxInterf
 }
 
 type DeleteInput struct {
-	ID           string  `json:"id" doc:"The status's id, or its name with team."`
-	Team         *string `json:"team" doc:"Team key, name or id, when id is a name."`
-	MoveIssuesTo *string `json:"moveIssuesTo" doc:"Status (name, type or id, same team) to move its issues to. Required when issues are in it or when it is the team's default or auto-close status."`
+	ID           string  `json:"id" doc:"The status's id or name."`
+	Team         *string `json:"team" doc:"Optional: the workspace's team by default. Its key, name or id."`
+	MoveIssuesTo *string `json:"moveIssuesTo" doc:"Status (name, type or id) to move its issues to. Required when issues are in it or when it is the default or auto-close status."`
 }
 
 func (self *StateService) Delete(ctx context.Context, actor *auth.Actor, input *DeleteInput) (models.DeletedIssueStatus, error) {

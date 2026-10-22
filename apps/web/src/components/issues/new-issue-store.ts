@@ -3,9 +3,8 @@ import { create } from "zustand";
 
 import type { TIssueDraft } from "@/components/issues/issue-draft";
 
-/** What a new issue starts with: its team and any properties the page or group implies. */
+/** What a new issue starts with: the properties the page or group implies. */
 export type TNewIssueDefaults = {
-  teamId?: string;
   draft?: Partial<TIssueDraft>;
 };
 

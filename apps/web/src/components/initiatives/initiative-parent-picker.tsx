@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { CornerLeftUpIcon } from "@/components/icons/symbols.gen";
+import { CornerLeftUpIcon } from "@/components/icons";
 import { InitiativeIcon } from "@/components/initiatives/initiative-status";
 import { descendantIds } from "@/components/initiatives/initiative-tree";
 import { PickerTrigger, type TPickerAppearance } from "@/components/projects/picker-trigger";

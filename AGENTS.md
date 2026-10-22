@@ -44,6 +44,11 @@ services call repositories, repositories use Ent.
   has CORS, body limits, compression and the bearer check (OAuth access tokens and API keys,
   `rr_key_...`; grants and keys reach the workspaces chosen, or all of the user's when
   `workspace_ids` is NULL).
+- A workspace has exactly one team (`teams` row): its key is the issue prefix, and it holds the
+  statuses, team labels, cycles and settings. Everyone but guests is a member. Team arguments are
+  optional and default to it (`resolve.TeamOrDefault`); resolving also takes the keys, names and
+  ids of teams merged into it (`previous_keys`, `previous_names`, `merged_team_ids`, from
+  migration 16's `unite_workspace_teams`) and of merged statuses and labels (`merged_ids`).
 - `internal/services/<area>` hold the logic, checks and transactions
   (`repo.WithTx(ctx, func(tx) error)`); `internal/repositories/<area>` the Ent queries, taking the
   transaction (`nil` reads from the pool). Raw SQL only where Ent can't say it, through
@@ -99,11 +104,10 @@ dnd-kit drags, cmdk is the command panel.
   `text-xl font-semibold` via `PageHeader`, section title `text-base font-semibold`, body
   `text-sm`, secondary `text-sm text-muted-foreground`, captions and identifiers `text-xs`,
   identifiers `font-mono`. Buttons only from `components/ui/button`, sizes `sm|default|icon`.
-  Icons are Material Symbols Rounded from `components/icons/symbols.gen` (add a name to
-  `symbol-map.json`, then `bun run symbols`), `size-4` (`size-3.5` in `text-xs`, `size-5` in
-  headers), `filled` for the solid glyph. No arbitrary Tailwind values, no raw
-  `<button>`/`<input>`. Every list has skeleton, error and empty states; every mutation failure
-  toasts; icon-only buttons have `aria-label`. `bun run lint` enforces the mechanical parts.
+  Icons lucide `size-4` (`size-3.5` in `text-xs`, `size-5` in headers). No arbitrary Tailwind
+  values, no raw `<button>`/`<input>`. Every list has skeleton, error and empty states; every
+  mutation failure toasts; icon-only buttons have `aria-label`. `bun run lint` enforces the
+  mechanical parts.
 
 ## Conventions
 

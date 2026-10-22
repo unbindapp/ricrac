@@ -3,12 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 
 import type { Issue, ProjectDetail, StateRef } from "@/api/ops.gen";
-import {
-  ChevronRightIcon,
-  CircleDotIcon,
-  DiamondIcon,
-  PlusIcon,
-} from "@/components/icons/symbols.gen";
+import { ChevronRightIcon, CircleDotIcon, DiamondIcon, PlusIcon } from "@/components/icons";
 import { useNewIssueContext, useNewIssueStore } from "@/components/issues/new-issue-store";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
@@ -47,9 +42,8 @@ export function ProjectIssues({ project, milestone, onMilestoneChange }: TProps)
   );
   const openNewIssue = useNewIssueStore((state) => state.open);
   const [toggled, setToggled] = useState<string[]>([]);
-  const teamId = project.teams[0]?.id;
   const projectRef = { id: project.id, name: project.name, slugId: project.slugId };
-  useNewIssueContext({ teamId, draft: { project: projectRef } });
+  useNewIssueContext({ draft: { project: projectRef } });
 
   const issues = (data ?? []).filter((issue) => {
     if (!milestone) return true;
@@ -61,7 +55,7 @@ export function ProjectIssues({ project, milestone, onMilestoneChange }: TProps)
     <Button
       size="sm"
       variant="outline"
-      onClick={() => openNewIssue({ teamId, draft: { project: projectRef } })}
+      onClick={() => openNewIssue({ draft: { project: projectRef } })}
     >
       <PlusIcon className="size-4" />
       New issue
@@ -110,11 +104,7 @@ export function ProjectIssues({ project, milestone, onMilestoneChange }: TProps)
         <EmptyState
           icon={CircleDotIcon}
           title={milestone ? "No matching issues" : "No issues yet"}
-          description={
-            milestone
-              ? "No issues in this milestone."
-              : "Add issues to the project from any of its teams."
-          }
+          description={milestone ? "No issues in this milestone." : "Add issues to the project."}
           action={newIssue}
         />
       )}

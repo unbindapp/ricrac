@@ -9,7 +9,6 @@ export function useInboxUnreadCount() {
   return unread;
 }
 
-/** How many unread notifications wait, beside the inbox in the sidebar. */
 export function InboxUnreadBadge() {
   const unread = useInboxUnreadCount();
   if (unread === 0) return null;

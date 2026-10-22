@@ -1,9 +1,8 @@
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useId, useRef, useState } from "react";
-import { useLocalStorage } from "usehooks-ts";
 
-import { ChevronDownIcon, CornerLeftUpIcon, XIcon } from "@/components/icons/symbols.gen";
+import { CornerLeftUpIcon, XIcon } from "@/components/icons";
 import {
   applyPatch,
   draftToCreateArgs,
@@ -13,24 +12,18 @@ import {
 import { IssueProperties } from "@/components/issues/issue-properties";
 import { type TNewIssueDefaults, useNewIssueStore } from "@/components/issues/new-issue-store";
 import { useTeamDetail, useWorkspaceUsers } from "@/components/issues/picker-sources";
-import { PropertyPicker } from "@/components/issues/property-picker";
 import { MarkdownEditor } from "@/components/shared/markdown-editor";
-import { NoTeamsNotice } from "@/components/shared/no-teams-notice";
-import { TeamIcon } from "@/components/shared/team-icon";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Kbd } from "@/components/ui/kbd";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/toast";
-import { useTeams } from "@/components/workspace/teams-provider";
-import { useTeamFromRoute } from "@/components/workspace/use-team-from-route";
+import { useWorkspaceTeam } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 import { ISSUE_TITLE_MAX_LENGTH, useCreateIssueMutation } from "@/lib/queries/issues";
 import { useEditorUploads } from "@/lib/queries/uploads";
-
-const LAST_TEAM_KEY = "new-issue-team";
 
 export function NewIssueDialog() {
   const isOpen = useNewIssueStore((state) => state.isOpen);
@@ -45,28 +38,10 @@ export function NewIssueDialog() {
   );
 }
 
-function useInitialTeamId(defaults: TNewIssueDefaults) {
-  const { teams, myTeams } = useTeams();
-  const routeTeam = useTeamFromRoute();
-  const [lastTeamId] = useLocalStorage<string | null>(LAST_TEAM_KEY, null);
-  const candidates = [defaults.teamId, routeTeam?.id, lastTeamId, myTeams[0]?.id, teams[0]?.id];
-  return candidates.find((id) => id && teams.some((team) => team.id === id)) ?? undefined;
-}
-
-/** Properties that only make sense in the team they were picked for. */
-const TEAM_SCOPED: Partial<TIssueDraft> = {
-  state: undefined,
-  cycle: null,
-  estimate: null,
-  labels: [],
-};
-
 function NewIssueForm({ defaults, onClose }: { defaults: TNewIssueDefaults; onClose: () => void }) {
   const { workspace } = useWorkspace();
   const navigate = useNavigate();
-  const initialTeamId = useInitialTeamId(defaults);
-  const [teamId, setTeamId] = useState<string | undefined>(initialTeamId);
-  const [, setLastTeamId] = useLocalStorage<string | null>(LAST_TEAM_KEY, null);
+  const teamId = useWorkspaceTeam()?.id;
   const [patch, setPatch] = useState<Partial<TIssueDraft>>({});
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -75,7 +50,6 @@ function NewIssueForm({ defaults, onClose }: { defaults: TNewIssueDefaults; onCl
   const titleRef = useRef<HTMLInputElement>(null);
   const submittingRef = useRef(false);
   const createMoreId = useId();
-  const { teams, myTeams, isPending: isTeamsPending } = useTeams();
   const team = useTeamDetail(teamId);
   const { users } = useWorkspaceUsers();
   const uploads = useEditorUploads(workspace.id);
@@ -84,15 +58,9 @@ function NewIssueForm({ defaults, onClose }: { defaults: TNewIssueDefaults; onCl
   const provided = Object.fromEntries(
     Object.entries(defaults.draft ?? {}).filter(([, value]) => value !== undefined),
   );
-  const base: TIssueDraft = {
-    ...EMPTY_DRAFT,
-    ...provided,
-    ...(teamId === initialTeamId ? {} : TEAM_SCOPED),
-  };
+  const base: TIssueDraft = { ...EMPTY_DRAFT, ...provided };
   base.state ??= team?.defaultIssueState ?? undefined;
   const draft = applyPatch(base, patch);
-  const pickableTeams = myTeams.length > 0 ? myTeams : teams;
-  const teamName = teams.find((item) => item.id === teamId)?.name;
 
   useEffect(() => {
     titleRef.current?.focus();
@@ -107,7 +75,6 @@ function NewIssueForm({ defaults, onClose }: { defaults: TNewIssueDefaults; onCl
         submittingRef.current = false;
       });
     if (!created) return;
-    setLastTeamId(teamId);
     toast.add({
       type: "success",
       title: `Created ${created.identifier}`,
@@ -142,12 +109,6 @@ function NewIssueForm({ defaults, onClose }: { defaults: TNewIssueDefaults; onCl
     modal: true,
   });
 
-  const changeTeam = (nextTeamId: string) => {
-    if (nextTeamId === teamId) return;
-    setTeamId(nextTeamId);
-    setPatch((current) => ({ ...current, ...TEAM_SCOPED }));
-  };
-
   return (
     <form
       className="flex flex-col gap-4"
@@ -156,40 +117,9 @@ function NewIssueForm({ defaults, onClose }: { defaults: TNewIssueDefaults; onCl
         void submit();
       }}
     >
-      <div className="flex min-w-0 items-center gap-2 pr-8">
-        <PropertyPicker
-          label="Team"
-          options={pickableTeams.map((item) => ({
-            value: item.id,
-            label: item.name,
-            description: item.key,
-            keywords: [item.key],
-            icon: <TeamIcon teamKey={item.key} icon={item.icon} color={item.color} size="sm" />,
-          }))}
-          value={teamId ? [teamId] : []}
-          onChange={([id]) => changeTeam(id)}
-          trigger={
-            <Button
-              variant="outline"
-              size="sm"
-              aria-label={`Team: ${teamName ?? "none"}, change team`}
-              className="max-w-48"
-            >
-              {team && (
-                <TeamIcon teamKey={team.key} icon={team.icon} color={team.color} size="sm" />
-              )}
-              <span className="truncate">{teamName ?? "Pick a team"}</span>
-              <ChevronDownIcon className="text-muted-foreground size-3.5" />
-            </Button>
-          }
-        />
-        <DialogTitle className="truncate">
-          {draft.parent ? "New sub-issue" : "New issue"}
-        </DialogTitle>
-      </div>
-      {!isTeamsPending && teams.length === 0 && (
-        <NoTeamsNotice entity="Issues" onNavigate={onClose} />
-      )}
+      <DialogTitle className="truncate pr-8">
+        {draft.parent ? "New sub-issue" : "New issue"}
+      </DialogTitle>
       {draft.parent && (
         <div className="text-muted-foreground flex min-w-0 items-center gap-1.5 text-sm">
           <CornerLeftUpIcon className="size-4 shrink-0" />

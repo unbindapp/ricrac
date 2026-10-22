@@ -15,7 +15,7 @@ export const scopeLabels: Record<TScope, string> = {
 export const scopeDescriptions: Record<TScope, string> = {
   read: "Read everything you can see",
   write: "Create and change issues, projects, comments and more",
-  admin: "Administer the workspaces where you're an admin: members, teams and settings",
+  admin: "Administer the workspaces where you're an admin: members and settings",
 };
 
 export const queryKeyApiKeys = ["api-keys"] as const;

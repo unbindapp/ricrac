@@ -7,7 +7,7 @@ import {
 } from "@tiptap/react";
 import { common, createLowlight } from "lowlight";
 
-import { ChevronDownIcon } from "@/components/icons/symbols.gen";
+import { ChevronDownIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import DropdownSelect from "@/components/ui/dropdown-select";
 

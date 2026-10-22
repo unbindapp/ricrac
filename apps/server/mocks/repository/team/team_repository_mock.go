@@ -741,6 +741,86 @@ func (_c *TeamRepositoryMock_InOwnTree_Call) RunAndReturn(run func(ctx context.C
 	return _c
 }
 
+// InWorkspace provides a mock function for the type TeamRepositoryMock
+func (_mock *TeamRepositoryMock) InWorkspace(ctx context.Context, tx repository.TxInterface, id uuid.UUID, users []uuid.UUID) ([]string, error) {
+	ret := _mock.Called(ctx, tx, id, users)
+
+	if len(ret) == 0 {
+		panic("no return value specified for InWorkspace")
+	}
+
+	var r0 []string
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, []uuid.UUID) ([]string, error)); ok {
+		return returnFunc(ctx, tx, id, users)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, []uuid.UUID) []string); ok {
+		r0 = returnFunc(ctx, tx, id, users)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]string)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, []uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id, users)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// TeamRepositoryMock_InWorkspace_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'InWorkspace'
+type TeamRepositoryMock_InWorkspace_Call struct {
+	*mock.Call
+}
+
+// InWorkspace is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - users []uuid.UUID
+func (_e *TeamRepositoryMock_Expecter) InWorkspace(ctx any, tx any, id any, users any) *TeamRepositoryMock_InWorkspace_Call {
+	return &TeamRepositoryMock_InWorkspace_Call{Call: _e.mock.On("InWorkspace", ctx, tx, id, users)}
+}
+
+func (_c *TeamRepositoryMock_InWorkspace_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, users []uuid.UUID)) *TeamRepositoryMock_InWorkspace_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 []uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].([]uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *TeamRepositoryMock_InWorkspace_Call) Return(strings []string, err error) *TeamRepositoryMock_InWorkspace_Call {
+	_c.Call.Return(strings, err)
+	return _c
+}
+
+func (_c *TeamRepositoryMock_InWorkspace_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, users []uuid.UUID) ([]string, error)) *TeamRepositoryMock_InWorkspace_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // IssuesInStates provides a mock function for the type TeamRepositoryMock
 func (_mock *TeamRepositoryMock) IssuesInStates(ctx context.Context, tx repository.TxInterface, states []uuid.UUID) ([]uuid.UUID, error) {
 	ret := _mock.Called(ctx, tx, states)
@@ -1918,6 +1998,80 @@ func (_c *TeamRepositoryMock_Unarchive_Call) Return(err error) *TeamRepositoryMo
 }
 
 func (_c *TeamRepositoryMock_Unarchive_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, state uuid.UUID) error) *TeamRepositoryMock_Unarchive_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Unarchived provides a mock function for the type TeamRepositoryMock
+func (_mock *TeamRepositoryMock) Unarchived(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID) ([]*ent.Team, error) {
+	ret := _mock.Called(ctx, tx, workspace)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Unarchived")
+	}
+
+	var r0 []*ent.Team
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) ([]*ent.Team, error)); ok {
+		return returnFunc(ctx, tx, workspace)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) []*ent.Team); ok {
+		r0 = returnFunc(ctx, tx, workspace)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ent.Team)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, workspace)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// TeamRepositoryMock_Unarchived_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Unarchived'
+type TeamRepositoryMock_Unarchived_Call struct {
+	*mock.Call
+}
+
+// Unarchived is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - workspace uuid.UUID
+func (_e *TeamRepositoryMock_Expecter) Unarchived(ctx any, tx any, workspace any) *TeamRepositoryMock_Unarchived_Call {
+	return &TeamRepositoryMock_Unarchived_Call{Call: _e.mock.On("Unarchived", ctx, tx, workspace)}
+}
+
+func (_c *TeamRepositoryMock_Unarchived_Call) Run(run func(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID)) *TeamRepositoryMock_Unarchived_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *TeamRepositoryMock_Unarchived_Call) Return(teams []*ent.Team, err error) *TeamRepositoryMock_Unarchived_Call {
+	_c.Call.Return(teams, err)
+	return _c
+}
+
+func (_c *TeamRepositoryMock_Unarchived_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID) ([]*ent.Team, error)) *TeamRepositoryMock_Unarchived_Call {
 	_c.Call.Return(run)
 	return _c
 }

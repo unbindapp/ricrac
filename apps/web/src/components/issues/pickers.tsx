@@ -20,12 +20,12 @@ import {
   CircleUserIcon,
   CornerLeftUpIcon,
   DiamondIcon,
+  type LucideIcon,
   TagIcon,
-  type TIcon,
   TriangleIcon,
   UsersIcon,
   XIcon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import { cycleName, NONE_KEY, PRIORITY_ORDER, userName } from "@/components/issues/grouping";
 import {
   useAvatarUrl,
@@ -145,7 +145,7 @@ function emptyText(appearance: TPickerAppearance, row: string, chip: string) {
   return appearance === "row" ? row : chip;
 }
 
-function MutedIcon({ icon: Icon }: { icon: TIcon }) {
+function MutedIcon({ icon: Icon }: { icon: LucideIcon }) {
   return <Icon className="text-muted-foreground size-4" />;
 }
 

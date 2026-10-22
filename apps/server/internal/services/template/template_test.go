@@ -75,14 +75,6 @@ func (suite *TemplateServiceSuite) TestRecurrenceIsForIssueTemplates() {
 	suite.NoError(suite.service.setRecurrence(suite.Ctx, nil, id, "issue", &Recurrence{Every: 2, Unit: "week", StartsAt: new("2026-11-02T09:00:00Z")}))
 }
 
-func (suite *TemplateServiceSuite) TestRecurringTemplatesNeedATeam() {
-	recurring := json.RawMessage(`{"every":1,"unit":"day"}`)
-	suite.True(teamless(&ent.Template{Recurrence: recurring, Data: json.RawMessage(`{"title":"Standup"}`)}))
-	suite.False(teamless(&ent.Template{Recurrence: recurring, Data: json.RawMessage(`{"team":"ENG"}`)}))
-	suite.False(teamless(&ent.Template{Recurrence: recurring, TeamID: &suite.team}))
-	suite.False(teamless(&ent.Template{Data: json.RawMessage(`{}`)}))
-}
-
 func (suite *TemplateServiceSuite) TestMonthsKeepTheDayUnlessTheMonthIsShorter() {
 	at := time.Date(2026, 1, 31, 9, 0, 0, 0, time.UTC)
 	suite.Equal(time.Date(2026, 2, 28, 9, 0, 0, 0, time.UTC), *nextRun(at, 1, "month"))

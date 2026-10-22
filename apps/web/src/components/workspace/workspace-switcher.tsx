@@ -12,7 +12,7 @@ import {
   SettingsIcon,
   UserIcon,
   UserPlusIcon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import { useInviteStore } from "@/components/settings/invite-store";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ import { meQuery, signOut } from "@/lib/queries/me";
 
 type TProps = {
   onNavigate?: () => void;
-  /** Only the workspace's icon, for the navigation rail. */
+  /** Only the workspace's icon, for a navigation rail. */
   compact?: boolean;
 };
 

@@ -15,7 +15,7 @@ import {
   type TAccess,
   type TScopeLevel,
 } from "@/components/api-key/helpers";
-import { PlusIcon } from "@/components/icons/symbols.gen";
+import { PlusIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

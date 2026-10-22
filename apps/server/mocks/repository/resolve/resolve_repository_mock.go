@@ -48,6 +48,72 @@ func (_m *ResolveRepositoryMock) EXPECT() *ResolveRepositoryMock_Expecter {
 	return &ResolveRepositoryMock_Expecter{mock: &_m.Mock}
 }
 
+// Aliases provides a mock function for the type ResolveRepositoryMock
+func (_mock *ResolveRepositoryMock) Aliases(ctx context.Context, workspace uuid.UUID) (resolve_repo.Aliases, error) {
+	ret := _mock.Called(ctx, workspace)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Aliases")
+	}
+
+	var r0 resolve_repo.Aliases
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) (resolve_repo.Aliases, error)); ok {
+		return returnFunc(ctx, workspace)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) resolve_repo.Aliases); ok {
+		r0 = returnFunc(ctx, workspace)
+	} else {
+		r0 = ret.Get(0).(resolve_repo.Aliases)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, workspace)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// ResolveRepositoryMock_Aliases_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Aliases'
+type ResolveRepositoryMock_Aliases_Call struct {
+	*mock.Call
+}
+
+// Aliases is a helper method to define mock.On call
+//   - ctx context.Context
+//   - workspace uuid.UUID
+func (_e *ResolveRepositoryMock_Expecter) Aliases(ctx any, workspace any) *ResolveRepositoryMock_Aliases_Call {
+	return &ResolveRepositoryMock_Aliases_Call{Call: _e.mock.On("Aliases", ctx, workspace)}
+}
+
+func (_c *ResolveRepositoryMock_Aliases_Call) Run(run func(ctx context.Context, workspace uuid.UUID)) *ResolveRepositoryMock_Aliases_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *ResolveRepositoryMock_Aliases_Call) Return(aliases resolve_repo.Aliases, err error) *ResolveRepositoryMock_Aliases_Call {
+	_c.Call.Return(aliases, err)
+	return _c
+}
+
+func (_c *ResolveRepositoryMock_Aliases_Call) RunAndReturn(run func(ctx context.Context, workspace uuid.UUID) (resolve_repo.Aliases, error)) *ResolveRepositoryMock_Aliases_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // AllIssueLabels provides a mock function for the type ResolveRepositoryMock
 func (_mock *ResolveRepositoryMock) AllIssueLabels(ctx context.Context, workspace uuid.UUID, teams []uuid.UUID) ([]resolve_repo.LabelRow, error) {
 	ret := _mock.Called(ctx, workspace, teams)

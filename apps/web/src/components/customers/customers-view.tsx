@@ -6,12 +6,7 @@ import { useDebounceValue } from "usehooks-ts";
 import type { Customer } from "@/api/ops.gen";
 import { CustomerLogo, OptionDot, OptionLabel } from "@/components/customers/customer-badges";
 import { CustomerDialog } from "@/components/customers/customer-dialog";
-import {
-  BuildingIcon,
-  ListFilterIcon,
-  PlusIcon,
-  SearchXIcon,
-} from "@/components/icons/symbols.gen";
+import { BuildingIcon, ListFilterIcon, PlusIcon, SearchXIcon } from "@/components/icons";
 import { PropertyPicker } from "@/components/issues/property-picker";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";

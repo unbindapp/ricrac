@@ -1,11 +1,8 @@
-import type { AnyFieldApi } from "@tanstack/react-form";
 import { z } from "zod";
 
 import type { Invitation } from "@/api/ops.gen";
 import { useInviteStore } from "@/components/settings/invite-store";
-import { CheckboxList, type TCheckboxListItem } from "@/components/shared/checkbox-list";
 import { roleItems } from "@/components/shared/role-select";
-import { TeamIcon } from "@/components/shared/team-icon";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,9 +14,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/toast";
-import { useTeams } from "@/components/workspace/teams-provider";
+import { useWorkspaceTeam } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { submitHandler, useAppForm, useFieldError } from "@/lib/hooks/use-app-form";
+import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
 import {
   INVITABLE_ROLES,
   useInviteUserMutation,
@@ -28,16 +25,10 @@ import {
 
 type TInvitableRole = Invitation["role"];
 
-const formSchema = z
-  .object({
-    email: z.string().trim().email("Enter a valid email address."),
-    role: z.enum(["admin", "member", "guest"]),
-    teams: z.array(z.string()),
-  })
-  .refine((value) => value.role !== "guest" || value.teams.length > 0, {
-    message: "Guests only see their teams. Pick at least one.",
-    path: ["teams"],
-  });
+const formSchema = z.object({
+  email: z.string().trim().email("Enter a valid email address."),
+  role: z.enum(["admin", "member", "guest"]),
+});
 
 export function InviteMemberDialog() {
   const isOpen = useInviteStore((state) => state.isOpen);
@@ -60,15 +51,15 @@ export function InviteMemberDialog() {
 
 function InviteForm({ onDone }: { onDone: () => void }) {
   const { workspace, isAdmin } = useWorkspace();
-  const { teams } = useTeams();
+  const team = useWorkspaceTeam();
   const { mutateAsync: invite } = useInviteUserMutation(workspace.id);
   const roles = INVITABLE_ROLES.filter((role) => isAdmin || role !== "admin");
   const form = useAppForm({
-    defaultValues: { email: "", role: "member" as TInvitableRole, teams: [] as string[] },
+    defaultValues: { email: "", role: "member" as TInvitableRole },
     validators: { onSubmit: formSchema },
     onSubmit: async ({ value }) => {
       const parsed = formSchema.parse(value);
-      const invitation = await invite(parsed);
+      const invitation = await invite({ ...parsed, teams: team ? [team.id] : [] });
       toast.add({ type: "success", title: `Invited ${invitation.email}` });
       onDone();
     },
@@ -96,20 +87,6 @@ function InviteForm({ onDone }: { onDone: () => void }) {
           />
         )}
       </form.Subscribe>
-      <form.Field
-        name="teams"
-        children={(field) => (
-          <TeamsField
-            field={field}
-            items={teams.map((team) => ({
-              value: team.key,
-              label: team.name,
-              description: team.key,
-              icon: <TeamIcon teamKey={team.key} icon={team.icon} color={team.color} size="sm" />,
-            }))}
-          />
-        )}
-      />
       <DialogFooter>
         <DialogClose
           render={
@@ -123,30 +100,5 @@ function InviteForm({ onDone }: { onDone: () => void }) {
         </form.AppForm>
       </DialogFooter>
     </form>
-  );
-}
-
-function TeamsField({ field, items }: { field: AnyFieldApi; items: TCheckboxListItem[] }) {
-  const { error } = useFieldError(field);
-  return (
-    <div className="flex flex-col gap-1.5">
-      <p className="text-sm font-medium">Teams</p>
-      <p className="text-muted-foreground text-xs">The teams they join. Required for guests.</p>
-      <CheckboxList
-        label="Teams"
-        emptyText="There are no teams yet."
-        items={items}
-        value={field.state.value as string[]}
-        onChange={(value) => {
-          field.handleChange(value);
-          field.handleBlur();
-        }}
-      />
-      {error && (
-        <p role="alert" className="text-destructive text-xs">
-          {error}
-        </p>
-      )}
-    </div>
   );
 }

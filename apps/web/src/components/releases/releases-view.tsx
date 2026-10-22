@@ -10,7 +10,7 @@ import {
   PlusIcon,
   RocketIcon,
   WorkflowIcon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import { PropertyPicker } from "@/components/issues/property-picker";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";

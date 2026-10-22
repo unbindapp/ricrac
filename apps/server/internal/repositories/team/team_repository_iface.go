@@ -55,6 +55,8 @@ type TeamRepositoryInterface interface {
 	// FindUnarchived is an unarchived team of the workspace by id, key or name, whatever its
 	// privacy: the id first, then the key.
 	FindUnarchived(ctx context.Context, workspace uuid.UUID, value string) (uuid.UUID, bool, error)
+	// Unarchived is the workspace's unarchived teams, the oldest first.
+	Unarchived(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID) ([]*ent.Team, error)
 	// KeyTakenBy is the name of another unarchived team of the workspace with the key.
 	KeyTakenBy(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, key string, except *uuid.UUID) (string, bool, error)
 	// NameTaken says whether another unarchived team of the workspace has the name, in any case.
@@ -64,6 +66,9 @@ type TeamRepositoryInterface interface {
 	// Blind is the names of users who can't see the team: neither its members nor, for a public
 	// team, members of the workspace who aren't guests.
 	Blind(ctx context.Context, tx repository.TxInterface, id uuid.UUID, users []uuid.UUID) ([]string, error)
+	// InWorkspace is the names of users who are active members of the team's workspace other than
+	// guests.
+	InWorkspace(ctx context.Context, tx repository.TxInterface, id uuid.UUID, users []uuid.UUID) ([]string, error)
 	// IssuesInStates is the issues in any of the states.
 	IssuesInStates(ctx context.Context, tx repository.TxInterface, states []uuid.UUID) ([]uuid.UUID, error)
 	// ArchivedTriageState is the team's most recently archived triage state, when it has no active

@@ -20,7 +20,7 @@ export const scopeLevelItems: { value: TScopeLevel; label: string }[] = [
 export const scopeLevelDescriptions: Record<TScopeLevel, string> = {
   read: "Reads everything you can see.",
   write: "Also creates and changes issues, projects, comments and more.",
-  admin: "Also manages members, teams and settings where you're an admin.",
+  admin: "Also manages members and settings where you're an admin.",
 };
 
 export function scopesOf(level: TScopeLevel): TScope[] {

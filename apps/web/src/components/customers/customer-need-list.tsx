@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import type { CustomerNeed } from "@/api/ops.gen";
 import { CustomerLogo, ImportantIcon } from "@/components/customers/customer-badges";
 import { CustomerNeedDialog } from "@/components/customers/customer-need-dialog";
-import { LinkIcon, PencilIcon, Trash2Icon } from "@/components/icons/symbols.gen";
+import { LinkIcon, PencilIcon, Trash2Icon } from "@/components/icons";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ProjectIcon } from "@/components/shared/project-icon";
 import { RelativeTime } from "@/components/shared/relative-time";

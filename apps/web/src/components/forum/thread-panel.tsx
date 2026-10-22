@@ -14,7 +14,7 @@ import {
   SplitIcon,
   Trash2Icon,
   UndoIcon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import { PickerTrigger } from "@/components/issues/pickers";
 import { PropertyPicker } from "@/components/issues/property-picker";
 import { ChatLayout } from "@/components/layout/chat-layout";

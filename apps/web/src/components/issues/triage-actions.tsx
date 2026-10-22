@@ -1,5 +1,5 @@
 import type { Issue, StateRef, TeamDetail } from "@/api/ops.gen";
-import { CheckIcon, XIcon } from "@/components/icons/symbols.gen";
+import { CheckIcon, XIcon } from "@/components/icons";
 import { useTeamDetail } from "@/components/issues/picker-sources";
 import { useIssuePatch } from "@/components/issues/use-issue-actions";
 import { Button } from "@/components/ui/button";
@@ -40,7 +40,9 @@ export function TriageActions({ issue }: { issue: Issue }) {
   if (!canEdit) return null;
   const acceptLabel = needsPriority
     ? "Set a priority to accept"
-    : `Accept into ${target?.name ?? "the team"}`;
+    : target
+      ? `Accept into ${target.name}`
+      : "Accept";
   return (
     <>
       <SimpleTooltip content={acceptLabel}>

@@ -1,4 +1,4 @@
-import { AlarmClockIcon, BellRingIcon } from "@/components/icons/symbols.gen";
+import { AlarmClockIcon, BellRingIcon } from "@/components/icons";
 import { snoozeOptions } from "@/components/inbox/snooze";
 import { useNow } from "@/components/providers/now-provider";
 import { Button } from "@/components/ui/button";

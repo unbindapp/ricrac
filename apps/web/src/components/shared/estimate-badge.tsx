@@ -1,4 +1,4 @@
-import { TriangleIcon } from "@/components/icons/symbols.gen";
+import { TriangleIcon } from "@/components/icons";
 import { formatEstimate, type TEstimateType } from "@/lib/helpers/estimates";
 
 type TProps = {

@@ -5,7 +5,7 @@ import { type ReactNode } from "react";
 import { z } from "zod";
 
 import type { WorkspaceUserDetail } from "@/api/ops.gen";
-import { MonitorIcon, MoonIcon, SunIcon } from "@/components/icons/symbols.gen";
+import { MonitorIcon, MoonIcon, SunIcon } from "@/components/icons";
 import { GithubAccountSection } from "@/components/integrations/github-account-section";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
@@ -21,6 +21,7 @@ import { timezoneOptions } from "@/lib/helpers/timezones";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
 import { useUpdateUserMutation, workspaceMeQuery } from "@/lib/queries/users";
 import { useAccentHueStore } from "@/lib/stores/accent-hue";
+import { useUiTheme } from "@/themes/ui-theme-provider";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/account/")({
   component: AccountProfileSettingsPage,
@@ -35,20 +36,21 @@ const themeOptions: { value: TTheme; label: string; icon: ReactNode }[] = [
 ];
 
 const accentPresets = [
-  { hue: DEFAULT_ACCENT_HUE, name: "Blue" },
-  { hue: 300, name: "Violet" },
-  { hue: 345, name: "Pink" },
-  { hue: 25, name: "Red" },
-  { hue: 60, name: "Orange" },
-  { hue: 105, name: "Olive" },
-  { hue: 150, name: "Green" },
-  { hue: 200, name: "Teal" },
+  { hue: DEFAULT_ACCENT_HUE, name: "Green" },
+  { hue: 170, name: "Teal" },
+  { hue: 210, name: "Blue" },
+  { hue: 260, name: "Violet" },
+  { hue: 320, name: "Pink" },
+  { hue: 0, name: "Red" },
+  { hue: 25, name: "Orange" },
+  { hue: 50, name: "Yellow" },
 ];
 
+const accentSwatch = (hue: number) => `hsl(${hue} 60% 50%)`;
+
 const HUE_STOPS = 12;
-const hueGradient = `linear-gradient(to right, ${Array.from(
-  { length: HUE_STOPS + 1 },
-  (_, index) => `oklch(70% 0.14 ${(index * 360) / HUE_STOPS})`,
+const hueGradient = `linear-gradient(to right, ${Array.from({ length: HUE_STOPS + 1 }, (_, index) =>
+  accentSwatch((index * 360) / HUE_STOPS),
 ).join(", ")})`;
 
 const formSchema = z.object({
@@ -191,15 +193,17 @@ function ThemeField({ theme, onChange }: { theme: string; onChange: (theme: stri
 }
 
 function AccentField() {
-  const hue = useAccentHueStore((state) => state.hue);
+  const { defaultAccentHue } = useUiTheme();
+  const chosenHue = useAccentHueStore((state) => state.hue);
   const setHue = useAccentHueStore((state) => state.setHue);
+  const hue = chosenHue ?? defaultAccentHue;
   return (
     <div className="flex flex-col gap-3">
       <div className="flex min-h-8 items-center gap-2">
         <span className="flex-1 text-sm font-medium">Accent color</span>
         <span className="text-muted-foreground text-xs tabular-nums">{hue}°</span>
-        {hue !== DEFAULT_ACCENT_HUE && (
-          <Button variant="ghost" size="sm" onClick={() => setHue(DEFAULT_ACCENT_HUE)}>
+        {chosenHue !== null && (
+          <Button variant="ghost" size="sm" onClick={() => setHue(null)}>
             Reset
           </Button>
         )}
@@ -216,29 +220,28 @@ function AccentField() {
         {accentPresets.map((preset) => (
           <Button
             key={preset.hue}
-            variant="ghost"
+            variant={preset.hue === hue ? "outline" : "ghost"}
             size="icon"
             aria-label={preset.name}
             aria-pressed={preset.hue === hue}
-            className="aria-pressed:ring-primary aria-pressed:ring-2"
             onClick={() => setHue(preset.hue)}
           >
             <span
-              className="size-6 rounded-full"
-              style={{ background: `oklch(70% 0.14 ${preset.hue})` }}
+              className="size-4 rounded-full"
+              style={{ background: accentSwatch(preset.hue) }}
             />
           </Button>
         ))}
       </div>
       <div className="grid grid-cols-3 gap-2">
-        <span className="bg-primary text-primary-foreground flex h-10 items-center justify-center rounded-md text-sm font-medium">
-          Primary
+        <span className="bg-background flex h-9 items-center justify-center rounded-md border text-sm font-medium">
+          Background
         </span>
-        <span className="bg-secondary text-secondary-foreground flex h-10 items-center justify-center rounded-md text-sm font-medium">
-          Secondary
+        <span className="bg-muted flex h-9 items-center justify-center rounded-md text-sm font-medium">
+          Muted
         </span>
-        <span className="bg-tertiary-container text-tertiary-container-foreground flex h-10 items-center justify-center rounded-md text-sm font-medium">
-          Tertiary
+        <span className="bg-top-loader text-primary-foreground flex h-9 items-center justify-center rounded-md text-sm font-medium">
+          Accent
         </span>
       </div>
     </div>

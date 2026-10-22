@@ -12,15 +12,9 @@ import {
   DiscussionGridSkeleton,
 } from "@/components/forum/discussion-card";
 import { DiscussionTagFilter } from "@/components/forum/discussion-tags";
-import { DiscussionTeamPicker } from "@/components/forum/discussion-team-picker";
 import { NewDiscussionDialog } from "@/components/forum/new-discussion-dialog";
 import { useCanRewrite } from "@/components/forum/use-can-rewrite";
-import {
-  MessagesSquareIcon,
-  PlusIcon,
-  SearchIcon,
-  Trash2Icon,
-} from "@/components/icons/symbols.gen";
+import { MessagesSquareIcon, PlusIcon, SearchIcon, Trash2Icon } from "@/components/icons";
 import { List } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { PageContainer } from "@/components/layout/page-container";
@@ -30,7 +24,6 @@ import { TrashedRow } from "@/components/projects/entity-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
-import { useTeams } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { FilterMenu } from "@/components/shared/filter-menu";
 import { discussionsQuery, useDiscussionLifecycleMutation } from "@/lib/queries/discussions";
@@ -40,7 +33,6 @@ type TForumView = (typeof VIEWS)[number];
 
 const searchSchema = z.object({
   status: z.enum(["closed", "all", "trash"]).optional(),
-  /** A team's key. */
   team: z.string().optional(),
   tag: z.string().optional(),
 });
@@ -59,18 +51,15 @@ const viewLabels: Record<TForumView, string> = {
 
 function ForumPage() {
   const { workspace, canEdit } = useWorkspace();
-  const { teams } = useTeams();
-  const { status = "open", team: teamKey, tag } = Route.useSearch();
+  const { status = "open", tag } = Route.useSearch();
   const navigate = Route.useNavigate();
   const [query, setQuery] = useState("");
   const [debouncedQuery] = useDebounceValue(query.trim(), 300);
-  const team = teams.find((item) => item.key === teamKey);
   const isTrash = status === "trash";
   const list = useInfiniteQuery(
     discussionsQuery(workspace.id, {
       status: isTrash ? "all" : status,
       onlyTrashed: isTrash || undefined,
-      team: teamKey,
       tag,
       query: debouncedQuery || undefined,
       includeBody: !isTrash || undefined,
@@ -79,7 +68,6 @@ function ForumPage() {
   const discussions = list.data?.pages.flatMap((page) => page.nodes) ?? [];
   const newButton = (placement: "header" | "empty") => (
     <NewDiscussionDialog
-      defaultTeamId={team?.id ?? null}
       trigger={
         <Button
           size={placement === "header" ? "default" : "sm"}
@@ -131,20 +119,6 @@ function ForumPage() {
                 className="h-8 pl-8"
               />
             </div>
-            <DiscussionTeamPicker
-              label="Filter by team"
-              noneLabel="All teams"
-              value={team?.id ?? null}
-              onChange={(teamId) =>
-                void navigate({
-                  search: (prev) => ({
-                    ...prev,
-                    team: teams.find((item) => item.id === teamId)?.key,
-                  }),
-                  replace: true,
-                })
-              }
-            />
             <DiscussionTagFilter
               value={tag ?? null}
               onChange={(next) =>
@@ -165,7 +139,7 @@ function ForumPage() {
         isEmpty={discussions.length === 0}
         empty={emptyState({
           status,
-          isFiltered: Boolean(debouncedQuery || teamKey || tag),
+          isFiltered: Boolean(debouncedQuery || tag),
           action: canEdit && status !== "closed" && !isTrash && newButton("empty"),
         })}
       >
@@ -256,7 +230,7 @@ function emptyState({
   return {
     icon: MessagesSquareIcon,
     title: "No discussions yet",
-    description: "Start one to talk through an idea, a design or a problem with your team.",
+    description: "Start one to talk through an idea, a design or a problem together.",
     action,
   };
 }

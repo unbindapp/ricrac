@@ -1,7 +1,7 @@
 import type { Editor } from "@tiptap/core";
 import { useEffect } from "react";
 
-import { MessageSquarePlusIcon, PencilLineIcon } from "@/components/icons/symbols.gen";
+import { MessageSquarePlusIcon, PencilLineIcon } from "@/components/icons";
 import {
   AnnotationBubble,
   type TAnnotationAction,

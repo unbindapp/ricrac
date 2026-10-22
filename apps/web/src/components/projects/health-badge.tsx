@@ -1,4 +1,4 @@
-import { CircleAlertIcon, CircleCheckIcon, CircleXIcon } from "@/components/icons/symbols.gen";
+import { CircleAlertIcon, CircleCheckIcon, CircleXIcon } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
 import type { THealth } from "@/lib/queries/projects";
 

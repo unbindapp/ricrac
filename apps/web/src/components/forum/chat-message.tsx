@@ -10,7 +10,7 @@ import {
   SendHorizontalIcon,
   SplitIcon,
   Trash2Icon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import { userName } from "@/components/issues/grouping";
 import { useWorkspaceUsers } from "@/components/issues/picker-sources";
 import { UserAvatar } from "@/components/issues/pickers";

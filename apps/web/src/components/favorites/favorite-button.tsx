@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { StarIcon } from "@/components/icons/symbols.gen";
+import { StarIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { SimpleTooltip } from "@/components/ui/tooltip";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
@@ -37,9 +37,8 @@ export function FavoriteButton({ kind, entityId }: TProps) {
         onClick={() => (favorite ? remove.mutate(favorite.id) : add.mutate({ kind, id: entityId }))}
       >
         <StarIcon
-          filled={!!favorite}
           data-active={favorite ? true : undefined}
-          className="data-active:text-warning size-4"
+          className="data-active:text-warning size-4 data-active:fill-current"
         />
       </Button>
     </SimpleTooltip>

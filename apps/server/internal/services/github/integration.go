@@ -293,8 +293,8 @@ func resolveOptional(value args.Nullable[string], resolve func(string) (uuid.UUI
 
 func (self *GitHubService) SaveRepoSync(ctx context.Context, actor *auth.Actor, input *SaveRepoSyncInput) (models.GitHubRepoSync, error) {
 	var team *uuid.UUID
-	if input.Team != nil {
-		resolved, err := self.resolve.Team(ctx, actor, *input.Team)
+	if input.Team != nil || input.ID == nil {
+		resolved, err := self.resolve.TeamOrDefault(ctx, actor, input.Team)
 		if err != nil {
 			return models.GitHubRepoSync{}, err
 		}
@@ -320,8 +320,8 @@ func (self *GitHubService) SaveRepoSync(ctx context.Context, actor *auth.Actor, 
 // saveRepoSync changes or creates the sync, saying whether to import the repository's issues.
 func (self *GitHubService) saveRepoSync(ctx context.Context, actor *auth.Actor, input *SaveRepoSyncInput, team, project *uuid.UUID) (uuid.UUID, bool, error) {
 	if input.ID == nil {
-		if input.Repository == nil || team == nil {
-			return uuid.Nil, false, errdefs.BadRequest("Pass repository and team to sync a repository")
+		if input.Repository == nil {
+			return uuid.Nil, false, errdefs.BadRequest("Pass repository to sync a repository")
 		}
 		id, err := self.createRepoSync(ctx, actor, *input.Repository, *team, project)
 		return id, input.Backfill == nil || *input.Backfill, err

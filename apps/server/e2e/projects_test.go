@@ -53,8 +53,8 @@ func TestCreatesProjectsWithMilestonesAndIssueProgress(t *testing.T) {
 	issue := call(t, w.Ann, "get_issue", M{"id": "ENG-1"})
 	check(t, issue.At("projectMilestone").IsNull() && issue.At("project", "name").Str() == "Launch v2!")
 
-	noTeam := fails(t, w.Ann, "save_project", M{"name": "Nowhere"})
-	contains(t, noTeam, "team")
+	noTeam := call(t, w.Ann, "save_project", M{"name": "Nowhere"})
+	eqList(t, noTeam.At("teams").Strings("key"), []string{"ENG"}, "the workspace's team by default")
 	long := fails(t, w.Ann, "save_project", M{"id": slug, "summary": strings.Repeat("x", 256)})
 	contains(t, long, "255")
 	last := fails(t, w.Ann, "save_project", M{"id": slug, "removeTeams": []any{"ENG"}})

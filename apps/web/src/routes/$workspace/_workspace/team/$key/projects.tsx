@@ -1,23 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
-
-import { ProjectsView } from "@/components/projects/projects-view";
-import { teamCrumb } from "@/components/workspace/team-crumb";
-import { useRequiredTeamFromRoute } from "@/components/workspace/use-team-from-route";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/$workspace/_workspace/team/$key/projects")({
-  component: TeamKeyProjectsPage,
+  beforeLoad: ({ params }) => {
+    throw redirect({
+      to: "/$workspace/projects",
+      params: { workspace: params.workspace },
+      search: true,
+      replace: true,
+    });
+  },
 });
-
-function TeamKeyProjectsPage() {
-  const team = useRequiredTeamFromRoute();
-  const { workspace } = Route.useParams();
-  return (
-    <ProjectsView
-      title="Projects"
-      breadcrumb={[teamCrumb(team, workspace), { label: "Projects" }]}
-      storageKey={`team:${team.id}`}
-      filters={{ team: team.id }}
-      teamId={team.id}
-    />
-  );
-}

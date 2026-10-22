@@ -8,7 +8,7 @@ import { type AnyExtension, type Editor, EditorContent, useEditor } from "@tipta
 import { StarterKit } from "@tiptap/starter-kit";
 import { type DragEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
-import { CirclePlusIcon, UploadIcon, XIcon } from "@/components/icons/symbols.gen";
+import { CirclePlusIcon, UploadIcon, XIcon } from "@/components/icons";
 import { Avatar } from "@/components/shared/avatar";
 import { BlockGaps } from "@/components/shared/editor/block-gaps";
 import { EditorCodeBlock } from "@/components/shared/editor/code-block";

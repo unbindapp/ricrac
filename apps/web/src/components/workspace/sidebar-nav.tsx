@@ -1,12 +1,12 @@
 import { type LinkProps } from "@tanstack/react-router";
 import { ReactNode, useState } from "react";
 
-import type { TIcon } from "@/components/icons/symbols.gen";
+import type { LucideIcon } from "@/components/icons";
 import { Button, LinkButton } from "@/components/ui/button";
 
 type TNavItemProps = {
   label: string;
-  icon: TIcon;
+  icon: LucideIcon;
   link: LinkProps;
   badge?: ReactNode;
   exact?: boolean;
@@ -14,10 +14,10 @@ type TNavItemProps = {
 };
 
 export const sidebarItemClassName =
-  "hit-gap-y h-9 w-full justify-start px-3 font-normal [&_svg]:text-muted-foreground";
+  "hit-gap-y h-7.5 w-full justify-start px-2 font-normal [&_svg]:text-muted-foreground dank:h-9 dank:pr-3 dank:pl-3";
 
 export const sidebarActiveItemClassName =
-  "data-[status=active]:bg-secondary data-[status=active]:text-secondary-foreground data-[status=active]:font-semibold data-[status=active]:[&_svg]:text-secondary-foreground";
+  "data-[status=active]:bg-accent dank:data-[status=active]:bg-secondary dank:data-[status=active]:text-secondary-foreground dank:data-[status=active]:font-semibold dank:data-[status=active]:[&_svg]:text-secondary-foreground";
 
 export function SidebarNavItem({
   label,

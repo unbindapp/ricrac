@@ -3,7 +3,7 @@ import { type ReactElement } from "react";
 
 import type { CustomerStatusRef, CustomerTierRef, UserRef } from "@/api/ops.gen";
 import { OptionDot } from "@/components/customers/customer-badges";
-import { CircleDashedIcon, CircleUserIcon, LayersIcon } from "@/components/icons/symbols.gen";
+import { CircleDashedIcon, CircleUserIcon, LayersIcon } from "@/components/icons";
 import { PropertyPicker, type TPickerOption } from "@/components/issues/property-picker";
 import { Avatar } from "@/components/shared/avatar";
 import { PropertyTrigger } from "@/components/shared/property-trigger";

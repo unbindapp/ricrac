@@ -1,4 +1,4 @@
-import { FlameIcon } from "@/components/icons/symbols.gen";
+import { FlameIcon } from "@/components/icons";
 import { cn } from "@/components/ui/utils";
 import { colorFromId, initials } from "@/lib/helpers/colors";
 

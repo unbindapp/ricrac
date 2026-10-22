@@ -9,7 +9,7 @@ import {
   MessagesSquareIcon,
   PinIcon,
   SplitIcon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import { commentExcerpt } from "@/components/inbox/notifications";
 import { PersonAvatar } from "@/components/projects/people";
 import { RelativeTime } from "@/components/shared/relative-time";
@@ -153,9 +153,6 @@ function DiscussionTags({ discussion }: { discussion: Discussion }) {
       ) : (
         <Badge variant="success">Open</Badge>
       )}
-      <Badge variant="outline" className="text-muted-foreground">
-        <span className="truncate">{discussion.team?.name ?? "Whole workspace"}</span>
-      </Badge>
       <DiscussionTagBadges tags={discussion.tags} max={MAX_CARD_TAGS} />
     </div>
   );

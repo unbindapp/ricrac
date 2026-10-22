@@ -1,13 +1,12 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { ALL_TEAMS, resourceLabel, toSaveArgs, webhookFormSchema } from "./webhook-form.ts";
+import { resourceLabel, toSaveArgs, webhookFormSchema } from "./webhook-form.ts";
 
 const valid = {
   url: " https://hooks.example.com/ricrac ",
   label: " Slack bridge ",
   resourceTypes: ["Issue", "Comment"],
-  team: ALL_TEAMS,
   enabled: true,
 };
 
@@ -17,10 +16,8 @@ test("a complete form maps to save_webhook's arguments", () => {
     url: "https://hooks.example.com/ricrac",
     label: "Slack bridge",
     resourceTypes: ["Issue", "Comment"],
-    team: null,
     enabled: true,
   });
-  assert.equal(toSaveArgs({ ...parsed, team: "team-1" }).team, "team-1");
   assert.equal(toSaveArgs({ ...parsed, label: "  " }).label, null);
 });
 
@@ -41,4 +38,5 @@ test("urls are https, or http on localhost, and something must be received", () 
 test("resource types read as words", () => {
   assert.equal(resourceLabel("IssueLabel"), "Issue label");
   assert.equal(resourceLabel("Issue"), "Issue");
+  assert.equal(resourceLabel("Team"), "Issue settings");
 });

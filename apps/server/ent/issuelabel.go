@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"ricrac/ent/issuelabel"
+	"ricrac/ent/schema/pgarray"
 	"ricrac/ent/team"
 	"ricrac/ent/user"
 	"ricrac/ent/workspace"
@@ -45,6 +46,8 @@ type IssueLabel struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// MergedIds holds the value of the "merged_ids" field.
+	MergedIds pgarray.UUID `json:"merged_ids,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the IssueLabelQuery when eager-loading is set.
 	Edges        IssueLabelEdges `json:"edges"`
@@ -150,6 +153,8 @@ func (*IssueLabel) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case issuelabel.FieldTeamID, issuelabel.FieldParentID, issuelabel.FieldCreatorID:
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case issuelabel.FieldMergedIds:
+			values[i] = new(pgarray.UUID)
 		case issuelabel.FieldIsGroup:
 			values[i] = new(sql.NullBool)
 		case issuelabel.FieldName, issuelabel.FieldDescription, issuelabel.FieldColor, issuelabel.FieldGroupType:
@@ -255,6 +260,12 @@ func (_m *IssueLabel) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				_m.UpdatedAt = value.Time
+			}
+		case issuelabel.FieldMergedIds:
+			if value, ok := values[i].(*pgarray.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field merged_ids", values[i])
+			} else if value != nil {
+				_m.MergedIds = *value
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -372,6 +383,9 @@ func (_m *IssueLabel) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("merged_ids=")
+	builder.WriteString(fmt.Sprintf("%v", _m.MergedIds))
 	builder.WriteByte(')')
 	return builder.String()
 }

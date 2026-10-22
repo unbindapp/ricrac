@@ -6,31 +6,25 @@ import (
 	"time"
 )
 
-func TestCreatesTeamsWithSettings(t *testing.T) {
+func TestTheWorkspacesTeamTakesSettings(t *testing.T) {
 	w := world(t)
 	bob := w.member("bob@acme.test", "Bob Jones", "member")
 	gus := w.member("gus@else.test", "Gus", "guest")
 
-	team := call(t, bob, "save_team", M{"name": "Mobile Platform", "description": "Apps", "color": "#ABC"})
-	eq(t, team.At("key").Str(), "MP")
+	contains(t, fails(t, gus, "save_team", M{"id": "ENG", "description": "Apps"}), "Guests can't")
+	contains(t, fails(t, bob, "save_team", M{"id": "ENG", "key": "1AB"}), "team key")
+	team := call(t, bob, "save_team", M{"id": "ENG", "description": "Apps", "color": "#ABC"})
 	eq(t, team.At("description").Str(), "Apps")
 	eq(t, team.At("color").Str(), "#abc")
-	eq(t, team.At("members", 0, "email").Str(), "bob@acme.test")
-	eq(t, team.At("members", 0, "owner").Bool(), true)
 	eq(t, team.At("defaultIssueState", "name").Str(), "Backlog")
 	eq(t, team.At("autoCloseState", "name").Str(), "Canceled")
 	eqList(t, team.At("states").Strings("name"), []string{"Backlog", "Todo", "In Progress", "In Review", "Done", "Canceled", "Duplicate"})
-	eq(t, team.At("url").Str(), "http://localhost:3000/acme/team/MP")
-
-	contains(t, fails(t, gus, "save_team", M{"name": "Guests"}), "Guests can't")
-	contains(t, fails(t, bob, "save_team", M{"name": "Other", "key": "eng"}), "ENG is taken by the team Engineering")
-	contains(t, fails(t, bob, "save_team", M{"name": "Bad", "key": "1AB"}), "team key")
-	contains(t, fails(t, bob, "save_team", M{"name": "engineering", "key": "EN2"}), "already")
+	eq(t, team.At("url").Str(), "http://localhost:3000/acme/team/ENG")
 
 	updated := call(t, bob, "save_team", M{
-		"id": "MP", "estimateType": "fibonacci", "defaultEstimate": 3, "cyclesEnabled": true,
+		"id": "ENG", "estimateType": "fibonacci", "defaultEstimate": 3, "cyclesEnabled": true,
 		"cycleDurationWeeks": 1, "cycleStartDay": 0, "autoArchiveMonths": nil, "autoCloseMonths": 3,
-		"defaultIssueState": "Todo", "timezone": "America/New_York", "parent": "ENG", "icon": "Phone",
+		"defaultIssueState": "Todo", "timezone": "America/New_York", "icon": "Phone",
 	})
 	eq(t, updated.At("estimateType").Str(), "fibonacci")
 	eq(t, updated.At("allowedEstimates").JSON(), "[1,2,3,5,8]")
@@ -40,31 +34,58 @@ func TestCreatesTeamsWithSettings(t *testing.T) {
 	check(t, updated.At("autoArchiveMonths").IsNull())
 	eq(t, updated.At("autoCloseMonths").Num(), 3)
 	eq(t, updated.At("defaultIssueState", "name").Str(), "Todo")
-	eq(t, updated.At("parent", "key").Str(), "ENG")
 	eq(t, updated.At("description").Str(), "Apps", "omitted fields stay")
-	eq(t, call(t, bob, "get_team", M{"id": "ENG"}).At("subTeams", 0, "key").Str(), "MP")
-	eq(t, call(t, bob, "save_issue", M{"team": "MP", "title": "x"}).At("state", "name").Str(), "Todo")
+	eq(t, call(t, bob, "save_issue", M{"title": "x"}).At("state", "name").Str(), "Todo")
 
 	for _, c := range []struct {
 		args  M
 		error string
 	}{
-		{M{"id": "MP", "cycleDurationWeeks": 9}, "cycleDurationWeeks is 1 to 8"},
-		{M{"id": "MP", "defaultEstimate": 4}, "isn't on the fibonacci scale"},
-		{M{"id": "MP", "autoCloseMonths": 2}, "1, 3, 6, 9 or 12"},
-		{M{"id": "MP", "estimateType": "huge"}, "estimateType"},
-		{M{"id": "MP", "defaultIssueState": "Done"}, "backlog or unstarted"},
-		{M{"id": "MP", "autoCloseState": "Done"}, "canceled"},
-		{M{"id": "ENG", "parent": "MP"}, "own sub-teams"},
-		{M{"id": "MP", "timezone": "Nowhere"}, "timezone"},
+		{M{"id": "ENG", "cycleDurationWeeks": 9}, "cycleDurationWeeks is 1 to 8"},
+		{M{"id": "ENG", "defaultEstimate": 4}, "isn't on the fibonacci scale"},
+		{M{"id": "ENG", "autoCloseMonths": 2}, "1, 3, 6, 9 or 12"},
+		{M{"id": "ENG", "estimateType": "huge"}, "estimateType"},
+		{M{"id": "ENG", "defaultIssueState": "Done"}, "backlog or unstarted"},
+		{M{"id": "ENG", "autoCloseState": "Done"}, "canceled"},
+		{M{"id": "ENG", "parent": "ENG"}, "own sub-teams"},
+		{M{"id": "ENG", "timezone": "Nowhere"}, "timezone"},
 	} {
 		contains(t, fails(t, bob, "save_team", c.args), c.error)
 	}
 	listed := call(t, bob, "list_teams", M{"mine": true})
-	eqList(t, listed.At("nodes").Strings("key"), []string{"MP"})
+	eqList(t, listed.At("nodes").Strings("key"), []string{"ENG"})
 	eq(t, listed.At("nodes", 0, "isMember").Bool(), true)
 	eq(t, listed.At("nodes", 0, "issueCount").Num(), 1)
-	eqList(t, call(t, bob, "list_teams", M{"query": "eng"}).At("nodes").Strings("key"), []string{"ENG"})
+}
+
+func TestAWorkspaceHasOneTeam(t *testing.T) {
+	w := world(t)
+	bob := w.member("bob@acme.test", "Bob Jones", "member")
+	gus := w.member("gus@else.test", "Gus", "guest")
+
+	created := fails(t, w.Ann, "save_team", M{"name": "Design", "key": "DES"})
+	contains(t, created, "ENG (Engineering)", `id "ENG"`)
+	contains(t, fails(t, w.Ann, "delete_team", M{"id": "ENG"}), "can't be deleted")
+	contains(t, fails(t, bob, "leave_team", M{"id": "ENG"}), "leave the workspace instead")
+	eqList(t, call(t, w.Ann, "list_teams", M{"includeArchived": true}).At("nodes").Strings("key"), []string{"ENG"})
+
+	eqList(t, call(t, w.Ann, "get_team", M{"id": "ENG"}).At("members").Strings("email"), []string{"ann@acme.test", "bob@acme.test"})
+	joined := call(t, bob, "join_team", M{"id": "ENG"})
+	eq(t, joined.At("key").Str(), "ENG")
+	eq(t, joined.At("isMember").Bool(), true)
+	contains(t, fails(t, gus, "join_team", M{"id": "ENG"}), "Guests can't")
+	contains(t, fails(t, w.Ann, "save_team", M{"id": "ENG", "removeMembers": []any{"bob"}}), "remove Bob Jones from the workspace")
+
+	call(t, w.Ann, "save_issue", M{"title": "Not for guests yet"})
+	contains(t, fails(t, gus, "get_issue", M{"id": "ENG-1"}), "No issue")
+	call(t, w.Ann, "save_team", M{"id": "ENG", "addMembers": []any{"gus"}})
+	eq(t, call(t, gus, "get_issue", M{"id": "ENG-1"}).At("title").Str(), "Not for guests yet")
+	call(t, w.Ann, "save_team", M{"id": "ENG", "removeMembers": []any{"gus"}})
+	contains(t, fails(t, gus, "get_issue", M{"id": "ENG-1"}), "No issue")
+
+	call(t, w.Ann, "update_user", M{"id": "gus", "role": "member"})
+	eqList(t, call(t, w.Ann, "get_team", M{"id": "ENG"}).At("members").Strings("email"),
+		[]string{"ann@acme.test", "bob@acme.test", "gus@else.test"}, "members join the workspace's team")
 }
 
 func TestChangingTheKeyKeepsOldIdentifiersWorking(t *testing.T) {
@@ -82,48 +103,13 @@ func TestChangingTheKeyKeepsOldIdentifiersWorking(t *testing.T) {
 	eq(t, issue.At("identifier").Str(), "CO-1")
 	eqList(t, issue.At("previousIdentifiers").Strings(), []string{"ENG-1", "CORE-1"})
 	eq(t, call(t, w.Ann, "save_issue", M{"title": "Third"}).At("identifier").Str(), "CO-3")
-}
-
-func TestPrivateTeamsAreHiddenFromOthers(t *testing.T) {
-	w := world(t)
-	bob := w.member("bob@acme.test", "Bob Jones", "member")
-	ada := w.member("ada@acme.test", "Ada Admin", "admin")
-	call(t, w.Ann, "save_team", M{"name": "Secret", "key": "SEC", "private": true})
-	call(t, w.Ann, "save_issue", M{"team": "SEC", "title": "Hidden"})
-
-	eqList(t, call(t, bob, "list_teams", M{}).At("nodes").Strings("key"), []string{"ENG"})
-	contains(t, fails(t, bob, "get_team", M{"id": "SEC"}), "No team")
-	contains(t, fails(t, bob, "get_issue", M{"id": "SEC-1"}), "No issue")
-	contains(t, fails(t, bob, "join_team", M{"id": "SEC"}), "No team")
-	eq(t, len(identifiers(call(t, bob, "list_issues", M{}))), 0)
-	eq(t, call(t, bob, "get_workspace", M{}).At("teams").Len(), 1)
-
-	joined := call(t, ada, "join_team", M{"id": "SEC"})
-	eq(t, joined.At("isMember").Bool(), true)
-	call(t, w.Ann, "save_team", M{"id": "SEC", "addMembers": []any{"bob"}})
-	eq(t, call(t, bob, "get_issue", M{"id": "SEC-1"}).At("title").Str(), "Hidden")
-	call(t, bob, "save_team", M{"id": "SEC", "removeMembers": []any{"ada", "me"}})
-	contains(t, fails(t, w.Ann, "leave_team", M{"id": "SEC"}), "last member")
-	contains(t, fails(t, w.Ann, "save_team", M{"id": "SEC", "removeMembers": []any{"ann"}}), "at least one member")
-
-	left := call(t, w.Ann, "leave_team", M{"id": "ENG"})
-	eq(t, left.At("left", "key").Str(), "ENG")
-	contains(t, fails(t, w.Ann, "leave_team", M{"id": "ENG"}), "aren't a member")
-}
-
-func TestArchivingATeamKeepsItsIssuesReadable(t *testing.T) {
-	w := world(t)
-	bob := w.member("bob@acme.test", "Bob Jones", "member")
-	call(t, w.Ann, "save_issue", M{"title": "Old work"})
-	contains(t, fails(t, bob, "delete_team", M{"id": "ENG"}), "owners")
-	eq(t, call(t, w.Ann, "delete_team", M{"id": "ENG"}).At("key").Str(), "ENG")
-	eq(t, call(t, w.Ann, "list_teams", M{}).At("nodes").Len(), 0)
-	eqList(t, call(t, w.Ann, "list_teams", M{"includeArchived": true}).At("nodes").Strings("key"), []string{"ENG"})
-	eq(t, call(t, w.Ann, "get_issue", M{"id": "ENG-1"}).At("title").Str(), "Old work")
-	reused := call(t, w.Ann, "save_team", M{"name": "Engineering", "key": "ENG"})
-	eq(t, reused.At("key").Str(), "ENG", "the key and name are free again")
-	log := call(t, w.Ann, "get_audit_log", M{"type": "team.archived"})
-	eq(t, log.At("nodes", 0, "metadata", "key").Str(), "ENG")
+	eq(t, call(t, w.Ann, "get_team", M{"id": "ENG"}).At("key").Str(), "CO", "earlier keys still name the team")
+	eq(t, call(t, w.Ann, "get_team", M{"id": "engineering"}).At("key").Str(), "CO", "and earlier names")
+	eq(t, len(identifiers(call(t, w.Ann, "list_issues", M{"team": "core"}))), 3)
+	eq(t, call(t, w.Ann, "save_issue", M{"team": "ENG", "title": "Fourth"}).At("identifier").Str(), "CO-4")
+	back := call(t, w.Ann, "save_team", M{"id": "CO", "key": "ENG"})
+	eq(t, back.At("key").Str(), "ENG")
+	eq(t, call(t, w.Ann, "get_team", M{"id": "CORE"}).At("key").Str(), "ENG")
 }
 
 func TestTriageRoutesIssuesToTheResponsiblePerson(t *testing.T) {

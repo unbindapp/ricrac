@@ -1,23 +1,12 @@
-import { Link, type LinkProps, useNavigate } from "@tanstack/react-router";
+import { Link, type LinkProps } from "@tanstack/react-router";
 import { Fragment, ReactNode } from "react";
 
-import { ChevronDownIcon, ChevronRightIcon, type TIcon } from "@/components/icons/symbols.gen";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
-export type TBreadcrumbMenuItem = { label: string; icon: TIcon; link: LinkProps };
+import { ChevronRightIcon } from "@/components/icons";
 
 export type TBreadcrumbItem = {
   label: string;
   icon?: ReactNode;
   link?: LinkProps;
-  /** Pages next to this one, offered from a menu on the crumb. */
-  menu?: TBreadcrumbMenuItem[];
 };
 
 export function Breadcrumb({ items }: { items: TBreadcrumbItem[] }) {
@@ -57,7 +46,6 @@ function BreadcrumbEntry({ item, isLast }: { item: TBreadcrumbItem; isLast: bool
       <span className="truncate">{item.label}</span>
     </>
   );
-  if (item.menu && !isLast) return <BreadcrumbMenu item={item} menu={item.menu} />;
   if (!item.link || isLast) {
     return (
       <span
@@ -76,31 +64,5 @@ function BreadcrumbEntry({ item, isLast }: { item: TBreadcrumbItem; isLast: bool
     >
       {content}
     </Link>
-  );
-}
-
-function BreadcrumbMenu({ item, menu }: { item: TBreadcrumbItem; menu: TBreadcrumbMenuItem[] }) {
-  const navigate = useNavigate();
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        aria-label={`${item.label} pages`}
-        className="has-hover:hover:text-foreground focus-visible:ring-primary data-popup-open:text-foreground flex min-w-0 items-center gap-1.5 rounded-sm outline-hidden focus-visible:ring-2"
-      >
-        {item.icon}
-        <span className="truncate">{item.label}</span>
-        <ChevronDownIcon className="size-3.5 shrink-0" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-48">
-        <DropdownMenuGroup>
-          {menu.map((page) => (
-            <DropdownMenuItem key={page.label} onClick={() => void navigate(page.link)}>
-              <page.icon className="size-4" />
-              {page.label}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
   );
 }

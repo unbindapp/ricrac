@@ -5,7 +5,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -35,6 +34,11 @@ const groupTypeItems: { value: TLabelGroupType; label: string }[] = [
   { value: "multiSelect", label: "Multi select: an issue takes any of its labels" },
 ];
 
+/** The server only takes a label into a team's group when the label is that team's too. */
+function groupTeam(groups: TLabel[], parent: string) {
+  return groups.find((group) => group.id === parent)?.team?.id ?? null;
+}
+
 export type TLabelDialogTarget =
   { mode: "create"; isGroup: boolean; parent?: string } | { mode: "edit"; label: TLabel };
 
@@ -42,32 +46,20 @@ type TProps = {
   /** What the dialog creates or edits; null keeps it closed. */
   target: TLabelDialogTarget | null;
   onClose: () => void;
-  /** The team the label belongs to; null for a workspace label. */
-  team: { id: string; name: string } | null;
   /** The groups a label can go in. */
   groups: TLabel[];
 };
 
-export function LabelDialog({ target, onClose, team, groups }: TProps) {
+export function LabelDialog({ target, onClose, groups }: TProps) {
   const isGroup = target?.mode === "edit" ? target.label.isGroup : !!target?.isGroup;
   const noun = isGroup ? "group" : "label";
-  const scope = team ? `Only ${team.name} uses it.` : "Every team can use it.";
   return (
     <Dialog open={target !== null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="w-md max-w-full">
         <DialogHeader>
           <DialogTitle>{target?.mode === "edit" ? `Edit ${noun}` : `New ${noun}`}</DialogTitle>
-          {target?.mode === "create" && <DialogDescription>{scope}</DialogDescription>}
         </DialogHeader>
-        {target && (
-          <LabelForm
-            target={target}
-            team={team}
-            groups={groups}
-            isGroup={isGroup}
-            onDone={onClose}
-          />
-        )}
+        {target && <LabelForm target={target} groups={groups} isGroup={isGroup} onDone={onClose} />}
       </DialogContent>
     </Dialog>
   );
@@ -75,7 +67,6 @@ export function LabelDialog({ target, onClose, team, groups }: TProps) {
 
 function LabelForm({
   target,
-  team,
   groups,
   isGroup,
   onDone,
@@ -89,10 +80,9 @@ function LabelForm({
   const label = target.mode === "edit" ? target.label : null;
   const groupItems = [
     { value: NO_GROUP, label: "No group" },
-    ...groups.map((group) => ({
-      value: group.id,
-      label: group.team || !team ? group.name : `${group.name} (workspace)`,
-    })),
+    ...groups
+      .filter((group) => !label || !group.team || group.team.id === label.team?.id)
+      .map((group) => ({ value: group.id, label: group.name })),
   ];
   const form = useAppForm({
     defaultValues: {
@@ -114,7 +104,7 @@ function LabelForm({
           : { parent: parsed.parent === NO_GROUP ? null : parsed.parent }),
       };
       if (label) await saveLabel({ id: label.id, ...fields });
-      else await saveLabel({ ...fields, isGroup, team: team?.id ?? null });
+      else await saveLabel({ ...fields, isGroup, team: groupTeam(groups, parsed.parent) });
       onDone();
     },
   });

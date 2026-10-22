@@ -103,19 +103,22 @@ func (self *StateRepository) GetForUpdate(ctx context.Context, tx repository.TxI
 		WithTeam(func(q *ent.TeamQuery) { q.ForUpdate() }).ForUpdate().Only(ctx)
 }
 
-// TeamOf is the team of a state of the workspace.
-func (self *StateRepository) TeamOf(ctx context.Context, workspace, id uuid.UUID) (uuid.UUID, bool, error) {
-	state, err := self.base.DB.WorkflowState.Query().Where(workflowstate.ID(id)).WithTeam().Only(ctx)
-	if ent.IsNotFound(err) {
-		return uuid.Nil, false, nil
-	}
+// Owned is a state of the workspace by its id or the id of a state merged into it, with its team.
+func (self *StateRepository) Owned(ctx context.Context, workspace, id uuid.UUID) (uuid.UUID, uuid.UUID, bool, error) {
+	states, err := self.base.DB.WorkflowState.Query().
+		Where(func(s *entsql.Selector) {
+			s.Where(repository.Raw(s.C(workflowstate.FieldID)+" = ? OR ? = ANY("+s.C(workflowstate.FieldMergedIds)+")", id, id))
+		}).
+		WithTeam().All(ctx)
 	if err != nil {
-		return uuid.Nil, false, err
+		return uuid.Nil, uuid.Nil, false, err
 	}
-	if state.Edges.Team.WorkspaceID != workspace {
-		return uuid.Nil, false, nil
+	for _, state := range states {
+		if state.Edges.Team.WorkspaceID == workspace {
+			return state.ID, state.TeamID, true, nil
+		}
 	}
-	return state.TeamID, true, nil
+	return uuid.Nil, uuid.Nil, false, nil
 }
 
 // NameTaken says whether another unarchived state of the team has the name, in any case.

@@ -48,6 +48,10 @@ func CompileFilter(filter any, me uuid.UUID) (*issue_repo.Condition, error) {
 // CheckFilter compiles and runs the filter in tx, so that mistakes in it surface now rather
 // than when it is used.
 func (self *IssueService) CheckFilter(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, filter any) error {
+	filter, err := self.resolve.CurrentNames(ctx, actor, filter)
+	if err != nil {
+		return err
+	}
 	condition, err := CompileFilter(filter, actor.User)
 	if err != nil {
 		return err

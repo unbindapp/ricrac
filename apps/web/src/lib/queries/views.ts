@@ -17,8 +17,8 @@ export const queryKeyViews = {
   all: (workspaceId: string) => [workspaceId, "views"] as const,
   list: (workspaceId: string) => [workspaceId, "views", "list"] as const,
   detail: (workspaceId: string, view: string) => [workspaceId, "views", "detail", view] as const,
-  results: (workspaceId: string, model: TViewModel, team: string | null, filter: TFilter) =>
-    [workspaceId, "views", "results", model, team, filter] as const,
+  results: (workspaceId: string, model: TViewModel, filter: TFilter) =>
+    [workspaceId, "views", "results", model, filter] as const,
 };
 
 export const viewsQuery = (workspaceId: string) =>
@@ -43,30 +43,20 @@ export function viewParam(view: Pick<TView, "url" | "slugId">) {
 const RESULTS_PAGE_SIZE = 100;
 
 /** The issues a filter matches, as an issue view shows them (also unsaved edits of its filter). */
-export const viewIssuesQuery = (workspaceId: string, team: string | null, filter: TFilter) =>
+export const viewIssuesQuery = (workspaceId: string, filter: TFilter) =>
   infiniteQueryOptions({
-    queryKey: queryKeyViews.results(workspaceId, "issue", team, filter),
+    queryKey: queryKeyViews.results(workspaceId, "issue", filter),
     queryFn: ({ pageParam }) =>
-      call(workspaceId, "list_issues", {
-        team,
-        filter,
-        cursor: pageParam,
-        limit: RESULTS_PAGE_SIZE,
-      }),
+      call(workspaceId, "list_issues", { filter, cursor: pageParam, limit: RESULTS_PAGE_SIZE }),
     initialPageParam: null as string | null,
     getNextPageParam: (page) => (page.pageInfo.hasNextPage ? page.pageInfo.endCursor : null),
   });
 
-export const viewProjectsQuery = (workspaceId: string, team: string | null, filter: TFilter) =>
+export const viewProjectsQuery = (workspaceId: string, filter: TFilter) =>
   infiniteQueryOptions({
-    queryKey: queryKeyViews.results(workspaceId, "project", team, filter),
+    queryKey: queryKeyViews.results(workspaceId, "project", filter),
     queryFn: ({ pageParam }) =>
-      call(workspaceId, "list_projects", {
-        team,
-        filter,
-        cursor: pageParam,
-        limit: RESULTS_PAGE_SIZE,
-      }),
+      call(workspaceId, "list_projects", { filter, cursor: pageParam, limit: RESULTS_PAGE_SIZE }),
     initialPageParam: null as string | null,
     getNextPageParam: (page) => (page.pageInfo.hasNextPage ? page.pageInfo.endCursor : null),
   });

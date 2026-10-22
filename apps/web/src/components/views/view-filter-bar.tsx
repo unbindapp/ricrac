@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { ListFilterIcon, XIcon } from "@/components/icons/symbols.gen";
+import { ListFilterIcon, XIcon } from "@/components/icons";
 import {
   FIELDS,
   IS_ONLY,
@@ -103,7 +103,6 @@ function valuesLabel(condition: TCondition, options: TFilterOption[]) {
 }
 
 const pluralLabels: Record<TFilterField, string> = {
-  team: "teams",
   statusType: "status types",
   status: "statuses",
   assignee: "people",
@@ -115,7 +114,6 @@ const pluralLabels: Record<TFilterField, string> = {
   dueDate: "dates",
   projectStatus: "statuses",
   lead: "people",
-  projectTeam: "teams",
   projectPriority: "priorities",
   health: "health values",
 };

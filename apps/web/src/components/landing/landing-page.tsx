@@ -2,25 +2,25 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 
 import { GoogleSignInButton, SignInNotConfigured } from "@/components/auth/sign-in";
-import { Logo } from "@/components/icons/logo";
 import {
   BotIcon,
   CableIcon,
   KanbanIcon,
+  type LucideIcon,
   MailIcon,
   MonitorIcon,
   RepeatIcon,
-  type TIcon,
   UsersIcon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
+import { Logo } from "@/components/icons/logo";
 import { Button, LinkButton } from "@/components/ui/button";
 import { appConfigQuery } from "@/lib/queries/me";
 
-const features: { icon: TIcon; heading: string; body: string }[] = [
+const features: { icon: LucideIcon; heading: string; body: string }[] = [
   {
     icon: KanbanIcon,
-    heading: "Everything a team tracks",
-    body: "Teams, issues with sub-issues and relations, workflows, labels, projects with milestones and updates, initiatives, cycles, documents, views and templates.",
+    heading: "Everything you track",
+    body: "Issues with sub-issues and relations, workflows, labels, projects with milestones and updates, initiatives, cycles, documents, views and templates.",
   },
   {
     icon: BotIcon,
@@ -45,7 +45,7 @@ const features: { icon: TIcon; heading: string; body: string }[] = [
   {
     icon: UsersIcon,
     heading: "Your people stay in charge",
-    body: "Workspaces with owners, admins, members and guests, private teams, and control over every key and connected app.",
+    body: "Workspaces with owners, admins, members and guests, and control over every key and connected app.",
   },
 ];
 

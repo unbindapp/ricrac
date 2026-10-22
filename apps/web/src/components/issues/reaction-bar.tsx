@@ -2,7 +2,7 @@ import { useTheme } from "next-themes";
 import { lazy, Suspense, useState } from "react";
 
 import type { UserRef } from "@/api/ops.gen";
-import { SmilePlusIcon } from "@/components/icons/symbols.gen";
+import { SmilePlusIcon } from "@/components/icons";
 import { userName } from "@/components/issues/grouping";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";

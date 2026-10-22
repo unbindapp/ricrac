@@ -2,7 +2,7 @@ import type { Editor } from "@tiptap/core";
 import { useEditorState } from "@tiptap/react";
 import { BubbleMenu } from "@tiptap/react/menus";
 
-import { ExternalLinkIcon, PencilIcon, UnlinkIcon } from "@/components/icons/symbols.gen";
+import { ExternalLinkIcon, PencilIcon, UnlinkIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { SimpleTooltip } from "@/components/ui/tooltip";
 

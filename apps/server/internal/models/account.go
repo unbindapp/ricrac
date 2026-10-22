@@ -19,6 +19,7 @@ type WorkspaceSummary struct {
 	URLKey  string    `json:"urlKey"`
 	Role    string    `json:"role"`
 	LogoURL *string   `json:"logoUrl"`
+	Theme   string    `json:"theme" enum:"default,dank" doc:"The look of the web app for everyone in the workspace."`
 }
 
 type PendingInvitation struct {

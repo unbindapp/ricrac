@@ -97,6 +97,12 @@ const (
 	FieldGithubPrOpenedStateID = "github_pr_opened_state_id"
 	// FieldGithubPrMergedStateID holds the string denoting the github_pr_merged_state_id field in the database.
 	FieldGithubPrMergedStateID = "github_pr_merged_state_id"
+	// FieldPreviousKeys holds the string denoting the previous_keys field in the database.
+	FieldPreviousKeys = "previous_keys"
+	// FieldPreviousNames holds the string denoting the previous_names field in the database.
+	FieldPreviousNames = "previous_names"
+	// FieldMergedTeamIds holds the string denoting the merged_team_ids field in the database.
+	FieldMergedTeamIds = "merged_team_ids"
 	// EdgeWorkspace holds the string denoting the workspace edge name in mutations.
 	EdgeWorkspace = "workspace"
 	// EdgeParent holds the string denoting the parent edge name in mutations.
@@ -350,6 +356,9 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldGithubPrOpenedStateID,
 	FieldGithubPrMergedStateID,
+	FieldPreviousKeys,
+	FieldPreviousNames,
+	FieldMergedTeamIds,
 }
 
 var (
@@ -595,6 +604,21 @@ func ByGithubPrOpenedStateID(opts ...sql.OrderTermOption) OrderOption {
 // ByGithubPrMergedStateID orders the results by the github_pr_merged_state_id field.
 func ByGithubPrMergedStateID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldGithubPrMergedStateID, opts...).ToFunc()
+}
+
+// ByPreviousKeys orders the results by the previous_keys field.
+func ByPreviousKeys(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPreviousKeys, opts...).ToFunc()
+}
+
+// ByPreviousNames orders the results by the previous_names field.
+func ByPreviousNames(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPreviousNames, opts...).ToFunc()
+}
+
+// ByMergedTeamIds orders the results by the merged_team_ids field.
+func ByMergedTeamIds(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMergedTeamIds, opts...).ToFunc()
 }
 
 // ByWorkspaceField orders the results by workspace field.

@@ -37,7 +37,7 @@ export type TCycleDialogTarget =
   { mode: "create"; startsOn: Date; weeks: number } | { mode: "edit"; cycle: Cycle };
 
 type TProps = {
-  team: { id: string; name: string };
+  team: { id: string };
   target: TCycleDialogTarget | null;
   onClose: () => void;
 };
@@ -52,7 +52,7 @@ export function CycleDialog({ team, target, onClose }: TProps) {
           </DialogTitle>
           {target?.mode === "create" && (
             <DialogDescription>
-              {team.name} plans cycles on its own; add one for a break from the schedule.
+              Cycles are planned on their own; add one for a break from the schedule.
             </DialogDescription>
           )}
         </DialogHeader>

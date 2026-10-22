@@ -2,8 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { z } from "zod";
 
+import { MailIcon } from "@/components/icons";
 import { GoogleIcon } from "@/components/icons/google";
-import { MailIcon } from "@/components/icons/symbols.gen";
 import { ErrorCard } from "@/components/layout/error-card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";

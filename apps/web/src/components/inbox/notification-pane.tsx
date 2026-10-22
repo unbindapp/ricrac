@@ -7,7 +7,7 @@ import {
   InboxIcon,
   MailIcon,
   MailOpenIcon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import {
   NotificationTargetIcon,
   notificationTypeIcon,

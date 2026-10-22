@@ -38,7 +38,7 @@ func NewTemplateService(repo repositories.RepositoriesInterface, resolve resolve
 
 type ListInput struct {
 	Type *string `json:"type" doc:"issue, project or document."`
-	Team *string `json:"team" doc:"Team key, name or id: the team's templates and the workspace-wide ones."`
+	Team *string `json:"team" doc:"Optional team key, name or id: the team's templates and the workspace-wide ones. All by default."`
 	args.Page
 }
 
@@ -66,7 +66,7 @@ type SaveInput struct {
 	Name        *string                   `json:"name"`
 	Description args.Nullable[string]     `json:"description"`
 	Type        *string                   `json:"type" doc:"issue, project or document. Required to create; can't change."`
-	Team        args.Nullable[string]     `json:"team" doc:"Team key, name or id the template belongs to; null makes it workspace-wide."`
+	Team        args.Nullable[string]     `json:"team" doc:"Optional team key, name or id the template belongs to; null makes it workspace-wide."`
 	Data        any                       `json:"data" doc:"What the template fills in; the keys depend on the type (see the description)."`
 	Recurrence  args.Nullable[Recurrence] `json:"recurrence" doc:"Issue templates only: create an issue from the template on a schedule, e.g. {\"every\": 1, \"unit\": \"week\",\n\"startsAt\": \"2026-11-02T09:00:00Z\"}. unit is day, week or month; startsAt (ISO 8601, default now) is the\nfirst one. null stops it."`
 }

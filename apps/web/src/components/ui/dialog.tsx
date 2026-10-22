@@ -1,5 +1,5 @@
 import * as React from "react";
-import { XIcon } from "@/components/icons/symbols.gen";
+import { XIcon } from "@/components/icons";
 import { pressStartedInExemptElement } from "@/components/ui/press-origin";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 
@@ -96,7 +96,7 @@ export const dialogContentVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-surface-container-high shadow-dialog shadow-shadow-color/shadow-opacity rounded-xl p-6 pt-5",
+          "bg-background shadow-dialog shadow-shadow-color/shadow-opacity rounded-lg border p-5 pt-4 dank:bg-surface-container-high dank:rounded-xl dank:border-0 dank:p-6 dank:pt-5",
         styleless: "",
       },
       animate: {
@@ -140,7 +140,7 @@ function DialogContent({
       >
         <DialogPrimitive.Popup
           data-slot="dialog-content"
-          className={cn(dialogContentVariants({ variant, animate, className }))}
+          className={cn(dialogContentVariants({ variant, animate }), className)}
           finalFocus={returnFocusTarget}
           {...props}
         >

@@ -1,5 +1,5 @@
 import type { PendingInvitation, WorkspaceSummary } from "@/api/account.gen";
-import { MailIcon } from "@/components/icons/symbols.gen";
+import { MailIcon } from "@/components/icons";
 import { List, ListRow, ListRowText } from "@/components/layout/list";
 import { Button } from "@/components/ui/button";
 import {

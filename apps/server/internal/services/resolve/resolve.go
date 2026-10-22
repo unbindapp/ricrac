@@ -103,7 +103,8 @@ func (self *ResolveService) Users(ctx context.Context, actor *auth.Actor, values
 	return all(ctx, actor, values, self.User)
 }
 
-// Team is a team the caller can see, by id, key or name.
+// Team is a team the caller can see, by id, key or name, or by the id, key or name of a team that
+// was merged into it or a key or name it had before.
 func (self *ResolveService) Team(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error) {
 	visible, err := actor.TeamIDs(ctx)
 	if err != nil {
@@ -119,6 +120,13 @@ func (self *ResolveService) Team(ctx context.Context, actor *auth.Actor, value s
 		func(r resolve_repo.Keyed) bool { return isID && r.ID == id },
 		func(r resolve_repo.Keyed) bool { return strings.EqualFold(r.Key, value) },
 		func(r resolve_repo.Keyed) bool { return strings.EqualFold(r.Name, value) },
+		func(r resolve_repo.Keyed) bool { return isID && slices.Contains(r.MergedIDs, id) },
+		func(r resolve_repo.Keyed) bool {
+			return slices.ContainsFunc(r.PreviousKeys, func(key string) bool { return strings.EqualFold(key, value) })
+		},
+		func(r resolve_repo.Keyed) bool {
+			return slices.ContainsFunc(r.PreviousNames, func(name string) bool { return strings.EqualFold(name, value) })
+		},
 	} {
 		for _, r := range rows {
 			if match(r) {
@@ -145,6 +153,100 @@ func (self *ResolveService) OptionalTeam(ctx context.Context, actor *auth.Actor,
 	return &id, nil
 }
 
+// DefaultTeam is the workspace's team, for arguments that name none.
+func (self *ResolveService) DefaultTeam(ctx context.Context, actor *auth.Actor) (uuid.UUID, error) {
+	visible, err := actor.TeamIDs(ctx)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	rows, err := self.lookups().Teams(ctx, visible)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	switch len(rows) {
+	case 1:
+		return rows[0].ID, nil
+	case 0:
+		return uuid.Nil, errdefs.Forbidden("You aren't on the workspace's team; ask an admin to add you")
+	}
+	keys := make([]string, len(rows))
+	for i, r := range rows {
+		keys[i] = r.Key
+	}
+	slices.Sort(keys)
+	return uuid.Nil, errdefs.BadRequest("Name the team: %s", strings.Join(keys, ", "))
+}
+
+// TeamOrDefault is the team named, or the workspace's team when value is nil or blank.
+func (self *ResolveService) TeamOrDefault(ctx context.Context, actor *auth.Actor, value *string) (uuid.UUID, error) {
+	if value == nil || strings.TrimSpace(*value) == "" {
+		return self.DefaultTeam(ctx, actor)
+	}
+	return self.Team(ctx, actor, *value)
+}
+
+// CurrentNames rewrites what a filter calls a team, status or label by an earlier name to what
+// it is called now: the ids of those merged into others, and the earlier keys and names of teams.
+func (self *ResolveService) CurrentNames(ctx context.Context, actor *auth.Actor, filter any) (any, error) {
+	aliases, err := self.lookups().Aliases(ctx, actor.Workspace)
+	if err != nil || len(aliases.IDs)+len(aliases.Keys)+len(aliases.Names) == 0 {
+		return filter, err
+	}
+	return renamed(filter, "", aliases), nil
+}
+
+func renamed(value any, field string, aliases resolve_repo.Aliases) any {
+	switch v := value.(type) {
+	case map[string]any:
+		out := make(map[string]any, len(v))
+		for key, inner := range v {
+			switch {
+			case (field == "team" || field == "teams") && key == "key":
+				out[key] = replaced(inner, func(s string) string { return aliases.Keys[strings.ToUpper(s)] })
+			case (field == "team" || field == "teams") && key == "name":
+				out[key] = replaced(inner, func(s string) string { return aliases.Names[strings.ToLower(s)] })
+			default:
+				out[key] = renamed(inner, key, aliases)
+			}
+		}
+		return out
+	case []any:
+		out := make([]any, len(v))
+		for i, inner := range v {
+			out[i] = renamed(inner, field, aliases)
+		}
+		return out
+	case string:
+		if current, ok := aliases.IDs[strings.ToLower(v)]; ok {
+			return current
+		}
+	}
+	return value
+}
+
+// replaced is value with every string current names replaced by it.
+func replaced(value any, current func(string) string) any {
+	switch v := value.(type) {
+	case map[string]any:
+		out := make(map[string]any, len(v))
+		for key, inner := range v {
+			out[key] = replaced(inner, current)
+		}
+		return out
+	case []any:
+		out := make([]any, len(v))
+		for i, inner := range v {
+			out[i] = replaced(inner, current)
+		}
+		return out
+	case string:
+		if now := current(v); now != "" {
+			return now
+		}
+	}
+	return value
+}
+
 // FindTyped is the row with this id, name or type, or one the extra tests pick.
 func FindTyped(rows []resolve_repo.Typed, value string, extra ...func(resolve_repo.Typed) bool) (uuid.UUID, bool) {
 	id, isID := utils.AsUUID(value)
@@ -152,6 +254,7 @@ func FindTyped(rows []resolve_repo.Typed, value string, extra ...func(resolve_re
 		func(r resolve_repo.Typed) bool { return isID && r.ID == id },
 		func(r resolve_repo.Typed) bool { return strings.EqualFold(r.Name, value) },
 		func(r resolve_repo.Typed) bool { return strings.EqualFold(r.Type, value) },
+		func(r resolve_repo.Typed) bool { return isID && slices.Contains(r.MergedIDs, id) },
 	}, extra...)
 	for _, test := range tests {
 		for _, r := range rows {
@@ -246,9 +349,10 @@ func (self *ResolveService) Issues(ctx context.Context, actor *auth.Actor, value
 	return all(ctx, actor, values, self.Issue)
 }
 
-// LabelMatches says whether value names the label: its id, its name, or Group/Name.
-func LabelMatches(id uuid.UUID, name string, parent *string, value string) bool {
-	if uid, ok := utils.AsUUID(value); ok && uid == id {
+// LabelMatches says whether value names the label: its id (or one merged into it), its name, or
+// Group/Name.
+func LabelMatches(id uuid.UUID, merged []uuid.UUID, name string, parent *string, value string) bool {
+	if uid, ok := utils.AsUUID(value); ok && (uid == id || slices.Contains(merged, uid)) {
 		return true
 	}
 	group, wanted := utils.SplitGroup(value)
@@ -258,12 +362,17 @@ func LabelMatches(id uuid.UUID, name string, parent *string, value string) bool 
 	return group == nil || parent != nil && strings.EqualFold(*parent, *group)
 }
 
-// Labels is issue labels by id or name, among the workspace's labels and the team's. A child of
-// a group can be named Group/Child.
+// Labels is issue labels by id or name, among the workspace's labels and the team's (the
+// workspace's team when nil). A child of a group can be named Group/Child.
 func (self *ResolveService) Labels(ctx context.Context, actor *auth.Actor, team *uuid.UUID, values []string) ([]uuid.UUID, error) {
 	ids := []uuid.UUID{}
 	if len(values) == 0 {
 		return ids, nil
+	}
+	if team == nil {
+		if fallback, err := self.DefaultTeam(ctx, actor); err == nil {
+			team = &fallback
+		}
 	}
 	rows, err := self.lookups().IssueLabels(ctx, actor.Workspace, team)
 	if err != nil {
@@ -273,7 +382,7 @@ func (self *ResolveService) Labels(ctx context.Context, actor *auth.Actor, team 
 		value = strings.TrimSpace(value)
 		var matches []resolve_repo.LabelRow
 		for _, r := range rows {
-			if !r.IsGroup && LabelMatches(r.ID, r.Name, r.Parent, value) {
+			if !r.IsGroup && LabelMatches(r.ID, r.MergedIDs, r.Name, r.Parent, value) {
 				matches = append(matches, r)
 			}
 		}
@@ -410,7 +519,11 @@ func (self *ResolveService) Cycle(ctx context.Context, actor *auth.Actor, team *
 		return uuid.Nil, errdefs.NotFound("No cycle %s", value)
 	}
 	if team == nil {
-		return uuid.Nil, errdefs.BadRequest("Name the team too, or pass the cycle's id")
+		fallback, err := self.DefaultTeam(ctx, actor)
+		if err != nil {
+			return uuid.Nil, err
+		}
+		team = &fallback
 	}
 	var id uuid.UUID
 	var found bool
@@ -547,7 +660,7 @@ func (self *ResolveService) ProjectLabels(ctx context.Context, actor *auth.Actor
 	}
 	for _, value := range values {
 		value = strings.TrimSpace(value)
-		index := slices.IndexFunc(rows, func(r resolve_repo.LabelRow) bool { return LabelMatches(r.ID, r.Name, r.Parent, value) })
+		index := slices.IndexFunc(rows, func(r resolve_repo.LabelRow) bool { return LabelMatches(r.ID, r.MergedIDs, r.Name, r.Parent, value) })
 		if index < 0 {
 			names := make([]string, len(rows))
 			for i, r := range rows {

@@ -24,8 +24,8 @@ type StateRepositoryInterface interface {
 	Get(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.WorkflowState, error)
 	// GetForUpdate is the state with its team, both locked until the transaction ends.
 	GetForUpdate(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.WorkflowState, error)
-	// TeamOf is the team of a state of the workspace.
-	TeamOf(ctx context.Context, workspace, id uuid.UUID) (uuid.UUID, bool, error)
+	// Owned is a state of the workspace by its id or the id of a state merged into it, with its team.
+	Owned(ctx context.Context, workspace, id uuid.UUID) (uuid.UUID, uuid.UUID, bool, error)
 	// NameTaken says whether another unarchived state of the team has the name, in any case.
 	NameTaken(ctx context.Context, tx repository.TxInterface, team uuid.UUID, name string, except *uuid.UUID) (bool, error)
 	// HasTriage says whether the team has an unarchived triage state other than except.

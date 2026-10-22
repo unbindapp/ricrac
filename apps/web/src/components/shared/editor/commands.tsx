@@ -13,14 +13,14 @@ import {
   ListChecksIcon,
   ListIcon,
   ListOrderedIcon,
+  type LucideIcon,
   MinusIcon,
   PaperclipIcon,
   PilcrowIcon,
   SmileIcon,
   TableIcon,
   TextQuoteIcon,
-  type TIcon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import {
   suggestionRenderer,
   type TSuggestionSink,
@@ -33,7 +33,7 @@ export type TPickFiles = (kind: "media" | "any") => void;
 export type TBlockCommand = {
   id: string;
   label: string;
-  icon: TIcon;
+  icon: LucideIcon;
   hint?: string;
   keywords: string[];
   needsUpload?: boolean;

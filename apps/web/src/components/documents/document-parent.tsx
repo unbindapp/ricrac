@@ -2,15 +2,8 @@ import { type LinkProps } from "@tanstack/react-router";
 import { type ReactNode } from "react";
 
 import type { Document } from "@/api/ops.gen";
-import {
-  CircleDotIcon,
-  RefreshCwIcon,
-  RocketIcon,
-  TargetIcon,
-} from "@/components/icons/symbols.gen";
+import { CircleDotIcon, RefreshCwIcon, RocketIcon, TargetIcon } from "@/components/icons";
 import { ProjectIcon } from "@/components/shared/project-icon";
-import { TeamIcon } from "@/components/shared/team-icon";
-import { useTeams } from "@/components/workspace/teams-provider";
 import { entitySlug } from "@/lib/helpers/entity-slug";
 
 type TParentFields = Pick<
@@ -20,12 +13,11 @@ type TParentFields = Pick<
 
 export type TDocumentParentInfo = { label: string; icon: ReactNode; link?: LinkProps };
 
-/** What a document belongs to, with an icon and where it lives in the app. */
+/** What a document belongs to, with an icon and where it lives in the app; null for the workspace. */
 export function useDocumentParent(
   document: TParentFields,
   workspaceUrlKey: string,
 ): TDocumentParentInfo | null {
-  const { teamByKey } = useTeams();
   const workspace = workspaceUrlKey;
   if (document.project) {
     return {
@@ -58,28 +50,13 @@ export function useDocumentParent(
     };
   }
   if (document.cycle) {
-    const { cycle, team } = document;
+    const { cycle } = document;
     return {
       label: cycle.name ?? `Cycle ${cycle.number}`,
       icon: <RefreshCwIcon className="text-muted-foreground size-3.5" />,
-      link: team
-        ? {
-            to: "/$workspace/team/$key/cycle/$number",
-            params: { workspace, key: team.key, number: String(cycle.number) },
-          }
-        : undefined,
-    };
-  }
-  if (document.team) {
-    const team = teamByKey(document.team.key);
-    return {
-      label: document.team.name,
-      icon: (
-        <TeamIcon teamKey={document.team.key} icon={team?.icon} color={team?.color} size="sm" />
-      ),
       link: {
-        to: "/$workspace/team/$key/issues",
-        params: { workspace, key: document.team.key },
+        to: "/$workspace/cycle/$number",
+        params: { workspace, number: String(cycle.number) },
       },
     };
   }

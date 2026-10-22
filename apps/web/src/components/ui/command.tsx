@@ -1,7 +1,7 @@
 import * as React from "react";
 import { type Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { Command as CommandPrimitive } from "cmdk";
-import { LoaderIcon, SearchIcon } from "@/components/icons/symbols.gen";
+import { LoaderIcon, SearchIcon } from "@/components/icons";
 import { cn } from "@/components/ui/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cva, VariantProps } from "class-variance-authority";

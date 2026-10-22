@@ -12,7 +12,7 @@ import {
   PlusIcon,
   TagIcon,
   Trash2Icon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { List } from "@/components/layout/list";

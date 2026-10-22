@@ -1224,6 +1224,7 @@ var (
 		{Name: "retired_at", Type: field.TypeTime, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "merged_ids", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"postgres": "uuid[]"}},
 		{Name: "parent_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "team_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "creator_id", Type: field.TypeUUID, Nullable: true},
@@ -1237,25 +1238,25 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "issue_labels_issue_labels_children",
-				Columns:    []*schema.Column{IssueLabelsColumns[9]},
+				Columns:    []*schema.Column{IssueLabelsColumns[10]},
 				RefColumns: []*schema.Column{IssueLabelsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "issue_labels_teams_issue_labels",
-				Columns:    []*schema.Column{IssueLabelsColumns[10]},
+				Columns:    []*schema.Column{IssueLabelsColumns[11]},
 				RefColumns: []*schema.Column{TeamsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "issue_labels_users_issue_labels",
-				Columns:    []*schema.Column{IssueLabelsColumns[11]},
+				Columns:    []*schema.Column{IssueLabelsColumns[12]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "issue_labels_workspaces_issue_labels",
-				Columns:    []*schema.Column{IssueLabelsColumns[12]},
+				Columns:    []*schema.Column{IssueLabelsColumns[13]},
 				RefColumns: []*schema.Column{WorkspacesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -2219,6 +2220,9 @@ var (
 		{Name: "archived_at", Type: field.TypeTime, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "previous_keys", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"postgres": "text[]"}},
+		{Name: "previous_names", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"postgres": "text[]"}},
+		{Name: "merged_team_ids", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"postgres": "uuid[]"}},
 		{Name: "parent_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "auto_close_state_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "default_issue_state_id", Type: field.TypeUUID, Nullable: true},
@@ -2234,37 +2238,37 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "teams_teams_children",
-				Columns:    []*schema.Column{TeamsColumns[37]},
+				Columns:    []*schema.Column{TeamsColumns[40]},
 				RefColumns: []*schema.Column{TeamsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "teams_workflow_states_teams_by_auto_close_state",
-				Columns:    []*schema.Column{TeamsColumns[38]},
-				RefColumns: []*schema.Column{WorkflowStatesColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "teams_workflow_states_teams_by_default_issue_state",
-				Columns:    []*schema.Column{TeamsColumns[39]},
-				RefColumns: []*schema.Column{WorkflowStatesColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "teams_workflow_states_teams_by_github_pr_opened_state",
-				Columns:    []*schema.Column{TeamsColumns[40]},
-				RefColumns: []*schema.Column{WorkflowStatesColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "teams_workflow_states_teams_by_github_pr_merged_state",
 				Columns:    []*schema.Column{TeamsColumns[41]},
 				RefColumns: []*schema.Column{WorkflowStatesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "teams_workspaces_teams",
+				Symbol:     "teams_workflow_states_teams_by_default_issue_state",
 				Columns:    []*schema.Column{TeamsColumns[42]},
+				RefColumns: []*schema.Column{WorkflowStatesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "teams_workflow_states_teams_by_github_pr_opened_state",
+				Columns:    []*schema.Column{TeamsColumns[43]},
+				RefColumns: []*schema.Column{WorkflowStatesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "teams_workflow_states_teams_by_github_pr_merged_state",
+				Columns:    []*schema.Column{TeamsColumns[44]},
+				RefColumns: []*schema.Column{WorkflowStatesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "teams_workspaces_teams",
+				Columns:    []*schema.Column{TeamsColumns[45]},
 				RefColumns: []*schema.Column{WorkspacesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -2436,6 +2440,7 @@ var (
 		{Name: "archived_at", Type: field.TypeTime, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "merged_ids", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"postgres": "uuid[]"}},
 		{Name: "team_id", Type: field.TypeUUID},
 	}
 	// WorkflowStatesTable holds the schema information for the "workflow_states" table.
@@ -2446,7 +2451,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "workflow_states_teams_workflow_states",
-				Columns:    []*schema.Column{WorkflowStatesColumns[9]},
+				Columns:    []*schema.Column{WorkflowStatesColumns[10]},
 				RefColumns: []*schema.Column{TeamsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -2460,6 +2465,7 @@ var (
 		{Name: "logo_url", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "default_team_settings", Type: field.TypeJSON, Nullable: true},
 		{Name: "project_update_reminder_day", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "theme", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "created_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 	}

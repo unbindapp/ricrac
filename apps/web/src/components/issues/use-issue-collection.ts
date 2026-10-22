@@ -12,6 +12,7 @@ import { groupIssues, type TIssueGroup } from "@/components/issues/grouping";
 import type { TNewIssueDefaults } from "@/components/issues/new-issue-store";
 import { useTeamDetail } from "@/components/issues/picker-sources";
 import { useNow } from "@/components/providers/now-provider";
+import { useWorkspaceTeam } from "@/components/workspace/teams-provider";
 import { issuesListQuery } from "@/lib/queries/issues";
 
 const HOUR_MS = 60 * 60 * 1000;
@@ -43,8 +44,8 @@ export function useIssueCollection({
   }, [hasNextPage, isFetchingNextPage, isError, fetchNextPage]);
 
   const merged = mergeFilters(filters, fixedFilters);
-  const teamId = merged.team_ids?.length === 1 ? merged.team_ids[0] : undefined;
-  const fixedTeamId = fixedFilters?.team_ids?.length === 1 ? fixedFilters.team_ids[0] : undefined;
+  const workspaceTeamId = useWorkspaceTeam()?.id;
+  const teamId = merged.team_ids?.length === 1 ? merged.team_ids[0] : workspaceTeamId;
   const team = useTeamDetail(teamId);
   const now = useNow();
   const nowMs = Math.floor(now / HOUR_MS) * HOUR_MS;
@@ -93,36 +94,30 @@ export function useIssueCollection({
     issues,
     groups,
     display,
-    fixedTeamId: fixedTeamId ?? teamId,
     isLoadingMore: hasNextPage || isFetchingNextPage,
     isCapped,
   };
 }
 
-export function newIssueDefaultsForGroup(
-  group: TIssueGroup,
-  base: TNewIssueDefaults,
-): TNewIssueDefaults {
+export function newIssueDefaultsForGroup(group: TIssueGroup): TNewIssueDefaults {
   const meta = group.meta;
   switch (meta.kind) {
     case "none":
-      return base;
+      return {};
     case "state":
-      if (!meta.teamId) return base;
-      return { ...base, teamId: meta.teamId, draft: { ...base.draft, state: meta.state } };
+      if (!meta.teamId) return {};
+      return { draft: { state: meta.state } };
     case "priority":
-      return { ...base, draft: { ...base.draft, priority: meta.priority } };
+      return { draft: { priority: meta.priority } };
     case "assignee":
-      return { ...base, draft: { ...base.draft, assignee: meta.user } };
+      return { draft: { assignee: meta.user } };
     case "project":
-      return { ...base, draft: { ...base.draft, project: meta.project } };
+      return { draft: { project: meta.project } };
     case "cycle":
-      return { ...base, draft: { ...base.draft, cycle: meta.cycle } };
+      return { draft: { cycle: meta.cycle } };
     case "label":
-      return { ...base, draft: { ...base.draft, labels: meta.label ? [meta.label] : [] } };
+      return { draft: { labels: meta.label ? [meta.label] : [] } };
     case "parent":
-      return { ...base, draft: { ...base.draft, parent: meta.parent } };
-    case "team":
-      return { ...base, teamId: meta.team.id };
+      return { draft: { parent: meta.parent } };
   }
 }

@@ -7,7 +7,7 @@ import { DiscussionDetail } from "@/components/forum/discussion-detail";
 import { MainChatPanel } from "@/components/forum/main-chat";
 import { MessageThreadPanel } from "@/components/forum/message-thread-panel";
 import { ThreadPanel } from "@/components/forum/thread-panel";
-import { MessagesSquareIcon } from "@/components/icons/symbols.gen";
+import { MessagesSquareIcon } from "@/components/icons";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PageContainer } from "@/components/layout/page-container";

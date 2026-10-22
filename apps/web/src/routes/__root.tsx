@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { useLayoutEffect } from "react";
 
-import { TriangleAlertIcon } from "@/components/icons/symbols.gen";
+import { TriangleAlertIcon } from "@/components/icons";
 import NotFoundTemplate from "@/components/navigation/not-found-template";
 import Providers from "@/components/providers/providers";
 import { meQuery } from "@/lib/queries/me";

@@ -8,7 +8,7 @@ import {
   LoaderIcon,
   TriangleAlertIcon,
   XIcon,
-} from "@/components/icons/symbols.gen";
+} from "@/components/icons";
 import { useDeviceSize } from "@/components/providers/device-size-provider";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/ui/utils";

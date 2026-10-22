@@ -152,6 +152,26 @@ func (_u *WorkspaceUpdate) ClearProjectUpdateReminderDay() *WorkspaceUpdate {
 	return _u
 }
 
+// SetTheme sets the "theme" field.
+func (_u *WorkspaceUpdate) SetTheme(v string) *WorkspaceUpdate {
+	_u.mutation.SetTheme(v)
+	return _u
+}
+
+// SetNillableTheme sets the "theme" field if the given value is not nil.
+func (_u *WorkspaceUpdate) SetNillableTheme(v *string) *WorkspaceUpdate {
+	if v != nil {
+		_u.SetTheme(*v)
+	}
+	return _u
+}
+
+// ClearTheme clears the value of the "theme" field.
+func (_u *WorkspaceUpdate) ClearTheme() *WorkspaceUpdate {
+	_u.mutation.ClearTheme()
+	return _u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_u *WorkspaceUpdate) SetCreatedAt(v time.Time) *WorkspaceUpdate {
 	_u.mutation.SetCreatedAt(v)
@@ -1491,6 +1511,12 @@ func (_u *WorkspaceUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.ProjectUpdateReminderDayCleared() {
 		_spec.ClearField(workspace.FieldProjectUpdateReminderDay, field.TypeString)
+	}
+	if value, ok := _u.mutation.Theme(); ok {
+		_spec.SetField(workspace.FieldTheme, field.TypeString, value)
+	}
+	if _u.mutation.ThemeCleared() {
+		_spec.ClearField(workspace.FieldTheme, field.TypeString)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(workspace.FieldCreatedAt, field.TypeTime, value)
@@ -3142,6 +3168,26 @@ func (_u *WorkspaceUpdateOne) ClearProjectUpdateReminderDay() *WorkspaceUpdateOn
 	return _u
 }
 
+// SetTheme sets the "theme" field.
+func (_u *WorkspaceUpdateOne) SetTheme(v string) *WorkspaceUpdateOne {
+	_u.mutation.SetTheme(v)
+	return _u
+}
+
+// SetNillableTheme sets the "theme" field if the given value is not nil.
+func (_u *WorkspaceUpdateOne) SetNillableTheme(v *string) *WorkspaceUpdateOne {
+	if v != nil {
+		_u.SetTheme(*v)
+	}
+	return _u
+}
+
+// ClearTheme clears the value of the "theme" field.
+func (_u *WorkspaceUpdateOne) ClearTheme() *WorkspaceUpdateOne {
+	_u.mutation.ClearTheme()
+	return _u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_u *WorkspaceUpdateOne) SetCreatedAt(v time.Time) *WorkspaceUpdateOne {
 	_u.mutation.SetCreatedAt(v)
@@ -4511,6 +4557,12 @@ func (_u *WorkspaceUpdateOne) sqlSave(ctx context.Context) (_node *Workspace, er
 	}
 	if _u.mutation.ProjectUpdateReminderDayCleared() {
 		_spec.ClearField(workspace.FieldProjectUpdateReminderDay, field.TypeString)
+	}
+	if value, ok := _u.mutation.Theme(); ok {
+		_spec.SetField(workspace.FieldTheme, field.TypeString, value)
+	}
+	if _u.mutation.ThemeCleared() {
+		_spec.ClearField(workspace.FieldTheme, field.TypeString)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(workspace.FieldCreatedAt, field.TypeTime, value)

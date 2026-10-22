@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import type { IssueStatus } from "@/api/ops.gen";
-import { Trash2Icon } from "@/components/icons/symbols.gen";
+import { Trash2Icon } from "@/components/icons";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { StateIcon } from "@/components/shared/state-icon";
 import { Button } from "@/components/ui/button";

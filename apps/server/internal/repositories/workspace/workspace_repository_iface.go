@@ -16,8 +16,11 @@ type WorkspaceRepositoryInterface interface {
 	SetName(ctx context.Context, tx repository.TxInterface, id uuid.UUID, name string) error
 	SetURLKey(ctx context.Context, tx repository.TxInterface, id uuid.UUID, key string) error
 	SetLogoURL(ctx context.Context, tx repository.TxInterface, id uuid.UUID, logo *string) error
+	SetTheme(ctx context.Context, tx repository.TxInterface, id uuid.UUID, theme string) error
 	Touch(ctx context.Context, tx repository.TxInterface, id uuid.UUID, now time.Time) error
 	SetRole(ctx context.Context, tx repository.TxInterface, id, user uuid.UUID, role string) error
+	// JoinTeam adds the user to the workspace's team.
+	JoinTeam(ctx context.Context, tx repository.TxInterface, id, user uuid.UUID) error
 	SetUserName(ctx context.Context, tx repository.TxInterface, user uuid.UUID, name string) error
 	SetDisplayName(ctx context.Context, tx repository.TxInterface, user uuid.UUID, displayName string) error
 	SetTimezone(ctx context.Context, tx repository.TxInterface, user uuid.UUID, timezone *string) error

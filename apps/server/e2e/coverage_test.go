@@ -46,7 +46,7 @@ func TestReadsLabelsViewsAndTemplatesByName(t *testing.T) {
 	call(t, w.Ann, "get_issue_label", M{"id": "Type"})
 	call(t, w.Ann, "get_issue_label", M{"id": "Type/Bug"})
 	call(t, w.Ann, "get_issue_label", M{"id": "Bug", "team": "ENG"})
-	fails(t, w.Ann, "get_issue_label", M{"id": "Bug"})
+	eq(t, call(t, w.Ann, "get_issue_label", M{"id": "Bug"}).At("team", "key").Str(), "ENG", "the team's label wins a tie")
 	call(t, w.Ann, "list_issue_labels", M{"team": "ENG", "query": "bu"})
 	call(t, w.Ann, "save_custom_view", M{"name": "Urgent", "filter": M{"priority": M{"eq": 1}}, "shared": true})
 	call(t, w.Ann, "get_custom_view", M{"id": "Urgent"})
