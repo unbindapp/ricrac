@@ -1,6 +1,5 @@
 import { Toast as ToastPrimitive } from "@base-ui/react/toast";
 import * as React from "react";
-
 import {
   CheckCircleIcon,
   CircleAlertIcon,
@@ -8,7 +7,8 @@ import {
   LoaderIcon,
   TriangleAlertIcon,
   XIcon,
-} from "@/components/icons/symbols.gen";
+} from "lucide-react";
+
 import { useDeviceSize } from "@/components/providers/device-size-provider";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/ui/utils";

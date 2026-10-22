@@ -1,12 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-
-import type { DiscussionThreadDetail } from "@/api/ops.gen";
-import { ChatComposer } from "@/components/forum/chat-message";
-import { ChatMessages } from "@/components/forum/chat-messages";
-import { IssueLinkPicker } from "@/components/forum/issue-link-picker";
-import { THREAD_KINDS, threadKindOf, threadKinds } from "@/components/forum/thread-kinds";
-import { useCanRewrite } from "@/components/forum/use-can-rewrite";
 import {
   ArrowLeftIcon,
   CircleCheckIcon,
@@ -14,7 +7,14 @@ import {
   SplitIcon,
   Trash2Icon,
   UndoIcon,
-} from "@/components/icons/symbols.gen";
+} from "lucide-react";
+
+import type { DiscussionThreadDetail } from "@/api/ops.gen";
+import { ChatComposer } from "@/components/forum/chat-message";
+import { ChatMessages } from "@/components/forum/chat-messages";
+import { IssueLinkPicker } from "@/components/forum/issue-link-picker";
+import { THREAD_KINDS, threadKindOf, threadKinds } from "@/components/forum/thread-kinds";
+import { useCanRewrite } from "@/components/forum/use-can-rewrite";
 import { PickerTrigger } from "@/components/issues/pickers";
 import { PropertyPicker } from "@/components/issues/property-picker";
 import { ChatLayout } from "@/components/layout/chat-layout";

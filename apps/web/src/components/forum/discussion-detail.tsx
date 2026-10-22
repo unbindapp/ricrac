@@ -1,13 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-
-import type { DiscussionDetail as TDiscussionDetail } from "@/api/ops.gen";
-import { DiscussionTagBadges, DiscussionTagsPicker } from "@/components/forum/discussion-tags";
-import { MainChatComposer, MainChatMessages } from "@/components/forum/main-chat";
-import { ThreadBranches } from "@/components/forum/thread-branches";
-import { ThumbnailPicker } from "@/components/forum/thumbnail-picker";
-import { useCanRewrite } from "@/components/forum/use-can-rewrite";
 import {
   BellIcon,
   BellOffIcon,
@@ -17,7 +10,14 @@ import {
   MessagesSquareIcon,
   PinIcon,
   PinOffIcon,
-} from "@/components/icons/symbols.gen";
+} from "lucide-react";
+
+import type { DiscussionDetail as TDiscussionDetail } from "@/api/ops.gen";
+import { DiscussionTagBadges, DiscussionTagsPicker } from "@/components/forum/discussion-tags";
+import { MainChatComposer, MainChatMessages } from "@/components/forum/main-chat";
+import { ThreadBranches } from "@/components/forum/thread-branches";
+import { ThumbnailPicker } from "@/components/forum/thumbnail-picker";
+import { useCanRewrite } from "@/components/forum/use-can-rewrite";
 import { Breadcrumb, type TBreadcrumbItem } from "@/components/layout/breadcrumb";
 import { ChatLayout } from "@/components/layout/chat-layout";
 import { PageContainer } from "@/components/layout/page-container";

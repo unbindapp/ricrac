@@ -1,5 +1,6 @@
 import { type LinkProps } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { BoxIcon, FileTextIcon, LayersIcon, ListTodoIcon, TargetIcon } from "lucide-react";
 
 import type {
   DocumentRef,
@@ -11,13 +12,6 @@ import type {
   ProjectRef,
 } from "@/api/ops.gen";
 import { cycleStatus } from "@/components/cycles/cycle-status";
-import {
-  BoxIcon,
-  FileTextIcon,
-  LayersIcon,
-  ListTodoIcon,
-  TargetIcon,
-} from "@/components/icons/symbols.gen";
 import { CycleIcon } from "@/components/shared/cycle-icon";
 import { StateIcon } from "@/components/shared/state-icon";
 import { cycleName } from "@/lib/queries/cycles";

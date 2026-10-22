@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { FileTextIcon, PlusIcon, RocketIcon, Trash2Icon } from "lucide-react";
 
 import type { ReleaseNote } from "@/api/ops.gen";
-import { FileTextIcon, PlusIcon, RocketIcon, Trash2Icon } from "@/components/icons/symbols.gen";
 import { PropertyPicker } from "@/components/issues/property-picker";
 import { PageBar } from "@/components/layout/page-header";
 import { Breadcrumb } from "@/components/layout/breadcrumb";

@@ -1,4 +1,4 @@
-import { CircleUserIcon } from "@/components/icons/symbols.gen";
+import { CircleUserIcon } from "lucide-react";
 import { type TFilterField, UNASSIGNED } from "@/components/issues/filters";
 import { cycleName, PRIORITY_ORDER, userName } from "@/components/issues/grouping";
 import {

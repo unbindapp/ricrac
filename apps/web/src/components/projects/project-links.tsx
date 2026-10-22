@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { z } from "zod";
+import { LinkIcon, PlusIcon, XIcon } from "lucide-react";
 
 import type { EntityLink } from "@/api/ops.gen";
-import { LinkIcon, PlusIcon, XIcon } from "@/components/icons/symbols.gen";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

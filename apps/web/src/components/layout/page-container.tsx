@@ -16,7 +16,7 @@ export function PageContainer({ width = "full", children }: TProps) {
     >
       <div
         className={cn(
-          "animate-in fade-in-0 slide-in-from-bottom-2 ease-emphasized mx-auto flex w-full flex-1 flex-col gap-4 px-4 pt-4 pb-8 duration-300 motion-reduce:animate-none",
+          "mx-auto flex w-full flex-1 flex-col gap-4 px-4 pt-4 pb-8",
           width === "narrow" ? "max-w-3xl sm:px-6 sm:pt-10" : "max-w-none",
         )}
       >

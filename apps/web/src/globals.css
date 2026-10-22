@@ -251,9 +251,8 @@
     outline: none;
   }
 
-  pre,
-  code {
-    font-family: var(--font-code);
+  pre {
+    font-family: var(--font-mono);
   }
 
   input[type="number"]::-webkit-inner-spin-button,
@@ -375,10 +374,10 @@
     @apply my-4 border-t;
   }
   .rr-prose code {
-    @apply bg-muted font-code rounded-sm px-1 py-0.5 text-xs;
+    @apply bg-muted rounded-sm px-1 py-0.5 font-mono text-xs;
   }
   .rr-prose pre {
-    @apply bg-card font-code overflow-x-auto rounded-md border p-3 text-xs;
+    @apply bg-card overflow-x-auto rounded-md border p-3 font-mono text-xs;
   }
   .rr-prose pre code {
     @apply bg-transparent p-0;

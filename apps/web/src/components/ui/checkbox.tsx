@@ -1,6 +1,6 @@
 import { Checkbox as CheckboxPrimitive } from "@base-ui/react/checkbox";
+import { CheckIcon } from "lucide-react";
 
-import { CheckIcon } from "@/components/icons/symbols.gen";
 import { cn } from "@/components/ui/utils";
 
 function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
@@ -8,16 +8,16 @@ function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
     <CheckboxPrimitive.Root
       data-slot="checkbox"
       className={cn(
-        "peer border-muted-foreground data-checked:border-primary aria-invalid:border-destructive focus-visible:ring-primary focus-visible:ring-offset-background size-4 shrink-0 rounded-xs border-2 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+        "peer bg-border ring-foreground/6-10 focus-visible:ring-foreground/8-10 aria-invalid:ring-destructive/8-10 focus-visible:ring-offset-background size-3.75 shrink-0 rounded-sm ring-1 outline-none focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
       {...props}
     >
       <CheckboxPrimitive.Indicator
         data-slot="checkbox-indicator"
-        className="data-checked:bg-primary data-checked:text-primary-foreground flex size-full items-center justify-center p-px text-current"
+        className="data-checked:ring-foreground data-checked:bg-primary data-checked:text-primary-foreground flex size-full items-center justify-center rounded-sm p-px text-current ring-1 ring-transparent transition-none"
       >
-        <CheckIcon className="size-full" />
+        <CheckIcon className="size-full" strokeWidth={4} />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   );

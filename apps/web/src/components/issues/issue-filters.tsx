@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import {
   BellIcon,
   BoxIcon,
@@ -10,10 +9,11 @@ import {
   RefreshCwIcon,
   SignalHighIcon,
   TagIcon,
-  type TIcon,
+  type LucideIcon,
   UserPenIcon,
   XIcon,
-} from "@/components/icons/symbols.gen";
+} from "lucide-react";
+
 import {
   activeFilterFields,
   clearFilterField,
@@ -30,7 +30,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-const fieldIcons: Record<TFilterField, TIcon> = {
+const fieldIcons: Record<TFilterField, LucideIcon> = {
   status: CircleDashedIcon,
   assignee: CircleUserIcon,
   creator: UserPenIcon,

@@ -13,7 +13,7 @@ function Switch({ className, checked, size = "sm", ...props }: TSwitchProps) {
       data-slot="switch"
       checked={checked}
       className={cn(
-        "group/switch focus-visible:ring-primary focus-visible:ring-offset-background inline-flex shrink-0 cursor-pointer items-center rounded-full outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 data-disabled:cursor-not-allowed data-disabled:opacity-50",
+        "group/switch focus-visible:ring-primary/8-10 focus-visible:ring-offset-background inline-flex shrink-0 cursor-pointer items-center rounded-full outline-hidden focus-visible:ring-1 focus-visible:ring-offset-2 data-disabled:cursor-not-allowed data-disabled:opacity-50",
         className,
       )}
       {...props}

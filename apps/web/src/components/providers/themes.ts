@@ -11,7 +11,7 @@ export function nextTheme(theme: string | undefined): TTheme {
   return themeCycle[(themeCycle.indexOf(current) + 1) % themeCycle.length];
 }
 
-export const DEFAULT_ACCENT_HUE = 257;
+export const DEFAULT_ACCENT_HUE = 120;
 export const ACCENT_HUE_KEY = "ricrac:accent-hue";
 
 export function accentHueOf(stored: string | null | undefined): number {

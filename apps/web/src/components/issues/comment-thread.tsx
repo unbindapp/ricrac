@@ -1,8 +1,6 @@
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-
-import type { Comment, CommentThread as TCommentThread } from "@/api/ops.gen";
 import {
   CheckCircle2Icon,
   ChevronRightIcon,
@@ -11,7 +9,9 @@ import {
   ReplyIcon,
   Trash2Icon,
   UndoIcon,
-} from "@/components/icons/symbols.gen";
+} from "lucide-react";
+
+import type { Comment, CommentThread as TCommentThread } from "@/api/ops.gen";
 import { userName } from "@/components/issues/grouping";
 import { useWorkspaceUsers } from "@/components/issues/picker-sources";
 import { UserAvatar } from "@/components/issues/pickers";

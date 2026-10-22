@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState } from "react";
 import { useTheme } from "next-themes";
+import { SmileIcon, XIcon } from "lucide-react";
 
-import { SmileIcon, XIcon } from "@/components/icons/symbols.gen";
 import { EntityIcon } from "@/components/shared/entity-icon";
 import { ENTITY_ICON_NAMES, ENTITY_ICONS } from "@/components/shared/entity-icons";
 import { Button } from "@/components/ui/button";

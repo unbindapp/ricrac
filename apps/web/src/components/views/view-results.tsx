@@ -1,8 +1,8 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { BoxIcon, CircleDotIcon } from "lucide-react";
 
 import type { Issue, Project } from "@/api/ops.gen";
-import { BoxIcon, CircleDotIcon } from "@/components/icons/symbols.gen";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { List } from "@/components/layout/list";

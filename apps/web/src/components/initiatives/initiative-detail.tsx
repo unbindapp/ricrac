@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { TargetIcon } from "lucide-react";
 
 import type { InitiativeDetail as TInitiativeDetail } from "@/api/ops.gen";
 import { FavoriteButton } from "@/components/favorites/favorite-button";
 import { ParentDocuments } from "@/components/documents/document-list";
-import { TargetIcon } from "@/components/icons/symbols.gen";
 import { AutosaveMarkdown } from "@/components/shared/autosave-markdown";
 import { InitiativeProjects, SubInitiatives } from "@/components/initiatives/initiative-projects";
 import { InitiativeProperties } from "@/components/initiatives/initiative-properties";

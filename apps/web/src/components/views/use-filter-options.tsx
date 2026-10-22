@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
+import { BoxIcon, CalendarIcon, RefreshCwIcon, UserIcon } from "lucide-react";
 
-import { BoxIcon, CalendarIcon, RefreshCwIcon, UserIcon } from "@/components/icons/symbols.gen";
 import { type TFilterField, ME, NONE } from "@/components/views/view-filter";
 import { Avatar } from "@/components/shared/avatar";
 import { PriorityIcon, priorityLabel, PRIORITIES } from "@/components/shared/priority-icon";

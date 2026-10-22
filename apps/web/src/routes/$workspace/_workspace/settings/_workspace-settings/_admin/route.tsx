@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { LockIcon } from "lucide-react";
 
-import { LockIcon } from "@/components/icons/symbols.gen";
 import { EmptyState } from "@/components/layout/empty-state";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 

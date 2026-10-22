@@ -2,8 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
+import { UserCircleIcon } from "lucide-react";
 
-import { UserCircleIcon } from "@/components/icons/symbols.gen";
 import {
   filtersFromSearch,
   filtersToSearch,

@@ -1,7 +1,7 @@
 import { type ReactNode, useState } from "react";
+import { PlusIcon } from "lucide-react";
 
 import type { UserRef } from "@/api/ops.gen";
-import { PlusIcon } from "@/components/icons/symbols.gen";
 import { applyPatch, type TIssueDraft, type TIssuePatch } from "@/components/issues/issue-draft";
 import { useCycles, useTeamDetail } from "@/components/issues/picker-sources";
 import {

@@ -1,7 +1,7 @@
-import { LoaderIcon } from "@/components/icons/symbols.gen";
 import { cn } from "@/components/ui/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import type { FC, ReactNode } from "react";
+import { LoaderIcon } from "lucide-react";
 
 const chipVariants = cva(
   "flex items-center gap-1 rounded-sm border px-1.5 py-0.5 text-xs font-medium",

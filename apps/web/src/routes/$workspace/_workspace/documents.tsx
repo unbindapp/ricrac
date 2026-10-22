@@ -3,11 +3,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
 import { type ReactNode, useState } from "react";
 import { z } from "zod";
+import { FileTextIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react";
 
 import type { Document } from "@/api/ops.gen";
 import { DocumentRow } from "@/components/documents/document-row";
 import { NewDocumentDialog } from "@/components/documents/new-document-dialog";
-import { FileTextIcon, PlusIcon, SearchIcon, Trash2Icon } from "@/components/icons/symbols.gen";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { List } from "@/components/layout/list";

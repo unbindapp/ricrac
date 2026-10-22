@@ -1,6 +1,6 @@
 import { type ReactElement, type ReactNode, useState } from "react";
+import { CheckIcon } from "lucide-react";
 
-import { CheckIcon } from "@/components/icons/symbols.gen";
 import {
   Command,
   CommandEmpty,

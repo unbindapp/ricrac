@@ -3,14 +3,14 @@ import { createLink, type LinkComponent } from "@tanstack/react-router";
 import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
 
-import { LoaderIcon } from "@/components/icons/symbols.gen";
 import { cn } from "@/components/ui/utils";
+import { LoaderIcon } from "lucide-react";
 
 export const minButtonSizeEnforcerClassName =
   "before:w-full before:h-full before:min-w-[44px] before:min-h-[44px] before:z-[-1] before:bg-transparent before:absolute before:-translate-y-1/2 before:top-1/2 before:-translate-x-1/2 before:left-1/2";
 
 const buttonVariants = cva(
-  "relative group/button focus-visible:z-[1] text-center leading-tight max-w-full select-none z-0 touch-manipulation gap-1.5 rounded-[1.25rem] text-sm font-medium transition-[background-color,color,border-radius,box-shadow] duration-200 ease-emphasized active:rounded-[0.625rem] data-popup-open:rounded-[0.625rem] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&>[data-slot=button-spinner]+svg]:hidden data-pending:[&:not(:has(>[data-slot=button-spinner]+svg))>*:not([data-slot=button-spinner])]:opacity-0",
+  "relative group/button focus-visible:z-[1] text-center leading-tight max-w-full select-none z-0 touch-manipulation gap-1.5 rounded-md text-sm font-medium focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-primary/8-10 disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&>[data-slot=button-spinner]+svg]:hidden data-pending:[&:not(:has(>[data-slot=button-spinner]+svg))>*:not([data-slot=button-spinner])]:opacity-0",
   {
     variants: {
       variant: {
@@ -26,7 +26,7 @@ const buttonVariants = cva(
           "bg-process text-process-foreground has-hover:hover:bg-process/85 active:bg-process/85",
         change: "bg-change text-change-foreground has-hover:hover:bg-change/85 active:bg-change/85",
         outline:
-          "border border-muted-more-foreground/7-10 has-hover:hover:bg-accent active:bg-accent has-hover:hover:text-foreground active:text-foreground",
+          "border border-border bg-background has-hover:hover:bg-accent active:bg-accent has-hover:hover:text-foreground active:text-foreground",
         "outline-muted":
           "border border-border bg-background has-hover:hover:bg-card active:bg-card has-hover:hover:text-foreground active:text-foreground",
         "outline-foreground":
@@ -38,9 +38,7 @@ const buttonVariants = cva(
         "warning-outline":
           "border border-warning/6-10 bg-background has-hover:hover:bg-warning/3-10 active:bg-warning/3-10 has-hover:hover:border-warning/0 active:border-warning/0 text-warning has-hover:hover:text-warning active:text-warning",
         secondary:
-          "bg-secondary text-secondary-foreground has-hover:hover:bg-secondary/85 active:bg-secondary/85",
-        tonal:
-          "bg-primary-container text-primary-container-foreground has-hover:hover:bg-primary-container/85 active:bg-primary-container/85",
+          "bg-secondary text-secondary-foreground has-hover:hover:bg-secondary active:bg-secondary",
         ghost:
           "has-hover:hover:bg-accent has-hover:hover:text-foreground active:bg-accent active:text-foreground",
         "ghost-destructive":
@@ -63,9 +61,9 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 has-hover:hover:underline active:underline",
       },
       size: {
-        default: "h-9 px-4",
-        sm: "h-8 px-3",
-        icon: "size-8 shrink-0 flex items-center justify-center",
+        default: "h-8 px-3",
+        sm: "h-7 px-2",
+        icon: "size-7 shrink-0 flex items-center justify-center",
       },
       loadingState: {
         default: "",

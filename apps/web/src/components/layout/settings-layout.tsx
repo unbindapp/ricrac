@@ -1,113 +1,87 @@
-import { Link, type LinkProps, useLocation, useMatchRoute } from "@tanstack/react-router";
-import { ReactNode, useState } from "react";
+import { type LinkProps, useLocation } from "@tanstack/react-router";
+import { ReactNode, useEffect, useRef } from "react";
+import type { LucideIcon } from "lucide-react";
 
-import { ArrowLeftIcon, TIcon } from "@/components/icons/symbols.gen";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/components/ui/utils";
+import { SidebarButton } from "@/components/layout/sidebar-button";
+import { LinkButton } from "@/components/ui/button";
 
 export type TSettingsTab = {
   label: string;
-  description: string;
-  icon: TIcon;
+  icon: LucideIcon;
   link: LinkProps;
   exact?: boolean;
-  destructive?: boolean;
+};
+
+export type TSettingsTabGroup = {
+  title: string;
+  tabs: TSettingsTab[];
 };
 
 type TProps = {
   title: string;
-  switcher: ReactNode;
-  groups: TSettingsTab[][];
+  groups: TSettingsTabGroup[];
   children: ReactNode;
 };
 
-const groupBadges = [
-  "bg-primary text-primary-foreground",
-  "bg-tertiary text-tertiary-foreground",
-  "bg-success text-success-foreground",
-  "bg-process text-process-foreground",
-  "bg-wait text-wait-foreground",
-];
-
-export function SettingsLayout({ title, switcher, groups, children }: TProps) {
+export function SettingsLayout({ title, groups, children }: TProps) {
+  const navRef = useRef<HTMLElement>(null);
   const pathname = useLocation({ select: (location) => location.pathname });
-  const matchRoute = useMatchRoute();
-  const firstTab = groups[0]?.[0];
-  const [isListShown, setIsListShown] = useState(() =>
-    firstTab ? Boolean(matchRoute(firstTab.link)) : false,
-  );
+
+  useEffect(() => {
+    const activeTab = navRef.current?.querySelector("[data-status=active]");
+    activeTab?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [pathname]);
 
   return (
-    <div
-      data-view={isListShown ? "list" : "page"}
-      className="group/settings flex min-h-0 w-full flex-1"
-    >
-      <aside className="scrollbar-hidden flex min-h-0 w-full flex-col gap-3 overflow-y-auto p-3 group-data-[view=page]/settings:max-md:hidden md:w-[clamp(260px,36%,390px)] md:flex-none">
-        {switcher}
-        <nav aria-label={title} className="flex flex-col gap-2.5">
-          {groups.map((tabs, index) => (
-            <div key={tabs[0]?.label ?? index} className="flex flex-col gap-[3px]">
-              {tabs.map((tab) => (
-                <SettingsTabLink
-                  key={tab.label}
-                  tab={tab}
-                  badge={groupBadges[index % groupBadges.length]}
-                  onSelect={() => setIsListShown(false)}
-                />
+    <div className="flex min-h-0 w-full flex-1 flex-col">
+      <header
+        data-mobile-bar
+        className="flex h-11 shrink-0 items-center gap-2 border-b px-4 md:h-auto md:border-0 md:px-8 md:pt-7 md:pb-3"
+      >
+        <SidebarButton />
+        <h1 className="min-w-0 truncate text-sm font-medium md:text-2xl md:leading-tight md:font-semibold">
+          {title}
+        </h1>
+      </header>
+      <div className="flex min-h-0 flex-1 flex-col md:flex-row md:gap-4 md:pl-5">
+        <nav
+          ref={navRef}
+          aria-label={title}
+          className="scrollbar-hidden flex shrink-0 overflow-x-auto border-b px-2 md:w-52 md:flex-col md:gap-4 md:overflow-y-auto md:border-0 md:px-0 md:pb-8"
+        >
+          {groups.map((group) => (
+            <div key={group.title} className="flex md:flex-col">
+              <p className="text-muted-foreground hidden h-7 items-center px-3 text-xs font-medium md:flex">
+                {group.title}
+              </p>
+              {group.tabs.map((tab) => (
+                <SettingsTabLink key={tab.label} tab={tab} />
               ))}
             </div>
           ))}
         </nav>
-      </aside>
-      <main
-        key={pathname}
-        className="bg-surface-container flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto group-data-[view=list]/settings:max-md:hidden"
-      >
-        <div className="animate-in fade-in-0 slide-in-from-right-8 ease-emphasized mx-auto flex w-full max-w-3xl flex-col gap-2 px-4 pt-4 pb-16 duration-300 motion-reduce:animate-none md:px-8 md:pt-6">
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Back to settings"
-            className="-ml-2 size-10 md:hidden"
-            onClick={() => setIsListShown(true)}
-          >
-            <ArrowLeftIcon className="size-5" />
-          </Button>
-          {children}
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
+          <div className="flex w-full max-w-3xl flex-col px-4 pt-4 pb-16 md:pt-1 md:pr-8 md:pl-0">
+            {children}
+          </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
 
-type TTabLinkProps = {
-  tab: TSettingsTab;
-  badge: string;
-  onSelect: () => void;
-};
-
-function SettingsTabLink({ tab, badge, onSelect }: TTabLinkProps) {
+function SettingsTabLink({ tab }: { tab: TSettingsTab }) {
   return (
-    <Link
+    <LinkButton
       {...tab.link}
       activeOptions={{ exact: tab.exact ?? false, includeSearch: false }}
-      onClick={onSelect}
-      className="group/tab bg-surface-container text-foreground has-hover:hover:bg-surface-container-high focus-visible:outline-primary data-[status=active]:bg-secondary data-[status=active]:text-secondary-foreground ease-emphasized flex items-center gap-4 rounded-[0.375rem] px-5 py-3 transition-[background-color,border-radius] duration-200 first:rounded-t-[1.5rem] last:rounded-b-[1.5rem] focus-visible:outline-2 focus-visible:-outline-offset-2 data-[status=active]:rounded-[1.5rem]"
+      variant="ghost"
+      size="sm"
+      forceMinSize={false}
+      className="text-muted-foreground data-[status=active]:text-foreground before:bg-foreground relative h-10 shrink-0 justify-start gap-2.5 px-3 font-medium before:absolute before:rounded-full before:opacity-0 before:content-[''] data-[status=active]:before:opacity-100 max-md:before:inset-x-3 max-md:before:bottom-0 max-md:before:h-0.5 md:h-8 md:before:inset-y-1.5 md:before:left-0 md:before:w-0.5"
     >
-      <span
-        className={cn(
-          "flex size-12 shrink-0 items-center justify-center rounded-full [&_svg]:size-6",
-          tab.destructive ? "bg-destructive text-destructive-foreground" : badge,
-        )}
-      >
-        <tab.icon />
-      </span>
-      <span className="flex min-w-0 flex-col gap-0.5">
-        <span className="truncate text-base leading-tight font-medium">{tab.label}</span>
-        <span className="text-muted-foreground group-data-[status=active]/tab:text-secondary-foreground truncate text-sm">
-          {tab.description}
-        </span>
-      </span>
-    </Link>
+      <tab.icon className="size-4" />
+      <span className="truncate">{tab.label}</span>
+    </LinkButton>
   );
 }

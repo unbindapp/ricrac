@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { KeySquareIcon } from "lucide-react";
 
 import { ApiKeyRow } from "@/components/api-key/api-key-row";
 import { CreateApiKeyDialog } from "@/components/api-key/create-api-key-dialog";
-import { KeySquareIcon } from "@/components/icons/symbols.gen";
 import { List } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { SettingsPage } from "@/components/layout/settings-page";

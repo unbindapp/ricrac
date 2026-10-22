@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { PlusIcon, RefreshCwIcon, SettingsIcon } from "lucide-react";
 
 import type { Team } from "@/api/ops.gen";
 import { CycleDialog, type TCycleDialogTarget } from "@/components/cycles/cycle-dialog";
 import { CycleList } from "@/components/cycles/cycle-list";
-import { PlusIcon, RefreshCwIcon, SettingsIcon } from "@/components/icons/symbols.gen";
 import { EmptyState } from "@/components/layout/empty-state";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
