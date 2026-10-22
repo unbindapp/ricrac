@@ -40,7 +40,7 @@ import { Route as WorkspaceWorkspaceIssueIdentifierRouteImport } from './routes/
 import { Route as WorkspaceWorkspaceReleaseNoteSlugRouteImport } from './routes/$workspace/_workspace/release-note/$slug'
 import { Route as WorkspaceWorkspaceReleaseSlugRouteImport } from './routes/$workspace/_workspace/release/$slug'
 import { Route as WorkspaceWorkspaceSettingsWorkspaceSettingsRouteRouteImport } from './routes/$workspace/_workspace/settings/_workspace-settings/route'
-import { Route as WorkspaceWorkspaceSettingsTeamsRouteImport } from './routes/$workspace/_workspace/settings/teams'
+import { Route as WorkspaceWorkspaceSettingsTeamsRouteImport } from './routes/$workspace/_workspace/settings_/teams'
 import { Route as WorkspaceWorkspaceViewView_idRouteImport } from './routes/$workspace/_workspace/view/$view_id'
 import { Route as WorkspaceWorkspaceProjectSlugIndexRouteImport } from './routes/$workspace/_workspace/project/$slug/index'
 import { Route as WorkspaceWorkspaceProjectSlugIssuesRouteImport } from './routes/$workspace/_workspace/project/$slug/issues'
@@ -58,7 +58,7 @@ import { Route as WorkspaceWorkspaceSettingsAccountIndexRouteImport } from './ro
 import { Route as WorkspaceWorkspaceSettingsAccountApiKeysRouteImport } from './routes/$workspace/_workspace/settings/account/api-keys'
 import { Route as WorkspaceWorkspaceSettingsAccountConnectedAppsRouteImport } from './routes/$workspace/_workspace/settings/account/connected-apps'
 import { Route as WorkspaceWorkspaceSettingsAccountInvitationsRouteImport } from './routes/$workspace/_workspace/settings/account/invitations'
-import { Route as WorkspaceWorkspaceSettingsTeamSplatRouteImport } from './routes/$workspace/_workspace/settings/team/$'
+import { Route as WorkspaceWorkspaceSettingsTeamSplatRouteImport } from './routes/$workspace/_workspace/settings_/team/$'
 import { Route as WorkspaceWorkspaceTeamKeyIndexRouteImport } from './routes/$workspace/_workspace/team/$key/index'
 import { Route as WorkspaceWorkspaceTeamKeyBacklogRouteImport } from './routes/$workspace/_workspace/team/$key/backlog'
 import { Route as WorkspaceWorkspaceTeamKeyCyclesRouteImport } from './routes/$workspace/_workspace/team/$key/cycles'
@@ -253,9 +253,9 @@ const WorkspaceWorkspaceSettingsWorkspaceSettingsRouteRoute =
   } as any)
 const WorkspaceWorkspaceSettingsTeamsRoute =
   WorkspaceWorkspaceSettingsTeamsRouteImport.update({
-    id: '/teams',
-    path: '/teams',
-    getParentRoute: () => WorkspaceWorkspaceSettingsRouteRoute,
+    id: '/settings_/teams',
+    path: '/settings/teams',
+    getParentRoute: () => WorkspaceWorkspaceRouteRoute,
   } as any)
 const WorkspaceWorkspaceViewView_idRoute =
   WorkspaceWorkspaceViewView_idRouteImport.update({
@@ -360,9 +360,9 @@ const WorkspaceWorkspaceSettingsAccountInvitationsRoute =
   } as any)
 const WorkspaceWorkspaceSettingsTeamSplatRoute =
   WorkspaceWorkspaceSettingsTeamSplatRouteImport.update({
-    id: '/team/$',
-    path: '/team/$',
-    getParentRoute: () => WorkspaceWorkspaceSettingsRouteRoute,
+    id: '/settings_/team/$',
+    path: '/settings/team/$',
+    getParentRoute: () => WorkspaceWorkspaceRouteRoute,
   } as any)
 const WorkspaceWorkspaceTeamKeyIndexRoute =
   WorkspaceWorkspaceTeamKeyIndexRouteImport.update({
@@ -656,7 +656,7 @@ export interface FileRoutesById {
   '/$workspace/_workspace/issue/$identifier': typeof WorkspaceWorkspaceIssueIdentifierRoute
   '/$workspace/_workspace/release-note/$slug': typeof WorkspaceWorkspaceReleaseNoteSlugRoute
   '/$workspace/_workspace/release/$slug': typeof WorkspaceWorkspaceReleaseSlugRoute
-  '/$workspace/_workspace/settings/teams': typeof WorkspaceWorkspaceSettingsTeamsRoute
+  '/$workspace/_workspace/settings_/teams': typeof WorkspaceWorkspaceSettingsTeamsRoute
   '/$workspace/_workspace/view/$view_id': typeof WorkspaceWorkspaceViewView_idRoute
   '/$workspace/_workspace/settings/_workspace-settings/_admin': typeof WorkspaceWorkspaceSettingsWorkspaceSettingsAdminRouteRouteWithChildren
   '/$workspace/_workspace/project/$slug/issues': typeof WorkspaceWorkspaceProjectSlugIssuesRoute
@@ -671,7 +671,7 @@ export interface FileRoutesById {
   '/$workspace/_workspace/settings/account/api-keys': typeof WorkspaceWorkspaceSettingsAccountApiKeysRoute
   '/$workspace/_workspace/settings/account/connected-apps': typeof WorkspaceWorkspaceSettingsAccountConnectedAppsRoute
   '/$workspace/_workspace/settings/account/invitations': typeof WorkspaceWorkspaceSettingsAccountInvitationsRoute
-  '/$workspace/_workspace/settings/team/$': typeof WorkspaceWorkspaceSettingsTeamSplatRoute
+  '/$workspace/_workspace/settings_/team/$': typeof WorkspaceWorkspaceSettingsTeamSplatRoute
   '/$workspace/_workspace/team/$key/backlog': typeof WorkspaceWorkspaceTeamKeyBacklogRoute
   '/$workspace/_workspace/team/$key/cycles': typeof WorkspaceWorkspaceTeamKeyCyclesRoute
   '/$workspace/_workspace/team/$key/issues': typeof WorkspaceWorkspaceTeamKeyIssuesRoute
@@ -862,7 +862,7 @@ export interface FileRouteTypes {
     | '/$workspace/_workspace/issue/$identifier'
     | '/$workspace/_workspace/release-note/$slug'
     | '/$workspace/_workspace/release/$slug'
-    | '/$workspace/_workspace/settings/teams'
+    | '/$workspace/_workspace/settings_/teams'
     | '/$workspace/_workspace/view/$view_id'
     | '/$workspace/_workspace/settings/_workspace-settings/_admin'
     | '/$workspace/_workspace/project/$slug/issues'
@@ -877,7 +877,7 @@ export interface FileRouteTypes {
     | '/$workspace/_workspace/settings/account/api-keys'
     | '/$workspace/_workspace/settings/account/connected-apps'
     | '/$workspace/_workspace/settings/account/invitations'
-    | '/$workspace/_workspace/settings/team/$'
+    | '/$workspace/_workspace/settings_/team/$'
     | '/$workspace/_workspace/team/$key/backlog'
     | '/$workspace/_workspace/team/$key/cycles'
     | '/$workspace/_workspace/team/$key/issues'
@@ -1131,12 +1131,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceWorkspaceSettingsWorkspaceSettingsRouteRouteImport
       parentRoute: typeof WorkspaceWorkspaceSettingsRouteRoute
     }
-    '/$workspace/_workspace/settings/teams': {
-      id: '/$workspace/_workspace/settings/teams'
-      path: '/teams'
+    '/$workspace/_workspace/settings_/teams': {
+      id: '/$workspace/_workspace/settings_/teams'
+      path: '/settings/teams'
       fullPath: '/$workspace/settings/teams'
       preLoaderRoute: typeof WorkspaceWorkspaceSettingsTeamsRouteImport
-      parentRoute: typeof WorkspaceWorkspaceSettingsRouteRoute
+      parentRoute: typeof WorkspaceWorkspaceRouteRoute
     }
     '/$workspace/_workspace/view/$view_id': {
       id: '/$workspace/_workspace/view/$view_id'
@@ -1257,12 +1257,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceWorkspaceSettingsAccountInvitationsRouteImport
       parentRoute: typeof WorkspaceWorkspaceSettingsRouteRoute
     }
-    '/$workspace/_workspace/settings/team/$': {
-      id: '/$workspace/_workspace/settings/team/$'
-      path: '/team/$'
+    '/$workspace/_workspace/settings_/team/$': {
+      id: '/$workspace/_workspace/settings_/team/$'
+      path: '/settings/team/$'
       fullPath: '/$workspace/settings/team/$'
       preLoaderRoute: typeof WorkspaceWorkspaceSettingsTeamSplatRouteImport
-      parentRoute: typeof WorkspaceWorkspaceSettingsRouteRoute
+      parentRoute: typeof WorkspaceWorkspaceRouteRoute
     }
     '/$workspace/_workspace/team/$key/': {
       id: '/$workspace/_workspace/team/$key/'
@@ -1479,11 +1479,9 @@ const WorkspaceWorkspaceSettingsWorkspaceSettingsRouteRouteWithChildren =
 
 interface WorkspaceWorkspaceSettingsRouteRouteChildren {
   WorkspaceWorkspaceSettingsWorkspaceSettingsRouteRoute: typeof WorkspaceWorkspaceSettingsWorkspaceSettingsRouteRouteWithChildren
-  WorkspaceWorkspaceSettingsTeamsRoute: typeof WorkspaceWorkspaceSettingsTeamsRoute
   WorkspaceWorkspaceSettingsAccountApiKeysRoute: typeof WorkspaceWorkspaceSettingsAccountApiKeysRoute
   WorkspaceWorkspaceSettingsAccountConnectedAppsRoute: typeof WorkspaceWorkspaceSettingsAccountConnectedAppsRoute
   WorkspaceWorkspaceSettingsAccountInvitationsRoute: typeof WorkspaceWorkspaceSettingsAccountInvitationsRoute
-  WorkspaceWorkspaceSettingsTeamSplatRoute: typeof WorkspaceWorkspaceSettingsTeamSplatRoute
   WorkspaceWorkspaceSettingsAccountIndexRoute: typeof WorkspaceWorkspaceSettingsAccountIndexRoute
 }
 
@@ -1491,15 +1489,12 @@ const WorkspaceWorkspaceSettingsRouteRouteChildren: WorkspaceWorkspaceSettingsRo
   {
     WorkspaceWorkspaceSettingsWorkspaceSettingsRouteRoute:
       WorkspaceWorkspaceSettingsWorkspaceSettingsRouteRouteWithChildren,
-    WorkspaceWorkspaceSettingsTeamsRoute: WorkspaceWorkspaceSettingsTeamsRoute,
     WorkspaceWorkspaceSettingsAccountApiKeysRoute:
       WorkspaceWorkspaceSettingsAccountApiKeysRoute,
     WorkspaceWorkspaceSettingsAccountConnectedAppsRoute:
       WorkspaceWorkspaceSettingsAccountConnectedAppsRoute,
     WorkspaceWorkspaceSettingsAccountInvitationsRoute:
       WorkspaceWorkspaceSettingsAccountInvitationsRoute,
-    WorkspaceWorkspaceSettingsTeamSplatRoute:
-      WorkspaceWorkspaceSettingsTeamSplatRoute,
     WorkspaceWorkspaceSettingsAccountIndexRoute:
       WorkspaceWorkspaceSettingsAccountIndexRoute,
   }
@@ -1532,8 +1527,10 @@ interface WorkspaceWorkspaceRouteRouteChildren {
   WorkspaceWorkspaceIssueIdentifierRoute: typeof WorkspaceWorkspaceIssueIdentifierRoute
   WorkspaceWorkspaceReleaseNoteSlugRoute: typeof WorkspaceWorkspaceReleaseNoteSlugRoute
   WorkspaceWorkspaceReleaseSlugRoute: typeof WorkspaceWorkspaceReleaseSlugRoute
+  WorkspaceWorkspaceSettingsTeamsRoute: typeof WorkspaceWorkspaceSettingsTeamsRoute
   WorkspaceWorkspaceViewView_idRoute: typeof WorkspaceWorkspaceViewView_idRoute
   WorkspaceWorkspaceProjectSlugIssuesRoute: typeof WorkspaceWorkspaceProjectSlugIssuesRoute
+  WorkspaceWorkspaceSettingsTeamSplatRoute: typeof WorkspaceWorkspaceSettingsTeamSplatRoute
   WorkspaceWorkspaceTeamKeyBacklogRoute: typeof WorkspaceWorkspaceTeamKeyBacklogRoute
   WorkspaceWorkspaceTeamKeyCyclesRoute: typeof WorkspaceWorkspaceTeamKeyCyclesRoute
   WorkspaceWorkspaceTeamKeyIssuesRoute: typeof WorkspaceWorkspaceTeamKeyIssuesRoute
@@ -1574,9 +1571,12 @@ const WorkspaceWorkspaceRouteRouteChildren: WorkspaceWorkspaceRouteRouteChildren
     WorkspaceWorkspaceReleaseNoteSlugRoute:
       WorkspaceWorkspaceReleaseNoteSlugRoute,
     WorkspaceWorkspaceReleaseSlugRoute: WorkspaceWorkspaceReleaseSlugRoute,
+    WorkspaceWorkspaceSettingsTeamsRoute: WorkspaceWorkspaceSettingsTeamsRoute,
     WorkspaceWorkspaceViewView_idRoute: WorkspaceWorkspaceViewView_idRoute,
     WorkspaceWorkspaceProjectSlugIssuesRoute:
       WorkspaceWorkspaceProjectSlugIssuesRoute,
+    WorkspaceWorkspaceSettingsTeamSplatRoute:
+      WorkspaceWorkspaceSettingsTeamSplatRoute,
     WorkspaceWorkspaceTeamKeyBacklogRoute:
       WorkspaceWorkspaceTeamKeyBacklogRoute,
     WorkspaceWorkspaceTeamKeyCyclesRoute: WorkspaceWorkspaceTeamKeyCyclesRoute,

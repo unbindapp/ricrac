@@ -1,6 +1,6 @@
 import { loadSymbols } from "@/components/icons/symbol-set";
 import { DankNavigation, DankNavigationDrawer } from "@/themes/dank/navigation";
-import { DankSettingsFrame } from "@/themes/dank/settings-frame";
+import { DankSettingsWindow } from "@/themes/dank/dank-settings-window";
 import { DankTopBar } from "@/themes/dank/top-bar";
 import type { TUiTheme } from "@/themes/types";
 
@@ -12,7 +12,7 @@ export const dankTheme: TUiTheme = {
   useIsNavigationHidden: () => false,
   TopBar: DankTopBar,
   NavigationDrawer: DankNavigationDrawer,
-  SettingsFrame: DankSettingsFrame,
+  SettingsWindow: DankSettingsWindow,
   icons: "symbols",
   createButton: "fab",
   separatesBars: true,

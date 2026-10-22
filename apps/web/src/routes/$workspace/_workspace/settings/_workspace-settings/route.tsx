@@ -1,21 +1,15 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
-import { LockIcon } from "@/components/icons";
-import { EmptyState } from "@/components/layout/empty-state";
-import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { SettingsGate } from "@/components/settings/settings-gate";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/_workspace-settings")({
   component: WorkspaceSettingsGate,
 });
 
 function WorkspaceSettingsGate() {
-  const { canEdit } = useWorkspace();
-  if (canEdit) return <Outlet />;
   return (
-    <EmptyState
-      icon={LockIcon}
-      title="Members only"
-      description="Guests can't change workspace settings."
-    />
+    <SettingsGate access="members">
+      <Outlet />
+    </SettingsGate>
   );
 }

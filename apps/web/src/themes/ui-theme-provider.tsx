@@ -2,8 +2,8 @@ import { createContext, type ReactNode, use, useContext, useLayoutEffect } from 
 
 import { loadedSymbols, SymbolSetContext } from "@/components/icons/symbol-set";
 import { defaultTheme } from "@/themes/default/theme";
-import { uiThemes } from "@/themes/registry";
-import { isUiThemeId, type TUiTheme } from "@/themes/types";
+import { uiThemeOf } from "@/themes/registry";
+import type { TUiTheme } from "@/themes/types";
 
 const UiThemeContext = createContext<TUiTheme>(defaultTheme);
 
@@ -41,7 +41,7 @@ export function UiThemeProvider({
   workspaceUrlKey: string;
   children: ReactNode;
 }) {
-  const theme = isUiThemeId(themeId) ? uiThemes[themeId] : defaultTheme;
+  const theme = uiThemeOf(themeId);
   const pending = loaded(theme);
   if (pending) use(pending);
 

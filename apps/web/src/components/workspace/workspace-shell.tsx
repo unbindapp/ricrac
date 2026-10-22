@@ -19,7 +19,7 @@ import { useUiTheme } from "@/themes/ui-theme-provider";
 export function WorkspaceShell({ children }: { children: ReactNode }) {
   const { canEdit } = useWorkspace();
   const openNewIssue = useNewIssueStore((state) => state.open);
-  const { Navigation, TopBar, useIsNavigationHidden } = useUiTheme();
+  const { Navigation, TopBar, SettingsWindow, useIsNavigationHidden } = useUiTheme();
   const isNavigationHidden = useIsNavigationHidden();
 
   useHotkeyScope([{ hotkey: "C", callback: () => openNewIssue(), enabled: canEdit }]);
@@ -38,6 +38,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
         </main>
       </div>
       <MobileNavDrawer />
+      {SettingsWindow && <SettingsWindow />}
       <CommandPanel />
       <NewIssueDialog />
       <NewProjectDialog />

@@ -7,7 +7,7 @@ type TSettingsReturnStore = {
   remember: (href: string) => void;
 };
 
-/** Where closing the settings window goes back to. */
+/** The page a settings window opens over: the last one outside settings. */
 export const useSettingsReturnStore = create<TSettingsReturnStore>((set) => ({
   href: null,
   remember: (href) => set({ href }),
@@ -27,10 +27,15 @@ export function useRememberSettingsReturn() {
   }, [pathname, searchStr, remember]);
 }
 
-export function useSettingsReturnHref(workspaceUrlKey: string) {
-  const href = useSettingsReturnStore((state) => state.href);
-  if (!href) return null;
-  const hrefWorkspace = href.split(/[/?#]/)[1]?.toLowerCase();
-  if (hrefWorkspace !== workspaceUrlKey.toLowerCase()) return null;
-  return href;
+/** The page to open a settings page over, with the settings window showing it. */
+export function settingsWindowHref(workspaceUrlKey: string, settingsPath: string) {
+  const href = useSettingsReturnStore.getState().href;
+  const hrefWorkspace = href?.split(/[/?#]/)[1]?.toLowerCase();
+  const isInWorkspace = hrefWorkspace === workspaceUrlKey.toLowerCase();
+  const url = new URL(
+    href && isInWorkspace ? href : `/${workspaceUrlKey}/issues`,
+    window.location.origin,
+  );
+  url.searchParams.set("settings", settingsPath);
+  return url.pathname + url.search;
 }
