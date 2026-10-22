@@ -1,3 +1,6 @@
+import type { Team } from "@/api/ops.gen";
+import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
+import { SidebarFavorites } from "@/components/favorites/sidebar-favorites";
 import {
   BoxIcon,
   BuildingIcon,
@@ -17,11 +20,7 @@ import {
   TargetIcon,
   TriangleIcon,
   UserCircleIcon,
-} from "lucide-react";
-
-import type { Team } from "@/api/ops.gen";
-import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
-import { SidebarFavorites } from "@/components/favorites/sidebar-favorites";
+} from "@/components/icons/symbols.gen";
 import { InboxUnreadBadge } from "@/components/inbox/inbox-unread-badge";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
 import { HideSidebarButton } from "@/components/layout/sidebar-button";

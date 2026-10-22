@@ -1,44 +1,32 @@
 import { ReactNode } from "react";
 
-import {
-  ResizableGroup,
-  ResizableHandle,
-  ResizablePanel,
-  ResizableSizedPanel,
-} from "@/components/ui/resizable";
+import { cn } from "@/components/ui/utils";
 
 type TProps = {
   main: ReactNode;
   aside?: ReactNode;
-  storageKey?: string;
-  /** The aside's width until the reader resizes it. */
-  defaultAsideWidth?: number;
 };
 
-const DEFAULT_ASIDE_WIDTH = 480;
-const MIN_ASIDE_WIDTH = 360;
-const MAX_ASIDE_WIDTH = 900;
-
-export function SplitView({
-  main,
-  aside,
-  storageKey,
-  defaultAsideWidth = DEFAULT_ASIDE_WIDTH,
-}: TProps) {
+/** Two panes side by side, half the width each, apart on the shell; the aside only on wide screens. */
+export function SplitView({ main, aside }: TProps) {
   return (
-    <ResizableGroup
-      defaultSize={defaultAsideWidth}
-      minSize={MIN_ASIDE_WIDTH}
-      maxSize={MAX_ASIDE_WIDTH}
-      storageKey={storageKey}
-    >
-      <ResizablePanel>{main}</ResizablePanel>
-      {aside && (
-        <>
-          <ResizableHandle className="hidden lg:block" />
-          <ResizableSizedPanel className="hidden lg:flex">{aside}</ResizableSizedPanel>
-        </>
+    <div data-slot="split-view" className="flex min-h-0 w-full flex-1 gap-2">
+      <SplitPane>{main}</SplitPane>
+      {aside && <SplitPane className="hidden lg:flex">{aside}</SplitPane>}
+    </div>
+  );
+}
+
+function SplitPane({ className, children }: { className?: string; children: ReactNode }) {
+  return (
+    <div
+      data-slot="split-pane"
+      className={cn(
+        "bg-background flex min-h-0 min-w-0 flex-1 basis-0 flex-col overflow-hidden md:rounded-lg",
+        className,
       )}
-    </ResizableGroup>
+    >
+      {children}
+    </div>
   );
 }

@@ -9,7 +9,6 @@ import {
   CircleXIcon,
   FileTextIcon,
   FlagIcon,
-  type LucideIcon,
   MegaphoneIcon,
   MessageSquareIcon,
   MessagesSquareIcon,
@@ -18,16 +17,16 @@ import {
   Share2Icon,
   SplitIcon,
   TargetIcon,
+  type TIcon,
   TriangleIcon,
   UnlockIcon,
   UserMinusIcon,
   UserPlusIcon,
-} from "lucide-react";
-
+} from "@/components/icons/symbols.gen";
 import type { TNotificationTarget } from "@/components/inbox/notifications";
 import { StateIcon } from "@/components/shared/state-icon";
 
-const typeIcons: Record<string, LucideIcon> = {
+const typeIcons: Record<string, TIcon> = {
   issueAssignedToYou: UserPlusIcon,
   issueUnassignedFromYou: UserMinusIcon,
   issueStatusChanged: CircleArrowRightIcon,
@@ -46,7 +45,7 @@ const typeIcons: Record<string, LucideIcon> = {
 };
 
 /** The icon of what happened: a mention, a comment, a reply, an assignment... */
-export function notificationTypeIcon(type: string): LucideIcon {
+export function notificationTypeIcon(type: string): TIcon {
   if (typeIcons[type]) return typeIcons[type];
   if (type.endsWith("Mention")) return AtSignIcon;
   if (type.endsWith("Reply")) return ReplyIcon;
@@ -54,7 +53,7 @@ export function notificationTypeIcon(type: string): LucideIcon {
   return BellIcon;
 }
 
-const targetIcons: Record<Exclude<TNotificationTarget["kind"], "issue">, LucideIcon> = {
+const targetIcons: Record<Exclude<TNotificationTarget["kind"], "issue">, TIcon> = {
   project: BoxIcon,
   initiative: TargetIcon,
   document: FileTextIcon,

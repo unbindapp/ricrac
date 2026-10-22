@@ -1,5 +1,4 @@
-import { InfoIcon } from "lucide-react";
-
+import { InfoIcon } from "@/components/icons/symbols.gen";
 import { LinkButton } from "@/components/ui/button";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 

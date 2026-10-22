@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { PlusIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { DocumentRow } from "@/components/documents/document-row";
@@ -7,6 +6,7 @@ import {
   type TDocumentParent,
   useCreateDocument,
 } from "@/components/documents/use-create-document";
+import { PlusIcon } from "@/components/icons/symbols.gen";
 import { ErrorCard } from "@/components/layout/error-card";
 import { List } from "@/components/layout/list";
 import { ListSkeleton } from "@/components/layout/list-skeleton";

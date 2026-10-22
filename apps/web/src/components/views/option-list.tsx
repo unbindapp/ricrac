@@ -1,5 +1,4 @@
-import { CheckIcon } from "lucide-react";
-
+import { CheckIcon } from "@/components/icons/symbols.gen";
 import {
   Command,
   CommandEmpty,

@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
-import { FileTextIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { z } from "zod";
 
 import type { Document } from "@/api/ops.gen";
 import { DocumentRow } from "@/components/documents/document-row";
 import { NewDocumentDialog } from "@/components/documents/new-document-dialog";
+import { FileTextIcon, PlusIcon, SearchIcon, Trash2Icon } from "@/components/icons/symbols.gen";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { List } from "@/components/layout/list";
@@ -19,9 +19,9 @@ import { TrashedRow } from "@/components/projects/entity-menu";
 import { EntityIcon } from "@/components/shared/entity-icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsList, TabsTab } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/toast";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { FilterMenu } from "@/components/shared/filter-menu";
 import { documentsQuery, useDocumentLifecycleMutation } from "@/lib/queries/documents";
 
 const searchSchema = z.object({ view: z.enum(["all", "trash"]).optional() });
@@ -68,20 +68,17 @@ function DocumentsPage() {
         toolbar={
           <PageToolbar
             actions={
-              <Tabs
+              <FilterMenu
+                label="Show"
                 value={view}
-                onValueChange={(value) =>
+                options={[
+                  { value: "all", label: "All" },
+                  { value: "trash", label: "Trash", icon: <Trash2Icon className="size-4" /> },
+                ]}
+                onChange={(value) =>
                   void navigate({ search: { view: value === "trash" ? "trash" : undefined } })
                 }
-              >
-                <TabsList>
-                  <TabsTab value="all">All</TabsTab>
-                  <TabsTab value="trash">
-                    <Trash2Icon />
-                    Trash
-                  </TabsTab>
-                </TabsList>
-              </Tabs>
+              />
             }
           >
             <div className="relative w-full max-w-xs">

@@ -16,9 +16,9 @@ import {
 } from "@dnd-kit/sortable";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { BoxIcon, GripVerticalIcon, PencilIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 
+import { BoxIcon, GripVerticalIcon, PencilIcon, PlusIcon } from "@/components/icons/symbols.gen";
 import { sortOrderBetween } from "@/components/issues/sort-order";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";

@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { PlusIcon, XIcon } from "lucide-react";
 
 import type { ProjectDetail, ProjectRef } from "@/api/ops.gen";
+import { PlusIcon, XIcon } from "@/components/icons/symbols.gen";
 import { PropertyPicker, type TPickerOption } from "@/components/issues/property-picker";
 import { ProjectIcon } from "@/components/shared/project-icon";
 import { Button } from "@/components/ui/button";

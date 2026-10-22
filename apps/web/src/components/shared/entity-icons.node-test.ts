@@ -3,8 +3,8 @@ import { test } from "node:test";
 
 import { resolveEntityIcon } from "./entity-icons.ts";
 
-test("known icon names resolve to their lucide icon", () => {
-  assert.equal(resolveEntityIcon("rocket").kind, "lucide");
+test("known icon names resolve to their symbol", () => {
+  assert.equal(resolveEntityIcon("rocket").kind, "symbol");
 });
 
 test("emoji render as emoji", () => {

@@ -51,7 +51,6 @@ export function IssuePeekHost({ children }: { children: ReactNode }) {
   return (
     <IssuePeekContext.Provider value={value}>
       <SplitView
-        storageKey="issue-peek-width"
         main={children}
         aside={peek && isPeekable ? <IssuePeek identifier={peek} /> : undefined}
       />

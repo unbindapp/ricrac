@@ -1,5 +1,4 @@
-import { ImageIcon, ImageUpIcon, XIcon } from "lucide-react";
-
+import { ImageIcon, ImageUpIcon, XIcon } from "@/components/icons/symbols.gen";
 import { Button } from "@/components/ui/button";
 import { FileTrigger } from "@/components/ui/file-trigger";
 import { useWorkspace } from "@/components/workspace/workspace-provider";

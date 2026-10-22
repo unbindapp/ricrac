@@ -1,7 +1,7 @@
 import { parseISO } from "date-fns";
-import { CalendarIcon, FlameIcon, MoonIcon } from "lucide-react";
 
 import type { Issue } from "@/api/ops.gen";
+import { CalendarIcon, FlameIcon, MoonIcon } from "@/components/icons/symbols.gen";
 import { useNow } from "@/components/providers/now-provider";
 import { ProjectIcon } from "@/components/shared/project-icon";
 import { SimpleTooltip } from "@/components/ui/tooltip";

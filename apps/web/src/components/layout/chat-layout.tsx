@@ -19,18 +19,28 @@ type TProps = {
   width?: "full" | "narrow";
   children: ReactNode;
   composer?: ReactNode;
+  /** Opens on the last message; off when the chat follows other content on the page. */
+  startAtEnd?: boolean;
 };
 
 /** A conversation that scrolls above its composer and follows new messages while you read the end. */
-export function ChatLayout({ bar, header, width = "full", children, composer }: TProps) {
+export function ChatLayout({
+  bar,
+  header,
+  width = "full",
+  children,
+  composer,
+  startAtEnd = true,
+}: TProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const isAtEndRef = useRef(false);
+  const isAtEndRef = useRef(startAtEnd);
 
   useEffect(() => {
     const scroller = scrollRef.current;
     const content = contentRef.current;
     if (!scroller || !content) return;
+    if (isAtEndRef.current) scroller.scrollTop = scroller.scrollHeight;
     const observer = new ResizeObserver(() => {
       if (isAtEndRef.current) scroller.scrollTop = scroller.scrollHeight;
     });

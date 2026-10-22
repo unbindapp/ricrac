@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { CheckIcon, CircleAlertIcon } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 
@@ -13,6 +12,7 @@ import {
   pickWorkspaceMessage,
   type TAccess,
 } from "@/components/api-key/helpers";
+import { CheckIcon, CircleAlertIcon } from "@/components/icons/symbols.gen";
 import { AuthShell } from "@/components/layout/auth-shell";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";

@@ -1,5 +1,4 @@
-import { FlameIcon } from "lucide-react";
-
+import { FlameIcon } from "@/components/icons/symbols.gen";
 import { cn } from "@/components/ui/utils";
 import { colorFromId, initials } from "@/lib/helpers/colors";
 

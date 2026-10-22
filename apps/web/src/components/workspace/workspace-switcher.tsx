@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { type LinkProps, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+
 import {
   CheckIcon,
   ChevronDownIcon,
@@ -10,9 +12,7 @@ import {
   SettingsIcon,
   UserIcon,
   UserPlusIcon,
-} from "lucide-react";
-import { useState } from "react";
-
+} from "@/components/icons/symbols.gen";
 import { useInviteStore } from "@/components/settings/invite-store";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,13 @@ import { WorkspaceIcon } from "@/components/workspace/workspace-icon";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { meQuery, signOut } from "@/lib/queries/me";
 
-export function WorkspaceSwitcher({ onNavigate }: { onNavigate?: () => void }) {
+type TProps = {
+  onNavigate?: () => void;
+  /** Only the workspace's icon, for the navigation rail. */
+  compact?: boolean;
+};
+
+export function WorkspaceSwitcher({ onNavigate, compact }: TProps) {
   const { workspace, isAdmin, canEdit } = useWorkspace();
   const openInvite = useInviteStore((state) => state.setOpen);
   const { data: me } = useQuery(meQuery);
@@ -49,21 +55,32 @@ export function WorkspaceSwitcher({ onNavigate }: { onNavigate?: () => void }) {
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
-            <Button
-              variant="ghost"
-              size="sm"
-              forceMinSize={false}
-              aria-label="Switch workspace"
-              className="h-8 min-w-0 flex-1 justify-start px-1.5"
-            >
-              <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} />
-              <span className="min-w-0 truncate">{workspace.name}</span>
-              <ChevronDownIcon className="text-muted-foreground size-3.5" />
-              <span className="flex-1" />
-            </Button>
+            compact ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Switch workspace"
+                className="size-10 p-0"
+              >
+                <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} size="lg" />
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                forceMinSize={false}
+                aria-label="Switch workspace"
+                className="h-8 min-w-0 flex-1 justify-start px-1.5"
+              >
+                <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} />
+                <span className="min-w-0 truncate">{workspace.name}</span>
+                <ChevronDownIcon className="text-muted-foreground size-3.5" />
+                <span className="flex-1" />
+              </Button>
+            )
           }
         />
-        <DropdownMenuContent className="w-64">
+        <DropdownMenuContent className="w-64" side={compact ? "right" : "bottom"}>
           <DropdownMenuGroup>
             <DropdownMenuLabel>{me?.email}</DropdownMenuLabel>
             {me?.workspaces.map((item) => (

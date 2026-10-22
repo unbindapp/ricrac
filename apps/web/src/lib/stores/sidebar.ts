@@ -1,8 +1,8 @@
 import { create } from "zustand";
 
-const key = "ricrac:sidebar-collapsed";
+const key = "ricrac:navigation-expanded";
 
-function storedCollapsed() {
+function storedExpanded() {
   try {
     return localStorage.getItem(key) === "true";
   } catch {
@@ -10,27 +10,27 @@ function storedCollapsed() {
   }
 }
 
-function storeCollapsed(isCollapsed: boolean) {
+function storeExpanded(isExpanded: boolean) {
   try {
-    localStorage.setItem(key, String(isCollapsed));
+    localStorage.setItem(key, String(isExpanded));
   } catch {
     return;
   }
 }
 
 type TSidebarStore = {
-  isCollapsed: boolean;
+  isExpanded: boolean;
   toggle: () => void;
 };
 
 export const SIDEBAR_HOTKEY = "[";
 
-/** The workspace sidebar on wide screens; narrow ones open it as a drawer. */
+/** The workspace navigation on wide screens: a rail, or expanded to the full sidebar. Narrow ones open it as a drawer. */
 export const useSidebarStore = create<TSidebarStore>((set) => ({
-  isCollapsed: storedCollapsed(),
+  isExpanded: storedExpanded(),
   toggle: () =>
     set((state) => {
-      storeCollapsed(!state.isCollapsed);
-      return { isCollapsed: !state.isCollapsed };
+      storeExpanded(!state.isExpanded);
+      return { isExpanded: !state.isExpanded };
     }),
 }));

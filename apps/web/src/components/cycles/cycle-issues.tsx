@@ -1,9 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { ChevronRightIcon, CircleDotIcon } from "lucide-react";
 import { useState } from "react";
 
 import type { CycleIssue, StateRef } from "@/api/ops.gen";
 import { pointsText } from "@/components/cycles/cycle-status";
+import { ChevronRightIcon, CircleDotIcon } from "@/components/icons/symbols.gen";
 import { EmptyState } from "@/components/layout/empty-state";
 import { List } from "@/components/layout/list";
 import { Avatar } from "@/components/shared/avatar";

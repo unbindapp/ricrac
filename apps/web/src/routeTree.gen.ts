@@ -26,6 +26,7 @@ import { Route as WorkspaceWorkspaceIssuesRouteImport } from './routes/$workspac
 import { Route as WorkspaceWorkspaceMyIssuesRouteImport } from './routes/$workspace/_workspace/my-issues'
 import { Route as WorkspaceWorkspaceProjectsRouteImport } from './routes/$workspace/_workspace/projects'
 import { Route as WorkspaceWorkspaceReleasesRouteImport } from './routes/$workspace/_workspace/releases'
+import { Route as WorkspaceWorkspaceSettingsRouteRouteImport } from './routes/$workspace/_workspace/settings/route'
 import { Route as WorkspaceWorkspaceViewsRouteImport } from './routes/$workspace/_workspace/views'
 import { Route as OauthAuthorizeIndexRouteImport } from './routes/oauth/authorize/index'
 import { Route as WorkspaceWorkspaceCustomerSlugRouteImport } from './routes/$workspace/_workspace/customer/$slug'
@@ -171,6 +172,12 @@ const WorkspaceWorkspaceReleasesRoute =
     path: '/releases',
     getParentRoute: () => WorkspaceWorkspaceRouteRoute,
   } as any)
+const WorkspaceWorkspaceSettingsRouteRoute =
+  WorkspaceWorkspaceSettingsRouteRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => WorkspaceWorkspaceRouteRoute,
+  } as any)
 const WorkspaceWorkspaceViewsRoute = WorkspaceWorkspaceViewsRouteImport.update({
   id: '/views',
   path: '/views',
@@ -225,15 +232,14 @@ const WorkspaceWorkspaceReleaseSlugRoute =
   } as any)
 const WorkspaceWorkspaceSettingsAdminRouteRoute =
   WorkspaceWorkspaceSettingsAdminRouteRouteImport.update({
-    id: '/settings/_admin',
-    path: '/settings',
-    getParentRoute: () => WorkspaceWorkspaceRouteRoute,
+    id: '/_admin',
+    getParentRoute: () => WorkspaceWorkspaceSettingsRouteRoute,
   } as any)
 const WorkspaceWorkspaceSettingsAccountRouteRoute =
   WorkspaceWorkspaceSettingsAccountRouteRouteImport.update({
-    id: '/settings/account',
-    path: '/settings/account',
-    getParentRoute: () => WorkspaceWorkspaceRouteRoute,
+    id: '/account',
+    path: '/account',
+    getParentRoute: () => WorkspaceWorkspaceSettingsRouteRoute,
   } as any)
 const WorkspaceWorkspaceTeamKeyRouteRoute =
   WorkspaceWorkspaceTeamKeyRouteRouteImport.update({
@@ -363,9 +369,9 @@ const WorkspaceWorkspaceSettingsAccountConnectedAppsRoute =
   } as any)
 const WorkspaceWorkspaceSettingsTeamKeyRouteRoute =
   WorkspaceWorkspaceSettingsTeamKeyRouteRouteImport.update({
-    id: '/settings/team/$key',
-    path: '/settings/team/$key',
-    getParentRoute: () => WorkspaceWorkspaceRouteRoute,
+    id: '/team/$key',
+    path: '/team/$key',
+    getParentRoute: () => WorkspaceWorkspaceSettingsRouteRoute,
   } as any)
 const WorkspaceWorkspaceTeamKeyIndexRoute =
   WorkspaceWorkspaceTeamKeyIndexRouteImport.update({
@@ -490,6 +496,7 @@ export interface FileRoutesByFullPath {
   '/privacy/': typeof PrivacyIndexRoute
   '/sign-in/': typeof SignInIndexRoute
   '/terms/': typeof TermsIndexRoute
+  '/$workspace/settings': typeof WorkspaceWorkspaceSettingsRouteRouteWithChildren
   '/$workspace/customers': typeof WorkspaceWorkspaceCustomersRoute
   '/$workspace/documents': typeof WorkspaceWorkspaceDocumentsRoute
   '/$workspace/forum': typeof WorkspaceWorkspaceForumRoute
@@ -502,7 +509,6 @@ export interface FileRoutesByFullPath {
   '/$workspace/views': typeof WorkspaceWorkspaceViewsRoute
   '/$workspace/': typeof WorkspaceWorkspaceIndexRoute
   '/oauth/authorize/': typeof OauthAuthorizeIndexRoute
-  '/$workspace/settings': typeof WorkspaceWorkspaceSettingsAdminRouteRouteWithChildren
   '/$workspace/settings/account': typeof WorkspaceWorkspaceSettingsAccountRouteRouteWithChildren
   '/$workspace/team/$key': typeof WorkspaceWorkspaceTeamKeyRouteRouteWithChildren
   '/$workspace/customer/$slug': typeof WorkspaceWorkspaceCustomerSlugRoute
@@ -560,6 +566,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyIndexRoute
   '/sign-in': typeof SignInIndexRoute
   '/terms': typeof TermsIndexRoute
+  '/$workspace/settings': typeof WorkspaceWorkspaceSettingsAdminIndexRoute
   '/$workspace/customers': typeof WorkspaceWorkspaceCustomersRoute
   '/$workspace/documents': typeof WorkspaceWorkspaceDocumentsRoute
   '/$workspace/forum': typeof WorkspaceWorkspaceForumRoute
@@ -603,7 +610,6 @@ export interface FileRoutesByTo {
   '/$workspace/team/$key/projects': typeof WorkspaceWorkspaceTeamKeyProjectsRoute
   '/$workspace/team/$key/triage': typeof WorkspaceWorkspaceTeamKeyTriageRoute
   '/$workspace/project/$slug': typeof WorkspaceWorkspaceProjectSlugIndexRoute
-  '/$workspace/settings': typeof WorkspaceWorkspaceSettingsAdminIndexRoute
   '/$workspace/settings/account': typeof WorkspaceWorkspaceSettingsAccountIndexRoute
   '/$workspace/team/$key': typeof WorkspaceWorkspaceTeamKeyIndexRoute
   '/$workspace/settings/team/$key/auto-archive': typeof WorkspaceWorkspaceSettingsTeamKeyAutoArchiveRoute
@@ -628,6 +634,7 @@ export interface FileRoutesById {
   '/privacy/': typeof PrivacyIndexRoute
   '/sign-in/': typeof SignInIndexRoute
   '/terms/': typeof TermsIndexRoute
+  '/$workspace/_workspace/settings': typeof WorkspaceWorkspaceSettingsRouteRouteWithChildren
   '/$workspace/_workspace/customers': typeof WorkspaceWorkspaceCustomersRoute
   '/$workspace/_workspace/documents': typeof WorkspaceWorkspaceDocumentsRoute
   '/$workspace/_workspace/forum': typeof WorkspaceWorkspaceForumRoute
@@ -701,6 +708,7 @@ export interface FileRouteTypes {
     | '/privacy/'
     | '/sign-in/'
     | '/terms/'
+    | '/$workspace/settings'
     | '/$workspace/customers'
     | '/$workspace/documents'
     | '/$workspace/forum'
@@ -713,7 +721,6 @@ export interface FileRouteTypes {
     | '/$workspace/views'
     | '/$workspace/'
     | '/oauth/authorize/'
-    | '/$workspace/settings'
     | '/$workspace/settings/account'
     | '/$workspace/team/$key'
     | '/$workspace/customer/$slug'
@@ -771,6 +778,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sign-in'
     | '/terms'
+    | '/$workspace/settings'
     | '/$workspace/customers'
     | '/$workspace/documents'
     | '/$workspace/forum'
@@ -814,7 +822,6 @@ export interface FileRouteTypes {
     | '/$workspace/team/$key/projects'
     | '/$workspace/team/$key/triage'
     | '/$workspace/project/$slug'
-    | '/$workspace/settings'
     | '/$workspace/settings/account'
     | '/$workspace/team/$key'
     | '/$workspace/settings/team/$key/auto-archive'
@@ -838,6 +845,7 @@ export interface FileRouteTypes {
     | '/privacy/'
     | '/sign-in/'
     | '/terms/'
+    | '/$workspace/_workspace/settings'
     | '/$workspace/_workspace/customers'
     | '/$workspace/_workspace/documents'
     | '/$workspace/_workspace/forum'
@@ -1034,6 +1042,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceWorkspaceReleasesRouteImport
       parentRoute: typeof WorkspaceWorkspaceRouteRoute
     }
+    '/$workspace/_workspace/settings': {
+      id: '/$workspace/_workspace/settings'
+      path: '/settings'
+      fullPath: '/$workspace/settings'
+      preLoaderRoute: typeof WorkspaceWorkspaceSettingsRouteRouteImport
+      parentRoute: typeof WorkspaceWorkspaceRouteRoute
+    }
     '/$workspace/_workspace/views': {
       id: '/$workspace/_workspace/views'
       path: '/views'
@@ -1099,17 +1114,17 @@ declare module '@tanstack/react-router' {
     }
     '/$workspace/_workspace/settings/_admin': {
       id: '/$workspace/_workspace/settings/_admin'
-      path: '/settings'
+      path: ''
       fullPath: '/$workspace/settings'
       preLoaderRoute: typeof WorkspaceWorkspaceSettingsAdminRouteRouteImport
-      parentRoute: typeof WorkspaceWorkspaceRouteRoute
+      parentRoute: typeof WorkspaceWorkspaceSettingsRouteRoute
     }
     '/$workspace/_workspace/settings/account': {
       id: '/$workspace/_workspace/settings/account'
-      path: '/settings/account'
+      path: '/account'
       fullPath: '/$workspace/settings/account'
       preLoaderRoute: typeof WorkspaceWorkspaceSettingsAccountRouteRouteImport
-      parentRoute: typeof WorkspaceWorkspaceRouteRoute
+      parentRoute: typeof WorkspaceWorkspaceSettingsRouteRoute
     }
     '/$workspace/_workspace/team/$key': {
       id: '/$workspace/_workspace/team/$key'
@@ -1260,10 +1275,10 @@ declare module '@tanstack/react-router' {
     }
     '/$workspace/_workspace/settings/team/$key': {
       id: '/$workspace/_workspace/settings/team/$key'
-      path: '/settings/team/$key'
+      path: '/team/$key'
       fullPath: '/$workspace/settings/team/$key'
       preLoaderRoute: typeof WorkspaceWorkspaceSettingsTeamKeyRouteRouteImport
-      parentRoute: typeof WorkspaceWorkspaceRouteRoute
+      parentRoute: typeof WorkspaceWorkspaceSettingsRouteRoute
     }
     '/$workspace/_workspace/team/$key/': {
       id: '/$workspace/_workspace/team/$key/'
@@ -1476,37 +1491,6 @@ const WorkspaceWorkspaceSettingsAccountRouteRouteWithChildren =
     WorkspaceWorkspaceSettingsAccountRouteRouteChildren,
   )
 
-interface WorkspaceWorkspaceTeamKeyRouteRouteChildren {
-  WorkspaceWorkspaceTeamKeyBacklogRoute: typeof WorkspaceWorkspaceTeamKeyBacklogRoute
-  WorkspaceWorkspaceTeamKeyCyclesRoute: typeof WorkspaceWorkspaceTeamKeyCyclesRoute
-  WorkspaceWorkspaceTeamKeyIssuesRoute: typeof WorkspaceWorkspaceTeamKeyIssuesRoute
-  WorkspaceWorkspaceTeamKeyLabelsRoute: typeof WorkspaceWorkspaceTeamKeyLabelsRoute
-  WorkspaceWorkspaceTeamKeyProjectsRoute: typeof WorkspaceWorkspaceTeamKeyProjectsRoute
-  WorkspaceWorkspaceTeamKeyTriageRoute: typeof WorkspaceWorkspaceTeamKeyTriageRoute
-  WorkspaceWorkspaceTeamKeyIndexRoute: typeof WorkspaceWorkspaceTeamKeyIndexRoute
-  WorkspaceWorkspaceTeamKeyCycleNumberRoute: typeof WorkspaceWorkspaceTeamKeyCycleNumberRoute
-}
-
-const WorkspaceWorkspaceTeamKeyRouteRouteChildren: WorkspaceWorkspaceTeamKeyRouteRouteChildren =
-  {
-    WorkspaceWorkspaceTeamKeyBacklogRoute:
-      WorkspaceWorkspaceTeamKeyBacklogRoute,
-    WorkspaceWorkspaceTeamKeyCyclesRoute: WorkspaceWorkspaceTeamKeyCyclesRoute,
-    WorkspaceWorkspaceTeamKeyIssuesRoute: WorkspaceWorkspaceTeamKeyIssuesRoute,
-    WorkspaceWorkspaceTeamKeyLabelsRoute: WorkspaceWorkspaceTeamKeyLabelsRoute,
-    WorkspaceWorkspaceTeamKeyProjectsRoute:
-      WorkspaceWorkspaceTeamKeyProjectsRoute,
-    WorkspaceWorkspaceTeamKeyTriageRoute: WorkspaceWorkspaceTeamKeyTriageRoute,
-    WorkspaceWorkspaceTeamKeyIndexRoute: WorkspaceWorkspaceTeamKeyIndexRoute,
-    WorkspaceWorkspaceTeamKeyCycleNumberRoute:
-      WorkspaceWorkspaceTeamKeyCycleNumberRoute,
-  }
-
-const WorkspaceWorkspaceTeamKeyRouteRouteWithChildren =
-  WorkspaceWorkspaceTeamKeyRouteRoute._addFileChildren(
-    WorkspaceWorkspaceTeamKeyRouteRouteChildren,
-  )
-
 interface WorkspaceWorkspaceSettingsTeamKeyRouteRouteChildren {
   WorkspaceWorkspaceSettingsTeamKeyAutoArchiveRoute: typeof WorkspaceWorkspaceSettingsTeamKeyAutoArchiveRoute
   WorkspaceWorkspaceSettingsTeamKeyCyclesRoute: typeof WorkspaceWorkspaceSettingsTeamKeyCyclesRoute
@@ -1552,7 +1536,60 @@ const WorkspaceWorkspaceSettingsTeamKeyRouteRouteWithChildren =
     WorkspaceWorkspaceSettingsTeamKeyRouteRouteChildren,
   )
 
+interface WorkspaceWorkspaceSettingsRouteRouteChildren {
+  WorkspaceWorkspaceSettingsAdminRouteRoute: typeof WorkspaceWorkspaceSettingsAdminRouteRouteWithChildren
+  WorkspaceWorkspaceSettingsAccountRouteRoute: typeof WorkspaceWorkspaceSettingsAccountRouteRouteWithChildren
+  WorkspaceWorkspaceSettingsTeamKeyRouteRoute: typeof WorkspaceWorkspaceSettingsTeamKeyRouteRouteWithChildren
+}
+
+const WorkspaceWorkspaceSettingsRouteRouteChildren: WorkspaceWorkspaceSettingsRouteRouteChildren =
+  {
+    WorkspaceWorkspaceSettingsAdminRouteRoute:
+      WorkspaceWorkspaceSettingsAdminRouteRouteWithChildren,
+    WorkspaceWorkspaceSettingsAccountRouteRoute:
+      WorkspaceWorkspaceSettingsAccountRouteRouteWithChildren,
+    WorkspaceWorkspaceSettingsTeamKeyRouteRoute:
+      WorkspaceWorkspaceSettingsTeamKeyRouteRouteWithChildren,
+  }
+
+const WorkspaceWorkspaceSettingsRouteRouteWithChildren =
+  WorkspaceWorkspaceSettingsRouteRoute._addFileChildren(
+    WorkspaceWorkspaceSettingsRouteRouteChildren,
+  )
+
+interface WorkspaceWorkspaceTeamKeyRouteRouteChildren {
+  WorkspaceWorkspaceTeamKeyBacklogRoute: typeof WorkspaceWorkspaceTeamKeyBacklogRoute
+  WorkspaceWorkspaceTeamKeyCyclesRoute: typeof WorkspaceWorkspaceTeamKeyCyclesRoute
+  WorkspaceWorkspaceTeamKeyIssuesRoute: typeof WorkspaceWorkspaceTeamKeyIssuesRoute
+  WorkspaceWorkspaceTeamKeyLabelsRoute: typeof WorkspaceWorkspaceTeamKeyLabelsRoute
+  WorkspaceWorkspaceTeamKeyProjectsRoute: typeof WorkspaceWorkspaceTeamKeyProjectsRoute
+  WorkspaceWorkspaceTeamKeyTriageRoute: typeof WorkspaceWorkspaceTeamKeyTriageRoute
+  WorkspaceWorkspaceTeamKeyIndexRoute: typeof WorkspaceWorkspaceTeamKeyIndexRoute
+  WorkspaceWorkspaceTeamKeyCycleNumberRoute: typeof WorkspaceWorkspaceTeamKeyCycleNumberRoute
+}
+
+const WorkspaceWorkspaceTeamKeyRouteRouteChildren: WorkspaceWorkspaceTeamKeyRouteRouteChildren =
+  {
+    WorkspaceWorkspaceTeamKeyBacklogRoute:
+      WorkspaceWorkspaceTeamKeyBacklogRoute,
+    WorkspaceWorkspaceTeamKeyCyclesRoute: WorkspaceWorkspaceTeamKeyCyclesRoute,
+    WorkspaceWorkspaceTeamKeyIssuesRoute: WorkspaceWorkspaceTeamKeyIssuesRoute,
+    WorkspaceWorkspaceTeamKeyLabelsRoute: WorkspaceWorkspaceTeamKeyLabelsRoute,
+    WorkspaceWorkspaceTeamKeyProjectsRoute:
+      WorkspaceWorkspaceTeamKeyProjectsRoute,
+    WorkspaceWorkspaceTeamKeyTriageRoute: WorkspaceWorkspaceTeamKeyTriageRoute,
+    WorkspaceWorkspaceTeamKeyIndexRoute: WorkspaceWorkspaceTeamKeyIndexRoute,
+    WorkspaceWorkspaceTeamKeyCycleNumberRoute:
+      WorkspaceWorkspaceTeamKeyCycleNumberRoute,
+  }
+
+const WorkspaceWorkspaceTeamKeyRouteRouteWithChildren =
+  WorkspaceWorkspaceTeamKeyRouteRoute._addFileChildren(
+    WorkspaceWorkspaceTeamKeyRouteRouteChildren,
+  )
+
 interface WorkspaceWorkspaceRouteRouteChildren {
+  WorkspaceWorkspaceSettingsRouteRoute: typeof WorkspaceWorkspaceSettingsRouteRouteWithChildren
   WorkspaceWorkspaceCustomersRoute: typeof WorkspaceWorkspaceCustomersRoute
   WorkspaceWorkspaceDocumentsRoute: typeof WorkspaceWorkspaceDocumentsRoute
   WorkspaceWorkspaceForumRoute: typeof WorkspaceWorkspaceForumRoute
@@ -1564,8 +1601,6 @@ interface WorkspaceWorkspaceRouteRouteChildren {
   WorkspaceWorkspaceReleasesRoute: typeof WorkspaceWorkspaceReleasesRoute
   WorkspaceWorkspaceViewsRoute: typeof WorkspaceWorkspaceViewsRoute
   WorkspaceWorkspaceIndexRoute: typeof WorkspaceWorkspaceIndexRoute
-  WorkspaceWorkspaceSettingsAdminRouteRoute: typeof WorkspaceWorkspaceSettingsAdminRouteRouteWithChildren
-  WorkspaceWorkspaceSettingsAccountRouteRoute: typeof WorkspaceWorkspaceSettingsAccountRouteRouteWithChildren
   WorkspaceWorkspaceTeamKeyRouteRoute: typeof WorkspaceWorkspaceTeamKeyRouteRouteWithChildren
   WorkspaceWorkspaceCustomerSlugRoute: typeof WorkspaceWorkspaceCustomerSlugRoute
   WorkspaceWorkspaceDiscussionSlugRoute: typeof WorkspaceWorkspaceDiscussionSlugRoute
@@ -1575,13 +1610,14 @@ interface WorkspaceWorkspaceRouteRouteChildren {
   WorkspaceWorkspaceReleaseNoteSlugRoute: typeof WorkspaceWorkspaceReleaseNoteSlugRoute
   WorkspaceWorkspaceReleaseSlugRoute: typeof WorkspaceWorkspaceReleaseSlugRoute
   WorkspaceWorkspaceViewView_idRoute: typeof WorkspaceWorkspaceViewView_idRoute
-  WorkspaceWorkspaceSettingsTeamKeyRouteRoute: typeof WorkspaceWorkspaceSettingsTeamKeyRouteRouteWithChildren
   WorkspaceWorkspaceProjectSlugIssuesRoute: typeof WorkspaceWorkspaceProjectSlugIssuesRoute
   WorkspaceWorkspaceProjectSlugIndexRoute: typeof WorkspaceWorkspaceProjectSlugIndexRoute
 }
 
 const WorkspaceWorkspaceRouteRouteChildren: WorkspaceWorkspaceRouteRouteChildren =
   {
+    WorkspaceWorkspaceSettingsRouteRoute:
+      WorkspaceWorkspaceSettingsRouteRouteWithChildren,
     WorkspaceWorkspaceCustomersRoute: WorkspaceWorkspaceCustomersRoute,
     WorkspaceWorkspaceDocumentsRoute: WorkspaceWorkspaceDocumentsRoute,
     WorkspaceWorkspaceForumRoute: WorkspaceWorkspaceForumRoute,
@@ -1593,10 +1629,6 @@ const WorkspaceWorkspaceRouteRouteChildren: WorkspaceWorkspaceRouteRouteChildren
     WorkspaceWorkspaceReleasesRoute: WorkspaceWorkspaceReleasesRoute,
     WorkspaceWorkspaceViewsRoute: WorkspaceWorkspaceViewsRoute,
     WorkspaceWorkspaceIndexRoute: WorkspaceWorkspaceIndexRoute,
-    WorkspaceWorkspaceSettingsAdminRouteRoute:
-      WorkspaceWorkspaceSettingsAdminRouteRouteWithChildren,
-    WorkspaceWorkspaceSettingsAccountRouteRoute:
-      WorkspaceWorkspaceSettingsAccountRouteRouteWithChildren,
     WorkspaceWorkspaceTeamKeyRouteRoute:
       WorkspaceWorkspaceTeamKeyRouteRouteWithChildren,
     WorkspaceWorkspaceCustomerSlugRoute: WorkspaceWorkspaceCustomerSlugRoute,
@@ -1611,8 +1643,6 @@ const WorkspaceWorkspaceRouteRouteChildren: WorkspaceWorkspaceRouteRouteChildren
       WorkspaceWorkspaceReleaseNoteSlugRoute,
     WorkspaceWorkspaceReleaseSlugRoute: WorkspaceWorkspaceReleaseSlugRoute,
     WorkspaceWorkspaceViewView_idRoute: WorkspaceWorkspaceViewView_idRoute,
-    WorkspaceWorkspaceSettingsTeamKeyRouteRoute:
-      WorkspaceWorkspaceSettingsTeamKeyRouteRouteWithChildren,
     WorkspaceWorkspaceProjectSlugIssuesRoute:
       WorkspaceWorkspaceProjectSlugIssuesRoute,
     WorkspaceWorkspaceProjectSlugIndexRoute:

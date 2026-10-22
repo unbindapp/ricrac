@@ -1,12 +1,12 @@
 import { type LinkProps } from "@tanstack/react-router";
-import { type LucideIcon } from "lucide-react";
 import { ReactNode, useState } from "react";
 
+import type { TIcon } from "@/components/icons/symbols.gen";
 import { Button, LinkButton } from "@/components/ui/button";
 
 type TNavItemProps = {
   label: string;
-  icon: LucideIcon;
+  icon: TIcon;
   link: LinkProps;
   badge?: ReactNode;
   exact?: boolean;

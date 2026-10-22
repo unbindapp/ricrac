@@ -1,5 +1,4 @@
-import { GlobeIcon } from "lucide-react";
-
+import { GlobeIcon } from "@/components/icons/symbols.gen";
 import { NONE_KEY } from "@/components/issues/grouping";
 import { PickerTrigger, type TPickerAppearance } from "@/components/issues/pickers";
 import { PropertyPicker, type TPickerOption } from "@/components/issues/property-picker";

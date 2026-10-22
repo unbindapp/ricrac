@@ -1,6 +1,6 @@
 import { Checkbox as CheckboxPrimitive } from "@base-ui/react/checkbox";
-import { CheckIcon } from "lucide-react";
 
+import { CheckIcon } from "@/components/icons/symbols.gen";
 import { cn } from "@/components/ui/utils";
 
 function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
@@ -17,7 +17,7 @@ function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
         data-slot="checkbox-indicator"
         className="data-checked:bg-primary data-checked:text-primary-foreground flex size-full items-center justify-center p-px text-current"
       >
-        <CheckIcon className="size-full" strokeWidth={4} />
+        <CheckIcon className="size-full" />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   );

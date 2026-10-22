@@ -1,7 +1,6 @@
-import { FolderSyncIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
-
 import type { GitHubRepoSync } from "@/api/ops.gen";
 import { GithubIcon } from "@/components/icons/github";
+import { FolderSyncIcon, PencilIcon, PlusIcon, Trash2Icon } from "@/components/icons/symbols.gen";
 import { GithubRepoSyncDialog } from "@/components/integrations/github-repo-sync-dialog";
 import { EmptyState } from "@/components/layout/empty-state";
 import { List, ListRow } from "@/components/layout/list";

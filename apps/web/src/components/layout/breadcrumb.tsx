@@ -1,6 +1,7 @@
 import { Link, type LinkProps } from "@tanstack/react-router";
-import { ChevronRightIcon } from "lucide-react";
 import { Fragment, ReactNode } from "react";
+
+import { ChevronRightIcon } from "@/components/icons/symbols.gen";
 
 export type TBreadcrumbItem = {
   label: string;

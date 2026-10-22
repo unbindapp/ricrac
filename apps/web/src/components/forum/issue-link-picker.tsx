@@ -1,6 +1,5 @@
-import { CircleDotIcon, XIcon } from "lucide-react";
-
 import type { IssueRef } from "@/api/ops.gen";
+import { CircleDotIcon, XIcon } from "@/components/icons/symbols.gen";
 import { NONE_KEY } from "@/components/issues/grouping";
 import {
   IssueSearchPicker,

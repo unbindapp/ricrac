@@ -1,5 +1,4 @@
-import { CheckIcon } from "lucide-react";
-
+import { CheckIcon } from "@/components/icons/symbols.gen";
 import { cn } from "@/components/ui/utils";
 
 type TProps = {
@@ -23,10 +22,7 @@ export function ToggleKnob({ checked, hasChanges, size = "md", className }: TPro
       )}
     >
       <div className="bg-muted-more-foreground group-data-checked/knob:bg-primary-foreground group-data-checked/knob:text-primary group-data-staged/knob:group-data-checked/knob:text-change ease-emphasized absolute top-1/2 left-1.5 flex size-4 -translate-y-1/2 items-center justify-center rounded-full transition-all duration-300 group-active/switch:left-0 group-active/switch:size-7 group-data-checked/knob:left-5.5 group-data-checked/knob:size-6 group-data-checked/knob:group-active/switch:left-5 group-data-checked/knob:group-active/switch:size-7 group-data-[size=sm]/knob:left-1 group-data-[size=sm]/knob:size-3 group-data-[size=sm]/knob:group-active/switch:left-0 group-data-[size=sm]/knob:group-active/switch:size-5 group-data-checked/knob:group-data-[size=sm]/knob:left-4.25 group-data-checked/knob:group-data-[size=sm]/knob:size-4.5 group-data-checked/knob:group-data-[size=sm]/knob:group-active/switch:left-4 group-data-checked/knob:group-data-[size=sm]/knob:group-active/switch:size-5">
-        <CheckIcon
-          strokeWidth={3}
-          className="size-3.5 opacity-0 transition-opacity group-data-checked/knob:opacity-100 group-data-[size=sm]/knob:size-3"
-        />
+        <CheckIcon className="size-3.5 opacity-0 transition-opacity group-data-checked/knob:opacity-100 group-data-[size=sm]/knob:size-3" />
       </div>
     </div>
   );

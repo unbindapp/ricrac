@@ -1,6 +1,7 @@
 import { Extension, type Editor, type Range } from "@tiptap/core";
 import { PluginKey } from "@tiptap/pm/state";
 import { Suggestion } from "@tiptap/suggestion";
+
 import {
   AtSignIcon,
   CodeSquareIcon,
@@ -12,15 +13,14 @@ import {
   ListChecksIcon,
   ListIcon,
   ListOrderedIcon,
-  type LucideIcon,
   MinusIcon,
   PaperclipIcon,
   PilcrowIcon,
   SmileIcon,
   TableIcon,
   TextQuoteIcon,
-} from "lucide-react";
-
+  type TIcon,
+} from "@/components/icons/symbols.gen";
 import {
   suggestionRenderer,
   type TSuggestionSink,
@@ -33,7 +33,7 @@ export type TPickFiles = (kind: "media" | "any") => void;
 export type TBlockCommand = {
   id: string;
   label: string;
-  icon: LucideIcon;
+  icon: TIcon;
   hint?: string;
   keywords: string[];
   needsUpload?: boolean;

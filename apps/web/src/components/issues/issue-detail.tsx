@@ -1,5 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { type ReactNode, useEffect, useState } from "react";
+
+import type { IssueDetail as TIssueDetail } from "@/api/ops.gen";
+import { CustomerNeedDialog } from "@/components/customers/customer-need-dialog";
+import { CustomerNeedsSection } from "@/components/customers/customer-needs-section";
+import { GithubIcon } from "@/components/icons/github";
 import {
   ArchiveIcon,
   CheckIcon,
@@ -10,13 +16,7 @@ import {
   TriangleIcon,
   UserPlusIcon,
   XIcon,
-} from "lucide-react";
-import { type ReactNode, useEffect, useState } from "react";
-
-import type { IssueDetail as TIssueDetail } from "@/api/ops.gen";
-import { CustomerNeedDialog } from "@/components/customers/customer-need-dialog";
-import { CustomerNeedsSection } from "@/components/customers/customer-needs-section";
-import { GithubIcon } from "@/components/icons/github";
+} from "@/components/icons/symbols.gen";
 import { IssueActivity } from "@/components/issues/issue-activity";
 import { AttachMenu, IssueAttachments } from "@/components/issues/issue-attachments";
 import { IssueDetailHeader } from "@/components/issues/issue-detail-header";

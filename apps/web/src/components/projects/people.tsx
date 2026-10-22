@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { CircleUserIcon, UsersIcon } from "lucide-react";
 
 import type { UserRef, WorkspaceUser } from "@/api/ops.gen";
+import { CircleUserIcon, UsersIcon } from "@/components/icons/symbols.gen";
 import { PickerTrigger, type TPickerAppearance } from "@/components/projects/picker-trigger";
 import { PropertyPicker, type TPickerOption } from "@/components/issues/property-picker";
 import { Avatar } from "@/components/shared/avatar";

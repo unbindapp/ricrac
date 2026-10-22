@@ -1,9 +1,9 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { MessagesSquareIcon } from "lucide-react";
 import { useEffect } from "react";
 
 import type { Comment, CommentThread, UserRef } from "@/api/ops.gen";
 import { ChatDayDivider, ChatMessage } from "@/components/forum/chat-message";
+import { MessagesSquareIcon } from "@/components/icons/symbols.gen";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { Skeleton } from "@/components/ui/skeleton";

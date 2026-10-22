@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Trash2Icon, UserPlusIcon, UsersIcon } from "lucide-react";
 import { useState } from "react";
 
 import type { TeamDetail, TeamMember } from "@/api/ops.gen";
+import { Trash2Icon, UserPlusIcon, UsersIcon } from "@/components/icons/symbols.gen";
 import { EmptyState } from "@/components/layout/empty-state";
 import { List, ListRow, ListRowText } from "@/components/layout/list";
 import { SettingsPage } from "@/components/layout/settings-page";

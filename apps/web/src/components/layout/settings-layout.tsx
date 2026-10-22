@@ -1,55 +1,113 @@
-import { type LinkProps } from "@tanstack/react-router";
-import { LucideIcon } from "lucide-react";
-import { ReactNode } from "react";
+import { Link, type LinkProps, useLocation, useMatchRoute } from "@tanstack/react-router";
+import { ReactNode, useState } from "react";
 
-import { SidebarButton } from "@/components/layout/sidebar-button";
-import { PageContainer } from "@/components/layout/page-container";
-import { LinkButton } from "@/components/ui/button";
+import { ArrowLeftIcon, TIcon } from "@/components/icons/symbols.gen";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/components/ui/utils";
 
 export type TSettingsTab = {
   label: string;
-  icon: LucideIcon;
+  description: string;
+  icon: TIcon;
   link: LinkProps;
   exact?: boolean;
+  destructive?: boolean;
 };
 
 type TProps = {
   title: string;
-  tabs: TSettingsTab[];
+  switcher: ReactNode;
+  groups: TSettingsTab[][];
   children: ReactNode;
 };
 
-export function SettingsLayout({ title, tabs, children }: TProps) {
+const groupBadges = [
+  "bg-primary text-primary-foreground",
+  "bg-tertiary text-tertiary-foreground",
+  "bg-success text-success-foreground",
+  "bg-process text-process-foreground",
+  "bg-wait text-wait-foreground",
+];
+
+export function SettingsLayout({ title, switcher, groups, children }: TProps) {
+  const pathname = useLocation({ select: (location) => location.pathname });
+  const matchRoute = useMatchRoute();
+  const firstTab = groups[0]?.[0];
+  const [isListShown, setIsListShown] = useState(() =>
+    firstTab ? Boolean(matchRoute(firstTab.link)) : false,
+  );
+
   return (
-    <div className="flex min-h-0 w-full flex-1 flex-col lg:flex-row">
-      <div data-mobile-bar className="flex shrink-0 items-center border-b pl-4 md:pl-0 lg:contents">
-        <SidebarButton />
-        <nav
-          aria-label={title}
-          className="scrollbar-hidden flex min-w-0 flex-1 items-center gap-1 overflow-x-auto px-3 py-2 lg:w-72 lg:flex-none lg:flex-col lg:items-stretch lg:gap-0 lg:overflow-y-auto lg:px-3 lg:py-4"
-        >
-          <p className="text-primary hidden h-8 items-center px-3 text-sm font-medium lg:flex">
-            {title}
-          </p>
-          {tabs.map((tab) => (
-            <LinkButton
-              key={tab.label}
-              {...tab.link}
-              activeOptions={{ exact: tab.exact ?? false, includeSearch: false }}
-              variant="ghost"
-              size="sm"
-              forceMinSize={false}
-              className="group/tab data-[status=active]:bg-secondary data-[status=active]:text-secondary-foreground lg:hit-gap-y lg:bg-surface-container-high lg:has-hover:hover:bg-surface-container-highest lg:data-[status=active]:bg-secondary h-8 shrink-0 justify-start gap-3 px-3 font-normal lg:h-12 lg:rounded-xs lg:px-2 lg:first-of-type:rounded-t-lg lg:last-of-type:rounded-b-lg lg:data-[status=active]:rounded-lg"
-            >
-              <span className="lg:bg-primary lg:text-primary-foreground group-data-[status=active]/tab:lg:bg-secondary-foreground group-data-[status=active]/tab:lg:text-secondary flex shrink-0 items-center justify-center rounded-full transition-colors lg:size-8 [&_svg]:size-4">
-                <tab.icon />
-              </span>
-              <span className="truncate lg:font-medium">{tab.label}</span>
-            </LinkButton>
+    <div
+      data-view={isListShown ? "list" : "page"}
+      className="group/settings flex min-h-0 w-full flex-1"
+    >
+      <aside className="scrollbar-hidden flex min-h-0 w-full flex-col gap-3 overflow-y-auto p-3 group-data-[view=page]/settings:max-md:hidden md:w-[clamp(260px,36%,390px)] md:flex-none">
+        {switcher}
+        <nav aria-label={title} className="flex flex-col gap-2.5">
+          {groups.map((tabs, index) => (
+            <div key={tabs[0]?.label ?? index} className="flex flex-col gap-[3px]">
+              {tabs.map((tab) => (
+                <SettingsTabLink
+                  key={tab.label}
+                  tab={tab}
+                  badge={groupBadges[index % groupBadges.length]}
+                  onSelect={() => setIsListShown(false)}
+                />
+              ))}
+            </div>
           ))}
         </nav>
-      </div>
-      <PageContainer width="narrow">{children}</PageContainer>
+      </aside>
+      <main
+        key={pathname}
+        className="bg-surface-container flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto group-data-[view=list]/settings:max-md:hidden"
+      >
+        <div className="animate-in fade-in-0 slide-in-from-right-8 ease-emphasized mx-auto flex w-full max-w-3xl flex-col gap-2 px-4 pt-4 pb-16 duration-300 motion-reduce:animate-none md:px-8 md:pt-6">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Back to settings"
+            className="-ml-2 size-10 md:hidden"
+            onClick={() => setIsListShown(true)}
+          >
+            <ArrowLeftIcon className="size-5" />
+          </Button>
+          {children}
+        </div>
+      </main>
     </div>
+  );
+}
+
+type TTabLinkProps = {
+  tab: TSettingsTab;
+  badge: string;
+  onSelect: () => void;
+};
+
+function SettingsTabLink({ tab, badge, onSelect }: TTabLinkProps) {
+  return (
+    <Link
+      {...tab.link}
+      activeOptions={{ exact: tab.exact ?? false, includeSearch: false }}
+      onClick={onSelect}
+      className="group/tab bg-surface-container text-foreground has-hover:hover:bg-surface-container-high focus-visible:outline-primary data-[status=active]:bg-secondary data-[status=active]:text-secondary-foreground ease-emphasized flex items-center gap-4 rounded-[0.375rem] px-5 py-3 transition-[background-color,border-radius] duration-200 first:rounded-t-[1.5rem] last:rounded-b-[1.5rem] focus-visible:outline-2 focus-visible:-outline-offset-2 data-[status=active]:rounded-[1.5rem]"
+    >
+      <span
+        className={cn(
+          "flex size-12 shrink-0 items-center justify-center rounded-full [&_svg]:size-6",
+          tab.destructive ? "bg-destructive text-destructive-foreground" : badge,
+        )}
+      >
+        <tab.icon />
+      </span>
+      <span className="flex min-w-0 flex-col gap-0.5">
+        <span className="truncate text-base leading-tight font-medium">{tab.label}</span>
+        <span className="text-muted-foreground group-data-[status=active]/tab:text-secondary-foreground truncate text-sm">
+          {tab.description}
+        </span>
+      </span>
+    </Link>
   );
 }

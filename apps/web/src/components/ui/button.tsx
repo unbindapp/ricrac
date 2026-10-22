@@ -3,8 +3,8 @@ import { createLink, type LinkComponent } from "@tanstack/react-router";
 import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
 
+import { LoaderIcon } from "@/components/icons/symbols.gen";
 import { cn } from "@/components/ui/utils";
-import { LoaderIcon } from "lucide-react";
 
 export const minButtonSizeEnforcerClassName =
   "before:w-full before:h-full before:min-w-[44px] before:min-h-[44px] before:z-[-1] before:bg-transparent before:absolute before:-translate-y-1/2 before:top-1/2 before:-translate-x-1/2 before:left-1/2";

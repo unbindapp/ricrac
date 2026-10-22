@@ -1,9 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { BoxIcon, BracesIcon, GlobeIcon, LayersIcon, LockIcon } from "lucide-react";
 import { useState } from "react";
 
 import { FavoriteButton } from "@/components/favorites/favorite-button";
+import {
+  BoxIcon,
+  BracesIcon,
+  GlobeIcon,
+  LayersIcon,
+  LockIcon,
+} from "@/components/icons/symbols.gen";
 import type { TBreadcrumbItem } from "@/components/layout/breadcrumb";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";

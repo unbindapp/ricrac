@@ -1,5 +1,4 @@
-import { type LucideIcon } from "lucide-react";
-
+import type { TIcon } from "@/components/icons/symbols.gen";
 import { LinkButton } from "@/components/ui/button";
 
 type TProps = {
@@ -7,7 +6,7 @@ type TProps = {
   description: string;
   buttonText: string;
   buttonTo: string;
-  Icon: LucideIcon;
+  Icon: TIcon;
 };
 
 export default function NotFoundTemplate({
@@ -33,7 +32,7 @@ export default function NotFoundTemplate({
   );
 }
 
-export function EntityNotFound({ Icon, description }: { Icon: LucideIcon; description: string }) {
+export function EntityNotFound({ Icon, description }: { Icon: TIcon; description: string }) {
   return (
     <NotFoundTemplate
       code={404}
