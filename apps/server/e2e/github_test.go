@@ -52,6 +52,7 @@ func testAppKey(t *testing.T) *rsa.PrivateKey {
 type fakeRequest struct {
 	Method, Path, Query string
 	Body                M
+	Token               string
 }
 
 // fakeGitHub answers the API calls Ricrac makes and records them.
@@ -66,6 +67,11 @@ type fakeGitHub struct {
 	comments      map[int][]M
 	// Refuse what the app does with its installation token.
 	failing bool
+	// What GitHub answers to what the app does with a user's token, 0 for the usual.
+	userStatus  int
+	lastComment int
+	// Runs when a comment is posted, before GitHub answers.
+	onComment func(id int)
 }
 
 var issuePath = regexp.MustCompile(`^/repos/[^/]+/[^/]+/issues/(\d+)$`)
@@ -91,24 +97,33 @@ func (f *fakeGitHub) serve(w http.ResponseWriter, r *http.Request) {
 	}
 	if r.Header.Get("Content-Type") == "application/x-www-form-urlencoded" {
 		form, _ := url.ParseQuery(string(raw))
-		body = M{"code": form.Get("code"), "client_id": form.Get("client_id")}
+		body = M{"code": form.Get("code"), "client_id": form.Get("client_id"), "grant_type": form.Get("grant_type"), "refresh_token": form.Get("refresh_token")}
 	}
+	token := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
 	f.mu.Lock()
-	f.requests = append(f.requests, fakeRequest{r.Method, r.URL.Path, r.URL.RawQuery, body})
+	f.requests = append(f.requests, fakeRequest{r.Method, r.URL.Path, r.URL.RawQuery, body, token})
 	f.mu.Unlock()
 	path := r.URL.Path
 	answer := func(value any) { writeJSON(w, http.StatusOK, value) }
 	switch {
 	case f.failing && strings.HasPrefix(path, "/repos/"):
 		writeJSON(w, http.StatusForbidden, M{"message": "Resource not accessible by integration"})
+	case f.userStatus != 0 && strings.HasPrefix(token, "ghu_") && strings.HasPrefix(path, "/repos/"):
+		writeJSON(w, f.userStatus, M{"message": "Refused"})
 	case strings.HasSuffix(path, "/access_tokens"):
 		answer(M{"token": "ghs_installation", "expires_at": time.Now().Add(time.Hour)})
+	case path == "/login/oauth/access_token" && body["grant_type"] == "refresh_token":
+		if body["refresh_token"] != "ghr_user" {
+			answer(M{"error": "bad_refresh_token"})
+			return
+		}
+		answer(M{"access_token": "ghu_refreshed", "expires_in": 28800, "refresh_token": "ghr_refreshed", "refresh_token_expires_in": 15897600})
 	case path == "/login/oauth/access_token":
 		if body["code"] != "good-code" {
 			answer(M{"error": "bad_verification_code"})
 			return
 		}
-		answer(M{"access_token": "gho_user"})
+		answer(M{"access_token": "ghu_user", "expires_in": 28800, "refresh_token": "ghr_user", "refresh_token_expires_in": 15897600})
 	case path == "/user":
 		answer(M{"login": f.login})
 	case path == "/user/installations":
@@ -125,7 +140,15 @@ func (f *fakeGitHub) serve(w http.ResponseWriter, r *http.Request) {
 		}
 		answer(f.issuePages[page-1])
 	case r.Method == http.MethodPost && strings.HasSuffix(path, "/comments"):
-		answer(M{"id": 9001, "body": body["body"]})
+		f.mu.Lock()
+		f.lastComment++
+		id := 9000 + f.lastComment
+		onComment := f.onComment
+		f.mu.Unlock()
+		if onComment != nil {
+			onComment(id)
+		}
+		answer(M{"id": id, "body": body["body"]})
 	case r.Method == http.MethodPatch && issuePath.MatchString(path):
 		answer(M{"id": 1, "number": 1, "updated_at": time.Now().UTC()})
 	case r.Method == http.MethodDelete:
@@ -299,7 +322,9 @@ func TestPeopleLinkTheirGitHubAccount(t *testing.T) {
 	req.Header.Set("Cookie", g.session(g.Ann.User))
 	_, me := send(g.router, req)
 	eq(t, me.At("githubLogin").Str(), "ann-gh", me.JSON())
+	check(t, me.At("githubAuthorized").Bool(), me.JSON())
 	check(t, call(t, g.Ann, "disconnect_github_account", nil).At("githubLogin").IsNull())
+	eq(t, scalar[int](g.World, "SELECT count(*) FROM github_user_tokens"), 0)
 	check(t, call(t, g.Ann, "get_github_integration", nil).At("githubLogin").IsNull())
 }
 
@@ -574,6 +599,89 @@ func TestRicracChangesGoToGitHubButNotBack(t *testing.T) {
 	call(t, g.Ann, "delete_github_repo_sync", M{"id": "unbindapp/unbind"})
 	call(t, g.Ann, "save_issue", M{"id": "ENG-1", "title": "No longer synced"})
 	eq(t, scalar[int](g.World, "SELECT count(*) FROM github_outbox"), 0)
+}
+
+// linkGitHub links the user's GitHub account as the account settings do.
+func (g *gitHubWorld) linkGitHub(t *testing.T, user uuid.UUID) {
+	t.Helper()
+	state := queryOf(t, g.browse(t, user, "/api/github/connect?return_to=/acme/settings/account")).Get("state")
+	g.browse(t, user, "/api/github/callback?code=good-code&state="+url.QueryEscape(state))
+}
+
+func (g *gitHubWorld) me(user uuid.UUID) J {
+	req := httptest.NewRequest("GET", "/api/me", nil)
+	req.Header.Set("Cookie", g.session(user))
+	_, me := send(g.router, req)
+	return me
+}
+
+func TestCommentsGoToGitHubAsTheirAuthor(t *testing.T) {
+	g := withGitHub(t)
+	g.syncRepo(t, "ENG")
+	g.deliver(t, "issues", "issues_opened.json", nil)
+	check(t, !g.me(g.Ann.User).At("githubAuthorized").Bool())
+	g.linkGitHub(t, g.Ann.User)
+	check(t, g.me(g.Ann.User).At("githubAuthorized").Bool())
+	eq(t, scalar[int](g.World, "SELECT count(*) FROM github_user_tokens WHERE access_token LIKE 'gh%' OR refresh_token LIKE 'gh%'"), 0,
+		"tokens are sealed")
+	lastPost := func() fakeRequest {
+		posted := g.fake.sent("POST", "/issues/1347/comments")
+		return posted[len(posted)-1]
+	}
+
+	// GitHub's webhook for the comment can come before Ricrac has linked it.
+	echoed := make(chan int)
+	g.fake.onComment = func(id int) {
+		go func() {
+			echoed <- g.deliver(t, "issue_comment", "issue_comment_created.json", func(p M) {
+				created := p["comment"].(M)
+				created["id"], created["body"], created["user"] = id, "Fixed by raising the idle timeout.", M{"login": "Ann-GH"}
+				p["sender"] = M{"login": "Ann-GH"}
+			})
+		}()
+		time.Sleep(100 * time.Millisecond)
+	}
+	comment := call(t, g.Ann, "save_comment", M{"issueId": "ENG-1", "body": "Fixed by raising the idle timeout."})
+	g.runJobs(t)
+	eq(t, <-echoed, http.StatusOK)
+	g.fake.onComment = nil
+	eq(t, lastPost().Token, "ghu_user")
+	eq(t, lastPost().Body["body"], any("Fixed by raising the idle timeout."))
+	eq(t, call(t, g.Ann, "list_comments", M{"issueId": "ENG-1"}).At("nodes").Len(), 1, "the comment doesn't come back")
+
+	call(t, g.Ann, "save_comment", M{"id": comment.At("id").Str(), "body": "Fixed by raising the timeout."})
+	g.runJobs(t)
+	edited := g.fake.sent("PATCH", "/issues/comments/9001")
+	eq(t, edited[0].Token, "ghu_user")
+	eq(t, edited[0].Body["body"], any("Fixed by raising the timeout."))
+
+	bob := g.member("bob@acme.test", "Bob", "member")
+	call(t, bob, "save_comment", M{"issueId": "ENG-1", "body": "Thanks!"})
+	g.runJobs(t)
+	eq(t, lastPost().Token, "ghs_installation", "without a linked account the app posts")
+	eq(t, lastPost().Body["body"], any("**Bob on Ricrac**\n\nThanks!"))
+
+	g.exec("UPDATE github_user_tokens SET expires_at = now() WHERE user_id = $1", g.Ann.User)
+	call(t, g.Ann, "save_comment", M{"issueId": "ENG-1", "body": "Shipped in 1.4."})
+	g.runJobs(t)
+	eq(t, g.fake.sent("POST", "/login/oauth/access_token")[1].Body["refresh_token"], any("ghr_user"))
+	eq(t, lastPost().Token, "ghu_refreshed", "an expiring token is refreshed first")
+	call(t, g.Ann, "delete_comment", M{"id": comment.At("id").Str()})
+	g.runJobs(t)
+	eq(t, g.fake.sent("DELETE", "/issues/comments/9001")[0].Token, "ghu_refreshed")
+
+	g.fake.userStatus = http.StatusForbidden
+	call(t, g.Ann, "save_comment", M{"issueId": "ENG-1", "body": "Out of reach for Ann."})
+	g.runJobs(t)
+	eq(t, lastPost().Body["body"], any("**Ann Smith on Ricrac**\n\nOut of reach for Ann."), "the app posts what GitHub refuses Ann")
+	check(t, g.me(g.Ann.User).At("githubAuthorized").Bool())
+
+	g.fake.userStatus = http.StatusUnauthorized
+	call(t, g.Ann, "save_comment", M{"issueId": "ENG-1", "body": "Revoked."})
+	g.runJobs(t)
+	eq(t, lastPost().Token, "ghs_installation")
+	check(t, !g.me(g.Ann.User).At("githubAuthorized").Bool(), "a revoked token is forgotten")
+	check(t, call(t, g.Ann, "list_github_repo_syncs", nil).At("nodes", 0, "lastError").IsNull())
 }
 
 func TestFailedPushesAreRetriedAndReported(t *testing.T) {

@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
@@ -55,6 +57,31 @@ func (k Keys) Verify(token string) (string, bool) {
 		return "", false
 	}
 	return string(payload), true
+}
+
+// Seal encrypts a secret Ricrac has to read back, like a GitHub user token.
+func (k Keys) Seal(secret string) string {
+	aead := k.aead()
+	nonce := make([]byte, aead.NonceSize())
+	_, _ = rand.Read(nonce)
+	return b64.EncodeToString(aead.Seal(nonce, nonce, []byte(secret), nil))
+}
+
+// Open decrypts what Seal sealed; false when it wasn't sealed with this SECRET_KEY.
+func (k Keys) Open(sealed string) (string, bool) {
+	aead := k.aead()
+	data, err := b64.DecodeString(sealed)
+	if err != nil || len(data) < aead.NonceSize() {
+		return "", false
+	}
+	secret, err := aead.Open(nil, data[:aead.NonceSize()], data[aead.NonceSize():], nil)
+	return string(secret), err == nil
+}
+
+func (k Keys) aead() cipher.AEAD {
+	block, _ := aes.NewCipher(k.mac([]byte("sealing key")))
+	aead, _ := cipher.NewGCM(block)
+	return aead
 }
 
 func (k Keys) SessionToken(user uuid.UUID) string {

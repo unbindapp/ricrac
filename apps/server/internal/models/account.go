@@ -30,14 +30,16 @@ type PendingInvitation struct {
 }
 
 type Me struct {
-	ID          uuid.UUID           `json:"id"`
-	Email       string              `json:"email"`
-	Name        string              `json:"name"`
-	DisplayName string              `json:"displayName"`
-	AvatarURL   *string             `json:"avatarUrl"`
-	GitHubLogin *string             `json:"githubLogin"`
-	Workspaces  []WorkspaceSummary  `json:"workspaces"`
-	Invitations []PendingInvitation `json:"invitations"`
+	ID          uuid.UUID `json:"id"`
+	Email       string    `json:"email"`
+	Name        string    `json:"name"`
+	DisplayName string    `json:"displayName"`
+	AvatarURL   *string   `json:"avatarUrl"`
+	GitHubLogin *string   `json:"githubLogin"`
+	// Ricrac holds a GitHub token of theirs, to post their comments on GitHub as them.
+	GitHubAuthorized bool                `json:"githubAuthorized"`
+	Workspaces       []WorkspaceSummary  `json:"workspaces"`
+	Invitations      []PendingInvitation `json:"invitations"`
 }
 
 type APIKey struct {

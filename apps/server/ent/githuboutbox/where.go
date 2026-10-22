@@ -96,6 +96,11 @@ func NextAttemptAt(v time.Time) predicate.GithubOutbox {
 	return predicate.GithubOutbox(sql.FieldEQ(FieldNextAttemptAt, v))
 }
 
+// ActAs applies equality check predicate on the "act_as" field. It's identical to ActAsEQ.
+func ActAs(v uuid.UUID) predicate.GithubOutbox {
+	return predicate.GithubOutbox(sql.FieldEQ(FieldActAs, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.GithubOutbox {
 	return predicate.GithubOutbox(sql.FieldEQ(FieldCreatedAt, v))
@@ -444,6 +449,56 @@ func NextAttemptAtIsNil() predicate.GithubOutbox {
 // NextAttemptAtNotNil applies the NotNil predicate on the "next_attempt_at" field.
 func NextAttemptAtNotNil() predicate.GithubOutbox {
 	return predicate.GithubOutbox(sql.FieldNotNull(FieldNextAttemptAt))
+}
+
+// ActAsEQ applies the EQ predicate on the "act_as" field.
+func ActAsEQ(v uuid.UUID) predicate.GithubOutbox {
+	return predicate.GithubOutbox(sql.FieldEQ(FieldActAs, v))
+}
+
+// ActAsNEQ applies the NEQ predicate on the "act_as" field.
+func ActAsNEQ(v uuid.UUID) predicate.GithubOutbox {
+	return predicate.GithubOutbox(sql.FieldNEQ(FieldActAs, v))
+}
+
+// ActAsIn applies the In predicate on the "act_as" field.
+func ActAsIn(vs ...uuid.UUID) predicate.GithubOutbox {
+	return predicate.GithubOutbox(sql.FieldIn(FieldActAs, vs...))
+}
+
+// ActAsNotIn applies the NotIn predicate on the "act_as" field.
+func ActAsNotIn(vs ...uuid.UUID) predicate.GithubOutbox {
+	return predicate.GithubOutbox(sql.FieldNotIn(FieldActAs, vs...))
+}
+
+// ActAsGT applies the GT predicate on the "act_as" field.
+func ActAsGT(v uuid.UUID) predicate.GithubOutbox {
+	return predicate.GithubOutbox(sql.FieldGT(FieldActAs, v))
+}
+
+// ActAsGTE applies the GTE predicate on the "act_as" field.
+func ActAsGTE(v uuid.UUID) predicate.GithubOutbox {
+	return predicate.GithubOutbox(sql.FieldGTE(FieldActAs, v))
+}
+
+// ActAsLT applies the LT predicate on the "act_as" field.
+func ActAsLT(v uuid.UUID) predicate.GithubOutbox {
+	return predicate.GithubOutbox(sql.FieldLT(FieldActAs, v))
+}
+
+// ActAsLTE applies the LTE predicate on the "act_as" field.
+func ActAsLTE(v uuid.UUID) predicate.GithubOutbox {
+	return predicate.GithubOutbox(sql.FieldLTE(FieldActAs, v))
+}
+
+// ActAsIsNil applies the IsNil predicate on the "act_as" field.
+func ActAsIsNil() predicate.GithubOutbox {
+	return predicate.GithubOutbox(sql.FieldIsNull(FieldActAs))
+}
+
+// ActAsNotNil applies the NotNil predicate on the "act_as" field.
+func ActAsNotNil() predicate.GithubOutbox {
+	return predicate.GithubOutbox(sql.FieldNotNull(FieldActAs))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

@@ -121,6 +121,20 @@ func (_c *GithubOutboxCreate) SetNillableNextAttemptAt(v *time.Time) *GithubOutb
 	return _c
 }
 
+// SetActAs sets the "act_as" field.
+func (_c *GithubOutboxCreate) SetActAs(v uuid.UUID) *GithubOutboxCreate {
+	_c.mutation.SetActAs(v)
+	return _c
+}
+
+// SetNillableActAs sets the "act_as" field if the given value is not nil.
+func (_c *GithubOutboxCreate) SetNillableActAs(v *uuid.UUID) *GithubOutboxCreate {
+	if v != nil {
+		_c.SetActAs(*v)
+	}
+	return _c
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_c *GithubOutboxCreate) SetCreatedAt(v time.Time) *GithubOutboxCreate {
 	_c.mutation.SetCreatedAt(v)
@@ -258,6 +272,10 @@ func (_c *GithubOutboxCreate) createSpec() (*GithubOutbox, *sqlgraph.CreateSpec)
 	if value, ok := _c.mutation.NextAttemptAt(); ok {
 		_spec.SetField(githuboutbox.FieldNextAttemptAt, field.TypeTime, value)
 		_node.NextAttemptAt = value
+	}
+	if value, ok := _c.mutation.ActAs(); ok {
+		_spec.SetField(githuboutbox.FieldActAs, field.TypeUUID, value)
+		_node.ActAs = &value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(githuboutbox.FieldCreatedAt, field.TypeTime, value)
@@ -528,6 +546,24 @@ func (u *GithubOutboxUpsert) ClearNextAttemptAt() *GithubOutboxUpsert {
 	return u
 }
 
+// SetActAs sets the "act_as" field.
+func (u *GithubOutboxUpsert) SetActAs(v uuid.UUID) *GithubOutboxUpsert {
+	u.Set(githuboutbox.FieldActAs, v)
+	return u
+}
+
+// UpdateActAs sets the "act_as" field to the value that was provided on create.
+func (u *GithubOutboxUpsert) UpdateActAs() *GithubOutboxUpsert {
+	u.SetExcluded(githuboutbox.FieldActAs)
+	return u
+}
+
+// ClearActAs clears the value of the "act_as" field.
+func (u *GithubOutboxUpsert) ClearActAs() *GithubOutboxUpsert {
+	u.SetNull(githuboutbox.FieldActAs)
+	return u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (u *GithubOutboxUpsert) SetCreatedAt(v time.Time) *GithubOutboxUpsert {
 	u.Set(githuboutbox.FieldCreatedAt, v)
@@ -780,6 +816,27 @@ func (u *GithubOutboxUpsertOne) UpdateNextAttemptAt() *GithubOutboxUpsertOne {
 func (u *GithubOutboxUpsertOne) ClearNextAttemptAt() *GithubOutboxUpsertOne {
 	return u.Update(func(s *GithubOutboxUpsert) {
 		s.ClearNextAttemptAt()
+	})
+}
+
+// SetActAs sets the "act_as" field.
+func (u *GithubOutboxUpsertOne) SetActAs(v uuid.UUID) *GithubOutboxUpsertOne {
+	return u.Update(func(s *GithubOutboxUpsert) {
+		s.SetActAs(v)
+	})
+}
+
+// UpdateActAs sets the "act_as" field to the value that was provided on create.
+func (u *GithubOutboxUpsertOne) UpdateActAs() *GithubOutboxUpsertOne {
+	return u.Update(func(s *GithubOutboxUpsert) {
+		s.UpdateActAs()
+	})
+}
+
+// ClearActAs clears the value of the "act_as" field.
+func (u *GithubOutboxUpsertOne) ClearActAs() *GithubOutboxUpsertOne {
+	return u.Update(func(s *GithubOutboxUpsert) {
+		s.ClearActAs()
 	})
 }
 
@@ -1203,6 +1260,27 @@ func (u *GithubOutboxUpsertBulk) UpdateNextAttemptAt() *GithubOutboxUpsertBulk {
 func (u *GithubOutboxUpsertBulk) ClearNextAttemptAt() *GithubOutboxUpsertBulk {
 	return u.Update(func(s *GithubOutboxUpsert) {
 		s.ClearNextAttemptAt()
+	})
+}
+
+// SetActAs sets the "act_as" field.
+func (u *GithubOutboxUpsertBulk) SetActAs(v uuid.UUID) *GithubOutboxUpsertBulk {
+	return u.Update(func(s *GithubOutboxUpsert) {
+		s.SetActAs(v)
+	})
+}
+
+// UpdateActAs sets the "act_as" field to the value that was provided on create.
+func (u *GithubOutboxUpsertBulk) UpdateActAs() *GithubOutboxUpsertBulk {
+	return u.Update(func(s *GithubOutboxUpsert) {
+		s.UpdateActAs()
+	})
+}
+
+// ClearActAs clears the value of the "act_as" field.
+func (u *GithubOutboxUpsertBulk) ClearActAs() *GithubOutboxUpsertBulk {
+	return u.Update(func(s *GithubOutboxUpsert) {
+		s.ClearActAs()
 	})
 }
 

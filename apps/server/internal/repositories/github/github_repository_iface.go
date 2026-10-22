@@ -15,8 +15,9 @@ import (
 type GitHubRepositoryInterface interface {
 	// UserLogin is the GitHub login a user linked.
 	UserLogin(ctx context.Context, id uuid.UUID) (*string, error)
-	ClearUserLogin(ctx context.Context, id uuid.UUID) error
-	// SetUserLogin links a GitHub login to a user, taking it from anyone who had it.
+	// ClearUserLogin unlinks a user's GitHub account and forgets its token.
+	ClearUserLogin(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error
+	// SetUserLogin links a GitHub login to a user, taking it and its token from anyone who had it.
 	SetUserLogin(ctx context.Context, tx repository.TxInterface, id uuid.UUID, login string) error
 	WorkspaceURLKey(ctx context.Context, id uuid.UUID) (string, error)
 	// Installations is the workspace's installations, oldest first, with their installer.
@@ -56,9 +57,10 @@ type GitHubRepositoryInterface interface {
 	// CommentWithAuthor is a comment with its author, nil when there's none.
 	CommentWithAuthor(ctx context.Context, id uuid.UUID) (*ent.Comment, error)
 	// CommentPosted says whether a comment is linked to a GitHub comment.
-	CommentPosted(ctx context.Context, id uuid.UUID) (bool, error)
-	// LinkPostedComment links a comment the app posted on the linked GitHub issue.
-	LinkPostedComment(ctx context.Context, commentID uuid.UUID, issueID *uuid.UUID, githubID int64) error
+	CommentPosted(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (bool, error)
+	// LinkPostedComment links a comment the app posted on the linked GitHub issue, as postedAs or
+	// as itself when nil.
+	LinkPostedComment(ctx context.Context, tx repository.TxInterface, commentID uuid.UUID, issueID *uuid.UUID, githubID int64, postedAs *uuid.UUID) error
 	// Issue is an issue, nil when there's none.
 	Issue(ctx context.Context, id uuid.UUID) (*ent.Issue, error)
 	// LoginOf is the GitHub login of the user with this id; false when there's no such user.
@@ -90,7 +92,7 @@ type GitHubRepositoryInterface interface {
 	// LabelsNamedOn is the issue's labels with this name.
 	LabelsNamedOn(ctx context.Context, issueID uuid.UUID, name string) ([]uuid.UUID, error)
 	// CommentLinked says whether a GitHub comment is linked to a comment already.
-	CommentLinked(ctx context.Context, githubID int64) (bool, error)
+	CommentLinked(ctx context.Context, tx repository.TxInterface, githubID int64) (bool, error)
 	// LinkedComment is the comment a GitHub comment is linked to.
 	LinkedComment(ctx context.Context, githubID int64) (uuid.UUID, bool, error)
 	AddCommentLink(ctx context.Context, tx repository.TxInterface, commentID, issueID uuid.UUID, githubID int64) error
@@ -101,6 +103,14 @@ type GitHubRepositoryInterface interface {
 	DueBackfills(ctx context.Context) ([]uuid.UUID, error)
 	FailBackfill(ctx context.Context, id uuid.UUID) error
 	AdvanceBackfill(ctx context.Context, id uuid.UUID, progress BackfillProgress) error
+	// UserToken is the GitHub token a user linked, nil when there's none.
+	UserToken(ctx context.Context, user uuid.UUID) (*SealedToken, error)
+	HasUserToken(ctx context.Context, user uuid.UUID) (bool, error)
+	SaveUserToken(ctx context.Context, tx repository.TxInterface, user uuid.UUID, token SealedToken) error
+	DeleteUserToken(ctx context.Context, tx repository.TxInterface, user uuid.UUID) error
+	// LockIssueComments holds the GitHub comments of an issue until tx ends, so a comment being
+	// posted can't be imported back before it is linked.
+	LockIssueComments(ctx context.Context, tx repository.TxInterface, issue uuid.UUID) error
 	// RecordEvent notes an installation's last webhook event, answering its workspace; false when no
 	// workspace has the installation.
 	RecordEvent(ctx context.Context, installation int64, kind string) (uuid.UUID, bool, error)

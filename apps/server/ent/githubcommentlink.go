@@ -25,6 +25,8 @@ type GithubCommentLink struct {
 	GithubID int64 `json:"github_id,omitempty"`
 	// Posted holds the value of the "posted" field.
 	Posted bool `json:"posted,omitempty"`
+	// PostedAs holds the value of the "posted_as" field.
+	PostedAs *uuid.UUID `json:"posted_as,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -58,6 +60,8 @@ func (*GithubCommentLink) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case githubcommentlink.FieldPostedAs:
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case githubcommentlink.FieldPosted:
 			values[i] = new(sql.NullBool)
 		case githubcommentlink.FieldGithubID:
@@ -104,6 +108,13 @@ func (_m *GithubCommentLink) assignValues(columns []string, values []any) error 
 				return fmt.Errorf("unexpected type %T for field posted", values[i])
 			} else if value.Valid {
 				_m.Posted = value.Bool
+			}
+		case githubcommentlink.FieldPostedAs:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field posted_as", values[i])
+			} else if value.Valid {
+				_m.PostedAs = new(uuid.UUID)
+				*_m.PostedAs = *value.S.(*uuid.UUID)
 			}
 		case githubcommentlink.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -160,6 +171,11 @@ func (_m *GithubCommentLink) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("posted=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Posted))
+	builder.WriteString(", ")
+	if v := _m.PostedAs; v != nil {
+		builder.WriteString("posted_as=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

@@ -796,6 +796,7 @@ var (
 		{Name: "comment_id", Type: field.TypeUUID},
 		{Name: "github_id", Type: field.TypeInt64},
 		{Name: "posted", Type: field.TypeBool, Nullable: true},
+		{Name: "posted_as", Type: field.TypeUUID, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime, Nullable: true},
 		{Name: "issue_id", Type: field.TypeUUID},
 	}
@@ -807,7 +808,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "github_comment_links_github_issue_links_github_comment_links",
-				Columns:    []*schema.Column{GithubCommentLinksColumns[4]},
+				Columns:    []*schema.Column{GithubCommentLinksColumns[5]},
 				RefColumns: []*schema.Column{GithubIssueLinksColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -880,6 +881,7 @@ var (
 		{Name: "changes", Type: field.TypeJSON, Nullable: true},
 		{Name: "attempts", Type: field.TypeInt, Nullable: true, SchemaType: map[string]string{"postgres": "integer"}},
 		{Name: "next_attempt_at", Type: field.TypeTime, Nullable: true},
+		{Name: "act_as", Type: field.TypeUUID, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime, Nullable: true},
 		{Name: "comment_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "repo_sync_id", Type: field.TypeUUID},
@@ -893,19 +895,19 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "github_outbox_comments_github_outbox",
-				Columns:    []*schema.Column{GithubOutboxColumns[8]},
+				Columns:    []*schema.Column{GithubOutboxColumns[9]},
 				RefColumns: []*schema.Column{CommentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "github_outbox_github_repo_syncs_github_outbox",
-				Columns:    []*schema.Column{GithubOutboxColumns[9]},
+				Columns:    []*schema.Column{GithubOutboxColumns[10]},
 				RefColumns: []*schema.Column{GithubRepoSyncsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "github_outbox_issues_github_outbox",
-				Columns:    []*schema.Column{GithubOutboxColumns[10]},
+				Columns:    []*schema.Column{GithubOutboxColumns[11]},
 				RefColumns: []*schema.Column{IssuesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -963,6 +965,20 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 		},
+	}
+	// GithubUserTokensColumns holds the columns for the "github_user_tokens" table.
+	GithubUserTokensColumns = []*schema.Column{
+		{Name: "user_id", Type: field.TypeUUID},
+		{Name: "access_token", Type: field.TypeString, Size: 2147483647},
+		{Name: "expires_at", Type: field.TypeTime, Nullable: true},
+		{Name: "refresh_token", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "refresh_expires_at", Type: field.TypeTime, Nullable: true},
+	}
+	// GithubUserTokensTable holds the schema information for the "github_user_tokens" table.
+	GithubUserTokensTable = &schema.Table{
+		Name:       "github_user_tokens",
+		Columns:    GithubUserTokensColumns,
+		PrimaryKey: []*schema.Column{GithubUserTokensColumns[0]},
 	}
 	// InitiativesColumns holds the columns for the "initiatives" table.
 	InitiativesColumns = []*schema.Column{
@@ -2529,6 +2545,7 @@ var (
 		GithubIssueLinksTable,
 		GithubOutboxTable,
 		GithubRepoSyncsTable,
+		GithubUserTokensTable,
 		InitiativesTable,
 		InitiativeProjectsTable,
 		InvitationsTable,
@@ -2719,6 +2736,9 @@ func init() {
 	GithubRepoSyncsTable.ForeignKeys[3].RefTable = WorkspacesTable
 	GithubRepoSyncsTable.Annotation = &entsql.Annotation{
 		Table: "github_repo_syncs",
+	}
+	GithubUserTokensTable.Annotation = &entsql.Annotation{
+		Table: "github_user_tokens",
 	}
 	InitiativesTable.ForeignKeys[0].RefTable = InitiativesTable
 	InitiativesTable.ForeignKeys[1].RefTable = UsersTable

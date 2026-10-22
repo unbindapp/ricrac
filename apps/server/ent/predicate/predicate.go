@@ -78,6 +78,9 @@ type GithubOutbox func(*sql.Selector)
 // GithubRepoSync is the predicate function for githubreposync builders.
 type GithubRepoSync func(*sql.Selector)
 
+// GithubUserToken is the predicate function for githubusertoken builders.
+type GithubUserToken func(*sql.Selector)
+
 // Initiative is the predicate function for initiative builders.
 type Initiative func(*sql.Selector)
 

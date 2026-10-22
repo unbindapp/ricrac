@@ -27,6 +27,7 @@ func (GithubOutbox) Fields() []ent.Field {
 		field.JSON("changes", json.RawMessage{}).Optional(),
 		field.Int("attempts").SchemaType(integer).Optional(),
 		field.Time("next_attempt_at").Optional(),
+		field.UUID("act_as", uuid.UUID{}).Optional().Nillable(),
 		field.Time("created_at").Optional(),
 	}
 }

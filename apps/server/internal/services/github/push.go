@@ -8,9 +8,9 @@ import (
 	"slices"
 	"time"
 
-	"github.com/google/uuid"
-
+	"ricrac/ent"
 	"ricrac/internal/integrations/github"
+	repository "ricrac/internal/repositories"
 	github_repo "ricrac/internal/repositories/github"
 )
 
@@ -64,56 +64,97 @@ func (self *GitHubService) pushEntry(ctx context.Context, entry github_repo.Outb
 	case "comment_created":
 		return self.pushNewComment(ctx, token, entry)
 	case "comment_edited":
-		body, found, err := self.commentForGitHub(ctx, entry.Comment)
-		if err != nil || !found || entry.GitHubComment == nil {
-			return err
-		}
-		_, err = self.app.Do(ctx, token, http.MethodPatch, github.CommentPath(entry.FullName, *entry.GitHubComment), M{"body": body}, nil)
-		return err
+		return self.pushCommentEdit(ctx, token, entry)
 	case "comment_deleted":
-		if entry.GitHubComment == nil {
-			return nil
-		}
-		_, err := self.app.Do(ctx, token, http.MethodDelete, github.CommentPath(entry.FullName, *entry.GitHubComment), nil, nil)
-		if github.IsNotFound(err) {
-			return nil
-		}
-		return err
+		return self.pushCommentDeletion(ctx, token, entry)
 	}
 	return nil
 }
 
-// commentForGitHub is a comment's body as the app posts it, with its author's name.
-func (self *GitHubService) commentForGitHub(ctx context.Context, comment *uuid.UUID) (string, bool, error) {
-	if comment == nil {
-		return "", false, nil
-	}
-	found, err := self.github().CommentWithAuthor(ctx, *comment)
-	if err != nil || found == nil {
-		return "", false, err
-	}
+// bodyForApp is a comment's body as the app posts it as itself, with its author's name.
+func bodyForApp(comment *ent.Comment) string {
 	author := "Someone"
-	if found.Edges.User != nil {
-		author = found.Edges.User.Name
+	if comment.Edges.User != nil {
+		author = comment.Edges.User.Name
 	}
-	return github.RicracCommentBody(author, found.Body), true, nil
+	return github.RicracCommentBody(author, comment.Body)
 }
 
+// pushNewComment posts a comment as its author when they linked GitHub, else as the app. The
+// issue's comments stay locked until it is linked, so its webhook doesn't import it back.
 func (self *GitHubService) pushNewComment(ctx context.Context, token string, entry github_repo.OutboxEntry) error {
-	body, found, err := self.commentForGitHub(ctx, entry.Comment)
-	if err != nil || !found {
+	if entry.Comment == nil || entry.Issue == nil {
+		return nil
+	}
+	found, err := self.github().CommentWithAuthor(ctx, *entry.Comment)
+	if err != nil || found == nil {
 		return err
 	}
-	posted, err := self.github().CommentPosted(ctx, *entry.Comment)
-	if err != nil || posted {
+	path := github.IssuePath(entry.FullName, entry.Number) + "/comments"
+	return self.repo.WithTx(ctx, func(tx repository.TxInterface) error {
+		if err := self.github().LockIssueComments(ctx, tx, *entry.Issue); err != nil {
+			return err
+		}
+		posted, err := self.github().CommentPosted(ctx, tx, found.ID)
+		if err != nil || posted {
+			return err
+		}
+		var created github.Comment
+		postedAs, err := self.asAuthor(ctx, found.UserID, func(userToken string) error {
+			_, err := self.app.Do(ctx, userToken, http.MethodPost, path, M{"body": found.Body}, &created)
+			return err
+		})
+		if err != nil {
+			return err
+		}
+		if postedAs == nil {
+			if _, err := self.app.Do(ctx, token, http.MethodPost, path, M{"body": bodyForApp(found)}, &created); err != nil {
+				return err
+			}
+		}
+		return self.github().LinkPostedComment(ctx, tx, found.ID, entry.Issue, created.ID, postedAs)
+	})
+}
+
+func (self *GitHubService) pushCommentEdit(ctx context.Context, token string, entry github_repo.OutboxEntry) error {
+	if entry.Comment == nil || entry.GitHubComment == nil {
+		return nil
+	}
+	found, err := self.github().CommentWithAuthor(ctx, *entry.Comment)
+	if err != nil || found == nil {
 		return err
 	}
-	var created github.Comment
-	_, err = self.app.Do(ctx, token, http.MethodPost, github.IssuePath(entry.FullName, entry.Number)+"/comments", M{"body": body}, &created)
-	if err != nil {
+	body := found.Body
+	if entry.ActAs == nil {
+		body = bodyForApp(found)
+	}
+	patch := func(token string) error {
+		_, err := self.app.Do(ctx, token, http.MethodPatch, github.CommentPath(entry.FullName, *entry.GitHubComment), M{"body": body}, nil)
 		return err
 	}
-	return self.github().LinkPostedComment(ctx, *entry.Comment, entry.Issue, created.ID)
+	editedAs, err := self.asAuthor(ctx, entry.ActAs, patch)
+	if err != nil || editedAs != nil {
+		return err
+	}
+	return patch(token)
+}
+
+func (self *GitHubService) pushCommentDeletion(ctx context.Context, token string, entry github_repo.OutboxEntry) error {
+	if entry.GitHubComment == nil {
+		return nil
+	}
+	remove := func(token string) error {
+		_, err := self.app.Do(ctx, token, http.MethodDelete, github.CommentPath(entry.FullName, *entry.GitHubComment), nil, nil)
+		return err
+	}
+	deletedAs, err := self.asAuthor(ctx, entry.ActAs, remove)
+	if err == nil && deletedAs == nil {
+		err = remove(token)
+	}
+	if github.IsNotFound(err) {
+		return nil
+	}
+	return err
 }
 
 // gitHubState is how a status type reads on GitHub: open, or closed as completed or not planned.

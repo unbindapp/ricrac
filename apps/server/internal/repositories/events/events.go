@@ -130,8 +130,8 @@ func (self *EventsRepository) QueueCommentForGitHub(ctx context.Context, tx repo
 	sql := `INSERT INTO github_outbox (repo_sync_id, github_number, issue_id, comment_id, kind)
 		SELECT repo_sync_id, github_number, issue_id, $2, $3 FROM github_issue_links WHERE issue_id = $1`
 	if kind != "comment_created" {
-		sql = `INSERT INTO github_outbox (repo_sync_id, github_number, issue_id, comment_id, github_comment_id, kind)
-			SELECT l.repo_sync_id, l.github_number, l.issue_id, cl.comment_id, cl.github_id, $3
+		sql = `INSERT INTO github_outbox (repo_sync_id, github_number, issue_id, comment_id, github_comment_id, kind, act_as)
+			SELECT l.repo_sync_id, l.github_number, l.issue_id, cl.comment_id, cl.github_id, $3, cl.posted_as
 			FROM github_comment_links cl JOIN github_issue_links l ON l.issue_id = cl.issue_id
 			WHERE l.issue_id = $1 AND cl.posted AND cl.comment_id IN (SELECT id FROM comments WHERE id = $2 OR parent_id = $2)`
 	}

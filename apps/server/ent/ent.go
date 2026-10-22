@@ -31,6 +31,7 @@ import (
 	"ricrac/ent/githubissuelink"
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/githubreposync"
+	"ricrac/ent/githubusertoken"
 	"ricrac/ent/initiative"
 	"ricrac/ent/initiativeproject"
 	"ricrac/ent/invitation"
@@ -162,6 +163,7 @@ func checkColumn(t, c string) error {
 			githubissuelink.Table:      githubissuelink.ValidColumn,
 			githuboutbox.Table:         githuboutbox.ValidColumn,
 			githubreposync.Table:       githubreposync.ValidColumn,
+			githubusertoken.Table:      githubusertoken.ValidColumn,
 			initiative.Table:           initiative.ValidColumn,
 			initiativeproject.Table:    initiativeproject.ValidColumn,
 			invitation.Table:           invitation.ValidColumn,

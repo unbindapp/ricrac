@@ -424,13 +424,18 @@ func (self *GitHubService) importComment(ctx context.Context, sync *ent.GithubRe
 	if github.FromRicrac(comment.Body) || strings.TrimSpace(comment.Body) == "" {
 		return false, nil
 	}
-	known, err := self.github().CommentLinked(ctx, comment.ID)
-	if err != nil || known {
-		return false, err
-	}
 	member := self.memberByLogin(ctx, sync.WorkspaceID, &comment.User)
 	actor := self.access.System(sync.WorkspaceID, member, auth.Origin{Label: "Commented on GitHub", URL: comment.HTMLURL, FromGitHubIssue: true})
-	err = self.repo.WithTx(ctx, func(tx repository.TxInterface) error {
+	imported := false
+	err := self.repo.WithTx(ctx, func(tx repository.TxInterface) error {
+		if err := self.github().LockIssueComments(ctx, tx, link.ID); err != nil {
+			return err
+		}
+		known, err := self.github().CommentLinked(ctx, tx, comment.ID)
+		if err != nil || known {
+			return err
+		}
+		imported = true
 		id, _, err := self.comments.Create(ctx, tx, actor, comment_service.Target{Column: "issue_id", ID: link.ID}, nil, commentFromGitHub(member, comment), nil)
 		if err != nil {
 			return err
@@ -443,7 +448,7 @@ func (self *GitHubService) importComment(ctx context.Context, sync *ent.GithubRe
 	if isUniqueViolation(err) {
 		return false, nil
 	}
-	return err == nil, err
+	return imported && err == nil, err
 }
 
 func (h *hook) editComment(sync *ent.GithubRepoSync, link *ent.GithubIssueLink, comment *github.Comment) error {
@@ -464,8 +469,12 @@ func (h *hook) editComment(sync *ent.GithubRepoSync, link *ent.GithubIssueLink, 
 	if err != nil {
 		return err
 	}
+	body := commentFromGitHub(member, comment)
+	if body == row.Body {
+		return nil
+	}
 	return h.repo.WithTx(h.ctx, func(tx repository.TxInterface) error {
-		_, err := h.comments.Change(h.ctx, tx, actor, row, commentFromGitHub(member, comment))
+		_, err := h.comments.Change(h.ctx, tx, actor, row, body)
 		return err
 	})
 }
