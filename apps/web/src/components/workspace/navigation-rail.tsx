@@ -1,7 +1,6 @@
 import { Link, type LinkProps, useNavigate, useRouterState } from "@tanstack/react-router";
 import { type ComponentProps, type ReactNode } from "react";
 
-import type { Team } from "@/api/ops.gen";
 import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
 import {
   BoxIcon,
@@ -15,15 +14,12 @@ import {
   ListTodoIcon,
   MenuIcon,
   MessagesSquareIcon,
-  RefreshCwIcon,
   RocketIcon,
   SearchIcon,
   SettingsIcon,
   SquarePenIcon,
   TargetIcon,
   type TIcon,
-  TriangleIcon,
-  UsersIcon,
 } from "@/components/icons/symbols.gen";
 import { useInboxUnreadCount } from "@/components/inbox/inbox-unread-badge";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
@@ -36,9 +32,6 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -65,7 +58,7 @@ export function NavigationRail() {
   const unread = useInboxUnreadCount();
   const params = { workspace: workspace.urlKey };
 
-  const destinations: TDestination[] = [
+  const personal: TDestination[] = [
     {
       label: "Inbox",
       icon: InboxIcon,
@@ -73,6 +66,8 @@ export function NavigationRail() {
       badge: unread > 0 && <RailBadge count={unread} />,
     },
     { label: "My issues", icon: CircleDotIcon, link: { to: "/$workspace/my-issues", params } },
+  ];
+  const shared: TDestination[] = [
     { label: "Projects", icon: BoxIcon, link: { to: "/$workspace/projects", params } },
     { label: "Views", icon: LayersIcon, link: { to: "/$workspace/views", params } },
     { label: "Docs", icon: FileTextIcon, link: { to: "/$workspace/documents", params } },
@@ -110,10 +105,13 @@ export function NavigationRail() {
       </div>
       <ScrollArea className="min-h-0 w-full flex-1" classNameViewport="flex flex-col items-center">
         <div className="flex w-full flex-col items-center gap-1">
-          {destinations.map((destination) => (
+          {personal.map((destination) => (
             <RailLink key={destination.label} {...destination} />
           ))}
-          <TeamsMenu />
+          <TeamLinks />
+          {shared.map((destination) => (
+            <RailLink key={destination.label} {...destination} />
+          ))}
           <MoreMenu />
         </div>
       </ScrollArea>
@@ -135,21 +133,16 @@ export function NavigationRail() {
 const railItemClassName =
   "group/rail text-muted-foreground has-hover:hover:text-foreground focus-visible:text-foreground data-[status=active]:text-secondary-foreground data-popup-open:text-foreground flex w-full flex-col items-center gap-1 py-1 text-xs font-medium outline-hidden select-none";
 
-function RailIndicator({
-  icon: Icon,
-  isActive,
-  badge,
-}: {
-  icon: TIcon;
-  isActive?: boolean;
-  badge?: ReactNode;
-}) {
+function RailIndicator({ children }: { children: ReactNode }) {
   return (
     <span className="group-has-hover/rail:group-hover/rail:bg-accent group-focus-visible/rail:ring-primary group-data-[status=active]/rail:bg-secondary group-data-popup-open/rail:bg-accent relative flex h-8 w-14 items-center justify-center rounded-full transition-colors group-focus-visible/rail:ring-2">
-      <Icon filled={isActive} className="size-5" />
-      {badge}
+      {children}
     </span>
   );
+}
+
+function RailIcon({ icon: Icon, isActive }: { icon: TIcon; isActive?: boolean }) {
+  return <Icon filled={isActive} className="size-5" />;
 }
 
 function RailLink({ label, icon, link, badge }: TDestination) {
@@ -157,7 +150,10 @@ function RailLink({ label, icon, link, badge }: TDestination) {
     <Link {...link} activeOptions={{ includeSearch: false }} className={railItemClassName}>
       {({ isActive }) => (
         <>
-          <RailIndicator icon={icon} isActive={isActive} badge={badge} />
+          <RailIndicator>
+            <RailIcon icon={icon} isActive={isActive} />
+            {badge}
+          </RailIndicator>
           <span className="max-w-full truncate px-1">{label}</span>
         </>
       )}
@@ -179,7 +175,9 @@ function RailButton({
       {...props}
       className={`${railItemClassName} h-auto rounded-none px-0 active:rounded-none active:bg-transparent has-hover:hover:bg-transparent`}
     >
-      <RailIndicator icon={icon} isActive={isActive} />
+      <RailIndicator>
+        <RailIcon icon={icon} isActive={isActive} />
+      </RailIndicator>
       <span className="max-w-full truncate px-1">{label}</span>
     </Button>
   );
@@ -196,68 +194,28 @@ function RailBadge({ count }: { count: number }) {
   );
 }
 
-function TeamsMenu() {
+function TeamLinks() {
+  const { workspace } = useWorkspace();
   const { myTeams } = useTeams();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const isInTeam = /\/team\//.test(pathname);
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={<RailButton label="Teams" icon={UsersIcon} isActive={isInTeam} />}
-      />
-      <DropdownMenuContent side="right" className="w-56">
-        <DropdownMenuGroup>
-          {myTeams.length === 0 && (
-            <DropdownMenuItem disabled>You are not in any team yet</DropdownMenuItem>
-          )}
-          {myTeams.map((team) => (
-            <TeamSubmenu key={team.id} team={team} />
-          ))}
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
-function TeamSubmenu({ team }: { team: Team }) {
-  const { workspace } = useWorkspace();
-  const navigate = useNavigate();
-  const params = { workspace: workspace.urlKey, key: team.key };
-  const pages: TDestination[] = [
-    { label: "Issues", icon: CircleDotIcon, link: { to: "/$workspace/team/$key/issues", params } },
-    { label: "Backlog", icon: ListTodoIcon, link: { to: "/$workspace/team/$key/backlog", params } },
-    {
-      label: "Triage",
-      icon: TriangleIcon,
-      link: { to: "/$workspace/team/$key/triage", params },
-      isHidden: !team.triageEnabled,
-    },
-    {
-      label: "Cycles",
-      icon: RefreshCwIcon,
-      link: { to: "/$workspace/team/$key/cycles", params },
-      isHidden: !team.cyclesEnabled,
-    },
-    { label: "Projects", icon: BoxIcon, link: { to: "/$workspace/team/$key/projects", params } },
-  ];
-  return (
-    <DropdownMenuSub>
-      <DropdownMenuSubTrigger>
-        <TeamIcon teamKey={team.key} icon={team.icon} color={team.color} size="sm" />
-        <span className="min-w-0 flex-1 truncate">{team.name}</span>
-      </DropdownMenuSubTrigger>
-      <DropdownMenuSubContent className="w-48">
-        {pages
-          .filter((page) => !page.isHidden)
-          .map((page) => (
-            <DropdownMenuItem key={page.label} onClick={() => void navigate(page.link)}>
-              <page.icon className="size-4" />
-              {page.label}
-            </DropdownMenuItem>
-          ))}
-      </DropdownMenuSubContent>
-    </DropdownMenuSub>
-  );
+  return myTeams.map((team) => {
+    const isActive = pathname.startsWith(`/${workspace.urlKey}/team/${team.key}/`);
+    return (
+      <Link
+        key={team.id}
+        to="/$workspace/team/$key/issues"
+        params={{ workspace: workspace.urlKey, key: team.key }}
+        data-status={isActive ? "active" : undefined}
+        aria-current={isActive ? "page" : undefined}
+        className={railItemClassName}
+      >
+        <RailIndicator>
+          <TeamIcon teamKey={team.key} icon={team.icon} color={team.color} />
+        </RailIndicator>
+        <span className="max-w-full truncate px-1">{team.name}</span>
+      </Link>
+    );
+  });
 }
 
 function MoreMenu() {
