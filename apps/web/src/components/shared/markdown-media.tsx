@@ -80,26 +80,32 @@ export function MediaLightbox({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-dvh w-fit max-w-dvw">
-        <div className="flex items-center gap-2 pr-8">
-          <DialogTitle className="min-w-0 flex-1 truncate pr-0 text-sm">{name}</DialogTitle>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Open the original"
-            render={<a href={src} target="_blank" rel="noreferrer noopener" />}
-          >
-            <ExternalLinkIcon className="size-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Download"
-            render={<a href={src} download={name} />}
-          >
-            <DownloadIcon className="size-4" />
-          </Button>
-        </div>
+      <DialogContent
+        className="max-h-dvh w-fit max-w-dvw"
+        headerActions={
+          <>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Open the original"
+              className="text-muted-foreground"
+              render={<a href={src} target="_blank" rel="noreferrer noopener" />}
+            >
+              <ExternalLinkIcon className="size-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Download"
+              className="text-muted-foreground"
+              render={<a href={src} download={name} />}
+            >
+              <DownloadIcon className="size-4" />
+            </Button>
+          </>
+        }
+      >
+        <DialogTitle className="truncate pr-28 text-sm">{name}</DialogTitle>
         <img src={src} alt={name} className="rr-lightbox-image" />
       </DialogContent>
     </Dialog>

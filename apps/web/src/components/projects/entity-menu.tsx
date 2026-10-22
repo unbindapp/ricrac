@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 
 import {
   ArchiveIcon,
@@ -8,6 +8,7 @@ import {
   Trash2Icon,
   UndoIcon,
 } from "@/components/icons";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Button } from "@/components/ui/button";
 import {
@@ -98,41 +99,52 @@ export function EntityMenu({
   onShowHistory,
   children,
 }: TProps) {
+  const [isTrashing, setIsTrashing] = useState(false);
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <Button variant="ghost" size="icon" aria-label={`More ${noun} actions`}>
-            <EllipsisIcon className="size-4" />
-          </Button>
-        }
-      />
-      <DropdownMenuContent align="end" className="w-52">
-        {children}
-        {onShowHistory && (
-          <>
-            <DropdownMenuItem onClick={onShowHistory}>
-              <HistoryIcon className="size-4" />
-              Version history
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button variant="ghost" size="icon" aria-label={`More ${noun} actions`}>
+              <EllipsisIcon className="size-4" />
+            </Button>
+          }
+        />
+        <DropdownMenuContent align="end" className="w-52">
+          {children}
+          {onShowHistory && (
+            <>
+              <DropdownMenuItem onClick={onShowHistory}>
+                <HistoryIcon className="size-4" />
+                Version history
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
+          {onArchive && (
+            <DropdownMenuItem onClick={() => onArchive(!isArchived)}>
+              {isArchived ? (
+                <ArchiveRestoreIcon className="size-4" />
+              ) : (
+                <ArchiveIcon className="size-4" />
+              )}
+              {isArchived ? "Unarchive" : "Archive"}
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-          </>
-        )}
-        {onArchive && (
-          <DropdownMenuItem onClick={() => onArchive(!isArchived)}>
-            {isArchived ? (
-              <ArchiveRestoreIcon className="size-4" />
-            ) : (
-              <ArchiveIcon className="size-4" />
-            )}
-            {isArchived ? "Unarchive" : "Archive"}
+          )}
+          <DropdownMenuItem className="text-destructive" onClick={() => setIsTrashing(true)}>
+            <Trash2Icon className="size-4" />
+            Move {noun} to trash
           </DropdownMenuItem>
-        )}
-        <DropdownMenuItem className="text-destructive" onClick={onTrash}>
-          <Trash2Icon className="size-4" />
-          Move {noun} to trash
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <ConfirmDialog
+        open={isTrashing}
+        onOpenChange={setIsTrashing}
+        title={`Move ${noun} to trash`}
+        description="It stays in the trash for 30 days, then it is deleted for good."
+        confirmLabel="Move to trash"
+        onConfirm={async () => onTrash()}
+      />
+    </>
   );
 }

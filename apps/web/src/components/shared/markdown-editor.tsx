@@ -8,7 +8,7 @@ import { type AnyExtension, type Editor, EditorContent, useEditor } from "@tipta
 import { StarterKit } from "@tiptap/starter-kit";
 import { type DragEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
-import { CirclePlusIcon, UploadIcon, XIcon } from "@/components/icons";
+import { UploadIcon, XIcon } from "@/components/icons";
 import { Avatar } from "@/components/shared/avatar";
 import { BlockGaps } from "@/components/shared/editor/block-gaps";
 import { EditorCodeBlock } from "@/components/shared/editor/code-block";
@@ -61,6 +61,8 @@ type TProps = {
   onUpload?: TEditorUpload;
   /** Called when uploads start and when the last one ends; their embeds aren't in `value` until then. */
   onUploadingChange?: (isUploading: boolean) => void;
+  /** Takes pasted and dropped files instead of embedding them in the text. */
+  onAttach?: (files: File[]) => void;
   readOnly?: boolean;
   /**
    * Saves a moment after you stop writing. `value` is then the server's text: a new one replaces
@@ -88,6 +90,7 @@ export function MarkdownEditor({
   users,
   onUpload,
   onUploadingChange,
+  onAttach,
   readOnly = false,
   autosave,
   onSubmit,
@@ -102,6 +105,7 @@ export function MarkdownEditor({
   const uploadRef = useRef(onUpload);
   const canUploadRef = useRef(Boolean(onUpload));
   const uploadingChangeRef = useRef(onUploadingChange);
+  const attachRef = useRef(onAttach);
   const isUploadingRef = useRef(false);
   const submitRef = useRef(onSubmit);
   const changeRef = useRef(onChange);
@@ -130,11 +134,13 @@ export function MarkdownEditor({
     uploadRef.current = onUpload;
     canUploadRef.current = Boolean(onUpload);
     uploadingChangeRef.current = onUploadingChange;
+    attachRef.current = onAttach;
     submitRef.current = onSubmit;
     changeRef.current = onChange;
   });
 
   const uploadFiles = (files: File[], at?: number) => {
+    if (attachRef.current) return attachRef.current(files);
     const upload = uploadRef.current;
     const editor = editorRef.current;
     if (!upload || !editor || files.length === 0) return;
@@ -281,14 +287,14 @@ export function MarkdownEditor({
       },
       handlePaste: (_view, event) => {
         const files = Array.from(event.clipboardData?.files ?? []);
-        if (files.length === 0 || !uploadRef.current) return false;
+        if (files.length === 0 || !(uploadRef.current || attachRef.current)) return false;
         uploadFiles(files);
         return true;
       },
       handleDrop: (view, event, _slice, moved) => {
         if (moved) return false;
         const files = Array.from(event.dataTransfer?.files ?? []);
-        if (files.length === 0 || !uploadRef.current) return false;
+        if (files.length === 0 || !(uploadRef.current || attachRef.current)) return false;
         event.preventDefault();
         const at = view.posAtCoords({ left: event.clientX, top: event.clientY })?.pos;
         uploadFiles(files, at);
@@ -391,7 +397,7 @@ export function MarkdownEditor({
     editor.commands.setContent(incoming, { contentType: "markdown" });
   };
 
-  const canUpload = Boolean(onUpload) && !readOnly;
+  const canUpload = Boolean(onUpload || onAttach) && !readOnly;
   const isFileDrag = (event: DragEvent) => canUpload && event.dataTransfer.types.includes("Files");
   const dragHandlers = {
     onDragEnter: (event: DragEvent) => {
@@ -447,24 +453,7 @@ export function MarkdownEditor({
             />
           </div>
         )}
-        {chat && canUpload ? (
-          <div className="flex w-full items-start gap-2">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              forceMinSize={false}
-              aria-label="Attach images or videos"
-              className="text-muted-foreground size-7 shrink-0"
-              onClick={() => pickFiles("media")}
-            >
-              <CirclePlusIcon className="size-5" />
-            </Button>
-            {content}
-          </div>
-        ) : (
-          content
-        )}
+        {content}
       </div>
       {isDraggingFiles && (
         <div

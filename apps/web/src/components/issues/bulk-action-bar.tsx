@@ -11,6 +11,7 @@ import {
   StatePicker,
 } from "@/components/issues/pickers";
 import { PropertyPicker } from "@/components/issues/property-picker";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { useIssueLifecycle } from "@/components/issues/use-issue-actions";
 import { StateIcon, type TStateType, stateTypeLabels } from "@/components/shared/state-icon";
 import { Button } from "@/components/ui/button";
@@ -162,15 +163,18 @@ export function BulkActionBar({ issues, onClear }: TProps) {
           <ArchiveIcon className="size-4" />
           Archive
         </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          isPending={lifecycle.isPending}
-          onClick={() => void lifecycle.run(ids, "delete").then(onClear, () => undefined)}
-        >
-          <Trash2Icon className="size-4" />
-          Delete
-        </Button>
+        <ConfirmDialog
+          trigger={
+            <Button variant="outline" size="sm" isPending={lifecycle.isPending}>
+              <Trash2Icon className="size-4" />
+              Delete
+            </Button>
+          }
+          title={ids.length === 1 ? "Delete 1 issue" : `Delete ${ids.length} issues`}
+          description="They stay in the trash for 30 days, then they are deleted for good."
+          confirmLabel={ids.length === 1 ? "Delete issue" : "Delete issues"}
+          onConfirm={() => lifecycle.run(ids, "delete").then(onClear)}
+        />
       </div>
     </div>
   );

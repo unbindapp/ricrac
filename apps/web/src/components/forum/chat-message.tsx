@@ -1,8 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 
 import type { Comment, UserRef } from "@/api/ops.gen";
 import {
+  AttachmentTray,
+  MessageAttachments,
+  useDraftAttachments,
+} from "@/components/forum/chat-attachments";
+import {
+  CirclePlusIcon,
   CopyIcon,
   CornerDownRightIcon,
   EllipsisIcon,
@@ -39,8 +45,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/components/ui/toast";
 import { SimpleTooltip } from "@/components/ui/tooltip";
+import { useFilePicker } from "@/components/ui/file-trigger";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { useCopyToClipboard } from "@/lib/hooks/use-copy";
+import { joinAttachments, splitAttachments } from "@/lib/helpers/chat";
 import { formatDateTime, formatDay, formatMessageTime, formatTime } from "@/lib/helpers/dates";
 import {
   type TCommentTarget,
@@ -49,7 +57,6 @@ import {
   useSaveCommentMutation,
 } from "@/lib/queries/comments";
 import { meQuery } from "@/lib/queries/me";
-import { useEditorUploads } from "@/lib/queries/uploads";
 import { useUiTheme } from "@/themes/ui-theme-provider";
 
 type TMessageProps = {
@@ -81,6 +88,7 @@ export function ChatMessage({
   const isAuthor = Boolean(me && message.user?.id === me.id);
   const authorName = message.user ? userName(message.user) : "Deleted user";
   const reactions = groupReactions(message.reactions, me?.id);
+  const { text, attachments } = splitAttachments(message.body);
   const react = (emoji: string, reacted: boolean) =>
     toggleReaction({ commentId: message.id, emoji, reacted });
   const { copyToClipboard } = useCopyToClipboard();
@@ -159,13 +167,24 @@ export function ChatMessage({
               onSave={(body) => saveComment({ id: message.id, body })}
             />
           ) : (
-            <div className="rr-chat flex min-w-0 flex-col" onContextMenu={keepNativeMenu}>
-              <MarkdownView
-                markdown={message.body}
-                onChange={
-                  canEdit && isAuthor ? (body) => saveComment({ id: message.id, body }) : undefined
-                }
-              />
+            <div className="flex min-w-0 flex-col gap-1.5" onContextMenu={keepNativeMenu}>
+              {text && (
+                <div className="rr-chat flex min-w-0 flex-col">
+                  <MarkdownView
+                    markdown={text}
+                    onChange={
+                      canEdit && isAuthor
+                        ? (next) =>
+                            saveComment({
+                              id: message.id,
+                              body: joinAttachments(next, attachments),
+                            })
+                        : undefined
+                    }
+                  />
+                </div>
+              )}
+              <MessageAttachments attachments={attachments} />
               {message.editedAt && <span className="text-muted-foreground text-xs">(edited)</span>}
             </div>
           )}
@@ -299,44 +318,83 @@ function MessageEditor({
 }) {
   const { workspace } = useWorkspace();
   const { users } = useWorkspaceUsers();
-  const uploads = useEditorUploads(workspace.id);
-  const [draft, setDraft] = useState(message.body);
+  const [original] = useState(() => splitAttachments(message.body));
+  const attachments = useDraftAttachments(workspace.id, original.attachments);
+  const [draft, setDraft] = useState(original.text);
   const [isSaving, setIsSaving] = useState(false);
+  const body = joinAttachments(draft, attachments.uploaded);
+  const canSave = Boolean(body) && !attachments.isUploading;
   const save = async () => {
-    if (!draft.trim() || uploads.isUploading) return;
-    if (draft === message.body) return onDone();
+    if (!canSave) return;
+    if (body === message.body) return onDone();
     setIsSaving(true);
-    const saved = await onSave(draft).catch(() => null);
+    const saved = await onSave(body).catch(() => null);
     setIsSaving(false);
     if (saved) onDone();
   };
   return (
     <div className="flex flex-col gap-2">
-      <MarkdownEditor
-        label="Edit message"
-        value={draft}
-        onChange={setDraft}
-        onSubmit={() => void save()}
-        users={users}
-        {...uploads.editorProps}
-        autoFocus
-        framed
-        chat
-      />
+      <ComposerBox attachments={attachments}>
+        <MarkdownEditor
+          label="Edit message"
+          value={draft}
+          onChange={setDraft}
+          onSubmit={() => void save()}
+          users={users}
+          onAttach={attachments.add}
+          autoFocus
+          chat
+        />
+      </ComposerBox>
       <div className="text-muted-foreground flex items-center gap-2 text-xs">
         <span className="max-sm:hidden">Enter to save</span>
         <span className="flex-1" />
         <Button variant="ghost" size="sm" onClick={onDone}>
           Cancel
         </Button>
-        <Button
-          size="sm"
-          isPending={isSaving}
-          disabled={!draft.trim() || uploads.isUploading}
-          onClick={() => void save()}
-        >
+        <Button size="sm" isPending={isSaving} disabled={!canSave} onClick={() => void save()}>
           Save
         </Button>
+      </div>
+    </div>
+  );
+}
+
+/** A message being written: attachments above the text, the button adding them bottom left. */
+function ComposerBox({
+  attachments,
+  action,
+  children,
+}: {
+  attachments: ReturnType<typeof useDraftAttachments>;
+  action?: ReactNode;
+  children: ReactNode;
+}) {
+  const picker = useFilePicker({ multiple: true, onSelect: attachments.add });
+  return (
+    <div className="bg-input focus-within:ring-primary/8-10 flex flex-col rounded-lg border focus-within:ring-1">
+      {attachments.items.length > 0 && (
+        <div className="border-b p-2">
+          <AttachmentTray items={attachments.items} onRemove={attachments.remove} />
+        </div>
+      )}
+      <div className="flex items-end gap-2 p-1">
+        <SimpleTooltip content="Attach files">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Attach files"
+            className="text-muted-foreground shrink-0"
+            onClick={picker.open}
+          >
+            <CirclePlusIcon className="size-5" />
+          </Button>
+        </SimpleTooltip>
+        {picker.input}
+        <div className="rr-chat rr-chat-draft max-h-80 min-w-0 flex-1 self-center overflow-y-auto py-0.5">
+          {children}
+        </div>
+        {action}
       </div>
     </div>
   );
@@ -363,48 +421,52 @@ export function ChatComposer({
 }) {
   const { workspace } = useWorkspace();
   const { scrollToEnd } = useChatScroll();
-  const [body, setBody] = useState("");
+  const [text, setText] = useState("");
   const [sent, setSent] = useState(0);
   const { users } = useWorkspaceUsers();
-  const uploads = useEditorUploads(workspace.id);
+  const attachments = useDraftAttachments(workspace.id);
   const { mutateAsync: saveComment, isPending } = useSaveCommentMutation(workspace.id);
-  const canSend = Boolean(body.trim()) && !uploads.isUploading;
+  const body = joinAttachments(text, attachments.uploaded);
+  const canSend = Boolean(body) && !attachments.isUploading;
   const send = async () => {
     if (!canSend || isPending) return;
     const saved = await saveComment({ ...target, body, parentId }).catch(() => null);
     if (!saved) return;
-    setBody("");
+    setText("");
+    attachments.clear();
     setSent((count) => count + 1);
     scrollToEnd();
   };
   return (
     <div className="flex flex-col gap-1.5">
-      <div className="bg-input focus-within:ring-primary/8-10 flex items-end gap-2 rounded-lg border p-1 focus-within:ring-1">
-        <div className="rr-chat rr-chat-draft max-h-80 min-w-0 flex-1 overflow-y-auto py-0.5">
-          <MarkdownEditor
-            key={sent}
-            label={parentId ? "Reply" : "Message"}
-            value={body}
-            onChange={setBody}
-            onSubmit={() => void send()}
-            placeholder={placeholder}
-            users={users}
-            {...uploads.editorProps}
-            autoFocus={sent > 0}
-            chat
-          />
-        </div>
-        <Button
-          variant={canSend ? "default" : "ghost"}
-          size="icon"
-          aria-label="Send"
-          isPending={isPending}
-          disabled={!canSend}
-          onClick={() => void send()}
-        >
-          <SendHorizontalIcon className="size-4" />
-        </Button>
-      </div>
+      <ComposerBox
+        attachments={attachments}
+        action={
+          <Button
+            variant={canSend ? "default" : "ghost"}
+            size="icon"
+            aria-label="Send"
+            isPending={isPending}
+            disabled={!canSend}
+            onClick={() => void send()}
+          >
+            <SendHorizontalIcon className="size-4" />
+          </Button>
+        }
+      >
+        <MarkdownEditor
+          key={sent}
+          label={parentId ? "Reply" : "Message"}
+          value={text}
+          onChange={setText}
+          onSubmit={() => void send()}
+          placeholder={placeholder}
+          users={users}
+          onAttach={attachments.add}
+          autoFocus={sent > 0}
+          chat
+        />
+      </ComposerBox>
       <p className="text-muted-foreground px-1 text-xs max-sm:hidden">
         Enter to send, Shift+Enter for a new line, / for commands
       </p>
