@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { ChevronRightIcon, PlusIcon } from "lucide-react";
 
 import type { Project, ProjectStatusRef } from "@/api/ops.gen";
+import { ChevronRightIcon, PlusIcon } from "@/components/icons/symbols.gen";
 import { HealthIcon, healthLabels } from "@/components/projects/health-badge";
 import { PersonAvatar } from "@/components/projects/people";
 import { ProgressBar } from "@/components/projects/progress-bar";

@@ -1,7 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
-import { MessagesSquareIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import { z } from "zod";
@@ -16,6 +15,12 @@ import { DiscussionTagFilter } from "@/components/forum/discussion-tags";
 import { DiscussionTeamPicker } from "@/components/forum/discussion-team-picker";
 import { NewDiscussionDialog } from "@/components/forum/new-discussion-dialog";
 import { useCanRewrite } from "@/components/forum/use-can-rewrite";
+import {
+  MessagesSquareIcon,
+  PlusIcon,
+  SearchIcon,
+  Trash2Icon,
+} from "@/components/icons/symbols.gen";
 import { List } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { PageContainer } from "@/components/layout/page-container";
@@ -24,10 +29,10 @@ import { PageToolbar } from "@/components/layout/page-toolbar";
 import { TrashedRow } from "@/components/projects/entity-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsList, TabsTab } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/toast";
 import { useTeams } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { FilterMenu } from "@/components/shared/filter-menu";
 import { discussionsQuery, useDiscussionLifecycleMutation } from "@/lib/queries/discussions";
 
 const VIEWS = ["open", "closed", "all", "trash"] as const;
@@ -51,8 +56,6 @@ const viewLabels: Record<TForumView, string> = {
   all: "All",
   trash: "Trash",
 };
-
-const isView = (value: unknown): value is TForumView => VIEWS.includes(value as TForumView);
 
 function ForumPage() {
   const { workspace, canEdit } = useWorkspace();
@@ -98,27 +101,21 @@ function ForumPage() {
         toolbar={
           <PageToolbar
             actions={
-              <Tabs
+              <FilterMenu
+                label="Show"
                 value={status}
-                onValueChange={(value) =>
+                options={VIEWS.map((value) => ({
+                  value,
+                  label: viewLabels[value],
+                  icon: value === "trash" ? <Trash2Icon className="size-4" /> : undefined,
+                }))}
+                onChange={(value) =>
                   void navigate({
-                    search: (prev) => ({
-                      ...prev,
-                      status: isView(value) && value !== "open" ? value : undefined,
-                    }),
+                    search: (prev) => ({ ...prev, status: value !== "open" ? value : undefined }),
                     replace: true,
                   })
                 }
-              >
-                <TabsList>
-                  {VIEWS.map((value) => (
-                    <TabsTab key={value} value={value}>
-                      {value === "trash" && <Trash2Icon />}
-                      {viewLabels[value]}
-                    </TabsTab>
-                  ))}
-                </TabsList>
-              </Tabs>
+              />
             }
           >
             <div className="relative w-full max-w-xs">

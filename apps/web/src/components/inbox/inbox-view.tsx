@@ -1,5 +1,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useRef, useState } from "react";
+
 import {
   AlarmClockIcon,
   ArchiveIcon,
@@ -7,9 +9,7 @@ import {
   EllipsisIcon,
   InboxIcon,
   MailIcon,
-} from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
-
+} from "@/components/icons/symbols.gen";
 import { NotificationPane } from "@/components/inbox/notification-pane";
 import { NotificationRow } from "@/components/inbox/notification-row";
 import {
@@ -31,9 +31,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Tabs, TabsList, TabsTab } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/toast";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { FilterMenu } from "@/components/shared/filter-menu";
 import { formatDateTime } from "@/lib/helpers/dates";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 import {
@@ -268,18 +268,18 @@ export function InboxView({ filter, selectedKey, onFilterChange, onSelect }: TPr
           </>
         }
         toolbar={
-          <Tabs value={filter} onValueChange={(value) => onFilterChange(value as TInboxFilter)}>
-            <TabsList>
-              {INBOX_FILTERS.map((value) => (
-                <TabsTab key={value} value={value}>
-                  {filterLabels[value]}
-                  {value === "unread" && unread > 0 && (
-                    <Badge variant="muted">{unread > 99 ? "99+" : unread}</Badge>
-                  )}
-                </TabsTab>
-              ))}
-            </TabsList>
-          </Tabs>
+          <FilterMenu
+            label="Show"
+            value={filter}
+            options={INBOX_FILTERS.map((value) => ({
+              value,
+              label: filterLabels[value],
+              suffix: value === "unread" && unread > 0 && (
+                <Badge variant="muted">{unread > 99 ? "99+" : unread}</Badge>
+              ),
+            }))}
+            onChange={onFilterChange}
+          />
         }
       />
       <ListStates
@@ -324,8 +324,6 @@ export function InboxView({ filter, selectedKey, onFilterChange, onSelect }: TPr
 
   return (
     <SplitView
-      storageKey="inbox-pane-width"
-      defaultAsideWidth={640}
       main={main}
       aside={
         hasPane ? (

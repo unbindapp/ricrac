@@ -17,7 +17,6 @@ import {
   HeartIcon,
   LayersIcon,
   LightbulbIcon,
-  type LucideIcon,
   MegaphoneIcon,
   PaletteIcon,
   PuzzleIcon,
@@ -28,13 +27,14 @@ import {
   SparklesIcon,
   StarIcon,
   TargetIcon,
+  type TIcon,
   TrophyIcon,
   UsersIcon,
   WrenchIcon,
   ZapIcon,
-} from "lucide-react";
+} from "../icons/symbols.gen.ts";
 
-export const ENTITY_ICONS: Record<string, LucideIcon> = {
+export const ENTITY_ICONS: Record<string, TIcon> = {
   rocket: RocketIcon,
   box: BoxIcon,
   layers: LayersIcon,
@@ -72,13 +72,13 @@ export const ENTITY_ICONS: Record<string, LucideIcon> = {
 export const ENTITY_ICON_NAMES = Object.keys(ENTITY_ICONS);
 
 export type TResolvedIcon =
-  { kind: "lucide"; Icon: LucideIcon } | { kind: "emoji"; emoji: string } | { kind: "none" };
+  { kind: "symbol"; Icon: TIcon } | { kind: "emoji"; emoji: string } | { kind: "none" };
 
 const ICON_NAME = /^[A-Za-z][\w-]*$/;
 
 export function resolveEntityIcon(icon: string | null | undefined): TResolvedIcon {
   if (!icon) return { kind: "none" };
-  if (Object.hasOwn(ENTITY_ICONS, icon)) return { kind: "lucide", Icon: ENTITY_ICONS[icon] };
+  if (Object.hasOwn(ENTITY_ICONS, icon)) return { kind: "symbol", Icon: ENTITY_ICONS[icon] };
   if (ICON_NAME.test(icon)) return { kind: "none" };
   return { kind: "emoji", emoji: icon };
 }

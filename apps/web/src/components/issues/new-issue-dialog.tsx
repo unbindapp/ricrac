@@ -1,9 +1,9 @@
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { useNavigate } from "@tanstack/react-router";
-import { ChevronDownIcon, CornerLeftUpIcon, XIcon } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
+import { ChevronDownIcon, CornerLeftUpIcon, XIcon } from "@/components/icons/symbols.gen";
 import {
   applyPatch,
   draftToCreateArgs,

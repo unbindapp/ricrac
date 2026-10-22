@@ -1,6 +1,6 @@
 import { useQueries } from "@tanstack/react-query";
-import { CircleUserIcon } from "lucide-react";
 
+import { CircleUserIcon } from "@/components/icons/symbols.gen";
 import { type TFilterField, UNASSIGNED } from "@/components/issues/filters";
 import { cycleName, PRIORITY_ORDER, userName } from "@/components/issues/grouping";
 import {

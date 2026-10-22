@@ -15,6 +15,11 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useQuery } from "@tanstack/react-query";
+import { type ReactElement, useState } from "react";
+import { z } from "zod";
+
+import type { CustomerStatus } from "@/api/ops.gen";
+import { OptionDot } from "@/components/customers/customer-badges";
 import {
   CircleDotIcon,
   GripVerticalIcon,
@@ -22,12 +27,7 @@ import {
   PencilIcon,
   PlusIcon,
   Trash2Icon,
-} from "lucide-react";
-import { type ReactElement, useState } from "react";
-import { z } from "zod";
-
-import type { CustomerStatus } from "@/api/ops.gen";
-import { OptionDot } from "@/components/customers/customer-badges";
+} from "@/components/icons/symbols.gen";
 import { List } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { SettingsSection } from "@/components/layout/settings-section";

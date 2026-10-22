@@ -1,8 +1,7 @@
-import { ArchiveIcon, type LucideIcon, Trash2Icon } from "lucide-react";
-
+import { ArchiveIcon, type TIcon, Trash2Icon } from "@/components/icons/symbols.gen";
 import type { TProjectScope } from "@/components/projects/project-groups";
 import { EmptyState } from "@/components/layout/empty-state";
-import { Tabs, TabsList, TabsTab } from "@/components/ui/tabs";
+import { FilterMenu } from "@/components/shared/filter-menu";
 
 export function ScopeTabs({
   scope,
@@ -12,28 +11,20 @@ export function ScopeTabs({
   onChange: (scope: TProjectScope) => void;
 }) {
   return (
-    <Tabs
+    <FilterMenu
+      label="Show"
       value={scope}
-      onValueChange={(value) =>
-        onChange(value === "archived" || value === "trash" ? value : "active")
-      }
-    >
-      <TabsList>
-        <TabsTab value="active">Active</TabsTab>
-        <TabsTab value="archived">
-          <ArchiveIcon />
-          <span className="max-sm:sr-only">Archived</span>
-        </TabsTab>
-        <TabsTab value="trash">
-          <Trash2Icon />
-          <span className="max-sm:sr-only">Trash</span>
-        </TabsTab>
-      </TabsList>
-    </Tabs>
+      options={[
+        { value: "active", label: "Active" },
+        { value: "archived", label: "Archived", icon: <ArchiveIcon className="size-4" /> },
+        { value: "trash", label: "Trash", icon: <Trash2Icon className="size-4" /> },
+      ]}
+      onChange={onChange}
+    />
   );
 }
 
-const scopeEmpty: Record<Exclude<TProjectScope, "active">, { icon: LucideIcon; title: string }> = {
+const scopeEmpty: Record<Exclude<TProjectScope, "active">, { icon: TIcon; title: string }> = {
   archived: { icon: ArchiveIcon, title: "No archived {noun}s yet" },
   trash: { icon: Trash2Icon, title: "No trashed {noun}s yet" },
 };

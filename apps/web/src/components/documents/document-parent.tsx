@@ -1,8 +1,13 @@
 import { type LinkProps } from "@tanstack/react-router";
-import { CircleDotIcon, RefreshCwIcon, RocketIcon, TargetIcon } from "lucide-react";
 import { type ReactNode } from "react";
 
 import type { Document } from "@/api/ops.gen";
+import {
+  CircleDotIcon,
+  RefreshCwIcon,
+  RocketIcon,
+  TargetIcon,
+} from "@/components/icons/symbols.gen";
 import { ProjectIcon } from "@/components/shared/project-icon";
 import { TeamIcon } from "@/components/shared/team-icon";
 import { useTeams } from "@/components/workspace/teams-provider";

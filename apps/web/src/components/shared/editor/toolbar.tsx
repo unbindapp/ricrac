@@ -1,5 +1,8 @@
 import type { Editor } from "@tiptap/core";
 import { useEditorState } from "@tiptap/react";
+import { type FormEvent, type ReactNode, useState } from "react";
+
+import { ShortcutKeys } from "@/components/command-panel/shortcut-keys";
 import {
   ArrowDownToLineIcon,
   ArrowLeftToLineIcon,
@@ -11,15 +14,12 @@ import {
   HelpCircleIcon,
   ItalicIcon,
   LinkIcon,
-  type LucideIcon,
   StrikethroughIcon,
   TableColumnsSplitIcon,
   TableRowsSplitIcon,
+  type TIcon,
   Trash2Icon,
-} from "lucide-react";
-import { type FormEvent, type ReactNode, useState } from "react";
-
-import { ShortcutKeys } from "@/components/command-panel/shortcut-keys";
+} from "@/components/icons/symbols.gen";
 import {
   blockCommands,
   insertCommands,
@@ -44,7 +44,7 @@ import { SimpleTooltip } from "@/components/ui/tooltip";
 import { cn } from "@/components/ui/utils";
 import { mediaLayout } from "@/lib/helpers/media";
 
-type TMark = { id: string; label: string; icon: LucideIcon; keys: string[] };
+type TMark = { id: string; label: string; icon: TIcon; keys: string[] };
 
 const marks: TMark[] = [
   { id: "bold", label: "Bold", icon: BoldIcon, keys: ["Mod+B"] },
@@ -71,7 +71,7 @@ const blockKeys: Record<string, string[]> = {
 const toolbarBlocks = [...listCommands, ...blockCommands];
 const toolbarInserts = insertCommands.filter((command) => command.needsUpload);
 
-type TTableAction = { label: string; icon: LucideIcon; run: (editor: Editor) => void };
+type TTableAction = { label: string; icon: TIcon; run: (editor: Editor) => void };
 
 const tableActions: TTableAction[] = [
   {
@@ -267,7 +267,7 @@ function ToolButton({
   label: string;
   keys?: string[];
   hint?: string;
-  icon: LucideIcon;
+  icon: TIcon;
   isActive?: boolean;
   disabled?: boolean;
   onClick: () => void;

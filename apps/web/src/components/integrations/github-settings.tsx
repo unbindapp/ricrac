@@ -1,15 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
+
+import type { GitHubInstallation, GitHubIntegration } from "@/api/ops.gen";
+import { GithubIcon } from "@/components/icons/github";
 import {
   ExternalLinkIcon,
   GitMergeIcon,
   GitPullRequestIcon,
   RefreshCwIcon,
-  type LucideIcon,
+  type TIcon,
   UnplugIcon,
-} from "lucide-react";
-
-import type { GitHubInstallation, GitHubIntegration } from "@/api/ops.gen";
-import { GithubIcon } from "@/components/icons/github";
+} from "@/components/icons/symbols.gen";
 import { GithubRepoSyncs } from "@/components/integrations/github-repo-syncs";
 import { ErrorCard } from "@/components/layout/error-card";
 import { List, ListRow } from "@/components/layout/list";
@@ -85,7 +85,7 @@ function GithubNotConnected() {
   );
 }
 
-function Feature({ icon: Icon, title, text }: { icon: LucideIcon; title: string; text: string }) {
+function Feature({ icon: Icon, title, text }: { icon: TIcon; title: string; text: string }) {
   return (
     <li className="flex items-start gap-3">
       <span className="bg-muted text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-lg">

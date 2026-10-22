@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { ChevronRightIcon, MessageSquareTextIcon, XIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import type { TCommentDraft } from "@/components/documents/document-annotations";
@@ -9,6 +8,7 @@ import {
 } from "@/components/documents/document-comment-composer";
 import { DocumentThreadCard } from "@/components/documents/document-thread-card";
 import { groupThreads } from "@/components/documents/document-threads";
+import { ChevronRightIcon, MessageSquareTextIcon, XIcon } from "@/components/icons/symbols.gen";
 import { ListStates } from "@/components/layout/list-states";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/components/workspace/workspace-provider";

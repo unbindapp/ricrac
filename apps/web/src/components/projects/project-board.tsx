@@ -18,10 +18,10 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Link } from "@tanstack/react-router";
-import { PlusIcon } from "lucide-react";
 import { type CSSProperties, type HTMLAttributes, type ReactNode, type Ref, useState } from "react";
 
 import type { Project } from "@/api/ops.gen";
+import { PlusIcon } from "@/components/icons/symbols.gen";
 import { sortOrderAtIndex } from "@/components/issues/sort-order";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";

@@ -1,7 +1,6 @@
-import { KeySquareIcon, Trash2Icon } from "lucide-react";
-
 import type { APIKey } from "@/api/account.gen";
 import { describeAccess, scopeLevel, scopeLevelItems } from "@/components/api-key/helpers";
+import { KeySquareIcon, Trash2Icon } from "@/components/icons/symbols.gen";
 import { ListRow, ListRowText } from "@/components/layout/list";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { RelativeTime } from "@/components/shared/relative-time";

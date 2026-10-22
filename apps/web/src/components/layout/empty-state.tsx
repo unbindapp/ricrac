@@ -1,10 +1,10 @@
-import { LucideIcon } from "lucide-react";
 import { ReactNode } from "react";
 
+import { TIcon } from "@/components/icons/symbols.gen";
 import { ShapeBadge } from "@/components/ui/shape-badge";
 
 type TProps = {
-  icon: LucideIcon;
+  icon: TIcon;
   title: string;
   description?: string;
   action?: ReactNode;

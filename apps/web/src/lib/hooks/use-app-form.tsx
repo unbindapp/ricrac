@@ -8,10 +8,10 @@ import {
   type FormValidateOrFn,
   useStore,
 } from "@tanstack/react-form";
-import { UploadIcon } from "lucide-react";
 import type React from "react";
 import { type ComponentProps, type ReactNode, useId, useState } from "react";
 
+import { UploadIcon } from "@/components/icons/symbols.gen";
 import { ColorPicker } from "@/components/shared/color-picker";
 import { IconPicker } from "@/components/shared/icon-picker";
 import { Button } from "@/components/ui/button";

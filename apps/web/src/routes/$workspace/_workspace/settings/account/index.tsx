@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { type ReactNode } from "react";
 import { z } from "zod";
 
 import type { WorkspaceUserDetail } from "@/api/ops.gen";
+import { MonitorIcon, MoonIcon, SunIcon } from "@/components/icons/symbols.gen";
 import { GithubAccountSection } from "@/components/integrations/github-account-section";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";

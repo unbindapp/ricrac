@@ -1,8 +1,8 @@
-import { SearchIcon } from "lucide-react";
 import { ReactNode } from "react";
 
 import { CommandPanel } from "@/components/command-panel/command-panel";
 import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
+import { SearchIcon } from "@/components/icons/symbols.gen";
 import { NewIssueDialog } from "@/components/issues/new-issue-dialog";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
 import { SidebarButton } from "@/components/layout/sidebar-button";
@@ -11,18 +11,22 @@ import { CreateTeamDialog } from "@/components/settings/create-team-dialog";
 import { InviteMemberDialog } from "@/components/settings/invite-member-dialog";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
+import { NavigationRail } from "@/components/workspace/navigation-rail";
 import { Sidebar } from "@/components/workspace/sidebar";
 import { WorkspaceIcon } from "@/components/workspace/workspace-icon";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 import { useMobileNavStore } from "@/lib/stores/mobile-nav";
+import { useRememberSettingsReturn } from "@/lib/stores/settings-return";
 import { SIDEBAR_HOTKEY, useSidebarStore } from "@/lib/stores/sidebar";
 
 export function WorkspaceShell({ children }: { children: ReactNode }) {
   const { canEdit } = useWorkspace();
   const openNewIssue = useNewIssueStore((state) => state.open);
-  const isSidebarCollapsed = useSidebarStore((state) => state.isCollapsed);
+  const isSidebarExpanded = useSidebarStore((state) => state.isExpanded);
   const toggleSidebar = useSidebarStore((state) => state.toggle);
+
+  useRememberSettingsReturn();
 
   useHotkeyScope([
     { hotkey: "C", callback: () => openNewIssue(), enabled: canEdit },
@@ -30,18 +34,19 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
   ]);
 
   return (
-    <div
-      data-sidebar-collapsed={isSidebarCollapsed || undefined}
-      className="group/shell bg-sidebar flex h-svh w-full overflow-hidden"
-    >
-      {!isSidebarCollapsed && (
-        <aside className="hidden w-60 shrink-0 md:flex">
-          <Sidebar />
-        </aside>
-      )}
-      <div className="flex min-w-0 flex-1 flex-col md:py-2 md:pr-2 md:group-data-sidebar-collapsed/shell:pl-2">
+    <div className="group/shell bg-sidebar flex h-svh w-full overflow-hidden">
+      <aside className="hidden shrink-0 md:flex">
+        {isSidebarExpanded ? (
+          <div className="flex w-64">
+            <Sidebar />
+          </div>
+        ) : (
+          <NavigationRail />
+        )}
+      </aside>
+      <div className="flex min-w-0 flex-1 flex-col md:py-2 md:pr-2">
         <FallbackMobileBar />
-        <main className="bg-background flex min-h-0 flex-1 flex-col overflow-hidden md:rounded-lg">
+        <main className="bg-background flex min-h-0 flex-1 flex-col overflow-hidden has-data-[slot=split-view]:bg-transparent md:rounded-lg">
           {children}
         </main>
       </div>

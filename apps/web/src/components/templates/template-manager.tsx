@@ -1,18 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { useState } from "react";
+
 import {
   BoxIcon,
   CircleDotIcon,
   EllipsisIcon,
   FileTextIcon,
-  type LucideIcon,
   PencilIcon,
   PlusIcon,
   RepeatIcon,
+  type TIcon,
   Trash2Icon,
-} from "lucide-react";
-import { useState } from "react";
-
+} from "@/components/icons/symbols.gen";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { List } from "@/components/layout/list";
@@ -34,7 +34,7 @@ import { TemplateDialog, type TTemplateDialogTarget } from "@/components/templat
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { templatesQuery, type TTemplate, useDeleteTemplateMutation } from "@/lib/queries/templates";
 
-const KINDS: { kind: TTemplateKind; title: string; icon: LucideIcon; about: string }[] = [
+const KINDS: { kind: TTemplateKind; title: string; icon: TIcon; about: string }[] = [
   {
     kind: "issue",
     title: "Issue templates",
@@ -127,7 +127,7 @@ function TemplateRow({
   onEdit,
 }: {
   template: TTemplate;
-  icon: LucideIcon;
+  icon: TIcon;
   showTeam: boolean;
   canEdit: boolean;
   onEdit: () => void;

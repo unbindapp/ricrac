@@ -1,6 +1,6 @@
-import { ListFilterIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 
+import { ListFilterIcon, XIcon } from "@/components/icons/symbols.gen";
 import {
   FIELDS,
   IS_ONLY,

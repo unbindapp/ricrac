@@ -1,5 +1,4 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { ListTodoIcon, PlusIcon } from "lucide-react";
 import {
   type MouseEvent,
   type ReactNode,
@@ -11,6 +10,7 @@ import {
 } from "react";
 
 import type { Issue } from "@/api/ops.gen";
+import { ListTodoIcon, PlusIcon } from "@/components/icons/symbols.gen";
 import { BulkActionBar } from "@/components/issues/bulk-action-bar";
 import type { DisplaySettings } from "@/components/issues/display";
 import type { ListIssuesFilters } from "@/components/issues/filters";

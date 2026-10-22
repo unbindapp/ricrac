@@ -1,5 +1,4 @@
-import { BoxIcon } from "lucide-react";
-
+import { BoxIcon } from "@/components/icons/symbols.gen";
 import { EntityIcon } from "@/components/shared/entity-icon";
 
 type TProps = {

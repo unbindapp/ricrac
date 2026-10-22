@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { ChevronDownIcon } from "lucide-react";
 import { type ReactElement, useState } from "react";
 import { z } from "zod";
 
@@ -8,6 +7,7 @@ import {
   type TDocumentParent,
   useCreateDocument,
 } from "@/components/documents/use-create-document";
+import { ChevronDownIcon } from "@/components/icons/symbols.gen";
 import { InitiativeIcon } from "@/components/initiatives/initiative-status";
 import { ProjectIcon } from "@/components/shared/project-icon";
 import { TeamIcon } from "@/components/shared/team-icon";

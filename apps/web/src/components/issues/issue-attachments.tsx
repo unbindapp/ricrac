@@ -1,3 +1,7 @@
+import { type FormEvent, useState } from "react";
+
+import type { IssueAttachment, IssueDetail } from "@/api/ops.gen";
+import { GithubIcon } from "@/components/icons/github";
 import {
   BugIcon,
   ChevronDownIcon,
@@ -9,18 +13,14 @@ import {
   HashIcon,
   ImageIcon,
   LinkIcon,
-  type LucideIcon,
   NotebookTextIcon,
   PaperclipIcon,
   PenToolIcon,
+  type TIcon,
   UploadIcon,
   VideoIcon,
   XIcon,
-} from "lucide-react";
-import { type FormEvent, useState } from "react";
-
-import type { IssueAttachment, IssueDetail } from "@/api/ops.gen";
-import { GithubIcon } from "@/components/icons/github";
+} from "@/components/icons/symbols.gen";
 import {
   githubLinkOf,
   type TPullRequestState,
@@ -46,7 +46,7 @@ import { fileKind } from "@/lib/helpers/media";
 import { uploadFile } from "@/lib/queries/uploads";
 import { errorText } from "@/lib/server/errors";
 
-type TSource = { label: string; icon: LucideIcon | typeof GithubIcon; rank: number };
+type TSource = { label: string; icon: TIcon | typeof GithubIcon; rank: number };
 
 /** How each attachment source reads, in the order the sections show. */
 const SOURCES: Record<string, TSource> = {

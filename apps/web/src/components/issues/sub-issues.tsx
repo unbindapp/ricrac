@@ -1,6 +1,5 @@
-import { ListTreeIcon, PlusIcon } from "lucide-react";
-
 import type { IssueDetail } from "@/api/ops.gen";
+import { ListTreeIcon, PlusIcon } from "@/components/icons/symbols.gen";
 import { useIsPeekable, useIssuePeek } from "@/components/issues/issue-peek";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
 import {

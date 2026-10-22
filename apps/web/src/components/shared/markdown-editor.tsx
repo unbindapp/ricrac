@@ -6,9 +6,9 @@ import { TaskList } from "@tiptap/extension-task-list";
 import { Markdown } from "@tiptap/markdown";
 import { type AnyExtension, type Editor, EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
-import { CirclePlusIcon, UploadIcon, XIcon } from "lucide-react";
 import { type DragEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
+import { CirclePlusIcon, UploadIcon, XIcon } from "@/components/icons/symbols.gen";
 import { Avatar } from "@/components/shared/avatar";
 import { BlockGaps } from "@/components/shared/editor/block-gaps";
 import { EditorCodeBlock } from "@/components/shared/editor/code-block";

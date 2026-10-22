@@ -1,6 +1,6 @@
+import { LoaderIcon } from "@/components/icons/symbols.gen";
 import { cn } from "@/components/ui/utils";
 import { cva, type VariantProps } from "class-variance-authority";
-import { LoaderIcon } from "lucide-react";
 import type { FC, ReactNode } from "react";
 
 const chipVariants = cva(

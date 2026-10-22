@@ -1,5 +1,4 @@
-import { ArchiveIcon } from "lucide-react";
-
+import { ArchiveIcon } from "@/components/icons/symbols.gen";
 import { Button } from "@/components/ui/button";
 
 type TProps = {

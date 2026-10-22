@@ -1,5 +1,4 @@
-import { TriangleIcon } from "lucide-react";
-
+import { TriangleIcon } from "@/components/icons/symbols.gen";
 import { formatEstimate, type TEstimateType } from "@/lib/helpers/estimates";
 
 type TProps = {

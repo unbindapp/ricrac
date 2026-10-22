@@ -1,6 +1,6 @@
-import { LucideIcon } from "lucide-react";
 import { ReactNode } from "react";
 
+import { TIcon } from "@/components/icons/symbols.gen";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
@@ -11,7 +11,7 @@ type TProps = {
   isEmpty: boolean;
   onRetry?: () => void;
   empty: {
-    icon: LucideIcon;
+    icon: TIcon;
     title: string;
     description?: string;
     action?: ReactNode;

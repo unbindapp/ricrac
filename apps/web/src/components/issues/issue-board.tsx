@@ -17,10 +17,10 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { LayoutGridIcon, PlusIcon } from "lucide-react";
 import { type MouseEvent, type ReactNode, useState } from "react";
 
 import type { Issue } from "@/api/ops.gen";
+import { LayoutGridIcon, PlusIcon } from "@/components/icons/symbols.gen";
 import type { DisplaySettings } from "@/components/issues/display";
 import type { ListIssuesFilters } from "@/components/issues/filters";
 import { GroupIcon } from "@/components/issues/group-icon";

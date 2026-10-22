@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "@tanstack/react-router";
-import { FileTextIcon, FolderInputIcon, MessageSquareTextIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { DocumentDetail as TDocumentDetail } from "@/api/ops.gen";
@@ -13,6 +12,11 @@ import { linkedThreadId, threadAnnotations } from "@/components/documents/docume
 import { FavoriteButton } from "@/components/favorites/favorite-button";
 import { useDocumentParent } from "@/components/documents/document-parent";
 import { DocumentParentPicker } from "@/components/documents/document-parent-picker";
+import {
+  FileTextIcon,
+  FolderInputIcon,
+  MessageSquareTextIcon,
+} from "@/components/icons/symbols.gen";
 import { AutosaveMarkdown } from "@/components/shared/autosave-markdown";
 import { VersionHistoryDialog } from "@/components/documents/version-history";
 import { PageContainer } from "@/components/layout/page-container";
@@ -233,8 +237,6 @@ function DocumentDetailContent({ document }: { document: TDocumentDetail }) {
   return (
     <>
       <SplitView
-        storageKey="document-comments-width"
-        defaultAsideWidth={COMMENTS_WIDTH}
         main={<PageContainer width="narrow">{main}</PageContainer>}
         aside={comments.isAsideShown ? panel(() => comments.setIsAsideOpen(false)) : undefined}
       />
@@ -253,8 +255,6 @@ function DocumentDetailContent({ document }: { document: TDocumentDetail }) {
     </>
   );
 }
-
-const COMMENTS_WIDTH = 384;
 
 /** The comments panel's state: a column on wide screens, a drawer otherwise. */
 function useDocumentComments(documentId: string) {

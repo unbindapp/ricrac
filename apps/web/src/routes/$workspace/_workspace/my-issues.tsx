@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
-import { UserCircleIcon } from "lucide-react";
 import { z } from "zod";
 
+import { UserCircleIcon } from "@/components/icons/symbols.gen";
 import {
   filtersFromSearch,
   filtersToSearch,
@@ -13,7 +13,7 @@ import {
 } from "@/components/issues/filters";
 import { IssuesView } from "@/components/issues/issues-view";
 import { EmptyState } from "@/components/layout/empty-state";
-import { Tabs, TabsList, TabsTab } from "@/components/ui/tabs";
+import { FilterMenu } from "@/components/shared/filter-menu";
 import { meQuery } from "@/lib/queries/me";
 
 const TABS = ["assigned", "created", "subscribed"] as const;
@@ -92,20 +92,12 @@ function MyIssuesPage() {
         void navigate({ search: (prev) => ({ ...prev, ...filtersToSearch(filters) }) })
       }
       tabs={
-        <Tabs
+        <FilterMenu
+          label="Issues"
           value={tab}
-          onValueChange={(value) =>
-            void navigate({ search: (prev) => ({ ...prev, tab: value as TMyIssuesTab }) })
-          }
-        >
-          <TabsList>
-            {TABS.map((item) => (
-              <TabsTab key={item} value={item}>
-                {tabLabels[item]}
-              </TabsTab>
-            ))}
-          </TabsList>
-        </Tabs>
+          options={TABS.map((item) => ({ value: item, label: tabLabels[item] }))}
+          onChange={(value) => void navigate({ search: (prev) => ({ ...prev, tab: value }) })}
+        />
       }
     />
   );

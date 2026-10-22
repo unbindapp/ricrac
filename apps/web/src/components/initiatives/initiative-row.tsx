@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { BoxIcon } from "lucide-react";
 
 import type { Initiative } from "@/api/ops.gen";
+import { BoxIcon } from "@/components/icons/symbols.gen";
 import { InitiativeIcon } from "@/components/initiatives/initiative-status";
 import { HealthIcon, healthLabels } from "@/components/projects/health-badge";
 import { PersonAvatar } from "@/components/projects/people";

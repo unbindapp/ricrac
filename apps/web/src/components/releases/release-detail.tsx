@@ -1,5 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { type ReactNode, useState } from "react";
+
+import type { ReleaseDetail as TReleaseDetail, ReleasePipeline } from "@/api/ops.gen";
 import {
   ArchiveIcon,
   EllipsisIcon,
@@ -7,10 +10,7 @@ import {
   PencilIcon,
   PlusIcon,
   RocketIcon,
-} from "lucide-react";
-import { type ReactNode, useState } from "react";
-
-import type { ReleaseDetail as TReleaseDetail, ReleasePipeline } from "@/api/ops.gen";
+} from "@/components/icons/symbols.gen";
 import { PageBar } from "@/components/layout/page-header";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { ErrorCard } from "@/components/layout/error-card";

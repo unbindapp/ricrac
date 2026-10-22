@@ -1,4 +1,3 @@
-import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 
@@ -16,6 +15,7 @@ import {
   type TAccess,
   type TScopeLevel,
 } from "@/components/api-key/helpers";
+import { PlusIcon } from "@/components/icons/symbols.gen";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

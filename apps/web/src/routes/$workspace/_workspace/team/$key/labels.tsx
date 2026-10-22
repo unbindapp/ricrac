@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { TagIcon } from "lucide-react";
 
+import { TagIcon } from "@/components/icons/symbols.gen";
 import { LabelManager } from "@/components/labels/label-manager";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";

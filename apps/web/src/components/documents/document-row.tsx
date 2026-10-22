@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { FileTextIcon } from "lucide-react";
 
 import type { Document } from "@/api/ops.gen";
 import { useDocumentParent } from "@/components/documents/document-parent";
+import { FileTextIcon } from "@/components/icons/symbols.gen";
 import { PersonAvatar } from "@/components/projects/people";
 import { EntityIcon } from "@/components/shared/entity-icon";
 import { RelativeTime } from "@/components/shared/relative-time";

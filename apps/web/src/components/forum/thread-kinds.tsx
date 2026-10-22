@@ -2,12 +2,11 @@ import {
   BugIcon,
   CircleHelpIcon,
   LightbulbIcon,
-  type LucideIcon,
   MessageCircleIcon,
   PaletteIcon,
   SquareCheckBigIcon,
-} from "lucide-react";
-
+  type TIcon,
+} from "@/components/icons/symbols.gen";
 import { Badge } from "@/components/ui/badge";
 import type { TThreadKind } from "@/lib/queries/discussions";
 
@@ -20,7 +19,7 @@ export const THREAD_KINDS = [
   "task",
 ] as const satisfies readonly TThreadKind[];
 
-export const threadKinds: Record<TThreadKind, { label: string; icon: LucideIcon }> = {
+export const threadKinds: Record<TThreadKind, { label: string; icon: TIcon }> = {
   general: { label: "General", icon: MessageCircleIcon },
   bug: { label: "Bug", icon: BugIcon },
   design: { label: "Design", icon: PaletteIcon },

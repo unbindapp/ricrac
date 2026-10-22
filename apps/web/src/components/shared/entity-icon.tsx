@@ -1,12 +1,11 @@
-import type { LucideIcon } from "lucide-react";
-
+import type { TIcon } from "@/components/icons/symbols.gen";
 import { resolveEntityIcon } from "@/components/shared/entity-icons";
 import { cn } from "@/components/ui/utils";
 
 type TProps = {
   icon?: string | null;
   color?: string | null;
-  fallback: LucideIcon;
+  fallback: TIcon;
   size?: "sm" | "md" | "lg";
   label?: string;
 };
@@ -20,7 +19,7 @@ const sizeClass = {
 export function EntityIcon({ icon, color, fallback, size = "md", label }: TProps) {
   const resolved = resolveEntityIcon(icon);
   const Icon =
-    resolved.kind === "lucide" ? resolved.Icon : resolved.kind === "none" ? fallback : null;
+    resolved.kind === "symbol" ? resolved.Icon : resolved.kind === "none" ? fallback : null;
   const style = color ? { color } : undefined;
   if (Icon) {
     return (

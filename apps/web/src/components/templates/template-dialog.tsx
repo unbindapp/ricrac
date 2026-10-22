@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { PlusIcon, UserIcon, XIcon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
 import type { TemplateDetail } from "@/api/ops.gen";
+import { PlusIcon, UserIcon, XIcon } from "@/components/icons/symbols.gen";
 import { ErrorCard } from "@/components/layout/error-card";
 import { Avatar } from "@/components/shared/avatar";
 import { PriorityIcon, priorityLabel, PRIORITIES } from "@/components/shared/priority-icon";

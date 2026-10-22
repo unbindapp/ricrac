@@ -1,6 +1,5 @@
-import { CheckIcon, XIcon } from "lucide-react";
-
 import type { Issue, StateRef, TeamDetail } from "@/api/ops.gen";
+import { CheckIcon, XIcon } from "@/components/icons/symbols.gen";
 import { useTeamDetail } from "@/components/issues/picker-sources";
 import { useIssuePatch } from "@/components/issues/use-issue-actions";
 import { Button } from "@/components/ui/button";

@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { LayersIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 
+import { LayersIcon, PlusIcon } from "@/components/icons/symbols.gen";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";

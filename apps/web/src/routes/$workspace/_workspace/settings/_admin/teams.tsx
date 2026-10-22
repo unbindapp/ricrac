@@ -1,7 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { LockIcon, PlusIcon, SettingsIcon, Trash2Icon, UsersRoundIcon } from "lucide-react";
 
 import type { Team } from "@/api/ops.gen";
+import {
+  LockIcon,
+  PlusIcon,
+  SettingsIcon,
+  Trash2Icon,
+  UsersRoundIcon,
+} from "@/components/icons/symbols.gen";
 import { List, ListRow, ListRowText } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { SettingsPage } from "@/components/layout/settings-page";

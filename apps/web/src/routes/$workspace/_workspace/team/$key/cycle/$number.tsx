@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { RefreshCwIcon } from "lucide-react";
 import { useState } from "react";
 
 import type { CycleDetail } from "@/api/ops.gen";
@@ -15,6 +14,7 @@ import {
   daysLeft,
 } from "@/components/cycles/cycle-status";
 import { FavoriteButton } from "@/components/favorites/favorite-button";
+import { RefreshCwIcon } from "@/components/icons/symbols.gen";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PageContainer } from "@/components/layout/page-container";

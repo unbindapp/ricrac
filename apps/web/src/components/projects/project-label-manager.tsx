@@ -1,4 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
+import { type ReactElement, useState } from "react";
+import { z } from "zod";
+
+import type { ProjectLabel } from "@/api/ops.gen";
 import {
   ArchiveIcon,
   ArchiveRestoreIcon,
@@ -8,11 +12,7 @@ import {
   PlusIcon,
   TagIcon,
   Trash2Icon,
-} from "lucide-react";
-import { type ReactElement, useState } from "react";
-import { z } from "zod";
-
-import type { ProjectLabel } from "@/api/ops.gen";
+} from "@/components/icons/symbols.gen";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { List } from "@/components/layout/list";

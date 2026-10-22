@@ -1,14 +1,14 @@
 import type { Editor } from "@tiptap/core";
 import type { EditorState } from "@tiptap/pm/state";
 import { BubbleMenu, type BubbleMenuProps } from "@tiptap/react/menus";
-import { type LucideIcon } from "lucide-react";
 import { useEffect, useRef } from "react";
 
+import type { TIcon } from "@/components/icons/symbols.gen";
 import { Button } from "@/components/ui/button";
 
 export type TAnnotationAction = {
   label: string;
-  icon: LucideIcon;
+  icon: TIcon;
   /** Gets the selected text. */
   onSelect: (quote: string) => void;
 };

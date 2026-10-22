@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
-import { TriangleIcon } from "lucide-react";
 import { z } from "zod";
 
+import { TriangleIcon } from "@/components/icons/symbols.gen";
 import { filtersFromSearch, filtersToSearch, issueSearchSchema } from "@/components/issues/filters";
 import { IssuesView } from "@/components/issues/issues-view";
 import { TriageActions } from "@/components/issues/triage-actions";
@@ -10,10 +10,10 @@ import { EmptyState } from "@/components/layout/empty-state";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
 import { LinkButton } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTab } from "@/components/ui/tabs";
 import { teamCrumb } from "@/components/workspace/team-crumb";
 import { useRequiredTeamFromRoute } from "@/components/workspace/use-team-from-route";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { FilterMenu } from "@/components/shared/filter-menu";
 
 const searchSchema = issueSearchSchema.extend({
   tab: z.enum(["snoozed"]).optional().catch(undefined),
@@ -75,19 +75,19 @@ function TeamKeyTriagePage() {
       }
       rowActions={(issue) => <TriageActions issue={issue} />}
       tabs={
-        <Tabs
+        <FilterMenu
+          label="Show"
           value={tab ?? "inbox"}
-          onValueChange={(value) =>
+          options={[
+            { value: "inbox", label: "To triage" },
+            { value: "snoozed", label: "Snoozed" },
+          ]}
+          onChange={(value) =>
             void navigate({
               search: (prev) => ({ ...prev, tab: value === "snoozed" ? "snoozed" : undefined }),
             })
           }
-        >
-          <TabsList>
-            <TabsTab value="inbox">To triage</TabsTab>
-            <TabsTab value="snoozed">Snoozed</TabsTab>
-          </TabsList>
-        </Tabs>
+        />
       }
       emptyState={
         <EmptyState

@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
-import { MessagesSquareIcon } from "lucide-react";
 import { z } from "zod";
 
 import { DiscussionDetail } from "@/components/forum/discussion-detail";
 import { MainChatPanel } from "@/components/forum/main-chat";
 import { MessageThreadPanel } from "@/components/forum/message-thread-panel";
 import { ThreadPanel } from "@/components/forum/thread-panel";
+import { MessagesSquareIcon } from "@/components/icons/symbols.gen";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
@@ -95,8 +95,6 @@ function DiscussionSlugPage() {
   }
   return (
     <SplitView
-      storageKey="discussion-panel-width"
-      defaultAsideWidth={460}
       main={
         <DiscussionDetail
           key={data.id}

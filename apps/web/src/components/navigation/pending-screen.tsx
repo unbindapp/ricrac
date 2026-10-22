@@ -1,4 +1,4 @@
-import { LoaderIcon } from "lucide-react";
+import { LoaderIcon } from "@/components/icons/symbols.gen";
 
 export default function PendingScreen() {
   return (

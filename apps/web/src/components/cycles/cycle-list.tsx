@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { RefreshCwIcon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
 import type { Cycle, Team } from "@/api/ops.gen";
@@ -14,6 +13,7 @@ import {
   pointsText,
   type TCycleStatus,
 } from "@/components/cycles/cycle-status";
+import { RefreshCwIcon } from "@/components/icons/symbols.gen";
 import { List } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { SectionTitle } from "@/components/layout/section-title";

@@ -1,5 +1,4 @@
 import { type LinkProps } from "@tanstack/react-router";
-import { BoxIcon, FileTextIcon, LayersIcon, TargetIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 import type {
@@ -13,6 +12,7 @@ import type {
   TeamRef,
 } from "@/api/ops.gen";
 import { cycleStatus } from "@/components/cycles/cycle-status";
+import { BoxIcon, FileTextIcon, LayersIcon, TargetIcon } from "@/components/icons/symbols.gen";
 import { CycleIcon } from "@/components/shared/cycle-icon";
 import { StateIcon } from "@/components/shared/state-icon";
 import { TeamIcon } from "@/components/shared/team-icon";

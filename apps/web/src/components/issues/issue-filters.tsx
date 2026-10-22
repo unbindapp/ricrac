@@ -1,19 +1,19 @@
+import { useState } from "react";
+
 import {
+  BellIcon,
+  BoxIcon,
   CalendarIcon,
   CircleDashedIcon,
   CircleUserIcon,
-  type LucideIcon,
-  BellIcon,
-  BoxIcon,
   ListFilterIcon,
   RefreshCwIcon,
   SignalHighIcon,
   TagIcon,
+  type TIcon,
   UserPenIcon,
   XIcon,
-} from "lucide-react";
-import { useState } from "react";
-
+} from "@/components/icons/symbols.gen";
 import {
   activeFilterFields,
   clearFilterField,
@@ -30,7 +30,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-const fieldIcons: Record<TFilterField, LucideIcon> = {
+const fieldIcons: Record<TFilterField, TIcon> = {
   status: CircleDashedIcon,
   assignee: CircleUserIcon,
   creator: UserPenIcon,

@@ -1,17 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { CircleDotIcon, ListTodoIcon, PlusIcon, TriangleIcon } from "lucide-react";
 
 import type { Team } from "@/api/ops.gen";
+import {
+  CircleDotIcon,
+  ListTodoIcon,
+  PlusIcon,
+  TriangleIcon,
+} from "@/components/icons/symbols.gen";
 import type { ListIssuesFilters } from "@/components/issues/filters";
 import { IssuesView } from "@/components/issues/issues-view";
 import { EmptyState } from "@/components/layout/empty-state";
 import type { TStateType } from "@/components/shared/state-icon";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
 import { Button, LinkButton } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTab } from "@/components/ui/tabs";
 import { teamCrumb } from "@/components/workspace/team-crumb";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { FilterMenu } from "@/components/shared/filter-menu";
 import { teamStatusesQuery } from "@/lib/queries/teams";
 
 export type TTeamIssuesTab = "active" | "backlog" | "all";
@@ -74,18 +79,18 @@ export function TeamIssues({
   };
 
   const tabs = (
-    <Tabs value={tab} onValueChange={(value) => goTo(value as TTeamIssuesTab)}>
-      <TabsList>
-        {(["active", "backlog", "all"] as const).map((item) => (
-          <TabsTab key={item} value={item}>
-            {TITLES[item]}
-            {item !== "all" && counts[item] !== undefined && (
-              <span className="text-muted-foreground text-xs font-normal">{counts[item]}</span>
-            )}
-          </TabsTab>
-        ))}
-      </TabsList>
-    </Tabs>
+    <FilterMenu
+      label="Issues"
+      value={tab}
+      options={(["active", "backlog", "all"] as const).map((item) => ({
+        value: item,
+        label: TITLES[item],
+        suffix: item !== "all" && counts[item] !== undefined && (
+          <span className="text-xs font-normal opacity-75">{counts[item]}</span>
+        ),
+      }))}
+      onChange={goTo}
+    />
   );
 
   const backlogCount = counts.backlog ?? 0;
