@@ -10,7 +10,7 @@ operations and permissions.
 
 - **Workspaces** with members and roles (owner, admin, member, guest), email invitations and an
   audit log.
-- **Email**: invitations, and digests of notifications still unread after a couple of minutes
+- **Email**: invitations, and digests of unread notifications with the comments they are about, at most one an hour
   (each person can turn them off).
 - **One team per workspace**, holding its issue prefix (ENG in ENG-123) and settings: estimates
   (exponential, Fibonacci, linear, t-shirt), cycles, triage with responsibility rotations,

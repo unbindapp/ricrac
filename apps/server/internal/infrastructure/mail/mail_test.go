@@ -6,6 +6,8 @@ import (
 )
 
 func digestContent() Content {
+	commented := ActorLine("7d4e2f60-1c2b-4a8e-b0a1-9e5c3d2f4a77", "Ada Lovelace", "commented")
+	commented.Excerpt = "Fixed in main.\nShipping today."
 	return Content{
 		Subject:   "3 unread notifications",
 		Preheader: "Ann Smith assigned the issue to you",
@@ -18,6 +20,7 @@ func digestContent() Content {
 				Lines: []Line{
 					ActorLine("0b9f6c1e-5d1a-4c55-9a43-3f7f1a2b8c11", "Ann Smith", "assigned the issue to you"),
 					ActorLine("7d4e2f60-1c2b-4a8e-b0a1-9e5c3d2f4a77", "Ada Lovelace", "moved the issue to Done"),
+					commented,
 				},
 			},
 			{
@@ -67,6 +70,9 @@ func TestRenderDigest(t *testing.T) {
 ENG-12 Fix login
     Ann Smith assigned the issue to you
     Ada Lovelace moved the issue to Done
+    Ada Lovelace commented
+    > Fixed in main.
+    > Shipping today.
     https://ricrac.example.com/acme/issue/ENG-12
 
 ENG-7 Billing page
@@ -91,6 +97,7 @@ Notification settings: https://ricrac.example.com/settings/notifications
 		`>AL</td>`,
 		`Ada Lovelace</span> moved the issue to Done`,
 		`>Due today</td>`,
+		"white-space:pre-line;\">Fixed in main.\nShipping today.</div>",
 		`>Open your inbox</a>`,
 		`>Notification settings</a>`,
 		`src="cid:logo.png"`,
@@ -129,11 +136,12 @@ func TestRenderEscapesUserInput(t *testing.T) {
 	content.Items[0].Title = "<script>alert(1)</script>"
 	content.Items[0].URL = "javascript:alert(1)"
 	content.Items[0].Lines[0].ActorName = `<a href="https://evil.example">Mallory</a>`
+	content.Items[0].Lines[2].Excerpt = `<img src=x onerror=alert(1)>`
 	msg, err := Render("grace@example.com", content)
 	if err != nil {
 		t.Fatal(err)
 	}
-	mustNotContain(t, msg.HTML, "<b>Acme", "<script>", "javascript:alert", `<a href="https://evil.example">`)
+	mustNotContain(t, msg.HTML, "<b>Acme", "<script>", "javascript:alert", `<a href="https://evil.example">`, "<img src=x")
 	mustContain(t, msg.HTML, "Join &lt;b&gt;Acme&lt;/b&gt;", `href="#ZgotmplZ"`)
 }
 

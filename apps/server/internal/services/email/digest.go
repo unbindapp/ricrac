@@ -2,7 +2,9 @@ package email_service
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -28,15 +30,17 @@ type notice struct {
 	Identifier  *string
 	Title       *string
 	URL         *string
+	Excerpt     string
+	CreatedAt   time.Time
 }
 
-// noticeOf needs the notification's user, workspace, actor, issue with its team, project,
-// initiative and document loaded.
+// noticeOf needs the notification's user, workspace, actor, comment, status update, issue with its
+// team, project, initiative, document, discussion and discussion thread with its discussion loaded.
 func noticeOf(n *ent.Notification, publicURL string) notice {
 	w := n.Edges.Workspace
 	found := notice{
 		ID: n.ID, UserID: n.UserID, Email: n.Edges.User.Email, Kind: n.Type, Summary: n.Summary, ActorID: n.ActorID,
-		WorkspaceID: w.ID, Workspace: w.Name, URLKey: w.URLKey,
+		WorkspaceID: w.ID, Workspace: w.Name, URLKey: w.URLKey, CreatedAt: n.CreatedAt,
 	}
 	if a := n.Edges.Actor; a != nil {
 		found.ActorName = &a.Name
@@ -57,8 +61,50 @@ func noticeOf(n *ent.Notification, publicURL string) notice {
 		found.Subject, found.Title, found.URL = &e.Initiative.ID, &e.Initiative.Name, slugged("initiative", e.Initiative.Name, e.Initiative.SlugID)
 	case e.Document != nil:
 		found.Subject, found.Title, found.URL = &e.Document.ID, &e.Document.Title, slugged("document", e.Document.Title, e.Document.SlugID)
+	case e.DiscussionThread != nil:
+		discussion := e.DiscussionThread.Edges.Discussion
+		link := models.DiscussionThreadURL(models.DiscussionURL(publicURL, w.URLKey, discussion.Title, discussion.SlugID), models.ID(e.DiscussionThread.ID))
+		found.Subject, found.Title, found.URL = &e.DiscussionThread.ID, &e.DiscussionThread.Title, &link
+	case e.Discussion != nil:
+		link := models.DiscussionURL(publicURL, w.URLKey, e.Discussion.Title, e.Discussion.SlugID)
+		found.Subject, found.Title, found.URL = &e.Discussion.ID, &e.Discussion.Title, &link
+	}
+	switch e := n.Edges; {
+	case e.Comment != nil:
+		found.Excerpt = excerpt(e.Comment.Body)
+	case e.StatusUpdate != nil:
+		found.Excerpt = excerpt(e.StatusUpdate.Body)
+	case e.DiscussionThread != nil && n.Type == "discussionNewThread":
+		found.Excerpt = excerpt(e.DiscussionThread.Body)
 	}
 	return found
+}
+
+var (
+	markdownImage  = regexp.MustCompile(`!\[([^\]]*)\]\([^)]*\)`)
+	markdownLink   = regexp.MustCompile(`\[([^\]]*)\]\([^)]*\)`)
+	markdownMarks  = regexp.MustCompile("(?m)^ {0,3}(#{1,6} +|> ?|```.*$)|\\*\\*|__|~~|`")
+	repeatedBlanks = regexp.MustCompile(`\n{3,}`)
+)
+
+// excerpt is the start of Markdown as plain text.
+func excerpt(markdown string) string {
+	text := strings.ReplaceAll(markdown, "\r\n", "\n")
+	text = markdownImage.ReplaceAllStringFunc(text, func(image string) string {
+		alt := markdownImage.FindStringSubmatch(image)[1]
+		if alt == "" {
+			alt = "image"
+		}
+		return "[" + alt + "]"
+	})
+	text = markdownLink.ReplaceAllString(text, "$1")
+	text = markdownMarks.ReplaceAllString(text, "")
+	text = repeatedBlanks.ReplaceAllString(strings.TrimSpace(text), "\n\n")
+	runes := []rune(text)
+	if len(runes) <= excerptLength {
+		return text
+	}
+	return strings.TrimSpace(string(runes[:excerptLength])) + "…"
 }
 
 func nonEmpty(parts ...string) []string {
@@ -102,16 +148,15 @@ func digest(batch []notice, publicURL string) (mail.Content, string) {
 		heading += " in " + batch[0].Workspace
 		inbox = publicURL + "/" + batch[0].URLKey + "/inbox"
 	}
-	subject := fmt.Sprintf("%d unread notifications", count)
-	if count == 1 {
-		subject = strings.TrimSpace(items[0].Identifier+" "+items[0].Title) + ": " + lineSentence(items[0].Lines[0])
+	subject := strings.TrimSpace(items[0].Identifier+" "+items[0].Title) + ": " + lineSentence(items[0].Lines[0])
+	if count > 1 {
+		subject += fmt.Sprintf(" (+%d more)", count-1)
 	}
 	content := mail.Content{
 		Subject:   subject,
-		Preheader: lineSentence(items[0].Lines[0]),
+		Preheader: preheader(items[0].Lines[0]),
 		Heading:   heading + ".",
 		Items:     items,
-		Button:    mail.Button{Label: "Open your inbox", URL: inbox},
 		Footer: mail.Footer{
 			InstanceURL: publicURL,
 			ManageURL:   publicURL + "/settings/profile",
@@ -119,7 +164,7 @@ func digest(batch []notice, publicURL string) (mail.Content, string) {
 		},
 	}
 	if count > digestMaxItems {
-		content.Note = fmt.Sprintf("And %d more in your inbox.", count-digestMaxItems)
+		content.Button = mail.Button{Label: fmt.Sprintf("See all %d in your inbox", count), URL: inbox}
 	}
 	return content, batch[0].Email
 }
@@ -147,6 +192,8 @@ var actorSentences = map[string]string{
 	"projectUpdateCreated":    "posted an update",
 	"projectUpdateMention":    "mentioned you in an update",
 	"initiativeUpdateCreated": "posted an update",
+	"discussionNewThread":     "started a thread",
+	"discussionMention":       "mentioned you",
 }
 
 func digestLine(n notice) mail.Line {
@@ -168,13 +215,22 @@ func digestLine(n notice) mail.Line {
 		if n.Identifier != nil {
 			text = upperFirst(strings.TrimSpace(strings.TrimPrefix(text, *n.Identifier)))
 		}
-		return mail.Line{Text: text}
+		return mail.Line{Text: text, Excerpt: n.Excerpt}
 	}
-	return mail.ActorLine(n.ActorID.String(), *n.ActorName, sentence)
+	line := mail.ActorLine(n.ActorID.String(), *n.ActorName, sentence)
+	line.Excerpt = n.Excerpt
+	return line
 }
 
 func lineSentence(line mail.Line) string {
 	return strings.TrimSpace(line.ActorName + " " + line.Text)
+}
+
+func preheader(line mail.Line) string {
+	if line.Excerpt == "" {
+		return lineSentence(line)
+	}
+	return lineSentence(line) + ": " + line.Excerpt
 }
 
 func upperFirst(text string) string {

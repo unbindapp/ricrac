@@ -119,17 +119,91 @@ func (_c *EmailRepositoryMock_Due_Call) RunAndReturn(run func(ctx context.Contex
 	return _c
 }
 
+// LastEmailed provides a mock function for the type EmailRepositoryMock
+func (_mock *EmailRepositoryMock) LastEmailed(ctx context.Context, tx repository.TxInterface, users []uuid.UUID) (map[uuid.UUID]time.Time, error) {
+	ret := _mock.Called(ctx, tx, users)
+
+	if len(ret) == 0 {
+		panic("no return value specified for LastEmailed")
+	}
+
+	var r0 map[uuid.UUID]time.Time
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, []uuid.UUID) (map[uuid.UUID]time.Time, error)); ok {
+		return returnFunc(ctx, tx, users)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, []uuid.UUID) map[uuid.UUID]time.Time); ok {
+		r0 = returnFunc(ctx, tx, users)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[uuid.UUID]time.Time)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, []uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, users)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// EmailRepositoryMock_LastEmailed_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LastEmailed'
+type EmailRepositoryMock_LastEmailed_Call struct {
+	*mock.Call
+}
+
+// LastEmailed is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - users []uuid.UUID
+func (_e *EmailRepositoryMock_Expecter) LastEmailed(ctx any, tx any, users any) *EmailRepositoryMock_LastEmailed_Call {
+	return &EmailRepositoryMock_LastEmailed_Call{Call: _e.mock.On("LastEmailed", ctx, tx, users)}
+}
+
+func (_c *EmailRepositoryMock_LastEmailed_Call) Run(run func(ctx context.Context, tx repository.TxInterface, users []uuid.UUID)) *EmailRepositoryMock_LastEmailed_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 []uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].([]uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *EmailRepositoryMock_LastEmailed_Call) Return(uUIDToTime map[uuid.UUID]time.Time, err error) *EmailRepositoryMock_LastEmailed_Call {
+	_c.Call.Return(uUIDToTime, err)
+	return _c
+}
+
+func (_c *EmailRepositoryMock_LastEmailed_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, users []uuid.UUID) (map[uuid.UUID]time.Time, error)) *EmailRepositoryMock_LastEmailed_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // MarkEmailed provides a mock function for the type EmailRepositoryMock
-func (_mock *EmailRepositoryMock) MarkEmailed(ctx context.Context, tx repository.TxInterface, before time.Time, now time.Time) error {
-	ret := _mock.Called(ctx, tx, before, now)
+func (_mock *EmailRepositoryMock) MarkEmailed(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID, now time.Time) error {
+	ret := _mock.Called(ctx, tx, ids, now)
 
 	if len(ret) == 0 {
 		panic("no return value specified for MarkEmailed")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, time.Time, time.Time) error); ok {
-		r0 = returnFunc(ctx, tx, before, now)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, []uuid.UUID, time.Time) error); ok {
+		r0 = returnFunc(ctx, tx, ids, now)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -144,13 +218,13 @@ type EmailRepositoryMock_MarkEmailed_Call struct {
 // MarkEmailed is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tx repository.TxInterface
-//   - before time.Time
+//   - ids []uuid.UUID
 //   - now time.Time
-func (_e *EmailRepositoryMock_Expecter) MarkEmailed(ctx any, tx any, before any, now any) *EmailRepositoryMock_MarkEmailed_Call {
-	return &EmailRepositoryMock_MarkEmailed_Call{Call: _e.mock.On("MarkEmailed", ctx, tx, before, now)}
+func (_e *EmailRepositoryMock_Expecter) MarkEmailed(ctx any, tx any, ids any, now any) *EmailRepositoryMock_MarkEmailed_Call {
+	return &EmailRepositoryMock_MarkEmailed_Call{Call: _e.mock.On("MarkEmailed", ctx, tx, ids, now)}
 }
 
-func (_c *EmailRepositoryMock_MarkEmailed_Call) Run(run func(ctx context.Context, tx repository.TxInterface, before time.Time, now time.Time)) *EmailRepositoryMock_MarkEmailed_Call {
+func (_c *EmailRepositoryMock_MarkEmailed_Call) Run(run func(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID, now time.Time)) *EmailRepositoryMock_MarkEmailed_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -160,9 +234,9 @@ func (_c *EmailRepositoryMock_MarkEmailed_Call) Run(run func(ctx context.Context
 		if args[1] != nil {
 			arg1 = args[1].(repository.TxInterface)
 		}
-		var arg2 time.Time
+		var arg2 []uuid.UUID
 		if args[2] != nil {
-			arg2 = args[2].(time.Time)
+			arg2 = args[2].([]uuid.UUID)
 		}
 		var arg3 time.Time
 		if args[3] != nil {
@@ -183,7 +257,7 @@ func (_c *EmailRepositoryMock_MarkEmailed_Call) Return(err error) *EmailReposito
 	return _c
 }
 
-func (_c *EmailRepositoryMock_MarkEmailed_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, before time.Time, now time.Time) error) *EmailRepositoryMock_MarkEmailed_Call {
+func (_c *EmailRepositoryMock_MarkEmailed_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID, now time.Time) error) *EmailRepositoryMock_MarkEmailed_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -405,8 +479,8 @@ func (_c *EmailRepositoryMock_Names_Call) RunAndReturn(run func(ctx context.Cont
 }
 
 // PendingNotifications provides a mock function for the type EmailRepositoryMock
-func (_mock *EmailRepositoryMock) PendingNotifications(ctx context.Context, tx repository.TxInterface, after time.Time, before time.Time) ([]*ent.Notification, error) {
-	ret := _mock.Called(ctx, tx, after, before)
+func (_mock *EmailRepositoryMock) PendingNotifications(ctx context.Context, tx repository.TxInterface, after time.Time) ([]*ent.Notification, error) {
+	ret := _mock.Called(ctx, tx, after)
 
 	if len(ret) == 0 {
 		panic("no return value specified for PendingNotifications")
@@ -414,18 +488,18 @@ func (_mock *EmailRepositoryMock) PendingNotifications(ctx context.Context, tx r
 
 	var r0 []*ent.Notification
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, time.Time, time.Time) ([]*ent.Notification, error)); ok {
-		return returnFunc(ctx, tx, after, before)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, time.Time) ([]*ent.Notification, error)); ok {
+		return returnFunc(ctx, tx, after)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, time.Time, time.Time) []*ent.Notification); ok {
-		r0 = returnFunc(ctx, tx, after, before)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, time.Time) []*ent.Notification); ok {
+		r0 = returnFunc(ctx, tx, after)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*ent.Notification)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, time.Time, time.Time) error); ok {
-		r1 = returnFunc(ctx, tx, after, before)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, time.Time) error); ok {
+		r1 = returnFunc(ctx, tx, after)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -441,12 +515,11 @@ type EmailRepositoryMock_PendingNotifications_Call struct {
 //   - ctx context.Context
 //   - tx repository.TxInterface
 //   - after time.Time
-//   - before time.Time
-func (_e *EmailRepositoryMock_Expecter) PendingNotifications(ctx any, tx any, after any, before any) *EmailRepositoryMock_PendingNotifications_Call {
-	return &EmailRepositoryMock_PendingNotifications_Call{Call: _e.mock.On("PendingNotifications", ctx, tx, after, before)}
+func (_e *EmailRepositoryMock_Expecter) PendingNotifications(ctx any, tx any, after any) *EmailRepositoryMock_PendingNotifications_Call {
+	return &EmailRepositoryMock_PendingNotifications_Call{Call: _e.mock.On("PendingNotifications", ctx, tx, after)}
 }
 
-func (_c *EmailRepositoryMock_PendingNotifications_Call) Run(run func(ctx context.Context, tx repository.TxInterface, after time.Time, before time.Time)) *EmailRepositoryMock_PendingNotifications_Call {
+func (_c *EmailRepositoryMock_PendingNotifications_Call) Run(run func(ctx context.Context, tx repository.TxInterface, after time.Time)) *EmailRepositoryMock_PendingNotifications_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -460,15 +533,10 @@ func (_c *EmailRepositoryMock_PendingNotifications_Call) Run(run func(ctx contex
 		if args[2] != nil {
 			arg2 = args[2].(time.Time)
 		}
-		var arg3 time.Time
-		if args[3] != nil {
-			arg3 = args[3].(time.Time)
-		}
 		run(
 			arg0,
 			arg1,
 			arg2,
-			arg3,
 		)
 	})
 	return _c
@@ -479,7 +547,7 @@ func (_c *EmailRepositoryMock_PendingNotifications_Call) Return(notifications []
 	return _c
 }
 
-func (_c *EmailRepositoryMock_PendingNotifications_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, after time.Time, before time.Time) ([]*ent.Notification, error)) *EmailRepositoryMock_PendingNotifications_Call {
+func (_c *EmailRepositoryMock_PendingNotifications_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, after time.Time) ([]*ent.Notification, error)) *EmailRepositoryMock_PendingNotifications_Call {
 	_c.Call.Return(run)
 	return _c
 }

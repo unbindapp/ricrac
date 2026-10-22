@@ -18,13 +18,14 @@ type EmailRepositoryInterface interface {
 	Queue(ctx context.Context, tx repository.TxInterface, to string, content json.RawMessage) error
 	// Names is the user's name and the workspace's.
 	Names(ctx context.Context, tx repository.TxInterface, userID, workspace uuid.UUID) (string, string, error)
-	// PendingNotifications is the notifications created between after and before that are still
-	// unread, unarchived, not snoozed and not emailed, of people who get emails, by person then
-	// time, with what a digest shows of them. They stay locked until the transaction ends; ones
-	// locked elsewhere are skipped.
-	PendingNotifications(ctx context.Context, tx repository.TxInterface, after, before time.Time) ([]*ent.Notification, error)
-	// MarkEmailed marks the notifications created until before as emailed.
-	MarkEmailed(ctx context.Context, tx repository.TxInterface, before, now time.Time) error
+	// PendingNotifications is the notifications created since after that are still unread,
+	// unarchived, not snoozed and not emailed, of people who get emails, by person then time, with
+	// what a digest shows of them. They stay locked until the transaction ends; ones locked elsewhere
+	// are skipped.
+	PendingNotifications(ctx context.Context, tx repository.TxInterface, after time.Time) ([]*ent.Notification, error)
+	// LastEmailed is when each of users was last emailed a digest, for those who ever were.
+	LastEmailed(ctx context.Context, tx repository.TxInterface, users []uuid.UUID) (map[uuid.UUID]time.Time, error)
+	MarkEmailed(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID, now time.Time) error
 	// Due is up to 100 unsent emails due now with fewer than attempts attempts, oldest first.
 	Due(ctx context.Context, attempts int) ([]*ent.Email, error)
 	MarkSent(ctx context.Context, id uuid.UUID, now time.Time) error
