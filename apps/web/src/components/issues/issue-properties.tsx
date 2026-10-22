@@ -234,41 +234,44 @@ export function IssueProperties({
       !hideEmpty || openProperty === property || isSet(draft, property);
     const unset = visible.filter((field) => !isShown(field.property));
     return (
-      <div className="flex flex-wrap items-center gap-2">
-        {visible
-          .filter((field) => isShown(field.property))
-          .map((field) => (
-            <span key={field.property} className="contents">
-              {field.node}
-            </span>
-          ))}
-        {!disabled && unset.length > 0 && (
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button
-                  variant="outline"
-                  size="sm"
-                  forceMinSize={false}
-                  aria-label="Add property"
-                  className="text-muted-foreground px-2"
-                >
-                  <PlusIcon className="size-4" />
-                </Button>
-              }
-            />
-            <DropdownMenuContent align="start" className="w-44">
-              {unset.map((field) => (
-                <DropdownMenuItem
-                  key={field.property}
-                  onClick={() => setOpenProperty(field.property)}
-                >
-                  {field.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {visible
+            .filter((field) => isShown(field.property))
+            .map((field) => (
+              <span key={field.property} className="contents">
+                {field.node}
+              </span>
+            ))}
+          {!disabled && unset.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    forceMinSize={false}
+                    aria-label="Add property"
+                    className="text-muted-foreground px-2"
+                  >
+                    <PlusIcon className="size-4" />
+                  </Button>
+                }
+              />
+              <DropdownMenuContent align="start" className="w-44">
+                {unset.map((field) => (
+                  <DropdownMenuItem
+                    key={field.property}
+                    onClick={() => setOpenProperty(field.property)}
+                  >
+                    {field.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+        {children}
       </div>
     );
   }
