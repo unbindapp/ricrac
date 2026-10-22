@@ -2,8 +2,8 @@ import type { Editor } from "@tiptap/core";
 import type { EditorState } from "@tiptap/pm/state";
 import { BubbleMenu, type BubbleMenuProps } from "@tiptap/react/menus";
 import { useEffect, useRef } from "react";
-import type { LucideIcon } from "lucide-react";
 
+import type { LucideIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 
 export type TAnnotationAction = {

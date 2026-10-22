@@ -1,5 +1,5 @@
-import { TriangleAlertIcon } from "lucide-react";
 import type { OAuthAppSecret } from "@/api/account.gen";
+import { TriangleAlertIcon } from "@/components/icons";
 import { CopyField } from "@/components/shared/copy-button";
 import { Button } from "@/components/ui/button";
 import {

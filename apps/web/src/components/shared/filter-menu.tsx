@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
-import { CheckIcon, ChevronDownIcon } from "lucide-react";
 
+import { CheckIcon, ChevronDownIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -36,7 +36,7 @@ export function FilterMenu<T extends string>({ label, value, options, onChange }
             variant="outline"
             size="sm"
             aria-label={`${label}: ${current.label}`}
-            className="w-fit"
+            className="dank:bg-secondary dank:text-secondary-foreground dank:has-hover:hover:bg-secondary/85 dank:has-hover:hover:text-secondary-foreground dank:active:bg-secondary/85 dank:border-0 w-fit"
           >
             {current.icon}
             <span>{current.label}</span>
@@ -48,7 +48,12 @@ export function FilterMenu<T extends string>({ label, value, options, onChange }
       <DropdownMenuContent className="min-w-48">
         <DropdownMenuGroup>
           {options.map((option) => (
-            <DropdownMenuItem key={option.value} onClick={() => onChange(option.value)}>
+            <DropdownMenuItem
+              key={option.value}
+              data-selected={option.value === value || undefined}
+              className="dank:data-selected:bg-secondary dank:data-selected:text-secondary-foreground"
+              onClick={() => onChange(option.value)}
+            >
               {option.icon}
               <span className="min-w-0 flex-1 truncate">{option.label}</span>
               {option.suffix}

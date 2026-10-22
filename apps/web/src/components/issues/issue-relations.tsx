@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { ArrowRightLeftIcon, XIcon } from "lucide-react";
 
 import type { IssueDetail, IssueRef } from "@/api/ops.gen";
+import { ArrowRightLeftIcon, XIcon } from "@/components/icons";
 import { IssueSearchPicker } from "@/components/issues/pickers";
 import { useOpenIssue } from "@/components/issues/sub-issues";
 import { List } from "@/components/layout/list";

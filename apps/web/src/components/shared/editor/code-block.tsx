@@ -6,8 +6,8 @@ import {
   type ReactNodeViewProps,
 } from "@tiptap/react";
 import { common, createLowlight } from "lowlight";
-import { ChevronDownIcon } from "lucide-react";
 
+import { ChevronDownIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import DropdownSelect from "@/components/ui/dropdown-select";
 

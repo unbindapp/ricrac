@@ -19,9 +19,9 @@ import {
 } from "@dnd-kit/sortable";
 import { Link } from "@tanstack/react-router";
 import { type CSSProperties, type HTMLAttributes, type ReactNode, type Ref, useState } from "react";
-import { PlusIcon } from "lucide-react";
 
 import type { Project } from "@/api/ops.gen";
+import { PlusIcon } from "@/components/icons";
 import { sortOrderAtIndex } from "@/components/issues/sort-order";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";

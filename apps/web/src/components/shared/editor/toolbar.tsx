@@ -1,6 +1,8 @@
 import type { Editor } from "@tiptap/core";
 import { useEditorState } from "@tiptap/react";
 import { type FormEvent, type ReactNode, useState } from "react";
+
+import { ShortcutKeys } from "@/components/command-panel/shortcut-keys";
 import {
   ArrowDownToLineIcon,
   ArrowLeftToLineIcon,
@@ -12,14 +14,12 @@ import {
   HelpCircleIcon,
   ItalicIcon,
   LinkIcon,
+  type LucideIcon,
   StrikethroughIcon,
   TableColumnsSplitIcon,
   TableRowsSplitIcon,
-  type LucideIcon,
   Trash2Icon,
-} from "lucide-react";
-
-import { ShortcutKeys } from "@/components/command-panel/shortcut-keys";
+} from "@/components/icons";
 import {
   blockCommands,
   insertCommands,

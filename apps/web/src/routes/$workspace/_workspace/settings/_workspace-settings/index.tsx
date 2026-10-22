@@ -13,6 +13,8 @@ import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
 import { TeamFormSchema, useSaveTeamMutation } from "@/lib/queries/teams";
 import { useUploadAsset } from "@/lib/queries/uploads";
 import { useUpdateWorkspaceMutation, WorkspaceFormSchema } from "@/lib/queries/workspaces";
+import { uiThemes } from "@/themes/registry";
+import { isUiThemeId, UI_THEME_IDS } from "@/themes/types";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/_workspace-settings/")({
   component: GeneralSettingsPage,
@@ -40,8 +42,42 @@ function GeneralSettingsPage() {
       }
     >
       {isAdmin && <WorkspaceSection />}
+      {isAdmin && <ThemeSection />}
       <IssuesSection />
     </SettingsPage>
+  );
+}
+
+const themeItems = UI_THEME_IDS.map((id) => ({ value: id, label: uiThemes[id].label }));
+
+function ThemeSection() {
+  const { workspace } = useWorkspace();
+  const { mutate: update } = useUpdateWorkspaceMutation(workspace.id);
+  const form = useAppForm({ defaultValues: { theme: workspace.theme } });
+  return (
+    <SettingsSection
+      title="Theme"
+      description="How the app looks for everyone in this workspace. Light or dark stays each person's choice."
+    >
+      <form.AppField
+        name="theme"
+        listeners={{
+          onChange: ({ value }) => {
+            if (isUiThemeId(value)) update({ theme: value });
+          },
+        }}
+        children={(field) => (
+          <field.SelectField
+            label="Theme"
+            hideLabel
+            items={themeItems}
+            description={
+              isUiThemeId(field.state.value) ? uiThemes[field.state.value].description : undefined
+            }
+          />
+        )}
+      />
+    </SettingsSection>
   );
 }
 

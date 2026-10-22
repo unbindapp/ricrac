@@ -2,6 +2,7 @@ import { Image } from "@tiptap/extension-image";
 import { NodeSelection } from "@tiptap/pm/state";
 import { NodeViewWrapper, ReactNodeViewRenderer, type ReactNodeViewProps } from "@tiptap/react";
 import { type DragEvent, type PointerEvent, useRef, useState } from "react";
+
 import {
   AlignCenterIcon,
   AlignLeftIcon,
@@ -11,8 +12,7 @@ import {
   Maximize2Icon,
   PaperclipIcon,
   Trash2Icon,
-} from "lucide-react";
-
+} from "@/components/icons";
 import { usePendingUpload } from "@/components/shared/editor/uploads";
 import { MediaFrame, MediaLightbox, MediaVideo } from "@/components/shared/markdown-media";
 import { Button } from "@/components/ui/button";

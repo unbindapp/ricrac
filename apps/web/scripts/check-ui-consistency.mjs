@@ -10,7 +10,7 @@ const rules = [
     name: "arbitrary Tailwind value",
     pattern:
       /(?<![\w[-])[a-z][a-z0-9]*(?:-[a-z0-9.]+)*-(?:\[[^\]\s"'`]+\]|\(--[^)\s"'`]+\))(?!\/?[\w-]*:)/g,
-    allowedIn: ["src/components/ui/", "src/components/layout/"],
+    allowedIn: ["src/components/ui/", "src/components/layout/", "src/themes/"],
   },
   {
     name: "raw <button>, <input>, <select> or <textarea> element",
@@ -22,9 +22,15 @@ const rules = [
     pattern: /\btext-[2-9]xl\b/g,
     allowedIn: [
       "src/components/layout/",
+      "src/themes/",
       "src/components/shared/inline-text.tsx",
       "src/components/landing/",
     ],
+  },
+  {
+    name: "lucide-react import (use @/components/icons, or run scripts/use-themed-icons.mjs)",
+    pattern: /from ["']lucide-react["']/g,
+    allowedIn: ["src/components/icons/"],
   },
   {
     name: "alert()",
@@ -39,7 +45,7 @@ const rules = [
   {
     name: "radius larger than rounded-lg",
     pattern: /\brounded-(?:xl|2xl|3xl)\b/g,
-    allowedIn: ["src/components/ui/"],
+    allowedIn: ["src/components/ui/", "src/themes/"],
   },
   {
     name: "hardcoded color outside the palette",

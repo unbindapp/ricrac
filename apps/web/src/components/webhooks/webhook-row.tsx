@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useState } from "react";
+
 import {
   ChevronRightIcon,
   CircleCheckIcon,
@@ -12,8 +13,7 @@ import {
   PlayIcon,
   SendIcon,
   Trash2Icon,
-} from "lucide-react";
-
+} from "@/components/icons";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Badge } from "@/components/ui/badge";

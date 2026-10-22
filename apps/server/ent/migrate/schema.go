@@ -2465,6 +2465,7 @@ var (
 		{Name: "logo_url", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "default_team_settings", Type: field.TypeJSON, Nullable: true},
 		{Name: "project_update_reminder_day", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "theme", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "created_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 	}

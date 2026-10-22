@@ -1,14 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import {
-  ArchiveIcon,
-  BuildingIcon,
-  EllipsisIcon,
-  MessageSquareQuoteIcon,
-  PencilIcon,
-  PlusIcon,
-} from "lucide-react";
 
 import type { CustomerDetail as TCustomerDetail } from "@/api/ops.gen";
 import { CustomerLogo } from "@/components/customers/customer-badges";
@@ -20,6 +12,14 @@ import {
   CustomerStatusPicker,
   CustomerTierPicker,
 } from "@/components/customers/customer-pickers";
+import {
+  ArchiveIcon,
+  BuildingIcon,
+  EllipsisIcon,
+  MessageSquareQuoteIcon,
+  PencilIcon,
+  PlusIcon,
+} from "@/components/icons";
 import { PageBar } from "@/components/layout/page-header";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { EmptyState } from "@/components/layout/empty-state";

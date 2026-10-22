@@ -105,6 +105,20 @@ func (_c *WorkspaceCreate) SetNillableProjectUpdateReminderDay(v *string) *Works
 	return _c
 }
 
+// SetTheme sets the "theme" field.
+func (_c *WorkspaceCreate) SetTheme(v string) *WorkspaceCreate {
+	_c.mutation.SetTheme(v)
+	return _c
+}
+
+// SetNillableTheme sets the "theme" field if the given value is not nil.
+func (_c *WorkspaceCreate) SetNillableTheme(v *string) *WorkspaceCreate {
+	if v != nil {
+		_c.SetTheme(*v)
+	}
+	return _c
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_c *WorkspaceCreate) SetCreatedAt(v time.Time) *WorkspaceCreate {
 	_c.mutation.SetCreatedAt(v)
@@ -761,6 +775,10 @@ func (_c *WorkspaceCreate) createSpec() (*Workspace, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.ProjectUpdateReminderDay(); ok {
 		_spec.SetField(workspace.FieldProjectUpdateReminderDay, field.TypeString, value)
 		_node.ProjectUpdateReminderDay = &value
+	}
+	if value, ok := _c.mutation.Theme(); ok {
+		_spec.SetField(workspace.FieldTheme, field.TypeString, value)
+		_node.Theme = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(workspace.FieldCreatedAt, field.TypeTime, value)
@@ -1444,6 +1462,24 @@ func (u *WorkspaceUpsert) ClearProjectUpdateReminderDay() *WorkspaceUpsert {
 	return u
 }
 
+// SetTheme sets the "theme" field.
+func (u *WorkspaceUpsert) SetTheme(v string) *WorkspaceUpsert {
+	u.Set(workspace.FieldTheme, v)
+	return u
+}
+
+// UpdateTheme sets the "theme" field to the value that was provided on create.
+func (u *WorkspaceUpsert) UpdateTheme() *WorkspaceUpsert {
+	u.SetExcluded(workspace.FieldTheme)
+	return u
+}
+
+// ClearTheme clears the value of the "theme" field.
+func (u *WorkspaceUpsert) ClearTheme() *WorkspaceUpsert {
+	u.SetNull(workspace.FieldTheme)
+	return u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (u *WorkspaceUpsert) SetCreatedAt(v time.Time) *WorkspaceUpsert {
 	u.Set(workspace.FieldCreatedAt, v)
@@ -1616,6 +1652,27 @@ func (u *WorkspaceUpsertOne) UpdateProjectUpdateReminderDay() *WorkspaceUpsertOn
 func (u *WorkspaceUpsertOne) ClearProjectUpdateReminderDay() *WorkspaceUpsertOne {
 	return u.Update(func(s *WorkspaceUpsert) {
 		s.ClearProjectUpdateReminderDay()
+	})
+}
+
+// SetTheme sets the "theme" field.
+func (u *WorkspaceUpsertOne) SetTheme(v string) *WorkspaceUpsertOne {
+	return u.Update(func(s *WorkspaceUpsert) {
+		s.SetTheme(v)
+	})
+}
+
+// UpdateTheme sets the "theme" field to the value that was provided on create.
+func (u *WorkspaceUpsertOne) UpdateTheme() *WorkspaceUpsertOne {
+	return u.Update(func(s *WorkspaceUpsert) {
+		s.UpdateTheme()
+	})
+}
+
+// ClearTheme clears the value of the "theme" field.
+func (u *WorkspaceUpsertOne) ClearTheme() *WorkspaceUpsertOne {
+	return u.Update(func(s *WorkspaceUpsert) {
+		s.ClearTheme()
 	})
 }
 
@@ -1964,6 +2021,27 @@ func (u *WorkspaceUpsertBulk) UpdateProjectUpdateReminderDay() *WorkspaceUpsertB
 func (u *WorkspaceUpsertBulk) ClearProjectUpdateReminderDay() *WorkspaceUpsertBulk {
 	return u.Update(func(s *WorkspaceUpsert) {
 		s.ClearProjectUpdateReminderDay()
+	})
+}
+
+// SetTheme sets the "theme" field.
+func (u *WorkspaceUpsertBulk) SetTheme(v string) *WorkspaceUpsertBulk {
+	return u.Update(func(s *WorkspaceUpsert) {
+		s.SetTheme(v)
+	})
+}
+
+// UpdateTheme sets the "theme" field to the value that was provided on create.
+func (u *WorkspaceUpsertBulk) UpdateTheme() *WorkspaceUpsertBulk {
+	return u.Update(func(s *WorkspaceUpsert) {
+		s.UpdateTheme()
+	})
+}
+
+// ClearTheme clears the value of the "theme" field.
+func (u *WorkspaceUpsertBulk) ClearTheme() *WorkspaceUpsertBulk {
+	return u.Update(func(s *WorkspaceUpsert) {
+		s.ClearTheme()
 	})
 }
 

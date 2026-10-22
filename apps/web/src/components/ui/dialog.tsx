@@ -1,10 +1,10 @@
 import * as React from "react";
+import { XIcon } from "@/components/icons";
 import { pressStartedInExemptElement } from "@/components/ui/press-origin";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 
 import { cn } from "@/components/ui/utils";
 import { cva, VariantProps } from "class-variance-authority";
-import { XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { returnFocusTarget } from "@/components/ui/focus-origin";
 
@@ -96,7 +96,7 @@ export const dialogContentVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-background shadow-dialog shadow-shadow-color/shadow-opacity rounded-lg border p-5 pt-4",
+          "bg-background shadow-dialog shadow-shadow-color/shadow-opacity rounded-lg border p-5 pt-4 dank:bg-surface-container-high dank:rounded-xl dank:border-0 dank:p-6 dank:pt-5",
         styleless: "",
       },
       animate: {
@@ -140,7 +140,7 @@ function DialogContent({
       >
         <DialogPrimitive.Popup
           data-slot="dialog-content"
-          className={cn(dialogContentVariants({ variant, animate, className }))}
+          className={cn(dialogContentVariants({ variant, animate }), className)}
           finalFocus={returnFocusTarget}
           {...props}
         >

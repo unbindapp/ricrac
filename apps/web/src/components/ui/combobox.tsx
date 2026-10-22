@@ -9,7 +9,7 @@ function ComboboxInput({ className, ...props }: ComboboxPrimitive.Input.Props) {
   return (
     <ComboboxPrimitive.Input
       className={cn(
-        "bg-input placeholder:text-muted-foreground focus-visible:ring-primary/8-10 has-hover:hover:ring-border has-hover:hover:focus-visible:ring-primary/8-10 data-staged:focus-visible:ring-change/8-10 data-staged:has-hover:hover:ring-change/7-10 data-staged:has-hover:hover:focus-visible:ring-change/8-10 flex h-8 w-full rounded-md border px-2.5 py-1.5 text-sm leading-tight focus-visible:ring-1 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50 has-hover:hover:ring-1 disabled:has-hover:hover:ring-0",
+        "bg-input placeholder:text-muted-foreground focus-visible:ring-primary/8-10 has-hover:hover:ring-border has-hover:hover:focus-visible:ring-primary/8-10 data-staged:focus-visible:ring-change/8-10 data-staged:has-hover:hover:ring-change/7-10 data-staged:has-hover:hover:focus-visible:ring-change/8-10 dank:focus-visible:ring-primary dank:has-hover:hover:focus-visible:ring-primary dank:h-9 dank:border-transparent dank:pr-3 dank:pl-3 dank:focus-visible:ring-2 flex h-8 w-full rounded-md border px-2.5 py-1.5 text-sm leading-tight focus-visible:ring-1 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50 has-hover:hover:ring-1 disabled:has-hover:hover:ring-0",
         className,
       )}
       {...props}
@@ -114,7 +114,7 @@ function ComboboxChipRemove({ className, ...props }: ComboboxPrimitive.ChipRemov
   return (
     <ComboboxPrimitive.ChipRemove
       className={cn(
-        "text-muted-foreground has-hover:hover:bg-border has-hover:hover:text-foreground active:bg-border active:text-foreground focus-visible:ring-primary/8-10 group-data-staged/chip:text-change/8-10 group-data-staged/chip:border-change/5-10 group-data-staged/chip:has-hover:hover:bg-change/3-10 group-data-staged/chip:has-hover:hover:text-change group-data-staged/chip:active:bg-change/3-10 group-data-staged/chip:active:text-change flex shrink-0 items-center border-l px-2 focus-visible:ring-1 focus-visible:outline-hidden",
+        "text-muted-foreground has-hover:hover:bg-border has-hover:hover:text-foreground active:bg-border active:text-foreground focus-visible:ring-primary/8-10 group-data-staged/chip:text-change/8-10 group-data-staged/chip:border-change/5-10 group-data-staged/chip:has-hover:hover:bg-change/3-10 group-data-staged/chip:has-hover:hover:text-change group-data-staged/chip:active:bg-change/3-10 group-data-staged/chip:active:text-change dank:focus-visible:ring-primary flex shrink-0 items-center border-l px-2 focus-visible:ring-1 focus-visible:outline-hidden",
         className,
       )}
       {...props}

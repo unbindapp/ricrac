@@ -80131,6 +80131,7 @@ type WorkspaceMutation struct {
 	default_team_settings       *jsontext.Value
 	appenddefault_team_settings jsontext.Value
 	project_update_reminder_day *string
+	theme                       *string
 	created_at                  *time.Time
 	updated_at                  *time.Time
 	clearedFields               map[string]struct{}
@@ -80578,6 +80579,55 @@ func (m *WorkspaceMutation) ProjectUpdateReminderDayCleared() bool {
 func (m *WorkspaceMutation) ResetProjectUpdateReminderDay() {
 	m.project_update_reminder_day = nil
 	delete(m.clearedFields, workspace.FieldProjectUpdateReminderDay)
+}
+
+// SetTheme sets the "theme" field.
+func (m *WorkspaceMutation) SetTheme(s string) {
+	m.theme = &s
+}
+
+// Theme returns the value of the "theme" field in the mutation.
+func (m *WorkspaceMutation) Theme() (r string, exists bool) {
+	v := m.theme
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTheme returns the old "theme" field's value of the Workspace entity.
+// If the Workspace object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WorkspaceMutation) OldTheme(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTheme is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTheme requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTheme: %w", err)
+	}
+	return oldValue.Theme, nil
+}
+
+// ClearTheme clears the value of the "theme" field.
+func (m *WorkspaceMutation) ClearTheme() {
+	m.theme = nil
+	m.clearedFields[workspace.FieldTheme] = struct{}{}
+}
+
+// ThemeCleared returns if the "theme" field was cleared in this mutation.
+func (m *WorkspaceMutation) ThemeCleared() bool {
+	_, ok := m.clearedFields[workspace.FieldTheme]
+	return ok
+}
+
+// ResetTheme resets all changes to the "theme" field.
+func (m *WorkspaceMutation) ResetTheme() {
+	m.theme = nil
+	delete(m.clearedFields, workspace.FieldTheme)
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -82548,7 +82598,7 @@ func (m *WorkspaceMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *WorkspaceMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.name != nil {
 		fields = append(fields, workspace.FieldName)
 	}
@@ -82563,6 +82613,9 @@ func (m *WorkspaceMutation) Fields() []string {
 	}
 	if m.project_update_reminder_day != nil {
 		fields = append(fields, workspace.FieldProjectUpdateReminderDay)
+	}
+	if m.theme != nil {
+		fields = append(fields, workspace.FieldTheme)
 	}
 	if m.created_at != nil {
 		fields = append(fields, workspace.FieldCreatedAt)
@@ -82588,6 +82641,8 @@ func (m *WorkspaceMutation) Field(name string) (ent.Value, bool) {
 		return m.DefaultTeamSettings()
 	case workspace.FieldProjectUpdateReminderDay:
 		return m.ProjectUpdateReminderDay()
+	case workspace.FieldTheme:
+		return m.Theme()
 	case workspace.FieldCreatedAt:
 		return m.CreatedAt()
 	case workspace.FieldUpdatedAt:
@@ -82611,6 +82666,8 @@ func (m *WorkspaceMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldDefaultTeamSettings(ctx)
 	case workspace.FieldProjectUpdateReminderDay:
 		return m.OldProjectUpdateReminderDay(ctx)
+	case workspace.FieldTheme:
+		return m.OldTheme(ctx)
 	case workspace.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case workspace.FieldUpdatedAt:
@@ -82658,6 +82715,13 @@ func (m *WorkspaceMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetProjectUpdateReminderDay(v)
+		return nil
+	case workspace.FieldTheme:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTheme(v)
 		return nil
 	case workspace.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -82712,6 +82776,9 @@ func (m *WorkspaceMutation) ClearedFields() []string {
 	if m.FieldCleared(workspace.FieldProjectUpdateReminderDay) {
 		fields = append(fields, workspace.FieldProjectUpdateReminderDay)
 	}
+	if m.FieldCleared(workspace.FieldTheme) {
+		fields = append(fields, workspace.FieldTheme)
+	}
 	if m.FieldCleared(workspace.FieldCreatedAt) {
 		fields = append(fields, workspace.FieldCreatedAt)
 	}
@@ -82741,6 +82808,9 @@ func (m *WorkspaceMutation) ClearField(name string) error {
 	case workspace.FieldProjectUpdateReminderDay:
 		m.ClearProjectUpdateReminderDay()
 		return nil
+	case workspace.FieldTheme:
+		m.ClearTheme()
+		return nil
 	case workspace.FieldCreatedAt:
 		m.ClearCreatedAt()
 		return nil
@@ -82769,6 +82839,9 @@ func (m *WorkspaceMutation) ResetField(name string) error {
 		return nil
 	case workspace.FieldProjectUpdateReminderDay:
 		m.ResetProjectUpdateReminderDay()
+		return nil
+	case workspace.FieldTheme:
+		m.ResetTheme()
 		return nil
 	case workspace.FieldCreatedAt:
 		m.ResetCreatedAt()

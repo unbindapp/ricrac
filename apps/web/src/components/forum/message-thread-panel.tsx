@@ -1,6 +1,6 @@
-import { ArrowLeftIcon, MessageSquareReplyIcon } from "lucide-react";
 import { ChatComposer, ChatDayDivider, ChatMessage } from "@/components/forum/chat-message";
 import { ChatSkeleton, useChatMessages } from "@/components/forum/chat-messages";
+import { ArrowLeftIcon, MessageSquareReplyIcon } from "@/components/icons";
 import { userName } from "@/components/issues/grouping";
 import { ChatLayout } from "@/components/layout/chat-layout";
 import { EmptyState } from "@/components/layout/empty-state";

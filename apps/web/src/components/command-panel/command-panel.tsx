@@ -2,6 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { type LinkProps, useNavigate } from "@tanstack/react-router";
 import { useTheme } from "next-themes";
 import { ReactNode, useState } from "react";
+
+import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
+import { ShortcutKeys } from "@/components/command-panel/shortcut-keys";
+import { ShortcutsDialog } from "@/components/command-panel/shortcuts-dialog";
 import {
   BoxIcon,
   CheckIcon,
@@ -24,11 +28,7 @@ import {
   TriangleIcon,
   UserCircleIcon,
   UserPlusIcon,
-} from "lucide-react";
-
-import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
-import { ShortcutKeys } from "@/components/command-panel/shortcut-keys";
-import { ShortcutsDialog } from "@/components/command-panel/shortcuts-dialog";
+} from "@/components/icons";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
 import { useNewProjectStore } from "@/components/projects/new-project-store";
 import type { TTheme } from "@/components/providers/themes";

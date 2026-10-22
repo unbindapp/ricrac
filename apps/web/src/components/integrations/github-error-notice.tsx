@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { TriangleAlertIcon, XIcon } from "lucide-react";
 
+import { TriangleAlertIcon, XIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { githubErrorMessage } from "@/lib/helpers/github-sync";
 

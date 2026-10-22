@@ -16,6 +16,8 @@ import {
 } from "@dnd-kit/sortable";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+
+import type { ReleasePipeline, ReleaseStage } from "@/api/ops.gen";
 import {
   ArchiveIcon,
   GripVerticalIcon,
@@ -23,9 +25,7 @@ import {
   PlusIcon,
   Trash2Icon,
   WorkflowIcon,
-} from "lucide-react";
-
-import type { ReleasePipeline, ReleaseStage } from "@/api/ops.gen";
+} from "@/components/icons";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { List } from "@/components/layout/list";

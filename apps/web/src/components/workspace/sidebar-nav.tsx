@@ -1,7 +1,7 @@
 import { type LinkProps } from "@tanstack/react-router";
 import { ReactNode, useState } from "react";
-import type { LucideIcon } from "lucide-react";
 
+import type { LucideIcon } from "@/components/icons";
 import { Button, LinkButton } from "@/components/ui/button";
 
 type TNavItemProps = {
@@ -14,7 +14,10 @@ type TNavItemProps = {
 };
 
 export const sidebarItemClassName =
-  "hit-gap-y h-7.5 w-full justify-start px-2 font-normal [&_svg]:text-muted-foreground";
+  "hit-gap-y h-7.5 w-full justify-start px-2 font-normal [&_svg]:text-muted-foreground dank:h-9 dank:pr-3 dank:pl-3";
+
+export const sidebarActiveItemClassName =
+  "data-[status=active]:bg-accent dank:data-[status=active]:bg-secondary dank:data-[status=active]:text-secondary-foreground dank:data-[status=active]:font-semibold dank:data-[status=active]:[&_svg]:text-secondary-foreground";
 
 export function SidebarNavItem({
   label,
@@ -32,7 +35,7 @@ export function SidebarNavItem({
       size="sm"
       forceMinSize={false}
       onClick={onNavigate}
-      className={`${sidebarItemClassName} data-[status=active]:bg-accent`}
+      className={`${sidebarItemClassName} ${sidebarActiveItemClassName}`}
     >
       <Icon className="size-4" />
       <span className="min-w-0 flex-1 truncate text-left">{label}</span>

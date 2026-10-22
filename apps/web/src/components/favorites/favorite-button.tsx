@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { StarIcon } from "lucide-react";
 
+import { StarIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { SimpleTooltip } from "@/components/ui/tooltip";
 import { useWorkspace } from "@/components/workspace/workspace-provider";

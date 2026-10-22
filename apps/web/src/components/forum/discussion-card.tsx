@@ -1,9 +1,15 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { LockIcon, MessageSquareIcon, MessagesSquareIcon, PinIcon, SplitIcon } from "lucide-react";
 
 import type { Discussion } from "@/api/ops.gen";
 import { DiscussionTagBadges } from "@/components/forum/discussion-tags";
+import {
+  LockIcon,
+  MessageSquareIcon,
+  MessagesSquareIcon,
+  PinIcon,
+  SplitIcon,
+} from "@/components/icons";
 import { commentExcerpt } from "@/components/inbox/notifications";
 import { PersonAvatar } from "@/components/projects/people";
 import { RelativeTime } from "@/components/shared/relative-time";

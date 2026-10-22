@@ -2,11 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { type ReactNode, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
-import { BuildingIcon, ListFilterIcon, PlusIcon, SearchXIcon } from "lucide-react";
 
 import type { Customer } from "@/api/ops.gen";
 import { CustomerLogo, OptionDot, OptionLabel } from "@/components/customers/customer-badges";
 import { CustomerDialog } from "@/components/customers/customer-dialog";
+import { BuildingIcon, ListFilterIcon, PlusIcon, SearchXIcon } from "@/components/icons";
 import { PropertyPicker } from "@/components/issues/property-picker";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";

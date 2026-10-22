@@ -23,6 +23,8 @@ const (
 	FieldDefaultTeamSettings = "default_team_settings"
 	// FieldProjectUpdateReminderDay holds the string denoting the project_update_reminder_day field in the database.
 	FieldProjectUpdateReminderDay = "project_update_reminder_day"
+	// FieldTheme holds the string denoting the theme field in the database.
+	FieldTheme = "theme"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -352,6 +354,7 @@ var Columns = []string{
 	FieldLogoURL,
 	FieldDefaultTeamSettings,
 	FieldProjectUpdateReminderDay,
+	FieldTheme,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -403,6 +406,11 @@ func ByLogoURL(opts ...sql.OrderTermOption) OrderOption {
 // ByProjectUpdateReminderDay orders the results by the project_update_reminder_day field.
 func ByProjectUpdateReminderDay(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldProjectUpdateReminderDay, opts...).ToFunc()
+}
+
+// ByTheme orders the results by the theme field.
+func ByTheme(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTheme, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

@@ -1,13 +1,13 @@
 import { type ReactNode, useCallback, useId } from "react";
 import { useLocalStorage } from "usehooks-ts";
+
 import {
   ArrowDownNarrowWideIcon,
   ArrowUpNarrowWideIcon,
   LayoutGridIcon,
   ListIcon,
   SlidersHorizontalIcon,
-} from "lucide-react";
-
+} from "@/components/icons";
 import {
   defaultOrderFor,
   GROUP_BY_OPTIONS,

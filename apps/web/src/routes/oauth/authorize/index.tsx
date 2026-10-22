@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
-import { CheckIcon, CircleAlertIcon } from "lucide-react";
 
 import type { Me, OAuthClientInfo, OAuthDecision } from "@/api/account.gen";
 import { WorkspaceAccessList } from "@/components/api-key/access-fields";
@@ -13,6 +12,7 @@ import {
   pickWorkspaceMessage,
   type TAccess,
 } from "@/components/api-key/helpers";
+import { CheckIcon, CircleAlertIcon } from "@/components/icons";
 import { AuthShell } from "@/components/layout/auth-shell";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";

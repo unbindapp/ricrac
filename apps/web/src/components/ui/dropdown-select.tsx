@@ -1,3 +1,4 @@
+import { CheckIcon } from "@/components/icons";
 import { ErrorCard } from "@/components/layout/error-card";
 import {
   DropdownMenu,
@@ -10,7 +11,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/components/ui/utils";
-import { CheckIcon } from "lucide-react";
 import { FC, ReactElement, useRef, useState } from "react";
 
 export type TDropdownSelectItem = {

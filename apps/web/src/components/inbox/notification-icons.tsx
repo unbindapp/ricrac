@@ -9,6 +9,7 @@ import {
   CircleXIcon,
   FileTextIcon,
   FlagIcon,
+  type LucideIcon,
   MegaphoneIcon,
   MessageSquareIcon,
   MessagesSquareIcon,
@@ -17,12 +18,11 @@ import {
   Share2Icon,
   SplitIcon,
   TargetIcon,
-  type LucideIcon,
   TriangleIcon,
   UnlockIcon,
   UserMinusIcon,
   UserPlusIcon,
-} from "lucide-react";
+} from "@/components/icons";
 import type { TNotificationTarget } from "@/components/inbox/notifications";
 import { StateIcon } from "@/components/shared/state-icon";
 

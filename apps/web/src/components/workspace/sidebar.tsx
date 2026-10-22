@@ -1,4 +1,8 @@
 import type { LinkProps } from "@tanstack/react-router";
+import type { ReactNode } from "react";
+
+import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
+import { SidebarFavorites } from "@/components/favorites/sidebar-favorites";
 import {
   BoxIcon,
   BuildingIcon,
@@ -7,6 +11,7 @@ import {
   InboxIcon,
   KeyboardIcon,
   LayersIcon,
+  type LucideIcon,
   MessagesSquareIcon,
   RefreshCwIcon,
   RocketIcon,
@@ -14,16 +19,11 @@ import {
   SettingsIcon,
   SquarePenIcon,
   TargetIcon,
-  type LucideIcon,
   TriangleIcon,
   UserCircleIcon,
-} from "lucide-react";
-
-import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
-import { SidebarFavorites } from "@/components/favorites/sidebar-favorites";
+} from "@/components/icons";
 import { InboxUnreadBadge } from "@/components/inbox/inbox-unread-badge";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
-import { HideSidebarButton } from "@/components/layout/sidebar-button";
 import { Button, LinkButton } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarNavItem, SidebarSection } from "@/components/workspace/sidebar-nav";
@@ -35,9 +35,13 @@ type TProps = {
   onNavigate?: () => void;
 };
 
+type TSidebarProps = TProps & {
+  hideButton?: ReactNode;
+};
+
 type TNavDestination = { label: string; icon: LucideIcon; link: LinkProps; isHidden?: boolean };
 
-export function Sidebar({ onNavigate }: TProps) {
+export function Sidebar({ onNavigate, hideButton }: TSidebarProps) {
   const { workspace, canEdit } = useWorkspace();
   const openCommandPanel = useCommandPanelStore((state) => state.setOpen);
   const openNewIssue = useNewIssueStore((state) => state.open);
@@ -97,6 +101,7 @@ export function Sidebar({ onNavigate }: TProps) {
             variant="outline"
             size="icon"
             aria-label="New issue"
+            className="dank:bg-primary-container dank:text-primary-container-foreground dank:has-hover:hover:bg-primary-container/85 dank:active:bg-primary-container/85 dank:rounded-md dank:border-0"
             onClick={() => {
               onNavigate?.();
               openNewIssue();
@@ -105,7 +110,7 @@ export function Sidebar({ onNavigate }: TProps) {
             <SquarePenIcon className="size-4" />
           </Button>
         )}
-        {!onNavigate && <HideSidebarButton />}
+        {hideButton}
       </div>
       <ScrollArea className="min-h-0" classNameViewport="px-2 pb-2">
         <nav aria-label="Workspace" className="flex flex-col gap-4">

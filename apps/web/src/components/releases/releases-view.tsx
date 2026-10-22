@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+
+import type { Release, ReleaseNote, ReleasePipeline } from "@/api/ops.gen";
 import {
   ChevronDownIcon,
   CircleDotIcon,
@@ -8,9 +10,7 @@ import {
   PlusIcon,
   RocketIcon,
   WorkflowIcon,
-} from "lucide-react";
-
-import type { Release, ReleaseNote, ReleasePipeline } from "@/api/ops.gen";
+} from "@/components/icons";
 import { PropertyPicker } from "@/components/issues/property-picker";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";

@@ -37,7 +37,7 @@ export function ImportFormat() {
         ))}
       </dl>
       <div className="relative">
-        <pre className="bg-muted overflow-x-auto rounded-md p-3 font-mono text-xs leading-relaxed">
+        <pre className="bg-muted dank:font-code overflow-x-auto rounded-md p-3 font-mono text-xs leading-relaxed">
           {EXAMPLE_IMPORT}
         </pre>
         <div className="absolute top-2 right-2">

@@ -2,6 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { addDays, addMonths, nextMonday, set } from "date-fns";
 
 import type { ReactNode } from "react";
+
+import type { IssueDetail } from "@/api/ops.gen";
+import { FavoriteButton } from "@/components/favorites/favorite-button";
 import {
   AlarmClockIcon,
   ArchiveIcon,
@@ -18,10 +21,7 @@ import {
   Trash2Icon,
   UndoIcon,
   XIcon,
-} from "lucide-react";
-
-import type { IssueDetail } from "@/api/ops.gen";
-import { FavoriteButton } from "@/components/favorites/favorite-button";
+} from "@/components/icons";
 import {
   useCopyIssue,
   useIssueLifecycle,

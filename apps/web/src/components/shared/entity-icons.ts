@@ -32,7 +32,7 @@ import {
   UsersIcon,
   WrenchIcon,
   ZapIcon,
-} from "lucide-react";
+} from "../icons/index.ts";
 
 export const ENTITY_ICONS: Record<string, LucideIcon> = {
   rocket: RocketIcon,

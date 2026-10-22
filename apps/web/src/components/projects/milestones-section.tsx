@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { DiamondIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 
 import type { Milestone, ProjectDetail } from "@/api/ops.gen";
+import { DiamondIcon, PencilIcon, PlusIcon, Trash2Icon } from "@/components/icons";
 import { List } from "@/components/layout/list";
 import { SectionTitle } from "@/components/layout/section-title";
 import { MilestoneDialog } from "@/components/projects/milestone-dialog";

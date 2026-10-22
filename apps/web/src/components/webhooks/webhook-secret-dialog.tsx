@@ -1,4 +1,4 @@
-import { TriangleAlertIcon } from "lucide-react";
+import { TriangleAlertIcon } from "@/components/icons";
 import { CopyField } from "@/components/shared/copy-button";
 import { Button } from "@/components/ui/button";
 import {

@@ -1,5 +1,4 @@
-import type { LucideIcon } from "lucide-react";
-
+import type { LucideIcon } from "@/components/icons";
 import { resolveEntityIcon } from "@/components/shared/entity-icons";
 import { cn } from "@/components/ui/utils";
 

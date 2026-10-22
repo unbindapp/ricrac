@@ -1,10 +1,10 @@
 import * as React from "react";
 import { Menu as MenuPrimitive } from "@base-ui/react/menu";
 
+import { CheckIcon, ChevronRightIcon, CircleIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/ui/utils";
 import { cva, VariantProps } from "class-variance-authority";
-import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
 
 function DropdownMenu({ highlightItemOnHover, ...props }: MenuPrimitive.Root.Props) {
   // On touch devices a tap fires synthesized mouse events at the tap point,

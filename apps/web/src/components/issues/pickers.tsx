@@ -2,18 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { parseISO } from "date-fns";
 import { type ReactElement, type ReactNode, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
-import {
-  CalendarIcon,
-  CircleDashedIcon,
-  CircleUserIcon,
-  CornerLeftUpIcon,
-  DiamondIcon,
-  TagIcon,
-  type LucideIcon,
-  TriangleIcon,
-  UsersIcon,
-  XIcon,
-} from "lucide-react";
 
 import type {
   CycleRef,
@@ -26,6 +14,18 @@ import type {
   StateRef,
   UserRef,
 } from "@/api/ops.gen";
+import {
+  CalendarIcon,
+  CircleDashedIcon,
+  CircleUserIcon,
+  CornerLeftUpIcon,
+  DiamondIcon,
+  type LucideIcon,
+  TagIcon,
+  TriangleIcon,
+  UsersIcon,
+  XIcon,
+} from "@/components/icons";
 import { cycleName, NONE_KEY, PRIORITY_ORDER, userName } from "@/components/issues/grouping";
 import {
   useAvatarUrl,

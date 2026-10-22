@@ -66,11 +66,11 @@ function Slider<Value extends number | readonly number[]>({
           data-slot="slider-track"
           data-painted={trackStyle ? true : undefined}
           style={trackStyle}
-          className="bg-border group-data-staged/root:bg-change/5-10 relative grow overflow-hidden rounded-full select-none data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5"
+          className="bg-border group-data-staged/root:bg-change/5-10 dank:bg-secondary dank:overflow-visible dank:data-[orientation=horizontal]:h-4 dank:data-[orientation=vertical]:w-4 relative grow overflow-hidden rounded-full select-none data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5"
         >
           <SliderPrimitive.Indicator
             data-slot="slider-range"
-            className="bg-primary group-data-staged/root:bg-change select-none in-data-painted:hidden data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full"
+            className="bg-primary group-data-staged/root:bg-change dank:rounded-full select-none in-data-painted:hidden data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full"
           />
         </SliderPrimitive.Track>
         {Array.from({ length: _values.length }, (_, index) => (
@@ -78,7 +78,7 @@ function Slider<Value extends number | readonly number[]>({
             data-slot="slider-thumb"
             key={index}
             getAriaLabel={thumbLabel ? () => thumbLabel : undefined}
-            className="bg-foreground shadow-shadow-color/shadow-opacity group-active/slider:ring-foreground/8-10 active:ring-foreground/8-10 ring-foreground/7-10 group-data-staged/root:bg-change group-data-staged/root:ring-change/7-10 group-data-staged/root:active:ring-change/8-10 group-data-staged/root:group-active/slider:ring-change/8-10 block size-4 shrink-0 rounded-full shadow-md transition-[color,box-shadow] select-none group-active/slider:ring-4 active:cursor-grabbing active:ring-4 disabled:pointer-events-none disabled:opacity-50 has-hover:group-hover/slider:ring-6 has-hover:group-hover/slider:group-active/slider:ring-4 has-focus-visible:ring-6"
+            className="bg-foreground shadow-shadow-color/shadow-opacity group-active/slider:ring-foreground/8-10 active:ring-foreground/8-10 ring-foreground/7-10 group-data-staged/root:bg-change group-data-staged/root:ring-change/7-10 group-data-staged/root:active:ring-change/8-10 group-data-staged/root:group-active/slider:ring-change/8-10 dank:bg-primary dank:group-has-data-painted/slider:bg-foreground dank:ease-emphasized dank:has-focus-visible:outline-primary dank:h-11 dank:w-1 dank:shadow-none dank:ring-6 dank:ring-[color:var(--slider-gap,var(--color-card))] dank:transition-[width] dank:duration-200 dank:group-active/slider:w-0.5 dank:group-active/slider:ring-6 dank:group-active/slider:ring-[color:var(--slider-gap,var(--color-card))] dank:active:ring-6 dank:active:ring-[color:var(--slider-gap,var(--color-card))] dank:has-hover:group-hover/slider:group-active/slider:ring-6 dank:group-data-staged/root:ring-[color:var(--slider-gap,var(--color-card))] dank:has-focus-visible:outline-2 dank:has-focus-visible:outline-offset-4 dank:data-[orientation=vertical]:h-1 dank:data-[orientation=vertical]:w-11 block size-4 shrink-0 rounded-full shadow-md transition-[color,box-shadow] select-none group-active/slider:ring-4 active:cursor-grabbing active:ring-4 disabled:pointer-events-none disabled:opacity-50 has-hover:group-hover/slider:ring-6 has-hover:group-hover/slider:group-active/slider:ring-4 has-focus-visible:ring-6"
           />
         ))}
       </SliderPrimitive.Control>

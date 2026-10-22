@@ -1,14 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
+
+import type { GitHubInstallation, GitHubIntegration } from "@/api/ops.gen";
 import {
   ExternalLinkIcon,
   GitMergeIcon,
   GitPullRequestIcon,
-  RefreshCwIcon,
   type LucideIcon,
+  RefreshCwIcon,
   UnplugIcon,
-} from "lucide-react";
-
-import type { GitHubInstallation, GitHubIntegration } from "@/api/ops.gen";
+} from "@/components/icons";
 import { GithubIcon } from "@/components/icons/github";
 import { GithubRepoSyncs } from "@/components/integrations/github-repo-syncs";
 import { ErrorCard } from "@/components/layout/error-card";

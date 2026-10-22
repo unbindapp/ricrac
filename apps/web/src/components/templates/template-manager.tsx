@@ -1,18 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useState } from "react";
+
 import {
   BoxIcon,
   CircleDotIcon,
   EllipsisIcon,
   FileTextIcon,
+  type LucideIcon,
   PencilIcon,
   PlusIcon,
   RepeatIcon,
-  type LucideIcon,
   Trash2Icon,
-} from "lucide-react";
-
+} from "@/components/icons";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { List } from "@/components/layout/list";

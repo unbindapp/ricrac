@@ -1,4 +1,5 @@
 import { type ReactNode } from "react";
+
 import {
   ArchiveIcon,
   ArchiveRestoreIcon,
@@ -6,8 +7,7 @@ import {
   HistoryIcon,
   Trash2Icon,
   UndoIcon,
-} from "lucide-react";
-
+} from "@/components/icons";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Button } from "@/components/ui/button";
 import {

@@ -1,4 +1,4 @@
-import { CircleUserIcon, CornerLeftUpIcon, ListIcon } from "lucide-react";
+import { CircleUserIcon, CornerLeftUpIcon, ListIcon } from "@/components/icons";
 import type { TGroupMeta } from "@/components/issues/grouping";
 import { useProjectLookup } from "@/components/issues/picker-sources";
 import { LabelDot, UserAvatar } from "@/components/issues/pickers";

@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { MailIcon, Trash2Icon, UserPlusIcon, UsersIcon } from "lucide-react";
 
 import type { Invitation, WorkspaceUser } from "@/api/ops.gen";
+import { MailIcon, Trash2Icon, UserPlusIcon, UsersIcon } from "@/components/icons";
 import { List, ListRow, ListRowText } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { SettingsPage } from "@/components/layout/settings-page";

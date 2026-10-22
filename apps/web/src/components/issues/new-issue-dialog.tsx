@@ -1,8 +1,8 @@
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useId, useRef, useState } from "react";
-import { CornerLeftUpIcon, XIcon } from "lucide-react";
 
+import { CornerLeftUpIcon, XIcon } from "@/components/icons";
 import {
   applyPatch,
   draftToCreateArgs,

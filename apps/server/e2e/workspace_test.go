@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"net/http/httptest"
 	"testing"
 )
 
@@ -38,6 +39,26 @@ func TestReadsAndUpdatesTheWorkspace(t *testing.T) {
 	eq(t, log.At("nodes", 1, "metadata", "urlKey").JSON(), `{"from":"acme","to":"acme-inc"}`)
 	eq(t, log.At("nodes", 0, "actor", "email").Str(), "ann@acme.test")
 	contains(t, fails(t, bob, "get_audit_log", M{}), "admins")
+}
+
+func TestSetsTheWorkspaceTheme(t *testing.T) {
+	w := world(t)
+	bob := w.member("bob@acme.test", "Bob Jones", "member")
+	eq(t, call(t, bob, "get_workspace", M{}).At("theme").Str(), "default")
+
+	contains(t, fails(t, bob, "update_workspace", M{"theme": "dank"}), "admins")
+	contains(t, fails(t, w.Ann, "update_workspace", M{"theme": "neon"}), "theme")
+	eq(t, call(t, w.Ann, "update_workspace", M{"theme": "dank"}).At("theme").Str(), "dank")
+	eq(t, call(t, bob, "get_workspace", M{}).At("theme").Str(), "dank")
+
+	req := httptest.NewRequest("GET", "/api/me", nil)
+	req.Header.Set("Cookie", w.session(bob.User))
+	_, me := send(w.Router, req)
+	eq(t, me.At("workspaces", 0, "theme").Str(), "dank")
+
+	log := call(t, w.Ann, "get_audit_log", M{"type": "workspace.updated"})
+	eq(t, log.At("nodes").Len(), 1)
+	eq(t, log.At("nodes", 0, "metadata", "theme").JSON(), `{"from":"default","to":"dank"}`)
 }
 
 func TestListsAndReadsMembers(t *testing.T) {

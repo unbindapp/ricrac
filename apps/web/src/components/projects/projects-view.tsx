@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
-import { BoxIcon, LayoutGridIcon, ListIcon, PlusIcon, SearchIcon } from "lucide-react";
 
+import { BoxIcon, LayoutGridIcon, ListIcon, PlusIcon, SearchIcon } from "@/components/icons";
 import type { TBreadcrumbItem } from "@/components/layout/breadcrumb";
 import { EmptyState } from "@/components/layout/empty-state";
 import { PageContainer } from "@/components/layout/page-container";

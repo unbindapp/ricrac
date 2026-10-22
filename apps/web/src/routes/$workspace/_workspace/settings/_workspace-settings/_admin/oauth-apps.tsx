@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { AppWindowIcon, KeyRoundIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 
 import type { OAuthApp, OAuthAppSecret } from "@/api/account.gen";
+import { AppWindowIcon, KeyRoundIcon, PencilIcon, PlusIcon, Trash2Icon } from "@/components/icons";
 import { List, ListRow, ListRowText } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { SettingsPage } from "@/components/layout/settings-page";

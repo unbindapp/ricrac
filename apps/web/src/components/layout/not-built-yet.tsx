@@ -1,4 +1,4 @@
-import { HammerIcon } from "lucide-react";
+import { HammerIcon } from "@/components/icons";
 import { EmptyState } from "@/components/layout/empty-state";
 
 export function NotBuiltYet() {
