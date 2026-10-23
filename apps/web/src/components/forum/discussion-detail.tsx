@@ -187,6 +187,11 @@ export function DiscussionDetail({
           )}
         </div>
       </div>
+      <ThreadBranches
+        discussion={discussion}
+        openThreadId={openThreadId}
+        isMainChatOpen={!openThreadId && !openMessageId}
+      />
       <AutosaveMarkdown
         label="Discussion body"
         placeholder="Write it up…"
@@ -196,11 +201,6 @@ export function DiscussionDetail({
           const saved = await saveAsync({ id: discussion.id, edit: { before, after } });
           return saved.body ?? "";
         }}
-      />
-      <ThreadBranches
-        discussion={discussion}
-        openThreadId={openThreadId}
-        isMainChatOpen={!openThreadId && !openMessageId}
       />
       <Dialog open={isEditingThumbnail} onOpenChange={setIsEditingThumbnail}>
         <DialogContent className="w-xl max-w-full">

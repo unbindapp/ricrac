@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 
-import { InboxIcon, LogOutIcon, SettingsIcon, UserCircleIcon } from "@/components/icons";
+import { InboxIcon, SettingsIcon, UserCircleIcon } from "@/components/icons";
 import { useInboxUnreadCount } from "@/components/inbox/inbox-unread-badge";
 import { UserAvatar } from "@/components/issues/pickers";
 import { GlobalSearch } from "@/themes/dank/global-search";
@@ -12,12 +12,12 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SimpleTooltip } from "@/components/ui/tooltip";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { meQuery, signOut } from "@/lib/queries/me";
+import { WorkspaceMenu } from "@/components/workspace/workspace-switcher";
+import { meQuery } from "@/lib/queries/me";
 
 /** Material 3's app bar with search: a 56dp search bar in a 64dp bar, actions at the end. */
 export function DankTopBar() {
@@ -39,35 +39,25 @@ function AccountMenu() {
   const { data: me } = useQuery(meQuery);
   if (!me) return null;
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Account"
-            className="shrink-0 rounded-full active:rounded-full data-popup-open:rounded-full [&>*]:size-7.5"
-          >
-            <UserAvatar user={me} size="lg" />
-          </Button>
-        }
-      />
-      <DropdownMenuContent align="end" className="w-64">
-        <DropdownMenuGroup>
-          <DropdownMenuLabel className="flex flex-col gap-0.5">
-            <span className="text-foreground truncate text-sm">{me.name}</span>
-            <span className="truncate">{me.email}</span>
-          </DropdownMenuLabel>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => void signOut()}>
-            <LogOutIcon className="size-4" />
-            Sign out
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <WorkspaceMenu
+      align="end"
+      header={
+        <DropdownMenuLabel className="flex flex-col gap-0.5">
+          <span className="text-foreground truncate text-sm">{me.name}</span>
+          <span className="truncate">{me.email}</span>
+        </DropdownMenuLabel>
+      }
+      trigger={
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Account and workspaces"
+          className="shrink-0 rounded-full active:rounded-full popup-open:rounded-full [&>*]:size-7.5"
+        >
+          <UserAvatar user={me} size="lg" />
+        </Button>
+      }
+    />
   );
 }
 

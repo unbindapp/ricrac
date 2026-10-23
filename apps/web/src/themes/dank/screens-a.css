@@ -266,7 +266,7 @@
 :root[data-ui-theme="dank"]
   [data-slot="properties"]
   > [data-slot="property-row"]:has(
-    [data-picker="row"]:is(:focus-visible, :active, [data-popup-open])
+    [data-picker="row"]:is(:focus-visible, :active, [data-popup-open][aria-expanded="true"])
   ) {
   border-radius: var(--radius-lg);
 }

@@ -10,10 +10,7 @@ export function DankNavigation() {
   useHotkeyScope([{ hotkey: SIDEBAR_HOTKEY, callback: toggle }]);
   useRememberSettingsReturn();
   return (
-    <aside
-      data-expanded={isExpanded || undefined}
-      className="ease-spring-default-spatial hidden w-24 shrink-0 overflow-hidden transition-[width] duration-(--spring-default-spatial-duration) data-expanded:w-64 md:flex"
-    >
+    <aside className="hidden shrink-0 overflow-hidden md:flex">
       <NavigationRail
         isExpanded={isExpanded}
         menuLabel={isExpanded ? "Collapse navigation" : "Expand navigation"}

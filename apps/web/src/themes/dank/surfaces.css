@@ -178,3 +178,72 @@
     }
   }
 }
+
+@property --rail-progress {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --rail-fab-progress {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --rail-selected {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+[data-slot="navigation-rail"] {
+  --rail-progress: 0;
+  --rail-fab-progress: 0;
+  --rail-expanding: 0;
+  transition:
+    --rail-progress var(--spring-default-spatial-duration) var(--ease-spring-default-spatial),
+    --rail-fab-progress var(--spring-fast-spatial-duration) var(--ease-spring-fast-spatial);
+
+  &[data-expanded] {
+    --rail-progress: 1;
+    --rail-fab-progress: 1;
+    --rail-expanding: 1;
+  }
+
+  --rail-width: calc(6rem + 7.75rem * var(--rail-progress));
+  --rail-item-gap: calc(0.25rem * (1 - var(--rail-progress)));
+  --rail-fab-width: calc(3.5rem + var(--rail-fab-progress) * (100% - 3.5rem));
+
+  --rail-item-progress: max(0, var(--rail-progress));
+  --rail-label-switch: clamp(0, (var(--rail-item-progress) - 0.5) * 1000000, 1);
+  --rail-indicator-padding: calc(0.25rem + 0.75rem * var(--rail-item-progress));
+  --rail-indicator-height: calc(1.5rem + 2 * var(--rail-indicator-padding));
+  --rail-indicator-width: calc(3.5rem + var(--rail-item-progress) * (100% - 3.5rem));
+  --rail-content-height: calc(
+    var(--rail-indicator-height) + (1 - var(--rail-item-progress)) *
+      (1.25rem + 0.25rem * var(--rail-label-switch))
+  );
+  --rail-item-height: max(4rem - 1rem * var(--rail-progress), var(--rail-content-height));
+  --rail-content-top: calc((var(--rail-item-height) - var(--rail-content-height)) / 2);
+  --rail-icon-top: calc(
+    var(--rail-indicator-padding) + var(--rail-item-progress) *
+      ((var(--rail-content-height) - 1.5rem) / 2 - var(--rail-indicator-padding))
+  );
+  --rail-top-label-top: calc(
+    var(--rail-content-top) + var(--rail-icon-top) + 1.75rem + var(--rail-indicator-padding)
+  );
+  --rail-top-label-opacity: calc(
+    4 * (0.5 - var(--rail-item-progress)) * (0.5 - var(--rail-item-progress)) *
+      (1 - var(--rail-label-switch))
+  );
+  --rail-start-label-left: calc(
+    (3rem - 1.25rem * var(--rail-expanding) * (1 - var(--rail-item-progress))) *
+      var(--rail-item-progress) - 3rem
+  );
+  --rail-start-label-top: calc((var(--rail-content-height) - 1.25rem) / 2);
+  --rail-start-label-opacity: calc(
+    4 * (var(--rail-item-progress) - 0.5) * (var(--rail-item-progress) - 0.5) *
+      var(--rail-label-switch)
+  );
+}

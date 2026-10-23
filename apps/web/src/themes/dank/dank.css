@@ -472,7 +472,7 @@
   }
   &:focus-visible::after,
   &:active::after,
-  &[data-popup-open]::after {
+  &[data-popup-open][aria-expanded="true"]::after {
     opacity: 0.1;
   }
 }
