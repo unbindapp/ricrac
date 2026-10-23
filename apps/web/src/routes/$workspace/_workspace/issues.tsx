@@ -29,11 +29,11 @@ import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { WorkspaceTeamGate } from "@/components/workspace/workspace-team-gate";
 import { teamStatusesQuery } from "@/lib/queries/teams";
 
-const TABS = ["active", "backlog", "all"] as const;
+const TABS = ["all", "active", "backlog"] as const;
 type TIssuesTab = (typeof TABS)[number];
 
 const searchSchema = issueSearchSchema.extend({
-  tab: z.enum(["backlog", "all"]).optional().catch(undefined),
+  tab: z.enum(["active", "backlog"]).optional().catch(undefined),
 });
 
 export const Route = createFileRoute("/$workspace/_workspace/issues")({
@@ -61,11 +61,11 @@ function IssuesPage() {
       {(team) => (
         <Issues
           team={team}
-          tab={tab ?? "active"}
+          tab={tab ?? "all"}
           filters={filtersFromSearch(search)}
           onTabChange={(next) =>
             void navigate({
-              search: (prev) => ({ ...prev, tab: next === "active" ? undefined : next }),
+              search: (prev) => ({ ...prev, tab: next === "all" ? undefined : next }),
             })
           }
           onFiltersChange={(filters) =>
@@ -91,7 +91,7 @@ function useTabCounts(workspaceId: string, teamId: string) {
   };
 }
 
-/** Active (todo and in progress), Backlog and All, with the backlog's count always in sight. */
+/** All issues, Active (todo and in progress) and Backlog, with the backlog's count always in sight. */
 function Issues({
   team,
   tab,
