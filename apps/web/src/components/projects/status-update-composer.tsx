@@ -3,7 +3,7 @@ import { useState } from "react";
 import { HEALTHS, HealthIcon, healthLabels } from "@/components/projects/health-badge";
 import { useMentionUsers } from "@/components/projects/people";
 import { FilterChip } from "@/components/shared/filter-chip";
-import { MarkdownEditor } from "@/components/shared/markdown-editor";
+import { MarkdownEditor, useToolbarSlot } from "@/components/shared/markdown-editor";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -31,6 +31,7 @@ export function StatusUpdateComposer({
   const [body, setBody] = useState(initialBody);
   const [health, setHealth] = useState<THealth>(initialHealth);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const toolbar = useToolbarSlot();
   const canSubmit = body.trim().length > 0 && !isSubmitting && !uploads.isUploading;
 
   const submit = async () => {
@@ -71,8 +72,10 @@ export function StatusUpdateComposer({
         label="Update"
         onSubmit={() => void submit()}
         {...uploads.editorProps}
+        toolbarSlot={toolbar.target}
       />
       <div className="flex items-center justify-end gap-2">
+        {toolbar.slot}
         {onCancel && (
           <Button variant="ghost" size="sm" onClick={onCancel}>
             Cancel

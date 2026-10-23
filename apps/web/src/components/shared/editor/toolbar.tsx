@@ -72,7 +72,8 @@ const blockKeys: Record<string, string[]> = {
 const toolbarBlocks = [...listCommands, ...blockCommands];
 const toolbarInserts = insertCommands.filter((command) => command.needsUpload);
 const overflowBlockIds = new Set(blockCommands.map((command) => command.id));
-const hiddenWhenNarrow = "dank:@max-[49rem]:hidden";
+const hiddenWhenNarrow = "dank:@max-[40rem]:hidden";
+const toolSize = "dank:size-8 dank:[&>svg]:size-5";
 
 type TTableAction = { label: string; icon: LucideIcon; run: (editor: Editor) => void };
 
@@ -241,6 +242,7 @@ export function EditorToolbar({
                 aria-pressed={media.width === size.width}
                 className={cn(
                   "dank:type-label-large text-xs",
+                  toolSize,
                   media.width === size.width && "bg-accent text-foreground",
                 )}
                 onClick={() => editor.chain().focus().setMediaLayout({ width: size.width }).run()}
@@ -293,7 +295,7 @@ function OverflowMenu({
             size="icon"
             forceMinSize={false}
             aria-label="More formatting"
-            className="dank:@max-[49rem]:flex hidden"
+            className={cn("dank:@max-[40rem]:flex hidden", toolSize)}
           >
             <EllipsisIcon className="size-4" />
           </Button>
@@ -346,7 +348,12 @@ function ToolButton({
         aria-label={label}
         aria-pressed={isActive === undefined ? undefined : isActive}
         disabled={disabled}
-        className={cn("text-muted-foreground", isActive && "bg-accent text-foreground", className)}
+        className={cn(
+          "text-muted-foreground",
+          isActive && "bg-accent text-foreground",
+          toolSize,
+          className,
+        )}
         onClick={onClick}
       >
         <Icon className="size-4" />
@@ -436,7 +443,11 @@ function LinkButton({
               forceMinSize={false}
               aria-label="Link"
               aria-pressed={isActive}
-              className={cn("text-muted-foreground", isActive && "bg-accent text-foreground")}
+              className={cn(
+                "text-muted-foreground",
+                isActive && "bg-accent text-foreground",
+                toolSize,
+              )}
             >
               <LinkIcon className="size-4" />
             </Button>
@@ -552,7 +563,7 @@ function EditorHelp() {
               size="icon"
               forceMinSize={false}
               aria-label="Editor help"
-              className="text-muted-foreground shrink-0"
+              className={cn("text-muted-foreground shrink-0", toolSize)}
             >
               <HelpCircleIcon className="size-4" />
             </Button>
