@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { type LinkProps, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { type ReactElement, type ReactNode, useState } from "react";
 
 import {
   CheckIcon,
@@ -31,6 +31,36 @@ import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { meQuery, signOut } from "@/lib/queries/me";
 
 export function WorkspaceSwitcher({ onNavigate }: { onNavigate?: () => void }) {
+  const { workspace } = useWorkspace();
+  return (
+    <WorkspaceMenu
+      onNavigate={onNavigate}
+      trigger={
+        <Button
+          variant="ghost"
+          size="sm"
+          forceMinSize={false}
+          aria-label="Switch workspace"
+          className="h-8 min-w-0 flex-1 justify-start px-1.5"
+        >
+          <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} />
+          <span className="min-w-0 truncate">{workspace.name}</span>
+          <ChevronDownIcon className="text-muted-foreground size-3.5" />
+          <span className="flex-1" />
+        </Button>
+      }
+    />
+  );
+}
+
+type TWorkspaceMenuProps = {
+  trigger: ReactElement;
+  header?: ReactNode;
+  align?: "start" | "end";
+  onNavigate?: () => void;
+};
+
+export function WorkspaceMenu({ trigger, header, align, onNavigate }: TWorkspaceMenuProps) {
   const { workspace, isAdmin, canEdit } = useWorkspace();
   const openInvite = useInviteStore((state) => state.setOpen);
   const { data: me } = useQuery(meQuery);
@@ -47,25 +77,10 @@ export function WorkspaceSwitcher({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger
-          render={
-            <Button
-              variant="ghost"
-              size="sm"
-              forceMinSize={false}
-              aria-label="Switch workspace"
-              className="h-8 min-w-0 flex-1 justify-start px-1.5"
-            >
-              <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} />
-              <span className="min-w-0 truncate">{workspace.name}</span>
-              <ChevronDownIcon className="text-muted-foreground size-3.5" />
-              <span className="flex-1" />
-            </Button>
-          }
-        />
-        <DropdownMenuContent className="w-64">
+        <DropdownMenuTrigger render={trigger} />
+        <DropdownMenuContent align={align} className="w-64">
           <DropdownMenuGroup>
-            <DropdownMenuLabel>{me?.email}</DropdownMenuLabel>
+            {header ?? <DropdownMenuLabel>{me?.email}</DropdownMenuLabel>}
             {me?.workspaces.map((item) => (
               <DropdownMenuItem
                 key={item.id}

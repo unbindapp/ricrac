@@ -1,5 +1,5 @@
 import { Link, type LinkProps, useNavigate } from "@tanstack/react-router";
-import { type ComponentProps } from "react";
+import { type ComponentProps, type ComponentType } from "react";
 
 import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
 import { SidebarFavorites } from "@/components/favorites/sidebar-favorites";
@@ -40,7 +40,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { SimpleTooltip } from "@/components/ui/tooltip";
 import { cn } from "@/components/ui/utils";
 import { useWorkspaceTeam } from "@/components/workspace/teams-provider";
+import { WorkspaceIcon } from "@/components/workspace/workspace-icon";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { WorkspaceMenu } from "@/components/workspace/workspace-switcher";
 
 type TDestination = {
   label: string;
@@ -185,6 +187,16 @@ export function NavigationRail({
       </ScrollArea>
       {hasAccountLinks && (
         <div className="flex w-full flex-col pt-2 pb-3">
+          <WorkspaceMenu
+            onNavigate={onNavigate}
+            trigger={
+              <RailButton
+                label={workspace.name}
+                icon={CurrentWorkspaceIcon}
+                aria-label="Switch workspace"
+              />
+            }
+          />
           <RailLink
             label="Settings"
             icon={SettingsIcon}
@@ -205,13 +217,15 @@ const railItemClassName = cn(
   "group/rail relative flex min-h-16 w-full flex-col items-start gap-1 px-5 py-1.5 outline-hidden select-none transition-[min-height,padding,gap] group-data-expanded/rail-root:min-h-14 group-data-expanded/rail-root:gap-0 group-data-expanded/rail-root:py-0",
 );
 
+type TRailIcon = ComponentType<{ className?: string }>;
+
 function RailItemContent({
   icon: Icon,
   label,
   isActive = false,
   unread = 0,
 }: {
-  icon: LucideIcon;
+  icon: TRailIcon;
   label: string;
   isActive?: boolean;
   unread?: number;
@@ -290,7 +304,7 @@ function RailButton({
   label,
   icon,
   ...props
-}: ComponentProps<typeof Button> & { label: string; icon: LucideIcon }) {
+}: ComponentProps<typeof Button> & { label: string; icon: TRailIcon }) {
   return (
     <Button
       variant="ghost"
@@ -304,6 +318,15 @@ function RailButton({
     >
       <RailItemContent icon={icon} label={label} />
     </Button>
+  );
+}
+
+function CurrentWorkspaceIcon({ className }: { className?: string }) {
+  const { workspace } = useWorkspace();
+  return (
+    <span className={cn(className, "flex items-center justify-center")}>
+      <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} />
+    </span>
   );
 }
 
