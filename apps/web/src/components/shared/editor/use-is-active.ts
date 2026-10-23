@@ -8,7 +8,11 @@ function isPopup(target: EventTarget | null) {
 }
 
 /** True from focus or a press landing in the element until focus or a press lands outside it and its menus. */
-export function useIsActive(ref: RefObject<HTMLElement | null>, initial = false) {
+export function useIsActive(
+  ref: RefObject<HTMLElement | null>,
+  initial = false,
+  alsoInside: HTMLElement | null = null,
+) {
   const [isActive, setIsActive] = useState(initial);
   useEffect(() => {
     const element = ref.current;
@@ -16,7 +20,9 @@ export function useIsActive(ref: RefObject<HTMLElement | null>, initial = false)
     let pressed: EventTarget | null = null;
     const settle = (target: EventTarget | null) => {
       if (isPopup(target)) return;
-      setIsActive(target instanceof Node && element.contains(target));
+      const isInside = (node: Node) =>
+        element.contains(node) || Boolean(alsoInside?.contains(node));
+      setIsActive(target instanceof Node && isInside(target));
     };
     const onFocusIn = (event: Event) => settle(event.target);
     const onPointerDown = (event: Event) => {
@@ -38,6 +44,6 @@ export function useIsActive(ref: RefObject<HTMLElement | null>, initial = false)
       document.removeEventListener("pointerup", onPointerUp);
       document.removeEventListener("pointercancel", onPointerUp);
     };
-  }, [ref]);
+  }, [ref, alsoInside]);
   return isActive;
 }

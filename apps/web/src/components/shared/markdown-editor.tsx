@@ -7,6 +7,7 @@ import { Markdown } from "@tiptap/markdown";
 import { type AnyExtension, type Editor, EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { type DragEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { UploadIcon, XIcon } from "@/components/icons";
 import { Avatar } from "@/components/shared/avatar";
@@ -32,6 +33,7 @@ import { SuggestionMenu, type TSuggestionItem } from "@/components/ui/suggestion
 import { toast } from "@/components/ui/toast";
 import useDebouncedCallback from "@/lib/hooks/use-debounced-callback";
 import { mediaAccept } from "@/lib/helpers/media";
+import { useUiTheme } from "@/themes/ui-theme-provider";
 
 const AUTOSAVE_DELAY_MS = 800;
 const MAX_MENTION_RESULTS = 8;
@@ -79,6 +81,8 @@ type TProps = {
   framed?: boolean;
   toolbar?: boolean;
   addons?: TEditorAddons;
+  /** Where the toolbar goes instead of over the text, from useToolbarSlot. */
+  toolbarSlot?: HTMLElement | null;
   /** Like a chat box: one line tall, no toolbar, Enter sends and Shift+Enter starts a new line. */
   chat?: boolean;
 };
@@ -99,6 +103,7 @@ export function MarkdownEditor({
   framed = false,
   toolbar = true,
   addons,
+  toolbarSlot = null,
   chat = false,
 }: TProps) {
   const usersRef = useRef(users ?? []);
@@ -118,7 +123,8 @@ export function MarkdownEditor({
   const dragDepthRef = useRef(0);
   const [incoming, setIncoming] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
-  const isActive = useIsActive(rootRef, Boolean(autoFocus));
+  const isActive = useIsActive(rootRef, Boolean(autoFocus), toolbarSlot);
+  const isDank = useUiTheme().id === "dank";
   const [suggestion, setSuggestion] = useState<TSuggestionState | null>(null);
   const suggestionRef = useRef<TSuggestionState | null>(null);
   const suggestionSinkRef = useRef((next: TSuggestionState | null) => {
@@ -424,7 +430,26 @@ export function MarkdownEditor({
       data-chat={chat || undefined}
     />
   );
-  const showToolbar = toolbar && !chat && !readOnly && editor && (isActive || isLinkOpen);
+  const isWriting = isActive || isLinkOpen;
+  const holdsToolbarSpace = isDank && !hasAutosave && !toolbarSlot;
+  const showToolbar = toolbar && !chat && !readOnly && editor && (isWriting || holdsToolbarSpace);
+  const toolbarDock = showToolbar && (
+    <div
+      data-slot="editor-toolbar-dock"
+      data-idle={!isWriting || undefined}
+      data-framed={framed || undefined}
+      data-sticky={(hasAutosave && !toolbarSlot) || undefined}
+      className="bg-background data-framed:bg-input mb-2 border-b pb-1 data-framed:mb-0 data-framed:rounded-t-md data-framed:px-1 data-framed:pt-1 data-sticky:sticky data-sticky:top-11 data-sticky:z-20 group-data-[bar=apart]/page:data-sticky:top-0 group-data-[width=narrow]/page:data-sticky:top-0"
+    >
+      <EditorToolbar
+        editor={editor}
+        canUpload={canUpload}
+        pickFiles={pickFiles}
+        isLinkOpen={isLinkOpen}
+        onLinkOpenChange={setIsLinkOpen}
+      />
+    </div>
+  );
 
   return (
     <div
@@ -440,21 +465,7 @@ export function MarkdownEditor({
         data-inline={(hasAutosave && !framed && !readOnly) || undefined}
         className="data-framed:bg-input data-framed:has-hover:hover:ring-border data-framed:focus-within:ring-primary/8-10 data-inline:has-hover:hover:ring-border data-inline:focus-within:ring-border flex w-full flex-col transition-shadow data-framed:rounded-md data-framed:border data-framed:focus-within:ring-1 data-framed:has-hover:hover:ring-1 data-inline:-mx-3 data-inline:-my-2 data-inline:w-auto data-inline:rounded-md data-inline:px-3 data-inline:py-2 data-inline:ring-1 data-inline:ring-transparent"
       >
-        {showToolbar && (
-          <div
-            data-framed={framed || undefined}
-            data-sticky={hasAutosave || undefined}
-            className="bg-background data-framed:bg-input dank:bg-transparent dank:border-b-0 dank:pb-0 dank:data-framed:bg-transparent dank:data-framed:p-2 mb-2 border-b pb-1 data-framed:mb-0 data-framed:rounded-t-md data-framed:px-1 data-framed:pt-1 data-sticky:sticky data-sticky:top-11 data-sticky:z-20 group-data-[bar=apart]/page:data-sticky:top-0 group-data-[width=narrow]/page:data-sticky:top-0"
-          >
-            <EditorToolbar
-              editor={editor}
-              canUpload={canUpload}
-              pickFiles={pickFiles}
-              isLinkOpen={isLinkOpen}
-              onLinkOpenChange={setIsLinkOpen}
-            />
-          </div>
-        )}
+        {toolbarSlot ? toolbarDock && createPortal(toolbarDock, toolbarSlot) : toolbarDock}
         {content}
       </div>
       {isDraggingFiles && (
@@ -580,4 +591,14 @@ function mentionItems(users: TMentionUser[], query: string): TSuggestionItem[] {
       description: user.name !== user.displayName ? user.name : undefined,
       icon: <Avatar id={user.id} name={user.name} src={user.avatarUrl} size="xs" />,
     }));
+}
+
+/** A place for an editor's toolbar beside its form's buttons, in Dank, so focusing the editor moves nothing. */
+export function useToolbarSlot() {
+  const isDank = useUiTheme().id === "dank";
+  const [target, setTarget] = useState<HTMLElement | null>(null);
+  const slot = isDank ? (
+    <div ref={setTarget} data-slot="editor-toolbar-slot" className="min-w-0 flex-1" />
+  ) : null;
+  return { slot, target: isDank ? target : null };
 }

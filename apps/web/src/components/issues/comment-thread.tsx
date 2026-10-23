@@ -17,7 +17,7 @@ import { useWorkspaceUsers } from "@/components/issues/picker-sources";
 import { UserAvatar } from "@/components/issues/pickers";
 import { AddReactionButton, groupReactions, ReactionBar } from "@/components/issues/reaction-bar";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
-import { MarkdownEditor } from "@/components/shared/markdown-editor";
+import { MarkdownEditor, useToolbarSlot } from "@/components/shared/markdown-editor";
 import { MarkdownView } from "@/components/shared/markdown-view";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Button } from "@/components/ui/button";
@@ -55,6 +55,7 @@ export function CommentComposer({
   const { workspace } = useWorkspace();
   const [body, setBody] = useState("");
   const [formKey, setFormKey] = useState(0);
+  const toolbar = useToolbarSlot();
   const { users } = useWorkspaceUsers();
   const uploads = useEditorUploads(workspace.id);
   const { mutateAsync: saveComment, isPending } = useSaveCommentMutation(workspace.id);
@@ -81,8 +82,10 @@ export function CommentComposer({
         users={users}
         {...uploads.editorProps}
         autoFocus={autoFocus}
+        toolbarSlot={toolbar.target}
       />
       <div className="flex items-center justify-end gap-2">
+        {toolbar.slot}
         {onDone && (
           <Button variant="ghost" size="sm" onClick={onDone}>
             Cancel
@@ -203,6 +206,7 @@ function CommentItem({
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [draft, setDraft] = useState(comment.body);
+  const toolbar = useToolbarSlot();
   const { data: me } = useQuery(meQuery);
   const { users } = useWorkspaceUsers();
   const uploads = useEditorUploads(workspace.id);
@@ -320,8 +324,10 @@ function CommentItem({
             {...uploads.editorProps}
             autoFocus
             framed
+            toolbarSlot={toolbar.target}
           />
           <div className="flex items-center justify-end gap-2">
+            {toolbar.slot}
             <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)}>
               Cancel
             </Button>
