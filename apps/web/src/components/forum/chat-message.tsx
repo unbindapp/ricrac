@@ -129,7 +129,7 @@ export function ChatMessage({
             aria-label={`Message from ${authorName}`}
             data-continuation={isContinuation || undefined}
             data-current={thread?.isOpen || undefined}
-            className="group/message group/reactable has-hover:hover:bg-foreground/2-10 data-current:bg-primary/1-10 data-popup-open:bg-foreground/2-10 relative -mx-2 flex gap-3 rounded-md px-2 py-1 not-data-continuation:mt-2"
+            className="group/message group/reactable has-hover:hover:bg-foreground/2-10 data-current:bg-primary/1-10 data-popup-open:bg-foreground/2-10 dank:state-layer dank:has-hover:hover:bg-transparent dank:data-popup-open:bg-transparent dank:data-current:bg-m3-secondary-container relative -mx-2 flex gap-3 rounded-md px-2 py-1 not-data-continuation:mt-2"
           />
         }
       >
@@ -150,7 +150,9 @@ export function ChatMessage({
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           {!isContinuation && (
             <header className="flex min-w-0 items-baseline gap-2">
-              <span className="truncate text-sm font-semibold">{authorName}</span>
+              <span className="dank:type-title-small truncate text-sm font-semibold">
+                {authorName}
+              </span>
               <MessageTime value={message.createdAt} />
             </header>
           )}
@@ -196,7 +198,7 @@ export function ChatMessage({
           )}
         </div>
         {!isEditing && (canEdit || isAdmin) && (
-          <div className="bg-popover absolute -top-4 right-2 flex items-center rounded-md border p-0.5 opacity-0 shadow-sm group-hover/message:opacity-100 focus-within:opacity-100 has-data-popup-open:opacity-100">
+          <div className="bg-popover dank:rounded-full dank:border-0 dank:p-1 dank:gap-1 dank:shadow-elevation-2 dank:-top-5 absolute -top-4 right-2 flex items-center rounded-md border p-0.5 opacity-0 shadow-sm group-hover/message:opacity-100 focus-within:opacity-100 has-data-popup-open:opacity-100">
             {canEdit && <AddReactionButton reactions={reactions} onToggle={react} />}
             {canEdit && thread && (
               <SimpleTooltip content={replyCount > 0 ? "Open thread" : "Reply in thread"}>
@@ -205,7 +207,7 @@ export function ChatMessage({
                   size="icon"
                   forceMinSize={false}
                   aria-label={replyCount > 0 ? "Open thread" : "Reply in thread"}
-                  className="size-7"
+                  className="dank:size-8 dank:[&>svg]:size-5 size-7"
                   onClick={thread.onOpen}
                 >
                   <MessageSquareReplyIcon className="text-muted-foreground size-4" />
@@ -221,7 +223,7 @@ export function ChatMessage({
                       size="icon"
                       forceMinSize={false}
                       aria-label="Message actions"
-                      className="size-7"
+                      className="dank:size-8 dank:[&>svg]:size-5 size-7"
                     >
                       <EllipsisIcon className="text-muted-foreground size-4" />
                     </Button>
@@ -293,11 +295,12 @@ function ThreadChip({ replies, onOpen }: { replies: Comment[]; onOpen: () => voi
     <Button
       variant="outline"
       size="sm"
+      data-m3-chip="assist"
       className="max-w-full self-start font-normal"
       onClick={onOpen}
     >
       <AvatarStack users={people} max={3} />
-      <span className="text-primary font-medium">
+      <span className="text-primary dank:text-m3-on-surface font-medium">
         {replies.length} {replies.length === 1 ? "reply" : "replies"}
       </span>
       <span className="text-muted-foreground truncate text-xs max-sm:hidden">
@@ -372,7 +375,10 @@ function ComposerBox({
 }) {
   const picker = useFilePicker({ multiple: true, onSelect: attachments.add });
   return (
-    <div className="bg-input focus-within:ring-primary/8-10 flex flex-col rounded-lg border focus-within:ring-1">
+    <div
+      data-m3-field="outlined"
+      className="bg-input focus-within:ring-primary/8-10 dank:min-h-14 dank:justify-center flex flex-col rounded-lg border focus-within:ring-1"
+    >
       {attachments.items.length > 0 && (
         <div className="border-b p-2">
           <AttachmentTray items={attachments.items} onRemove={attachments.remove} />

@@ -216,7 +216,7 @@ function SortableStatusRow({
         </span>
       )}
       {status.projectCount > 0 && (
-        <span className="text-muted-foreground shrink-0 text-xs tabular-nums">
+        <span className="text-muted-foreground dank:type-label-small shrink-0 text-xs tabular-nums">
           {status.projectCount} project{status.projectCount === 1 ? "" : "s"}
         </span>
       )}

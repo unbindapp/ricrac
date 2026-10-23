@@ -281,7 +281,7 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
   ];
 
   return (
-    <Command loop className="h-auto sm:max-h-120">
+    <Command loop variant="searchView" className="h-auto sm:max-h-120">
       <CommandInput
         autoFocus
         value={query}

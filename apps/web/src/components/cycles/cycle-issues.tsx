@@ -60,7 +60,7 @@ function StateGroup({ group }: { group: TGroup }) {
   const [isOpen, setIsOpen] = useState(!isFinished);
   return (
     <>
-      <div className="bg-muted/50 flex h-9 items-center gap-2 border-b px-3 last:border-b-0">
+      <div className="bg-muted/50 dank:h-12 dank:gap-1 dank:border-0 dank:bg-transparent dank:px-0 flex h-9 items-center gap-2 border-b px-3 last:border-b-0">
         <Button
           variant="ghost"
           size="icon"
@@ -68,7 +68,7 @@ function StateGroup({ group }: { group: TGroup }) {
           aria-expanded={isOpen}
           aria-label={isOpen ? `Collapse ${group.state.name}` : `Expand ${group.state.name}`}
           onClick={() => setIsOpen((open) => !open)}
-          className="text-muted-foreground -ml-1 size-6"
+          className="text-muted-foreground dank:ml-0 dank:size-10 -ml-1 size-6"
         >
           <ChevronRightIcon
             data-open={isOpen || undefined}
@@ -76,8 +76,10 @@ function StateGroup({ group }: { group: TGroup }) {
           />
         </Button>
         <StateIcon type={group.state.type} color={group.state.color} />
-        <span className="text-sm font-medium">{group.state.name}</span>
-        <span className="text-muted-foreground text-xs tabular-nums">{group.issues.length}</span>
+        <span className="dank:type-title-small text-sm font-medium">{group.state.name}</span>
+        <span className="text-muted-foreground dank:type-label-large text-xs tabular-nums">
+          {group.issues.length}
+        </span>
       </div>
       {isOpen && group.issues.map((issue) => <IssueRow key={issue.id} issue={issue} />)}
     </>

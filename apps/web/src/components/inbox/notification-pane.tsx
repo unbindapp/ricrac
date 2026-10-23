@@ -84,15 +84,15 @@ export function NotificationPane({
       aria-label={target.title}
       className="bg-background flex min-h-0 w-full flex-1 flex-col"
     >
-      <div className="flex h-12 shrink-0 items-center gap-2 border-b px-3">
-        <div className="flex min-w-0 flex-1 items-center gap-1.5 text-sm">
+      <div className="dank:h-16 dank:border-b-0 dank:pr-1 dank:pl-4 flex h-12 shrink-0 items-center gap-2 border-b px-3">
+        <div className="dank:type-title-large dank:gap-2 flex min-w-0 flex-1 items-center gap-1.5 text-sm">
           <NotificationTargetIcon target={target} />
           {target.kind === "issue" && (
-            <span className="text-muted-foreground shrink-0 font-mono text-xs">
+            <span className="text-muted-foreground dank:type-title-large shrink-0 font-mono text-xs">
               {target.identifier}
             </span>
           )}
-          <span className="truncate font-medium">{target.title}</span>
+          <span className="dank:font-normal truncate font-medium">{target.title}</span>
         </div>
         <ActionTooltip label={isUnread ? "Mark read" : "Mark unread"} hotkey="U">
           <Button
@@ -226,7 +226,7 @@ function NotificationEvents({ group }: { group: TNotificationGroup }) {
                   variant="ghost"
                   size="sm"
                   forceMinSize={false}
-                  className="bg-muted/60 text-muted-foreground h-auto justify-start py-1.5 text-left font-normal whitespace-normal"
+                  className="bg-muted/60 text-muted-foreground dank:bg-m3-surface-container-highest dank:rounded-md dank:active:rounded-md dank:px-4 dank:py-3 h-auto justify-start py-1.5 text-left font-normal whitespace-normal"
                 >
                   <span className="line-clamp-2">{excerpt}</span>
                 </LinkButton>

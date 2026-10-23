@@ -157,7 +157,10 @@ function ReleasePage({
           <ReleaseNotesSection release={release} />
         </div>
         <aside aria-label="Properties" className="w-full shrink-0 lg:w-72">
-          <div className="flex flex-col gap-1 rounded-lg border p-4 lg:sticky lg:top-0">
+          <div
+            data-slot="properties"
+            className="dank:rounded-none dank:border-0 dank:bg-transparent dank:p-0 flex flex-col gap-1 rounded-lg border p-4 lg:sticky lg:top-0"
+          >
             <ReleaseProperties release={release} pipeline={pipeline} />
           </div>
         </aside>
@@ -291,7 +294,11 @@ function ReleaseNotesSection({ release }: { release: TReleaseDetail }) {
       {release.releaseNotes.length === 0 ? (
         <p className="text-muted-foreground text-sm">No release notes cover this release yet.</p>
       ) : (
-        <div role="list" className="flex w-full flex-col overflow-hidden rounded-lg border">
+        <div
+          role="list"
+          data-slot="list"
+          className="flex w-full flex-col overflow-hidden rounded-lg border"
+        >
           {release.releaseNotes.map((note) => (
             <Link
               key={note.id}

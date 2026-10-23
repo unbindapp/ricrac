@@ -50,7 +50,7 @@ export function UpdateReactions({ reactions, meId, disabled, onToggle }: TProps)
             aria-pressed={group.reacted}
             aria-label={`${group.emoji} ${group.names.length}`}
             data-active={group.reacted || undefined}
-            className="data-active:border-primary/6-10 data-active:bg-primary/1-10 h-7 rounded-full px-2"
+            className="data-active:border-primary/6-10 data-active:bg-primary/1-10 dank:h-8 dank:rounded-sm dank:data-active:border-transparent dank:data-active:bg-m3-secondary-container dank:data-active:text-m3-on-secondary-container h-7 rounded-full px-2"
             onClick={() => onToggle(group.emoji, group.reacted)}
           >
             <span>{group.emoji}</span>

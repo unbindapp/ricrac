@@ -71,7 +71,12 @@ export function AddSubIssueMenu({
         });
       }}
       trigger={
-        <Button variant="ghost" size="sm" className="text-muted-foreground font-normal">
+        <Button
+          variant="ghost"
+          size="sm"
+          data-m3-chip="assist"
+          className="text-muted-foreground font-normal"
+        >
           <ListTreeIcon className="size-4" />
           {label}
         </Button>
@@ -91,7 +96,7 @@ export function SubIssues({ issue }: { issue: IssueDetail }) {
   return (
     <section aria-label="Sub-issues" className="flex w-full flex-col gap-2">
       <div className="flex min-h-7 items-center gap-2">
-        <h2 className="text-sm font-semibold">Sub-issues</h2>
+        <h2 className="dank:type-title-medium text-sm font-semibold">Sub-issues</h2>
         <span className="text-muted-foreground text-xs">
           {done}/{children.length} done
         </span>
@@ -110,7 +115,7 @@ export function SubIssues({ issue }: { issue: IssueDetail }) {
               event.target === event.currentTarget &&
               open(child.identifier)
             }
-            className="group/row has-hover:hover:bg-accent focus-visible:ring-primary/8-10 flex h-9 w-full cursor-default items-center gap-2 border-b px-3 text-sm outline-hidden last:border-b-0 focus-visible:ring-1 focus-visible:ring-inset"
+            className="group/row has-hover:hover:bg-accent focus-visible:ring-primary/8-10 dank:relative dank:state-layer dank:has-hover:hover:bg-transparent dank:focus-visible:ring-0 flex h-9 w-full cursor-default items-center gap-2 border-b px-3 text-sm outline-hidden last:border-b-0 focus-visible:ring-1 focus-visible:ring-inset"
           >
             <StatePicker
               appearance="icon"

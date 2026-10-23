@@ -59,7 +59,7 @@ export function LabelRowMenu({ label, onOpen }: TProps) {
               size="icon"
               forceMinSize={false}
               aria-label={`Actions for ${label.name}`}
-              className="text-muted-foreground -mr-1 size-7"
+              className="text-muted-foreground dank:mr-0 dank:size-10 -mr-1 size-7"
             >
               <EllipsisIcon className="size-4" />
             </Button>

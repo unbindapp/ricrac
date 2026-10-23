@@ -16,7 +16,7 @@ import { ColorPicker } from "@/components/shared/color-picker";
 import { IconPicker } from "@/components/shared/icon-picker";
 import { Button } from "@/components/ui/button";
 import { FileTrigger } from "@/components/ui/file-trigger";
-import { Input } from "@/components/ui/input";
+import { Input, OutlinedField } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -27,8 +27,10 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
+import { cn } from "@/components/ui/utils";
 import { imageUploadAccept } from "@/lib/queries/uploads";
 import { errorText } from "@/lib/server/errors";
+import { useUiTheme } from "@/themes/ui-theme-provider";
 
 const { fieldContext, formContext, useFieldContext, useFormContext } = createFormHookContexts();
 
@@ -138,6 +140,59 @@ function FieldShell({
   );
 }
 
+function OutlinedFieldShell({
+  id,
+  label,
+  description,
+  hideLabel,
+  disabled,
+  populated,
+  children,
+}: TFieldShellProps & {
+  id: string;
+  disabled?: boolean;
+  populated?: boolean;
+  children: ReactNode;
+}) {
+  const field = useFieldContext<unknown>();
+  const { error, formDomId } = useFieldError(field);
+  return (
+    <div
+      data-form-id={formDomId}
+      data-invalid={error ? true : undefined}
+      className="flex min-w-0 flex-col"
+    >
+      <OutlinedField
+        label={label}
+        htmlFor={id}
+        hideLabel={hideLabel}
+        invalid={Boolean(error)}
+        disabled={disabled}
+        populated={populated}
+      >
+        {children}
+      </OutlinedField>
+      {error ? (
+        <p id={`${id}-error`} role="alert" className="text-m3-error px-4 pt-1 text-xs">
+          {error}
+        </p>
+      ) : (
+        description && (
+          <p
+            id={`${id}-description`}
+            className={cn(
+              "px-4 pt-1 text-xs",
+              disabled ? "text-m3-on-surface/38" : "text-m3-on-surface-variant",
+            )}
+          >
+            {description}
+          </p>
+        )
+      )}
+    </div>
+  );
+}
+
 function useFieldIds(description?: string) {
   const id = useId();
   return { id, describedBy: description ? `${id}-description` : undefined };
@@ -152,20 +207,37 @@ function TextField({ label, description, hideLabel, transform, ...inputProps }: 
   const field = useFieldContext<string>();
   const { id, describedBy } = useFieldIds(description);
   const { error } = useFieldError(field);
+  const isOutlined = useUiTheme().id === "dank";
+  const input = (
+    <Input
+      {...inputProps}
+      id={id}
+      name={field.name}
+      value={field.state.value ?? ""}
+      aria-invalid={error ? true : undefined}
+      aria-describedby={describedBy}
+      onBlur={field.handleBlur}
+      onChange={(event) =>
+        field.handleChange(transform ? transform(event.target.value) : event.target.value)
+      }
+    />
+  );
+  if (isOutlined) {
+    return (
+      <OutlinedFieldShell
+        id={id}
+        label={label}
+        description={description}
+        hideLabel={hideLabel}
+        disabled={inputProps.disabled}
+      >
+        {input}
+      </OutlinedFieldShell>
+    );
+  }
   return (
     <FieldShell id={id} label={label} description={description} hideLabel={hideLabel}>
-      <Input
-        {...inputProps}
-        id={id}
-        name={field.name}
-        value={field.state.value ?? ""}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={describedBy}
-        onBlur={field.handleBlur}
-        onChange={(event) =>
-          field.handleChange(transform ? transform(event.target.value) : event.target.value)
-        }
-      />
+      {input}
     </FieldShell>
   );
 }
@@ -177,21 +249,41 @@ function TextareaField({ label, description, hideLabel, ...textareaProps }: TTex
   const field = useFieldContext<string>();
   const { id, describedBy } = useFieldIds(description);
   const { error } = useFieldError(field);
+  const isOutlined = useUiTheme().id === "dank";
+  const textarea = (
+    <Textarea
+      {...textareaProps}
+      id={id}
+      name={field.name}
+      value={field.state.value ?? ""}
+      aria-invalid={error ? true : undefined}
+      aria-describedby={describedBy}
+      onBlur={field.handleBlur}
+      onChange={(event) => field.handleChange(event.target.value)}
+    />
+  );
+  if (isOutlined) {
+    return (
+      <OutlinedFieldShell
+        id={id}
+        label={label}
+        description={description}
+        hideLabel={hideLabel}
+        disabled={textareaProps.disabled}
+      >
+        {textarea}
+      </OutlinedFieldShell>
+    );
+  }
   return (
     <FieldShell id={id} label={label} description={description} hideLabel={hideLabel}>
-      <Textarea
-        {...textareaProps}
-        id={id}
-        name={field.name}
-        value={field.state.value ?? ""}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={describedBy}
-        onBlur={field.handleBlur}
-        onChange={(event) => field.handleChange(event.target.value)}
-      />
+      {textarea}
     </FieldShell>
   );
 }
+
+const outlinedSelectTriggerClassName =
+  "dank:h-14 dank:rounded-xs dank:border-0 dank:px-4 dank:text-base dank:focus-visible:ring-0 has-hover:hover:ring-0";
 
 export type TSelectFieldItem = {
   value: string;
@@ -217,40 +309,60 @@ function SelectField({
   const { id, describedBy } = useFieldIds(description);
   const { error } = useFieldError(field);
   const selected = items.find((item) => item.value === field.state.value);
+  const isOutlined = useUiTheme().id === "dank";
+  const select = (
+    <Select
+      items={items}
+      value={field.state.value ?? null}
+      disabled={disabled}
+      onValueChange={(value) => {
+        field.handleChange(value ?? "");
+        field.handleBlur();
+      }}
+    >
+      <SelectTrigger
+        id={id}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy}
+        data-focus-indicator={isOutlined ? "child" : undefined}
+        className={cn(isOutlined && outlinedSelectTriggerClassName)}
+      >
+        <SelectValue placeholder={placeholder}>
+          {selected && (
+            <>
+              {selected.icon}
+              <span className="truncate">{selected.label}</span>
+            </>
+          )}
+        </SelectValue>
+      </SelectTrigger>
+      <SelectContent>
+        {items.map((item) => (
+          <SelectItem key={item.value} value={item.value}>
+            {item.icon}
+            <span className="truncate">{item.label}</span>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+  if (isOutlined) {
+    return (
+      <OutlinedFieldShell
+        id={id}
+        label={label}
+        description={description}
+        hideLabel={hideLabel}
+        disabled={disabled}
+        populated
+      >
+        {select}
+      </OutlinedFieldShell>
+    );
+  }
   return (
     <FieldShell id={id} label={label} description={description} hideLabel={hideLabel}>
-      <Select
-        items={items}
-        value={field.state.value ?? null}
-        disabled={disabled}
-        onValueChange={(value) => {
-          field.handleChange(value ?? "");
-          field.handleBlur();
-        }}
-      >
-        <SelectTrigger
-          id={id}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={describedBy}
-        >
-          <SelectValue placeholder={placeholder}>
-            {selected && (
-              <>
-                {selected.icon}
-                <span className="truncate">{selected.label}</span>
-              </>
-            )}
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent>
-          {items.map((item) => (
-            <SelectItem key={item.value} value={item.value}>
-              {item.icon}
-              <span className="truncate">{item.label}</span>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {select}
     </FieldShell>
   );
 }

@@ -60,12 +60,15 @@ export function ViewIssues({ filter }: TProps) {
             key={group.type}
             role="group"
             aria-label={stateTypeLabels[group.type]}
-            className="border-b last:border-b-0"
+            data-slot="list-group"
+            className="dank:border-0 border-b last:border-b-0"
           >
-            <div className="bg-muted flex h-9 items-center gap-2 px-3 group-data-flush/list:px-6">
+            <div className="bg-muted dank:h-12 dank:bg-transparent dank:px-0 dank:group-data-flush/list:px-0 flex h-9 items-center gap-2 px-3 group-data-flush/list:px-6">
               <StateIcon type={group.type} />
-              <span className="text-sm font-medium">{stateTypeLabels[group.type]}</span>
-              <span className="text-muted-foreground text-xs tabular-nums">
+              <span className="dank:type-title-small text-sm font-medium">
+                {stateTypeLabels[group.type]}
+              </span>
+              <span className="text-muted-foreground dank:type-label-large text-xs tabular-nums">
                 {group.issues.length}
               </span>
             </div>

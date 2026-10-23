@@ -111,6 +111,8 @@ export function PickerTrigger({
           forceMinSize={false}
           aria-label={label}
           data-muted={muted || undefined}
+          data-m3-chip="assist"
+          data-picker="compact"
           className={cn("data-muted:text-muted-foreground max-w-48 font-normal", className)}
           {...props}
         >
@@ -127,8 +129,9 @@ export function PickerTrigger({
           fadeOnDisabled={false}
           aria-label={label}
           data-muted={muted || undefined}
+          data-picker="row"
           className={cn(
-            "data-muted:text-muted-foreground h-auto min-h-7 w-full min-w-0 justify-start py-1 font-normal",
+            "data-muted:text-muted-foreground dank:text-m3-on-surface dank:data-muted:text-m3-on-surface-variant h-auto min-h-7 w-full min-w-0 justify-start py-1 font-normal",
             className,
           )}
           {...props}

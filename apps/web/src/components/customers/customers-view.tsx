@@ -17,7 +17,8 @@ import { PageHeader } from "@/components/layout/page-header";
 import { PageToolbar } from "@/components/layout/page-toolbar";
 import { Avatar } from "@/components/shared/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { segmentOf } from "@/components/shared/list-segment";
+import { SearchField } from "@/components/ui/search-field";
 import { cn } from "@/components/ui/utils";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { formatRevenue, formatSize } from "@/lib/helpers/customers";
@@ -69,12 +70,12 @@ export function CustomersView() {
         actions={newButton("header")}
         toolbar={
           <PageToolbar>
-            <Input
+            <SearchField
+              icon={false}
               aria-label="Search customers"
               placeholder="Search by name or domain…"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              className="max-w-xs"
             />
             <StatusFilter value={status} onChange={setStatus} />
             <TierFilter value={tier} onChange={setTier} />
@@ -108,11 +109,11 @@ function CustomerTable({ customers }: { customers: Customer[] }) {
     <div
       role="table"
       aria-label="Customers"
-      className="flex w-full flex-col overflow-hidden rounded-lg border"
+      className="dank:gap-0.5 dank:overflow-visible dank:rounded-none dank:border-0 flex w-full flex-col overflow-hidden rounded-lg border"
     >
       <div
         role="row"
-        className="bg-card text-muted-foreground flex h-9 items-center gap-3 border-b px-3 text-xs font-medium"
+        className="bg-card text-muted-foreground dank:type-label-medium dank:border-0 dank:bg-transparent dank:px-4 flex h-9 items-center gap-3 border-b px-3 text-xs font-medium"
       >
         <span role="columnheader" className="min-w-0 flex-1">
           Name
@@ -136,14 +137,18 @@ function CustomerTable({ customers }: { customers: Customer[] }) {
           Requests
         </span>
       </div>
-      {customers.map((customer) => (
-        <CustomerRow key={customer.id} customer={customer} />
+      {customers.map((customer, index) => (
+        <CustomerRow
+          key={customer.id}
+          customer={customer}
+          segment={segmentOf(index, customers.length)}
+        />
       ))}
     </div>
   );
 }
 
-function CustomerRow({ customer }: { customer: Customer }) {
+function CustomerRow({ customer, segment }: { customer: Customer; segment?: string }) {
   const { workspace } = useWorkspace();
   const navigate = useNavigate();
   const open = () =>
@@ -156,6 +161,8 @@ function CustomerRow({ customer }: { customer: Customer }) {
       role="row"
       tabIndex={0}
       aria-label={customer.name}
+      data-slot="list-item"
+      data-segment={segment}
       onClick={open}
       onKeyDown={(event) => {
         if (event.key === "Enter") open();
@@ -164,9 +171,9 @@ function CustomerRow({ customer }: { customer: Customer }) {
     >
       <span role="cell" className="flex min-w-0 flex-1 items-center gap-2">
         <CustomerLogo id={customer.id} name={customer.name} logoUrl={customer.logoUrl} />
-        <span className="truncate font-medium">{customer.name}</span>
+        <span className="dank:font-normal truncate font-medium">{customer.name}</span>
         {customer.domains[0] && (
-          <span className="text-muted-foreground hidden truncate text-xs sm:inline">
+          <span className="text-muted-foreground dank:text-sm hidden truncate text-xs sm:inline">
             {customer.domains[0]}
           </span>
         )}
@@ -203,7 +210,10 @@ function CustomerRow({ customer }: { customer: Customer }) {
 
 function Cell({ className, children }: { className: string; children: ReactNode }) {
   return (
-    <span role="cell" className={cn("text-muted-foreground min-w-0 items-center", className)}>
+    <span
+      role="cell"
+      className={cn("text-muted-foreground dank:text-sm min-w-0 items-center", className)}
+    >
       {children || <span aria-hidden>–</span>}
     </span>
   );

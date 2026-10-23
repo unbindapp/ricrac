@@ -1,0 +1,45 @@
+@utility popup-motion {
+  transition:
+    scale var(--spring-fast-spatial-duration) var(--ease-spring-fast-spatial),
+    opacity var(--spring-fast-effects-duration) var(--ease-spring-fast-effects);
+
+  &[data-starting-style],
+  &[data-ending-style] {
+    scale: 0.8;
+    opacity: 0;
+  }
+
+  &[data-ending-style] {
+    transition-duration: var(--spring-fast-effects-duration);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &[data-starting-style],
+    &[data-ending-style] {
+      scale: 1;
+    }
+  }
+}
+
+:root[data-ui-theme="dank"] .EmojiPickerReact {
+  --epr-bg-color: transparent;
+  --epr-picker-border-color: transparent;
+  --epr-picker-border-radius: 0;
+  --epr-category-label-bg-color: var(--m3-surface-container);
+  --epr-text-color: var(--m3-on-surface-variant);
+  --epr-highlight-color: var(--m3-primary);
+  --epr-hover-bg-color: color-mix(in srgb, var(--m3-on-surface) 8%, transparent);
+  --epr-hover-bg-color-reduced-opacity: color-mix(in srgb, var(--m3-on-surface) 8%, transparent);
+  --epr-focus-bg-color: color-mix(in srgb, var(--m3-on-surface) 10%, transparent);
+  --epr-search-input-bg-color: var(--m3-surface-container-high);
+  --epr-search-input-bg-color-active: var(--m3-surface-container-high);
+  --epr-search-input-text-color: var(--m3-on-surface);
+  --epr-search-input-placeholder-color: var(--m3-on-surface-variant);
+  --epr-search-input-border-radius: 9999px;
+  --epr-search-border-color: transparent;
+  --epr-search-border-color-active: var(--m3-primary);
+  --epr-category-icon-active-color: var(--m3-primary);
+  --epr-category-icon-inactive-color: var(--m3-on-surface-variant);
+  --epr-emoji-variation-picker-bg-color: var(--m3-surface-container-high);
+  --epr-skin-tone-picker-menu-color: var(--m3-surface-container-high);
+}

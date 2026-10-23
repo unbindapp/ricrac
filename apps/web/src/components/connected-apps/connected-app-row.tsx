@@ -30,7 +30,7 @@ export function ConnectedAppRow({ app }: { app: ConnectedApp }) {
         </>
       }
     >
-      <BoxIcon className="text-muted-foreground size-4" />
+      <BoxIcon className="text-muted-foreground dank:size-5 size-4" />
       <ListRowText
         primary={app.name}
         secondary={

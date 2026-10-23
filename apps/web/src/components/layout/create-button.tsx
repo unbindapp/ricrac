@@ -21,9 +21,10 @@ export function CreateButton({ label, icon: Icon = PlusIcon, size, ...props }: T
       <Button
         {...props}
         variant="tonal"
-        className="shadow-shadow-color/shadow-opacity dank:h-14 dank:rounded-[1rem] dank:pr-5 dank:pl-4 dank:active:rounded-[0.75rem] gap-3 text-base shadow-lg"
+        forceMinSize={false}
+        className="bg-m3-primary-container text-m3-on-primary-container shadow-elevation-3 has-hover:hover:shadow-elevation-4 dank:h-14 dank:rounded-lg dank:px-4 dank:active:rounded-lg dank:text-base dank:leading-6 dank:tracking-[0.009375rem] dank:[&_svg]:size-6 gap-2"
       >
-        <Icon className="size-6" />
+        <Icon />
         {label}
       </Button>,
       fab,

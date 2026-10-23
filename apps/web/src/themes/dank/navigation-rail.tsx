@@ -1,5 +1,5 @@
 import { Link, type LinkProps, useNavigate } from "@tanstack/react-router";
-import { type ComponentProps, type ReactNode } from "react";
+import { type ComponentProps } from "react";
 
 import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
 import { SidebarFavorites } from "@/components/favorites/sidebar-favorites";
@@ -58,18 +58,21 @@ type TRailProps = {
   onNavigate?: () => void;
   /** Lists the inbox, my issues and settings, which the top bar holds on wide screens. */
   hasAccountLinks?: boolean;
+  /** Over the page in a drawer, on the modal rail's container color. */
+  isModal?: boolean;
 };
 
-const showWhenExpanded =
-  "ease-emphasized opacity-0 transition-opacity duration-100 group-data-expanded/rail-root:opacity-100 group-data-expanded/rail-root:duration-300";
+const spatial =
+  "ease-spring-default-spatial duration-(--spring-default-spatial-duration) [interpolate-size:allow-keywords]";
 
-/** Material 3's navigation rail: collapsed to icons, or expanded with labels beside them. */
+/** Material 3's navigation rail: collapsed to icons over labels, or expanded with labels beside them. */
 export function NavigationRail({
   isExpanded,
   menuLabel,
   onMenu,
   onNavigate,
   hasAccountLinks = false,
+  isModal = false,
 }: TRailProps) {
   const { workspace, canEdit, isAdmin } = useWorkspace();
   const team = useWorkspaceTeam();
@@ -115,18 +118,21 @@ export function NavigationRail({
     <nav
       aria-label="Workspace"
       data-expanded={isExpanded || undefined}
-      className="group/rail-root bg-sidebar flex h-full w-full flex-col"
+      className={cn(
+        "group/rail-root flex h-full w-full flex-col pt-11",
+        isModal ? "bg-m3-surface-container" : "bg-m3-surface",
+      )}
     >
-      <div className="flex flex-col items-start gap-3 px-5 pt-3 pb-4">
+      <div className="flex flex-col items-start gap-1 px-5 pb-10">
         <SidebarToggleTooltip label={menuLabel} side="right">
           <Button
             variant="ghost"
             size="icon"
             aria-label={menuLabel}
-            className="text-muted-foreground ml-2 size-10"
+            className="text-m3-on-surface-variant mx-2"
             onClick={onMenu}
           >
-            <MenuToggleIcon className="size-5" />
+            <MenuToggleIcon className="size-6" />
           </Button>
         </SidebarToggleTooltip>
         {canEdit && (
@@ -134,17 +140,21 @@ export function NavigationRail({
             <Button
               variant="tonal"
               aria-label="New issue"
-              className="dank:h-14 dank:rounded-[1rem] dank:px-4.5 dank:active:rounded-[0.75rem] flex items-center gap-0 text-base"
+              forceMinSize={false}
+              className={cn(
+                spatial,
+                "bg-m3-primary-container text-m3-on-primary-container shadow-elevation-1 has-hover:hover:shadow-elevation-2 dank:h-14 dank:rounded-lg dank:px-4 dank:text-base dank:tracking-[0.009375rem] dank:active:rounded-lg flex items-center gap-0 transition-[box-shadow,padding] [&>svg]:size-6",
+              )}
               onClick={() => {
                 onNavigate?.();
                 openNewIssue();
               }}
             >
-              <SquarePenIcon className="size-5" />
+              <SquarePenIcon className="size-6" />
               <span
                 className={cn(
-                  showWhenExpanded,
-                  "max-w-0 overflow-hidden whitespace-nowrap transition-[max-width,margin,opacity] group-data-expanded/rail-root:ml-3 group-data-expanded/rail-root:max-w-40",
+                  spatial,
+                  "max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-[max-width,margin,opacity] group-data-expanded/rail-root:ml-2 group-data-expanded/rail-root:max-w-40 group-data-expanded/rail-root:opacity-100",
                 )}
               >
                 New issue
@@ -154,7 +164,12 @@ export function NavigationRail({
         )}
       </div>
       <ScrollArea className="min-h-0 w-full flex-1">
-        <div className="flex w-full flex-col gap-1">
+        <div
+          className={cn(
+            spatial,
+            "flex w-full flex-col gap-1 transition-[gap] group-data-expanded/rail-root:gap-0",
+          )}
+        >
           {destinations
             .filter((destination) => !destination.isHidden)
             .map((destination) => (
@@ -162,14 +177,14 @@ export function NavigationRail({
             ))}
           <MoreMenu isExpanded={isExpanded} onNavigate={onNavigate} />
           {isExpanded && (
-            <div className="animate-in fade-in-0 flex flex-col px-3 pt-3 pb-2 duration-300">
+            <div className="animate-in fade-in-0 ease-spring-default-effects flex flex-col px-3 pt-3 pb-2 duration-(--spring-default-effects-duration)">
               <SidebarFavorites onNavigate={onNavigate} />
             </div>
           )}
         </div>
       </ScrollArea>
       {hasAccountLinks && (
-        <div className="flex w-full flex-col gap-1 pt-2 pb-3">
+        <div className="flex w-full flex-col pt-2 pb-3">
           <RailLink
             label="Settings"
             icon={SettingsIcon}
@@ -185,33 +200,67 @@ export function NavigationRail({
   );
 }
 
-const railItemClassName =
-  "group/rail text-muted-foreground has-hover:hover:text-foreground focus-visible:text-foreground data-[status=active]:text-secondary-foreground data-popup-open:text-foreground relative flex h-14 w-full items-start px-5 font-medium outline-hidden select-none";
+const railItemClassName = cn(
+  spatial,
+  "group/rail relative flex min-h-16 w-full flex-col items-start gap-1 px-5 py-1.5 outline-hidden select-none transition-[min-height,padding,gap] group-data-expanded/rail-root:min-h-14 group-data-expanded/rail-root:gap-0 group-data-expanded/rail-root:py-0",
+);
 
-function RailIndicator({ children }: { children: ReactNode }) {
-  return (
-    <span className="group-has-hover/rail:group-hover/rail:bg-accent group-focus-visible/rail:ring-primary group-data-[status=active]/rail:bg-secondary group-data-popup-open/rail:bg-accent ease-emphasized mt-0.5 flex h-8 w-full items-center overflow-hidden rounded-full pl-4.5 transition-[height,margin,background-color] duration-300 group-focus-visible/rail:ring-2 group-data-expanded/rail-root:mt-0 group-data-expanded/rail-root:h-14">
-      {children}
-    </span>
-  );
-}
-
-function RailIcon({ icon: Icon, isActive }: { icon: LucideIcon; isActive?: boolean }) {
-  return (
-    <Icon
-      data-active={isActive || undefined}
-      className="size-5 shrink-0 data-active:fill-current"
-    />
-  );
-}
-
-function RailLabels({ label }: { label: string }) {
+function RailItemContent({
+  icon: Icon,
+  label,
+  isActive = false,
+  unread = 0,
+}: {
+  icon: LucideIcon;
+  label: string;
+  isActive?: boolean;
+  unread?: number;
+}) {
   return (
     <>
-      <span className={cn(showWhenExpanded, "ml-3 text-sm whitespace-nowrap")}>{label}</span>
+      <span
+        data-active={isActive || undefined}
+        className={cn(
+          spatial,
+          "text-m3-on-surface-variant data-active:bg-m3-secondary-container data-active:text-m3-on-secondary-container group-focus-visible/rail:outline-m3-secondary relative inline-flex h-8 min-w-14 items-center rounded-full px-4 transition-[height,background-color] group-focus-visible/rail:outline-3 group-focus-visible/rail:outline-offset-2 group-data-expanded/rail-root:h-14 group-data-popup-open/rail:after:opacity-10",
+          "after:bg-m3-on-secondary-container after:pointer-events-none after:absolute after:inset-0 after:rounded-full after:opacity-0 after:transition-opacity group-focus-visible/rail:after:opacity-10 group-active/rail:after:opacity-10 has-hover:group-hover/rail:after:opacity-8",
+        )}
+      >
+        <span className="relative flex shrink-0">
+          <Icon data-active={isActive || undefined} className="size-6 data-active:fill-current" />
+          {unread > 0 && (
+            <span
+              aria-label={`${unread} unread`}
+              className="bg-m3-error text-m3-on-error absolute -top-0.5 left-3 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[0.6875rem] leading-4 font-medium tracking-[0.03125rem] tabular-nums transition-opacity group-data-expanded/rail-root:opacity-0"
+            >
+              {unread > 999 ? "999+" : unread}
+            </span>
+          )}
+        </span>
+        <span
+          className={cn(
+            spatial,
+            "max-w-0 overflow-hidden text-sm font-medium tracking-[0.00625rem] whitespace-nowrap opacity-0 transition-[max-width,margin,opacity] group-data-expanded/rail-root:ml-2 group-data-expanded/rail-root:max-w-48 group-data-expanded/rail-root:opacity-100",
+          )}
+        >
+          {label}
+        </span>
+        {unread > 0 && (
+          <span
+            aria-hidden
+            className="max-w-0 overflow-hidden text-sm font-medium tracking-[0.00625rem] tabular-nums opacity-0 transition-opacity group-data-expanded/rail-root:ml-3 group-data-expanded/rail-root:max-w-12 group-data-expanded/rail-root:opacity-100"
+          >
+            {unread > 999 ? "999+" : unread}
+          </span>
+        )}
+      </span>
       <span
         aria-hidden
-        className="ease-emphasized pointer-events-none absolute top-9.5 left-0 w-24 truncate px-1 text-center text-xs transition-opacity delay-100 duration-200 group-data-expanded/rail-root:opacity-0 group-data-expanded/rail-root:delay-0 group-data-expanded/rail-root:duration-100"
+        data-active={isActive || undefined}
+        className={cn(
+          spatial,
+          "text-m3-on-surface-variant data-active:text-m3-secondary -mx-5 h-4 w-24 truncate px-1 text-center text-xs leading-4 font-medium tracking-[0.03125rem] transition-[height,opacity] group-data-expanded/rail-root:h-0 group-data-expanded/rail-root:opacity-0",
+        )}
       >
         {label}
       </span>
@@ -225,16 +274,13 @@ function RailLink({ label, icon, link, unread = 0, onNavigate }: TRailLinkProps)
   return (
     <Link
       {...link}
+      data-focus-indicator="child"
       activeOptions={{ includeSearch: false }}
       className={railItemClassName}
       onClick={onNavigate}
     >
       {({ isActive }) => (
-        <RailIndicator>
-          <RailIcon icon={icon} isActive={isActive} />
-          <RailLabels label={label} />
-          {unread > 0 && <RailBadge count={unread} />}
-        </RailIndicator>
+        <RailItemContent icon={icon} label={label} isActive={isActive} unread={unread} />
       )}
     </Link>
   );
@@ -249,25 +295,15 @@ function RailButton({
     <Button
       variant="ghost"
       forceMinSize={false}
+      data-focus-indicator="child"
       {...props}
-      className={`${railItemClassName} dank:h-14 dank:px-5 dank:active:rounded-none h-14 gap-0 rounded-none px-5 active:rounded-none active:bg-transparent has-hover:hover:bg-transparent`}
+      className={cn(
+        railItemClassName,
+        "dank:h-auto dank:px-5 dank:active:rounded-none h-auto rounded-none active:bg-transparent has-hover:hover:bg-transparent",
+      )}
     >
-      <RailIndicator>
-        <RailIcon icon={icon} />
-        <RailLabels label={label} />
-      </RailIndicator>
+      <RailItemContent icon={icon} label={label} />
     </Button>
-  );
-}
-
-function RailBadge({ count }: { count: number }) {
-  return (
-    <span
-      aria-label={`${count} unread`}
-      className="bg-destructive text-destructive-foreground mr-5 ml-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs leading-none tabular-nums"
-    >
-      {count > 99 ? "99+" : count}
-    </span>
   );
 }
 

@@ -58,8 +58,8 @@ export function IssueCard({
       data-dragging={isDragging || undefined}
       onClick={(event) => onClick?.(event, issue)}
       className={cn(
-        "group/card bg-card has-hover:hover:border-primary/4-10 data-active:border-primary/6-10 focus-visible:ring-primary/8-10 flex w-full cursor-default flex-col gap-2 rounded-lg border p-3 text-sm outline-hidden focus-visible:ring-1 data-dragging:opacity-40",
-        isOverlay && "shadow-lg",
+        "group/card bg-card has-hover:hover:border-primary/4-10 data-active:border-primary/6-10 focus-visible:ring-primary/8-10 dank:state-layer dank:relative dank:rounded-md dank:border-0 dank:bg-m3-surface-container-low dank:p-4 dank:shadow-elevation-1 dank:has-hover:hover:shadow-elevation-2 dank:data-active:bg-m3-secondary-container dank:data-active:text-m3-on-secondary-container flex w-full cursor-default flex-col gap-2 rounded-lg border p-3 text-sm outline-hidden focus-visible:ring-1 data-dragging:opacity-40",
+        isOverlay && "dank:shadow-elevation-4 shadow-lg",
       )}
     >
       <div className="flex items-center gap-2">
@@ -89,10 +89,10 @@ export function IssueCard({
             onChange={(state) => patch(issue, { state })}
           />
         )}
-        <p className="min-w-0 flex-1">{issue.title}</p>
+        <p className="dank:type-title-medium min-w-0 flex-1">{issue.title}</p>
       </div>
       {hasFooter && (
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div className="dank:gap-2 flex flex-wrap items-center gap-1.5">
           {show("priority") && issue.priority !== 0 && (
             <PriorityPicker
               appearance="icon"

@@ -25,7 +25,7 @@ export function PickerTrigger({ appearance = "row", label, icon, text, muted, ..
       forceMinSize={false}
       aria-label={label}
       data-muted={muted || undefined}
-      className="data-muted:text-muted-foreground max-w-48 font-normal"
+      className="data-muted:text-muted-foreground dank:text-m3-on-surface dank:data-muted:text-m3-on-surface-variant dank:h-8 dank:gap-2 dank:rounded-sm dank:px-4 dank:active:rounded-sm dank:has-[>svg]:pl-2 dank:font-medium dank:[&>svg]:size-4.5 dank:[&>svg.text-muted-foreground]:text-m3-primary max-w-48 font-normal"
       {...props}
     >
       {icon}

@@ -2,6 +2,7 @@ import { Slider as SliderPrimitive } from "@base-ui/react/slider";
 import type * as React from "react";
 
 import { cn } from "@/components/ui/utils";
+import { useUiTheme } from "@/themes/ui-theme-provider";
 
 export type SliderProps<Value extends number | readonly number[] = number | readonly number[]> =
   SliderPrimitive.Root.Props<Value> & {
@@ -28,11 +29,14 @@ function Slider<Value extends number | readonly number[]>({
   size = "default",
   ...props
 }: SliderProps<Value>) {
+  const isDank = useUiTheme().id === "dank";
   const _values = Array.isArray(value)
     ? value
     : Array.isArray(defaultValue)
       ? defaultValue
-      : [min, max];
+      : typeof (value ?? defaultValue) === "number"
+        ? [value ?? defaultValue]
+        : [min, max];
 
   // Base UI emits a plain number from pointer interactions on single-thumb
   // sliders even when `value`/`defaultValue` is an array (its keyboard path
@@ -65,27 +69,51 @@ function Slider<Value extends number | readonly number[]>({
       )}
       {...props}
     >
-      <SliderPrimitive.Control className="group/slider relative flex w-full touch-none items-center select-none before:absolute before:top-1/2 before:left-1/2 before:h-full before:min-h-11 before:w-full before:min-w-11 before:-translate-1/2 active:cursor-grabbing has-hover:hover:cursor-grab has-hover:hover:active:cursor-grabbing data-disabled:pointer-events-none data-disabled:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col">
-        <SliderPrimitive.Track
-          data-slot="slider-track"
-          data-painted={trackStyle ? true : undefined}
-          style={trackStyle}
-          className="bg-border group-data-staged/root:bg-change/5-10 dank:bg-secondary dank:overflow-visible dank:data-[orientation=horizontal]:h-4 dank:data-[orientation=vertical]:w-4 dank:group-data-[size=large]/root:data-[orientation=horizontal]:h-8 relative grow overflow-hidden rounded-full select-none data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full group-data-[size=large]/root:data-[orientation=horizontal]:h-3 data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5"
-        >
-          <SliderPrimitive.Indicator
-            data-slot="slider-range"
-            className="bg-primary group-data-staged/root:bg-change dank:rounded-full select-none in-data-painted:hidden data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full"
+      {isDank ? (
+        <SliderPrimitive.Control className="group/slider relative flex min-h-11 w-full touch-none items-center select-none active:cursor-grabbing has-hover:hover:cursor-grab has-hover:hover:active:cursor-grabbing data-disabled:pointer-events-none">
+          <SliderPrimitive.Track
+            data-slot="slider-track"
+            data-painted={trackStyle ? true : undefined}
+            style={(state) =>
+              ({
+                ...trackStyle,
+                "--slider-fraction": max > min ? (state.values[0] - min) / (max - min) : 0,
+              }) as React.CSSProperties
+            }
+            className="relative h-4 grow overflow-hidden rounded-full select-none"
           />
-        </SliderPrimitive.Track>
-        {Array.from({ length: _values.length }, (_, index) => (
-          <SliderPrimitive.Thumb
-            data-slot="slider-thumb"
-            key={index}
-            getAriaLabel={thumbLabel ? () => thumbLabel : undefined}
-            className="bg-foreground shadow-shadow-color/shadow-opacity group-active/slider:ring-foreground/8-10 active:ring-foreground/8-10 ring-foreground/7-10 group-data-staged/root:bg-change group-data-staged/root:ring-change/7-10 group-data-staged/root:active:ring-change/8-10 group-data-staged/root:group-active/slider:ring-change/8-10 dank:bg-primary dank:group-has-data-painted/slider:bg-foreground dank:ease-emphasized dank:has-focus-visible:outline-primary dank:h-11 dank:w-1 dank:shadow-none dank:ring-6 dank:ring-[color:var(--slider-gap,var(--color-card))] dank:transition-[width] dank:duration-200 dank:group-active/slider:w-0.5 dank:group-active/slider:ring-6 dank:group-active/slider:ring-[color:var(--slider-gap,var(--color-card))] dank:active:ring-6 dank:active:ring-[color:var(--slider-gap,var(--color-card))] dank:has-hover:group-hover/slider:group-active/slider:ring-6 dank:group-data-staged/root:ring-[color:var(--slider-gap,var(--color-card))] dank:has-focus-visible:outline-2 dank:has-focus-visible:outline-offset-4 dank:data-[orientation=vertical]:h-1 dank:data-[orientation=vertical]:w-11 dank:group-data-[size=large]/root:h-14 dank:group-data-[size=large]/root:w-1.5 dank:group-data-[size=large]/root:group-active/slider:w-1 block size-4 shrink-0 rounded-full shadow-md transition-[color,box-shadow] select-none group-active/slider:ring-4 group-data-[size=large]/root:size-6 before:absolute before:-inset-x-3 before:-inset-y-1 active:cursor-grabbing active:ring-4 disabled:pointer-events-none disabled:opacity-50 has-hover:group-hover/slider:ring-6 has-hover:group-hover/slider:group-active/slider:ring-4 has-focus-visible:ring-6"
-          />
-        ))}
-      </SliderPrimitive.Control>
+          {Array.from({ length: _values.length }, (_, index) => (
+            <SliderPrimitive.Thumb
+              data-slot="slider-thumb"
+              key={index}
+              getAriaLabel={thumbLabel ? () => thumbLabel : undefined}
+              className="has-focus-visible:outline-m3-secondary block h-11 w-1 shrink-0 rounded-full select-none before:absolute before:-inset-x-3 before:inset-y-0 after:absolute after:inset-y-0 after:left-1/2 after:w-1 after:-translate-x-1/2 after:rounded-full after:bg-(--slider-handle) group-active/slider:after:w-0.5 active:cursor-grabbing has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:after:w-0.5"
+            />
+          ))}
+        </SliderPrimitive.Control>
+      ) : (
+        <SliderPrimitive.Control className="group/slider relative flex w-full touch-none items-center select-none before:absolute before:top-1/2 before:left-1/2 before:h-full before:min-h-11 before:w-full before:min-w-11 before:-translate-1/2 active:cursor-grabbing has-hover:hover:cursor-grab has-hover:hover:active:cursor-grabbing data-disabled:pointer-events-none data-disabled:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col">
+          <SliderPrimitive.Track
+            data-slot="slider-track"
+            data-painted={trackStyle ? true : undefined}
+            style={trackStyle}
+            className="bg-border group-data-staged/root:bg-change/5-10 relative grow overflow-hidden rounded-full select-none data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full group-data-[size=large]/root:data-[orientation=horizontal]:h-3 data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5"
+          >
+            <SliderPrimitive.Indicator
+              data-slot="slider-range"
+              className="bg-primary group-data-staged/root:bg-change select-none in-data-painted:hidden data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full"
+            />
+          </SliderPrimitive.Track>
+          {Array.from({ length: _values.length }, (_, index) => (
+            <SliderPrimitive.Thumb
+              data-slot="slider-thumb"
+              key={index}
+              getAriaLabel={thumbLabel ? () => thumbLabel : undefined}
+              className="bg-foreground shadow-shadow-color/shadow-opacity group-active/slider:ring-foreground/8-10 active:ring-foreground/8-10 ring-foreground/7-10 group-data-staged/root:bg-change group-data-staged/root:ring-change/7-10 group-data-staged/root:active:ring-change/8-10 group-data-staged/root:group-active/slider:ring-change/8-10 block size-4 shrink-0 rounded-full shadow-md transition-[color,box-shadow] select-none group-active/slider:ring-4 group-data-[size=large]/root:size-6 before:absolute before:-inset-x-3 before:-inset-y-1 active:cursor-grabbing active:ring-4 disabled:pointer-events-none disabled:opacity-50 has-hover:group-hover/slider:ring-6 has-hover:group-hover/slider:group-active/slider:ring-4 has-focus-visible:ring-6"
+            />
+          ))}
+        </SliderPrimitive.Control>
+      )}
     </SliderPrimitive.Root>
   );
 }

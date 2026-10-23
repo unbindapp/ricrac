@@ -87,7 +87,7 @@ function InitiativeProjectRow({ project }: { project: InitiativeProject }) {
     >
       <span className="flex min-w-0 flex-1 items-center gap-2">
         <ProjectIcon icon={full?.icon} color={full?.color} />
-        <span className="truncate font-medium">{project.name}</span>
+        <span className="dank:font-normal truncate font-medium">{project.name}</span>
       </span>
       <SimpleTooltip content={project.status.name}>
         <span className="flex shrink-0">
@@ -166,7 +166,9 @@ function SubInitiativeRow({ initiative }: { initiative: SubInitiative }) {
       className="has-hover:hover:bg-accent focus-visible:bg-accent flex h-9 w-full items-center gap-3 border-b px-3 text-sm outline-hidden last:border-b-0"
     >
       <InitiativeStatusIcon status={initiative.status} />
-      <span className="min-w-0 flex-1 truncate font-medium">{initiative.name}</span>
+      <span className="dank:font-normal min-w-0 flex-1 truncate font-medium">
+        {initiative.name}
+      </span>
       <span className="flex w-4 shrink-0 justify-center">
         {initiative.health && (
           <SimpleTooltip content={healthLabels[initiative.health]}>

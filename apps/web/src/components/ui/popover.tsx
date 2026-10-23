@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Popover as PopoverPrimitive } from "@base-ui/react/popover";
 
+import { dankPopupMotionClassName } from "@/components/ui/dropdown-menu";
 import { cn } from "@/components/ui/utils";
 import { cva, VariantProps } from "class-variance-authority";
 
@@ -13,12 +14,11 @@ function PopoverTrigger({ ...props }: PopoverPrimitive.Trigger.Props) {
 }
 
 const popoverContentVariants = cva(
-  "shadow-shadow-color/shadow-opacity bg-popover text-popover-foreground max-w-(--available-width) max-h-(--available-height) w-(--anchor-width) origin-(--transform-origin) overflow-hidden rounded-lg border p-4 shadow-lg outline-hidden",
+  "shadow-shadow-color/shadow-opacity bg-popover text-popover-foreground max-w-(--available-width) max-h-(--available-height) w-(--anchor-width) origin-(--transform-origin) overflow-hidden rounded-lg border p-4 shadow-lg outline-hidden dank:bg-m3-surface-container dank:text-m3-on-surface dank:has-[[cmdk-list]]:bg-m3-surface-container-low dank:rounded-lg dank:border-0 dank:shadow-elevation-2 dank:[--tw-shadow-color:initial]",
   {
     variants: {
       animate: {
-        default:
-          "data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        default: `data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 ${dankPopupMotionClassName}`,
         false: "",
       },
     },
@@ -63,6 +63,7 @@ function PopoverContent({
       >
         <PopoverPrimitive.Popup
           data-slot="popover-content"
+          data-focus-indicator="child"
           className={cn(popoverContentVariants({ animate, className }))}
           {...props}
         />

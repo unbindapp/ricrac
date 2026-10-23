@@ -15,7 +15,7 @@ export function InitiativeListHeader() {
   return (
     <div
       aria-hidden
-      className="text-muted-foreground flex h-8 w-full items-center gap-3 border-b px-3 text-xs group-data-flush/list:px-6"
+      className="text-muted-foreground dank:type-label-medium dank:border-0 dank:group-data-flush/list:px-4 flex h-8 w-full items-center gap-3 border-b px-3 text-xs group-data-flush/list:px-6"
     >
       <span className="min-w-0 flex-1">Name</span>
       <span className="hidden w-24 shrink-0 md:block">Health</span>
@@ -49,14 +49,14 @@ export function InitiativeRow({ initiative, depth = 0, showParent }: TProps) {
         className="flex min-w-0 flex-1 items-center gap-2 data-[depth=1]:pl-6 data-[depth=2]:pl-12 data-[depth=3]:pl-16"
       >
         <InitiativeIcon initiative={initiative} />
-        <span className="truncate font-medium">{initiative.name}</span>
+        <span className="dank:font-normal truncate font-medium">{initiative.name}</span>
         {showParent && initiative.parent && (
-          <span className="text-muted-foreground hidden min-w-0 truncate text-xs md:inline">
+          <span className="text-muted-foreground dank:text-sm hidden min-w-0 truncate text-xs md:inline">
             in {initiative.parent.name}
           </span>
         )}
         {!showParent && initiative.summary && (
-          <span className="text-muted-foreground hidden min-w-0 truncate text-xs lg:inline">
+          <span className="text-muted-foreground dank:text-sm hidden min-w-0 truncate text-xs lg:inline">
             {initiative.summary}
           </span>
         )}

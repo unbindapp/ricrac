@@ -28,10 +28,12 @@ export function DocumentRow({ document, showParent = true }: TProps) {
       data-trashed={document.trashed || undefined}
       className="has-hover:hover:bg-muted focus-visible:bg-muted data-trashed:text-muted-foreground flex h-9 w-full items-center gap-3 border-b px-3 text-sm outline-hidden group-data-flush/list:h-11 group-data-flush/list:px-6 last:border-b-0"
     >
-      <EntityIcon icon={document.icon} color={document.color} fallback={FileTextIcon} />
-      <span className="min-w-0 flex-1 truncate font-medium">{document.title}</span>
+      <span className="dank:*:size-6 flex shrink-0">
+        <EntityIcon icon={document.icon} color={document.color} fallback={FileTextIcon} />
+      </span>
+      <span className="dank:font-normal min-w-0 flex-1 truncate font-medium">{document.title}</span>
       {showParent && parent && (
-        <span className="text-muted-foreground hidden max-w-56 shrink-0 items-center gap-1.5 text-xs sm:flex">
+        <span className="text-muted-foreground dank:type-label-small hidden max-w-56 shrink-0 items-center gap-1.5 text-xs sm:flex">
           {parent.icon}
           <span className="truncate">{parent.label}</span>
         </span>
@@ -45,7 +47,7 @@ export function DocumentRow({ document, showParent = true }: TProps) {
           </SimpleTooltip>
         )}
       </span>
-      <span className="text-muted-foreground w-20 shrink-0 text-right text-xs">
+      <span className="text-muted-foreground dank:type-label-small w-20 shrink-0 text-right text-xs">
         <RelativeTime value={document.updatedAt} />
       </span>
     </Link>

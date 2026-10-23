@@ -49,6 +49,7 @@ function CodeBlockView({ node, editor, updateAttributes }: ReactNodeViewProps) {
                 size="sm"
                 forceMinSize={false}
                 aria-label="Code language"
+                data-m3-chip="assist"
                 className="text-muted-foreground h-6 px-1.5 font-mono text-xs font-normal opacity-0 group-hover/code:opacity-100 focus-visible:opacity-100 data-popup-open:opacity-100"
               >
                 {label}

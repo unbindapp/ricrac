@@ -35,7 +35,7 @@ export function CheckboxList({ items, value, onChange, label, emptyText }: TProp
           <label
             key={item.value}
             htmlFor={id}
-            className="has-hover:hover:bg-accent flex h-9 shrink-0 cursor-pointer items-center gap-2 border-b px-3 text-sm last:border-b-0"
+            className="has-hover:hover:bg-accent dank:state-layer dank:has-hover:hover:bg-transparent dank:h-14 dank:gap-4 dank:px-4 dank:text-base relative flex h-9 shrink-0 cursor-pointer items-center gap-2 border-b px-3 text-sm last:border-b-0"
           >
             <Checkbox
               id={id}
@@ -47,7 +47,9 @@ export function CheckboxList({ items, value, onChange, label, emptyText }: TProp
             {item.icon}
             <span className="min-w-0 flex-1 truncate">{item.label}</span>
             {item.description && (
-              <span className="text-muted-foreground truncate text-xs">{item.description}</span>
+              <span className="text-muted-foreground dank:text-sm truncate text-xs">
+                {item.description}
+              </span>
             )}
           </label>
         );

@@ -51,7 +51,7 @@ export function EntityLinks({ links, canEdit, onAdd, onRemove }: TProps) {
       {links.map((link) => (
         <div
           key={link.id}
-          className="group/link has-hover:hover:bg-accent flex h-8 min-w-0 items-center gap-2 rounded-md px-2 text-sm"
+          className="group/link has-hover:hover:bg-accent dank:relative dank:state-layer dank:has-hover:hover:bg-transparent flex h-8 min-w-0 items-center gap-2 rounded-md px-2 text-sm"
         >
           <LinkIcon className="text-muted-foreground size-3.5 shrink-0" />
           <a
@@ -69,7 +69,7 @@ export function EntityLinks({ links, canEdit, onAdd, onRemove }: TProps) {
               size="icon"
               forceMinSize={false}
               aria-label={`Remove link ${link.label || link.url}`}
-              className="size-6 opacity-0 group-hover/link:opacity-100 focus-visible:opacity-100"
+              className="dank:size-8 dank:[&>svg]:size-5 size-6 opacity-0 group-hover/link:opacity-100 focus-visible:opacity-100"
               onClick={() => onRemove(link.url)}
             >
               <XIcon className="size-3.5" />

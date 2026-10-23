@@ -9,6 +9,7 @@ import {
   ProjectTargetPicker,
   type TPicked,
 } from "@/components/customers/need-target-pickers";
+import { FilterChip } from "@/components/shared/filter-chip";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -153,20 +154,19 @@ function NeedForm({
                 </label>
                 <div role="radiogroup" aria-label="Kind" className="flex items-center gap-1">
                   {(["issue", "project"] as const).map((type) => (
-                    <Button
+                    <FilterChip
                       key={type}
                       type="button"
                       role="radio"
                       aria-checked={targetType === type}
-                      variant={targetType === type ? "secondary" : "ghost"}
-                      size="sm"
+                      selected={targetType === type}
                       onClick={() => {
                         form.setFieldValue("targetType", type);
                         field.handleChange(null);
                       }}
                     >
                       {type === "issue" ? "Issue" : "Project"}
-                    </Button>
+                    </FilterChip>
                   ))}
                 </div>
               </div>

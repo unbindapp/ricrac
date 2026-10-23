@@ -75,13 +75,13 @@ function SettingsList({ path }: { path: string }) {
   return (
     <div
       data-view={isListShown ? "list" : "page"}
-      className="group/settings flex min-h-0 w-full flex-1"
+      className="group/settings flex min-h-0 w-full flex-1 gap-6"
     >
-      <aside className="scrollbar-hidden flex min-h-0 w-full flex-col gap-3 overflow-y-auto p-3 group-data-[view=page]/settings:max-md:hidden md:w-[clamp(260px,36%,390px)] md:flex-none">
+      <aside className="scrollbar-hidden flex min-h-0 w-full flex-col gap-3 overflow-y-auto max-md:p-4 group-data-[view=page]/settings:max-md:hidden md:w-[clamp(260px,36%,390px)] md:flex-none">
         {groups.length > 1 && <GroupSwitcher groups={groups} current={group} />}
         <nav aria-label={group?.title} className="flex flex-col gap-2.5">
           {sectionsOf(group?.tabs ?? []).map((tabs, index) => (
-            <div key={tabs[0].label} className="flex flex-col gap-[3px]">
+            <div key={tabs[0].label} className="flex flex-col gap-0.5">
               {tabs.map((tab) => (
                 <SettingsTabLink
                   key={tab.label}
@@ -97,7 +97,7 @@ function SettingsList({ path }: { path: string }) {
       </aside>
       <main
         key={path}
-        className="bg-surface-container flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto group-data-[view=list]/settings:max-md:hidden"
+        className="bg-surface-container flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto group-data-[view=list]/settings:max-md:hidden md:rounded-lg"
       >
         <div
           data-switched={path !== openedPath || undefined}
@@ -153,7 +153,7 @@ function GroupSwitcher({
   return (
     <nav
       aria-label="Settings sections"
-      className="bg-surface-container-highest grid h-14 shrink-0 auto-cols-fr grid-flow-col gap-1 rounded-full p-1"
+      className="grid h-12 shrink-0 auto-cols-fr grid-flow-col shadow-[inset_0_-1px_0_var(--m3-outline-variant)]"
     >
       {groups.map((group) => (
         <Link
@@ -161,10 +161,12 @@ function GroupSwitcher({
           {...group.tabs[0]?.link}
           aria-current={group === current || undefined}
           data-current={group === current || undefined}
-          className="text-muted-foreground has-hover:hover:bg-surface-container-high has-hover:hover:text-foreground data-current:bg-secondary data-current:text-secondary-foreground focus-visible:outline-primary ease-emphasized flex items-center justify-center gap-2 rounded-full text-base font-medium transition-colors duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2"
+          className="group/group-tab state-layer text-m3-on-surface-variant type-title-small has-hover:hover:text-m3-on-surface data-current:text-m3-primary has-hover:hover:data-current:text-m3-primary relative flex items-center justify-center px-4"
         >
-          <group.icon className="size-5" />
-          {group.title}
+          <span className="after:bg-m3-primary relative flex items-center gap-2 after:absolute after:inset-x-0 after:-bottom-3 after:h-[3px] after:rounded-[3px] after:opacity-0 group-data-current/group-tab:after:opacity-100">
+            <group.icon className="size-6" />
+            {group.title}
+          </span>
         </Link>
       ))}
     </nav>
@@ -183,20 +185,21 @@ function SettingsTabLink({ tab, isActive, badge, onSelect }: TTabLinkProps) {
     <Link
       {...tab.link}
       data-current={isActive || undefined}
+      data-focus-indicator="child"
       onClick={onSelect}
-      className="group/tab bg-surface-container text-foreground has-hover:hover:bg-surface-container-high focus-visible:outline-primary data-current:bg-secondary data-current:text-secondary-foreground ease-emphasized flex items-center gap-4 rounded-[0.375rem] px-5 py-3 transition-[background-color,border-radius] duration-200 first:rounded-t-[1.5rem] last:rounded-b-[1.5rem] focus-visible:outline-2 focus-visible:-outline-offset-2 data-current:rounded-[1.5rem]"
+      className="group/tab state-layer bg-m3-surface text-m3-on-surface data-current:bg-m3-secondary-container data-current:text-m3-on-secondary-container focus-visible:outline-m3-secondary ease-spring-fast-spatial relative flex min-h-18 items-center gap-3 rounded-xs px-4 py-2.5 transition-[background-color,border-radius] duration-(--spring-fast-spatial-duration) first:rounded-t-lg last:rounded-b-lg focus-visible:rounded-lg focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-solid has-hover:hover:rounded-md data-current:rounded-lg has-hover:hover:data-current:rounded-lg"
     >
       <span
         className={cn(
-          "flex size-12 shrink-0 items-center justify-center rounded-full [&_svg]:size-6",
+          "flex size-10 shrink-0 items-center justify-center rounded-full [&_svg]:size-6",
           tab.destructive ? "bg-destructive text-destructive-foreground" : badge,
         )}
       >
         <tab.icon />
       </span>
-      <span className="flex min-w-0 flex-col gap-0.5">
-        <span className="truncate text-base leading-tight font-medium">{tab.label}</span>
-        <span className="text-muted-foreground group-data-current/tab:text-secondary-foreground truncate text-sm">
+      <span className="flex min-w-0 flex-col">
+        <span className="type-body-large truncate">{tab.label}</span>
+        <span className="type-body-medium text-m3-on-surface-variant group-data-current/tab:text-m3-on-secondary-container truncate">
           {tab.description}
         </span>
       </span>

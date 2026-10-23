@@ -125,7 +125,7 @@ function ViewForm({
             setConditions([]);
           }}
         >
-          <TabsList>
+          <TabsList variant="segmented">
             <TabsTab value="issue">Issues</TabsTab>
             <TabsTab value="project">Projects</TabsTab>
           </TabsList>

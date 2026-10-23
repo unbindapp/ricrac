@@ -32,7 +32,7 @@ export function ProjectProperties({ project }: { project: ProjectDetail }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-0.5">
+      <div data-slot="properties" className="flex flex-col gap-0.5">
         <PropertyRow label="Status">
           <ProjectStatusPicker
             status={project.status}

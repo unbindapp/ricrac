@@ -94,7 +94,11 @@ export function AddRelationPicker({
       label="Add relation"
       exclude={[issue.id, ...related]}
       header={
-        <div role="radiogroup" aria-label="Relation" className="flex flex-wrap gap-1 border-b p-2">
+        <div
+          role="radiogroup"
+          aria-label="Relation"
+          className="dank:gap-2 flex flex-wrap gap-1 border-b p-2"
+        >
           {KINDS.map((item) => (
             <Button
               key={item.kind}
@@ -104,6 +108,7 @@ export function AddRelationPicker({
               size="sm"
               forceMinSize={false}
               data-active={kind === item.kind || undefined}
+              data-m3-chip="filter"
               onMouseDown={(event) => event.preventDefault()}
               className="data-active:bg-accent data-active:text-foreground text-muted-foreground font-normal"
               onClick={() => setKind(item.kind)}
@@ -118,7 +123,12 @@ export function AddRelationPicker({
         updateIssue({ id: issue.id, changes: addChange(kind, other.id) });
       }}
       trigger={
-        <Button variant="ghost" size="sm" className="text-muted-foreground font-normal">
+        <Button
+          variant="ghost"
+          size="sm"
+          data-m3-chip="assist"
+          className="text-muted-foreground font-normal"
+        >
           <ArrowRightLeftIcon className="size-4" />
           {label}
         </Button>
@@ -136,7 +146,7 @@ export function IssueRelations({ issue }: { issue: IssueDetail }) {
   return (
     <section aria-label="Relations" className="flex w-full flex-col gap-2">
       <div className="flex min-h-7 items-center gap-2">
-        <h2 className="text-sm font-semibold">Relations</h2>
+        <h2 className="dank:type-title-medium text-sm font-semibold">Relations</h2>
         <span className="flex-1" />
         {canEdit && <AddRelationPicker issue={issue} label="Add" />}
       </div>
@@ -152,7 +162,7 @@ export function IssueRelations({ issue }: { issue: IssueDetail }) {
               event.target === event.currentTarget &&
               open(row.issue.identifier)
             }
-            className="group/row has-hover:hover:bg-accent focus-visible:ring-primary/8-10 flex h-9 w-full cursor-default items-center gap-2 border-b px-3 text-sm outline-hidden last:border-b-0 focus-visible:ring-1 focus-visible:ring-inset"
+            className="group/row has-hover:hover:bg-accent focus-visible:ring-primary/8-10 dank:relative dank:state-layer dank:has-hover:hover:bg-transparent dank:focus-visible:ring-0 flex h-9 w-full cursor-default items-center gap-2 border-b px-3 text-sm outline-hidden last:border-b-0 focus-visible:ring-1 focus-visible:ring-inset"
           >
             <span className="text-muted-foreground w-24 shrink-0 truncate text-xs">
               {row.label}
@@ -172,7 +182,7 @@ export function IssueRelations({ issue }: { issue: IssueDetail }) {
                 size="icon"
                 forceMinSize={false}
                 aria-label={`Remove relation to ${row.issue.identifier}`}
-                className="size-6 opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100"
+                className="dank:size-8 dank:[&>svg]:size-5 size-6 opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100"
                 onClick={(event) => {
                   event.stopPropagation();
                   if (row.remove) updateIssue({ id: issue.id, changes: row.remove });

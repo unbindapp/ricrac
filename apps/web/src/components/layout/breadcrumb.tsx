@@ -14,7 +14,7 @@ export function Breadcrumb({ items }: { items: TBreadcrumbItem[] }) {
   const isCollapsedOnPhones = (index: number) => index < items.length - 2;
   return (
     <nav aria-label="Breadcrumb" className="min-w-0">
-      <ol className="text-muted-foreground flex min-w-0 items-center gap-1.5 text-sm">
+      <ol className="text-muted-foreground dank:in-data-[slot=page-bar]:type-title-large flex min-w-0 items-center gap-1.5 text-sm">
         {items.map((item, index) => (
           <Fragment key={`${item.label}-${index}`}>
             {index > 0 && (
@@ -23,7 +23,7 @@ export function Breadcrumb({ items }: { items: TBreadcrumbItem[] }) {
                 data-collapsed={isCollapsedOnPhones(index - 1) || undefined}
                 className="flex shrink-0 items-center max-sm:data-collapsed:hidden"
               >
-                <ChevronRightIcon className="size-3.5" />
+                <ChevronRightIcon className="dank:in-data-[slot=page-bar]:size-5 size-3.5" />
               </li>
             )}
             <li

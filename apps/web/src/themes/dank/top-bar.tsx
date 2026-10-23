@@ -4,7 +4,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { InboxIcon, LogOutIcon, SettingsIcon, UserCircleIcon } from "@/components/icons";
 import { useInboxUnreadCount } from "@/components/inbox/inbox-unread-badge";
 import { UserAvatar } from "@/components/issues/pickers";
-import { GlobalSearch } from "@/components/search/global-search";
+import { GlobalSearch } from "@/themes/dank/global-search";
 import { Button, LinkButton } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -19,15 +19,15 @@ import { SimpleTooltip } from "@/components/ui/tooltip";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { meQuery, signOut } from "@/lib/queries/me";
 
+/** Material 3's app bar with search: a 56dp search bar in a 64dp bar, actions at the end. */
 export function DankTopBar() {
   return (
-    <header className="hidden h-12 shrink-0 items-center gap-2 md:flex">
+    <header className="-mr-5 hidden h-16 shrink-0 items-center gap-1 md:flex">
       <div className="w-24 shrink-0" />
-      <div className="flex min-w-0 flex-1 items-center justify-center gap-2">
-        <GlobalSearch />
-        <AccountMenu />
+      <div className="flex min-w-0 flex-1 items-center justify-center py-1">
+        <GlobalSearch trailing={<AccountMenu />} />
       </div>
-      <div className="flex w-24 shrink-0 items-center justify-end gap-2">
+      <div className="flex w-24 shrink-0 items-center justify-end gap-2 pr-1">
         <InboxMenu />
         <SettingsButton />
       </div>
@@ -46,7 +46,7 @@ function AccountMenu() {
             variant="ghost"
             size="icon"
             aria-label="Account"
-            className="dank:size-12 dank:rounded-full shrink-0"
+            className="shrink-0 rounded-full active:rounded-full data-popup-open:rounded-full [&>*]:size-7.5"
           >
             <UserAvatar user={me} size="lg" />
           </Button>
@@ -76,7 +76,7 @@ function InboxMenu() {
   const navigate = useNavigate();
   const unread = useInboxUnreadCount();
   const params = { workspace: workspace.urlKey };
-  const unreadLabel = unread > 99 ? "99+" : String(unread);
+  const unreadLabel = unread > 999 ? "999+" : String(unread);
   return (
     <DropdownMenu>
       <SimpleTooltip content="Inbox and my issues">
@@ -86,11 +86,10 @@ function InboxMenu() {
               variant="ghost"
               size="icon"
               aria-label={unread > 0 ? `Inbox, ${unread} unread` : "Inbox"}
-              className="text-muted-foreground dank:size-10"
             >
-              <InboxIcon className="size-5" />
+              <InboxIcon />
               {unread > 0 && (
-                <span className="bg-destructive text-destructive-foreground absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-xs leading-none tabular-nums">
+                <span className="bg-m3-error text-m3-on-error type-label-small absolute top-1.5 left-5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 tabular-nums">
                   {unreadLabel}
                 </span>
               )}
@@ -127,9 +126,8 @@ function SettingsButton() {
         variant="ghost"
         size="icon"
         aria-label="Settings"
-        className="text-muted-foreground dank:size-10"
       >
-        <SettingsIcon className="size-5" />
+        <SettingsIcon />
       </LinkButton>
     </SimpleTooltip>
   );

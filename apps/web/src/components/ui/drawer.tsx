@@ -75,6 +75,9 @@ function DrawerClose({ ...props }: DrawerPrimitive.Close.Props) {
 // Matches vaul's feel: 500ms cubic-bezier(0.32, 0.72, 0, 1)
 const drawerEase = "duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]";
 
+const dankSheetEase =
+  "dank:duration-(--spring-default-spatial-duration) dank:ease-spring-default-spatial";
+
 function DrawerOverlay({
   className,
   transparent,
@@ -90,6 +93,7 @@ function DrawerOverlay({
           cn(
             "bg-barrier/barrier opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity data-ending-style:opacity-0 data-starting-style:opacity-0 data-swiping:transition-none",
             drawerEase,
+            "dank:duration-(--spring-default-effects-duration) dank:ease-spring-default-effects",
           ),
         className,
       )}
@@ -122,8 +126,10 @@ function DrawerContent({
       <DrawerPrimitive.Viewport data-slot="drawer-viewport" className="fixed inset-0 z-50">
         <DrawerPrimitive.Popup
           data-slot="drawer-content"
+          data-focus-indicator="child"
           className={cn(
             "bg-background ring-border absolute z-50 flex flex-col ring-1 focus:outline-hidden focus-visible:outline-hidden",
+            "dank:text-m3-on-surface dank:ring-0 dank:[--tw-shadow-color:initial]",
             keyboardAware ? "pb-(--drawer-keyboard-inset,0px)" : "pb-(--keyboard-inset-height)",
             cn("transition-transform", drawerEase),
             "data-ending-style:duration-[calc(var(--drawer-swipe-strength,1)*500ms)]",
@@ -132,11 +138,20 @@ function DrawerContent({
                 "inset-x-0 bottom-0 mt-24 h-auto rounded-t-2xl data-ending-style:translate-y-full data-starting-style:translate-y-full",
                 // Fills the gap revealed below the sheet when it's overdragged upward
                 "after:absolute after:inset-x-0 after:top-full after:h-[50vh] after:bg-inherit",
+                "dank:bg-m3-surface-container-low dank:shadow-elevation-1 dank:rounded-t-xl dank:duration-300 dank:ease-[cubic-bezier(0.4,0,0.2,1)]",
               ),
             direction === "right" &&
-              "top-0 right-0 h-full rounded-l-2xl data-ending-style:translate-x-full data-starting-style:translate-x-full",
+              cn(
+                "top-0 right-0 h-full rounded-l-2xl data-ending-style:translate-x-full data-starting-style:translate-x-full",
+                "dank:bg-m3-surface-container-low dank:shadow-elevation-1 dank:rounded-l-lg dank:after:absolute dank:after:inset-y-0 dank:after:left-full dank:after:w-8 dank:after:bg-inherit",
+                dankSheetEase,
+              ),
             direction === "left" &&
-              "top-0 left-0 h-full rounded-r-lg data-ending-style:-translate-x-full data-starting-style:-translate-x-full",
+              cn(
+                "top-0 left-0 h-full rounded-r-lg data-ending-style:-translate-x-full data-starting-style:-translate-x-full",
+                "dank:bg-m3-surface-container dank:shadow-elevation-2 dank:rounded-r-lg dank:after:absolute dank:after:inset-y-0 dank:after:right-full dank:after:w-8 dank:after:bg-inherit",
+                dankSheetEase,
+              ),
             className,
           )}
           {...props}
@@ -145,7 +160,7 @@ function DrawerContent({
             <div
               aria-hidden
               data-hide-handle={hideHandle || undefined}
-              className="bg-muted-more-foreground absolute top-0 left-1/2 h-1.5 w-[calc(min(33.3%,5rem))] -translate-x-1/2 -translate-y-3.5 rounded-full transition duration-100 data-hide-handle:translate-y-1.5"
+              className="bg-muted-more-foreground dank:top-5.5 dank:h-1 dank:w-8 dank:translate-y-0 dank:bg-m3-on-surface-variant dank:data-hide-handle:translate-y-0 absolute top-0 left-1/2 h-1.5 w-[calc(min(33.3%,5rem))] -translate-x-1/2 -translate-y-3.5 rounded-full transition duration-100 data-hide-handle:translate-y-1.5"
             />
           )}
           <DrawerPrimitive.Content
@@ -177,7 +192,7 @@ function DrawerTitle({ className, ...props }: DrawerPrimitive.Title.Props) {
   return (
     <DrawerPrimitive.Title
       data-slot="drawer-title"
-      className={cn("text-lg leading-tight font-semibold", className)}
+      className={cn("dank:type-headline-small text-lg leading-tight font-semibold", className)}
       {...props}
     />
   );
@@ -187,7 +202,7 @@ function DrawerDescription({ className, ...props }: DrawerPrimitive.Description.
   return (
     <DrawerPrimitive.Description
       data-slot="drawer-description"
-      className={cn("text-muted-foreground text-sm", className)}
+      className={cn("text-muted-foreground dank:type-body-medium text-sm", className)}
       {...props}
     />
   );

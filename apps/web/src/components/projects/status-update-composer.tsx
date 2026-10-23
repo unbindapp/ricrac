@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { HEALTHS, HealthIcon, healthLabels } from "@/components/projects/health-badge";
 import { useMentionUsers } from "@/components/projects/people";
+import { FilterChip } from "@/components/shared/filter-chip";
 import { MarkdownEditor } from "@/components/shared/markdown-editor";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { Button } from "@/components/ui/button";
@@ -48,18 +49,17 @@ export function StatusUpdateComposer({
     <Card className="flex flex-col gap-3 p-4">
       <div role="radiogroup" aria-label="Health" className="flex flex-wrap items-center gap-1">
         {HEALTHS.map((option) => (
-          <Button
+          <FilterChip
             key={option}
             role="radio"
             aria-checked={health === option}
-            variant={health === option ? "secondary" : "ghost"}
-            size="sm"
+            selected={health === option}
             forceMinSize={false}
             onClick={() => setHealth(option)}
           >
             <HealthIcon health={option} />
             {healthLabels[option]}
-          </Button>
+          </FilterChip>
         ))}
       </div>
       <MarkdownEditor

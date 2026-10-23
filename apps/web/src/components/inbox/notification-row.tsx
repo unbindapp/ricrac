@@ -62,13 +62,15 @@ export function NotificationRow({
         className={cn("size-2 shrink-0 rounded-full", isUnread ? "bg-process" : "bg-transparent")}
       />
       {latest.actor ? (
-        <Avatar id={latest.actor.id} name={actor ?? latest.actor.email} />
+        <span className="dank:*:size-10 dank:*:text-base flex shrink-0">
+          <Avatar id={latest.actor.id} name={actor ?? latest.actor.email} />
+        </span>
       ) : (
-        <span className="bg-muted text-muted-foreground flex size-6 shrink-0 items-center justify-center rounded-full">
-          <TypeIcon className="size-3.5" />
+        <span className="bg-muted text-muted-foreground dank:size-10 dank:bg-m3-primary-container dank:text-m3-on-primary-container flex size-6 shrink-0 items-center justify-center rounded-full">
+          <TypeIcon className="dank:size-5 size-3.5" />
         </span>
       )}
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+      <div className="dank:gap-0 flex min-w-0 flex-1 flex-col gap-0.5">
         <div className="flex min-w-0 items-center gap-1.5">
           <NotificationTargetIcon target={target} />
           {target.kind === "issue" && (
@@ -80,7 +82,10 @@ export function NotificationRow({
             {target.title}
           </span>
         </div>
-        <div className="text-muted-foreground flex min-w-0 items-center gap-1.5 text-xs">
+        <div
+          data-slot="list-supporting"
+          className="text-muted-foreground flex min-w-0 items-center gap-1.5 text-xs"
+        >
           {latest.actor && <TypeIcon className="size-3.5 shrink-0" />}
           <span className="truncate">
             {actor && <span className="text-foreground font-medium">{actor} </span>}
@@ -89,7 +94,7 @@ export function NotificationRow({
           </span>
         </div>
       </div>
-      <div className="text-muted-foreground flex shrink-0 flex-col items-end gap-0.5 text-xs has-hover:group-hover/row:hidden">
+      <div className="text-muted-foreground dank:type-label-small flex shrink-0 flex-col items-end gap-0.5 text-xs has-hover:group-hover/row:hidden">
         <span>
           {snoozedUntil ? (
             <>

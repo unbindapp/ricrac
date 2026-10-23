@@ -29,7 +29,12 @@ function WorkspaceDangerSettingsPage() {
         title="Leave workspace"
         description="You lose access to its issues until someone invites you again. A workspace's only owner can't leave it."
         footer={
-          <Button variant="outline" size="sm" onClick={() => setIsLeaving(true)}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="dank:text-m3-error"
+            onClick={() => setIsLeaving(true)}
+          >
             Leave workspace
           </Button>
         }

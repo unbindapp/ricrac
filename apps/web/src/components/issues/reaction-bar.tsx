@@ -54,7 +54,7 @@ function reactorNames(reaction: TReactionGroup) {
 export function ReactionBar({ reactions, onToggle, disabled, revealOnHover }: TProps) {
   if (disabled && reactions.length === 0) return null;
   return (
-    <div className="flex flex-wrap items-center gap-1.5">
+    <div className="dank:gap-2 flex flex-wrap items-center gap-1.5">
       {reactions.map((reaction) => (
         <SimpleTooltip key={reaction.emoji} content={reactorNames(reaction)}>
           <Button
@@ -65,11 +65,12 @@ export function ReactionBar({ reactions, onToggle, disabled, revealOnHover }: TP
             aria-pressed={reaction.reacted}
             aria-label={`${reaction.emoji} ${reaction.count}`}
             data-active={reaction.reacted || undefined}
+            data-m3-chip="filter"
             className="data-active:border-primary/6-10 data-active:bg-primary/1-10 rounded-full"
             onClick={() => onToggle(reaction.emoji, reaction.reacted)}
           >
             <span>{reaction.emoji}</span>
-            <span className="text-xs">{reaction.count}</span>
+            <span className="dank:type-label-large text-xs">{reaction.count}</span>
           </Button>
         </SimpleTooltip>
       ))}
@@ -102,7 +103,7 @@ export function AddReactionButton({
             forceMinSize={false}
             aria-label="Add reaction"
             data-reveal={revealOnHover || undefined}
-            className="size-7 data-reveal:opacity-0 data-reveal:group-hover/reactable:opacity-100 data-reveal:focus-visible:opacity-100 data-reveal:data-popup-open:opacity-100"
+            className="dank:size-8 dank:[&>svg]:size-5 size-7 data-reveal:opacity-0 data-reveal:group-hover/reactable:opacity-100 data-reveal:focus-visible:opacity-100 data-reveal:data-popup-open:opacity-100"
           >
             <SmilePlusIcon className="text-muted-foreground size-4" />
           </Button>

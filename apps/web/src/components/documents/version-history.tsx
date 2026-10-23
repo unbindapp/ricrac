@@ -91,7 +91,11 @@ function VersionBrowser({
     <div className="flex min-h-0 flex-1 flex-col gap-4 md:flex-row">
       <div className="flex max-h-48 shrink-0 flex-col rounded-lg border md:max-h-none md:w-56">
         <ScrollArea className="min-h-0 flex-1">
-          <div role="listbox" aria-label="Versions" className="flex flex-col p-1">
+          <div
+            role="listbox"
+            aria-label="Versions"
+            className="dank:gap-0.5 dank:p-2 flex flex-col p-1"
+          >
             {versions.data.map((version) => (
               <Button
                 key={version.id}
@@ -100,13 +104,16 @@ function VersionBrowser({
                 variant={version.id === selected ? "secondary" : "ghost"}
                 size="sm"
                 forceMinSize={false}
-                className="h-auto flex-col items-start gap-0.5 py-2 text-left"
+                className="dank:text-m3-on-surface dank:aria-selected:text-m3-on-secondary-container dank:rounded-xs dank:aria-selected:rounded-lg dank:px-4 dank:min-h-18 dank:justify-center h-auto flex-col items-start gap-0.5 py-2 text-left"
                 onClick={() => setSelectedId(version.id)}
               >
-                <span className="text-sm" title={formatDateTime(version.createdAt)}>
+                <span
+                  className="dank:type-body-large text-sm"
+                  title={formatDateTime(version.createdAt)}
+                >
                   {formatRelative(version.createdAt)}
                 </span>
-                <span className="text-muted-foreground text-xs font-normal">
+                <span className="text-muted-foreground dank:type-body-medium dank:group-aria-selected/button:text-m3-on-secondary-container text-xs font-normal">
                   {version.author?.name ?? "Someone"}
                 </span>
               </Button>
@@ -151,7 +158,9 @@ function VersionPreview({
       {data && (
         <>
           <div className="flex items-center gap-2">
-            <h3 className="min-w-0 flex-1 truncate text-base font-semibold">{data.title}</h3>
+            <h3 className="dank:type-title-medium min-w-0 flex-1 truncate text-base font-semibold">
+              {data.title}
+            </h3>
             {canRestore && (
               <Button
                 size="sm"

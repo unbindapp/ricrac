@@ -5,6 +5,7 @@ import { CustomerLogo, ImportantIcon } from "@/components/customers/customer-bad
 import { CustomerNeedDialog } from "@/components/customers/customer-need-dialog";
 import { LinkIcon, PencilIcon, Trash2Icon } from "@/components/icons";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { segmentOf } from "@/components/shared/list-segment";
 import { ProjectIcon } from "@/components/shared/project-icon";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { StateIcon } from "@/components/shared/state-icon";
@@ -20,24 +21,39 @@ type TProps = {
 };
 
 const linkClassName =
-  "flex min-w-0 items-center gap-1.5 font-medium outline-hidden focus-visible:underline has-hover:hover:underline";
+  "flex min-w-0 items-center gap-1.5 font-medium outline-hidden focus-visible:underline has-hover:hover:underline dank:font-normal";
 
 export function CustomerNeedList({ needs, scope, show }: TProps) {
   return (
-    <ul className="bg-card flex w-full flex-col overflow-hidden rounded-lg border">
-      {needs.map((need) => (
-        <NeedItem key={need.id} need={need} scope={scope} show={show} />
+    <ul data-slot="list" className="bg-card flex w-full flex-col overflow-hidden rounded-lg border">
+      {needs.map((need, index) => (
+        <NeedItem
+          key={need.id}
+          need={need}
+          scope={scope}
+          show={show}
+          segment={segmentOf(index, needs.length)}
+        />
       ))}
     </ul>
   );
 }
 
-function NeedItem({ need, scope, show }: { need: CustomerNeed } & Omit<TProps, "needs">) {
+function NeedItem({
+  need,
+  scope,
+  show,
+  segment,
+}: { need: CustomerNeed; segment?: string } & Omit<TProps, "needs">) {
   const { workspace, canEdit } = useWorkspace();
   const { mutateAsync: remove } = useDeleteCustomerNeedMutation(workspace.id);
   return (
-    <li className="flex flex-col gap-1 border-b px-3 py-2 last:border-b-0">
-      <div className="flex min-h-7 items-center gap-2 text-sm">
+    <li
+      data-slot="list-item"
+      data-segment={segment}
+      className="flex flex-col gap-1 border-b px-3 py-2 last:border-b-0"
+    >
+      <div className="dank:text-base flex min-h-7 items-center gap-2 text-sm">
         {need.priority === 1 && <ImportantIcon />}
         <div className="flex min-w-0 flex-1 items-center">
           {show === "customer" ? <CustomerLink need={need} /> : <TargetLink need={need} />}

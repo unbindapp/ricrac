@@ -169,7 +169,7 @@ function IssueDetailContent({
     <div className="flex min-w-0 flex-1 flex-col gap-8">
       <LifecycleBanner issue={issue} />
       <TriageBanner issue={issue} />
-      <div className="flex flex-col gap-2">
+      <div data-m3-title className="flex flex-col gap-2">
         <InlineText
           label="Issue title"
           value={issue.title}
@@ -195,7 +195,7 @@ function IssueDetailContent({
         )}
       </div>
       {!isPeek && !hasPropertiesAside && (
-        <section aria-label="Properties" className="rounded-lg border p-3">
+        <section aria-label="Properties" className="dank:border-0 dank:p-0 rounded-lg border p-3">
           {properties}
         </section>
       )}
@@ -210,7 +210,12 @@ function IssueDetailContent({
             <CustomerNeedDialog
               scope={{ issue: issue.identifier }}
               trigger={
-                <Button variant="ghost" size="sm" className="text-muted-foreground font-normal">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  data-m3-chip="assist"
+                  className="text-muted-foreground font-normal"
+                >
                   <HandshakeIcon className="size-4" />
                   Add customer request
                 </Button>
@@ -253,7 +258,7 @@ function IssueDetailContent({
             aria-label="Properties"
             className="flex w-80 shrink-0 flex-col gap-2 border-l px-5 py-4"
           >
-            <h2 className="text-muted-foreground flex h-7 items-center text-xs font-medium">
+            <h2 className="text-muted-foreground dank:type-title-small flex h-7 items-center text-xs font-medium">
               Properties
             </h2>
             {properties}
@@ -282,7 +287,7 @@ function EmptyExtras({
   if (issue.attachments.length === 0) actions.push(<AttachMenu key="attach" issue={issue} />);
   if (actions.length === 0 && !customerNeed && !reaction) return null;
   return (
-    <div className="-ml-2.5 flex flex-wrap items-center gap-1">
+    <div className="dank:ml-0 dank:gap-2 -ml-2.5 flex flex-wrap items-center gap-1">
       {actions}
       {customerNeed}
       {reaction}
@@ -297,7 +302,10 @@ function LifecycleBanner({ issue }: { issue: TIssueDetail }) {
   const isTrashed = Boolean(issue.trashedAt);
   const Icon = isTrashed ? Trash2Icon : ArchiveIcon;
   return (
-    <div role="status" className="bg-muted flex items-center gap-2 rounded-lg border p-3 text-sm">
+    <div
+      role="status"
+      className="bg-muted dank:rounded-md dank:border-0 dank:p-4 flex items-center gap-2 rounded-lg border p-3 text-sm"
+    >
       <Icon className="text-muted-foreground size-4 shrink-0" />
       <p className="min-w-0 flex-1">
         {isTrashed
@@ -329,7 +337,7 @@ function TriageBanner({ issue }: { issue: TIssueDetail }) {
   return (
     <div
       role="status"
-      className="bg-muted flex flex-wrap items-center gap-2 rounded-lg border p-3 text-sm"
+      className="bg-muted dank:rounded-md dank:border-0 dank:p-4 flex flex-wrap items-center gap-2 rounded-lg border p-3 text-sm"
     >
       <TriangleIcon className="text-muted-foreground size-4 shrink-0" />
       <p className="min-w-0 flex-1">

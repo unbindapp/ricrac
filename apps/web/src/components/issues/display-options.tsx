@@ -4,6 +4,7 @@ import { useLocalStorage } from "usehooks-ts";
 import {
   ArrowDownNarrowWideIcon,
   ArrowUpNarrowWideIcon,
+  CheckIcon,
   LayoutGridIcon,
   ListIcon,
   SlidersHorizontalIcon,
@@ -112,7 +113,12 @@ export function DisplayOptions({ value, onChange, onReset }: TProps) {
         }
       />
       <PopoverContent align="end" className="flex w-80 flex-col gap-4">
-        <div role="radiogroup" aria-label="Layout" className="-mx-1 grid grid-cols-2">
+        <div
+          role="radiogroup"
+          aria-label="Layout"
+          data-slot="connected-button-group"
+          className="dank:*:flex-1 -mx-1 grid grid-cols-2"
+        >
           {layouts.map((layout) => (
             <Button
               key={layout.value}
@@ -181,7 +187,7 @@ export function DisplayOptions({ value, onChange, onReset }: TProps) {
         </div>
         <div className="flex flex-col gap-2">
           <p className="text-muted-foreground text-xs font-medium">Display properties</p>
-          <div className="-m-0.75 flex flex-wrap">
+          <div className="dank:m-0 dank:gap-2 -m-0.75 flex flex-wrap">
             {ISSUE_PROPERTIES.map((property) => {
               const isOn = value.properties.includes(property.value);
               return (
@@ -192,7 +198,7 @@ export function DisplayOptions({ value, onChange, onReset }: TProps) {
                   forceMinSize={false}
                   aria-pressed={isOn}
                   data-active={isOn || undefined}
-                  className="hit-gap bg-muted text-muted-foreground data-active:bg-accent data-active:text-foreground h-7.5 px-2"
+                  className="hit-gap bg-muted text-muted-foreground data-active:bg-accent data-active:text-foreground dank:h-8 dank:gap-2 dank:rounded-sm dank:border dank:border-m3-outline-variant dank:bg-transparent dank:bg-clip-border dank:px-4 dank:text-m3-on-surface-variant dank:data-active:border-transparent dank:data-active:bg-m3-secondary-container dank:data-active:pl-2 dank:data-active:text-m3-on-secondary-container h-7.5 px-2"
                   onClick={() =>
                     onChange({
                       properties: isOn
@@ -201,6 +207,11 @@ export function DisplayOptions({ value, onChange, onReset }: TProps) {
                     })
                   }
                 >
+                  {isOn && (
+                    <span className="dank:flex hidden">
+                      <CheckIcon className="size-4.5" />
+                    </span>
+                  )}
                   {property.label}
                 </Button>
               );

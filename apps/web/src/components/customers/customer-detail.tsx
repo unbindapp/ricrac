@@ -170,7 +170,7 @@ function CustomerPage({ customer }: { customer: TCustomerDetail }) {
           </section>
         </div>
         <aside aria-label="Properties" className="w-full shrink-0 lg:w-72">
-          <div className="flex flex-col gap-1 rounded-lg border p-4 lg:sticky lg:top-0">
+          <div className="dank:rounded-md dank:bg-card flex flex-col gap-1 rounded-lg border p-4 lg:sticky lg:top-0">
             <CustomerProperties customer={customer} />
           </div>
         </aside>

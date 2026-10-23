@@ -53,6 +53,7 @@ const rules = [
     allowedIn: [
       "src/lib/helpers/colors.ts",
       "src/components/providers/themes.ts",
+      "src/themes/dank/palette.ts",
       "src/components/shared/color-picker.tsx",
       "src/components/icons/google.tsx",
     ],

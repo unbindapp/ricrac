@@ -23,6 +23,7 @@ import { PipelineDialog } from "@/components/releases/pipeline-dialog";
 import { ReleaseDialog } from "@/components/releases/release-dialog";
 import { ReleaseStageIcon } from "@/components/releases/release-stage-icon";
 import { Avatar } from "@/components/shared/avatar";
+import { FilterChip } from "@/components/shared/filter-chip";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -189,16 +190,15 @@ function TabSwitch({
   return (
     <div role="radiogroup" aria-label="Show" className="flex items-center gap-1">
       {tabs.map((item) => (
-        <Button
+        <FilterChip
           key={item.value}
           role="radio"
           aria-checked={tab === item.value}
-          variant={tab === item.value ? "secondary" : "ghost"}
-          size="sm"
+          selected={tab === item.value}
           onClick={() => onChange(item.value)}
         >
           {item.label}
-        </Button>
+        </FilterChip>
       ))}
     </div>
   );
@@ -242,17 +242,17 @@ function PipelineReleases({ pipeline }: { pipeline: ReleasePipeline }) {
   }
   const groups = groupByStage(pipeline.stages ?? [], releases);
   return (
-    <div className="flex w-full flex-col overflow-hidden rounded-lg border">
+    <div className="dank:overflow-visible dank:rounded-none dank:border-0 flex w-full flex-col overflow-hidden rounded-lg border">
       {groups.map((group) => (
         <section key={group.stage?.id ?? "none"} aria-label={group.stage?.name ?? "No stage"}>
-          <h2 className="bg-muted flex h-9 items-center gap-2 border-b px-3 text-sm font-medium">
+          <h2 className="bg-muted dank:h-12 dank:border-0 dank:bg-transparent dank:px-4 dank:type-title-small flex h-9 items-center gap-2 border-b px-3 text-sm font-medium">
             {group.stage && <ReleaseStageIcon type={group.stage.type} color={group.stage.color} />}
             <span>{group.stage?.name ?? "No stage"}</span>
-            <span className="text-muted-foreground text-xs font-normal">
+            <span className="text-muted-foreground dank:type-label-large text-xs font-normal">
               {group.releases.length}
             </span>
           </h2>
-          <div role="list">
+          <div role="list" data-slot="list">
             {group.releases.map((release) => (
               <ReleaseRow key={release.id} release={release} />
             ))}
@@ -290,7 +290,7 @@ function ReleaseRow({ release }: { release: Release }) {
           name={release.stage.name}
         />
       )}
-      <span className="min-w-0 truncate font-medium">{release.name}</span>
+      <span className="dank:font-normal min-w-0 truncate font-medium">{release.name}</span>
       {release.version && (
         <span className="text-muted-foreground shrink-0 font-mono text-xs">{release.version}</span>
       )}
@@ -333,7 +333,11 @@ function PipelineNotes({ pipeline }: { pipeline: ReleasePipeline }) {
     );
   }
   return (
-    <div role="list" className="flex w-full flex-col overflow-hidden rounded-lg border">
+    <div
+      role="list"
+      data-slot="list"
+      className="flex w-full flex-col overflow-hidden rounded-lg border"
+    >
       {notes.map((note) => (
         <NoteRow key={note.id} note={note} />
       ))}
@@ -362,9 +366,11 @@ function NoteRow({ note }: { note: ReleaseNote }) {
       className="has-hover:hover:bg-accent focus-visible:ring-primary/8-10 flex h-9 cursor-default items-center gap-2 border-b px-3 text-sm outline-hidden last:border-b-0 focus-visible:ring-1 focus-visible:ring-inset"
     >
       <FileTextIcon className="text-muted-foreground size-4 shrink-0" />
-      <span className="min-w-0 truncate font-medium">{note.title}</span>
+      <span className="dank:font-normal min-w-0 truncate font-medium">{note.title}</span>
       {covered && (
-        <span className="text-muted-foreground hidden truncate text-xs sm:inline">{covered}</span>
+        <span className="text-muted-foreground dank:text-sm hidden truncate text-xs sm:inline">
+          {covered}
+        </span>
       )}
       <span className="flex-1" />
       {note.creator && <Avatar id={note.creator.id} name={note.creator.name} size="xs" />}

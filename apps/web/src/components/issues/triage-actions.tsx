@@ -52,7 +52,7 @@ export function TriageActions({ issue }: { issue: Issue }) {
           forceMinSize={false}
           aria-label={acceptLabel}
           disabled={!accept}
-          className="size-6"
+          className="dank:size-8 dank:[&>svg]:size-5 size-6"
           onClick={accept}
         >
           <CheckIcon className="size-4" />
@@ -65,7 +65,7 @@ export function TriageActions({ issue }: { issue: Issue }) {
           forceMinSize={false}
           aria-label="Decline"
           disabled={!decline}
-          className="size-6"
+          className="dank:size-8 dank:[&>svg]:size-5 size-6"
           onClick={decline}
         >
           <XIcon className="size-4" />

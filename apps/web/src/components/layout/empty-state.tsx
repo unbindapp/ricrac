@@ -22,7 +22,7 @@ export function EmptyState({ icon: Icon, title, description, action }: TProps) {
       <ShapeBadge shape="cookie" className="text-tertiary-container dank:flex hidden size-14">
         <Icon className="text-tertiary-container-foreground size-5" />
       </ShapeBadge>
-      <p className="text-sm font-medium">{title}</p>
+      <p className="dank:type-title-medium text-sm font-medium">{title}</p>
       {description && <p className="text-muted-foreground max-w-sm text-sm">{description}</p>}
       {action && <div className="flex items-center gap-2 pt-2">{action}</div>}
     </div>

@@ -8,12 +8,15 @@ export function ListSkeleton({ rows = 6 }: { rows?: number }) {
       data-slot="list-skeleton"
       aria-busy
       aria-label="Loading"
-      className="flex w-full flex-col overflow-hidden rounded-lg border"
+      className="dank:gap-0.5 dank:border-0 flex w-full flex-col overflow-hidden rounded-lg border"
     >
       {Array.from({ length: rows }, (_, index) => (
-        <div key={index} className="flex h-9 items-center gap-2 border-b px-3 last:border-b-0">
-          <Skeleton className="size-4 rounded-full" />
-          <Skeleton className={`h-3 ${widths[index % widths.length]}`} />
+        <div
+          key={index}
+          className="dank:h-14 dank:gap-3 dank:rounded-xs dank:border-0 dank:bg-card dank:px-4 dank:first:rounded-t-lg dank:last:rounded-b-lg flex h-9 items-center gap-2 border-b px-3 last:border-b-0"
+        >
+          <Skeleton className="dank:size-6 size-4 rounded-full" />
+          <Skeleton className={`dank:h-4 h-3 ${widths[index % widths.length]}`} />
         </div>
       ))}
     </div>

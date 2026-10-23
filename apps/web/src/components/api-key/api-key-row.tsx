@@ -53,7 +53,7 @@ export function ApiKeyRow({ apiKey }: { apiKey: APIKey }) {
         </>
       }
     >
-      <KeySquareIcon className="text-muted-foreground size-4" />
+      <KeySquareIcon className="text-muted-foreground dank:size-5 size-4" />
       <ListRowText
         primary={apiKey.label}
         secondary={<span className="font-mono">{apiKey.keyHint}</span>}

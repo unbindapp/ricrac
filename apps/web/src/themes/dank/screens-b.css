@@ -1,0 +1,25 @@
+/* A destructive settings section outlines its card in the error role, as error text fields do. */
+:root[data-ui-theme="dank"] [data-slot="settings-section"]:has(h2[data-variant="destructive"]) {
+  border-color: var(--m3-error);
+}
+
+/* Grouped rows in a settings card stay flat, with the same inset dividers as its other rows. */
+:root[data-ui-theme="dank"] [data-slot="settings-section"] [data-slot="list-group"] {
+  gap: 0;
+
+  & > [role="listitem"] {
+    border-radius: 0;
+    background-color: transparent;
+  }
+
+  & > [role="listitem"] + [role="listitem"]::before,
+  & + [role="listitem"]::before,
+  & + [data-slot="list-group"] > [role="listitem"]:first-child::before {
+    content: "";
+    position: absolute;
+    inset-inline: 1rem;
+    top: 0;
+    height: 1px;
+    background-color: var(--m3-outline-variant);
+  }
+}

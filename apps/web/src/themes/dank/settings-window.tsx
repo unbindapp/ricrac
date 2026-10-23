@@ -36,44 +36,34 @@ export function SettingsWindow({ isOpen, onClose, children }: TProps) {
           ref={popupRef}
           initialFocus={popupRef}
           data-slot="settings-window"
+          data-focus-indicator="child"
           data-fullscreen={isFullscreen ? "" : undefined}
-          className="bg-surface shadow-dialog shadow-shadow-color/shadow-opacity border-primary ease-emphasized data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 fill-mode-forwards fixed inset-0 z-[1000] m-auto flex h-[min(1020px,calc(100dvh-48px))] w-[min(1100px,calc(100vw-48px))] flex-col overflow-hidden rounded-[1.75rem] border-2 outline-hidden transition-[width,height,border-radius] duration-300 data-fullscreen:size-full data-fullscreen:rounded-none data-fullscreen:border-0 max-md:size-full max-md:rounded-none max-md:border-0"
+          className="bg-m3-surface-container-high text-m3-on-surface shadow-elevation-3 ease-emphasized data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 fill-mode-forwards fixed inset-0 z-[1000] m-auto flex h-[min(1020px,calc(100dvh-48px))] w-[min(1100px,calc(100vw-48px))] flex-col overflow-hidden rounded-xl outline-hidden transition-[width,height,border-radius] duration-300 data-fullscreen:size-full data-fullscreen:rounded-none max-md:size-full max-md:rounded-none"
         >
-          <header className="relative flex h-16 shrink-0 items-center justify-center px-4">
-            <DialogPrimitive.Title className="text-lg font-medium">Settings</DialogPrimitive.Title>
-            <div className="absolute top-1/2 right-4 flex -translate-y-1/2 items-center gap-3">
-              <SimpleTooltip content={isFullscreen ? "Exit full screen" : "Full screen"}>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label={isFullscreen ? "Exit full screen" : "Full screen"}
-                  className="text-muted-foreground size-10 max-md:hidden"
-                  onClick={() => setIsFullscreen(!isFullscreen)}
-                >
-                  {isFullscreen ? (
-                    <MinimizeIcon className="size-5" />
-                  ) : (
-                    <MaximizeIcon className="size-5" />
-                  )}
+          <header className="flex h-16 shrink-0 items-center gap-2 pr-4 pl-6">
+            <DialogPrimitive.Title className="type-headline-small min-w-0 flex-1 truncate">
+              Settings
+            </DialogPrimitive.Title>
+            <SimpleTooltip content={isFullscreen ? "Exit full screen" : "Full screen"}>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label={isFullscreen ? "Exit full screen" : "Full screen"}
+                className="max-md:hidden"
+                onClick={() => setIsFullscreen(!isFullscreen)}
+              >
+                {isFullscreen ? <MinimizeIcon /> : <MaximizeIcon />}
+              </Button>
+            </SimpleTooltip>
+            <DialogClose
+              render={
+                <Button variant="ghost" size="icon" aria-label="Close settings">
+                  <XIcon />
                 </Button>
-              </SimpleTooltip>
-              <DialogClose
-                render={
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label="Close settings"
-                    className="bg-surface-container-highest has-hover:hover:bg-destructive has-hover:hover:text-destructive-foreground size-10 rounded-full"
-                  >
-                    <XIcon className="size-5" />
-                  </Button>
-                }
-              />
-            </div>
+              }
+            />
           </header>
-          <div className="bg-surface-container-low mx-2.5 mb-2.5 flex min-h-0 flex-1 overflow-hidden rounded-[1.375rem] max-md:mx-0 max-md:mb-0 max-md:rounded-none">
-            {children}
-          </div>
+          <div className="flex min-h-0 flex-1 overflow-hidden px-6 pb-6 max-md:p-0">{children}</div>
         </DialogPrimitive.Popup>
       </DialogPortal>
     </Dialog>

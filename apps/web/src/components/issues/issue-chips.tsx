@@ -13,8 +13,10 @@ export function ProjectChip({
   project: { name: string; icon?: string | null; color?: string | null };
 }) {
   return (
-    <span className="bg-background text-foreground inline-flex h-5 max-w-40 shrink-0 items-center gap-1.5 rounded-full border px-2 text-xs leading-none">
-      <ProjectIcon icon={project.icon} color={project.color} size="sm" />
+    <span className="bg-background text-foreground dank:h-8 dank:gap-2 dank:rounded-sm dank:border-m3-outline-variant dank:bg-transparent dank:pr-3 dank:pl-2 dank:type-label-large dank:text-m3-on-surface-variant inline-flex h-5 max-w-40 shrink-0 items-center gap-1.5 rounded-full border px-2 text-xs leading-none">
+      <span className="dank:*:size-4.5 flex shrink-0">
+        <ProjectIcon icon={project.icon} color={project.color} size="sm" />
+      </span>
       <span className="truncate">{project.name}</span>
     </span>
   );

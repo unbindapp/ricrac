@@ -109,7 +109,7 @@ export function LabelManager({ canEdit, title, description }: TProps) {
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Filter labels"
               aria-label="Filter labels"
-              className="pl-9"
+              className="h-8 pl-9"
             />
           </div>
         )}
@@ -220,17 +220,19 @@ function Row({
         className={cn("size-2.5 shrink-0 rounded-full", label.retiredAt && "opacity-50")}
         style={{ backgroundColor: label.color }}
       />
-      <span className={cn("shrink-0 truncate", !label.retiredAt && "font-medium")}>
+      <span className={cn("shrink-0 truncate", !label.retiredAt && "dank:font-normal font-medium")}>
         {label.name}
       </span>
       {meta}
       {label.retiredAt && <Badge variant="muted">Retired</Badge>}
       {label.description && (
-        <span className="text-muted-foreground hidden min-w-0 truncate sm:inline">
+        <span className="text-muted-foreground dank:text-sm hidden min-w-0 truncate sm:inline">
           {label.description}
         </span>
       )}
-      <span className="text-muted-foreground ml-auto shrink-0 text-xs">{trailing}</span>
+      <span className="text-muted-foreground dank:type-label-small ml-auto shrink-0 text-xs">
+        {trailing}
+      </span>
       {menu}
     </div>
   );

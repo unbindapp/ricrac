@@ -106,7 +106,7 @@ function ConnectionHint() {
         <Link
           to="/$workspace/settings/integrations"
           params={{ workspace: workspace.urlKey }}
-          className="text-foreground underline-offset-4 has-hover:hover:underline"
+          className="text-foreground dank:text-m3-primary underline-offset-4 has-hover:hover:underline"
         >
           Connect GitHub
         </Link>

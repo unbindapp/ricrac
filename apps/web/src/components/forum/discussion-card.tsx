@@ -47,10 +47,13 @@ export function DiscussionGridSkeleton() {
       className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3"
     >
       {Array.from({ length: SKELETON_CARDS }, (_, index) => (
-        <div key={index} className="bg-card flex flex-col overflow-hidden rounded-lg border">
+        <div
+          key={index}
+          className="bg-card dank:rounded-md flex flex-col overflow-hidden rounded-lg border"
+        >
           <div className="bg-muted aspect-video border-b" />
           <div className="flex flex-col gap-3 p-4">
-            <Skeleton className="h-4 w-16 rounded-full" />
+            <Skeleton className="dank:h-8 dank:rounded-sm h-4 w-16 rounded-full" />
             <Skeleton className="h-4 w-3/4" />
             <Skeleton className="h-3 w-1/2" />
           </div>
@@ -74,14 +77,16 @@ export function DiscussionCard({ discussion }: { discussion: Discussion }) {
             role="listitem"
             to="/$workspace/discussion/$slug"
             params={{ workspace: workspace.urlKey, slug: entitySlug(discussion) }}
-            className="bg-card has-hover:hover:bg-card-hover has-hover:hover:border-muted-most-foreground data-popup-open:border-muted-most-foreground focus-visible:ring-ring flex min-w-0 flex-col overflow-hidden rounded-lg border outline-hidden transition-colors focus-visible:ring-1"
+            className="bg-card has-hover:hover:bg-card-hover has-hover:hover:border-muted-most-foreground data-popup-open:border-muted-most-foreground focus-visible:ring-ring dank:relative dank:state-layer dank:rounded-md dank:has-hover:hover:bg-card dank:has-hover:hover:border-border dank:data-popup-open:border-border dank:has-hover:hover:shadow-elevation-1 dank:focus-visible:ring-0 dank:transition-shadow flex min-w-0 flex-col overflow-hidden rounded-lg border outline-hidden transition-colors focus-visible:ring-1"
           />
         }
       >
         <DiscussionPreview body={discussion.body ?? ""} thumbnailUrl={discussion.thumbnailUrl} />
         <div className="flex flex-1 flex-col gap-3 p-4">
           <DiscussionTags discussion={discussion} />
-          <h2 className="line-clamp-2 text-base leading-snug font-semibold">{discussion.title}</h2>
+          <h2 className="dank:type-title-medium line-clamp-2 text-base leading-snug font-semibold">
+            {discussion.title}
+          </h2>
           <div className="text-muted-foreground mt-auto flex min-w-0 items-center gap-3 text-xs">
             {discussion.creator && (
               <span className="flex min-w-0 items-center gap-1.5">
@@ -186,20 +191,22 @@ function DiscussionPreview({ body, thumbnailUrl }: { body: string; thumbnailUrl:
 
 function DiscussionTags({ discussion }: { discussion: Discussion }) {
   return (
-    <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+    <div className="dank:gap-2 flex min-w-0 flex-wrap items-center gap-1.5">
       {discussion.pinnedAt && (
-        <Badge variant="process">
+        <Badge variant="process" data-m3-chip="assist">
           <PinIcon />
           Pinned
         </Badge>
       )}
       {discussion.closedAt ? (
-        <Badge variant="muted">
+        <Badge variant="muted" data-m3-chip="assist">
           <LockIcon />
           Closed
         </Badge>
       ) : (
-        <Badge variant="success">Open</Badge>
+        <Badge variant="success" data-m3-chip="assist">
+          Open
+        </Badge>
       )}
       <DiscussionTagBadges tags={discussion.tags} max={MAX_CARD_TAGS} />
     </div>

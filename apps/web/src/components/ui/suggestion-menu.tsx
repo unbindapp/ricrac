@@ -2,6 +2,11 @@ import * as React from "react";
 import { createPortal } from "react-dom";
 
 import { Button } from "@/components/ui/button";
+import {
+  dankMenuContainerClassName,
+  dankMenuItemClassName,
+  dankMenuItemShapeClassName,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/components/ui/utils";
 
 export type TSuggestionItem = {
@@ -44,11 +49,17 @@ function SuggestionMenu({
       ref={listRef}
       role="listbox"
       data-slot="suggestion-menu"
-      className="bg-popover text-popover-foreground shadow-shadow-color/shadow-opacity fixed z-[1100] flex max-h-72 w-64 flex-col overflow-y-auto rounded-lg border p-1 shadow-lg"
+      className={cn(
+        "bg-popover text-popover-foreground shadow-shadow-color/shadow-opacity fixed z-[1100] flex max-h-72 w-64 flex-col overflow-y-auto rounded-lg border p-1 shadow-lg",
+        dankMenuContainerClassName,
+        "dank:px-0 dank:py-0.5",
+      )}
       style={{ ...position, left: Math.min(position.left, window.innerWidth - 264) }}
     >
       {items.length === 0 && (
-        <p className="text-muted-foreground px-2 py-1.5 text-sm">{emptyText}</p>
+        <p className="text-muted-foreground dank:type-body-large dank:px-4 dank:py-2.5 px-2 py-1.5 text-sm">
+          {emptyText}
+        </p>
       )}
       {items.map((item, index) => (
         <Button
@@ -63,13 +74,16 @@ function SuggestionMenu({
           onClick={() => onSelect(item)}
           className={cn(
             "w-full shrink-0 justify-start font-normal",
-            index === selectedIndex && "bg-accent text-accent-foreground",
+            dankMenuItemClassName,
+            dankMenuItemShapeClassName,
+            "dank:h-auto dank:w-auto dank:text-m3-on-surface dank:active:rounded-xs dank:[&>svg]:size-5",
+            index === selectedIndex && "bg-accent text-accent-foreground dank:after:opacity-10",
           )}
         >
           {item.icon}
           <span className="truncate">{item.label}</span>
           {item.description && (
-            <span className="text-muted-foreground ml-auto truncate text-xs">
+            <span className="text-muted-foreground dank:type-label-small ml-auto truncate text-xs">
               {item.description}
             </span>
           )}

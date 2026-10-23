@@ -67,7 +67,10 @@ export function CommentComposer({
     onDone?.();
   };
   return (
-    <div className="bg-card flex w-full flex-col gap-2 rounded-lg border p-3">
+    <div
+      data-m3-field="outlined"
+      className="bg-card dank:p-4 flex w-full flex-col gap-2 rounded-lg border p-3"
+    >
       <MarkdownEditor
         key={formKey}
         label={parentId ? "Reply" : "Comment"}
@@ -133,7 +136,7 @@ export function CommentThread({
   }
 
   return (
-    <div className="bg-card flex w-full flex-col rounded-lg border">
+    <div className="bg-card dank:rounded-md flex w-full flex-col rounded-lg border">
       <CommentItem
         comment={thread}
         thread={thread}
@@ -223,11 +226,11 @@ function CommentItem({
     <article
       id={`comment-${comment.id}`}
       aria-label={`Comment from ${authorName}`}
-      className="group/comment group/reactable flex flex-col gap-2 p-3"
+      className="group/comment group/reactable dank:p-4 flex flex-col gap-2 p-3"
     >
       <header className="flex min-h-7 items-center gap-2">
         {comment.user && <UserAvatar user={comment.user} size="sm" />}
-        <span className="truncate text-sm font-medium">{authorName}</span>
+        <span className="dank:type-title-small truncate text-sm font-medium">{authorName}</span>
         <span className="text-muted-foreground text-xs">
           <RelativeTime value={comment.createdAt} />
         </span>
@@ -247,7 +250,7 @@ function CommentItem({
             variant="ghost"
             size="icon"
             aria-label="Reply"
-            className="size-7 opacity-0 group-hover/comment:opacity-100 focus-visible:opacity-100"
+            className="dank:size-8 dank:[&>svg]:size-5 size-7 opacity-0 group-hover/comment:opacity-100 focus-visible:opacity-100"
             onClick={onReply}
           >
             <ReplyIcon className="size-4" />
@@ -261,7 +264,7 @@ function CommentItem({
                   variant="ghost"
                   size="icon"
                   aria-label="Comment actions"
-                  className="size-7 opacity-0 group-hover/comment:opacity-100 focus-visible:opacity-100 data-popup-open:opacity-100"
+                  className="dank:size-8 dank:[&>svg]:size-5 size-7 opacity-0 group-hover/comment:opacity-100 focus-visible:opacity-100 data-popup-open:opacity-100"
                 >
                   <EllipsisIcon className="size-4" />
                 </Button>

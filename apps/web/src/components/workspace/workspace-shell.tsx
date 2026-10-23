@@ -30,7 +30,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
       className="group/shell bg-sidebar flex h-svh w-full overflow-hidden"
     >
       <Navigation />
-      <div className="flex min-w-0 flex-1 flex-col md:gap-2 md:py-2 md:pr-2 md:group-data-sidebar-collapsed/shell:pl-2">
+      <div className="dank:md:gap-0 dank:md:pt-0 dank:md:pr-6 dank:md:pb-6 dank:md:pl-6 flex min-w-0 flex-1 flex-col md:gap-2 md:py-2 md:pr-2 md:group-data-sidebar-collapsed/shell:pl-2">
         <FallbackMobileBar />
         {TopBar && <TopBar />}
         <main className="bg-background dank:border-0 flex min-h-0 flex-1 flex-col overflow-hidden has-data-[slot=split-view]:border-0 has-data-[slot=split-view]:bg-transparent md:rounded-lg md:border">
@@ -65,7 +65,7 @@ function FallbackMobileBar() {
   const { workspace } = useWorkspace();
   const openCommandPanel = useCommandPanelStore((state) => state.setOpen);
   return (
-    <div className="flex h-11 shrink-0 items-center gap-2 border-b px-4 group-has-data-mobile-bar/shell:hidden md:hidden">
+    <div className="dank:h-16 dank:border-0 dank:px-1 flex h-11 shrink-0 items-center gap-2 border-b px-4 group-has-data-mobile-bar/shell:hidden md:hidden">
       <SidebarButton />
       <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} />
       <span className="min-w-0 flex-1 truncate text-sm font-medium">{workspace.name}</span>

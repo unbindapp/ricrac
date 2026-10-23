@@ -166,7 +166,7 @@ function NewIssueForm({ defaults, onClose }: { defaults: TNewIssueDefaults; onCl
           onChange={(next) => setPatch((current) => ({ ...current, ...next }))}
         />
       )}
-      <DialogFooter className="items-center border-t pt-4">
+      <DialogFooter className="dank:border-t-0 dank:pt-0 items-center border-t pt-4">
         <label
           htmlFor={createMoreId}
           className="text-muted-foreground mr-auto flex items-center gap-2 text-sm"
@@ -179,12 +179,13 @@ function NewIssueForm({ defaults, onClose }: { defaults: TNewIssueDefaults; onCl
         </Button>
         <Button
           type="submit"
+          variant="default"
           size="sm"
           isPending={isPending}
           disabled={!teamId || !title.trim() || uploads.isUploading}
         >
           Create issue
-          <Kbd className="bg-primary-foreground/2-10 text-primary-foreground group-disabled/button:text-muted-foreground border-transparent group-disabled/button:bg-transparent">
+          <Kbd className="bg-primary-foreground/2-10 text-primary-foreground group-disabled/button:text-muted-foreground dank:bg-m3-primary/10 dank:text-m3-primary dank:group-disabled/button:text-m3-on-surface/38 border-transparent group-disabled/button:bg-transparent">
             {formatForDisplay("Mod+Enter")}
           </Kbd>
         </Button>

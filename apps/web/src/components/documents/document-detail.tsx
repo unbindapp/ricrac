@@ -127,7 +127,7 @@ function DocumentDetailContent({ document }: { document: TDocumentDetail }) {
         </HeaderActions>
       </PageBar>
       <div className="flex flex-col gap-2">
-        <div className="flex min-w-0 items-center gap-2">
+        <div data-m3-title className="flex min-w-0 items-center gap-2">
           <IconPicker
             value={document.icon}
             color={document.color}
@@ -154,6 +154,7 @@ function DocumentDetailContent({ document }: { document: TDocumentDetail }) {
               variant="ghost"
               size="sm"
               forceMinSize={false}
+              data-m3-chip="assist"
               className="text-muted-foreground h-6 px-1.5 text-xs font-normal"
               onClick={() => setIsHistoryOpen(true)}
             >
@@ -174,6 +175,7 @@ function DocumentDetailContent({ document }: { document: TDocumentDetail }) {
                   variant="ghost"
                   size="sm"
                   forceMinSize={false}
+                  data-m3-chip="assist"
                   className="text-muted-foreground h-6 px-1.5 text-xs font-normal"
                 >
                   <FolderInputIcon className="size-3.5" />

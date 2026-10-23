@@ -1,6 +1,7 @@
 import { createContext, type ReactNode, use, useContext, useLayoutEffect } from "react";
 
 import { loadedSymbols, SymbolSetContext } from "@/components/icons/symbol-set";
+import { useAccentHueStore } from "@/lib/stores/accent-hue";
 import { defaultTheme } from "@/themes/default/theme";
 import { uiThemeOf } from "@/themes/registry";
 import type { TUiTheme } from "@/themes/types";
@@ -42,6 +43,7 @@ export function UiThemeProvider({
   children: ReactNode;
 }) {
   const theme = uiThemeOf(themeId);
+  const accentHue = useAccentHueStore((state) => state.hue);
   const pending = loaded(theme);
   if (pending) use(pending);
 
@@ -53,6 +55,8 @@ export function UiThemeProvider({
       delete root.dataset.uiTheme;
     };
   }, [theme.id, workspaceUrlKey]);
+
+  useLayoutEffect(() => theme.paintColors?.(accentHue), [theme, accentHue]);
 
   return (
     <UiThemeContext value={theme}>

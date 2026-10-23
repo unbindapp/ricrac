@@ -38,7 +38,7 @@ export function AnnotationBubble({
       pluginKey="annotationBubble"
       options={BUBBLE_OPTIONS}
       shouldShow={hasSelectedText}
-      className="bg-popover text-popover-foreground z-50 flex items-center gap-0.5 rounded-md border p-0.5 shadow-md"
+      className="bg-popover text-popover-foreground dank:bg-m3-surface-container-low dank:rounded-lg dank:border-0 dank:px-1 dank:py-2 dank:shadow-elevation-2 z-50 flex items-center gap-0.5 rounded-md border p-0.5 shadow-md"
     >
       {actions.map(({ label, icon: Icon, onSelect }) => (
         <Button
@@ -46,6 +46,7 @@ export function AnnotationBubble({
           variant="ghost"
           size="sm"
           forceMinSize={false}
+          className="dank:h-9 dank:gap-3 dank:rounded-xs dank:px-3 dank:text-m3-on-surface dank:type-body-large dank:has-hover:hover:rounded-md dank:focus-visible:rounded-md dank:active:rounded-md dank:[&>svg]:text-m3-on-surface-variant"
           onMouseDown={(event) => event.preventDefault()}
           onClick={() => {
             const quote = selectedText(editor.state);

@@ -66,7 +66,7 @@ function RelatedProject({ project, onRemove }: { project: ProjectRef; onRemove?:
   const { data } = useQuery(projectsQuery(workspace.id));
   const full = data?.find((item) => item.id === project.id);
   return (
-    <div className="group/dep has-hover:hover:bg-accent flex h-8 min-w-0 items-center gap-2 rounded-md px-2 text-sm">
+    <div className="group/dep has-hover:hover:bg-accent dank:relative dank:state-layer dank:has-hover:hover:bg-transparent flex h-8 min-w-0 items-center gap-2 rounded-md px-2 text-sm">
       <ProjectIcon icon={full?.icon} color={full?.color} />
       <Link
         to="/$workspace/project/$slug"
@@ -81,7 +81,7 @@ function RelatedProject({ project, onRemove }: { project: ProjectRef; onRemove?:
           size="icon"
           forceMinSize={false}
           aria-label={`Remove ${project.name}`}
-          className="size-6 opacity-0 group-hover/dep:opacity-100 focus-visible:opacity-100"
+          className="dank:size-8 dank:[&>svg]:size-5 size-6 opacity-0 group-hover/dep:opacity-100 focus-visible:opacity-100"
           onClick={onRemove}
         >
           <XIcon className="size-3.5" />
