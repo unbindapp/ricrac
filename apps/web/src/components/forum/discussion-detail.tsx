@@ -142,7 +142,7 @@ export function DiscussionDetail({
 
   const topic = (
     <>
-      <div className="flex flex-col gap-2">
+      <div data-m3-title className="flex flex-col gap-2">
         <InlineText
           value={discussion.title}
           label="Discussion title"
@@ -165,13 +165,13 @@ export function DiscussionDetail({
             </span>
           )}
           {isPinned && (
-            <Badge variant="process">
+            <Badge variant="process" data-m3-chip="assist">
               <PinIcon />
               Pinned
             </Badge>
           )}
           {isClosed && (
-            <Badge variant="muted">
+            <Badge variant="muted" data-m3-chip="assist">
               <LockIcon />
               Closed
             </Badge>

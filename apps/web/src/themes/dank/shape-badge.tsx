@@ -33,7 +33,7 @@ export function ShapeBadge({
         aria-hidden
         focusable="false"
         viewBox="0 0 1 1"
-        className="ease-emphasized absolute inset-0 size-full fill-current transition-transform duration-500"
+        className="ease-spring-slow-spatial absolute inset-0 size-full fill-current transition-transform duration-(--spring-slow-spatial-duration)"
       >
         <path d={shapes[shape]} />
       </svg>

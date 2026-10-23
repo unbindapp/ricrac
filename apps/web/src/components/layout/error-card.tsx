@@ -15,7 +15,7 @@ export function ErrorCard({ title = "Something went wrong", message, onRetry, cl
       role="alert"
       data-slot="error-card"
       className={cn(
-        "border-destructive/5-10 bg-destructive/1-10 flex w-full items-start gap-2 rounded-lg border p-4",
+        "border-destructive/5-10 bg-destructive/1-10 dank:rounded-md flex w-full items-start gap-2 rounded-lg border p-4",
         className,
       )}
     >

@@ -35,17 +35,21 @@ export function ListRow({ children, actions, muted }: TListRowProps) {
         muted && "text-muted-foreground",
       )}
     >
-      <div className="flex min-w-0 flex-1 items-center gap-2">{children}</div>
-      {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+      <div className="dank:gap-3 flex min-w-0 flex-1 items-center gap-2">{children}</div>
+      {actions && <div className="dank:gap-3 flex shrink-0 items-center gap-2">{actions}</div>}
     </div>
   );
 }
 
 export function ListRowText({ primary, secondary }: { primary: ReactNode; secondary?: ReactNode }) {
   return (
-    <div className="flex min-w-0 flex-1 items-baseline gap-2">
+    <div className="dank:flex-col dank:items-stretch dank:gap-0 flex min-w-0 flex-1 items-baseline gap-2">
       <span className="truncate">{primary}</span>
-      {secondary && <span className="text-muted-foreground truncate text-xs">{secondary}</span>}
+      {secondary && (
+        <span data-slot="list-supporting" className="text-muted-foreground truncate text-xs">
+          {secondary}
+        </span>
+      )}
     </div>
   );
 }

@@ -135,12 +135,16 @@ export function DiscussionTagBadges({ tags, max }: { tags: string[]; max?: numbe
   return (
     <>
       {shown.map((tag) => (
-        <Badge key={tag} variant="muted">
+        <Badge key={tag} variant="muted" data-m3-chip="assist">
           <HashIcon />
           <span className="truncate">{tag}</span>
         </Badge>
       ))}
-      {hidden > 0 && <Badge variant="muted">+{hidden}</Badge>}
+      {hidden > 0 && (
+        <Badge variant="muted" data-m3-chip="assist">
+          +{hidden}
+        </Badge>
+      )}
     </>
   );
 }

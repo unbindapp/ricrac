@@ -30,6 +30,7 @@ import { ErrorCard } from "@/components/layout/error-card";
 import { List } from "@/components/layout/list";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/components/ui/utils";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 import { LIST_MAX_ISSUES } from "@/lib/queries/issues";
@@ -51,7 +52,17 @@ const OVERSCAN = 12;
 
 type TListItem =
   | { kind: "header"; key: string; group: TIssueGroup }
-  | { kind: "row"; key: string; issue: Issue; depth: number };
+  | { kind: "row"; key: string; issue: Issue; depth: number; segment?: string };
+
+function segmentOf(index: number, count: number) {
+  const edges = [index === 0 && "first", index === count - 1 && "last"].filter(Boolean);
+  return edges.length > 0 ? edges.join(" ") : undefined;
+}
+
+function dankSpacingOf(item: TListItem, index: number) {
+  if (item.kind === "header") return index > 0 ? "dank:pt-2" : undefined;
+  return item.segment?.includes("last") ? undefined : "dank:pb-0.5";
+}
 
 function findScrollParent(element: HTMLElement | null): HTMLElement | null {
   let current = element?.parentElement ?? null;
@@ -156,11 +167,12 @@ function VirtualIssueList({
           : group.issues.map((issue) => ({ issue, depth: 0 }));
         return [
           ...header,
-          ...rows.map(({ issue, depth }): TListItem => ({
+          ...rows.map(({ issue, depth }, index): TListItem => ({
             kind: "row",
             key: `${group.key}:${issue.id}`,
             issue,
             depth,
+            segment: segmentOf(index, rows.length),
           })),
         ];
       }),
@@ -274,7 +286,9 @@ function VirtualIssueList({
               return (
                 <div
                   key={virtualItem.key}
-                  className="absolute inset-x-0 top-0"
+                  ref={virtualizer.measureElement}
+                  data-index={virtualItem.index}
+                  className={cn("absolute inset-x-0 top-0", dankSpacingOf(item, virtualItem.index))}
                   style={{ transform: `translateY(${virtualItem.start - scrollMargin}px)` }}
                 >
                   {item.kind === "header" ? (
@@ -298,6 +312,7 @@ function VirtualIssueList({
                     <IssueRow
                       issue={item.issue}
                       depth={item.depth}
+                      segment={item.segment}
                       properties={properties}
                       isSelected={selectedIds.includes(item.issue.id)}
                       isActive={peek?.peek?.toUpperCase() === item.issue.identifier}

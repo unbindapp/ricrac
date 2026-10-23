@@ -19,7 +19,7 @@ import { CreateButton } from "@/components/layout/create-button";
 import { TrashedRow } from "@/components/projects/entity-menu";
 import { EntityIcon } from "@/components/shared/entity-icon";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { SearchField } from "@/components/ui/search-field";
 import { toast } from "@/components/ui/toast";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { FilterMenu } from "@/components/shared/filter-menu";
@@ -83,19 +83,15 @@ function DocumentsPage() {
               />
             }
           >
-            <div className="relative w-full max-w-xs">
-              <SearchIcon className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
-              <Input
-                aria-label="Filter documents"
-                placeholder="Filter documents…"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Escape") setQuery("");
-                }}
-                className="h-8 pl-8"
-              />
-            </div>
+            <SearchField
+              aria-label="Filter documents"
+              placeholder="Filter documents…"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Escape") setQuery("");
+              }}
+            />
           </PageToolbar>
         }
       />

@@ -20,8 +20,9 @@ export function PropertyTrigger({ label, icon, text, muted, className, ...props 
       fadeOnDisabled={false}
       aria-label={label}
       data-muted={muted || undefined}
+      data-picker="row"
       className={cn(
-        "data-muted:text-muted-foreground w-full min-w-0 justify-start font-normal",
+        "data-muted:text-muted-foreground dank:text-m3-on-surface dank:data-muted:text-m3-on-surface-variant w-full min-w-0 justify-start font-normal",
         className,
       )}
       {...props}

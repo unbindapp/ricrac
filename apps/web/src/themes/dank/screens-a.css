@@ -1,0 +1,285 @@
+:root[data-ui-theme="dank"] .rr-prose {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  letter-spacing: 0.0125rem;
+}
+:root[data-ui-theme="dank"] [data-prose="large"] .rr-prose {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  letter-spacing: 0.03125rem;
+}
+:root[data-ui-theme="dank"] .rr-prose h1 {
+  font-size: 1.375rem;
+  line-height: 1.75rem;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+:root[data-ui-theme="dank"] .rr-prose h2 {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0.0125rem;
+}
+:root[data-ui-theme="dank"] .rr-prose h3 {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  letter-spacing: 0.00625rem;
+}
+:root[data-ui-theme="dank"] [data-prose="large"] .rr-prose h1 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+:root[data-ui-theme="dank"] [data-prose="large"] .rr-prose h2 {
+  font-size: 1.375rem;
+  line-height: 1.75rem;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+:root[data-ui-theme="dank"] [data-prose="large"] .rr-prose h3 {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0.0125rem;
+}
+:root[data-ui-theme="dank"] .rr-prose a {
+  color: var(--m3-primary);
+}
+:root[data-ui-theme="dank"] .rr-prose :not(pre) > code {
+  border-radius: var(--radius-xs);
+  background-color: var(--m3-surface-container-highest);
+  color: var(--m3-on-surface);
+  font-size: inherit;
+  line-height: inherit;
+}
+:root[data-ui-theme="dank"] .rr-prose pre {
+  border: 0;
+  border-radius: var(--radius-md);
+  background-color: var(--m3-surface-container-highest);
+  color: var(--m3-on-surface);
+  padding: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  letter-spacing: 0;
+}
+:root[data-ui-theme="dank"] .rr-prose blockquote {
+  border-inline-start-color: var(--m3-outline-variant);
+  color: var(--m3-on-surface-variant);
+}
+:root[data-ui-theme="dank"] .rr-prose hr {
+  border-color: var(--m3-outline-variant);
+}
+:root[data-ui-theme="dank"] .rr-prose :is(th, td) {
+  border-color: var(--m3-outline-variant);
+}
+:root[data-ui-theme="dank"] .rr-prose th {
+  background-color: var(--m3-surface-container-highest);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  letter-spacing: 0.00625rem;
+}
+:root[data-ui-theme="dank"] .rr-prose [data-type="mention"] {
+  border-radius: var(--radius-xs);
+  background-color: var(--m3-secondary-container);
+  color: var(--m3-on-secondary-container);
+  font-weight: 500;
+}
+:root[data-ui-theme="dank"] .rr-prose input[type="checkbox"] {
+  margin-top: 0.0625rem;
+}
+:root[data-ui-theme="dank"] [data-prose="large"] .rr-prose input[type="checkbox"] {
+  margin-top: 0.1875rem;
+}
+
+/* InlineText sets text-2xl! (important), so only its variables can change the size. */
+:root[data-ui-theme="dank"] [data-m3-title] textarea[data-variant="title"] {
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --tw-leading: 2rem;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+:root[data-ui-theme="dank"] [data-m3-chip] {
+  height: 2rem;
+  min-height: 2rem;
+  gap: 0.5rem;
+  padding-inline: 1rem;
+  border: 1px solid var(--m3-outline-variant);
+  border-radius: var(--radius-sm);
+  background-color: transparent;
+  box-shadow: none;
+  color: var(--m3-on-surface);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  letter-spacing: 0.00625rem;
+}
+:root[data-ui-theme="dank"] [data-m3-chip]:has(> :is(svg, [data-slot="avatar"]):first-child) {
+  padding-inline-start: 0.5rem;
+}
+:root[data-ui-theme="dank"] [data-m3-chip] > svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+:root[data-ui-theme="dank"] [data-m3-chip="assist"] > svg[aria-hidden="true"] {
+  color: var(--m3-primary);
+}
+:root[data-ui-theme="dank"] [data-m3-chip][data-muted] {
+  color: var(--m3-on-surface-variant);
+}
+:root[data-ui-theme="dank"] [data-m3-chip="filter"] {
+  color: var(--m3-on-surface-variant);
+}
+:root[data-ui-theme="dank"] [data-m3-chip="filter"] > svg[aria-hidden="true"] {
+  color: var(--m3-primary);
+}
+:root[data-ui-theme="dank"]
+  [data-m3-chip="filter"]:is([aria-pressed="true"], [aria-checked="true"]) {
+  border-color: transparent;
+  background-color: var(--m3-secondary-container);
+  color: var(--m3-on-secondary-container);
+}
+:root[data-ui-theme="dank"]
+  [data-m3-chip="filter"]:is([aria-pressed="true"], [aria-checked="true"])
+  > svg[aria-hidden="true"] {
+  color: var(--m3-on-secondary-container);
+}
+:root[data-ui-theme="dank"] span[data-m3-chip] {
+  display: inline-flex;
+  align-items: center;
+}
+:root[data-ui-theme="dank"] [data-m3-chip]:disabled {
+  border-color: color-mix(in srgb, var(--m3-on-surface) 12%, transparent);
+  color: color-mix(in srgb, var(--m3-on-surface) 38%, transparent);
+}
+
+:root[data-ui-theme="dank"]
+  :is([data-m3-field="outlined"], [data-slot="markdown-editor-frame"][data-framed]) {
+  border: 1px solid var(--m3-outline);
+  border-radius: var(--radius-xs);
+  background-color: transparent;
+  box-shadow: none;
+  transition-property: border-color, box-shadow;
+  transition-duration: var(--spring-fast-effects-duration);
+  transition-timing-function: var(--ease-spring-fast-effects);
+}
+@media (hover: hover) {
+  :root[data-ui-theme="dank"]
+    :is([data-m3-field="outlined"], [data-slot="markdown-editor-frame"][data-framed]):hover {
+    border-color: var(--m3-on-surface);
+  }
+}
+:root[data-ui-theme="dank"]
+  :is([data-m3-field="outlined"], [data-slot="markdown-editor-frame"][data-framed]):has(
+    :is([contenteditable="true"], textarea, input):focus
+  ) {
+  border-color: var(--m3-primary);
+  box-shadow: inset 0 0 0 1px var(--m3-primary);
+}
+
+:root[data-ui-theme="dank"] [data-slot="markdown-editor-frame"][data-inline] {
+  border-radius: var(--radius-xs);
+  box-shadow: none;
+  transition: box-shadow var(--spring-fast-effects-duration) var(--ease-spring-fast-effects);
+}
+:root[data-ui-theme="dank"]
+  [data-slot="markdown-editor-frame"][data-inline]:has([contenteditable="true"]:focus) {
+  box-shadow: inset 0 0 0 2px var(--m3-primary);
+}
+
+:root[data-ui-theme="dank"] [data-slot="editor-toolbar"] {
+  height: 4rem;
+  gap: 0.25rem;
+  padding-inline: 0.5rem;
+  border-radius: 9999px;
+  background-color: var(--m3-primary-container);
+  color: var(--m3-on-primary-container);
+}
+:root[data-ui-theme="dank"] [data-slot="editor-toolbar"] button:not(:disabled) {
+  color: var(--m3-on-primary-container);
+}
+:root[data-ui-theme="dank"]
+  [data-slot="editor-toolbar"]
+  button[aria-pressed="true"]:not(:disabled) {
+  border-radius: var(--radius-md);
+  background-color: var(--m3-surface-container);
+  color: var(--m3-on-surface);
+}
+:root[data-ui-theme="dank"] [data-slot="editor-toolbar"] [data-slot="toolbar-divider"] {
+  display: none;
+}
+
+:root[data-ui-theme="dank"] [data-slot="properties"] {
+  gap: 2px;
+}
+:root[data-ui-theme="dank"] [data-slot="properties"] > [data-slot="property-row"] {
+  position: relative;
+  min-height: 3.5rem;
+  gap: 0.75rem;
+  padding-inline: 1rem;
+  border-radius: var(--radius-xs);
+  background-color: var(--m3-surface);
+  transition: border-radius var(--spring-fast-spatial-duration) var(--ease-spring-fast-spatial);
+}
+:root[data-ui-theme="dank"] [data-slot="properties"] > [data-slot="property-row"]:first-child {
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
+}
+:root[data-ui-theme="dank"] [data-slot="properties"] > [data-slot="property-row"]:last-child {
+  border-bottom-left-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+}
+@media (hover: hover) {
+  :root[data-ui-theme="dank"]
+    [data-slot="properties"]
+    > [data-slot="property-row"]:has([data-picker="row"]:hover) {
+    border-radius: var(--radius-md);
+  }
+}
+:root[data-ui-theme="dank"]
+  [data-slot="properties"]
+  > [data-slot="property-row"]:has(
+    [data-picker="row"]:is(:focus-visible, :active, [data-popup-open])
+  ) {
+  border-radius: var(--radius-lg);
+}
+:root[data-ui-theme="dank"]
+  [data-slot="properties"]
+  > [data-slot="property-row"]:has([data-picker="row"]:focus-visible) {
+  outline: 3px solid var(--m3-secondary);
+  outline-offset: 2px;
+}
+:root[data-ui-theme="dank"] [data-slot="properties"] > [data-slot="property-row"] > div,
+:root[data-ui-theme="dank"] [data-slot="properties"] > [data-slot="property-row"] > div > span {
+  border-radius: inherit;
+}
+:root[data-ui-theme="dank"] [data-slot="properties"] [data-picker="row"] {
+  position: static;
+  min-height: 0;
+  padding-inline: 0;
+  border-radius: inherit;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  letter-spacing: 0.03125rem;
+}
+:root[data-ui-theme="dank"] [data-slot="properties"] [data-picker="row"]:focus-visible {
+  outline: none;
+}
+/* The picker's ::before and state layer span the whole row, so the label opens it too. */
+:root[data-ui-theme="dank"] [data-slot="properties"] [data-picker="row"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+:root[data-ui-theme="dank"] [data-slot="branch-link"] {
+  background-color: transparent;
+}
+:root[data-ui-theme="dank"] [data-slot="branch-link"][data-status="active"] {
+  background-color: var(--m3-secondary-container);
+  color: var(--m3-on-secondary-container);
+}

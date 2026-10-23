@@ -73,7 +73,7 @@ export function DocumentThreadCard({
       ref={cardRef}
       aria-label={`Thread from ${thread.user ? userName(thread.user) : "a deleted user"}`}
       data-active={isActive || undefined}
-      className="bg-card data-active:border-primary/6-10 flex w-full flex-col rounded-lg border data-active:shadow-sm"
+      className="bg-card data-active:border-primary/6-10 dank:rounded-md dank:data-active:border-m3-primary dank:data-active:shadow-elevation-1 flex w-full flex-col rounded-lg border data-active:shadow-sm"
       onMouseEnter={() => onHover(thread.id)}
       onMouseLeave={() => onHover(null)}
       onFocus={() => onActivate(thread.id)}
@@ -135,10 +135,12 @@ function ThreadComment({
     toggleReaction({ commentId: comment.id, emoji, reacted });
 
   return (
-    <div className="group/reactable flex flex-col gap-2 p-3">
+    <div className="group/reactable dank:p-4 flex flex-col gap-2 p-3">
       <header className="flex min-h-7 items-center gap-2">
         {comment.user && <UserAvatar user={comment.user} size="sm" />}
-        <span className="min-w-0 truncate text-sm font-medium">{authorName}</span>
+        <span className="dank:type-title-small min-w-0 truncate text-sm font-medium">
+          {authorName}
+        </span>
         <span className="text-muted-foreground shrink-0 text-xs">
           <RelativeTime value={comment.createdAt} />
         </span>

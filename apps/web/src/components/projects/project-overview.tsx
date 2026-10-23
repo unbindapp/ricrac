@@ -84,7 +84,7 @@ export function ProjectOverview({ project }: { project: ProjectDetail }) {
           <CustomerNeedsSection project={project.id} />
         </div>
         <aside aria-label="Properties" className="w-full shrink-0 lg:sticky lg:top-0 lg:w-80">
-          <div className="bg-card rounded-lg border p-4">
+          <div className="bg-card dank:rounded-none dank:border-0 dank:bg-transparent dank:p-0 rounded-lg border p-4">
             <ProjectProperties project={project} />
           </div>
         </aside>

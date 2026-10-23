@@ -156,7 +156,7 @@ export function IssueImport() {
       ) : (
         <div
           data-dragging={isDragging || undefined}
-          className="data-dragging:border-primary data-dragging:bg-accent flex flex-col items-center gap-2 rounded-lg border border-dashed p-6 text-center"
+          className="data-dragging:border-primary data-dragging:bg-accent dank:rounded-md dank:border-m3-outline flex flex-col items-center gap-2 rounded-lg border border-dashed p-6 text-center"
           onDragOver={(event) => {
             event.preventDefault();
             setIsDragging(true);

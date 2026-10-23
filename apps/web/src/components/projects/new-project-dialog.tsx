@@ -175,7 +175,7 @@ function NewProjectForm({
           }
         />
         <form.AppForm>
-          <form.SubmitButton size="sm" disabled={!team}>
+          <form.SubmitButton variant="default" size="sm" disabled={!team}>
             Create project
           </form.SubmitButton>
         </form.AppForm>

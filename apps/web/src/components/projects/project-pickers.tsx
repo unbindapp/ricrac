@@ -22,6 +22,7 @@ import {
 } from "@/components/projects/project-dates";
 import { ProjectStatusIcon } from "@/components/projects/project-status-icon";
 import { EntityIcon } from "@/components/shared/entity-icon";
+import { FilterChip } from "@/components/shared/filter-chip";
 import { LabelChip } from "@/components/shared/label-chip";
 import { PRIORITIES, PriorityIcon, priorityLabel } from "@/components/shared/priority-icon";
 import { ProjectIcon } from "@/components/shared/project-icon";
@@ -147,7 +148,7 @@ export function ProjectLabelsPicker({
         size="sm"
         forceMinSize={false}
         aria-label="Change labels"
-        className="h-auto min-h-8 w-full flex-wrap justify-start gap-1 py-1"
+        className="dank:text-m3-on-surface h-auto min-h-8 w-full flex-wrap justify-start gap-1 py-1"
       >
         {labels.map((label) => (
           <LabelChip key={label.id} name={label.name} color={label.color} />
@@ -352,6 +353,7 @@ function PeriodGrid({
               size="sm"
               forceMinSize={false}
               aria-pressed={isCurrent}
+              className="dank:type-body-large dank:text-m3-on-surface-variant dank:aria-pressed:bg-m3-primary dank:aria-pressed:text-m3-on-primary dank:h-9 dank:rounded-full dank:active:rounded-full"
               onClick={() => onPick(period.date)}
             >
               {period.label}
@@ -414,12 +416,11 @@ export function PlannedDatePicker({
       <PopoverContent align="start" className="flex w-80 flex-col gap-3 p-3">
         <div role="radiogroup" aria-label={`${label} precision`} className="flex flex-wrap gap-1">
           {resolutionOptions.map((option) => (
-            <Button
+            <FilterChip
               key={option.value}
               role="radio"
               aria-checked={draft === option.value}
-              variant={draft === option.value ? "secondary" : "ghost"}
-              size="sm"
+              selected={draft === option.value}
               forceMinSize={false}
               onClick={() => {
                 setDraft(option.value);
@@ -427,7 +428,7 @@ export function PlannedDatePicker({
               }}
             >
               {option.label}
-            </Button>
+            </FilterChip>
           ))}
         </div>
         {draft === "day" ? (

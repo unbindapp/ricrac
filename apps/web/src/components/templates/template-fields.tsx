@@ -1,6 +1,6 @@
 import { type ReactNode, useId } from "react";
 
-import { ChevronsUpDownIcon } from "@/components/icons";
+import { ChevronDownIcon, ChevronsUpDownIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
@@ -103,21 +103,25 @@ export function MultiPicker({
             id={id}
             variant="outline"
             aria-label={label}
-            className="h-auto min-h-9 w-full justify-start px-3 py-1.5 font-normal"
+            data-focus-indicator="child"
+            className="dank:type-body-large dank:text-m3-on-surface dank:border-m3-outline dank:has-hover:hover:border-m3-on-surface dank:focus-visible:border-m3-primary dank:focus-visible:ring-m3-primary dank:min-h-14 dank:gap-3 dank:rounded-xs dank:py-2 dank:pr-3 dank:pl-4 dank:after:hidden dank:focus-visible:ring-1 dank:focus-visible:ring-inset dank:active:rounded-xs h-auto min-h-9 w-full justify-start px-3 py-1.5 font-normal"
           >
             <span className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
               {picked.length === 0 && <span className="text-muted-foreground">{placeholder}</span>}
               {picked.map((option) => (
                 <span
                   key={option.value}
-                  className="bg-muted flex h-6 max-w-48 items-center gap-1.5 rounded-md px-2 text-xs"
+                  className="bg-muted dank:type-label-large dank:text-m3-on-surface-variant dank:border-m3-outline-variant dank:h-8 dank:gap-2 dank:rounded-sm dank:border dank:bg-transparent dank:px-2 flex h-6 max-w-48 items-center gap-1.5 rounded-md px-2 text-xs"
                 >
                   {option.icon}
                   <span className="truncate">{option.label}</span>
                 </span>
               ))}
             </span>
-            <ChevronsUpDownIcon className="text-muted-foreground size-3.5" />
+            <span className="text-muted-foreground dank:text-m3-on-surface-variant contents">
+              <ChevronsUpDownIcon className="dank:hidden size-3.5" />
+              <ChevronDownIcon className="dank:block hidden size-6" />
+            </span>
           </Button>
         }
       />

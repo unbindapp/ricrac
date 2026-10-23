@@ -61,7 +61,7 @@ export function DocumentComments({
   return (
     <section aria-label="Comments" className="bg-background flex min-h-0 w-full flex-1 flex-col">
       <div className="flex h-11 shrink-0 items-center gap-2 border-b px-4">
-        <h2 className="min-w-0 flex-1 text-base font-semibold">Comments</h2>
+        <h2 className="dank:type-title-medium min-w-0 flex-1 text-base font-semibold">Comments</h2>
         {onClose && (
           <Button variant="ghost" size="icon" aria-label="Close comments" onClick={onClose}>
             <XIcon className="size-4" />
@@ -130,7 +130,7 @@ function DraftCard({
   onDone: () => void;
 }) {
   return (
-    <div className="bg-card flex flex-col gap-2 rounded-lg border p-3">
+    <div className="bg-card dank:rounded-md dank:p-4 flex flex-col gap-2 rounded-lg border p-3">
       <blockquote className="text-muted-foreground line-clamp-3 border-l-2 pl-3 text-sm break-words">
         {draft.quotedText}
       </blockquote>

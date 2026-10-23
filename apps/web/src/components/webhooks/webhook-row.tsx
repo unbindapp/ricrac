@@ -84,7 +84,7 @@ export function WebhookRow({ webhook, onEdit, onSecret }: TProps) {
 
   return (
     <div role="listitem" className="flex w-full flex-col border-b last:border-b-0">
-      <div className="flex w-full items-center gap-2 px-3 py-2">
+      <div className="dank:gap-3 dank:p-0 flex w-full items-center gap-2 px-3 py-2">
         <Button
           variant="ghost"
           size="icon"
@@ -92,7 +92,7 @@ export function WebhookRow({ webhook, onEdit, onSecret }: TProps) {
           aria-expanded={isOpen}
           aria-label={isOpen ? "Hide deliveries" : "Show deliveries"}
           onClick={() => setIsOpen((open) => !open)}
-          className="text-muted-foreground -ml-1 size-6"
+          className="text-muted-foreground dank:ml-0 dank:size-10 -ml-1 size-6"
         >
           <ChevronRightIcon
             data-open={isOpen || undefined}
@@ -105,11 +105,13 @@ export function WebhookRow({ webhook, onEdit, onSecret }: TProps) {
           className="bg-muted-foreground/40 data-enabled:bg-success size-2 shrink-0 rounded-full"
         />
         <div className="flex min-w-0 flex-1 flex-col">
-          <div className="flex min-w-0 items-center gap-2 text-sm">
-            <span className="truncate font-medium">{name}</span>
+          <div className="dank:text-base flex min-w-0 items-center gap-2 text-sm">
+            <span className="dank:font-normal truncate font-medium">{name}</span>
             {!webhook.enabled && <Badge variant="muted">Disabled</Badge>}
           </div>
-          <span className="text-muted-foreground truncate font-mono text-xs">{webhook.url}</span>
+          <span className="text-muted-foreground dank:text-sm truncate font-mono text-xs">
+            {webhook.url}
+          </span>
         </div>
         <SimpleTooltip content={webhook.resourceTypes.map(resourceLabel).join(", ")}>
           <span className="text-muted-foreground hidden shrink-0 text-xs sm:inline">
@@ -187,7 +189,7 @@ function Deliveries({ webhookId }: { webhookId: string }) {
   const deliveries = query.data?.pages.flatMap((page) => page.nodes) ?? [];
 
   return (
-    <div className="bg-muted/30 flex flex-col border-t px-3 py-2 pl-12">
+    <div className="bg-muted/30 dank:border-0 dank:bg-transparent dank:pr-0 dank:pl-16 flex flex-col border-t px-3 py-2 pl-12">
       {query.isPending && <p className="text-muted-foreground py-1 text-xs">Loading deliveries…</p>}
       {query.error && (
         <p className="text-destructive py-1 text-xs">

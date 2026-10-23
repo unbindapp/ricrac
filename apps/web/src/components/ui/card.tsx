@@ -3,7 +3,13 @@ import * as React from "react";
 import { cn } from "@/components/ui/utils";
 
 function Card({ className, ...props }: React.ComponentProps<"div">) {
-  return <div className={cn("bg-card text-foreground rounded-lg border", className)} {...props} />;
+  return (
+    <div
+      data-slot="card"
+      className={cn("bg-card text-foreground dank:rounded-md rounded-lg border", className)}
+      {...props}
+    />
+  );
 }
 
 function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
@@ -11,12 +17,23 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
-  return <div className={cn("leading-tight font-semibold", className)} {...props} />;
+  return (
+    <div
+      className={cn("dank:type-title-medium leading-tight font-semibold", className)}
+      {...props}
+    />
+  );
 }
 
 function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <div className={cn("text-muted-foreground text-sm leading-normal", className)} {...props} />
+    <div
+      className={cn(
+        "text-muted-foreground dank:type-body-medium text-sm leading-normal",
+        className,
+      )}
+      {...props}
+    />
   );
 }
 

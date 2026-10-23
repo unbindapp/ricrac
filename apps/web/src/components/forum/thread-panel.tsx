@@ -172,7 +172,7 @@ function ThreadContent({ thread, onBack }: { thread: DiscussionThreadDetail; onB
           )
         }
       >
-        <div className="flex flex-col gap-2">
+        <div data-m3-title className="flex flex-col gap-2">
           <InlineText
             value={thread.title}
             label="Thread title"

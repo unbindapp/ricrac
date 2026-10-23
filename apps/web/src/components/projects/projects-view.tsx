@@ -14,7 +14,7 @@ import type { TProjectScope } from "@/components/projects/project-groups";
 import { ProjectList } from "@/components/projects/project-list";
 import { ScopeEmpty, ScopeTabs } from "@/components/projects/scope-tabs";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { SearchField } from "@/components/ui/search-field";
 import { SimpleTooltip } from "@/components/ui/tooltip";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import type { TProjectListArgs } from "@/lib/queries/projects";
@@ -76,7 +76,12 @@ export function ProjectsView({ title, breadcrumb, storageKey, filters }: TProps)
               <>
                 <ScopeTabs scope={scope} onChange={setScope} />
                 {scope === "active" && (
-                  <div role="radiogroup" aria-label="Layout" className="flex items-center gap-1">
+                  <div
+                    role="radiogroup"
+                    aria-label="Layout"
+                    data-slot="connected-button-group"
+                    className="flex items-center gap-1"
+                  >
                     <SimpleTooltip content="List">
                       <Button
                         variant={layout === "list" ? "secondary" : "ghost"}
@@ -106,19 +111,15 @@ export function ProjectsView({ title, breadcrumb, storageKey, filters }: TProps)
               </>
             }
           >
-            <div className="relative w-full max-w-xs">
-              <SearchIcon className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
-              <Input
-                aria-label="Filter projects"
-                placeholder="Filter projects…"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Escape") setQuery("");
-                }}
-                className="h-8 pl-8"
-              />
-            </div>
+            <SearchField
+              aria-label="Filter projects"
+              placeholder="Filter projects…"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Escape") setQuery("");
+              }}
+            />
           </PageToolbar>
         }
       />

@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
 import type { Initiative } from "@/api/ops.gen";
-import { ChevronRightIcon, PlusIcon, TargetIcon } from "@/components/icons";
+import { PlusIcon, TargetIcon } from "@/components/icons";
 import { InitiativeListHeader, InitiativeRow } from "@/components/initiatives/initiative-row";
 import {
   INITIATIVE_STATUSES,
@@ -22,6 +22,7 @@ import { CreateButton } from "@/components/layout/create-button";
 import { inScope, scopeArgs, type TProjectScope } from "@/components/projects/project-groups";
 import { TrashedRow } from "@/components/projects/entity-menu";
 import { ScopeEmpty, ScopeTabs } from "@/components/projects/scope-tabs";
+import { GroupToggle } from "@/components/shared/group-toggle";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
@@ -143,25 +144,15 @@ function StatusGroup({
   if (initiatives.length === 0) return null;
   const ids = new Set(initiatives.map((initiative) => initiative.id));
   return (
-    <div role="presentation" className="contents">
-      <div className="bg-muted flex h-9 items-center px-1.5 group-data-flush/list:px-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          forceMinSize={false}
-          aria-expanded={!isCollapsed}
-          onClick={() => setIsCollapsed((value) => !value)}
-        >
-          <ChevronRightIcon
-            data-open={!isCollapsed || undefined}
-            className="text-muted-foreground size-3.5 transition-transform data-open:rotate-90"
-          />
-          <InitiativeStatusIcon status={status} />
-          {initiativeStatusLabels[status]}
-          <span className="text-muted-foreground text-xs font-normal tabular-nums">
-            {initiatives.length}
-          </span>
-        </Button>
+    <div role="presentation" data-slot="list-group" className="contents">
+      <div className="bg-muted dank:h-12 dank:gap-1 dank:bg-transparent dank:px-0 flex h-9 items-center px-1.5 group-data-flush/list:px-4">
+        <GroupToggle
+          icon={<InitiativeStatusIcon status={status} />}
+          label={initiativeStatusLabels[status]}
+          count={initiatives.length}
+          isCollapsed={isCollapsed}
+          onToggle={() => setIsCollapsed((value) => !value)}
+        />
       </div>
       {!isCollapsed &&
         nestInitiatives(initiatives).map(({ item, depth }) => (

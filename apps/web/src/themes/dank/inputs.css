@@ -1,0 +1,381 @@
+@layer components {
+  :root[data-ui-theme="dank"] [data-text-field] {
+    --text-field-outline: var(--m3-outline);
+    --text-field-outline-width: 1px;
+    --text-field-label: var(--m3-on-surface-variant);
+    --text-field-caret: var(--m3-primary);
+  }
+  @media (hover: hover) {
+    :root[data-ui-theme="dank"] [data-text-field]:hover {
+      --text-field-outline: var(--m3-on-surface);
+      --text-field-label: var(--m3-on-surface);
+    }
+  }
+  :root[data-ui-theme="dank"] [data-text-field]:focus-within {
+    --text-field-outline: var(--m3-primary);
+    --text-field-outline-width: 2px;
+    --text-field-label: var(--m3-primary);
+  }
+  :root[data-ui-theme="dank"] [data-text-field]:is([aria-invalid="true"], [data-invalid]) {
+    --text-field-outline: var(--m3-error);
+    --text-field-label: var(--m3-error);
+    --text-field-caret: var(--m3-error);
+  }
+  @media (hover: hover) {
+    :root[data-ui-theme="dank"] [data-text-field]:is([aria-invalid="true"], [data-invalid]):hover {
+      --text-field-outline: var(--m3-on-error-container);
+      --text-field-label: var(--m3-on-error-container);
+    }
+  }
+  :root[data-ui-theme="dank"]
+    [data-text-field]:is([aria-invalid="true"], [data-invalid]):focus-within {
+    --text-field-outline: var(--m3-error);
+    --text-field-label: var(--m3-error);
+  }
+  :root[data-ui-theme="dank"] [data-text-field]:is(:disabled, [data-disabled]) {
+    --text-field-outline: color-mix(in srgb, var(--m3-on-surface) 12%, transparent);
+    --text-field-outline-width: 1px;
+    --text-field-label: color-mix(in srgb, var(--m3-on-surface) 38%, transparent);
+  }
+
+  /* The fieldset's top border runs through the middle of its 12px legend: start half a legend higher. */
+  :root[data-ui-theme="dank"] [data-slot="outlined-field-outline"] {
+    position: absolute;
+    inset: -5.5px 0 0;
+    margin: 0;
+    min-width: 0;
+    padding: 0 11px;
+    border: 1px solid var(--text-field-outline);
+    border-radius: var(--radius-xs);
+    pointer-events: none;
+  }
+  :root[data-ui-theme="dank"]
+    [data-slot="outlined-field"]:focus-within
+    > [data-slot="outlined-field-outline"] {
+    top: -5px;
+    padding: 0 10px;
+    border-width: 2px;
+  }
+  :root[data-ui-theme="dank"] [data-slot="outlined-field-outline"] > legend {
+    visibility: hidden;
+    height: 12px;
+    max-width: 0.01px;
+    overflow: hidden;
+    padding: 0;
+    font-size: 0.75rem;
+    line-height: 12px;
+    letter-spacing: 0.025rem;
+    white-space: nowrap;
+    transition: max-width var(--spring-fast-effects-duration) var(--ease-spring-fast-effects);
+  }
+  :root[data-ui-theme="dank"] [data-slot="outlined-field-outline"] > legend > span {
+    padding: 0 4px;
+  }
+
+  :root[data-ui-theme="dank"] [data-slot="outlined-field-label"] {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    max-width: calc(100% - 2rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    pointer-events: none;
+    color: var(--text-field-label);
+    font-size: 1rem;
+    line-height: 1.5rem;
+    letter-spacing: 0.03125rem;
+    transition:
+      top var(--spring-fast-spatial-duration) var(--ease-spring-fast-spatial),
+      font-size var(--spring-fast-spatial-duration) var(--ease-spring-fast-spatial),
+      line-height var(--spring-fast-spatial-duration) var(--ease-spring-fast-spatial),
+      color var(--spring-fast-effects-duration) var(--ease-spring-fast-effects);
+  }
+  :root[data-ui-theme="dank"]
+    [data-slot="outlined-field"]:is(
+      :focus-within,
+      [data-populated],
+      :has(> :is(input, textarea):not(:placeholder-shown))
+    )
+    > [data-slot="outlined-field-label"] {
+    top: -0.5rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    letter-spacing: 0.025rem;
+  }
+  :root[data-ui-theme="dank"]
+    [data-slot="outlined-field"]:is(
+      :focus-within,
+      [data-populated],
+      :has(> :is(input, textarea):not(:placeholder-shown))
+    )
+    > [data-slot="outlined-field-outline"]
+    > legend {
+    max-width: 100%;
+  }
+
+  :root[data-ui-theme="dank"] [data-slot="switch"] {
+    --switch-track: var(--m3-surface-container-highest);
+    --switch-outline: var(--m3-outline);
+    --switch-handle: var(--m3-outline);
+    --switch-handle-size: 1rem;
+    --switch-handle-left: 0.375rem;
+    --switch-icon: var(--m3-on-primary-container);
+    --switch-state-layer: var(--m3-on-surface);
+    --switch-state-layer-opacity: 0;
+    --switch-spatial-duration: var(--spring-fast-spatial-duration);
+  }
+  :root[data-ui-theme="dank"] [data-slot="switch"][data-checked] {
+    --switch-track: var(--m3-primary);
+    --switch-outline: transparent;
+    --switch-handle: var(--m3-on-primary);
+    --switch-handle-size: 1.5rem;
+    --switch-handle-left: 1.375rem;
+    --switch-state-layer: var(--m3-primary);
+  }
+  @media (hover: hover) {
+    :root[data-ui-theme="dank"] [data-slot="switch"]:not([data-disabled]):hover {
+      --switch-handle: var(--m3-on-surface-variant);
+      --switch-state-layer-opacity: 0.08;
+    }
+    :root[data-ui-theme="dank"] [data-slot="switch"][data-checked]:not([data-disabled]):hover {
+      --switch-handle: var(--m3-primary-container);
+    }
+  }
+  :root[data-ui-theme="dank"]
+    [data-slot="switch"]:not([data-disabled]):is(:focus-visible, :active) {
+    --switch-handle: var(--m3-on-surface-variant);
+    --switch-state-layer-opacity: 0.1;
+  }
+  :root[data-ui-theme="dank"]
+    [data-slot="switch"][data-checked]:not([data-disabled]):is(:focus-visible, :active) {
+    --switch-handle: var(--m3-primary-container);
+  }
+  :root[data-ui-theme="dank"] [data-slot="switch"]:not([data-disabled]):active {
+    --switch-handle-size: 1.75rem;
+    --switch-handle-left: 0;
+    --switch-spatial-duration: 0s;
+  }
+  :root[data-ui-theme="dank"] [data-slot="switch"][data-checked]:not([data-disabled]):active {
+    --switch-handle-left: 1.25rem;
+  }
+  :root[data-ui-theme="dank"] [data-slot="switch"][data-disabled] {
+    --switch-track: color-mix(in srgb, var(--m3-surface-container-highest) 12%, transparent);
+    --switch-outline: color-mix(in srgb, var(--m3-on-surface) 12%, transparent);
+    --switch-handle: color-mix(in srgb, var(--m3-on-surface) 38%, transparent);
+  }
+  :root[data-ui-theme="dank"] [data-slot="switch"][data-disabled][data-checked] {
+    --switch-track: color-mix(in srgb, var(--m3-on-surface) 12%, transparent);
+    --switch-outline: transparent;
+    --switch-handle: var(--m3-surface);
+    --switch-icon: color-mix(in srgb, var(--m3-on-surface) 38%, transparent);
+  }
+
+  :root[data-ui-theme="dank"] [data-slot="switch-handle"] {
+    transition:
+      left var(--switch-spatial-duration) var(--ease-spring-fast-spatial),
+      width var(--switch-spatial-duration) var(--ease-spring-fast-spatial),
+      height var(--switch-spatial-duration) var(--ease-spring-fast-spatial),
+      color var(--spring-fast-effects-duration) var(--ease-spring-fast-effects);
+  }
+
+  :root[data-ui-theme="dank"] :is([data-slot="checkbox"], .rr-prose input[type="checkbox"]) {
+    --checkbox-outline: var(--m3-on-surface-variant);
+    --checkbox-container: transparent;
+    --checkbox-icon: var(--m3-on-primary);
+    --checkbox-state-layer: var(--m3-on-surface);
+    --checkbox-state-layer-opacity: 0;
+    position: relative;
+    width: 1.125rem;
+    height: 1.125rem;
+    flex-shrink: 0;
+    border: 2px solid var(--checkbox-outline);
+    border-radius: 2px;
+    background: var(--checkbox-container);
+    transition:
+      background-color var(--spring-fast-effects-duration) var(--ease-spring-fast-effects),
+      border-color var(--spring-fast-effects-duration) var(--ease-spring-fast-effects);
+  }
+  :root[data-ui-theme="dank"] :is([data-slot="checkbox"], .rr-prose input[type="checkbox"])::after {
+    content: "";
+    position: absolute;
+    inset: -13px;
+    border-radius: 9999px;
+    background-color: var(--checkbox-state-layer);
+    opacity: var(--checkbox-state-layer-opacity);
+    pointer-events: none;
+    transition: opacity var(--spring-fast-effects-duration) var(--ease-spring-fast-effects);
+  }
+  :root[data-ui-theme="dank"]
+    :is([data-slot="checkbox"][data-checked], .rr-prose input[type="checkbox"]:checked) {
+    --checkbox-outline: var(--m3-primary);
+    --checkbox-container: var(--m3-primary);
+    --checkbox-state-layer: var(--m3-primary);
+  }
+  @media (hover: hover) {
+    :root[data-ui-theme="dank"]
+      :is(
+        [data-slot="checkbox"]:not([data-disabled]),
+        .rr-prose input[type="checkbox"]:enabled
+      ):hover {
+      --checkbox-state-layer-opacity: 0.08;
+    }
+    :root[data-ui-theme="dank"]
+      :is(
+        [data-slot="checkbox"]:not([data-checked], [data-disabled]),
+        .rr-prose input[type="checkbox"]:enabled:not(:checked)
+      ):not([aria-invalid="true"]):hover {
+      --checkbox-outline: var(--m3-on-surface);
+    }
+  }
+  :root[data-ui-theme="dank"]
+    :is(
+      [data-slot="checkbox"]:not([data-disabled]),
+      .rr-prose input[type="checkbox"]:enabled
+    ):focus-visible {
+    --checkbox-state-layer-opacity: 0.1;
+    outline: none;
+  }
+  :root[data-ui-theme="dank"]
+    :is([data-slot="checkbox"], .rr-prose input[type="checkbox"]):focus-visible::after {
+    outline: 3px solid var(--m3-secondary);
+    outline-offset: 2px;
+  }
+  :root[data-ui-theme="dank"]
+    :is(
+      [data-slot="checkbox"]:not([data-checked], [data-disabled]),
+      .rr-prose input[type="checkbox"]:enabled:not(:checked)
+    ):not([aria-invalid="true"]):focus-visible {
+    --checkbox-outline: var(--m3-on-surface);
+  }
+  :root[data-ui-theme="dank"]
+    :is(
+      [data-slot="checkbox"]:not([data-disabled]),
+      .rr-prose input[type="checkbox"]:enabled
+    ):active {
+    --checkbox-state-layer-opacity: 0.1;
+  }
+  :root[data-ui-theme="dank"]
+    :is(
+      [data-slot="checkbox"]:not([data-checked], [data-disabled]),
+      .rr-prose input[type="checkbox"]:enabled:not(:checked)
+    ):not([aria-invalid="true"]):active {
+    --checkbox-outline: var(--m3-on-surface);
+    --checkbox-state-layer: var(--m3-primary);
+  }
+  :root[data-ui-theme="dank"]
+    :is(
+      [data-slot="checkbox"][data-checked]:not([data-disabled]),
+      .rr-prose input[type="checkbox"]:enabled:checked
+    ):not([aria-invalid="true"]):active {
+    --checkbox-state-layer: var(--m3-on-surface);
+  }
+  :root[data-ui-theme="dank"]
+    :is([data-slot="checkbox"], .rr-prose input[type="checkbox"])[aria-invalid="true"] {
+    --checkbox-outline: var(--m3-error);
+    --checkbox-state-layer: var(--m3-error);
+  }
+  :root[data-ui-theme="dank"]
+    :is(
+      [data-slot="checkbox"][data-checked],
+      .rr-prose input[type="checkbox"]:checked
+    )[aria-invalid="true"] {
+    --checkbox-container: var(--m3-error);
+    --checkbox-icon: var(--m3-on-error);
+  }
+  :root[data-ui-theme="dank"]
+    :is([data-slot="checkbox"][data-disabled], .rr-prose input[type="checkbox"]:disabled) {
+    --checkbox-outline: color-mix(in srgb, var(--m3-on-surface) 38%, transparent);
+  }
+  :root[data-ui-theme="dank"]
+    :is(
+      [data-slot="checkbox"][data-disabled][data-checked],
+      .rr-prose input[type="checkbox"]:disabled:checked
+    ) {
+    --checkbox-outline: transparent;
+    --checkbox-container: color-mix(in srgb, var(--m3-on-surface) 38%, transparent);
+    --checkbox-icon: var(--m3-surface);
+  }
+
+  :root[data-ui-theme="dank"] .rr-prose input[type="checkbox"]::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    background-color: var(--checkbox-icon);
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18' fill='none' stroke='black' stroke-width='2' stroke-linecap='square'%3E%3Cpath d='M4.5 9l2.7 2.7 6.3-6.3'/%3E%3C/svg%3E")
+      center / 100% no-repeat;
+    opacity: 0;
+  }
+  :root[data-ui-theme="dank"] .rr-prose input[type="checkbox"]:checked::before {
+    opacity: 1;
+  }
+
+  /* --slider-fraction comes from Slider; the center matches Base UI's edge-aligned 4px thumb. */
+  :root[data-ui-theme="dank"] [data-slot="slider"] {
+    --slider-active: var(--m3-primary);
+    --slider-inactive: var(--m3-secondary-container);
+    --slider-stop: var(--m3-primary);
+    --slider-handle: var(--m3-primary);
+  }
+  :root[data-ui-theme="dank"] [data-slot="slider"]:has([data-painted]) {
+    --slider-handle: var(--m3-on-surface);
+  }
+  :root[data-ui-theme="dank"] [data-slot="slider"][data-disabled] {
+    --slider-active: color-mix(in srgb, var(--m3-on-surface) 38%, transparent);
+    --slider-inactive: color-mix(in srgb, var(--m3-on-surface) 12%, transparent);
+    --slider-stop: var(--m3-on-surface);
+    --slider-handle: color-mix(in srgb, var(--m3-on-surface) 38%, transparent);
+  }
+  :root[data-ui-theme="dank"] [data-slot="slider-track"] {
+    --slider-handle-center: calc(var(--slider-fraction) * (100% - 4px) + 2px);
+  }
+  :root[data-ui-theme="dank"] [data-slot="slider-track"]:not([data-painted])::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    width: max(0px, calc(var(--slider-handle-center) - 8px));
+    border-radius: 0 2px 2px 0;
+    background: var(--slider-active);
+  }
+  :root[data-ui-theme="dank"] [data-slot="slider-track"]:not([data-painted])::after {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    right: 0;
+    left: calc(var(--slider-handle-center) + 8px);
+    border-radius: 2px 0 0 2px;
+    background:
+      radial-gradient(circle at calc(100% - 8px) 50%, var(--slider-stop) 2px, transparent 2.5px),
+      var(--slider-inactive);
+  }
+  :root[data-ui-theme="dank"] [data-slot="slider-track"][data-painted] {
+    mask-image: linear-gradient(
+      to right,
+      #000 calc(var(--slider-handle-center) - 8px),
+      transparent calc(var(--slider-handle-center) - 8px),
+      transparent calc(var(--slider-handle-center) + 8px),
+      #000 calc(var(--slider-handle-center) + 8px)
+    );
+  }
+
+  :root[data-ui-theme="dank"] [data-slot="checkbox-mark"] {
+    stroke-dasharray: 2 2;
+    stroke-dashoffset: 1;
+    animation: dank-checkbox-draw var(--spring-default-spatial-duration)
+      var(--ease-spring-default-spatial);
+  }
+}
+
+@keyframes dank-checkbox-draw {
+  from {
+    stroke-dashoffset: 2;
+  }
+}
+
+/* Unlayered to beat the control's placeholder utility: the resting label sits there. */
+:root[data-ui-theme="dank"]
+  [data-slot="outlined-field"]:has(> [data-slot="outlined-field-label"]):not(:focus-within)
+  > :is(input, textarea)::placeholder {
+  color: transparent;
+}

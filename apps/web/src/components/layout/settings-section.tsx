@@ -22,7 +22,7 @@ export function SettingsSection({
   children,
 }: TProps) {
   const className = cn(
-    "bg-card flex w-full flex-col rounded-lg border",
+    "bg-card dank:rounded-md flex w-full flex-col rounded-lg border",
     variant === "destructive" && "border-destructive/6-10",
   );
   const body = (
@@ -31,7 +31,7 @@ export function SettingsSection({
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <h2
             data-variant={variant}
-            className="data-[variant=destructive]:text-destructive text-base leading-tight font-semibold"
+            className="data-[variant=destructive]:text-destructive dank:type-title-medium text-base leading-tight font-semibold"
           >
             {title}
           </h2>

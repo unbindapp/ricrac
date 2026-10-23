@@ -10,8 +10,11 @@ import { useIssuePatch } from "@/components/issues/use-issue-actions";
 import { EstimateBadge } from "@/components/shared/estimate-badge";
 import { LabelChip } from "@/components/shared/label-chip";
 import { RelativeTime } from "@/components/shared/relative-time";
+import { cn } from "@/components/ui/utils";
 
 const MAX_ROW_LABELS = 3;
+
+const dankIconTrigger = "dank:size-8 dank:*:size-5";
 
 /** Empty controls stay out of sight until the row is hovered or the control is focused or open. */
 export const hiddenUntilHover =
@@ -20,6 +23,7 @@ export const hiddenUntilHover =
 type TProps = {
   issue: Issue;
   depth?: number;
+  segment?: string;
   properties: TDisplaySettings["properties"];
   isSelected: boolean;
   isActive: boolean;
@@ -33,6 +37,7 @@ type TProps = {
 export function IssueRow({
   issue,
   depth = 0,
+  segment,
   properties,
   isSelected,
   isActive,
@@ -53,6 +58,8 @@ export function IssueRow({
     <div
       role="listitem"
       tabIndex={0}
+      data-slot="list-item"
+      data-segment={segment}
       data-issue-row={issue.id}
       aria-selected={isSelected}
       aria-label={`${issue.identifier} ${issue.title}`}
@@ -73,7 +80,7 @@ export function IssueRow({
           appearance="icon"
           disabled={!canEdit}
           priority={issue.priority}
-          className={issue.priority === 0 ? hiddenUntilHover : undefined}
+          className={cn(dankIconTrigger, issue.priority === 0 && hiddenUntilHover)}
           onChange={(priority) => patch(issue, { priority })}
         />
       )}
@@ -88,22 +95,25 @@ export function IssueRow({
           disabled={!canEdit}
           teamId={issue.team.id}
           state={issue.state}
+          className={dankIconTrigger}
           onChange={(state) => patch(issue, { state })}
         />
       )}
       <span
         data-nested={depth > 0 || undefined}
-        className="min-w-0 flex-1 truncate font-medium data-nested:pl-4"
+        className="dank:font-normal min-w-0 flex-1 truncate font-medium data-nested:pl-4"
       >
         {issue.title}
       </span>
-      <span className="hidden min-w-0 shrink items-center justify-end gap-1.5 overflow-hidden sm:flex">
+      <span className="dank:gap-2 hidden min-w-0 shrink items-center justify-end gap-1.5 overflow-hidden sm:flex">
         <SnoozedChip issue={issue} />
         <SlaChip issue={issue} />
         {show("labels") &&
           labels.map((label) => <LabelChip key={label.id} name={label.name} color={label.color} />)}
         {show("labels") && hiddenLabels > 0 && (
-          <span className="text-muted-foreground text-xs">+{hiddenLabels}</span>
+          <span className="text-muted-foreground dank:type-label-large text-xs">
+            +{hiddenLabels}
+          </span>
         )}
         {show("project") && issue.project && (
           <ProjectChip
@@ -138,7 +148,7 @@ export function IssueRow({
           appearance="icon"
           disabled={!canEdit}
           assignee={issue.assignee}
-          className={issue.assignee ? undefined : hiddenUntilHover}
+          className={cn(dankIconTrigger, !issue.assignee && hiddenUntilHover)}
           onChange={(assignee) => patch(issue, { assignee })}
         />
       )}

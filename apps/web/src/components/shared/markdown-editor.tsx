@@ -430,10 +430,12 @@ export function MarkdownEditor({
     <div
       ref={rootRef}
       data-slot="markdown-editor"
+      data-prose={hasAutosave ? "large" : undefined}
       className="relative flex w-full flex-col gap-1.5"
       {...dragHandlers}
     >
       <div
+        data-slot="markdown-editor-frame"
         data-framed={framed || undefined}
         data-inline={(hasAutosave && !framed && !readOnly) || undefined}
         className="data-framed:bg-input data-framed:has-hover:hover:ring-border data-framed:focus-within:ring-primary/8-10 data-inline:has-hover:hover:ring-border data-inline:focus-within:ring-border flex w-full flex-col transition-shadow data-framed:rounded-md data-framed:border data-framed:focus-within:ring-1 data-framed:has-hover:hover:ring-1 data-inline:-mx-3 data-inline:-my-2 data-inline:w-auto data-inline:rounded-md data-inline:px-3 data-inline:py-2 data-inline:ring-1 data-inline:ring-transparent"
@@ -442,7 +444,7 @@ export function MarkdownEditor({
           <div
             data-framed={framed || undefined}
             data-sticky={hasAutosave || undefined}
-            className="bg-background data-framed:bg-input mb-2 border-b pb-1 data-framed:mb-0 data-framed:rounded-t-md data-framed:px-1 data-framed:pt-1 data-sticky:sticky data-sticky:top-11 data-sticky:z-20 group-data-[bar=apart]/page:data-sticky:top-0 group-data-[width=narrow]/page:data-sticky:top-0"
+            className="bg-background data-framed:bg-input dank:bg-transparent dank:border-b-0 dank:pb-0 dank:data-framed:bg-transparent dank:data-framed:p-2 mb-2 border-b pb-1 data-framed:mb-0 data-framed:rounded-t-md data-framed:px-1 data-framed:pt-1 data-sticky:sticky data-sticky:top-11 data-sticky:z-20 group-data-[bar=apart]/page:data-sticky:top-0 group-data-[width=narrow]/page:data-sticky:top-0"
           >
             <EditorToolbar
               editor={editor}
@@ -527,7 +529,7 @@ function IncomingNotice({ onShow, onDismiss }: { onShow: () => void; onDismiss: 
         size="icon"
         forceMinSize={false}
         aria-label="Keep your version"
-        className="size-5"
+        className="dank:size-8 dank:[&>svg]:size-5 size-5"
         onClick={onDismiss}
       >
         <XIcon className="size-3.5" />

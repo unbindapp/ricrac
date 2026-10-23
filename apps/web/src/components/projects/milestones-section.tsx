@@ -67,17 +67,18 @@ function MilestoneRow({
   return (
     <div
       role="listitem"
+      data-interactive
       className="group/row has-hover:hover:bg-accent flex h-9 w-full items-center gap-3 border-b px-3 text-sm last:border-b-0"
     >
       <DiamondIcon
         data-done={isDone || undefined}
-        className="text-muted-foreground data-done:fill-primary data-done:text-primary size-3.5 shrink-0"
+        className="text-muted-foreground data-done:fill-primary data-done:text-primary dank:size-5 size-3.5 shrink-0"
       />
       <Link
         to="/$workspace/project/$slug/issues"
         params={{ workspace: workspace.urlKey, slug: entitySlug(project) }}
         search={{ milestone: milestone.id }}
-        className="min-w-0 flex-1 truncate font-medium"
+        className="dank:font-normal min-w-0 flex-1 truncate font-medium"
         title={milestone.description ?? undefined}
       >
         {milestone.name}

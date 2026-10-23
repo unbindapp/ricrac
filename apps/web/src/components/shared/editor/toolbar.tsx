@@ -11,6 +11,7 @@ import {
   BoldIcon,
   ChevronDownIcon,
   CodeIcon,
+  EllipsisIcon,
   HelpCircleIcon,
   ItalicIcon,
   LinkIcon,
@@ -70,6 +71,8 @@ const blockKeys: Record<string, string[]> = {
 
 const toolbarBlocks = [...listCommands, ...blockCommands];
 const toolbarInserts = insertCommands.filter((command) => command.needsUpload);
+const overflowBlockIds = new Set(blockCommands.map((command) => command.id));
+const hiddenWhenNarrow = "dank:@max-[49rem]:hidden";
 
 type TTableAction = { label: string; icon: LucideIcon; run: (editor: Editor) => void };
 
@@ -148,7 +151,7 @@ export function EditorToolbar({
       role="toolbar"
       aria-label="Formatting"
       data-slot="editor-toolbar"
-      className="bg-background flex min-w-0 items-center gap-0.5 overflow-x-auto"
+      className="bg-background dank:@container flex min-w-0 items-center gap-0.5 overflow-x-auto"
       onMouseDown={(event) => {
         if (event.target instanceof HTMLElement && event.target.closest("input")) return;
         event.preventDefault();
@@ -183,6 +186,7 @@ export function EditorToolbar({
           hint={command.hint}
           icon={command.icon}
           isActive={state.blocks[command.id]}
+          className={overflowBlockIds.has(command.id) ? hiddenWhenNarrow : undefined}
           onClick={() => command.run(editor, pickFiles)}
         />
       ))}
@@ -191,11 +195,17 @@ export function EditorToolbar({
         toolbarInserts.map((command) => (
           <ToolButton
             key={command.id}
-            label={command.id === "media" ? "Upload an image or video" : "Attach a file"}
+            label={insertLabel(command)}
             icon={command.icon}
+            className={hiddenWhenNarrow}
             onClick={() => command.run(editor, pickFiles)}
           />
         ))}
+      <OverflowMenu
+        editor={editor}
+        pickFiles={pickFiles}
+        commands={[...blockCommands, ...(canUpload ? toolbarInserts : [])]}
+      />
       {state.isInTable && (
         <>
           <Divider />
@@ -229,7 +239,10 @@ export function EditorToolbar({
                 forceMinSize={false}
                 aria-label={size.name}
                 aria-pressed={media.width === size.width}
-                className={cn("text-xs", media.width === size.width && "bg-accent text-foreground")}
+                className={cn(
+                  "dank:type-label-large text-xs",
+                  media.width === size.width && "bg-accent text-foreground",
+                )}
                 onClick={() => editor.chain().focus().setMediaLayout({ width: size.width }).run()}
               >
                 {size.label}
@@ -252,7 +265,57 @@ function selectedMediaSrc(editor: Editor) {
 }
 
 function Divider() {
-  return <span aria-hidden className="bg-border mx-1 h-4 w-px shrink-0" />;
+  return (
+    <span aria-hidden data-slot="toolbar-divider" className="bg-border mx-1 h-4 w-px shrink-0" />
+  );
+}
+
+function insertLabel(command: TBlockCommand) {
+  return command.id === "media" ? "Upload an image or video" : "Attach a file";
+}
+
+/** In narrow Dank toolbars, the blocks and uploads that don't fit. */
+function OverflowMenu({
+  editor,
+  pickFiles,
+  commands,
+}: {
+  editor: Editor;
+  pickFiles: TPickFiles;
+  commands: TBlockCommand[];
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        render={
+          <Button
+            variant="ghost"
+            size="icon"
+            forceMinSize={false}
+            aria-label="More formatting"
+            className="dank:@max-[49rem]:flex hidden"
+          >
+            <EllipsisIcon className="size-4" />
+          </Button>
+        }
+      />
+      <DropdownMenuContent className="w-64" finalFocus={false}>
+        <DropdownMenuGroup>
+          {commands.map((command) => {
+            const Icon = command.icon;
+            return (
+              <DropdownMenuItem key={command.id} onClick={() => command.run(editor, pickFiles)}>
+                <Icon className="size-4" />
+                <span className="flex-1">
+                  {command.needsUpload ? insertLabel(command) : command.label}
+                </span>
+              </DropdownMenuItem>
+            );
+          })}
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }
 
 function ToolButton({
@@ -262,6 +325,7 @@ function ToolButton({
   icon: Icon,
   isActive,
   disabled,
+  className,
   onClick,
 }: {
   label: string;
@@ -270,6 +334,7 @@ function ToolButton({
   icon: LucideIcon;
   isActive?: boolean;
   disabled?: boolean;
+  className?: string;
   onClick: () => void;
 }) {
   return (
@@ -281,7 +346,7 @@ function ToolButton({
         aria-label={label}
         aria-pressed={isActive === undefined ? undefined : isActive}
         disabled={disabled}
-        className={cn("text-muted-foreground", isActive && "bg-accent text-foreground")}
+        className={cn("text-muted-foreground", isActive && "bg-accent text-foreground", className)}
         onClick={onClick}
       >
         <Icon className="size-4" />
@@ -496,7 +561,9 @@ function EditorHelp() {
       </SimpleTooltip>
       <PopoverContent align="end" className="flex w-80 flex-col gap-4 text-sm" finalFocus={false}>
         <section className="flex flex-col gap-2">
-          <h3 className="text-muted-foreground text-xs font-medium">While you write</h3>
+          <h3 className="text-muted-foreground dank:type-title-small text-xs font-medium">
+            While you write
+          </h3>
           {tips.map((tip) => (
             <div key={tip.keys.join()} className="flex items-center gap-2">
               <ShortcutKeys keys={tip.keys} />
@@ -505,14 +572,18 @@ function EditorHelp() {
           ))}
         </section>
         <section className="flex flex-col gap-2">
-          <h3 className="text-muted-foreground text-xs font-medium">Images, videos and files</h3>
+          <h3 className="text-muted-foreground dank:type-title-small text-xs font-medium">
+            Images, videos and files
+          </h3>
           <p>
             Paste, drop or upload them from the toolbar. Hover one to move it by its handle, align
             it, resize it from its edges or open it full size. Click between two to type there.
           </p>
         </section>
         <section className="flex flex-col gap-2">
-          <h3 className="text-muted-foreground text-xs font-medium">Markdown</h3>
+          <h3 className="text-muted-foreground dank:type-title-small text-xs font-medium">
+            Markdown
+          </h3>
           <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
             {markdownTips.map(([syntax, label]) => (
               <div key={label} className="flex items-center gap-2">

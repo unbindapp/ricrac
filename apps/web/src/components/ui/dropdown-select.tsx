@@ -104,7 +104,7 @@ export default function DropdownSelect({
                 >
                   {ItemIcon && <ItemIcon className="size-4 shrink-0" value={item.value} />}
                   <div className="flex min-w-0 flex-wrap items-center gap-2.5 pr-1">
-                    <p className="min-w-0 shrink leading-tight">{item.label}</p>
+                    <p className="dank:leading-6 min-w-0 shrink leading-tight">{item.label}</p>
                     {ItemSuffix && <ItemSuffix value={item.value} />}
                   </div>
                   <CheckIcon

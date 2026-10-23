@@ -276,7 +276,7 @@ export function InboxView({ filter, selectedKey, onFilterChange, onSelect }: TPr
               value,
               ...filters[value],
               suffix: value === "unread" && unread > 0 && (
-                <Badge variant="muted">{unread > 99 ? "99+" : unread}</Badge>
+                <Badge variant="count">{unread > 99 ? "99+" : unread}</Badge>
               ),
             }))}
             onChange={onFilterChange}
@@ -294,6 +294,7 @@ export function InboxView({ filter, selectedKey, onFilterChange, onSelect }: TPr
           <div
             role="listbox"
             aria-label="Notifications"
+            data-slot="list"
             className="bg-card flex w-full flex-col overflow-hidden rounded-lg border"
           >
             {groups.map((group) => (

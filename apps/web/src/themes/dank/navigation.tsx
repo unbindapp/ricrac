@@ -12,7 +12,7 @@ export function DankNavigation() {
   return (
     <aside
       data-expanded={isExpanded || undefined}
-      className="ease-emphasized hidden w-24 shrink-0 overflow-hidden transition-[width] duration-300 data-expanded:w-64 md:flex"
+      className="ease-spring-default-spatial hidden w-24 shrink-0 overflow-hidden transition-[width] duration-(--spring-default-spatial-duration) data-expanded:w-64 md:flex"
     >
       <NavigationRail
         isExpanded={isExpanded}
@@ -29,6 +29,7 @@ export function DankNavigationDrawer({ onNavigate }: { onNavigate: () => void })
     <NavigationRail
       isExpanded
       hasAccountLinks
+      isModal
       menuLabel="Close navigation"
       onMenu={onNavigate}
       onNavigate={onNavigate}

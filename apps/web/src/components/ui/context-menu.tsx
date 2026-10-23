@@ -1,7 +1,7 @@
 import { ContextMenu as ContextMenuPrimitive } from "@base-ui/react/context-menu";
 import type { MouseEvent } from "react";
 
-import { dropdownContentVariants } from "@/components/ui/dropdown-menu";
+import { dropdownContentVariants, MenuPopupChildren } from "@/components/ui/dropdown-menu";
 import { cn } from "@/components/ui/utils";
 
 /** A menu opened by right click or a long press; its items are the dropdown menu's. */
@@ -13,7 +13,7 @@ function ContextMenuTrigger(props: ContextMenuPrimitive.Trigger.Props) {
   return <ContextMenuPrimitive.Trigger data-slot="context-menu-trigger" {...props} />;
 }
 
-function ContextMenuContent({ className, ...props }: ContextMenuPrimitive.Popup.Props) {
+function ContextMenuContent({ className, children, ...props }: ContextMenuPrimitive.Popup.Props) {
   return (
     <ContextMenuPrimitive.Portal>
       <ContextMenuPrimitive.Backdrop className="fixed inset-0 z-[1000]" />
@@ -24,9 +24,12 @@ function ContextMenuContent({ className, ...props }: ContextMenuPrimitive.Popup.
       >
         <ContextMenuPrimitive.Popup
           data-slot="context-menu-content"
+          data-focus-indicator="child"
           className={cn(dropdownContentVariants({ className }))}
           {...props}
-        />
+        >
+          <MenuPopupChildren>{children}</MenuPopupChildren>
+        </ContextMenuPrimitive.Popup>
       </ContextMenuPrimitive.Positioner>
     </ContextMenuPrimitive.Portal>
   );

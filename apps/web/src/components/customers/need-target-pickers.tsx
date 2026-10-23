@@ -44,7 +44,8 @@ function FieldButton({
       variant="outline"
       aria-invalid={invalid || undefined}
       data-muted={!text || undefined}
-      className="data-muted:text-muted-foreground aria-invalid:border-destructive w-full justify-start font-normal"
+      data-focus-indicator="child"
+      className="data-muted:text-muted-foreground aria-invalid:border-destructive dank:type-body-large dank:text-m3-on-surface dank:data-muted:text-m3-on-surface-variant dank:border-m3-outline dank:has-hover:hover:border-m3-on-surface dank:focus-visible:border-m3-primary dank:focus-visible:ring-m3-primary dank:aria-invalid:border-m3-error dank:h-14 dank:gap-3 dank:rounded-xs dank:px-4 dank:after:hidden dank:focus-visible:ring-1 dank:focus-visible:ring-inset dank:active:rounded-xs dank:[&>svg]:size-6 dank:[&>svg]:text-m3-on-surface-variant w-full justify-start font-normal"
       {...props}
     >
       {icon}

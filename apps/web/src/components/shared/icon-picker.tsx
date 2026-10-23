@@ -85,7 +85,7 @@ function IconGrid({
             size="icon"
             forceMinSize={false}
             data-selected={name === value || undefined}
-            className="data-selected:bg-accent"
+            className="data-selected:bg-accent dank:size-8 dank:justify-self-center dank:rounded-full dank:active:rounded-full dank:data-selected:bg-m3-secondary-container dank:[&>svg]:size-5"
             onClick={() => onSelect(name)}
           >
             <Icon className="size-4" style={color ? { color } : undefined} />

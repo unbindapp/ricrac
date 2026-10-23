@@ -27,7 +27,7 @@ export function MessageThreadPanel({ discussionId, messageId, onBack }: TProps) 
         <ArrowLeftIcon className="size-4" />
       </HeaderAction>
       <MessageSquareReplyIcon className="text-muted-foreground size-4" />
-      <span className="min-w-0 flex-1 truncate text-sm font-medium">
+      <span className="dank:type-title-medium min-w-0 flex-1 truncate text-sm font-medium">
         Replies{root?.user && ` to ${userName(root.user)}`}
         <span className="text-muted-foreground font-normal"> in the main chat</span>
       </span>

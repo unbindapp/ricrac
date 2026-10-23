@@ -1,5 +1,5 @@
 import { type LinkProps, useNavigate } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { type ReactNode, useRef, useState } from "react";
 
 import { TriangleAlertIcon } from "@/components/icons";
 import { SearchHitGroups } from "@/components/search/search-hit-groups";
@@ -8,7 +8,7 @@ import { Command, CommandEmpty, CommandInput, CommandList } from "@/components/u
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 /** Searches the whole workspace from a bar, listing what matches under it as you type. */
-export function GlobalSearch() {
+export function GlobalSearch({ trailing }: { trailing?: ReactNode }) {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
@@ -31,29 +31,36 @@ export function GlobalSearch() {
       shouldFilter={false}
       loop
       wrapper="none"
-      className="relative w-full max-w-2xl overflow-visible bg-transparent"
+      data-open={isListShown || undefined}
+      className="group/search data-open:shadow-elevation-3 relative w-full max-w-180 min-w-90 overflow-visible rounded-[1.75rem] bg-transparent"
       onKeyDown={(event) => {
         if (event.key === "Escape") close();
       }}
     >
-      <CommandInput
-        ref={inputRef}
-        value={query}
-        onValueChange={(value) => {
-          setQuery(value);
-          setIsOpen(true);
-        }}
-        onFocus={() => setIsOpen(true)}
-        onBlur={() => setIsOpen(false)}
-        showSpinner={search.isPending}
-        aria-label="Search"
-        placeholder="Search issues, projects, documents, discussions…"
-        classNameWrapper="bg-surface-container-highest has-hover:hover:bg-surface-container-highest/80 h-12 rounded-full border-0 transition-colors [&>div]:left-5 [&>div]:size-5"
-        className="h-12 rounded-full pr-5 pl-13 text-base"
-      />
+      <div
+        data-slot="search-bar"
+        className="bg-m3-surface-container-high flex h-14 items-center rounded-[1.75rem] pr-3 group-data-open/search:rounded-b-none"
+      >
+        <CommandInput
+          ref={inputRef}
+          value={query}
+          onValueChange={(value) => {
+            setQuery(value);
+            setIsOpen(true);
+          }}
+          onFocus={() => setIsOpen(true)}
+          onBlur={() => setIsOpen(false)}
+          showSpinner={search.isPending}
+          aria-label="Search"
+          placeholder="Search issues, projects, documents, discussions…"
+          classNameWrapper="min-w-0 flex-1 border-0 [&>div]:left-4 [&>div]:size-6 [&>div]:text-m3-on-surface [&_svg]:text-m3-on-surface"
+          className="text-m3-on-surface placeholder:text-m3-on-surface-variant h-14 pr-4 pl-14 text-base leading-6"
+        />
+        {trailing}
+      </div>
       {isListShown && (
         <div
-          className="bg-popover text-popover-foreground shadow-shadow-color/shadow-opacity absolute inset-x-0 top-full z-50 mt-2 flex max-h-120 flex-col overflow-hidden rounded-lg shadow-xl"
+          className="bg-m3-surface-container-high text-m3-on-surface shadow-elevation-3 border-m3-outline absolute inset-x-0 top-full z-50 flex max-h-120 min-h-60 flex-col overflow-hidden rounded-b-[1.75rem] border-t"
           onMouseDown={(event) => event.preventDefault()}
         >
           <ScrollArea className="min-h-0">

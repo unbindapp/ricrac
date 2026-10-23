@@ -131,10 +131,12 @@ function TemplateRow({
       role="listitem"
       className="flex h-9 w-full items-center gap-2 border-b px-3 text-sm last:border-b-0"
     >
-      <Icon className="text-muted-foreground size-4 shrink-0" />
-      <span className="shrink-0 truncate font-medium">{template.name}</span>
+      <Icon className="text-muted-foreground dank:size-5 size-4 shrink-0" />
+      <span className="dank:font-normal shrink-0 truncate font-medium">{template.name}</span>
       {template.description && (
-        <span className="text-muted-foreground min-w-0 truncate">{template.description}</span>
+        <span className="text-muted-foreground dank:text-sm min-w-0 truncate">
+          {template.description}
+        </span>
       )}
       <span className="flex-1" />
       {template.recurrence && (
@@ -160,7 +162,7 @@ function TemplateRow({
                 size="icon"
                 forceMinSize={false}
                 aria-label={`Actions for ${template.name}`}
-                className="text-muted-foreground -mr-1 size-7"
+                className="text-muted-foreground dank:mr-0 dank:size-10 -mr-1 size-7"
               >
                 <EllipsisIcon className="size-4" />
               </Button>

@@ -22,6 +22,7 @@ import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
 import { signOut } from "@/lib/queries/me";
 import { useUpdateUserMutation, workspaceMeQuery } from "@/lib/queries/users";
 import { useAccentHueStore } from "@/lib/stores/accent-hue";
+import { BASELINE_HUE, paletteVariables } from "@/themes/dank/palette";
 import { useUiTheme } from "@/themes/ui-theme-provider";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/account/")({
@@ -47,12 +48,38 @@ const accentPresets = [
   { hue: 50, name: "Yellow" },
 ];
 
+const dankAccentPresets = [
+  { hue: BASELINE_HUE, name: "Purple" },
+  { hue: 320, name: "Pink" },
+  { hue: 0, name: "Red" },
+  { hue: 25, name: "Orange" },
+  { hue: 50, name: "Yellow" },
+  { hue: 120, name: "Green" },
+  { hue: 170, name: "Teal" },
+  { hue: 210, name: "Blue" },
+];
+
 const accentSwatch = (hue: number) => `hsl(${hue} 60% 50%)`;
 
+const dankPrimaries = new Map<string, string>();
+
+/** The primary color Dank paints for a hue: tone 40 of its primary palette in light, 80 in dark. */
+function dankPrimary(hue: number, isDark: boolean) {
+  const key = `${hue}:${isDark}`;
+  const cached = dankPrimaries.get(key);
+  if (cached) return cached;
+  const accentHue = hue === BASELINE_HUE ? null : hue;
+  const color = paletteVariables(accentHue)[`--palette-primary-${isDark ? 80 : 40}`];
+  dankPrimaries.set(key, color);
+  return color;
+}
+
 const HUE_STOPS = 12;
-const hueGradient = `linear-gradient(to right, ${Array.from({ length: HUE_STOPS + 1 }, (_, index) =>
-  accentSwatch((index * 360) / HUE_STOPS),
-).join(", ")})`;
+const hueGradientOf = (swatch: (hue: number) => string) =>
+  `linear-gradient(to right, ${Array.from({ length: HUE_STOPS + 1 }, (_, index) =>
+    swatch((index * 360) / HUE_STOPS),
+  ).join(", ")})`;
+const hueGradient = hueGradientOf(accentSwatch);
 
 const formSchema = z.object({
   name: z.string().trim().min(1, "Name is required."),
@@ -210,11 +237,16 @@ function ThemeField({ theme, onChange }: { theme: string; onChange: (theme: stri
 }
 
 function AccentField() {
-  const { defaultAccentHue } = useUiTheme();
+  const { id: themeId, defaultAccentHue } = useUiTheme();
+  const { resolvedTheme } = useTheme();
   const chosenHue = useAccentHueStore((state) => state.hue);
   const setHue = useAccentHueStore((state) => state.setHue);
   const previewHue = useAccentHueStore((state) => state.previewHue);
   const hue = chosenHue ?? defaultAccentHue;
+  const isDank = themeId === "dank";
+  const isDark = resolvedTheme === "dark";
+  const presets = isDank ? dankAccentPresets : accentPresets;
+  const swatch = isDank ? (value: number) => dankPrimary(value, isDark) : accentSwatch;
   return (
     <div className="flex flex-col gap-3">
       <div className="flex min-h-8 items-center gap-2">
@@ -232,38 +264,73 @@ function AccentField() {
         value={hue}
         size="large"
         thumbLabel="Accent hue"
-        trackStyle={{ background: hueGradient }}
+        trackStyle={{ background: isDank ? hueGradientOf(swatch) : hueGradient }}
         onValueChange={(value) => previewHue(value)}
         onValueCommitted={(value) => setHue(value)}
       />
       <div className="flex flex-wrap items-center gap-2">
-        {accentPresets.map((preset) => (
+        {presets.map((preset) => (
           <Button
             key={preset.hue}
-            variant={preset.hue === hue ? "outline" : "ghost"}
+            variant={preset.hue === hue && !isDank ? "outline" : "ghost"}
             size="icon"
             aria-label={preset.name}
             aria-pressed={preset.hue === hue}
-            onClick={() => setHue(preset.hue)}
+            className="dank:aria-pressed:rounded-md dank:aria-pressed:bg-m3-inverse-surface"
+            onClick={() => setHue(isDank && preset.hue === BASELINE_HUE ? null : preset.hue)}
           >
             <span
-              className="size-4 rounded-full"
-              style={{ background: accentSwatch(preset.hue) }}
+              className="dank:size-6 size-4 rounded-full"
+              style={{ background: swatch(preset.hue) }}
             />
           </Button>
         ))}
       </div>
-      <div className="grid grid-cols-3 gap-2">
-        <span className="bg-background flex h-9 items-center justify-center rounded-md border text-sm font-medium">
-          Background
+      {isDank ? <DankRolePreview /> : <AccentPreview />}
+    </div>
+  );
+}
+
+function AccentPreview() {
+  return (
+    <div className="grid grid-cols-3 gap-2">
+      <span className="bg-background flex h-9 items-center justify-center rounded-md border text-sm font-medium">
+        Background
+      </span>
+      <span className="bg-muted flex h-9 items-center justify-center rounded-md text-sm font-medium">
+        Muted
+      </span>
+      <span className="bg-top-loader text-primary-foreground flex h-9 items-center justify-center rounded-md text-sm font-medium">
+        Accent
+      </span>
+    </div>
+  );
+}
+
+const dankRoles = [
+  { label: "Primary", className: "bg-m3-primary text-m3-on-primary" },
+  {
+    label: "Secondary",
+    className: "bg-m3-secondary-container text-m3-on-secondary-container",
+  },
+  { label: "Tertiary", className: "bg-m3-tertiary-container text-m3-on-tertiary-container" },
+  {
+    label: "Surface",
+    className: "bg-m3-surface-container text-m3-on-surface border border-m3-outline-variant",
+  },
+];
+
+function DankRolePreview() {
+  return (
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      {dankRoles.map((role) => (
+        <span
+          key={role.label}
+          className={`type-label-large flex h-12 items-center justify-center rounded-md ${role.className}`}
+        >
+          {role.label}
         </span>
-        <span className="bg-muted flex h-9 items-center justify-center rounded-md text-sm font-medium">
-          Muted
-        </span>
-        <span className="bg-top-loader text-primary-foreground flex h-9 items-center justify-center rounded-md text-sm font-medium">
-          Accent
-        </span>
-      </div>
+      ))}
     </div>
   );
 }

@@ -20,7 +20,7 @@ export function ProjectProgress({ project }: { project: ProjectDetail }) {
   if (total === 0) return null;
   const percent = Math.round(project.progress * 100);
   return (
-    <div className="bg-card flex w-full flex-col gap-3 rounded-lg border p-4">
+    <div className="bg-card dank:rounded-md flex w-full flex-col gap-3 rounded-lg border p-4">
       <div className="flex items-baseline gap-2">
         <span className="text-base font-semibold tabular-nums">{percent}%</span>
         <span className="text-muted-foreground text-sm">complete</span>

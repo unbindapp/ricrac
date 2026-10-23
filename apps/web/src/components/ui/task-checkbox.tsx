@@ -7,7 +7,7 @@ export function TaskCheckbox({ checked, onToggle }: { checked: boolean; onToggle
       disabled={!onToggle}
       aria-label={checked ? "Done task" : "Open task"}
       onChange={() => onToggle?.()}
-      className="focus-visible:ring-primary/8-10 cursor-pointer outline-none focus-visible:ring-2 disabled:cursor-default"
+      className="focus-visible:ring-primary/8-10 dank:focus-visible:ring-0 cursor-pointer outline-none focus-visible:ring-2 disabled:cursor-default"
     />
   );
 }

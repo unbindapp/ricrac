@@ -3,17 +3,20 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 
 import type { Issue, ProjectDetail, StateRef } from "@/api/ops.gen";
-import { ChevronRightIcon, CircleDotIcon, DiamondIcon, PlusIcon } from "@/components/icons";
+import { CircleDotIcon, DiamondIcon, PlusIcon } from "@/components/icons";
 import { useNewIssueContext, useNewIssueStore } from "@/components/issues/new-issue-store";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { List } from "@/components/layout/list";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PersonAvatar } from "@/components/projects/people";
+import { FilterChip } from "@/components/shared/filter-chip";
+import { GroupToggle } from "@/components/shared/group-toggle";
 import { PriorityIcon } from "@/components/shared/priority-icon";
 import { StateIcon, stateTypeLabels } from "@/components/shared/state-icon";
 import { Button } from "@/components/ui/button";
 import { SimpleTooltip } from "@/components/ui/tooltip";
+import { cn } from "@/components/ui/utils";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { projectIssuesQuery } from "@/lib/queries/projects";
 
@@ -116,31 +119,21 @@ export function ProjectIssues({ project, milestone, onMilestoneChange }: TProps)
             const closedByDefault = type === "completed" || type === "canceled";
             const isCollapsed = closedByDefault !== toggled.includes(type);
             return (
-              <div key={type} role="presentation" className="contents">
-                <div className="bg-muted flex h-9 items-center border-b px-1.5">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    forceMinSize={false}
-                    aria-expanded={!isCollapsed}
-                    onClick={() =>
+              <div key={type} role="presentation" data-slot="list-group" className="contents">
+                <div className="bg-muted dank:h-12 dank:gap-1 dank:border-0 dank:bg-transparent dank:px-0 flex h-9 items-center border-b px-1.5">
+                  <GroupToggle
+                    icon={<StateIcon type={type} />}
+                    label={stateTypeLabels[type]}
+                    count={group.length}
+                    isCollapsed={isCollapsed}
+                    onToggle={() =>
                       setToggled((current) =>
                         current.includes(type)
                           ? current.filter((item) => item !== type)
                           : [...current, type],
                       )
                     }
-                  >
-                    <ChevronRightIcon
-                      data-open={!isCollapsed || undefined}
-                      className="text-muted-foreground size-3.5 transition-transform data-open:rotate-90"
-                    />
-                    <StateIcon type={type} />
-                    {stateTypeLabels[type]}
-                    <span className="text-muted-foreground text-xs font-normal tabular-nums">
-                      {group.length}
-                    </span>
-                  </Button>
+                  />
                 </div>
                 {!isCollapsed &&
                   group.map((issue) => (
@@ -167,17 +160,23 @@ function MilestoneChip({
   onClick: () => void;
 }) {
   return (
-    <Button
+    <FilterChip
       role="radio"
       aria-checked={isActive}
-      variant={isActive ? "secondary" : "ghost"}
-      size="sm"
+      selected={isActive}
       forceMinSize={false}
       onClick={onClick}
     >
-      {icon && <DiamondIcon className="text-muted-foreground size-3.5" />}
+      {icon && (
+        <DiamondIcon
+          className={cn(
+            "text-muted-foreground dank:text-m3-primary size-3.5",
+            isActive && "dank:hidden",
+          )}
+        />
+      )}
       {label}
-    </Button>
+    </FilterChip>
   );
 }
 

@@ -19,8 +19,18 @@ const SERIES: { key: TKey; label: string; swatch: string; stroke: string }[] = [
     swatch: "bg-muted-foreground",
     stroke: "stroke-muted-foreground",
   },
-  { key: "started", label: "Started", swatch: "bg-chart-4", stroke: "stroke-chart-4" },
-  { key: "completed", label: "Completed", swatch: "bg-chart-1", stroke: "stroke-chart-1" },
+  {
+    key: "started",
+    label: "Started",
+    swatch: "bg-chart-4 dank:bg-m3-tertiary",
+    stroke: "stroke-chart-4 dank:stroke-m3-tertiary",
+  },
+  {
+    key: "completed",
+    label: "Completed",
+    swatch: "bg-chart-1 dank:bg-m3-primary",
+    stroke: "stroke-chart-1 dank:stroke-m3-primary",
+  },
 ];
 
 function cycleDays(cycle: Cycle): TDay[] {
@@ -89,11 +99,11 @@ export function BurnUpChart({ cycle }: { cycle: Cycle }) {
             y1={y(max * ratio)}
             y2={y(max * ratio)}
             vectorEffect="non-scaling-stroke"
-            className="stroke-border"
+            className="stroke-border dank:stroke-m3-outline-variant"
             strokeWidth={1}
           />
         ))}
-        <path d={completedArea} className="fill-chart-1/10" />
+        <path d={completedArea} className="fill-chart-1/10 dank:fill-m3-primary/10" />
         {SERIES.map((series) => (
           <path
             key={series.key}

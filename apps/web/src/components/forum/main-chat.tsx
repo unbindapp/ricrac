@@ -27,7 +27,7 @@ export function MainChatPanel({ discussion, openMessageId, onOpenMessage }: TPro
   const header = (
     <PanelBar>
       <MessagesSquareIcon className="text-muted-foreground size-4" />
-      <span className="text-sm font-medium">Main chat</span>
+      <span className="dank:type-title-medium text-sm font-medium">Main chat</span>
       <span className="text-muted-foreground text-xs tabular-nums">
         {count} {count === 1 ? "message" : "messages"}
       </span>

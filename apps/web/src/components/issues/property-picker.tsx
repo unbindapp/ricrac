@@ -158,7 +158,9 @@ function PickerGroups({
             {option.icon}
             <span className="min-w-0 flex-1 truncate">{option.label}</span>
             {option.description && (
-              <span className="text-muted-foreground truncate text-xs">{option.description}</span>
+              <span className="text-muted-foreground dank:type-label-small truncate text-xs">
+                {option.description}
+              </span>
             )}
             {option.shortcut && !isSelected && <CommandShortcut>{option.shortcut}</CommandShortcut>}
             {isSelected && (

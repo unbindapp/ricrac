@@ -281,7 +281,7 @@ export function IssueProperties({
                     size="sm"
                     forceMinSize={false}
                     aria-label="Add property"
-                    className="text-muted-foreground px-2"
+                    className="text-muted-foreground dank:w-8 dank:px-0 px-2"
                   >
                     <PlusIcon className="size-4" />
                   </Button>
@@ -307,7 +307,7 @@ export function IssueProperties({
   }
 
   return (
-    <div className="flex w-full flex-col gap-0.5">
+    <div data-slot="properties" className="flex w-full flex-col gap-0.5">
       {visible.map((field) => (
         <PropertyRow key={field.property} label={field.label}>
           {field.node}

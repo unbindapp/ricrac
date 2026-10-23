@@ -5,8 +5,9 @@ import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 
 import { cn } from "@/components/ui/utils";
 import { cva, VariantProps } from "class-variance-authority";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonVariantMapContext, type TButtonVariants } from "@/components/ui/button";
 import { returnFocusTarget } from "@/components/ui/focus-origin";
+import { useUiTheme } from "@/themes/ui-theme-provider";
 
 const createDialogHandle = DialogPrimitive.createHandle;
 export type TDialogHandle = DialogPrimitive.Handle<unknown>;
@@ -45,7 +46,7 @@ const dialogOverlayVariants = cva("bg-barrier/barrier fixed inset-0", {
     layer: dialogLayerVariants,
     animate: {
       default:
-        "data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 duration-200 data-closed:duration-200 data-open:duration-200",
+        "data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 duration-200 data-closed:duration-200 data-open:duration-200 dank:data-open:duration-(--spring-default-effects-duration) dank:data-closed:duration-(--spring-default-effects-duration) dank:ease-spring-default-effects",
       false: "",
     },
   },
@@ -96,12 +97,12 @@ export const dialogContentVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-background shadow-dialog shadow-shadow-color/shadow-opacity rounded-lg border p-5 pt-4 dank:bg-surface-container-high dank:rounded-xl dank:border-0 dank:p-6 dank:pt-5",
+          "bg-background shadow-dialog shadow-shadow-color/shadow-opacity rounded-lg border p-5 pt-4 dank:bg-m3-surface-container-high dank:text-m3-on-surface dank:rounded-xl dank:border-0 dank:p-6 dank:shadow-elevation-3 dank:[--tw-shadow-color:initial]",
         styleless: "",
       },
       animate: {
         default:
-          "duration-200 data-open:duration-200 data-closed:duration-200 data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-[95%] data-open:zoom-in-[95%] data-closed:slide-out-to-bottom-[5%] data-open:slide-in-from-bottom-[5%]",
+          "duration-200 data-open:duration-200 data-closed:duration-200 data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-[95%] data-open:zoom-in-[95%] data-closed:slide-out-to-bottom-[5%] data-open:slide-in-from-bottom-[5%] dank:data-open:duration-(--spring-default-spatial-duration) dank:data-open:ease-spring-default-spatial dank:data-closed:duration-(--spring-fast-effects-duration) dank:data-closed:ease-spring-fast-effects",
         false: "",
       },
     },
@@ -143,6 +144,7 @@ function DialogContent({
       >
         <DialogPrimitive.Popup
           data-slot="dialog-content"
+          data-focus-indicator="child"
           className={cn(dialogContentVariants({ variant, animate }), className)}
           finalFocus={returnFocusTarget}
           {...props}
@@ -150,7 +152,7 @@ function DialogContent({
           <div className={cn("flex w-full flex-col gap-4", classNameInnerWrapper)}>
             {children}
             {(headerActions || (!hideXButton && variant !== "styleless")) && (
-              <div className="dank:top-3.5 dank:right-4 absolute top-3 right-3 flex items-center gap-1">
+              <div className="dank:top-5 dank:right-4 absolute top-3 right-3 flex items-center gap-1">
                 {headerActions}
                 {!hideXButton && variant !== "styleless" && (
                   <DialogPrimitive.Close
@@ -179,20 +181,39 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex w-full flex-col items-start gap-2", className)}
+      className={cn("dank:gap-4 flex w-full flex-col items-start gap-2", className)}
       {...props}
     />
   );
 }
 
 function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
+  const isDank = useUiTheme().id === "dank";
   return (
-    <div
-      data-slot="dialog-footer"
-      className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}
-      {...props}
-    />
+    <ButtonVariantMapContext value={isDank ? asTextAction : null}>
+      <div
+        data-slot="dialog-footer"
+        className={cn(
+          "dank:mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
+          className,
+        )}
+        {...props}
+      />
+    </ButtonVariantMapContext>
   );
+}
+
+const textActionVariants: Partial<Record<string, TButtonVariants["variant"]>> = {
+  default: "ghost",
+  secondary: "ghost",
+  tonal: "ghost",
+  outline: "ghost",
+  destructive: "ghost-destructive",
+};
+
+/** Material dialogs act with text buttons. */
+function asTextAction(variant: NonNullable<TButtonVariants["variant"]>) {
+  return textActionVariants[variant] ?? variant;
 }
 
 function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props) {
@@ -200,7 +221,7 @@ function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props) {
     <DialogPrimitive.Title
       data-slot="dialog-title"
       className={cn(
-        "max-w-full pr-8 text-base leading-tight font-semibold wrap-break-word",
+        "dank:type-headline-small dank:text-m3-on-surface max-w-full pr-8 text-base leading-tight font-semibold wrap-break-word",
         className,
       )}
       {...props}
@@ -212,7 +233,10 @@ function DialogDescription({ className, ...props }: DialogPrimitive.Description.
   return (
     <DialogPrimitive.Description
       data-slot="dialog-description"
-      className={cn("text-muted-foreground max-w-full text-sm", className)}
+      className={cn(
+        "text-muted-foreground dank:type-body-medium dank:text-m3-on-surface-variant max-w-full text-sm",
+        className,
+      )}
       {...props}
     />
   );

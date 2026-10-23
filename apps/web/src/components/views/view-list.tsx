@@ -63,21 +63,27 @@ function ViewRow({ view }: { view: TView }) {
   return (
     <div
       role="listitem"
+      data-interactive
       className="has-hover:hover:bg-accent/50 flex h-11 w-full items-center gap-2 border-b px-3 text-sm last:border-b-0"
     >
-      <EntityIcon
-        icon={view.icon}
-        color={view.color}
-        fallback={isProjects ? BoxIcon : LayersIcon}
-      />
+      <span className="dank:*:size-6 flex shrink-0">
+        <EntityIcon
+          icon={view.icon}
+          color={view.color}
+          fallback={isProjects ? BoxIcon : LayersIcon}
+        />
+      </span>
       <Link
         to="/$workspace/view/$view_id"
         params={{ workspace: workspace.urlKey, view_id: viewParam(view) }}
-        className="flex min-w-0 flex-1 items-baseline gap-2 outline-hidden focus-visible:underline"
+        className="dank:flex-col dank:items-stretch dank:gap-0 dank:before:absolute dank:before:inset-0 flex min-w-0 flex-1 items-baseline gap-2 outline-hidden focus-visible:underline"
       >
-        <span className="truncate font-medium">{view.name}</span>
+        <span className="dank:font-normal truncate font-medium">{view.name}</span>
         {view.description && (
-          <span className="text-muted-foreground hidden truncate text-xs sm:inline">
+          <span
+            data-slot="list-supporting"
+            className="text-muted-foreground dank:block hidden truncate text-xs sm:inline"
+          >
             {view.description}
           </span>
         )}

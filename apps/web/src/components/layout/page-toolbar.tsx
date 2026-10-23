@@ -11,7 +11,7 @@ export function PageToolbar({ children, actions }: TProps) {
       <div className="scrollbar-hidden flex min-w-0 flex-1 items-center gap-2 overflow-x-auto">
         {children}
       </div>
-      {actions && <div className="flex shrink-0 items-center gap-1">{actions}</div>}
+      {actions && <div className="dank:gap-3 flex shrink-0 items-center gap-1">{actions}</div>}
     </div>
   );
 }

@@ -26,7 +26,7 @@ export function GithubErrorNotice({ title }: { title: string }) {
   return (
     <div
       role="alert"
-      className="border-warning/5-10 bg-warning/1-10 flex w-full items-start gap-2 rounded-lg border p-4"
+      className="border-warning/5-10 bg-warning/1-10 dank:rounded-md flex w-full items-start gap-2 rounded-lg border p-4"
     >
       <TriangleAlertIcon className="text-warning mt-0.5 size-4 shrink-0" />
       <div className="flex min-w-0 flex-1 flex-col gap-1">

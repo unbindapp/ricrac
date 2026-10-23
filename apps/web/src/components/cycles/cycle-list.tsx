@@ -94,11 +94,11 @@ function CurrentCycleCard({ cycle }: { cycle: Cycle }) {
       <SectionTitle title="Current" />
       <Card className="flex w-full flex-col gap-4 p-4">
         <div className="flex w-full flex-wrap items-center gap-2">
-          <CycleIcon progress={cycle.progress} status="active" className="size-4" />
+          <CycleIcon progress={cycle.progress} status="active" className="dank:size-6 size-4" />
           <Link
             to="/$workspace/cycle/$number"
             params={{ workspace: workspace.urlKey, number: String(cycle.number) }}
-            className="truncate text-sm font-medium hover:underline"
+            className="dank:type-title-medium truncate text-sm font-medium hover:underline"
           >
             {cycleName(cycle)}
           </Link>
@@ -139,13 +139,13 @@ export function CycleProgress({ cycle }: { cycle: Cycle }) {
           label="Started"
           value={String(scope.started)}
           detail={estimated ? pointsText(scope.startedEstimate) : null}
-          swatch="bg-chart-4"
+          swatch="bg-chart-4 dank:bg-m3-tertiary"
         />
         <Stat
           label="Completed"
           value={String(scope.completed)}
           detail={estimated ? pointsText(scope.completedEstimate) : null}
-          swatch="bg-chart-1"
+          swatch="bg-chart-1 dank:bg-m3-primary"
         />
         <Stat label="Not started" value={String(scope.unstarted)} />
       </dl>
@@ -211,10 +211,10 @@ function CycleRow({ cycle }: { cycle: Cycle }) {
       role="listitem"
       className="has-hover:hover:bg-accent focus-visible:bg-accent flex h-9 w-full items-center gap-2 border-b px-3 text-sm outline-hidden last:border-b-0"
     >
-      <CycleIcon progress={cycle.progress} status={status} className="size-4" />
+      <CycleIcon progress={cycle.progress} status={status} className="dank:size-5 size-4" />
       <span className="min-w-0 truncate">{cycleName(cycle)}</span>
       {cycle.archivedAt && <Badge variant="muted">Archived</Badge>}
-      <span className="text-muted-foreground min-w-0 flex-1 truncate text-xs">
+      <span className="text-muted-foreground dank:text-sm min-w-0 flex-1 truncate text-xs">
         {cycleDateRange(cycle)}
       </span>
       {hasIssues && (

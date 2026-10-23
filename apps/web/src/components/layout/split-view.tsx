@@ -10,7 +10,7 @@ type TProps = {
 /** Two panes side by side, half the width each, apart on the shell; the aside only on wide screens. */
 export function SplitView({ main, aside }: TProps) {
   return (
-    <div data-slot="split-view" className="flex min-h-0 w-full flex-1 gap-2">
+    <div data-slot="split-view" className="dank:gap-6 flex min-h-0 w-full flex-1 gap-2">
       <SplitPane>{main}</SplitPane>
       {aside && <SplitPane className="hidden lg:flex">{aside}</SplitPane>}
     </div>

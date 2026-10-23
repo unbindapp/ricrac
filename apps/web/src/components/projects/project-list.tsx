@@ -112,8 +112,13 @@ export function ProjectList({
                     : undefined
                 }
               />
-              {!isCollapsed &&
-                group.projects.map((project) => <ProjectRow key={project.id} project={project} />)}
+              {!isCollapsed && (
+                <div role="presentation" data-slot="list-group" className="contents">
+                  {group.projects.map((project) => (
+                    <ProjectRow key={project.id} project={project} />
+                  ))}
+                </div>
+              )}
             </div>
           );
         })}

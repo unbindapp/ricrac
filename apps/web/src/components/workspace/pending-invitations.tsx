@@ -68,7 +68,7 @@ function InvitationRow({
         </>
       }
     >
-      <MailIcon className="text-muted-foreground size-4" />
+      <MailIcon className="text-muted-foreground dank:size-5 size-4" />
       <ListRowText
         primary={invitation.workspaceName}
         secondary={details.filter(Boolean).join(" · ")}

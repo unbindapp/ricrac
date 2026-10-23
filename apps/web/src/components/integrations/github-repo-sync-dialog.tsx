@@ -211,7 +211,7 @@ function RepositoryField({
   }
   if (isEmpty) {
     return (
-      <p className="bg-muted text-muted-foreground rounded-lg p-4 text-sm">
+      <p className="bg-muted text-muted-foreground dank:rounded-md rounded-lg p-4 text-sm">
         Every repository the app can reach already syncs, or has issues turned off. Give the app
         more repositories on GitHub with Manage.
       </p>

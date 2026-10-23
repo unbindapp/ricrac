@@ -19,13 +19,13 @@ export function LinkBubble({ editor, onEdit }: { editor: Editor; onEdit: () => v
       shouldShow={({ editor: current, state }) =>
         current.isEditable && state.selection.empty && current.isActive("link")
       }
-      className="bg-popover text-popover-foreground z-50 flex max-w-sm items-center gap-0.5 rounded-md border p-0.5 shadow-md"
+      className="bg-popover text-popover-foreground dank:border-0 dank:p-1 dank:shadow-elevation-2 z-50 flex max-w-sm items-center gap-0.5 rounded-md border p-0.5 shadow-md"
     >
       <a
         href={href}
         target="_blank"
         rel="noreferrer noopener"
-        className="text-muted-foreground min-w-0 truncate px-2 text-xs"
+        className="text-muted-foreground dank:type-body-medium dank:px-3 min-w-0 truncate px-2 text-xs"
       >
         {href}
       </a>

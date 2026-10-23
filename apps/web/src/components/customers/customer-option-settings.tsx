@@ -210,7 +210,7 @@ function OptionRow({ kind, option }: { kind: TKind; option: TOption }) {
           {option.description}
         </span>
       )}
-      <span className="text-muted-foreground ml-auto shrink-0 text-xs">
+      <span className="text-muted-foreground dank:type-label-small ml-auto shrink-0 text-xs">
         {count} {count === 1 ? "customer" : "customers"}
       </span>
       <div className="flex shrink-0 items-center gap-2">

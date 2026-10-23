@@ -108,6 +108,7 @@ export function AttachMenu({ issue, label = "Attach" }: { issue: IssueDetail; la
             variant="ghost"
             size="sm"
             isPending={isUploading}
+            data-m3-chip="assist"
             className="text-muted-foreground font-normal"
           >
             <PaperclipIcon className="size-4" />
@@ -159,7 +160,7 @@ export function IssueAttachments({ issue }: { issue: IssueDetail }) {
   return (
     <section aria-label="Attachments" className="flex w-full flex-col gap-2">
       <div className="flex min-h-7 items-center gap-2">
-        <h2 className="text-sm font-semibold">Attachments</h2>
+        <h2 className="dank:type-title-medium text-sm font-semibold">Attachments</h2>
         <span className="text-muted-foreground text-xs">{issue.attachments.length}</span>
         <span className="flex-1" />
         {canEdit && <AttachMenu issue={issue} label="Add" />}
@@ -215,7 +216,7 @@ function AttachmentRow({ attachment, canEdit }: { attachment: IssueAttachment; c
               variant="ghost"
               size="icon"
               forceMinSize={false}
-              className="size-6"
+              className="dank:size-8 dank:[&>svg]:size-5 size-6"
               aria-label={isExpanded ? "Hide summary" : "Show summary"}
               aria-expanded={isExpanded}
               onClick={() => setIsExpanded(!isExpanded)}
@@ -232,7 +233,7 @@ function AttachmentRow({ attachment, canEdit }: { attachment: IssueAttachment; c
                   variant="ghost"
                   size="icon"
                   forceMinSize={false}
-                  className="size-6"
+                  className="dank:size-8 dank:[&>svg]:size-5 size-6"
                   aria-label={`Remove ${attachment.title}`}
                   isPending={isPending}
                 >

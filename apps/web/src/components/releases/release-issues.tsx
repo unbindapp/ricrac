@@ -42,7 +42,11 @@ export function ReleaseIssues({ release }: { release: ReleaseDetail }) {
           action={canEdit && <AddIssuePicker release={release} variant="outline" />}
         />
       ) : (
-        <div role="list" className="flex w-full flex-col overflow-hidden rounded-lg border">
+        <div
+          role="list"
+          data-slot="list"
+          className="flex w-full flex-col overflow-hidden rounded-lg border"
+        >
           {issues.map((issue) => (
             <ReleaseIssueRow key={issue.id} release={release} issue={issue} />
           ))}
@@ -58,6 +62,7 @@ function ReleaseIssueRow({ release, issue }: { release: ReleaseDetail; issue: Re
   return (
     <div
       role="listitem"
+      data-interactive
       className="group/row has-hover:hover:bg-accent flex h-9 items-center gap-2 border-b px-3 text-sm last:border-b-0"
     >
       <StateIcon type={issue.state.type} color={issue.state.color} name={issue.state.name} />
