@@ -47,9 +47,9 @@ export const dankButtonVariants: typeof buttonVariants = cva(
       },
       size: {
         default:
-          "h-10 gap-2 rounded-[1.25rem] px-4 active:rounded-sm data-popup-open:rounded-sm [&>svg]:size-5",
-        sm: "h-8 gap-2 rounded-[1rem] px-3 active:rounded-sm data-popup-open:rounded-sm [&>svg]:size-5",
-        icon: "flex size-10 shrink-0 items-center justify-center rounded-[1.25rem] active:rounded-sm data-popup-open:rounded-sm [&>svg]:size-6",
+          "h-10 gap-2 rounded-[1.25rem] px-4 active:rounded-sm popup-open:rounded-sm [&>svg]:size-5",
+        sm: "h-8 gap-2 rounded-[1rem] px-3 active:rounded-sm popup-open:rounded-sm [&>svg]:size-5",
+        icon: "flex size-10 shrink-0 items-center justify-center rounded-[1.25rem] active:rounded-sm popup-open:rounded-sm [&>svg]:size-6",
       },
       loadingState: {
         default: "",

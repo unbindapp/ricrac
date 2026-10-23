@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouter, useSearch } from "@tanstack/react-router";
-import { Suspense, useEffect, useState } from "react";
+import { type RefObject, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { ArrowLeftIcon } from "@/components/icons";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
@@ -150,10 +150,14 @@ function GroupSwitcher({
   groups: TSettingsTabGroup[];
   current: TSettingsTabGroup | undefined;
 }) {
+  const navRef = useRef<HTMLElement>(null);
+  const contentRefs = useRef(new Map<string, HTMLElement>());
+  const indicator = useIndicatorBox(navRef, contentRefs, current?.title);
   return (
     <nav
+      ref={navRef}
       aria-label="Settings sections"
-      className="grid h-12 shrink-0 auto-cols-fr grid-flow-col shadow-[inset_0_-1px_0_var(--m3-outline-variant)]"
+      className="relative grid h-12 shrink-0 auto-cols-fr grid-flow-col shadow-[inset_0_-1px_0_var(--m3-outline-variant)]"
     >
       {groups.map((group) => (
         <Link
@@ -161,16 +165,57 @@ function GroupSwitcher({
           {...group.tabs[0]?.link}
           aria-current={group === current || undefined}
           data-current={group === current || undefined}
-          className="group/group-tab state-layer text-m3-on-surface-variant type-title-small has-hover:hover:text-m3-on-surface data-current:text-m3-primary has-hover:hover:data-current:text-m3-primary relative flex items-center justify-center px-4"
+          className="state-layer text-m3-on-surface-variant type-title-small has-hover:hover:text-m3-on-surface data-current:text-m3-primary has-hover:hover:data-current:text-m3-primary relative flex items-center justify-center px-4"
         >
-          <span className="after:bg-m3-primary relative flex items-center gap-2 after:absolute after:inset-x-0 after:-bottom-3 after:h-[3px] after:rounded-[3px] after:opacity-0 group-data-current/group-tab:after:opacity-100">
+          <span
+            ref={(node) => {
+              if (!node) return;
+              contentRefs.current.set(group.title, node);
+              return () => void contentRefs.current.delete(group.title);
+            }}
+            className="flex items-center gap-2"
+          >
             <group.icon className="size-6" />
             {group.title}
           </span>
         </Link>
       ))}
+      {indicator && (
+        <span
+          aria-hidden
+          style={indicator}
+          className="bg-m3-primary ease-spring-default-spatial pointer-events-none absolute bottom-0 h-[3px] rounded-t-[3px] transition-[left,width] duration-(--spring-default-spatial-duration) motion-reduce:transition-none"
+        />
+      )}
     </nav>
   );
+}
+
+const MIN_INDICATOR_WIDTH = 24;
+
+function useIndicatorBox(
+  navRef: RefObject<HTMLElement | null>,
+  contentRefs: RefObject<Map<string, HTMLElement>>,
+  activeKey: string | undefined,
+) {
+  const [box, setBox] = useState<{ left: number; width: number }>();
+  useLayoutEffect(() => {
+    const nav = navRef.current;
+    const content = activeKey ? contentRefs.current.get(activeKey) : undefined;
+    if (!nav || !content) return;
+    const measure = () => {
+      const navRect = nav.getBoundingClientRect();
+      const contentRect = content.getBoundingClientRect();
+      const width = Math.max(contentRect.width, MIN_INDICATOR_WIDTH);
+      const left = contentRect.left - navRect.left - (width - contentRect.width) / 2;
+      setBox({ left, width });
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(nav);
+    return () => observer.disconnect();
+  }, [navRef, contentRefs, activeKey]);
+  return box;
 }
 
 type TTabLinkProps = {

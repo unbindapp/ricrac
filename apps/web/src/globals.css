@@ -10,6 +10,8 @@
 
 @custom-variant dank (&:where([data-ui-theme="dank"], [data-ui-theme="dank"] *));
 
+@custom-variant popup-open (&[data-popup-open][aria-expanded="true"]);
+
 @custom-variant has-hover {
   @media (hover: hover) {
     @slot;

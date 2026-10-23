@@ -40,7 +40,7 @@ function TabsList({
         {variant === "tabs" && (
           <TabsPrimitive.Indicator
             data-slot="tabs-indicator"
-            className="bg-m3-primary dank:block ease-spring-default-spatial absolute bottom-0 left-[calc(var(--active-tab-left)+1rem)] hidden h-[3px] w-[calc(var(--active-tab-width)-2rem)] rounded-[3px] transition-[left,width] duration-(--spring-default-spatial-duration)"
+            className="bg-m3-primary dank:block ease-spring-default-spatial absolute bottom-0 left-[calc(var(--active-tab-left)+1rem)] hidden h-[3px] w-[calc(var(--active-tab-width)-2rem)] rounded-t-[3px] transition-[left,width] duration-(--spring-default-spatial-duration)"
           />
         )}
       </TabsPrimitive.List>

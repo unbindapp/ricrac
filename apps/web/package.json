@@ -60,7 +60,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.16.0",
-    "@material-symbols/svg-400": "^0.48.1",
     "@tailwindcss/vite": "^4.3.1",
     "@tanstack/router-plugin": "^1.168.18",
     "@types/node": "^24",
