@@ -34,7 +34,7 @@ function Slider<Value extends number | readonly number[]>({
     ? value
     : Array.isArray(defaultValue)
       ? defaultValue
-      : typeof (value ?? defaultValue) === "number"
+      : isDank && typeof (value ?? defaultValue) === "number"
         ? [value ?? defaultValue]
         : [min, max];
 
