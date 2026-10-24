@@ -14,5 +14,7 @@ export const defaultTheme: TUiTheme = {
   createButton: "header",
   separatesBars: false,
   expandsReplies: false,
+  chatBubbles: false,
+  threadsInChat: false,
   defaultAccentHue: DEFAULT_ACCENT_HUE,
 };

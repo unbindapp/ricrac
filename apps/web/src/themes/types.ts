@@ -29,6 +29,10 @@ export type TUiTheme = {
   separatesBars: boolean;
   /** Replies show under the message they answer instead of behind a count. */
   expandsReplies: boolean;
+  /** Messages show in bubbles, yours on the right and everyone else's on the left. */
+  chatBubbles: boolean;
+  /** Threads start from the chat's composer, show in its timeline and switch from its header, instead of as branches beside the topic. */
+  threadsInChat: boolean;
   /** The accent hue until someone picks their own; the theme's CSS sets the same --accent-hue. */
   defaultAccentHue: number;
   /** The theme's own button styles, with the same variants and sizes. */

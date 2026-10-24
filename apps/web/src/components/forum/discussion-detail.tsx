@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 
 import type { DiscussionDetail as TDiscussionDetail } from "@/api/ops.gen";
 import { DiscussionTagBadges, DiscussionTagsPicker } from "@/components/forum/discussion-tags";
@@ -30,6 +30,7 @@ import { CopyLinkAction, HeaderAction, HeaderActions } from "@/components/shared
 import { InlineText } from "@/components/shared/inline-text";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { toast } from "@/components/ui/toast";
@@ -41,11 +42,14 @@ import {
   useSaveDiscussionMutation,
 } from "@/lib/queries/discussions";
 import { meQuery } from "@/lib/queries/me";
+import { useUiTheme } from "@/themes/ui-theme-provider";
 
 type TProps = {
   discussion: TDiscussionDetail;
-  /** The main chat follows the topic on narrow screens and sits beside it on wide ones. */
-  chat: "inline" | "aside";
+  /** The main chat follows the topic on narrow screens; on wide ones it sits beside it or is hidden. */
+  chat: "inline" | "aside" | "hidden";
+  onToggleChat: () => void;
+  threadSwitcher?: ReactNode;
   openThreadId?: string;
   openMessageId?: string;
   onOpenMessage: (messageId: string) => void;
@@ -54,11 +58,14 @@ type TProps = {
 export function DiscussionDetail({
   discussion,
   chat,
+  onToggleChat,
+  threadSwitcher,
   openThreadId,
   openMessageId,
   onOpenMessage,
 }: TProps) {
   const { workspace, canEdit } = useWorkspace();
+  const { threadsInChat } = useUiTheme();
   const canRewrite = useCanRewrite(discussion.creator);
   const { data: me } = useQuery(meQuery);
   const { mutate: save, mutateAsync: saveAsync } = useSaveDiscussionMutation(workspace.id);
@@ -99,6 +106,7 @@ export function DiscussionDetail({
         <Breadcrumb items={breadcrumb} />
       </div>
       <HeaderActions>
+        {chat !== "inline" && <ChatToggle isShown={chat === "aside"} onToggle={onToggleChat} />}
         <CopyLinkAction url={discussion.url} />
         {canEdit && (
           <>
@@ -187,11 +195,13 @@ export function DiscussionDetail({
           )}
         </div>
       </div>
-      <ThreadBranches
-        discussion={discussion}
-        openThreadId={openThreadId}
-        isMainChatOpen={!openThreadId && !openMessageId}
-      />
+      {!threadsInChat && (
+        <ThreadBranches
+          discussion={discussion}
+          openThreadId={openThreadId}
+          isMainChatOpen={!openThreadId && !openMessageId}
+        />
+      )}
       <AutosaveMarkdown
         label="Discussion body"
         placeholder="Write it up…"
@@ -217,7 +227,7 @@ export function DiscussionDetail({
     </>
   );
 
-  if (chat === "aside") {
+  if (chat !== "inline") {
     return (
       <PageContainer width="narrow">
         <div className="flex w-full flex-col gap-6">
@@ -235,12 +245,28 @@ export function DiscussionDetail({
       composer={canEdit && <MainChatComposer discussion={discussion} />}
     >
       {topic}
-      <SectionTitle title="Main chat" />
+      <SectionTitle title="Main chat" actions={threadSwitcher} />
       <MainChatMessages
         discussion={discussion}
         openMessageId={openMessageId}
         onOpenMessage={onOpenMessage}
       />
     </ChatLayout>
+  );
+}
+
+function ChatToggle({ isShown, onToggle }: { isShown: boolean; onToggle: () => void }) {
+  return (
+    <SimpleTooltip content={isShown ? "Hide chat" : "Show chat"}>
+      <Button
+        variant={isShown ? "secondary" : "ghost"}
+        size="icon"
+        aria-label="Chat"
+        aria-pressed={isShown}
+        onClick={onToggle}
+      >
+        <MessagesSquareIcon className="size-4" />
+      </Button>
+    </SimpleTooltip>
   );
 }

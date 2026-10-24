@@ -1,15 +1,18 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
-import type { Comment, CommentThread, UserRef } from "@/api/ops.gen";
-import { ChatDayDivider, ChatMessage } from "@/components/forum/chat-message";
-import { MessageSquareReplyIcon, MessagesSquareIcon } from "@/components/icons";
+import type { Comment, CommentThread, DiscussionThread, UserRef } from "@/api/ops.gen";
+import { ChatDayDivider, ChatMessage, MessageTime } from "@/components/forum/chat-message";
+import { threadKindOf, threadKinds } from "@/components/forum/thread-kinds";
+import { MessageSquareReplyIcon, MessagesSquareIcon, SplitIcon } from "@/components/icons";
+import { userName } from "@/components/issues/grouping";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
-import { Button } from "@/components/ui/button";
+import { Button, LinkButton } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { chatRows } from "@/lib/helpers/chat";
+import { entitySlug } from "@/lib/helpers/entity-slug";
 import { commentsQuery, type TCommentTarget } from "@/lib/queries/comments";
 import { useUiTheme } from "@/themes/ui-theme-provider";
 
@@ -32,15 +35,23 @@ type TProps = {
   /** Replies open in a thread beside the chat; without it they follow the message they answer. */
   threads?: { openId?: string; onOpen: (messageId: string) => void };
   onNewThread?: (message: Comment) => void;
+  /** Discussion threads to note in the timeline when they were started. */
+  startedThreads?: DiscussionThread[];
   empty: { title: string; description: string };
 };
 
-export function ChatMessages({ target, threads: threadView, onNewThread, empty }: TProps) {
+export function ChatMessages({
+  target,
+  threads: threadView,
+  onNewThread,
+  startedThreads = [],
+  empty,
+}: TProps) {
   const { expandsReplies } = useUiTheme();
   const { threads, isPending, error, refetch } = useChatMessages(target);
   if (isPending) return <ChatSkeleton />;
   if (error) return <ErrorCard message={error.message} onRetry={() => void refetch()} />;
-  if (threads.length === 0) {
+  if (threads.length === 0 && startedThreads.length === 0) {
     return (
       <EmptyState icon={MessagesSquareIcon} title={empty.title} description={empty.description} />
     );
@@ -50,36 +61,47 @@ export function ChatMessages({ target, threads: threadView, onNewThread, empty }
   const byId = new Map(threads.map((thread) => [thread.id, thread]));
   return (
     <ol aria-label="Messages" className="flex flex-col">
-      {chatRows(messages).map((row) => (
-        <li key={row.key} className="flex flex-col">
-          {row.kind === "day" ? (
-            <ChatDayDivider date={row.date} />
-          ) : (
-            <>
-              <ChatMessage
-                message={row.message}
-                isContinuation={row.isContinuation}
-                replyTo={replyTo.has(row.message.id) ? replyTo.get(row.message.id) : undefined}
-                thread={
-                  threadView && {
-                    replies: byId.get(row.message.id)?.replies ?? [],
-                    isOpen: threadView.openId === row.message.id,
-                    onOpen: () => threadView.onOpen(row.message.id),
-                  }
+      {chatRows(withThreadStarts(messages, startedThreads)).map((row) => {
+        if (row.kind === "day") {
+          return (
+            <li key={row.key} className="flex flex-col">
+              <ChatDayDivider date={row.date} />
+            </li>
+          );
+        }
+        const { message } = row;
+        if ("thread" in message) {
+          return (
+            <li key={row.key} className="flex flex-col">
+              <ThreadStarted thread={message.thread} />
+            </li>
+          );
+        }
+        return (
+          <li key={row.key} className="flex flex-col">
+            <ChatMessage
+              message={message}
+              isContinuation={row.isContinuation}
+              replyTo={replyTo.has(message.id) ? replyTo.get(message.id) : undefined}
+              thread={
+                threadView && {
+                  replies: byId.get(message.id)?.replies ?? [],
+                  isOpen: threadView.openId === message.id,
+                  onOpen: () => threadView.onOpen(message.id),
                 }
-                onNewThread={onNewThread && (() => onNewThread(row.message))}
+              }
+              onNewThread={onNewThread && (() => onNewThread(message))}
+            />
+            {threadView && expandsReplies && (
+              <MessageReplies
+                replies={byId.get(message.id)?.replies ?? []}
+                since={message.createdAt}
+                onReply={() => threadView.onOpen(message.id)}
               />
-              {threadView && expandsReplies && (
-                <MessageReplies
-                  replies={byId.get(row.message.id)?.replies ?? []}
-                  since={row.message.createdAt}
-                  onReply={() => threadView.onOpen(row.message.id)}
-                />
-              )}
-            </>
-          )}
-        </li>
-      ))}
+            )}
+          </li>
+        );
+      })}
     </ol>
   );
 }
@@ -116,6 +138,59 @@ export function ReplyList({ replies, since }: { replies: Comment[]; since: strin
         </li>
       ))}
     </ol>
+  );
+}
+
+type TThreadStart = { id: string; createdAt: string; user: null; thread: DiscussionThread };
+
+/** Messages with a note where each thread started; notes have no user, so they break up groups. */
+function withThreadStarts<T extends Comment>(
+  messages: T[],
+  threads: DiscussionThread[],
+): (T | TThreadStart)[] {
+  if (threads.length === 0) return messages;
+  const starts: TThreadStart[] = threads.map((thread) => ({
+    id: `thread-${thread.id}`,
+    createdAt: thread.createdAt,
+    user: null,
+    thread,
+  }));
+  return [...messages, ...starts].sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+  );
+}
+
+function ThreadStarted({ thread }: { thread: DiscussionThread }) {
+  const { workspace } = useWorkspace();
+  const { label: kind, icon: KindIcon } = threadKinds[threadKindOf(thread.kind)];
+  const count = thread.commentCount;
+  return (
+    <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-2 gap-y-1 py-3 text-xs">
+      <SplitIcon className="size-3.5" />
+      <span>
+        <span className="text-foreground font-medium">
+          {thread.creator ? userName(thread.creator) : "A deleted user"}
+        </span>{" "}
+        started a thread
+      </span>
+      <LinkButton
+        to="/$workspace/discussion/$slug"
+        params={{ workspace: workspace.urlKey, slug: entitySlug(thread.discussion) }}
+        search={{ thread: thread.id }}
+        replace
+        variant="outline"
+        size="sm"
+        data-m3-chip="assist"
+        className="max-w-full font-normal"
+      >
+        <KindIcon aria-label={kind} role="img" className="size-4" />
+        <span className="text-foreground truncate font-medium">{thread.title}</span>
+        <span className="text-muted-foreground font-normal tabular-nums">
+          {count} {count === 1 ? "message" : "messages"}
+        </span>
+      </LinkButton>
+      <MessageTime value={thread.createdAt} />
+    </div>
   );
 }
 

@@ -15,10 +15,10 @@ import {
   ListIndentDecreaseIcon,
   MenuIcon,
   MessagesSquareIcon,
+  PencilIcon,
   RefreshCwIcon,
   RocketIcon,
   SettingsIcon,
-  SquarePenIcon,
   TargetIcon,
   type LucideIcon,
   TriangleIcon,
@@ -145,13 +145,13 @@ export function NavigationRail({
                 variant="tonal"
                 aria-label="New issue"
                 forceMinSize={false}
-                className="bg-m3-primary-container text-m3-on-primary-container shadow-elevation-1 has-hover:hover:shadow-elevation-2 absolute inset-y-0 left-0 block h-full w-(--rail-fab-width) overflow-hidden rounded-lg p-0 active:rounded-lg"
+                className="bg-m3-primary-container text-m3-on-primary-container shadow-elevation-1 has-hover:hover:shadow-elevation-2 absolute inset-y-0 left-0 block h-full w-(--rail-fab-width) overflow-hidden rounded-lg p-0 active:rounded-lg [&>svg]:size-6"
                 onClick={() => {
                   onNavigate?.();
                   openNewIssue();
                 }}
               >
-                <SquarePenIcon className="absolute top-4 left-4 size-6" />
+                <PencilIcon className="absolute top-4 left-4" />
                 <span className="type-title-medium ease-spring-fast-effects absolute top-4 left-12 whitespace-nowrap opacity-0 transition-opacity duration-(--spring-fast-effects-duration) group-data-expanded/rail-root:opacity-100">
                   New issue
                 </span>
