@@ -21,6 +21,8 @@ export const dankTheme: TUiTheme = {
   createButton: "fab",
   separatesBars: true,
   expandsReplies: true,
+  chatBubbles: true,
+  threadsInChat: true,
   defaultAccentHue: BASELINE_HUE,
   buttonVariants: dankButtonVariants,
   paintColors: paintPalette,

@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 import type { Discussion } from "@/api/ops.gen";
 import { DiscussionTagBadges } from "@/components/forum/discussion-tags";
@@ -64,6 +64,117 @@ export function DiscussionGridSkeleton() {
 }
 
 export function DiscussionCard({ discussion }: { discussion: Discussion }) {
+  const { workspace } = useWorkspace();
+  return (
+    <DiscussionContextMenu
+      discussion={discussion}
+      trigger={
+        <Link
+          role="listitem"
+          to="/$workspace/discussion/$slug"
+          params={{ workspace: workspace.urlKey, slug: entitySlug(discussion) }}
+          className="bg-card has-hover:hover:bg-card-hover has-hover:hover:border-muted-most-foreground data-popup-open:border-muted-most-foreground focus-visible:ring-ring dank:relative dank:state-layer dank:rounded-md dank:has-hover:hover:bg-card dank:has-hover:hover:border-border dank:data-popup-open:border-border dank:has-hover:hover:shadow-elevation-1 dank:focus-visible:ring-0 dank:transition-shadow flex min-w-0 flex-col overflow-hidden rounded-lg border outline-hidden transition-colors focus-visible:ring-1"
+        />
+      }
+    >
+      <DiscussionPreview body={discussion.body ?? ""} thumbnailUrl={discussion.thumbnailUrl} />
+      <div className="flex flex-1 flex-col gap-3 p-4">
+        <DiscussionTags discussion={discussion} />
+        <h2 className="dank:type-title-medium line-clamp-2 text-base leading-snug font-semibold">
+          {discussion.title}
+        </h2>
+        <div className="text-muted-foreground mt-auto flex min-w-0 items-center gap-3 text-xs">
+          {discussion.creator && (
+            <span className="flex min-w-0 items-center gap-1.5">
+              <PersonAvatar user={discussion.creator} size="xs" />
+              <span className="text-foreground truncate font-medium">
+                {discussion.creator.name}
+              </span>
+            </span>
+          )}
+          <RelativeTime value={discussion.lastActivityAt} />
+          <DiscussionCounts discussion={discussion} />
+        </div>
+      </div>
+    </DiscussionContextMenu>
+  );
+}
+
+export function DiscussionRow({ discussion }: { discussion: Discussion }) {
+  const { workspace } = useWorkspace();
+  const isClosed = Boolean(discussion.closedAt);
+  const StatusIcon = discussion.pinnedAt ? PinIcon : isClosed ? LockIcon : MessagesSquareIcon;
+  return (
+    <DiscussionContextMenu
+      discussion={discussion}
+      trigger={
+        <Link
+          role="listitem"
+          to="/$workspace/discussion/$slug"
+          params={{ workspace: workspace.urlKey, slug: entitySlug(discussion) }}
+          data-closed={isClosed || undefined}
+          className="has-hover:hover:bg-muted focus-visible:bg-muted data-popup-open:bg-muted data-closed:text-muted-foreground flex h-9 w-full items-center gap-3 border-b px-3 text-sm outline-hidden group-data-flush/list:h-11 group-data-flush/list:px-6 last:border-b-0"
+        />
+      }
+    >
+      <StatusIcon className="text-muted-foreground dank:size-6 size-4 shrink-0" />
+      <span className="dank:font-normal min-w-0 flex-1 truncate font-medium">
+        {discussion.title}
+      </span>
+      <span className="hidden shrink-0 items-center gap-1.5 md:flex">
+        <DiscussionTagBadges tags={discussion.tags} max={MAX_ROW_TAGS} />
+      </span>
+      <span className="text-muted-foreground dank:type-label-small flex shrink-0 text-xs">
+        <DiscussionCounts discussion={discussion} />
+      </span>
+      <span className="flex w-6 shrink-0 justify-center">
+        {discussion.creator && (
+          <SimpleTooltip content={`Started by ${discussion.creator.name}`}>
+            <span className="flex">
+              <PersonAvatar user={discussion.creator} size="xs" />
+            </span>
+          </SimpleTooltip>
+        )}
+      </span>
+      <span className="text-muted-foreground dank:type-label-small w-20 shrink-0 text-right text-xs">
+        <RelativeTime value={discussion.lastActivityAt} />
+      </span>
+    </DiscussionContextMenu>
+  );
+}
+
+function DiscussionCounts({ discussion }: { discussion: Discussion }) {
+  return (
+    <span className="ml-auto flex shrink-0 items-center gap-3 tabular-nums">
+      <SimpleTooltip
+        content={`${discussion.openThreadCount} open of ${discussion.threadCount} thread${discussion.threadCount === 1 ? "" : "s"}`}
+      >
+        <span className="flex items-center gap-1.5">
+          <SplitIcon className="size-3.5" />
+          {discussion.openThreadCount}/{discussion.threadCount}
+        </span>
+      </SimpleTooltip>
+      <SimpleTooltip
+        content={`${discussion.commentCount} comment${discussion.commentCount === 1 ? "" : "s"}`}
+      >
+        <span className="flex items-center gap-1.5">
+          <MessageSquareIcon className="size-3.5" />
+          {discussion.commentCount}
+        </span>
+      </SimpleTooltip>
+    </span>
+  );
+}
+
+function DiscussionContextMenu({
+  discussion,
+  trigger,
+  children,
+}: {
+  discussion: Discussion;
+  trigger: ReactElement;
+  children: ReactNode;
+}) {
   const { workspace, canEdit } = useWorkspace();
   const { copyToClipboard } = useCopyToClipboard();
   const { mutate: save } = useSaveDiscussionMutation(workspace.id);
@@ -71,53 +182,7 @@ export function DiscussionCard({ discussion }: { discussion: Discussion }) {
   const isClosed = Boolean(discussion.closedAt);
   return (
     <ContextMenu>
-      <ContextMenuTrigger
-        render={
-          <Link
-            role="listitem"
-            to="/$workspace/discussion/$slug"
-            params={{ workspace: workspace.urlKey, slug: entitySlug(discussion) }}
-            className="bg-card has-hover:hover:bg-card-hover has-hover:hover:border-muted-most-foreground data-popup-open:border-muted-most-foreground focus-visible:ring-ring dank:relative dank:state-layer dank:rounded-md dank:has-hover:hover:bg-card dank:has-hover:hover:border-border dank:data-popup-open:border-border dank:has-hover:hover:shadow-elevation-1 dank:focus-visible:ring-0 dank:transition-shadow flex min-w-0 flex-col overflow-hidden rounded-lg border outline-hidden transition-colors focus-visible:ring-1"
-          />
-        }
-      >
-        <DiscussionPreview body={discussion.body ?? ""} thumbnailUrl={discussion.thumbnailUrl} />
-        <div className="flex flex-1 flex-col gap-3 p-4">
-          <DiscussionTags discussion={discussion} />
-          <h2 className="dank:type-title-medium line-clamp-2 text-base leading-snug font-semibold">
-            {discussion.title}
-          </h2>
-          <div className="text-muted-foreground mt-auto flex min-w-0 items-center gap-3 text-xs">
-            {discussion.creator && (
-              <span className="flex min-w-0 items-center gap-1.5">
-                <PersonAvatar user={discussion.creator} size="xs" />
-                <span className="text-foreground truncate font-medium">
-                  {discussion.creator.name}
-                </span>
-              </span>
-            )}
-            <RelativeTime value={discussion.lastActivityAt} />
-            <span className="ml-auto flex shrink-0 items-center gap-3 tabular-nums">
-              <SimpleTooltip
-                content={`${discussion.openThreadCount} open of ${discussion.threadCount} thread${discussion.threadCount === 1 ? "" : "s"}`}
-              >
-                <span className="flex items-center gap-1.5">
-                  <SplitIcon className="size-3.5" />
-                  {discussion.openThreadCount}/{discussion.threadCount}
-                </span>
-              </SimpleTooltip>
-              <SimpleTooltip
-                content={`${discussion.commentCount} comment${discussion.commentCount === 1 ? "" : "s"}`}
-              >
-                <span className="flex items-center gap-1.5">
-                  <MessageSquareIcon className="size-3.5" />
-                  {discussion.commentCount}
-                </span>
-              </SimpleTooltip>
-            </span>
-          </div>
-        </div>
-      </ContextMenuTrigger>
+      <ContextMenuTrigger render={trigger}>{children}</ContextMenuTrigger>
       <ContextMenuContent className="w-56">
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={() => window.open(discussion.url, "_blank", "noopener")}>
@@ -152,6 +217,7 @@ export function DiscussionCard({ discussion }: { discussion: Discussion }) {
 }
 
 const MAX_CARD_TAGS = 3;
+const MAX_ROW_TAGS = 2;
 
 function DiscussionPreview({ body, thumbnailUrl }: { body: string; thumbnailUrl: string | null }) {
   const embed = thumbnailUrl ? { url: thumbnailUrl, kind: "image" as const } : firstEmbed(body);

@@ -13,9 +13,9 @@ import { ProjectBoard } from "@/components/projects/project-board";
 import type { TProjectScope } from "@/components/projects/project-groups";
 import { ProjectList } from "@/components/projects/project-list";
 import { ScopeEmpty, ScopeTabs } from "@/components/projects/scope-tabs";
+import { LayoutToggle } from "@/components/shared/layout-toggle";
 import { Button } from "@/components/ui/button";
 import { SearchField } from "@/components/ui/search-field";
-import { SimpleTooltip } from "@/components/ui/tooltip";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import type { TProjectListArgs } from "@/lib/queries/projects";
 
@@ -76,37 +76,14 @@ export function ProjectsView({ title, breadcrumb, storageKey, filters }: TProps)
               <>
                 <ScopeTabs scope={scope} onChange={setScope} />
                 {scope === "active" && (
-                  <div
-                    role="radiogroup"
-                    aria-label="Layout"
-                    data-slot="connected-button-group"
-                    className="flex items-center gap-1"
-                  >
-                    <SimpleTooltip content="List">
-                      <Button
-                        variant={layout === "list" ? "secondary" : "ghost"}
-                        size="icon"
-                        role="radio"
-                        aria-checked={layout === "list"}
-                        aria-label="List layout"
-                        onClick={() => setLayout("list")}
-                      >
-                        <ListIcon className="size-4" />
-                      </Button>
-                    </SimpleTooltip>
-                    <SimpleTooltip content="Board">
-                      <Button
-                        variant={layout === "board" ? "secondary" : "ghost"}
-                        size="icon"
-                        role="radio"
-                        aria-checked={layout === "board"}
-                        aria-label="Board layout"
-                        onClick={() => setLayout("board")}
-                      >
-                        <LayoutGridIcon className="size-4" />
-                      </Button>
-                    </SimpleTooltip>
-                  </div>
+                  <LayoutToggle
+                    value={layout}
+                    options={[
+                      { value: "list", label: "List", icon: ListIcon },
+                      { value: "board", label: "Board", icon: LayoutGridIcon },
+                    ]}
+                    onChange={setLayout}
+                  />
                 )}
               </>
             }

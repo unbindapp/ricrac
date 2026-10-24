@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { ChatComposer, ChatMessage } from "@/components/forum/chat-message";
 import { ChatSkeleton, ReplyList, useChatMessages } from "@/components/forum/chat-messages";
 import { ArrowLeftIcon, MessageSquareReplyIcon } from "@/components/icons";
@@ -11,10 +13,15 @@ import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 
-type TProps = { discussionId: string; messageId: string; onBack: () => void };
+type TProps = {
+  discussionId: string;
+  messageId: string;
+  threadSwitcher?: ReactNode;
+  onBack: () => void;
+};
 
 /** A message of the discussion's chat and the replies in its thread. */
-export function MessageThreadPanel({ discussionId, messageId, onBack }: TProps) {
+export function MessageThreadPanel({ discussionId, messageId, threadSwitcher, onBack }: TProps) {
   const { canEdit } = useWorkspace();
   const target = { discussionId };
   const { threads, isPending, isComplete, error, refetch } = useChatMessages(target);
@@ -31,6 +38,7 @@ export function MessageThreadPanel({ discussionId, messageId, onBack }: TProps) 
         Replies{root?.user && ` to ${userName(root.user)}`}
         <span className="text-muted-foreground font-normal"> in the main chat</span>
       </span>
+      {threadSwitcher}
     </PanelBar>
   );
 

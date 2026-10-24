@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 
 import type { DiscussionThreadDetail } from "@/api/ops.gen";
 import { ChatComposer } from "@/components/forum/chat-message";
@@ -42,9 +42,9 @@ import {
 } from "@/lib/queries/discussions";
 import { isMissing } from "@/lib/queries/projects";
 
-type TProps = { threadId: string; onBack: () => void };
+type TProps = { threadId: string; threadSwitcher?: ReactNode; onBack: () => void };
 
-export function ThreadPanel({ threadId, onBack }: TProps) {
+export function ThreadPanel({ threadId, threadSwitcher, onBack }: TProps) {
   const { workspace } = useWorkspace();
   const { data, isPending, error, refetch } = useQuery(
     discussionThreadQuery(workspace.id, threadId),
@@ -60,6 +60,7 @@ export function ThreadPanel({ threadId, onBack }: TProps) {
         isPending={isPending}
         error={error}
         onRetry={() => void refetch()}
+        threadSwitcher={threadSwitcher}
         onBack={onBack}
       />
     </section>
@@ -71,12 +72,14 @@ function ThreadPanelBody({
   isPending,
   error,
   onRetry,
+  threadSwitcher,
   onBack,
 }: {
   thread: DiscussionThreadDetail | undefined;
   isPending: boolean;
   error: Error | null;
   onRetry: () => void;
+  threadSwitcher?: ReactNode;
   onBack: () => void;
 }) {
   if (isPending) {
@@ -108,10 +111,25 @@ function ThreadPanelBody({
       </div>
     );
   }
-  return <ThreadContent key={thread.id} thread={thread} onBack={onBack} />;
+  return (
+    <ThreadContent
+      key={thread.id}
+      thread={thread}
+      threadSwitcher={threadSwitcher}
+      onBack={onBack}
+    />
+  );
 }
 
-function ThreadContent({ thread, onBack }: { thread: DiscussionThreadDetail; onBack: () => void }) {
+function ThreadContent({
+  thread,
+  threadSwitcher,
+  onBack,
+}: {
+  thread: DiscussionThreadDetail;
+  threadSwitcher?: ReactNode;
+  onBack: () => void;
+}) {
   const { workspace, canEdit } = useWorkspace();
   const canRewrite = useCanRewrite(thread.creator);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -155,6 +173,7 @@ function ThreadContent({ thread, onBack }: { thread: DiscussionThreadDetail; onB
             <Trash2Icon className="size-4" />
           </HeaderAction>
         )}
+        {threadSwitcher}
       </HeaderActions>
     </PanelBar>
   );

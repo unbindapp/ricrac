@@ -1,14 +1,17 @@
 import { type LinkProps, useNavigate } from "@tanstack/react-router";
 import { type ReactNode, useRef, useState } from "react";
 
-import { TriangleAlertIcon } from "@/components/icons";
+import { TriangleAlertIcon, XIcon } from "@/components/icons";
 import { SearchHitGroups } from "@/components/search/search-hit-groups";
 import { useSearch } from "@/components/search/use-search";
+import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandInput, CommandList } from "@/components/ui/command";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useWorkspace } from "@/components/workspace/workspace-provider";
 
-/** Searches the whole workspace from a bar, listing what matches under it as you type. */
+/** Searches the whole workspace from a bar that widens while you type, listing what matches under it. */
 export function GlobalSearch({ trailing }: { trailing?: ReactNode }) {
+  const { workspace } = useWorkspace();
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
@@ -32,7 +35,8 @@ export function GlobalSearch({ trailing }: { trailing?: ReactNode }) {
       loop
       wrapper="none"
       data-open={isListShown || undefined}
-      className="group/search data-open:shadow-elevation-3 relative w-full max-w-180 min-w-90 overflow-visible rounded-[1.75rem] bg-transparent"
+      data-focused={isOpen || undefined}
+      className="group/search ease-spring-default-spatial relative w-120 max-w-full overflow-visible rounded-[1.75rem] bg-transparent transition-[width] duration-(--spring-default-spatial-duration) data-focused:w-140"
       onKeyDown={(event) => {
         if (event.key === "Escape") close();
       }}
@@ -52,15 +56,31 @@ export function GlobalSearch({ trailing }: { trailing?: ReactNode }) {
           onBlur={() => setIsOpen(false)}
           showSpinner={search.isPending}
           aria-label="Search"
-          placeholder="Search issues, projects, documents, discussions…"
+          placeholder={`Search ${workspace.name}`}
           classNameWrapper="min-w-0 flex-1 border-0 [&>div]:left-4 [&>div]:size-6 [&>div]:text-m3-on-surface [&_svg]:text-m3-on-surface"
           className="text-m3-on-surface placeholder:text-m3-on-surface-variant h-14 pr-4 pl-14 text-base leading-6"
         />
-        {trailing}
+        {query ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Clear search"
+            className="shrink-0"
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={() => {
+              setQuery("");
+              inputRef.current?.focus();
+            }}
+          >
+            <XIcon />
+          </Button>
+        ) : (
+          trailing
+        )}
       </div>
       {isListShown && (
         <div
-          className="bg-m3-surface-container-high text-m3-on-surface shadow-elevation-3 border-m3-outline absolute inset-x-0 top-full z-50 flex max-h-120 min-h-60 flex-col overflow-hidden rounded-b-[1.75rem] border-t"
+          className="bg-m3-surface-container-high text-m3-on-surface absolute inset-x-0 top-full z-50 flex max-h-120 min-h-60 flex-col overflow-hidden rounded-b-[1.75rem]"
           onMouseDown={(event) => event.preventDefault()}
         >
           <ScrollArea className="min-h-0">

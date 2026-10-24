@@ -1,16 +1,19 @@
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 
 import type { Comment, DiscussionDetail } from "@/api/ops.gen";
 import { ChatComposer } from "@/components/forum/chat-message";
 import { ChatMessages } from "@/components/forum/chat-messages";
 import { NewThreadDialog } from "@/components/forum/new-thread-dialog";
-import { MessagesSquareIcon } from "@/components/icons";
+import { MessagesSquareIcon, SplitIcon } from "@/components/icons";
 import { commentExcerpt } from "@/components/inbox/notifications";
 import { userName } from "@/components/issues/grouping";
 import { ChatLayout } from "@/components/layout/chat-layout";
 import { PanelBar } from "@/components/layout/panel-bar";
+import { Button } from "@/components/ui/button";
+import { SimpleTooltip } from "@/components/ui/tooltip";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { messagePlaceholder, shorten } from "@/lib/helpers/chat";
+import { useUiTheme } from "@/themes/ui-theme-provider";
 
 const THREAD_TITLE_FROM_MESSAGE_LENGTH = 80;
 
@@ -21,16 +24,22 @@ type TProps = {
 };
 
 /** The discussion's own chat, beside the topic. */
-export function MainChatPanel({ discussion, openMessageId, onOpenMessage }: TProps) {
+export function MainChatPanel({
+  discussion,
+  openMessageId,
+  onOpenMessage,
+  threadSwitcher,
+}: TProps & { threadSwitcher?: ReactNode }) {
   const { canEdit } = useWorkspace();
   const count = discussion.commentCount;
   const header = (
     <PanelBar>
       <MessagesSquareIcon className="text-muted-foreground size-4" />
       <span className="dank:type-title-medium text-sm font-medium">Main chat</span>
-      <span className="text-muted-foreground text-xs tabular-nums">
+      <span className="text-muted-foreground min-w-0 flex-1 text-xs tabular-nums">
         {count} {count === 1 ? "message" : "messages"}
       </span>
+      {threadSwitcher}
     </PanelBar>
   );
   return (
@@ -50,21 +59,49 @@ export function MainChatPanel({ discussion, openMessageId, onOpenMessage }: TPro
 }
 
 export function MainChatComposer({ discussion }: { discussion: DiscussionDetail }) {
+  const { threadsInChat } = useUiTheme();
+  const [isStartingThread, setIsStartingThread] = useState(false);
   return (
-    <ChatComposer
-      target={{ discussionId: discussion.id }}
-      placeholder={messagePlaceholder(discussion.title)}
-    />
+    <>
+      <ChatComposer
+        target={{ discussionId: discussion.id }}
+        placeholder={messagePlaceholder(discussion.title)}
+        tools={
+          threadsInChat && (
+            <SimpleTooltip content="New thread">
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="New thread"
+                className="text-muted-foreground shrink-0"
+                onClick={() => setIsStartingThread(true)}
+              >
+                <SplitIcon className="size-5" />
+              </Button>
+            </SimpleTooltip>
+          )
+        }
+      />
+      {threadsInChat && (
+        <NewThreadDialog
+          discussion={discussion}
+          open={isStartingThread}
+          onOpenChange={setIsStartingThread}
+        />
+      )}
+    </>
   );
 }
 
 export function MainChatMessages({ discussion, openMessageId, onOpenMessage }: TProps) {
+  const { threadsInChat } = useUiTheme();
   const [splitFrom, setSplitFrom] = useState<Comment | null>(null);
   return (
     <>
       <ChatMessages
         target={{ discussionId: discussion.id }}
         threads={{ openId: openMessageId, onOpen: onOpenMessage }}
+        startedThreads={threadsInChat ? discussion.threads : undefined}
         onNewThread={setSplitFrom}
         empty={{
           title: "No messages yet",

@@ -2,7 +2,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
 import { type ReactNode, useState } from "react";
-import { useDebounceValue } from "usehooks-ts";
+import { useDebounceValue, useLocalStorage } from "usehooks-ts";
 import { z } from "zod";
 
 import type { Discussion } from "@/api/ops.gen";
@@ -10,12 +10,15 @@ import {
   DiscussionCard,
   DiscussionGrid,
   DiscussionGridSkeleton,
+  DiscussionRow,
 } from "@/components/forum/discussion-card";
 import { DiscussionTagFilter } from "@/components/forum/discussion-tags";
 import { NewDiscussionDialog } from "@/components/forum/new-discussion-dialog";
 import { useCanRewrite } from "@/components/forum/use-can-rewrite";
 import {
   LayersIcon,
+  LayoutGridIcon,
+  ListIcon,
   LockIcon,
   LockOpenIcon,
   type LucideIcon,
@@ -36,10 +39,12 @@ import { SearchField } from "@/components/ui/search-field";
 import { toast } from "@/components/ui/toast";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { FilterMenu } from "@/components/shared/filter-menu";
+import { LayoutToggle } from "@/components/shared/layout-toggle";
 import { discussionsQuery, useDiscussionLifecycleMutation } from "@/lib/queries/discussions";
 
 const VIEWS = ["open", "closed", "all", "trash"] as const;
 type TForumView = (typeof VIEWS)[number];
+type TLayout = "grid" | "list";
 
 const searchSchema = z.object({
   status: z.enum(["closed", "all", "trash"]).optional(),
@@ -63,9 +68,11 @@ function ForumPage() {
   const { workspace, canEdit } = useWorkspace();
   const { status = "open", tag } = Route.useSearch();
   const navigate = Route.useNavigate();
+  const [layout, setLayout] = useLocalStorage<TLayout>("forum-layout", "grid");
   const [query, setQuery] = useState("");
   const [debouncedQuery] = useDebounceValue(query.trim(), 300);
   const isTrash = status === "trash";
+  const isGrid = layout === "grid" && !isTrash;
   const list = useInfiniteQuery(
     discussionsQuery(workspace.id, {
       status: isTrash ? "all" : status,
@@ -100,17 +107,29 @@ function ForumPage() {
         toolbar={
           <PageToolbar
             actions={
-              <FilterMenu
-                label="Show"
-                value={status}
-                options={VIEWS.map((value) => ({ value, ...views[value] }))}
-                onChange={(value) =>
-                  void navigate({
-                    search: (prev) => ({ ...prev, status: value !== "open" ? value : undefined }),
-                    replace: true,
-                  })
-                }
-              />
+              <>
+                <FilterMenu
+                  label="Show"
+                  value={status}
+                  options={VIEWS.map((value) => ({ value, ...views[value] }))}
+                  onChange={(value) =>
+                    void navigate({
+                      search: (prev) => ({ ...prev, status: value !== "open" ? value : undefined }),
+                      replace: true,
+                    })
+                  }
+                />
+                {!isTrash && (
+                  <LayoutToggle
+                    value={layout}
+                    options={[
+                      { value: "grid", label: "Grid", icon: LayoutGridIcon },
+                      { value: "list", label: "List", icon: ListIcon },
+                    ]}
+                    onChange={setLayout}
+                  />
+                )}
+              </>
             }
           >
             <SearchField
@@ -136,7 +155,7 @@ function ForumPage() {
       />
       <ListStates
         isPending={list.isPending}
-        skeleton={!isTrash && <DiscussionGridSkeleton />}
+        skeleton={isGrid ? <DiscussionGridSkeleton /> : undefined}
         error={list.error}
         onRetry={() => void list.refetch()}
         isEmpty={discussions.length === 0}
@@ -147,18 +166,26 @@ function ForumPage() {
         })}
       >
         <div className="flex w-full flex-col gap-3">
-          {isTrash ? (
+          {isTrash && (
             <List flush>
               {discussions.map((discussion) => (
                 <TrashedDiscussionRow key={discussion.id} discussion={discussion} />
               ))}
             </List>
-          ) : (
+          )}
+          {isGrid && (
             <DiscussionGrid>
               {discussions.map((discussion) => (
                 <DiscussionCard key={discussion.id} discussion={discussion} />
               ))}
             </DiscussionGrid>
+          )}
+          {!isTrash && !isGrid && (
+            <List flush>
+              {discussions.map((discussion) => (
+                <DiscussionRow key={discussion.id} discussion={discussion} />
+              ))}
+            </List>
           )}
           {list.hasNextPage && (
             <Button
