@@ -99,6 +99,28 @@
     letter-spacing: 0.0125rem;
   }
 
+  & [data-slot="forum-item-tags"] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding-top: 4px;
+
+    & [data-m3-chip] {
+      height: 1.5rem;
+      min-height: 1.5rem;
+      gap: 0.25rem;
+      padding-inline: 0.5rem;
+      color: inherit;
+      font-size: 0.75rem;
+      line-height: 1rem;
+    }
+
+    & [data-m3-chip] > svg {
+      width: 0.875rem;
+      height: 0.875rem;
+    }
+  }
+
   & [data-slot="forum-item"][data-selected] [data-slot="forum-item-supporting"] {
     color: var(--m3-on-primary-container);
   }
@@ -222,17 +244,14 @@
     background-color: var(--m3-surface-container-lowest);
   }
 
+  & [data-slot="discussion-panel"] [data-m3-title] textarea[data-variant="title"] {
+    font-weight: 500;
+  }
+
   & [data-slot="discussion-post"] {
     display: flex;
-    flex: none;
     flex-direction: column;
     gap: 16px;
-    max-height: 50%;
-    overflow-y: auto;
-
-    & [data-m3-title] textarea[data-variant="title"] {
-      font-weight: 500;
-    }
   }
 
   & [data-slot="discussion-cover"] {
@@ -249,8 +268,6 @@
     flex: 1;
     flex-direction: column;
     min-height: 0;
-    padding-top: 12px;
-    border-top: 1px solid var(--m3-surface-variant);
 
     & > section,
     & [data-slot="chat-layout"],
@@ -266,10 +283,12 @@
     & [data-slot="panel-bar"] {
       height: auto;
       padding: 0;
+      border-radius: 0;
+      background-color: transparent;
     }
 
     & [data-slot="chat-column"] {
-      padding: 12px 0;
+      padding: 0 0 12px;
     }
 
     & [data-slot="chat-composer"] {

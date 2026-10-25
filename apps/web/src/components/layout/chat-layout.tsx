@@ -13,6 +13,11 @@ const ChatScrollContext = createContext<TChatScroll>({ scrollToEnd: () => undefi
 
 export const useChatScroll = () => useContext(ChatScrollContext);
 
+/** What a chat belongs to, like a discussion's post: it opens the conversation and scrolls with it. */
+export const ChatLeadContext = createContext<ReactNode>(null);
+
+export const useChatLead = () => useContext(ChatLeadContext);
+
 type TProps = {
   /** What the page bar holds, when the chat is the page. */
   bar?: ReactNode;
@@ -35,10 +40,11 @@ export function ChatLayout({
   startAtEnd = true,
 }: TProps) {
   const { separatesBars } = useUiTheme();
+  const lead = useChatLead();
   const [barSlot, setBarSlot] = useState<HTMLElement | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const isAtEndRef = useRef(startAtEnd);
+  const isAtEndRef = useRef(startAtEnd && !lead);
 
   useEffect(() => {
     const scroller = scrollRef.current;
@@ -92,7 +98,7 @@ export function ChatLayout({
             )}
           </PageSlotsContext>
         )}
-        {header}
+        {!lead && header}
         <div className="dank:rounded-lg dank:bg-background flex min-h-0 flex-1 flex-col overflow-hidden">
           <div
             ref={scrollRef}
@@ -105,6 +111,8 @@ export function ChatLayout({
               data-slot="chat-column"
               className={cn(column, "flex flex-col gap-6 py-6")}
             >
+              {lead}
+              {lead && header}
               {children}
             </div>
           </div>

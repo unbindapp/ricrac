@@ -225,12 +225,10 @@ export function ChatMessage({
         {isEditing ? (
           <div className="w-full">{editor}</div>
         ) : (
-          <div
-            className={cn("flex w-full min-w-0 items-center gap-1", isMine && "flex-row-reverse")}
-          >
+          <div className={cn("flex w-full min-w-0", isMine && "justify-end")}>
             <div
               className={cn(
-                "flex max-w-4/5 min-w-0 flex-col gap-1.5",
+                "relative flex max-w-4/5 min-w-0 flex-col gap-1.5",
                 isMine ? "items-end" : "items-start",
               )}
               onContextMenu={keepNativeMenu}
@@ -250,13 +248,17 @@ export function ChatMessage({
               )}
               <MessageAttachments attachments={attachments} />
               {edited}
+              {hasActions && (
+                <div className="bg-popover shadow-elevation-2 absolute right-0 -bottom-3 z-10 flex items-center gap-1 rounded-full p-1 opacity-0 group-hover/message:opacity-100 focus-within:opacity-100 has-data-popup-open:opacity-100">
+                  {isContinuation && (
+                    <span className="px-2">
+                      <MessageTime value={message.createdAt} />
+                    </span>
+                  )}
+                  {actionButtons}
+                </div>
+              )}
             </div>
-            {hasActions && (
-              <div className="flex shrink-0 items-center gap-1 opacity-0 group-hover/message:opacity-100 focus-within:opacity-100 has-data-popup-open:opacity-100">
-                {isContinuation && <MessageTime value={message.createdAt} />}
-                {actionButtons}
-              </div>
-            )}
           </div>
         )}
         {after}
@@ -468,7 +470,7 @@ function ComposerBox({
 }) {
   const picker = useFilePicker({ multiple: true, onSelect: attachments.add });
   return (
-    <div className="bg-input focus-within:ring-primary/8-10 dank:min-h-12 dank:justify-center dank:rounded-md dank:border-0 dank:bg-m3-surface-container-low dank:focus-within:ring-0 dank:focus-within:outline-2 dank:focus-within:outline-m3-primary flex flex-col rounded-lg border focus-within:ring-1">
+    <div className="bg-input focus-within:ring-primary/8-10 dank:min-h-12 dank:justify-center dank:rounded-md dank:border-0 dank:bg-m3-surface-container-low flex flex-col rounded-lg border focus-within:ring-1">
       {attachments.items.length > 0 && (
         <div className="border-b p-2">
           <AttachmentTray items={attachments.items} onRemove={attachments.remove} />

@@ -39,6 +39,12 @@ export type TUiTheme = {
   ForumPanes?: ComponentType<TForumPanesProps>;
   /** Editors show toolbars for formatting text and laying out images. */
   editorToolbars: boolean;
+  /** Top-level pages show their title in a bar; without it their actions join the toolbar. */
+  pageTitles: boolean;
+  /** A list keeps its detail pane open, empty, before anything in it is picked. */
+  showsEmptyPanes: boolean;
+  /** Images and videos open in a dialog at their own size, or fill a stage centered on the screen. */
+  mediaViewer: "dialog" | "stage";
   /** The accent hue until someone picks their own; the theme's CSS sets the same --accent-hue. */
   defaultAccentHue: number;
   /** The theme's own button styles, with the same variants and sizes. */

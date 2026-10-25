@@ -491,19 +491,9 @@
   }
 }
 
-/* Material's focus indicator on everything focusable but text fields, which show focus in their
-   outline, and items that draw it on a child. Unlayered so it replaces the rings utilities draw. */
-:root[data-ui-theme="dank"]
-  :focus-visible:not(
-    input,
-    textarea,
-    select,
-    [contenteditable="true"],
-    [role="textbox"],
-    [data-focus-indicator="child"]
-  ) {
-  outline: 3px solid var(--m3-secondary);
-  outline-offset: 2px;
+/* No focus rings: no outlines, and none of the rings utilities draw. Unlayered to beat them. */
+:root[data-ui-theme="dank"] :is(:focus, :focus-visible, :focus-within) {
+  outline: none;
   --tw-ring-shadow: 0 0 #0000;
   --tw-ring-offset-shadow: 0 0 #0000;
 }

@@ -45,6 +45,7 @@ import {
   useMarkAllNotificationsReadMutation,
   useMarkNotificationsMutation,
 } from "@/lib/queries/notifications";
+import { useUiTheme } from "@/themes/ui-theme-provider";
 
 export const INBOX_FILTERS = ["inbox", "unread", "snoozed", "archived"] as const;
 
@@ -96,6 +97,7 @@ export function InboxView({ filter, selectedKey, onFilterChange, onSelect }: TPr
   const now = useNow();
   const { size } = useDeviceSize();
   const hasPane = size === "lg" || size === "xl";
+  const { showsEmptyPanes } = useUiTheme();
   const [isSnoozeOpen, setIsSnoozeOpen] = useState(false);
 
   const list = useInfiniteQuery(notificationsQuery(workspace.id, filter));
@@ -328,7 +330,7 @@ export function InboxView({ filter, selectedKey, onFilterChange, onSelect }: TPr
     <SplitView
       main={main}
       aside={
-        hasPane ? (
+        hasPane && (selected || showsEmptyPanes) ? (
           <NotificationPane
             group={selected}
             isArchived={isArchivedFilter}

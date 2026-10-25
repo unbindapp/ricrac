@@ -237,11 +237,6 @@
     outline: none;
   }
   :root[data-ui-theme="dank"]
-    :is([data-slot="checkbox"], .rr-prose input[type="checkbox"]):focus-visible::after {
-    outline: 3px solid var(--m3-secondary);
-    outline-offset: 2px;
-  }
-  :root[data-ui-theme="dank"]
     :is(
       [data-slot="checkbox"]:not([data-checked], [data-disabled]),
       .rr-prose input[type="checkbox"]:enabled:not(:checked)

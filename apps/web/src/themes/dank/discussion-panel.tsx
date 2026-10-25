@@ -4,9 +4,11 @@ import type { DiscussionDetail } from "@/api/ops.gen";
 import {
   DiscussionActions,
   DiscussionBody,
-  DiscussionHeading,
+  DiscussionMeta,
+  DiscussionTitle,
 } from "@/components/forum/discussion-detail";
 import { XIcon } from "@/components/icons";
+import { ChatLeadContext } from "@/components/layout/chat-layout";
 import { HeaderAction } from "@/components/shared/detail-actions";
 
 type TProps = {
@@ -16,29 +18,34 @@ type TProps = {
   onClose: () => void;
 };
 
-/** A discussion's topic over its chat, in one panel. */
+/** A discussion in one panel: its post opens the chat and scrolls with it. */
 export function DiscussionPanel({ discussion, chat, onClose }: TProps) {
   const body = discussion.body ?? "";
   const cover =
     discussion.thumbnailUrl && !body.includes(discussion.thumbnailUrl)
       ? discussion.thumbnailUrl
       : null;
+  const post = (
+    <article aria-label="Post" data-slot="discussion-post">
+      <DiscussionMeta discussion={discussion} tagChips />
+      {cover && <img data-slot="discussion-cover" src={cover} alt="" />}
+      <DiscussionBody discussion={discussion} />
+    </article>
+  );
   return (
     <section aria-label={discussion.title} data-slot="discussion-panel">
-      <div data-slot="discussion-post">
-        <div className="flex items-start gap-2">
-          <div className="min-w-0 flex-1">
-            <DiscussionHeading discussion={discussion} />
-          </div>
-          <DiscussionActions discussion={discussion} />
-          <HeaderAction label="Back to the forum" onClick={onClose}>
-            <XIcon className="size-4" />
-          </HeaderAction>
+      <div className="flex items-start gap-2">
+        <div className="min-w-0 flex-1">
+          <DiscussionTitle discussion={discussion} />
         </div>
-        {cover && <img data-slot="discussion-cover" src={cover} alt="" />}
-        <DiscussionBody discussion={discussion} />
+        <DiscussionActions discussion={discussion} />
+        <HeaderAction label="Back to the forum" onClick={onClose}>
+          <XIcon className="size-4" />
+        </HeaderAction>
       </div>
-      <div data-slot="discussion-chat">{chat}</div>
+      <ChatLeadContext value={post}>
+        <div data-slot="discussion-chat">{chat}</div>
+      </ChatLeadContext>
     </section>
   );
 }
