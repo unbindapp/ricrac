@@ -17,6 +17,8 @@ type TPickerProps = {
   onChange: (tags: string[]) => void;
   appearance?: TPickerAppearance;
   disabled?: boolean;
+  /** Shows each tag in its own chip beside a button that opens the picker. */
+  chips?: boolean;
 };
 
 /** Picks a discussion's tags from the ones in use, or makes new ones from what you type. */
@@ -25,6 +27,7 @@ export function DiscussionTagsPicker({
   onChange,
   appearance = "compact",
   disabled,
+  chips = false,
 }: TPickerProps) {
   const { workspace } = useWorkspace();
   const { data: tags = [], isPending } = useQuery(discussionTagsQuery(workspace.id));
@@ -60,7 +63,24 @@ export function DiscussionTagsPicker({
     if (next.some((tag) => tag.startsWith(CREATE_PREFIX))) setQuery("");
     onChange(picked);
   };
-  return (
+  const trigger =
+    chips && value.length > 0 ? (
+      <PickerTrigger
+        appearance="icon"
+        label="Edit tags"
+        icon={<PlusIcon className="text-muted-foreground size-4" />}
+        text="Edit tags"
+      />
+    ) : (
+      <PickerTrigger
+        appearance={appearance}
+        label="Tags"
+        icon={<TagIcon className="text-muted-foreground size-4" />}
+        text={value.length > 0 ? value.join(", ") : "Add tags"}
+        muted={value.length === 0}
+      />
+    );
+  const picker = (
     <PropertyPicker
       label="Tags"
       multiple
@@ -73,16 +93,15 @@ export function DiscussionTagsPicker({
       search={query}
       onSearchChange={setQuery}
       onChange={change}
-      trigger={
-        <PickerTrigger
-          appearance={appearance}
-          label="Tags"
-          icon={<TagIcon className="text-muted-foreground size-4" />}
-          text={value.length > 0 ? value.join(", ") : "Add tags"}
-          muted={value.length === 0}
-        />
-      }
+      trigger={trigger}
     />
+  );
+  if (!chips) return picker;
+  return (
+    <>
+      <DiscussionTagBadges tags={value} />
+      {picker}
+    </>
   );
 }
 

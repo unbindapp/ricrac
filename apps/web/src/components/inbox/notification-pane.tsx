@@ -143,7 +143,7 @@ export function NotificationPane({
           <NotificationIssue identifier={target.identifier} />
         ) : (
           link && (
-            <div className="flex px-4 pb-4">
+            <div className="dank:pl-11 flex px-4 pb-4">
               <LinkButton {...link} variant="outline" size="sm">
                 <NotificationTargetIcon target={target} />
                 {targetLabels[target.kind]}
@@ -188,7 +188,7 @@ function NotificationEvents({ group }: { group: TNotificationGroup }) {
   const shown = showAll ? group.notifications : group.notifications.slice(0, SHOWN_EVENTS);
   const hidden = group.notifications.length - shown.length;
   return (
-    <ol aria-label="What happened" className="flex flex-col gap-3 border-b p-4">
+    <ol aria-label="What happened" className="dank:border-b-0 flex flex-col gap-3 border-b p-4">
       {shown.map((notification) => {
         const { actor, text } = notificationSentence(notification);
         const TypeIcon = notificationTypeIcon(notification.type);

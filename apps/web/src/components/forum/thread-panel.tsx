@@ -17,7 +17,7 @@ import {
 } from "@/components/icons";
 import { PickerTrigger } from "@/components/issues/pickers";
 import { PropertyPicker } from "@/components/issues/property-picker";
-import { ChatLayout } from "@/components/layout/chat-layout";
+import { ChatLayout, useChatLead } from "@/components/layout/chat-layout";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
@@ -82,33 +82,34 @@ function ThreadPanelBody({
   threadSwitcher?: ReactNode;
   onBack: () => void;
 }) {
-  if (isPending) {
+  if (isPending)
     return (
-      <div className="p-4">
+      <ThreadPlaceholder>
         <ListSkeleton rows={4} />
-      </div>
+      </ThreadPlaceholder>
     );
-  }
   if (error && isMissing(error)) {
     return (
-      <EmptyState
-        icon={SplitIcon}
-        title="Thread not found"
-        description="It was deleted, or you cannot see it."
-        action={
-          <Button variant="outline" size="sm" onClick={onBack}>
-            <ArrowLeftIcon className="size-4" />
-            Back to the main chat
-          </Button>
-        }
-      />
+      <ThreadPlaceholder padded={false}>
+        <EmptyState
+          icon={SplitIcon}
+          title="Thread not found"
+          description="It was deleted, or you cannot see it."
+          action={
+            <Button variant="outline" size="sm" onClick={onBack}>
+              <ArrowLeftIcon className="size-4" />
+              Back to the main chat
+            </Button>
+          }
+        />
+      </ThreadPlaceholder>
     );
   }
   if (error || !thread) {
     return (
-      <div className="p-4">
+      <ThreadPlaceholder>
         <ErrorCard message={error?.message ?? "Could not load the thread"} onRetry={onRetry} />
-      </div>
+      </ThreadPlaceholder>
     );
   }
   return (
@@ -119,6 +120,13 @@ function ThreadPanelBody({
       onBack={onBack}
     />
   );
+}
+
+/** Keeps what the chat belongs to in view while the thread loads or fails to. */
+function ThreadPlaceholder({ padded = true, children }: { padded?: boolean; children: ReactNode }) {
+  const lead = useChatLead();
+  if (lead) return <ChatLayout>{children}</ChatLayout>;
+  return padded ? <div className="p-4">{children}</div> : children;
 }
 
 function ThreadContent({

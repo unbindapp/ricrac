@@ -220,11 +220,20 @@ export function DiscussionActions({
 
 /** The editable title over the tags, who started it and when, and who follows it. */
 export function DiscussionHeading({ discussion }: { discussion: TDiscussionDetail }) {
-  const { workspace, canEdit } = useWorkspace();
+  return (
+    <div className="flex flex-col gap-2">
+      <DiscussionTitle discussion={discussion} />
+      <DiscussionMeta discussion={discussion} />
+    </div>
+  );
+}
+
+export function DiscussionTitle({ discussion }: { discussion: TDiscussionDetail }) {
+  const { workspace } = useWorkspace();
   const canRewrite = useCanRewrite(discussion.creator);
   const { mutate: save } = useSaveDiscussionMutation(workspace.id);
   return (
-    <div data-m3-title className="flex flex-col gap-2">
+    <div data-m3-title>
       <InlineText
         value={discussion.title}
         label="Discussion title"
@@ -232,42 +241,58 @@ export function DiscussionHeading({ discussion }: { discussion: TDiscussionDetai
         readOnly={!canRewrite}
         onSave={(title) => save({ id: discussion.id, title })}
       />
-      <div className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">
-        {canEdit ? (
-          <DiscussionTagsPicker
-            value={discussion.tags}
-            onChange={(tags) => save({ id: discussion.id, tags })}
-          />
-        ) : (
-          <DiscussionTagBadges tags={discussion.tags} />
-        )}
-        {discussion.creator && (
-          <span>
-            Started by {discussion.creator.name} <RelativeTime value={discussion.createdAt} />
+    </div>
+  );
+}
+
+/** Its tags, who started it and when, whether it is pinned or closed, and who follows it. */
+export function DiscussionMeta({
+  discussion,
+  tagChips = false,
+}: {
+  discussion: TDiscussionDetail;
+  /** Each tag in its own chip, instead of all of them in the picker's button. */
+  tagChips?: boolean;
+}) {
+  const { workspace, canEdit } = useWorkspace();
+  const { mutate: save } = useSaveDiscussionMutation(workspace.id);
+  return (
+    <div className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">
+      {canEdit ? (
+        <DiscussionTagsPicker
+          value={discussion.tags}
+          chips={tagChips}
+          onChange={(tags) => save({ id: discussion.id, tags })}
+        />
+      ) : (
+        <DiscussionTagBadges tags={discussion.tags} />
+      )}
+      {discussion.creator && (
+        <span>
+          Started by {discussion.creator.name} <RelativeTime value={discussion.createdAt} />
+        </span>
+      )}
+      {discussion.pinnedAt && (
+        <Badge variant="process" data-m3-chip="assist">
+          <PinIcon />
+          Pinned
+        </Badge>
+      )}
+      {discussion.closedAt && (
+        <Badge variant="muted" data-m3-chip="assist">
+          <LockIcon />
+          Closed
+        </Badge>
+      )}
+      {discussion.subscribers.length > 0 && (
+        <SimpleTooltip
+          content={`Subscribed: ${discussion.subscribers.map((user) => user.name).join(", ")}`}
+        >
+          <span className="ml-auto flex" aria-label="Subscribers">
+            <AvatarStack users={discussion.subscribers} max={5} />
           </span>
-        )}
-        {discussion.pinnedAt && (
-          <Badge variant="process" data-m3-chip="assist">
-            <PinIcon />
-            Pinned
-          </Badge>
-        )}
-        {discussion.closedAt && (
-          <Badge variant="muted" data-m3-chip="assist">
-            <LockIcon />
-            Closed
-          </Badge>
-        )}
-        {discussion.subscribers.length > 0 && (
-          <SimpleTooltip
-            content={`Subscribed: ${discussion.subscribers.map((user) => user.name).join(", ")}`}
-          >
-            <span className="ml-auto flex" aria-label="Subscribers">
-              <AvatarStack users={discussion.subscribers} max={5} />
-            </span>
-          </SimpleTooltip>
-        )}
-      </div>
+        </SimpleTooltip>
+      )}
     </div>
   );
 }

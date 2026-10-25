@@ -9,7 +9,7 @@ import {
   DiscussionCounts,
   discussionCover,
 } from "@/components/forum/discussion-card";
-import { DiscussionTagFilter } from "@/components/forum/discussion-tags";
+import { DiscussionTagBadges, DiscussionTagFilter } from "@/components/forum/discussion-tags";
 import {
   forumDiscussionsQuery,
   forumEmptyState,
@@ -41,6 +41,7 @@ const MIN_LIST_WIDTH = 280;
 const MIN_DETAIL_WIDTH = 360;
 const RESIZER_WIDTH = 12;
 const RESIZE_STEP = 16;
+const MAX_ITEM_TAGS = 3;
 
 /** The forum's list in a pane, and the open discussion in a panel beside it on wide screens. */
 export function DankForumPanes({
@@ -220,6 +221,11 @@ function ForumItem({
           <RelativeTime value={discussion.lastActivityAt} />
           <DiscussionCounts discussion={discussion} />
         </span>
+        {discussion.tags.length > 0 && (
+          <span data-slot="forum-item-tags">
+            <DiscussionTagBadges tags={discussion.tags} max={MAX_ITEM_TAGS} />
+          </span>
+        )}
       </span>
     </>
   );

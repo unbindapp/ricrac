@@ -5,6 +5,7 @@ import { Breadcrumb, TBreadcrumbItem } from "@/components/layout/breadcrumb";
 import { usePageSlots } from "@/components/layout/page-container";
 import { SidebarButton } from "@/components/layout/sidebar-button";
 import { cn } from "@/components/ui/utils";
+import { useUiTheme } from "@/themes/ui-theme-provider";
 
 type TProps = {
   title: string;
@@ -16,6 +17,20 @@ type TProps = {
 };
 
 export function PageHeader({ title, icon, description, breadcrumb, actions, toolbar }: TProps) {
+  const { pageTitles } = useUiTheme();
+  if (!pageTitles && !breadcrumb) {
+    return (
+      <header data-slot="page-header" aria-label={title} className="flex w-full flex-col gap-3">
+        {(toolbar || actions) && (
+          <div className="flex w-full items-center gap-2">
+            <div className="min-w-0 flex-1">{toolbar}</div>
+            {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+          </div>
+        )}
+        {description && <p className="text-muted-foreground text-sm">{description}</p>}
+      </header>
+    );
+  }
   return (
     <header data-slot="page-header" className="flex w-full flex-col gap-3">
       <PageBar>

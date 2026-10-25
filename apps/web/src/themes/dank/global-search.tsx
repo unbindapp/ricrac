@@ -43,7 +43,7 @@ export function GlobalSearch({ trailing }: { trailing?: ReactNode }) {
     >
       <div
         data-slot="search-bar"
-        className="bg-m3-surface-container-lowest group-focus-within/search:outline-m3-primary flex h-14 items-center rounded-[1.75rem] px-1 outline-0 group-focus-within/search:outline-2 group-data-open/search:rounded-b-none"
+        className="bg-m3-surface-container-lowest flex h-14 items-center rounded-[1.75rem] px-1 group-data-open/search:rounded-b-none"
       >
         <CommandInput
           ref={inputRef}

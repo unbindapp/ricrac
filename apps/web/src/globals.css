@@ -429,6 +429,11 @@
     @apply max-w-full rounded-md object-contain;
     max-height: calc(100dvh - 8rem);
   }
+  .rr-stage-media {
+    @apply w-auto rounded-lg object-contain;
+    height: calc(100dvh - 10rem);
+    max-width: calc(100dvw - 2rem);
+  }
   .rr-dropcursor {
     @apply bg-primary;
   }

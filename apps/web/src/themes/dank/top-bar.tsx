@@ -3,23 +3,17 @@ import { useQuery } from "@tanstack/react-query";
 import { UserAvatar } from "@/components/issues/pickers";
 import { Button } from "@/components/ui/button";
 import { DropdownMenuLabel } from "@/components/ui/dropdown-menu";
-import { cn } from "@/components/ui/utils";
 import { WorkspaceMenu } from "@/components/workspace/workspace-switcher";
 import { meQuery } from "@/lib/queries/me";
 import { GlobalSearch } from "@/themes/dank/global-search";
-import { useNavigationStore } from "@/themes/dank/navigation-store";
 
-/** The search bar centered over pages, staying put while the rail expands. */
+/** The search bar, centered over pages beside the collapsed rail and fixed there while it expands. */
 export function DankTopBar() {
-  const isRailExpanded = useNavigationStore((state) => state.isExpanded);
   return (
-    <header
-      className={cn(
-        "relative z-20 hidden shrink-0 justify-center pt-3 transition-transform duration-250 ease-[ease] md:flex",
-        isRailExpanded && "-translate-x-24",
-      )}
-    >
-      <GlobalSearch trailing={<AccountMenu />} />
+    <header className="hidden h-17 shrink-0 md:block">
+      <div className="fixed top-6 left-[calc(50%+3.125rem)] z-20 flex w-[calc(100vw-31.75rem)] max-w-160 -translate-x-1/2 justify-center">
+        <GlobalSearch trailing={<AccountMenu />} />
+      </div>
     </header>
   );
 }

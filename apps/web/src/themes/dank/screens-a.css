@@ -178,17 +178,11 @@
     :is([contenteditable="true"], textarea, input):focus
   ) {
   border-color: var(--m3-primary);
-  box-shadow: inset 0 0 0 1px var(--m3-primary);
 }
 
 :root[data-ui-theme="dank"] [data-slot="markdown-editor-frame"][data-inline] {
   border-radius: var(--radius-xs);
   box-shadow: none;
-  transition: box-shadow var(--spring-fast-effects-duration) var(--ease-spring-fast-effects);
-}
-:root[data-ui-theme="dank"]
-  [data-slot="markdown-editor-frame"][data-inline]:has([contenteditable="true"]:focus) {
-  box-shadow: inset 0 0 0 2px var(--m3-primary);
 }
 
 :root[data-ui-theme="dank"] [data-slot="properties"] {
@@ -224,12 +218,6 @@
     [data-picker="row"]:is(:focus-visible, :active, [data-popup-open][aria-expanded="true"])
   ) {
   border-radius: var(--radius-lg);
-}
-:root[data-ui-theme="dank"]
-  [data-slot="properties"]
-  > [data-slot="property-row"]:has([data-picker="row"]:focus-visible) {
-  outline: 3px solid var(--m3-secondary);
-  outline-offset: 2px;
 }
 :root[data-ui-theme="dank"] [data-slot="properties"] > [data-slot="property-row"] > div,
 :root[data-ui-theme="dank"] [data-slot="properties"] > [data-slot="property-row"] > div > span {
