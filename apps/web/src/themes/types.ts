@@ -1,5 +1,7 @@
-import type { ComponentType } from "react";
+import type { ComponentType, ReactNode } from "react";
 
+import type { DiscussionDetail } from "@/api/ops.gen";
+import type { TForumFilters } from "@/components/forum/forum-views";
 import type { buttonVariants } from "@/components/ui/button";
 
 export const UI_THEME_IDS = ["default", "dank"] as const;
@@ -33,6 +35,10 @@ export type TUiTheme = {
   chatBubbles: boolean;
   /** Threads start from the chat's composer, show in its timeline and switch from its header, instead of as branches beside the topic. */
   threadsInChat: boolean;
+  /** Lists the forum in a pane beside the open discussion, whose topic and chat share a panel. */
+  ForumPanes?: ComponentType<TForumPanesProps>;
+  /** Editors show toolbars for formatting text and laying out images. */
+  editorToolbars: boolean;
   /** The accent hue until someone picks their own; the theme's CSS sets the same --accent-hue. */
   defaultAccentHue: number;
   /** The theme's own button styles, with the same variants and sizes. */
@@ -41,6 +47,17 @@ export type TUiTheme = {
   paintColors?: (accentHue: number | null) => void;
   /** Fetches what the theme needs before it shows, like its icon set. */
   load?: () => Promise<void>;
+};
+
+export type TForumPanesProps = {
+  filters: TForumFilters;
+  discussion?: DiscussionDetail;
+  /** The discussion's main chat, or the thread open in its place. */
+  chat?: ReactNode;
+  /** A thread is open in the chat, so Escape goes back to the main chat. */
+  isThreadOpen?: boolean;
+  /** Shows in the discussion's place while it loads or fails to. */
+  fallback?: ReactNode;
 };
 
 export function isUiThemeId(value: unknown): value is TUiThemeId {

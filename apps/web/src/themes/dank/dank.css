@@ -3,6 +3,8 @@
 @import "./surfaces.css";
 @import "./screens-a.css";
 @import "./screens-b.css";
+@import "./shell.css";
+@import "./forum.css";
 
 @font-face {
   font-family: "Google Sans Flex";
@@ -132,8 +134,8 @@
   --radius-2xl: 2rem;
   --radius-3xl: 3rem;
 
-  --sidebar: var(--m3-surface);
-  --background: var(--m3-surface-container);
+  --sidebar: var(--m3-surface-container);
+  --background: var(--m3-surface-container-low);
   --foreground: var(--m3-on-surface);
   --card: var(--m3-surface);
   --card-hover: color-mix(in srgb, var(--m3-on-surface) 8%, var(--m3-surface));

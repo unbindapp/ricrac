@@ -468,10 +468,7 @@ function ComposerBox({
 }) {
   const picker = useFilePicker({ multiple: true, onSelect: attachments.add });
   return (
-    <div
-      data-m3-field="outlined"
-      className="bg-input focus-within:ring-primary/8-10 dank:min-h-14 dank:justify-center flex flex-col rounded-lg border focus-within:ring-1"
-    >
+    <div className="bg-input focus-within:ring-primary/8-10 dank:min-h-12 dank:justify-center dank:rounded-md dank:border-0 dank:bg-m3-surface-container-low dank:focus-within:ring-0 dank:focus-within:outline-2 dank:focus-within:outline-m3-primary flex flex-col rounded-lg border focus-within:ring-1">
       {attachments.items.length > 0 && (
         <div className="border-b p-2">
           <AttachmentTray items={attachments.items} onRemove={attachments.remove} />
@@ -571,7 +568,7 @@ export function ChatComposer({
           chat
         />
       </ComposerBox>
-      <p className="text-muted-foreground px-1 text-xs max-sm:hidden">
+      <p className="text-muted-foreground dank:hidden px-1 text-xs max-sm:hidden">
         Enter to send, Shift+Enter for a new line, / for commands
       </p>
     </div>

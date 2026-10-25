@@ -25,6 +25,7 @@ import {
   type TMediaLayout,
   withMediaLayout,
 } from "@/lib/helpers/media";
+import { useUiTheme } from "@/themes/ui-theme-provider";
 
 const MIN_WIDTH = 80;
 
@@ -145,6 +146,7 @@ function PlacedMedia({
   onDelete: () => void;
   onDragStart: (event: DragEvent<HTMLElement>) => void;
 }) {
+  const { editorToolbars } = useUiTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [draftWidth, setDraftWidth] = useState<number | null>(null);
   const frameRef = useRef<HTMLDivElement>(null);
@@ -196,16 +198,18 @@ function PlacedMedia({
         )}
         {isEditable && (
           <>
-            <MediaControls
-              kind={kind}
-              layout={layout}
-              onChange={onChange}
-              onOpen={() => setIsOpen(true)}
-              onDelete={onDelete}
-              onDragStart={onDragStart}
-              url={url}
-              name={name}
-            />
+            {editorToolbars && (
+              <MediaControls
+                kind={kind}
+                layout={layout}
+                onChange={onChange}
+                onOpen={() => setIsOpen(true)}
+                onDelete={onDelete}
+                onDragStart={onDragStart}
+                url={url}
+                name={name}
+              />
+            )}
             <span
               aria-hidden
               data-media-resize="start"
@@ -252,7 +256,7 @@ function MediaControls({
     <div
       contentEditable={false}
       data-slot="media-controls"
-      className="bg-popover text-popover-foreground dank:h-16 dank:gap-1 dank:rounded-full dank:border-0 dank:px-2 dank:shadow-elevation-1 absolute top-2 right-2 flex items-center rounded-md border p-0.5 opacity-0 shadow-sm transition-opacity group-hover/media:opacity-100 group-data-selected/media:opacity-100 focus-within:opacity-100"
+      className="bg-popover text-popover-foreground absolute top-2 right-2 flex items-center rounded-md border p-0.5 opacity-0 shadow-sm transition-opacity group-hover/media:opacity-100 group-data-selected/media:opacity-100 focus-within:opacity-100"
     >
       <SimpleTooltip content="Drag to move">
         <span
@@ -260,7 +264,7 @@ function MediaControls({
           draggable
           aria-label="Drag to move"
           onDragStart={onDragStart}
-          className="text-muted-foreground dank:size-10 flex size-7 cursor-grab items-center justify-center active:cursor-grabbing"
+          className="text-muted-foreground flex size-7 cursor-grab items-center justify-center active:cursor-grabbing"
         >
           <GripVerticalIcon className="size-4" />
         </span>
@@ -275,7 +279,7 @@ function MediaControls({
           <Icon className="size-4" />
         </ControlButton>
       ))}
-      <span className="bg-border dank:hidden mx-0.5 h-4 w-px" />
+      <span className="bg-border mx-0.5 h-4 w-px" />
       {mediaSizes.map((size) => (
         <ControlButton
           key={size.label}
@@ -283,10 +287,10 @@ function MediaControls({
           isActive={layout.width === size.width}
           onClick={() => onChange({ width: size.width })}
         >
-          <span className="dank:type-label-large text-xs font-medium">{size.label}</span>
+          <span className="text-xs font-medium">{size.label}</span>
         </ControlButton>
       ))}
-      <span className="bg-border dank:hidden mx-0.5 h-4 w-px" />
+      <span className="bg-border mx-0.5 h-4 w-px" />
       {kind === "image" && (
         <ControlButton label="Open full size" onClick={onOpen}>
           <Maximize2Icon className="size-4" />
@@ -329,10 +333,7 @@ function ControlButton({
         forceMinSize={false}
         aria-label={label}
         aria-pressed={isActive}
-        className={cn(
-          isActive && "bg-accent text-foreground",
-          "dank:aria-pressed:bg-m3-secondary-container dank:aria-pressed:text-m3-on-secondary-container dank:aria-pressed:rounded-md",
-        )}
+        className={cn(isActive && "bg-accent text-foreground")}
         onMouseDown={(event) => event.preventDefault()}
         onClick={onClick}
       >

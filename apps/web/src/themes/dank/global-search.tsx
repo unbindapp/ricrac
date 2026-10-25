@@ -35,15 +35,15 @@ export function GlobalSearch({ trailing }: { trailing?: ReactNode }) {
       loop
       wrapper="none"
       data-open={isListShown || undefined}
-      data-focused={isOpen || undefined}
-      className="group/search ease-spring-default-spatial relative w-120 max-w-full overflow-visible rounded-[1.75rem] bg-transparent transition-[width] duration-(--spring-default-spatial-duration) data-focused:w-140"
+      data-typing={query ? true : undefined}
+      className="group/search relative w-140 max-w-full overflow-visible rounded-[1.75rem] bg-transparent transition-[width] duration-250 ease-[ease] data-typing:w-160"
       onKeyDown={(event) => {
         if (event.key === "Escape") close();
       }}
     >
       <div
         data-slot="search-bar"
-        className="bg-m3-surface-container-high flex h-14 items-center rounded-[1.75rem] pr-3 group-data-open/search:rounded-b-none"
+        className="bg-m3-surface-container-lowest group-focus-within/search:outline-m3-primary flex h-14 items-center rounded-[1.75rem] px-1 outline-0 group-focus-within/search:outline-2 group-data-open/search:rounded-b-none"
       >
         <CommandInput
           ref={inputRef}
@@ -57,15 +57,16 @@ export function GlobalSearch({ trailing }: { trailing?: ReactNode }) {
           showSpinner={search.isPending}
           aria-label="Search"
           placeholder={`Search ${workspace.name}`}
-          classNameWrapper="min-w-0 flex-1 border-0 [&>div]:left-4 [&>div]:size-6 [&>div]:text-m3-on-surface [&_svg]:text-m3-on-surface"
-          className="text-m3-on-surface placeholder:text-m3-on-surface-variant h-14 pr-4 pl-14 text-base leading-6"
+          classNameWrapper="min-w-0 flex-1 border-0 [&>div]:left-3 [&>div]:size-6 [&>div]:text-m3-on-surface-variant [&_svg]:text-m3-on-surface-variant"
+          className="text-m3-on-surface placeholder:text-m3-on-surface-variant h-14 pr-2 pl-14 text-base leading-6"
         />
         {query ? (
           <Button
             variant="ghost"
             size="icon"
+            forceMinSize={false}
             aria-label="Clear search"
-            className="shrink-0"
+            className="text-m3-on-surface size-12 shrink-0 rounded-full active:rounded-full"
             onMouseDown={(event) => event.preventDefault()}
             onClick={() => {
               setQuery("");
@@ -80,7 +81,7 @@ export function GlobalSearch({ trailing }: { trailing?: ReactNode }) {
       </div>
       {isListShown && (
         <div
-          className="bg-m3-surface-container-high text-m3-on-surface absolute inset-x-0 top-full z-50 flex max-h-120 min-h-60 flex-col overflow-hidden rounded-b-[1.75rem]"
+          className="bg-m3-surface-container-lowest text-m3-on-surface absolute inset-x-0 top-full z-50 flex max-h-120 min-h-60 flex-col overflow-hidden rounded-b-[1.75rem]"
           onMouseDown={(event) => event.preventDefault()}
         >
           <ScrollArea className="min-h-0">

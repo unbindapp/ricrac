@@ -4,6 +4,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	entsql "entgo.io/ent/dialect/sql"
 	"github.com/jackc/pgx/v5"
@@ -14,7 +15,10 @@ import (
 	_ "ricrac/ent/runtime"
 )
 
-const maxConnections = 20
+const (
+	maxConnections = 20
+	maxIdleTime    = 5 * time.Minute
+)
 
 // Open connects in UTC through pgx's database/sql driver.
 func Open(ctx context.Context, url string) (*ent.Client, *sql.DB, error) {
@@ -28,6 +32,9 @@ func Open(ctx context.Context, url string) (*ent.Client, *sql.DB, error) {
 		return nil
 	}))
 	db.SetMaxOpenConns(maxConnections)
+	// database/sql keeps 2 idle by default, so bursts reconnect (DNS, TCP, SCRAM) inside requests.
+	db.SetMaxIdleConns(maxConnections)
+	db.SetConnMaxIdleTime(maxIdleTime)
 	if err := db.PingContext(ctx); err != nil {
 		_ = db.Close()
 		return nil, nil, err

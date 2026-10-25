@@ -415,14 +415,14 @@
   .rr-chat-draft .rr-embed .rr-media {
     @apply max-h-40;
   }
-  .rr-embed[data-selected] .rr-media {
+  .ProseMirror-focused .rr-embed[data-selected] .rr-media {
     @apply ring-primary ring-2;
   }
   .rr-media-resize {
     @apply bg-background absolute top-1/2 z-10 h-12 w-1.5 -translate-y-1/2 cursor-ew-resize touch-none rounded-full border opacity-0 shadow-sm transition-opacity;
   }
   .rr-embed:hover .rr-media-resize,
-  .rr-embed[data-selected] .rr-media-resize {
+  .ProseMirror-focused .rr-embed[data-selected] .rr-media-resize {
     @apply opacity-100;
   }
   .rr-lightbox-image {

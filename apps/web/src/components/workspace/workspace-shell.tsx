@@ -27,10 +27,10 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
   return (
     <div
       data-sidebar-collapsed={isNavigationHidden || undefined}
-      className="group/shell bg-sidebar flex h-svh w-full overflow-hidden"
+      className="group/shell bg-sidebar dank:md:gap-3 dank:md:p-3 flex h-svh w-full overflow-hidden"
     >
       <Navigation />
-      <div className="dank:md:gap-0 dank:md:pt-0 dank:md:pr-6 dank:md:pb-6 dank:md:pl-6 flex min-w-0 flex-1 flex-col md:gap-2 md:py-2 md:pr-2 md:group-data-sidebar-collapsed/shell:pl-2">
+      <div className="dank:md:gap-3 dank:md:p-0 flex min-w-0 flex-1 flex-col md:gap-2 md:py-2 md:pr-2 md:group-data-sidebar-collapsed/shell:pl-2">
         <FallbackMobileBar />
         {TopBar && <TopBar />}
         <main className="bg-background dank:border-0 flex min-h-0 flex-1 flex-col overflow-hidden has-data-[slot=split-view]:border-0 has-data-[slot=split-view]:bg-transparent md:rounded-lg md:border">
