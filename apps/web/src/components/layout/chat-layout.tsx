@@ -49,6 +49,7 @@ export function ChatLayout({
       if (isAtEndRef.current) scroller.scrollTop = scroller.scrollHeight;
     });
     observer.observe(content);
+    observer.observe(scroller);
     return () => observer.disconnect();
   }, []);
 
@@ -72,7 +73,7 @@ export function ChatLayout({
     <ChatScrollContext value={{ scrollToEnd }}>
       <div
         data-slot="chat-layout"
-        className="dank:gap-2 dank:bg-sidebar flex min-h-0 w-full flex-1 flex-col"
+        className="dank:gap-3 dank:bg-sidebar flex min-h-0 w-full flex-1 flex-col"
       >
         {bar && separatesBars && (
           <div
@@ -99,11 +100,19 @@ export function ChatLayout({
             onScroll={onScroll}
             className="group/page flex min-h-0 flex-1 flex-col overflow-y-auto"
           >
-            <div ref={contentRef} className={cn(column, "flex flex-col gap-6 py-6")}>
+            <div
+              ref={contentRef}
+              data-slot="chat-column"
+              className={cn(column, "flex flex-col gap-6 py-6")}
+            >
               {children}
             </div>
           </div>
-          {composer && <div className={cn(column, "shrink-0 pb-4")}>{composer}</div>}
+          {composer && (
+            <div data-slot="chat-composer" className={cn(column, "shrink-0 pb-4")}>
+              {composer}
+            </div>
+          )}
         </div>
       </div>
     </ChatScrollContext>

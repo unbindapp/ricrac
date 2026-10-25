@@ -143,7 +143,7 @@ export function DiscussionRow({ discussion }: { discussion: Discussion }) {
   );
 }
 
-function DiscussionCounts({ discussion }: { discussion: Discussion }) {
+export function DiscussionCounts({ discussion }: { discussion: Discussion }) {
   return (
     <span className="ml-auto flex shrink-0 items-center gap-3 tabular-nums">
       <SimpleTooltip
@@ -166,7 +166,7 @@ function DiscussionCounts({ discussion }: { discussion: Discussion }) {
   );
 }
 
-function DiscussionContextMenu({
+export function DiscussionContextMenu({
   discussion,
   trigger,
   children,
@@ -219,8 +219,13 @@ function DiscussionContextMenu({
 const MAX_CARD_TAGS = 3;
 const MAX_ROW_TAGS = 2;
 
+/** The image or video the forum shows for a discussion: its thumbnail, or the first in its body. */
+export function discussionCover({ body, thumbnailUrl }: Pick<Discussion, "body" | "thumbnailUrl">) {
+  return thumbnailUrl ? { url: thumbnailUrl, kind: "image" as const } : firstEmbed(body ?? "");
+}
+
 function DiscussionPreview({ body, thumbnailUrl }: { body: string; thumbnailUrl: string | null }) {
-  const embed = thumbnailUrl ? { url: thumbnailUrl, kind: "image" as const } : firstEmbed(body);
+  const embed = discussionCover({ body, thumbnailUrl });
   if (embed?.kind === "image") {
     return (
       <div className="bg-muted aspect-video overflow-hidden border-b">

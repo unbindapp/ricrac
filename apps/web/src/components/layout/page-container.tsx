@@ -51,7 +51,7 @@ export function PageContainer({ width = "full", children }: TProps) {
   return (
     <PageSlotsContext value={{ bar: isBarApart ? bar : null, fab }}>
       {isBarApart ? (
-        <div className="bg-sidebar flex min-h-0 w-full flex-1 flex-col gap-2">
+        <div className="bg-sidebar flex min-h-0 w-full flex-1 flex-col gap-3">
           <div
             ref={setBar}
             data-slot="page-bar-slot"

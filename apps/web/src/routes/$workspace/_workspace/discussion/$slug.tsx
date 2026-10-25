@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
+import type { ReactNode } from "react";
 import { useLocalStorage } from "usehooks-ts";
 import { z } from "zod";
 
@@ -26,6 +27,9 @@ const searchSchema = z.object({
   thread: z.string().optional(),
   /** The message whose replies are open beside the discussion. */
   message: z.string().optional(),
+  /** The forum's filters, when the discussion opens beside its list. */
+  status: z.enum(["closed", "all", "trash"]).optional(),
+  tag: z.string().optional(),
 });
 
 export const Route = createFileRoute("/$workspace/_workspace/discussion/$slug")({
@@ -35,11 +39,11 @@ export const Route = createFileRoute("/$workspace/_workspace/discussion/$slug")(
 
 function DiscussionSlugPage() {
   const { slug } = Route.useParams();
-  const { thread, message } = Route.useSearch();
+  const { thread, message, status, tag } = Route.useSearch();
   const navigate = Route.useNavigate();
   const { workspace } = useWorkspace();
   const { size } = useDeviceSize();
-  const { threadsInChat } = useUiTheme();
+  const { threadsInChat, ForumPanes } = useUiTheme();
   const [isChatShown, setIsChatShown] = useLocalStorage("discussion-chat-shown", true);
   const { data, isPending, error, refetch } = useQuery(discussionQuery(workspace.id, slug));
   const hasPanel = size === "lg" || size === "xl";
@@ -60,25 +64,25 @@ function DiscussionSlugPage() {
       replace: true,
     });
 
-  if (isPending) {
-    return (
-      <PageContainer width="narrow">
-        <ListSkeleton rows={4} />
-      </PageContainer>
+  const filters = { status, tag };
+  const placeholder = (content: ReactNode) =>
+    ForumPanes ? (
+      <ForumPanes filters={filters} fallback={content} />
+    ) : (
+      <PageContainer width="narrow">{content}</PageContainer>
     );
-  }
+
+  if (isPending) return placeholder(<ListSkeleton rows={4} />);
   if (error) {
-    return (
-      <PageContainer width="narrow">
-        {isMissing(error) ? (
-          <EntityNotFound
-            Icon={MessagesSquareIcon}
-            description="Discussion not found. It was deleted, or you cannot see it."
-          />
-        ) : (
-          <ErrorCard message={error.message} onRetry={() => void refetch()} />
-        )}
-      </PageContainer>
+    return placeholder(
+      isMissing(error) ? (
+        <EntityNotFound
+          Icon={MessagesSquareIcon}
+          description="Discussion not found. It was deleted, or you cannot see it."
+        />
+      ) : (
+        <ErrorCard message={error.message} onRetry={() => void refetch()} />
+      ),
     );
   }
 
@@ -120,6 +124,16 @@ function DiscussionSlugPage() {
     />
   );
 
+  if (ForumPanes) {
+    return (
+      <ForumPanes
+        filters={filters}
+        discussion={data}
+        chat={threadPanel ?? mainChat}
+        isThreadOpen={Boolean(threadPanel)}
+      />
+    );
+  }
   if (!hasPanel) return threadPanel ?? detail("inline");
   if (!isAsideShown) return <SplitView main={detail("hidden")} />;
   return <SplitView main={detail("aside")} aside={threadPanel ?? mainChat} />;

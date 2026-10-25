@@ -1,0 +1,12 @@
+/* Panes on the shell, rounded as in the Ricrac layout mockup. */
+:root[data-ui-theme="dank"]
+  :is(
+    main,
+    [data-slot="page-bar-slot"],
+    [data-slot="page-container"][data-bar="apart"],
+    [data-slot="split-pane"],
+    [data-slot="chat-layout"] > div,
+    [data-slot="panel-bar"]
+  ) {
+  border-radius: 24px;
+}

@@ -16,5 +16,6 @@ export const defaultTheme: TUiTheme = {
   expandsReplies: false,
   chatBubbles: false,
   threadsInChat: false,
+  editorToolbars: true,
   defaultAccentHue: DEFAULT_ACCENT_HUE,
 };

@@ -66,36 +66,12 @@ export function DiscussionDetail({
 }: TProps) {
   const { workspace, canEdit } = useWorkspace();
   const { threadsInChat } = useUiTheme();
-  const canRewrite = useCanRewrite(discussion.creator);
-  const { data: me } = useQuery(meQuery);
-  const { mutate: save, mutateAsync: saveAsync } = useSaveDiscussionMutation(workspace.id);
-  const { mutateAsync: changeLifecycle } = useDiscussionLifecycleMutation(workspace.id);
-  const navigate = useNavigate();
-  const [isEditingThumbnail, setIsEditingThumbnail] = useState(false);
-  const isPinned = Boolean(discussion.pinnedAt);
-  const isClosed = Boolean(discussion.closedAt);
-  const isSubscribed = discussion.subscribers.some((user) => user.id === me?.id);
-  const forumLink = { to: "/$workspace/forum", params: { workspace: workspace.urlKey } } as const;
-
-  const trash = () =>
-    void changeLifecycle({ id: discussion.id, action: "trash" })
-      .then(async () => {
-        await navigate(forumLink);
-        toastTrashed(
-          "Discussion moved to trash",
-          () =>
-            void changeLifecycle({ id: discussion.id, action: "restore" })
-              .then(() => toast.add({ type: "success", title: "Discussion restored" }))
-              .catch(() => undefined),
-        );
-      })
-      .catch(() => undefined);
 
   const breadcrumb: TBreadcrumbItem[] = [
     {
       label: "Forum",
       icon: <MessagesSquareIcon className="size-4" />,
-      link: forumLink,
+      link: { to: "/$workspace/forum", params: { workspace: workspace.urlKey } },
     },
     { label: discussion.title },
   ];
@@ -105,96 +81,15 @@ export function DiscussionDetail({
       <div className="min-w-0 flex-1">
         <Breadcrumb items={breadcrumb} />
       </div>
-      <HeaderActions>
+      <DiscussionActions discussion={discussion}>
         {chat !== "inline" && <ChatToggle isShown={chat === "aside"} onToggle={onToggleChat} />}
-        <CopyLinkAction url={discussion.url} />
-        {canEdit && (
-          <>
-            <HeaderAction
-              label={isSubscribed ? "Unsubscribe" : "Subscribe"}
-              onClick={() =>
-                save(
-                  isSubscribed
-                    ? { id: discussion.id, removeSubscribers: ["me"] }
-                    : { id: discussion.id, addSubscribers: ["me"] },
-                )
-              }
-            >
-              {isSubscribed ? <BellOffIcon className="size-4" /> : <BellIcon className="size-4" />}
-            </HeaderAction>
-            <HeaderAction
-              label={isPinned ? "Unpin" : "Pin to the top"}
-              onClick={() => save({ id: discussion.id, pinned: !isPinned })}
-            >
-              {isPinned ? <PinOffIcon className="size-4" /> : <PinIcon className="size-4" />}
-            </HeaderAction>
-            <HeaderAction
-              label={isClosed ? "Reopen discussion" : "Close discussion"}
-              onClick={() => save({ id: discussion.id, closed: !isClosed })}
-            >
-              {isClosed ? <LockOpenIcon className="size-4" /> : <LockIcon className="size-4" />}
-            </HeaderAction>
-          </>
-        )}
-        {canRewrite && (
-          <EntityMenu noun="discussion" onTrash={trash}>
-            <DropdownMenuItem onClick={() => setIsEditingThumbnail(true)}>
-              <ImageIcon className="size-4" />
-              Change thumbnail
-            </DropdownMenuItem>
-          </EntityMenu>
-        )}
-      </HeaderActions>
+      </DiscussionActions>
     </>
   );
 
   const topic = (
     <>
-      <div data-m3-title className="flex flex-col gap-2">
-        <InlineText
-          value={discussion.title}
-          label="Discussion title"
-          maxLength={DISCUSSION_TITLE_MAX_LENGTH}
-          readOnly={!canRewrite}
-          onSave={(title) => save({ id: discussion.id, title })}
-        />
-        <div className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">
-          {canEdit ? (
-            <DiscussionTagsPicker
-              value={discussion.tags}
-              onChange={(tags) => save({ id: discussion.id, tags })}
-            />
-          ) : (
-            <DiscussionTagBadges tags={discussion.tags} />
-          )}
-          {discussion.creator && (
-            <span>
-              Started by {discussion.creator.name} <RelativeTime value={discussion.createdAt} />
-            </span>
-          )}
-          {isPinned && (
-            <Badge variant="process" data-m3-chip="assist">
-              <PinIcon />
-              Pinned
-            </Badge>
-          )}
-          {isClosed && (
-            <Badge variant="muted" data-m3-chip="assist">
-              <LockIcon />
-              Closed
-            </Badge>
-          )}
-          {discussion.subscribers.length > 0 && (
-            <SimpleTooltip
-              content={`Subscribed: ${discussion.subscribers.map((user) => user.name).join(", ")}`}
-            >
-              <span className="ml-auto flex" aria-label="Subscribers">
-                <AvatarStack users={discussion.subscribers} max={5} />
-              </span>
-            </SimpleTooltip>
-          )}
-        </div>
-      </div>
+      <DiscussionHeading discussion={discussion} />
       {!threadsInChat && (
         <ThreadBranches
           discussion={discussion}
@@ -202,28 +97,7 @@ export function DiscussionDetail({
           isMainChatOpen={!openThreadId && !openMessageId}
         />
       )}
-      <AutosaveMarkdown
-        label="Discussion body"
-        placeholder="Write it up…"
-        value={discussion.body ?? ""}
-        readOnly={!canRewrite}
-        onSave={async (after, before) => {
-          const saved = await saveAsync({ id: discussion.id, edit: { before, after } });
-          return saved.body ?? "";
-        }}
-      />
-      <Dialog open={isEditingThumbnail} onOpenChange={setIsEditingThumbnail}>
-        <DialogContent className="w-xl max-w-full">
-          <DialogHeader>
-            <DialogTitle>Thumbnail</DialogTitle>
-          </DialogHeader>
-          <ThumbnailPicker
-            value={discussion.thumbnailUrl}
-            body={discussion.body ?? ""}
-            onChange={(thumbnailUrl) => save({ id: discussion.id, thumbnailUrl })}
-          />
-        </DialogContent>
-      </Dialog>
+      <DiscussionBody discussion={discussion} />
     </>
   );
 
@@ -252,6 +126,167 @@ export function DiscussionDetail({
         onOpenMessage={onOpenMessage}
       />
     </ChatLayout>
+  );
+}
+
+/** Copying, subscribing, pinning, closing and trashing the discussion, after the buttons passed in. */
+export function DiscussionActions({
+  discussion,
+  children,
+}: {
+  discussion: TDiscussionDetail;
+  children?: ReactNode;
+}) {
+  const { workspace, canEdit } = useWorkspace();
+  const canRewrite = useCanRewrite(discussion.creator);
+  const { data: me } = useQuery(meQuery);
+  const { mutate: save } = useSaveDiscussionMutation(workspace.id);
+  const { mutateAsync: changeLifecycle } = useDiscussionLifecycleMutation(workspace.id);
+  const navigate = useNavigate();
+  const [isEditingThumbnail, setIsEditingThumbnail] = useState(false);
+  const isPinned = Boolean(discussion.pinnedAt);
+  const isClosed = Boolean(discussion.closedAt);
+  const isSubscribed = discussion.subscribers.some((user) => user.id === me?.id);
+
+  const trash = () =>
+    void changeLifecycle({ id: discussion.id, action: "trash" })
+      .then(async () => {
+        await navigate({ to: "/$workspace/forum", params: { workspace: workspace.urlKey } });
+        toastTrashed(
+          "Discussion moved to trash",
+          () =>
+            void changeLifecycle({ id: discussion.id, action: "restore" })
+              .then(() => toast.add({ type: "success", title: "Discussion restored" }))
+              .catch(() => undefined),
+        );
+      })
+      .catch(() => undefined);
+
+  return (
+    <HeaderActions>
+      {children}
+      <CopyLinkAction url={discussion.url} />
+      {canEdit && (
+        <>
+          <HeaderAction
+            label={isSubscribed ? "Unsubscribe" : "Subscribe"}
+            onClick={() =>
+              save(
+                isSubscribed
+                  ? { id: discussion.id, removeSubscribers: ["me"] }
+                  : { id: discussion.id, addSubscribers: ["me"] },
+              )
+            }
+          >
+            {isSubscribed ? <BellOffIcon className="size-4" /> : <BellIcon className="size-4" />}
+          </HeaderAction>
+          <HeaderAction
+            label={isPinned ? "Unpin" : "Pin to the top"}
+            onClick={() => save({ id: discussion.id, pinned: !isPinned })}
+          >
+            {isPinned ? <PinOffIcon className="size-4" /> : <PinIcon className="size-4" />}
+          </HeaderAction>
+          <HeaderAction
+            label={isClosed ? "Reopen discussion" : "Close discussion"}
+            onClick={() => save({ id: discussion.id, closed: !isClosed })}
+          >
+            {isClosed ? <LockOpenIcon className="size-4" /> : <LockIcon className="size-4" />}
+          </HeaderAction>
+        </>
+      )}
+      {canRewrite && (
+        <EntityMenu noun="discussion" onTrash={trash}>
+          <DropdownMenuItem onClick={() => setIsEditingThumbnail(true)}>
+            <ImageIcon className="size-4" />
+            Change thumbnail
+          </DropdownMenuItem>
+        </EntityMenu>
+      )}
+      <Dialog open={isEditingThumbnail} onOpenChange={setIsEditingThumbnail}>
+        <DialogContent className="w-xl max-w-full">
+          <DialogHeader>
+            <DialogTitle>Thumbnail</DialogTitle>
+          </DialogHeader>
+          <ThumbnailPicker
+            value={discussion.thumbnailUrl}
+            body={discussion.body ?? ""}
+            onChange={(thumbnailUrl) => save({ id: discussion.id, thumbnailUrl })}
+          />
+        </DialogContent>
+      </Dialog>
+    </HeaderActions>
+  );
+}
+
+/** The editable title over the tags, who started it and when, and who follows it. */
+export function DiscussionHeading({ discussion }: { discussion: TDiscussionDetail }) {
+  const { workspace, canEdit } = useWorkspace();
+  const canRewrite = useCanRewrite(discussion.creator);
+  const { mutate: save } = useSaveDiscussionMutation(workspace.id);
+  return (
+    <div data-m3-title className="flex flex-col gap-2">
+      <InlineText
+        value={discussion.title}
+        label="Discussion title"
+        maxLength={DISCUSSION_TITLE_MAX_LENGTH}
+        readOnly={!canRewrite}
+        onSave={(title) => save({ id: discussion.id, title })}
+      />
+      <div className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">
+        {canEdit ? (
+          <DiscussionTagsPicker
+            value={discussion.tags}
+            onChange={(tags) => save({ id: discussion.id, tags })}
+          />
+        ) : (
+          <DiscussionTagBadges tags={discussion.tags} />
+        )}
+        {discussion.creator && (
+          <span>
+            Started by {discussion.creator.name} <RelativeTime value={discussion.createdAt} />
+          </span>
+        )}
+        {discussion.pinnedAt && (
+          <Badge variant="process" data-m3-chip="assist">
+            <PinIcon />
+            Pinned
+          </Badge>
+        )}
+        {discussion.closedAt && (
+          <Badge variant="muted" data-m3-chip="assist">
+            <LockIcon />
+            Closed
+          </Badge>
+        )}
+        {discussion.subscribers.length > 0 && (
+          <SimpleTooltip
+            content={`Subscribed: ${discussion.subscribers.map((user) => user.name).join(", ")}`}
+          >
+            <span className="ml-auto flex" aria-label="Subscribers">
+              <AvatarStack users={discussion.subscribers} max={5} />
+            </span>
+          </SimpleTooltip>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function DiscussionBody({ discussion }: { discussion: TDiscussionDetail }) {
+  const { workspace } = useWorkspace();
+  const canRewrite = useCanRewrite(discussion.creator);
+  const { mutateAsync: saveAsync } = useSaveDiscussionMutation(workspace.id);
+  return (
+    <AutosaveMarkdown
+      label="Discussion body"
+      placeholder="Write it up…"
+      value={discussion.body ?? ""}
+      readOnly={!canRewrite}
+      onSave={async (after, before) => {
+        const saved = await saveAsync({ id: discussion.id, edit: { before, after } });
+        return saved.body ?? "";
+      }}
+    />
   );
 }
 
