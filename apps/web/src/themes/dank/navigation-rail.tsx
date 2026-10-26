@@ -173,7 +173,7 @@ export function NavigationRail({
 }
 
 const railItemClassName =
-  "relative flex h-14 w-full shrink-0 items-center justify-start gap-3 overflow-hidden rounded-full px-4 text-left text-[15px] leading-5 font-medium whitespace-nowrap text-m3-on-surface-variant transition-colors select-none has-hover:hover:bg-m3-surface-variant data-[status=active]:bg-m3-secondary-container data-[status=active]:text-m3-on-secondary-container data-current:bg-m3-secondary-container data-current:text-m3-on-secondary-container";
+  "relative flex h-14 w-full shrink-0 items-center justify-start gap-3 overflow-hidden rounded-full px-4 text-left text-[15px] leading-5 font-medium whitespace-nowrap transition-colors select-none";
 
 type TRailIcon = ComponentType<{ className?: string }>;
 
@@ -238,6 +238,7 @@ function RailLink({
         aria-current={isUnder ? "page" : undefined}
         data-current={isUnder || undefined}
         activeOptions={{ includeSearch: false }}
+        data-slot="rail-item"
         className={railItemClassName}
         onClick={onNavigate}
       >
@@ -268,6 +269,7 @@ function RailButton({
       forceMinSize={false}
       aria-label={isExpanded ? undefined : label}
       {...props}
+      data-slot="rail-item"
       className={cn(railItemClassName, "after:hidden active:rounded-full", className)}
     >
       <RailItemContent icon={icon} label={label} isExpanded={isExpanded} />
