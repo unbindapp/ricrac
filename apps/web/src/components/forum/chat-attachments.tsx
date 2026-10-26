@@ -168,28 +168,33 @@ function AttachmentPreview({ item }: { item: TDraftAttachment }) {
 /** What a message carries under its text: media to open, files to download. */
 export function MessageAttachments({ attachments }: { attachments: TChatAttachment[] }) {
   if (attachments.length === 0) return null;
+  const media = attachments.filter((attachment) => attachment.kind !== "file");
+  const files = attachments.filter((attachment) => attachment.kind === "file");
   return (
-    <div className="rr-chat flex flex-wrap items-start gap-2">
-      {attachments.map((attachment, index) =>
-        attachment.kind === "file" ? (
-          <a
-            key={`${index}:${attachment.markdown}`}
-            href={attachment.url}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="bg-card has-hover:hover:bg-card-hover dank:relative dank:state-layer dank:has-hover:hover:bg-card dank:px-4 flex h-14 w-64 max-w-full items-center gap-3 rounded-md border px-3 transition-colors"
-          >
-            <FileIcon className="text-muted-foreground size-5 shrink-0" />
-            <span className="text-primary min-w-0 truncate text-sm">{attachment.name}</span>
-          </a>
-        ) : (
-          <MarkdownMedia
-            key={`${index}:${attachment.markdown}`}
-            src={attachment.url}
-            alt={attachment.name}
-          />
-        ),
+    <div className="rr-chat flex max-w-full flex-wrap items-start gap-2">
+      {media.length > 0 && (
+        <div data-slot="message-media" data-count={media.length} className="contents">
+          {media.map((attachment, index) => (
+            <MarkdownMedia
+              key={`${index}:${attachment.markdown}`}
+              src={attachment.url}
+              alt={attachment.name}
+            />
+          ))}
+        </div>
       )}
+      {files.map((attachment, index) => (
+        <a
+          key={`${index}:${attachment.markdown}`}
+          href={attachment.url}
+          target="_blank"
+          rel="noreferrer noopener"
+          className="bg-card has-hover:hover:bg-card-hover dank:relative dank:state-layer dank:has-hover:hover:bg-card dank:px-4 flex h-14 w-64 max-w-full items-center gap-3 rounded-md border px-3 transition-colors"
+        >
+          <FileIcon className="text-muted-foreground size-5 shrink-0" />
+          <span className="text-primary min-w-0 truncate text-sm">{attachment.name}</span>
+        </a>
+      ))}
     </div>
   );
 }

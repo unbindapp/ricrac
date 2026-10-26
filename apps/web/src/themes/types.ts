@@ -37,7 +37,7 @@ export type TUiTheme = {
   threadsInChat: boolean;
   /** Lists the forum in a pane beside the open discussion, whose topic and chat share a panel. */
   ForumPanes?: ComponentType<TForumPanesProps>;
-  /** Editors show toolbars for formatting text and laying out images. */
+  /** Editors show toolbars for formatting text and laying out images, which resize from their edges. */
   editorToolbars: boolean;
   /** Top-level pages show their title in a bar; without it their actions join the toolbar. */
   pageTitles: boolean;

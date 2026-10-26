@@ -196,20 +196,18 @@ function PlacedMedia({
             onClick={() => !isEditable && setIsOpen(true)}
           />
         )}
-        {isEditable && (
+        {isEditable && editorToolbars && (
           <>
-            {editorToolbars && (
-              <MediaControls
-                kind={kind}
-                layout={layout}
-                onChange={onChange}
-                onOpen={() => setIsOpen(true)}
-                onDelete={onDelete}
-                onDragStart={onDragStart}
-                url={url}
-                name={name}
-              />
-            )}
+            <MediaControls
+              kind={kind}
+              layout={layout}
+              onChange={onChange}
+              onOpen={() => setIsOpen(true)}
+              onDelete={onDelete}
+              onDragStart={onDragStart}
+              url={url}
+              name={name}
+            />
             <span
               aria-hidden
               data-media-resize="start"

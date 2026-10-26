@@ -99,7 +99,10 @@ export function ChatLayout({
           </PageSlotsContext>
         )}
         {!lead && header}
-        <div className="dank:rounded-lg dank:bg-background flex min-h-0 flex-1 flex-col overflow-hidden">
+        <div
+          data-slot="chat-body"
+          className="dank:rounded-lg dank:bg-background flex min-h-0 flex-1 flex-col overflow-hidden"
+        >
           <div
             ref={scrollRef}
             data-width="narrow"

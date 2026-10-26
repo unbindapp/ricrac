@@ -287,12 +287,45 @@
       background-color: transparent;
     }
 
+    /* A gutter for what reaches past the column, like a message's highlight. */
+    & [data-slot="chat-body"] {
+      margin-inline: -12px;
+    }
+
     & [data-slot="chat-column"] {
-      padding: 0 0 12px;
+      padding: 0 12px 12px;
     }
 
     & [data-slot="chat-composer"] {
-      padding: 0;
+      padding: 0 12px;
+    }
+  }
+
+  & [data-slot="message-media"]:not([data-count="1"]) {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    width: 28rem;
+    max-width: 100%;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+
+    &:is([data-count="2"], [data-count="4"]) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    & .rr-embed {
+      width: 100%;
+      max-width: none;
+    }
+
+    & .rr-media {
+      width: 100%;
+      max-height: none;
+      aspect-ratio: 1;
+      border: 0;
+      border-radius: var(--radius-xs);
+      object-fit: cover;
     }
   }
 }

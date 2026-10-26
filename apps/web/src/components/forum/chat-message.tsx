@@ -97,6 +97,7 @@ export function ChatMessage({
   const canStartThread = canEdit && Boolean(onNewThread);
   const canChange = isAuthor && canEdit;
   const canDelete = isAuthor || isAdmin;
+  const edit = canChange ? () => setIsEditing(true) : undefined;
 
   const actionItems = (
     <>
@@ -107,7 +108,7 @@ export function ChatMessage({
         </DropdownMenuItem>
       )}
       {canChange && (
-        <DropdownMenuItem onClick={() => setIsEditing(true)}>
+        <DropdownMenuItem onClick={edit}>
           <PencilIcon className="size-4" />
           Edit
         </DropdownMenuItem>
@@ -225,13 +226,16 @@ export function ChatMessage({
         {isEditing ? (
           <div className="w-full">{editor}</div>
         ) : (
-          <div className={cn("flex w-full min-w-0", isMine && "justify-end")}>
+          <div
+            className={cn("flex w-full min-w-0 items-start gap-2", isMine && "flex-row-reverse")}
+          >
             <div
               className={cn(
-                "relative flex max-w-4/5 min-w-0 flex-col gap-1.5",
+                "flex max-w-4/5 min-w-0 flex-col gap-1.5",
                 isMine ? "items-end" : "items-start",
               )}
               onContextMenu={keepNativeMenu}
+              onDoubleClick={edit}
             >
               {text && (
                 <div
@@ -248,8 +252,10 @@ export function ChatMessage({
               )}
               <MessageAttachments attachments={attachments} />
               {edited}
-              {hasActions && (
-                <div className="bg-popover shadow-elevation-2 absolute right-0 -bottom-3 z-10 flex items-center gap-1 rounded-full p-1 opacity-0 group-hover/message:opacity-100 focus-within:opacity-100 has-data-popup-open:opacity-100">
+            </div>
+            {hasActions && (
+              <div className="touch:hidden h-0 shrink-0">
+                <div className="bg-popover shadow-elevation-2 relative z-10 flex -translate-y-1/2 items-center gap-1 rounded-full p-1 opacity-0 group-hover/message:opacity-100 focus-within:opacity-100 has-data-popup-open:opacity-100">
                   {isContinuation && (
                     <span className="px-2">
                       <MessageTime value={message.createdAt} />
@@ -257,8 +263,8 @@ export function ChatMessage({
                   )}
                   {actionButtons}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         )}
         {after}
@@ -295,7 +301,11 @@ export function ChatMessage({
         {isEditing ? (
           editor
         ) : (
-          <div className="flex min-w-0 flex-col gap-1.5" onContextMenu={keepNativeMenu}>
+          <div
+            className="flex min-w-0 flex-col gap-1.5"
+            onContextMenu={keepNativeMenu}
+            onDoubleClick={edit}
+          >
             {text && <div className="rr-chat flex min-w-0 flex-col">{textView}</div>}
             <MessageAttachments attachments={attachments} />
             {edited}
