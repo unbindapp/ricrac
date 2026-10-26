@@ -12,8 +12,6 @@ import (
 //go:embed templates/*
 var templateFS embed.FS
 
-const logoName = "logo.png"
-
 var layoutFuncs = htmltemplate.FuncMap{
 	"avatarColor":     AvatarColor,
 	"msoStyle":        constHTML(`<!--[if mso]><style>table,td,a,span{font-family:'Segoe UI',Arial,sans-serif !important;}</style><![endif]-->`),
@@ -33,16 +31,7 @@ func constHTML(markup string) func() htmltemplate.HTML {
 var (
 	htmlTemplate = htmltemplate.Must(htmltemplate.New("layout.html").Funcs(layoutFuncs).ParseFS(templateFS, "templates/layout.html"))
 	textTemplate = texttemplate.Must(texttemplate.New("layout.txt").Funcs(texttemplate.FuncMap{"lines": splitLines}).ParseFS(templateFS, "templates/layout.txt"))
-	logoPNG      = mustRead("templates/" + logoName)
 )
-
-func mustRead(name string) []byte {
-	data, err := templateFS.ReadFile(name)
-	if err != nil {
-		panic(err)
-	}
-	return data
-}
 
 // Content is what an email says; every email has the same layout.
 type Content struct {
@@ -105,16 +94,18 @@ func Render(to string, content Content) (Message, error) {
 	if err := textTemplate.Execute(&text, content); err != nil {
 		return Message{}, err
 	}
-	if err := htmlTemplate.Execute(&html, layout{Content: content, LogoSrc: htmltemplate.URL("cid:" + logoName)}); err != nil {
+	if err := htmlTemplate.Execute(&html, layout{Content: content, LogoSrc: logoSrc(content.Footer.InstanceURL)}); err != nil {
 		return Message{}, err
 	}
-	return Message{
-		To:      to,
-		Subject: content.Subject,
-		Text:    text.String(),
-		HTML:    html.String(),
-		Inline:  []Inline{{Name: logoName, ContentType: "image/png", Data: logoPNG}},
-	}, nil
+	return Message{To: to, Subject: content.Subject, Text: text.String(), HTML: html.String()}, nil
+}
+
+// logoSrc is the web app's icon on the instance.
+func logoSrc(instanceURL string) htmltemplate.URL {
+	if instanceURL == "" {
+		return ""
+	}
+	return htmltemplate.URL(strings.TrimSuffix(instanceURL, "/") + "/icon-192.png")
 }
 
 var avatarPalette = []string{"#95a2b3", "#5e6ad2", "#26b5ce", "#0f783c", "#4cb782", "#f2c94c", "#f2994a", "#eb5757",
