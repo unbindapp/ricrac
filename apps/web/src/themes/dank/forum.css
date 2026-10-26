@@ -236,12 +236,64 @@
     display: flex;
     flex: 1;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     min-height: 0;
     padding: 20px;
     overflow: hidden;
     border-radius: 24px;
     background-color: var(--m3-surface-container-lowest);
+  }
+
+  & [data-slot="discussion-bar"] {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  & [data-slot="discussion-channel"] {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    color: var(--m3-on-surface-variant);
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  & [data-slot="button-group"] {
+    display: flex;
+    flex: none;
+    gap: 2px;
+
+    & > button {
+      width: 56px;
+      height: 40px;
+      border-radius: 4px;
+      background-color: var(--m3-surface-container-high);
+      color: var(--m3-on-surface);
+
+      &:first-child {
+        border-top-left-radius: 20px;
+        border-bottom-left-radius: 20px;
+      }
+
+      &:last-child {
+        border-top-right-radius: 20px;
+        border-bottom-right-radius: 20px;
+      }
+
+      &:active,
+      &[data-popup-open] {
+        border-radius: 20px;
+      }
+
+      & svg {
+        width: 24px;
+        height: 24px;
+      }
+    }
   }
 
   & [data-slot="discussion-panel"] [data-m3-title] textarea[data-variant="title"] {
@@ -251,7 +303,16 @@
   & [data-slot="discussion-post"] {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--m3-surface-variant);
+
+    & [data-slot="markdown-editor"] .rr-prose {
+      max-width: 70ch;
+      color: var(--m3-on-surface-variant);
+      font-size: 15px;
+      line-height: 1.5;
+    }
   }
 
   & [data-slot="discussion-cover"] {
@@ -287,12 +348,46 @@
       background-color: transparent;
     }
 
+    /* A gutter for what reaches past the column, like a message's highlight. */
+    & [data-slot="chat-body"] {
+      margin-inline: -12px;
+    }
+
     & [data-slot="chat-column"] {
-      padding: 0 0 12px;
+      gap: 16px;
+      padding: 4px 12px 12px;
     }
 
     & [data-slot="chat-composer"] {
-      padding: 0;
+      padding: 0 12px;
+    }
+  }
+
+  & [data-slot="message-media"]:not([data-count="1"]) {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    width: 28rem;
+    max-width: 100%;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+
+    &:is([data-count="2"], [data-count="4"]) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    & .rr-embed {
+      width: 100%;
+      max-width: none;
+    }
+
+    & .rr-media {
+      width: 100%;
+      max-height: none;
+      aspect-ratio: 1;
+      border: 0;
+      border-radius: var(--radius-xs);
+      object-fit: cover;
     }
   }
 }

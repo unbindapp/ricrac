@@ -132,9 +132,12 @@ export function DiscussionDetail({
 /** Copying, subscribing, pinning, closing and trashing the discussion, after the buttons passed in. */
 export function DiscussionActions({
   discussion,
+  grouped = false,
   children,
 }: {
   discussion: TDiscussionDetail;
+  /** Only copying is a button of its own; the rest wait in the ⋯ menu. */
+  grouped?: boolean;
   children?: ReactNode;
 }) {
   const { workspace, canEdit } = useWorkspace();
@@ -162,22 +165,75 @@ export function DiscussionActions({
       })
       .catch(() => undefined);
 
+  const subscribe = () =>
+    save(
+      isSubscribed
+        ? { id: discussion.id, removeSubscribers: ["me"] }
+        : { id: discussion.id, addSubscribers: ["me"] },
+    );
+  const thumbnailDialog = (
+    <Dialog open={isEditingThumbnail} onOpenChange={setIsEditingThumbnail}>
+      <DialogContent className="w-xl max-w-full">
+        <DialogHeader>
+          <DialogTitle>Thumbnail</DialogTitle>
+        </DialogHeader>
+        <ThumbnailPicker
+          value={discussion.thumbnailUrl}
+          body={discussion.body ?? ""}
+          onChange={(thumbnailUrl) => save({ id: discussion.id, thumbnailUrl })}
+        />
+      </DialogContent>
+    </Dialog>
+  );
+  const thumbnailItem = (
+    <DropdownMenuItem onClick={() => setIsEditingThumbnail(true)}>
+      <ImageIcon className="size-4" />
+      Change thumbnail
+    </DropdownMenuItem>
+  );
+
+  if (grouped) {
+    return (
+      <>
+        {children}
+        <CopyLinkAction url={discussion.url} />
+        {(canEdit || canRewrite) && (
+          <EntityMenu noun="discussion" onTrash={canRewrite ? trash : undefined}>
+            {canEdit && (
+              <>
+                <DropdownMenuItem onClick={subscribe}>
+                  {isSubscribed ? (
+                    <BellOffIcon className="size-4" />
+                  ) : (
+                    <BellIcon className="size-4" />
+                  )}
+                  {isSubscribed ? "Unsubscribe" : "Subscribe"}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => save({ id: discussion.id, pinned: !isPinned })}>
+                  {isPinned ? <PinOffIcon className="size-4" /> : <PinIcon className="size-4" />}
+                  {isPinned ? "Unpin" : "Pin to the top"}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => save({ id: discussion.id, closed: !isClosed })}>
+                  {isClosed ? <LockOpenIcon className="size-4" /> : <LockIcon className="size-4" />}
+                  {isClosed ? "Reopen discussion" : "Close discussion"}
+                </DropdownMenuItem>
+              </>
+            )}
+            {canRewrite && thumbnailItem}
+          </EntityMenu>
+        )}
+        {thumbnailDialog}
+      </>
+    );
+  }
+
   return (
     <HeaderActions>
       {children}
       <CopyLinkAction url={discussion.url} />
       {canEdit && (
         <>
-          <HeaderAction
-            label={isSubscribed ? "Unsubscribe" : "Subscribe"}
-            onClick={() =>
-              save(
-                isSubscribed
-                  ? { id: discussion.id, removeSubscribers: ["me"] }
-                  : { id: discussion.id, addSubscribers: ["me"] },
-              )
-            }
-          >
+          <HeaderAction label={isSubscribed ? "Unsubscribe" : "Subscribe"} onClick={subscribe}>
             {isSubscribed ? <BellOffIcon className="size-4" /> : <BellIcon className="size-4" />}
           </HeaderAction>
           <HeaderAction
@@ -196,24 +252,10 @@ export function DiscussionActions({
       )}
       {canRewrite && (
         <EntityMenu noun="discussion" onTrash={trash}>
-          <DropdownMenuItem onClick={() => setIsEditingThumbnail(true)}>
-            <ImageIcon className="size-4" />
-            Change thumbnail
-          </DropdownMenuItem>
+          {thumbnailItem}
         </EntityMenu>
       )}
-      <Dialog open={isEditingThumbnail} onOpenChange={setIsEditingThumbnail}>
-        <DialogContent className="w-xl max-w-full">
-          <DialogHeader>
-            <DialogTitle>Thumbnail</DialogTitle>
-          </DialogHeader>
-          <ThumbnailPicker
-            value={discussion.thumbnailUrl}
-            body={discussion.body ?? ""}
-            onChange={(thumbnailUrl) => save({ id: discussion.id, thumbnailUrl })}
-          />
-        </DialogContent>
-      </Dialog>
+      {thumbnailDialog}
     </HeaderActions>
   );
 }

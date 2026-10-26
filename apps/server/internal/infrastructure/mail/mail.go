@@ -2,7 +2,6 @@
 package mail
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -72,13 +71,6 @@ type Message struct {
 	Subject string
 	Text    string
 	HTML    string
-	Inline  []Inline
-}
-
-type Inline struct {
-	Name        string
-	ContentType string
-	Data        []byte
 }
 
 type Sender interface {
@@ -108,20 +100,25 @@ func (s SMTP) Send(ctx context.Context, msg Message) error {
 	if err != nil {
 		return fmt.Errorf("mail client: %w", err)
 	}
-	m := gomail.NewMsg()
-	if err := m.FromFormat(s.Config.From.Name, s.Config.From.Address); err != nil {
-		return fmt.Errorf("from address: %w", err)
+	m, err := build(s.Config.From, msg)
+	if err != nil {
+		return err
+	}
+	return client.DialAndSendWithContext(ctx, m)
+}
+
+// build makes a plain multipart/alternative of the text and HTML.
+func build(from mail.Address, msg Message) (*gomail.Msg, error) {
+	// Spam filters score a User-Agent or X-Mailer header as mail sent straight from a client (DIRECT_TO_MX).
+	m := gomail.NewMsg(gomail.WithNoDefaultUserAgent())
+	if err := m.FromFormat(from.Name, from.Address); err != nil {
+		return nil, fmt.Errorf("from address: %w", err)
 	}
 	if err := m.To(msg.To); err != nil {
-		return fmt.Errorf("to address: %w", err)
+		return nil, fmt.Errorf("to address: %w", err)
 	}
 	m.Subject(msg.Subject)
 	m.SetBodyString(gomail.TypeTextPlain, msg.Text)
 	m.AddAlternativeString(gomail.TypeTextHTML, msg.HTML)
-	for _, inline := range msg.Inline {
-		if err := m.EmbedReader(inline.Name, bytes.NewReader(inline.Data), gomail.WithFileContentType(gomail.ContentType(inline.ContentType))); err != nil {
-			return fmt.Errorf("embed %s: %w", inline.Name, err)
-		}
-	}
-	return client.DialAndSendWithContext(ctx, m)
+	return m, nil
 }

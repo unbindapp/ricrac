@@ -1,14 +1,14 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
-import type { Comment, CommentThread, DiscussionThread, UserRef } from "@/api/ops.gen";
+import type { Comment, CommentThread, DiscussionThread } from "@/api/ops.gen";
 import { ChatDayDivider, ChatMessage, MessageTime } from "@/components/forum/chat-message";
 import { threadKindOf, threadKinds } from "@/components/forum/thread-kinds";
-import { MessageSquareReplyIcon, MessagesSquareIcon, SplitIcon } from "@/components/icons";
+import { MessagesSquareIcon, SplitIcon } from "@/components/icons";
 import { userName } from "@/components/issues/grouping";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
-import { Button, LinkButton } from "@/components/ui/button";
+import { LinkButton } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { chatRows } from "@/lib/helpers/chat";
@@ -32,7 +32,7 @@ export function useChatMessages(target: TCommentTarget) {
 
 type TProps = {
   target: TCommentTarget;
-  /** Replies open in a thread beside the chat; without it they follow the message they answer. */
+  /** Replies open in a thread beside the chat, unless the theme puts them in the timeline; without it they follow the message they answer. */
   threads?: { openId?: string; onOpen: (messageId: string) => void };
   onNewThread?: (message: Comment) => void;
   /** Discussion threads to note in the timeline when they were started. */
@@ -40,29 +40,26 @@ type TProps = {
   empty: { title: string; description: string };
 };
 
-export function ChatMessages({
-  target,
-  threads: threadView,
-  onNewThread,
-  startedThreads = [],
-  empty,
-}: TProps) {
-  const { expandsReplies } = useUiTheme();
-  const { threads, isPending, error, refetch } = useChatMessages(target);
+export function ChatMessages({ target, threads, onNewThread, startedThreads = [], empty }: TProps) {
+  const { inlineReplies, chatBubbles } = useUiTheme();
+  const threadView = inlineReplies ? undefined : threads;
+  const query = useChatMessages(target);
+  const { isPending, error, refetch } = query;
   if (isPending) return <ChatSkeleton />;
   if (error) return <ErrorCard message={error.message} onRetry={() => void refetch()} />;
-  if (threads.length === 0 && startedThreads.length === 0) {
+  if (query.threads.length === 0 && startedThreads.length === 0) {
     return (
       <EmptyState icon={MessagesSquareIcon} title={empty.title} description={empty.description} />
     );
   }
-  const replyTo = new Map<string, UserRef | null>();
-  const messages = threadView ? threads : withRepliesInline(threads, replyTo);
-  const byId = new Map(threads.map((thread) => [thread.id, thread]));
+  const replyTo = new Map<string, Comment>();
+  const messages = threadView ? query.threads : withRepliesInline(query.threads, replyTo);
+  const byId = new Map(query.threads.map((thread) => [thread.id, thread]));
   return (
     <ol aria-label="Messages" className="flex flex-col">
       {chatRows(withThreadStarts(messages, startedThreads)).map((row) => {
         if (row.kind === "day") {
+          if (chatBubbles) return null;
           return (
             <li key={row.key} className="flex flex-col">
               <ChatDayDivider date={row.date} />
@@ -81,8 +78,8 @@ export function ChatMessages({
           <li key={row.key} className="flex flex-col">
             <ChatMessage
               message={message}
-              isContinuation={row.isContinuation}
-              replyTo={replyTo.has(message.id) ? replyTo.get(message.id) : undefined}
+              isContinuation={row.isContinuation && !replyTo.has(message.id)}
+              replyTo={replyTo.get(message.id)}
               thread={
                 threadView && {
                   replies: byId.get(message.id)?.replies ?? [],
@@ -92,35 +89,10 @@ export function ChatMessages({
               }
               onNewThread={onNewThread && (() => onNewThread(message))}
             />
-            {threadView && expandsReplies && (
-              <MessageReplies
-                replies={byId.get(message.id)?.replies ?? []}
-                since={message.createdAt}
-                onReply={() => threadView.onOpen(message.id)}
-              />
-            )}
           </li>
         );
       })}
     </ol>
-  );
-}
-
-type TRepliesProps = { replies: Comment[]; since: string; onReply: () => void };
-
-function MessageReplies({ replies, since, onReply }: TRepliesProps) {
-  const { canEdit } = useWorkspace();
-  if (replies.length === 0) return null;
-  return (
-    <div className="ml-4 flex flex-col items-start gap-1 border-l-2 pl-5">
-      <ReplyList replies={replies} since={since} />
-      {canEdit && (
-        <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={onReply}>
-          <MessageSquareReplyIcon className="size-4" />
-          Reply
-        </Button>
-      )}
-    </div>
   );
 }
 
@@ -162,16 +134,39 @@ function withThreadStarts<T extends Comment>(
 
 function ThreadStarted({ thread }: { thread: DiscussionThread }) {
   const { workspace } = useWorkspace();
-  const { label: kind, icon: KindIcon } = threadKinds[threadKindOf(thread.kind)];
+  const { chatBubbles } = useUiTheme();
+  const kindId = threadKindOf(thread.kind);
+  const { label: kind, icon: KindIcon } = threadKinds[kindId];
   const count = thread.commentCount;
+  const creator = thread.creator ? userName(thread.creator) : "A deleted user";
+  if (chatBubbles) {
+    return (
+      <LinkButton
+        to="/$workspace/discussion/$slug"
+        params={{ workspace: workspace.urlKey, slug: entitySlug(thread.discussion) }}
+        search={{ thread: thread.id }}
+        replace
+        variant="ghost"
+        forceMinSize={false}
+        data-slot="thread-card"
+        data-kind={kindId}
+        aria-label={`${kind} thread: ${thread.title}, started by ${creator}`}
+      >
+        <span data-slot="thread-card-icon">
+          <KindIcon className="size-5" />
+        </span>
+        <span className="flex min-w-0 flex-col items-start">
+          <span data-slot="thread-card-title">{thread.title}</span>
+          <span data-slot="thread-card-by">Started by {creator}</span>
+        </span>
+      </LinkButton>
+    );
+  }
   return (
     <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-2 gap-y-1 py-3 text-xs">
       <SplitIcon className="size-3.5" />
       <span>
-        <span className="text-foreground font-medium">
-          {thread.creator ? userName(thread.creator) : "A deleted user"}
-        </span>{" "}
-        started a thread
+        <span className="text-foreground font-medium">{creator}</span> started a thread
       </span>
       <LinkButton
         to="/$workspace/discussion/$slug"
@@ -194,13 +189,13 @@ function ThreadStarted({ thread }: { thread: DiscussionThread }) {
   );
 }
 
-/** Each thread's replies right after it, oldest first, noting whom they answer in `replyTo`. */
-function withRepliesInline(threads: CommentThread[], replyTo: Map<string, UserRef | null>) {
+/** Each thread's replies right after it, oldest first, noting the message they answer in `replyTo`. */
+function withRepliesInline(threads: CommentThread[], replyTo: Map<string, Comment>) {
   return threads
     .flatMap((thread) => [
       thread,
       ...thread.replies.map((reply) => {
-        replyTo.set(reply.id, thread.user);
+        replyTo.set(reply.id, thread);
         return reply;
       }),
     ])

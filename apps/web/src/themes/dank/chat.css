@@ -1,0 +1,393 @@
+/* Chats, measured from the Ricrac chat mockup. */
+:root[data-ui-theme="dank"] {
+  & article[data-side] {
+    @media (hover: hover) {
+      &:hover {
+        background-color: color-mix(in srgb, var(--m3-on-surface) 5%, transparent);
+      }
+    }
+
+    &[data-popup-open] {
+      background-color: color-mix(in srgb, var(--m3-on-surface) 5%, transparent);
+    }
+  }
+
+  & [data-slot="message-avatar"] [data-slot="avatar"] {
+    width: 36px;
+    height: 36px;
+    font-size: 15px;
+  }
+
+  & [data-slot="message-body"]:not([data-editing]) {
+    max-width: min(75%, 560px);
+  }
+
+  & [data-slot="message-name"] {
+    color: var(--m3-on-surface);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  & [data-slot="message-bubble"] {
+    padding: 8px 14px;
+    border-radius: 18px;
+    background-color: var(--m3-surface-container-low);
+    color: var(--m3-on-surface);
+    overflow-wrap: anywhere;
+
+    & .rr-prose {
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    & [data-slot="message-edited"] {
+      color: inherit;
+      font-size: 11px;
+      opacity: 0.7;
+    }
+  }
+
+  & article[data-side="them"]:not([data-continuation]) [data-slot="message-bubble"] {
+    border-top-left-radius: 6px;
+  }
+
+  & article[data-side="me"] [data-slot="message-bubble"] {
+    background-color: var(--m3-primary);
+    color: var(--m3-on-primary);
+
+    & a {
+      color: inherit;
+    }
+  }
+
+  & article[data-side="me"]:not([data-continuation]) [data-slot="message-bubble"] {
+    border-top-right-radius: 6px;
+  }
+
+  & article[data-side] .rr-embed .rr-media {
+    max-height: 260px;
+    border: 0;
+    border-radius: 16px;
+  }
+
+  & [data-slot="message-reactions"] {
+    padding-top: 2px;
+
+    & [data-slot="reaction-bar"] {
+      gap: 4px;
+    }
+
+    & [data-m3-chip] {
+      height: 26px;
+      min-height: 26px;
+      gap: 6px;
+      padding-inline: 8px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background-color: var(--m3-surface-container-low);
+      color: var(--m3-on-surface-variant);
+      font-size: 13px;
+
+      &[aria-pressed="true"] {
+        border-color: var(--m3-primary);
+        background-color: var(--m3-secondary-container);
+        color: var(--m3-on-secondary-container);
+      }
+
+      & > span:first-child {
+        font-size: 15px;
+        line-height: 1;
+      }
+    }
+  }
+
+  & article[data-side="me"] [data-slot="reaction-bar"] {
+    justify-content: flex-end;
+  }
+
+  & [data-slot="message-tools"] {
+    background-color: var(--m3-surface-container-high);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.2);
+
+    & button {
+      width: 36px;
+      height: 30px;
+      border-radius: 15px;
+      color: var(--m3-on-surface-variant);
+    }
+
+    & button svg {
+      width: 20px;
+      height: 20px;
+      color: inherit;
+    }
+  }
+
+  /* The line from a reply's glimpse down to its avatar, or to its bubble on your side. */
+  & [data-slot="reply-glimpse"] {
+    position: relative;
+    display: flex;
+    align-self: flex-start;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    width: auto;
+    max-width: 100%;
+    height: 20px;
+    margin-bottom: 6px;
+    padding: 0 0 0 46px;
+    border-radius: 0;
+    color: var(--m3-on-surface-variant);
+    font-size: 13px;
+    font-weight: 400;
+
+    &::after {
+      display: none;
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 17px;
+      width: 22px;
+      height: calc(50% + 6px);
+      border: 0 solid color-mix(in srgb, var(--m3-on-surface-variant) 55%, transparent);
+      border-top-width: 2px;
+      border-left-width: 2px;
+      border-top-left-radius: 8px;
+    }
+
+    & [data-slot="avatar"] {
+      width: 16px;
+      height: 16px;
+      font-size: 10px;
+    }
+  }
+
+  & article[data-side="me"] [data-slot="reply-glimpse"] {
+    align-self: flex-end;
+    padding: 0 46px 0 0;
+
+    &::before {
+      right: 17px;
+      left: auto;
+      border-left-width: 0;
+      border-right-width: 2px;
+      border-top-left-radius: 0;
+      border-top-right-radius: 8px;
+    }
+  }
+
+  & [data-slot="reply-glimpse-name"] {
+    flex: none;
+    font-weight: 500;
+  }
+
+  & [data-slot="reply-glimpse-text"] {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  & [data-slot="reply-bar"] {
+    padding: 6px 6px 6px 16px;
+    border-radius: 16px;
+    background-color: var(--m3-surface-container-low);
+    color: var(--m3-on-surface-variant);
+    font-size: 14px;
+
+    & > svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    & button {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+    }
+  }
+
+  & [data-slot="composer"] {
+    gap: 8px;
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  & [data-slot="composer-tray"] {
+    padding: 0;
+    border: 0;
+  }
+
+  & [data-slot="composer-row"] {
+    gap: 8px;
+    padding: 0;
+  }
+
+  & [data-slot="composer-tool"],
+  & [data-slot="composer-send"] {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+
+    & svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  & [data-slot="composer-tool"] {
+    background-color: var(--m3-surface-container-high);
+    color: var(--m3-on-surface);
+  }
+
+  & [data-slot="composer-send"] {
+    background-color: var(--m3-primary);
+    color: var(--m3-on-primary);
+  }
+
+  & [data-slot="composer-field"] {
+    align-self: auto;
+    min-height: 48px;
+    padding: 12px 16px;
+    border-radius: 24px;
+    background-color: var(--m3-surface-container-low);
+    color: var(--m3-on-surface);
+
+    & .ProseMirror {
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    & p.is-editor-empty:first-child::before {
+      width: 100%;
+      height: 24px;
+      margin-bottom: -24px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &:focus-within {
+      outline: 2px solid var(--m3-primary);
+      outline-offset: -2px;
+    }
+  }
+
+  & [data-slot="thread-card"] {
+    display: flex;
+    align-self: center;
+    justify-content: flex-start;
+    gap: 12px;
+    width: min(320px, 100%);
+    height: auto;
+    margin: 10px 0;
+    padding: 10px 16px 10px 10px;
+    border-radius: 16px;
+    background-color: var(--thread-container);
+    color: var(--thread-on-container);
+    text-align: left;
+
+    @media (hover: hover) {
+      &:hover {
+        filter: brightness(0.96);
+      }
+    }
+  }
+
+  & [data-slot="thread-card-icon"] {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    background-color: color-mix(in srgb, var(--thread-on-container) 14%, transparent);
+
+    & svg {
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  & [data-slot="thread-card-title"] {
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 15px;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  & [data-slot="thread-card-by"] {
+    font-size: 12px;
+    font-weight: 400;
+    opacity: 0.8;
+  }
+
+  & [data-slot="thread-card"][data-kind="general"] {
+    --thread-container: #b8dbfe;
+    --thread-on-container: #2a4e6b;
+  }
+
+  & [data-slot="thread-card"][data-kind="bug"] {
+    --thread-container: #ffd3d0;
+    --thread-on-container: #7a1218;
+  }
+
+  & [data-slot="thread-card"][data-kind="design"] {
+    --thread-container: #d3d1f7;
+    --thread-on-container: #2f2e65;
+  }
+
+  & [data-slot="thread-card"][data-kind="question"] {
+    --thread-container: #fde3a0;
+    --thread-on-container: #5c4300;
+  }
+
+  & [data-slot="thread-card"][data-kind="idea"] {
+    --thread-container: #c6ebb6;
+    --thread-on-container: #1f4d14;
+  }
+
+  & [data-slot="thread-card"][data-kind="task"] {
+    --thread-container: #b3e9df;
+    --thread-on-container: #0b4a42;
+  }
+
+  &.dark {
+    & [data-slot="thread-card"][data-kind="general"] {
+      --thread-container: #264a66;
+      --thread-on-container: #b1d4f6;
+    }
+
+    & [data-slot="thread-card"][data-kind="bug"] {
+      --thread-container: #5c1f23;
+      --thread-on-container: #ffb4ae;
+    }
+
+    & [data-slot="thread-card"][data-kind="design"] {
+      --thread-container: #3a396f;
+      --thread-on-container: #cfcdff;
+    }
+
+    & [data-slot="thread-card"][data-kind="question"] {
+      --thread-container: #5a4510;
+      --thread-on-container: #ffe08a;
+    }
+
+    & [data-slot="thread-card"][data-kind="idea"] {
+      --thread-container: #264d1e;
+      --thread-on-container: #b9eaa6;
+    }
+
+    & [data-slot="thread-card"][data-kind="task"] {
+      --thread-container: #0f4a43;
+      --thread-on-container: #9be8dc;
+    }
+  }
+}

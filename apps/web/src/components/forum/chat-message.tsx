@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { type ReactNode, useState } from "react";
+import { type KeyboardEvent, type ReactNode, useState } from "react";
 
-import type { Comment, UserRef } from "@/api/ops.gen";
+import type { Comment } from "@/api/ops.gen";
 import {
   AttachmentTray,
   MessageAttachments,
@@ -12,17 +12,22 @@ import {
   CopyIcon,
   CornerDownRightIcon,
   EllipsisIcon,
+  ImageIcon,
   MessageSquareReplyIcon,
   PencilIcon,
+  PlusIcon,
+  ReplyIcon,
   SendHorizontalIcon,
   SplitIcon,
   Trash2Icon,
+  XIcon,
 } from "@/components/icons";
 import { userName } from "@/components/issues/grouping";
 import { useWorkspaceUsers } from "@/components/issues/picker-sources";
 import { UserAvatar } from "@/components/issues/pickers";
 import { AddReactionButton, groupReactions, ReactionBar } from "@/components/issues/reaction-bar";
-import { useChatScroll } from "@/components/layout/chat-layout";
+import { commentExcerpt } from "@/components/inbox/notifications";
+import { useChatReply, useChatScroll } from "@/components/layout/chat-layout";
 import { AvatarStack } from "@/components/projects/people";
 import { useNow } from "@/components/providers/now-provider";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -64,8 +69,8 @@ type TMessageProps = {
   message: Comment;
   /** Follows a message from the same person moments before: no avatar or name. */
   isContinuation?: boolean;
-  /** Whom it answers, when replies follow the messages they answer. */
-  replyTo?: UserRef | null;
+  /** The message it answers, when replies follow the messages they answer. */
+  replyTo?: Comment;
   /** The message's thread, when replies open beside the chat. */
   thread?: { replies: Comment[]; isOpen: boolean; onOpen: () => void };
   onNewThread?: () => void;
@@ -79,7 +84,8 @@ export function ChatMessage({
   onNewThread,
 }: TMessageProps) {
   const { workspace, canEdit, isAdmin } = useWorkspace();
-  const { expandsReplies, chatBubbles } = useUiTheme();
+  const { inlineReplies, chatBubbles } = useUiTheme();
+  const chatReply = useChatReply();
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { data: me } = useQuery(meQuery);
@@ -97,6 +103,9 @@ export function ChatMessage({
   const canStartThread = canEdit && Boolean(onNewThread);
   const canChange = isAuthor && canEdit;
   const canDelete = isAuthor || isAdmin;
+  const edit = canChange ? () => setIsEditing(true) : undefined;
+  const reply =
+    canEdit && chatReply ? () => chatReply.setReplyingTo(replyTo ?? message) : undefined;
 
   const actionItems = (
     <>
@@ -107,7 +116,7 @@ export function ChatMessage({
         </DropdownMenuItem>
       )}
       {canChange && (
-        <DropdownMenuItem onClick={() => setIsEditing(true)}>
+        <DropdownMenuItem onClick={edit}>
           <PencilIcon className="size-4" />
           Edit
         </DropdownMenuItem>
@@ -164,10 +173,10 @@ export function ChatMessage({
     </>
   );
 
-  const replyToNote = replyTo !== undefined && (
+  const replyToNote = replyTo && (
     <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
       <CornerDownRightIcon className="size-3.5" />
-      Replying to {replyTo ? userName(replyTo) : "a deleted user"}
+      Replying to {replyTo.user ? userName(replyTo.user) : "a deleted user"}
     </span>
   );
 
@@ -191,7 +200,9 @@ export function ChatMessage({
   );
 
   const edited = message.editedAt && (
-    <span className="text-muted-foreground text-xs">(edited)</span>
+    <span data-slot="message-edited" className="text-muted-foreground text-xs">
+      (edited)
+    </span>
   );
 
   const after = (
@@ -199,70 +210,137 @@ export function ChatMessage({
       {reactions.length > 0 && (
         <ReactionBar reactions={reactions} disabled={!canEdit} onToggle={react} revealOnHover />
       )}
-      {thread && replyCount > 0 && !expandsReplies && (
+      {thread && replyCount > 0 && !inlineReplies && (
         <ThreadChip replies={thread.replies} onOpen={thread.onOpen} />
       )}
     </>
   );
 
+  const bubbleTools = (
+    <div
+      role="toolbar"
+      aria-label="Message actions"
+      data-slot="message-tools"
+      className={cn(
+        "touch:hidden absolute -top-4.5 z-10 flex gap-0.5 rounded-full p-0.75 opacity-0 group-hover/message:opacity-100 group-data-popup-open/message:opacity-100 focus-within:opacity-100 has-data-popup-open:opacity-100",
+        isMine ? "left-2" : "right-2",
+      )}
+    >
+      {canEdit && <AddReactionButton reactions={reactions} onToggle={react} />}
+      {reply && (
+        <SimpleTooltip content="Reply">
+          <Button
+            variant="ghost"
+            size="icon"
+            forceMinSize={false}
+            aria-label="Reply"
+            onClick={reply}
+          >
+            <ReplyIcon />
+          </Button>
+        </SimpleTooltip>
+      )}
+      {canChange && (
+        <SimpleTooltip content="Edit">
+          <Button variant="ghost" size="icon" forceMinSize={false} aria-label="Edit" onClick={edit}>
+            <PencilIcon />
+          </Button>
+        </SimpleTooltip>
+      )}
+      {(canStartThread || canDelete) && (
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button variant="ghost" size="icon" forceMinSize={false} aria-label="More actions">
+                <EllipsisIcon />
+              </Button>
+            }
+          />
+          <DropdownMenuContent align={isMine ? "start" : "end"} className="w-56">
+            <DropdownMenuGroup>
+              {canStartThread && (
+                <DropdownMenuItem onClick={onNewThread}>
+                  <SplitIcon className="size-4" />
+                  New thread from message
+                </DropdownMenuItem>
+              )}
+              {canDelete && (
+                <DropdownMenuItem className="text-destructive" onClick={() => setIsDeleting(true)}>
+                  <Trash2Icon className="size-4" />
+                  Delete
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+    </div>
+  );
+
   const bubbleContent = (
     <>
-      {!isMine && (
-        <div className="flex w-8 shrink-0 justify-center">
-          {!isContinuation && message.user && <UserAvatar user={message.user} size="lg" />}
-        </div>
-      )}
-      <div
-        className={cn("flex min-w-0 flex-1 flex-col gap-1", isMine ? "items-end" : "items-start")}
-      >
-        {!isContinuation && (
-          <header className="flex max-w-full min-w-0 items-baseline gap-2 px-1">
-            {!isMine && <span className="type-title-small truncate">{authorName}</span>}
-            <MessageTime value={message.createdAt} />
-          </header>
+      {replyTo && <ReplyGlimpse message={replyTo} />}
+      <div className={cn("flex gap-2.5", isMine && "justify-end")}>
+        {!isMine && (
+          <div data-slot="message-avatar" className="flex w-9 shrink-0 justify-center">
+            {!isContinuation && message.user && <UserAvatar user={message.user} size="lg" />}
+          </div>
         )}
-        {replyToNote}
-        {isEditing ? (
-          <div className="w-full">{editor}</div>
-        ) : (
-          <div className={cn("flex w-full min-w-0", isMine && "justify-end")}>
+        <div
+          data-slot="message-body"
+          data-editing={isEditing || undefined}
+          className={cn(
+            "flex min-w-0 flex-col gap-0.5 data-editing:flex-1",
+            isMine ? "items-end" : "items-start",
+          )}
+        >
+          {!isContinuation && (
+            <header className="flex max-w-full min-w-0 items-baseline gap-2 px-1 pb-0.5">
+              {!isMine && (
+                <span data-slot="message-name" className="truncate">
+                  {authorName}
+                </span>
+              )}
+              <MessageTime value={message.createdAt} />
+            </header>
+          )}
+          {isEditing ? (
+            <div className="w-full">{editor}</div>
+          ) : (
             <div
               className={cn(
-                "relative flex max-w-4/5 min-w-0 flex-col gap-1.5",
+                "flex max-w-full min-w-0 flex-col gap-1",
                 isMine ? "items-end" : "items-start",
               )}
               onContextMenu={keepNativeMenu}
+              onDoubleClick={edit}
             >
               {text && (
                 <div
-                  className={cn(
-                    "rr-chat rounded-lg-increased flex max-w-full min-w-0 flex-col px-4 py-2",
-                    isMine
-                      ? "bg-m3-primary-container text-m3-on-primary-container"
-                      : "bg-m3-surface-container-high text-m3-on-surface",
-                    !isContinuation && (isMine ? "rounded-tr-xs" : "rounded-tl-xs"),
-                  )}
+                  data-slot="message-bubble"
+                  className="rr-chat flex max-w-full min-w-0 flex-wrap items-baseline gap-x-1.5"
                 >
                   {textView}
+                  {edited}
                 </div>
               )}
               <MessageAttachments attachments={attachments} />
-              {edited}
-              {hasActions && (
-                <div className="bg-popover shadow-elevation-2 absolute right-0 -bottom-3 z-10 flex items-center gap-1 rounded-full p-1 opacity-0 group-hover/message:opacity-100 focus-within:opacity-100 has-data-popup-open:opacity-100">
-                  {isContinuation && (
-                    <span className="px-2">
-                      <MessageTime value={message.createdAt} />
-                    </span>
-                  )}
-                  {actionButtons}
-                </div>
-              )}
+              {!text && edited}
             </div>
-          </div>
-        )}
-        {after}
+          )}
+          {reactions.length > 0 && (
+            <div data-slot="message-reactions">
+              <ReactionBar
+                reactions={reactions}
+                disabled={!canEdit}
+                onToggle={react}
+                withAddButton={false}
+              />
+            </div>
+          )}
+        </div>
       </div>
+      {!isEditing && (canEdit || canDelete) && bubbleTools}
     </>
   );
 
@@ -295,7 +373,11 @@ export function ChatMessage({
         {isEditing ? (
           editor
         ) : (
-          <div className="flex min-w-0 flex-col gap-1.5" onContextMenu={keepNativeMenu}>
+          <div
+            className="flex min-w-0 flex-col gap-1.5"
+            onContextMenu={keepNativeMenu}
+            onDoubleClick={edit}
+          >
             {text && <div className="rr-chat flex min-w-0 flex-col">{textView}</div>}
             <MessageAttachments attachments={attachments} />
             {edited}
@@ -320,9 +402,10 @@ export function ChatMessage({
             aria-label={`Message from ${authorName}`}
             data-continuation={isContinuation || undefined}
             data-current={thread?.isOpen || undefined}
+            data-side={chatBubbles ? (isMine ? "me" : "them") : undefined}
             className={
               chatBubbles
-                ? "group/message group/reactable data-current:bg-m3-secondary-container relative -mx-2 flex gap-2 rounded-lg px-2 py-0.5 not-data-continuation:mt-3"
+                ? "group/message group/reactable data-current:bg-m3-secondary-container relative -mx-2 flex flex-col rounded-md px-2 py-0.5 not-data-continuation:mt-2.5"
                 : "group/message group/reactable has-hover:hover:bg-foreground/2-10 data-current:bg-primary/1-10 data-popup-open:bg-foreground/2-10 dank:state-layer dank:has-hover:hover:bg-transparent dank:data-popup-open:bg-transparent dank:data-current:bg-m3-secondary-container relative -mx-2 flex gap-3 rounded-md px-2 py-1 not-data-continuation:mt-2"
             }
           />
@@ -363,6 +446,39 @@ export function ChatMessage({
         </DropdownMenuGroup>
       </ContextMenuContent>
     </ContextMenu>
+  );
+}
+
+/** The message a reply answers, in a line above it that jumps to it. */
+function ReplyGlimpse({ message }: { message: Comment }) {
+  const { text, attachments } = splitAttachments(message.body);
+  const name = message.user ? userName(message.user) : "deleted user";
+  const excerpt = commentExcerpt(text);
+  return (
+    <Button
+      variant="ghost"
+      forceMinSize={false}
+      data-slot="reply-glimpse"
+      aria-label={`Replying to ${name}: ${excerpt || "attachment"}`}
+      onClick={() =>
+        document
+          .getElementById(`comment-${message.id}`)
+          ?.scrollIntoView({ behavior: "smooth", block: "center" })
+      }
+    >
+      {message.user && <UserAvatar user={message.user} size="xs" />}
+      <span data-slot="reply-glimpse-name">@{name}</span>
+      {excerpt ? (
+        <span data-slot="reply-glimpse-text">{excerpt}</span>
+      ) : (
+        <>
+          <span data-slot="reply-glimpse-text" className="italic">
+            Click to see attachment
+          </span>
+          {attachments.length > 0 && <ImageIcon className="size-4.5" />}
+        </>
+      )}
+    </Button>
   );
 }
 
@@ -428,8 +544,13 @@ function MessageEditor({
     setIsSaving(false);
     if (saved) onDone();
   };
+  const cancel = (event: KeyboardEvent) => {
+    if (event.key !== "Escape" || event.defaultPrevented) return;
+    event.stopPropagation();
+    onDone();
+  };
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2" onKeyDown={cancel}>
       <ComposerBox attachments={attachments}>
         <MarkdownEditor
           label="Edit message"
@@ -443,7 +564,7 @@ function MessageEditor({
         />
       </ComposerBox>
       <div className="text-muted-foreground flex items-center gap-2 text-xs">
-        <span className="max-sm:hidden">Enter to save</span>
+        <span className="max-sm:hidden">Enter to save, Escape to cancel</span>
         <span className="flex-1" />
         <Button variant="ghost" size="sm" onClick={onDone}>
           Cancel
@@ -469,28 +590,36 @@ function ComposerBox({
   children: ReactNode;
 }) {
   const picker = useFilePicker({ multiple: true, onSelect: attachments.add });
+  const { chatBubbles } = useUiTheme();
   return (
-    <div className="bg-input focus-within:ring-primary/8-10 dank:min-h-12 dank:justify-center dank:rounded-md dank:border-0 dank:bg-m3-surface-container-low flex flex-col rounded-lg border focus-within:ring-1">
+    <div
+      data-slot="composer"
+      className="bg-input focus-within:ring-primary/8-10 flex flex-col rounded-lg border focus-within:ring-1"
+    >
       {attachments.items.length > 0 && (
-        <div className="border-b p-2">
+        <div data-slot="composer-tray" className="border-b p-2">
           <AttachmentTray items={attachments.items} onRemove={attachments.remove} />
         </div>
       )}
-      <div className="flex items-end gap-2 p-1">
+      <div data-slot="composer-row" className="flex items-end gap-2 p-1">
         <SimpleTooltip content="Attach files">
           <Button
             variant="ghost"
             size="icon"
             aria-label="Attach files"
+            data-slot="composer-tool"
             className="text-muted-foreground shrink-0"
             onClick={picker.open}
           >
-            <CirclePlusIcon className="size-5" />
+            {chatBubbles ? <PlusIcon /> : <CirclePlusIcon className="size-5" />}
           </Button>
         </SimpleTooltip>
         {tools}
         {picker.input}
-        <div className="rr-chat rr-chat-draft max-h-80 min-w-0 flex-1 self-center overflow-y-auto py-0.5">
+        <div
+          data-slot="composer-field"
+          className="rr-chat rr-chat-draft max-h-80 min-w-0 flex-1 self-center overflow-y-auto py-0.5"
+        >
           {children}
         </div>
         {action}
@@ -523,6 +652,9 @@ export function ChatComposer({
 }) {
   const { workspace } = useWorkspace();
   const { scrollToEnd } = useChatScroll();
+  const chatReply = useChatReply();
+  const { data: me } = useQuery(meQuery);
+  const replyingTo = parentId ? null : (chatReply?.replyingTo ?? null);
   const [text, setText] = useState("");
   const [sent, setSent] = useState(0);
   const { users } = useWorkspaceUsers();
@@ -532,15 +664,53 @@ export function ChatComposer({
   const canSend = Boolean(body) && !attachments.isUploading;
   const send = async () => {
     if (!canSend || isPending) return;
-    const saved = await saveComment({ ...target, body, parentId }).catch(() => null);
+    const saved = await saveComment({
+      ...target,
+      body,
+      parentId: parentId ?? replyingTo?.id,
+    }).catch(() => null);
     if (!saved) return;
     setText("");
     attachments.clear();
+    chatReply?.setReplyingTo(null);
     setSent((count) => count + 1);
     scrollToEnd();
   };
+  const cancelReply = (event: KeyboardEvent) => {
+    if (event.key !== "Escape" || event.defaultPrevented || !replyingTo) return;
+    event.stopPropagation();
+    chatReply?.setReplyingTo(null);
+  };
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-1.5" onKeyDown={cancelReply}>
+      {replyingTo && (
+        <div
+          data-slot="reply-bar"
+          className="bg-muted text-muted-foreground flex items-center gap-2 rounded-lg py-1 pr-1 pl-3 text-sm"
+        >
+          <ReplyIcon className="size-4" />
+          <span className="min-w-0 flex-1 truncate">
+            Replying to{" "}
+            <span className="text-foreground font-semibold">
+              {replyingTo.user?.id === me?.id
+                ? "yourself"
+                : replyingTo.user
+                  ? userName(replyingTo.user)
+                  : "a deleted user"}
+            </span>
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            forceMinSize={false}
+            aria-label="Cancel reply"
+            className="text-foreground size-8"
+            onClick={() => chatReply?.setReplyingTo(null)}
+          >
+            <XIcon className="size-4" />
+          </Button>
+        </div>
+      )}
       <ComposerBox
         attachments={attachments}
         tools={tools}
@@ -549,6 +719,7 @@ export function ChatComposer({
             variant={canSend ? "default" : "ghost"}
             size="icon"
             aria-label="Send"
+            data-slot="composer-send"
             isPending={isPending}
             disabled={!canSend}
             onClick={() => void send()}
@@ -558,15 +729,15 @@ export function ChatComposer({
         }
       >
         <MarkdownEditor
-          key={sent}
-          label={parentId ? "Reply" : "Message"}
+          key={`${sent}:${replyingTo?.id ?? ""}`}
+          label={parentId || replyingTo ? "Reply" : "Message"}
           value={text}
           onChange={setText}
           onSubmit={() => void send()}
           placeholder={placeholder}
           users={users}
           onAttach={attachments.add}
-          autoFocus={sent > 0}
+          autoFocus={sent > 0 || Boolean(replyingTo)}
           chat
         />
       </ComposerBox>

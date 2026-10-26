@@ -29,15 +29,15 @@ export type TUiTheme = {
   createButton: "header" | "fab";
   /** Page and panel bars sit on their own surface, apart from what scrolls under them. */
   separatesBars: boolean;
-  /** Replies show under the message they answer instead of behind a count. */
-  expandsReplies: boolean;
+  /** Replies join the timeline under a glimpse of the message they answer and are written from the composer, instead of behind a count. */
+  inlineReplies: boolean;
   /** Messages show in bubbles, yours on the right and everyone else's on the left. */
   chatBubbles: boolean;
   /** Threads start from the chat's composer, show in its timeline and switch from its header, instead of as branches beside the topic. */
   threadsInChat: boolean;
   /** Lists the forum in a pane beside the open discussion, whose topic and chat share a panel. */
   ForumPanes?: ComponentType<TForumPanesProps>;
-  /** Editors show toolbars for formatting text and laying out images. */
+  /** Editors show toolbars for formatting text and laying out images, which resize from their edges. */
   editorToolbars: boolean;
   /** Top-level pages show their title in a bar; without it their actions join the toolbar. */
   pageTitles: boolean;
@@ -60,6 +60,8 @@ export type TForumPanesProps = {
   discussion?: DiscussionDetail;
   /** The discussion's main chat, or the thread open in its place. */
   chat?: ReactNode;
+  /** Switches between the main chat and the discussion's threads. */
+  threadSwitcher?: ReactNode;
   /** A thread is open in the chat, so Escape goes back to the main chat. */
   isThreadOpen?: boolean;
   /** Shows in the discussion's place while it loads or fails to. */

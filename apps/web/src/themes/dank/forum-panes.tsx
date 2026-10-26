@@ -48,6 +48,7 @@ export function DankForumPanes({
   filters,
   discussion,
   chat,
+  threadSwitcher,
   isThreadOpen = false,
   fallback,
 }: TForumPanesProps) {
@@ -69,7 +70,12 @@ export function DankForumPanes({
   const detail = isOpen && (
     <div data-slot="forum-detail">
       {discussion ? (
-        <DiscussionPanel discussion={discussion} chat={chat} onClose={close} />
+        <DiscussionPanel
+          discussion={discussion}
+          chat={chat}
+          threadSwitcher={threadSwitcher}
+          onClose={close}
+        />
       ) : (
         <section data-slot="discussion-panel">{fallback}</section>
       )}

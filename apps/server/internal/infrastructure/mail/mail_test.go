@@ -1,6 +1,11 @@
 package mail
 
 import (
+	"bytes"
+	"io"
+	"mime"
+	"mime/multipart"
+	"net/mail"
 	"strings"
 	"testing"
 )
@@ -100,11 +105,55 @@ Notification settings: https://ricrac.example.com/settings/notifications
 		"white-space:pre-line;\">Fixed in main.\nShipping today.</div>",
 		`>Open your inbox</a>`,
 		`>Notification settings</a>`,
-		`src="cid:logo.png"`,
+		`src="https://ricrac.example.com/icon-192.png"`,
 	)
 	mustNotContain(t, msg.HTML, "Or open this link")
-	if len(msg.Inline) != 1 || msg.Inline[0].Name != "logo.png" {
-		t.Fatal("the logo is inlined")
+}
+
+func TestBuildIsTextAndHTMLOnly(t *testing.T) {
+	msg, err := Render("ada@example.com", Content{
+		Subject: "Sign in to Ricrac",
+		Heading: "Sign in",
+		Button:  Button{Label: "Sign in", URL: "https://ricrac.example.com/sign-in"},
+		Footer:  Footer{InstanceURL: "https://ricrac.example.com"},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	m, err := build(mail.Address{Name: "Ricrac", Address: "notifications@ricrac.example.com"}, msg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var raw bytes.Buffer
+	if _, err := m.WriteTo(&raw); err != nil {
+		t.Fatal(err)
+	}
+	parsed, err := mail.ReadMessage(&raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ua, xm := parsed.Header.Get("User-Agent"), parsed.Header.Get("X-Mailer"); ua != "" || xm != "" {
+		t.Fatalf("mailer headers %q %q", ua, xm)
+	}
+	mediaType, params, err := mime.ParseMediaType(parsed.Header.Get("Content-Type"))
+	if err != nil || mediaType != "multipart/alternative" {
+		t.Fatalf("content type %q %v", mediaType, err)
+	}
+	reader := multipart.NewReader(parsed.Body, params["boundary"])
+	var types []string
+	for {
+		part, err := reader.NextPart()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			t.Fatal(err)
+		}
+		partType, _, _ := mime.ParseMediaType(part.Header.Get("Content-Type"))
+		types = append(types, partType)
+	}
+	if strings.Join(types, ",") != "text/plain,text/html" {
+		t.Fatalf("parts %v", types)
 	}
 }
 

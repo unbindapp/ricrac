@@ -7,12 +7,12 @@ import { NewThreadDialog } from "@/components/forum/new-thread-dialog";
 import { MessagesSquareIcon, SplitIcon } from "@/components/icons";
 import { commentExcerpt } from "@/components/inbox/notifications";
 import { userName } from "@/components/issues/grouping";
-import { ChatLayout } from "@/components/layout/chat-layout";
+import { ChatLayout, useChatLead } from "@/components/layout/chat-layout";
 import { PanelBar } from "@/components/layout/panel-bar";
 import { Button } from "@/components/ui/button";
 import { SimpleTooltip } from "@/components/ui/tooltip";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { messagePlaceholder, shorten } from "@/lib/helpers/chat";
+import { channelName, messagePlaceholder, shorten } from "@/lib/helpers/chat";
 import { useUiTheme } from "@/themes/ui-theme-provider";
 
 const THREAD_TITLE_FROM_MESSAGE_LENGTH = 80;
@@ -31,8 +31,9 @@ export function MainChatPanel({
   threadSwitcher,
 }: TProps & { threadSwitcher?: ReactNode }) {
   const { canEdit } = useWorkspace();
+  const lead = useChatLead();
   const count = discussion.commentCount;
-  const header = (
+  const header = !lead && (
     <PanelBar>
       <MessagesSquareIcon className="text-muted-foreground size-4" />
       <span className="dank:type-title-medium text-sm font-medium">Main chat</span>
@@ -59,13 +60,15 @@ export function MainChatPanel({
 }
 
 export function MainChatComposer({ discussion }: { discussion: DiscussionDetail }) {
-  const { threadsInChat } = useUiTheme();
+  const { threadsInChat, chatBubbles } = useUiTheme();
   const [isStartingThread, setIsStartingThread] = useState(false);
   return (
     <>
       <ChatComposer
         target={{ discussionId: discussion.id }}
-        placeholder={messagePlaceholder(discussion.title)}
+        placeholder={messagePlaceholder(
+          chatBubbles ? `#${channelName(discussion.title)}` : discussion.title,
+        )}
         tools={
           threadsInChat && (
             <SimpleTooltip content="New thread">
@@ -73,6 +76,7 @@ export function MainChatComposer({ discussion }: { discussion: DiscussionDetail 
                 variant="ghost"
                 size="icon"
                 aria-label="New thread"
+                data-slot="composer-tool"
                 className="text-muted-foreground shrink-0"
                 onClick={() => setIsStartingThread(true)}
               >

@@ -81,20 +81,6 @@ export const searchIssuesQuery = (workspaceId: string, query: string) =>
     enabled: query.trim().length > 0,
   });
 
-/** Whether you have open issues assigned, which decides where a workspace opens. */
-export const hasAssignedWorkQuery = (workspaceId: string) =>
-  queryOptions({
-    queryKey: [workspaceId, "issues", "has-assigned-work"] as const,
-    queryFn: async () => {
-      const page = await call(workspaceId, "list_issues", {
-        assignee: "me",
-        filter: { state: { type: { in: ["unstarted", "started"] } } },
-        limit: 1,
-      });
-      return page.nodes.length > 0;
-    },
-  });
-
 /** Issues change projects' and cycles' progress and statuses' counts too. */
 export function invalidateIssues(queryClient: QueryClient, workspaceId: string) {
   return Promise.all([
