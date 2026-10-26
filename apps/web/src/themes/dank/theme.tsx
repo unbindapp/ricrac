@@ -22,7 +22,7 @@ export const dankTheme: TUiTheme = {
   icons: "symbols",
   createButton: "fab",
   separatesBars: true,
-  expandsReplies: true,
+  inlineReplies: true,
   chatBubbles: true,
   threadsInChat: true,
   editorToolbars: false,

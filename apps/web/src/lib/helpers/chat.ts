@@ -11,6 +11,14 @@ export function shorten(text: string, length: number) {
   return `${text.slice(0, length - 1).trimEnd()}…`;
 }
 
+/** A title as a channel's name, like new-onboarding-flow. */
+export function channelName(title: string) {
+  return title
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 /** What a composer says before you write: Message and where it goes. */
 export function messagePlaceholder(name: string) {
   return `Message ${shorten(name, PLACEHOLDER_NAME_LENGTH)}`;

@@ -5,6 +5,7 @@
 @import "./screens-b.css";
 @import "./shell.css";
 @import "./forum.css";
+@import "./chat.css";
 
 @font-face {
   font-family: "Google Sans Flex";

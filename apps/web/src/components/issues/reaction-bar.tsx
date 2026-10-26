@@ -45,16 +45,24 @@ type TProps = {
   disabled?: boolean;
   /** The add button shows only while a surrounding group/reactable is hovered. */
   revealOnHover?: boolean;
+  /** Off where reactions are added from elsewhere, like a message's toolbar. */
+  withAddButton?: boolean;
 };
 
 function reactorNames(reaction: TReactionGroup) {
   return reaction.users.map(userName).join(", ");
 }
 
-export function ReactionBar({ reactions, onToggle, disabled, revealOnHover }: TProps) {
+export function ReactionBar({
+  reactions,
+  onToggle,
+  disabled,
+  revealOnHover,
+  withAddButton = true,
+}: TProps) {
   if (disabled && reactions.length === 0) return null;
   return (
-    <div className="dank:gap-2 flex flex-wrap items-center gap-1.5">
+    <div data-slot="reaction-bar" className="dank:gap-2 flex flex-wrap items-center gap-1.5">
       {reactions.map((reaction) => (
         <SimpleTooltip key={reaction.emoji} content={reactorNames(reaction)}>
           <Button
@@ -74,7 +82,7 @@ export function ReactionBar({ reactions, onToggle, disabled, revealOnHover }: TP
           </Button>
         </SimpleTooltip>
       ))}
-      {!disabled && (
+      {!disabled && withAddButton && (
         <AddReactionButton
           reactions={reactions}
           onToggle={onToggle}
@@ -90,7 +98,7 @@ export function AddReactionButton({
   reactions,
   onToggle,
   revealOnHover,
-}: Omit<TProps, "disabled">) {
+}: Omit<TProps, "disabled" | "withAddButton">) {
   const [isOpen, setIsOpen] = useState(false);
   const { resolvedTheme } = useTheme();
   return (

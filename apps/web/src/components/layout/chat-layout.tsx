@@ -1,5 +1,6 @@
 import { createContext, type ReactNode, useContext, useEffect, useRef, useState } from "react";
 
+import type { Comment } from "@/api/ops.gen";
 import { PageSlotsContext } from "@/components/layout/page-container";
 import { PageBar } from "@/components/layout/page-header";
 import { cn } from "@/components/ui/utils";
@@ -12,6 +13,13 @@ type TChatScroll = { scrollToEnd: () => void };
 const ChatScrollContext = createContext<TChatScroll>({ scrollToEnd: () => undefined });
 
 export const useChatScroll = () => useContext(ChatScrollContext);
+
+type TChatReply = { replyingTo: Comment | null; setReplyingTo: (message: Comment | null) => void };
+
+/** The message the composer answers, picked from the chat above it. */
+const ChatReplyContext = createContext<TChatReply | null>(null);
+
+export const useChatReply = () => useContext(ChatReplyContext);
 
 /** What a chat belongs to, like a discussion's post: it opens the conversation and scrolls with it. */
 export const ChatLeadContext = createContext<ReactNode>(null);
@@ -45,6 +53,7 @@ export function ChatLayout({
   const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const isAtEndRef = useRef(startAtEnd && !lead);
+  const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
 
   useEffect(() => {
     const scroller = scrollRef.current;
@@ -77,55 +86,57 @@ export function ChatLayout({
 
   return (
     <ChatScrollContext value={{ scrollToEnd }}>
-      <div
-        data-slot="chat-layout"
-        className="dank:gap-3 dank:bg-sidebar flex min-h-0 w-full flex-1 flex-col"
-      >
-        {bar && separatesBars && (
-          <div
-            ref={setBarSlot}
-            className="bg-background shrink-0 overflow-hidden rounded-lg empty:hidden"
-          />
-        )}
-        {bar && (
-          <PageSlotsContext value={{ bar: separatesBars ? barSlot : null, fab: null }}>
-            {separatesBars ? (
-              <PageBar>{bar}</PageBar>
-            ) : (
-              <div className="shrink-0 px-4 pt-4">
-                <PageBar>{bar}</PageBar>
-              </div>
-            )}
-          </PageSlotsContext>
-        )}
-        {!lead && header}
+      <ChatReplyContext value={{ replyingTo, setReplyingTo }}>
         <div
-          data-slot="chat-body"
-          className="dank:rounded-lg dank:bg-background flex min-h-0 flex-1 flex-col overflow-hidden"
+          data-slot="chat-layout"
+          className="dank:gap-3 dank:bg-sidebar flex min-h-0 w-full flex-1 flex-col"
         >
+          {bar && separatesBars && (
+            <div
+              ref={setBarSlot}
+              className="bg-background shrink-0 overflow-hidden rounded-lg empty:hidden"
+            />
+          )}
+          {bar && (
+            <PageSlotsContext value={{ bar: separatesBars ? barSlot : null, fab: null }}>
+              {separatesBars ? (
+                <PageBar>{bar}</PageBar>
+              ) : (
+                <div className="shrink-0 px-4 pt-4">
+                  <PageBar>{bar}</PageBar>
+                </div>
+              )}
+            </PageSlotsContext>
+          )}
+          {!lead && header}
           <div
-            ref={scrollRef}
-            data-width="narrow"
-            onScroll={onScroll}
-            className="group/page flex min-h-0 flex-1 flex-col overflow-y-auto"
+            data-slot="chat-body"
+            className="dank:rounded-lg dank:bg-background flex min-h-0 flex-1 flex-col overflow-hidden"
           >
             <div
-              ref={contentRef}
-              data-slot="chat-column"
-              className={cn(column, "flex flex-col gap-6 py-6")}
+              ref={scrollRef}
+              data-width="narrow"
+              onScroll={onScroll}
+              className="group/page flex min-h-0 flex-1 flex-col overflow-y-auto"
             >
-              {lead}
-              {lead && header}
-              {children}
+              <div
+                ref={contentRef}
+                data-slot="chat-column"
+                className={cn(column, "flex flex-col gap-6 py-6")}
+              >
+                {lead}
+                {lead && header}
+                {children}
+              </div>
             </div>
+            {composer && (
+              <div data-slot="chat-composer" className={cn(column, "shrink-0 pb-4")}>
+                {composer}
+              </div>
+            )}
           </div>
-          {composer && (
-            <div data-slot="chat-composer" className={cn(column, "shrink-0 pb-4")}>
-              {composer}
-            </div>
-          )}
         </div>
-      </div>
+      </ChatReplyContext>
     </ChatScrollContext>
   );
 }

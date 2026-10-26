@@ -25,7 +25,8 @@ type TProps = {
   noun: string;
   isArchived?: boolean;
   onArchive?: (archive: boolean) => void;
-  onTrash: () => void;
+  /** Without it, the menu has no trash item. */
+  onTrash?: () => void;
   onShowHistory?: () => void;
   /** Items of the page's own, first. */
   children?: ReactNode;
@@ -131,10 +132,12 @@ export function EntityMenu({
               {isArchived ? "Unarchive" : "Archive"}
             </DropdownMenuItem>
           )}
-          <DropdownMenuItem className="text-destructive" onClick={() => setIsTrashing(true)}>
-            <Trash2Icon className="size-4" />
-            Move {noun} to trash
-          </DropdownMenuItem>
+          {onTrash && (
+            <DropdownMenuItem className="text-destructive" onClick={() => setIsTrashing(true)}>
+              <Trash2Icon className="size-4" />
+              Move {noun} to trash
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
       <ConfirmDialog
@@ -143,7 +146,7 @@ export function EntityMenu({
         title={`Move ${noun} to trash`}
         description="It stays in the trash for 30 days, then it is deleted for good."
         confirmLabel="Move to trash"
-        onConfirm={async () => onTrash()}
+        onConfirm={async () => onTrash?.()}
       />
     </>
   );

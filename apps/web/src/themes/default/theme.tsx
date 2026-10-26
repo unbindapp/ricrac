@@ -13,7 +13,7 @@ export const defaultTheme: TUiTheme = {
   icons: "lucide",
   createButton: "header",
   separatesBars: false,
-  expandsReplies: false,
+  inlineReplies: false,
   chatBubbles: false,
   threadsInChat: false,
   editorToolbars: true,
