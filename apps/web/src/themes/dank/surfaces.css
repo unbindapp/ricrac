@@ -49,27 +49,12 @@
       &[data-focused]:not(:focus-visible, :active)::after {
         opacity: 0.08;
       }
-
-      @media (hover: hover) {
-        &:hover {
-          border-radius: var(--radius-md);
-        }
-      }
-
-      &:focus-visible,
-      &:active {
-        border-radius: var(--radius-lg);
-      }
     }
 
     &:is([aria-selected="true"], [data-selected], [data-active]) {
       border-radius: var(--radius-lg);
       background-color: var(--m3-primary-container);
       color: var(--m3-on-primary-container);
-
-      &:hover {
-        border-radius: var(--radius-lg);
-      }
 
       & [data-slot="list-supporting"] {
         color: var(--m3-on-primary-container);

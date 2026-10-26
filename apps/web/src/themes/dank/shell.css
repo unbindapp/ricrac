@@ -10,3 +10,30 @@
   ) {
   border-radius: 24px;
 }
+
+/* Rail items: the active one keeps its indicator when hovered, under a state layer. */
+:root[data-ui-theme="dank"] [data-slot="rail-item"] {
+  background-color: transparent;
+  color: var(--m3-on-surface-variant);
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--m3-surface-variant);
+    }
+  }
+
+  &:is([data-status="active"], [data-current]) {
+    background-color: var(--m3-secondary-container);
+    color: var(--m3-on-secondary-container);
+
+    @media (hover: hover) {
+      &:hover {
+        background-color: color-mix(
+          in srgb,
+          var(--m3-on-secondary-container) 8%,
+          var(--m3-secondary-container)
+        );
+      }
+    }
+  }
+}
