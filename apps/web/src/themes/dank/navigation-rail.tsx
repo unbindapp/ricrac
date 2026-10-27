@@ -173,7 +173,7 @@ export function NavigationRail({
 }
 
 const railItemClassName =
-  "relative flex h-14 w-full shrink-0 items-center justify-start gap-3 overflow-hidden rounded-full px-4 text-left text-[15px] leading-5 font-medium whitespace-nowrap transition-colors select-none";
+  "relative flex h-14 w-full shrink-0 items-center justify-start gap-3 rounded-full px-4 text-left text-[15px] leading-5 font-medium whitespace-nowrap transition-colors select-none";
 
 type TRailIcon = ComponentType<{ className?: string }>;
 
