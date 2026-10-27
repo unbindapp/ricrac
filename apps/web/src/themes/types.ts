@@ -60,10 +60,11 @@ export type TForumPanesProps = {
   discussion?: DiscussionDetail;
   /** The discussion's main chat, or the thread open in its place. */
   chat?: ReactNode;
-  /** Switches between the main chat and the discussion's threads. */
-  threadSwitcher?: ReactNode;
+  /** The thread open in place of the main chat. */
+  threadId?: string;
   /** A thread is open in the chat, so Escape goes back to the main chat. */
   isThreadOpen?: boolean;
+  onBackToChat?: () => void;
   /** Shows in the discussion's place while it loads or fails to. */
   fallback?: ReactNode;
 };

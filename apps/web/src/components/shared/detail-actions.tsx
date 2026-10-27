@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import {
   ArchiveIcon,
@@ -43,11 +43,11 @@ export function HeaderAction({ label, onClick, isPending, children }: THeaderAct
   );
 }
 
-export function CopyLinkAction({ url }: { url: string }) {
+export function CopyLinkAction({ url, label = "Copy link" }: { url: string; label?: string }) {
   const { copyToClipboard } = useCopyToClipboard();
   return (
     <HeaderAction
-      label="Copy link"
+      label={label}
       onClick={() => {
         copyToClipboard(url);
         toast.add({ type: "success", title: "Link copied" });
@@ -101,6 +101,35 @@ export function DeleteMenuAction({ label, onSelect }: { label: string; onSelect:
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+const CONFIRM_WINDOW_MS = 3000;
+
+/** Deletes on a second click within a few seconds, so it can't be hit by accident. */
+export function ConfirmDeleteAction({ label, onDelete }: { label: string; onDelete: () => void }) {
+  const [isConfirming, setIsConfirming] = useState(false);
+  useEffect(() => {
+    if (!isConfirming) return;
+    const timer = setTimeout(() => setIsConfirming(false), CONFIRM_WINDOW_MS);
+    return () => clearTimeout(timer);
+  }, [isConfirming]);
+  return (
+    <SimpleTooltip content={isConfirming ? "Click again to delete" : label}>
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label={isConfirming ? `${label}: click again to confirm` : label}
+        data-confirming={isConfirming || undefined}
+        onClick={() => {
+          if (!isConfirming) return setIsConfirming(true);
+          setIsConfirming(false);
+          onDelete();
+        }}
+      >
+        <Trash2Icon className="size-4" />
+      </Button>
+    </SimpleTooltip>
   );
 }
 

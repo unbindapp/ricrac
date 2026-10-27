@@ -275,7 +275,7 @@ function ThreadStatusBadge({ thread }: { thread: DiscussionThreadDetail }) {
   );
 }
 
-function ThreadKindPicker({
+export function ThreadKindPicker({
   kind,
   disabled,
   onChange,

@@ -87,12 +87,11 @@ function DiscussionSlugPage() {
   }
 
   const threadSwitcher = threadsInChat && <ThreadSwitcher discussion={data} threadId={thread} />;
-  const panelSwitcher = ForumPanes ? undefined : threadSwitcher;
   const threadPanel = thread ? (
     <ThreadPanel
       key={thread}
       threadId={thread}
-      threadSwitcher={panelSwitcher}
+      threadSwitcher={threadSwitcher}
       onBack={backToMainChat}
     />
   ) : message ? (
@@ -100,7 +99,7 @@ function DiscussionSlugPage() {
       key={message}
       discussionId={data.id}
       messageId={message}
-      threadSwitcher={panelSwitcher}
+      threadSwitcher={threadSwitcher}
       onBack={backToMainChat}
     />
   ) : null;
@@ -130,9 +129,10 @@ function DiscussionSlugPage() {
       <ForumPanes
         filters={filters}
         discussion={data}
-        chat={threadPanel ?? mainChat}
-        threadSwitcher={threadSwitcher}
+        chat={message ? threadPanel : mainChat}
+        threadId={thread}
         isThreadOpen={Boolean(threadPanel)}
+        onBackToChat={backToMainChat}
       />
     );
   }

@@ -329,63 +329,85 @@
     opacity: 0.8;
   }
 
-  & [data-slot="thread-card"][data-kind="general"] {
+  & [data-slot="thread-card-count"] {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background-color: color-mix(in srgb, var(--thread-on-container) 14%, transparent);
+    font-size: 12px;
+    font-weight: 500;
+
+    & svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  & [data-slot="thread-card"][data-resolved] {
+    opacity: 0.7;
+  }
+
+  & :is([data-slot="thread-card"], [data-slot="thread-kind-chip"])[data-kind="general"] {
     --thread-container: #b8dbfe;
     --thread-on-container: #2a4e6b;
   }
 
-  & [data-slot="thread-card"][data-kind="bug"] {
+  & :is([data-slot="thread-card"], [data-slot="thread-kind-chip"])[data-kind="bug"] {
     --thread-container: #ffd3d0;
     --thread-on-container: #7a1218;
   }
 
-  & [data-slot="thread-card"][data-kind="design"] {
+  & :is([data-slot="thread-card"], [data-slot="thread-kind-chip"])[data-kind="design"] {
     --thread-container: #d3d1f7;
     --thread-on-container: #2f2e65;
   }
 
-  & [data-slot="thread-card"][data-kind="question"] {
+  & :is([data-slot="thread-card"], [data-slot="thread-kind-chip"])[data-kind="question"] {
     --thread-container: #fde3a0;
     --thread-on-container: #5c4300;
   }
 
-  & [data-slot="thread-card"][data-kind="idea"] {
+  & :is([data-slot="thread-card"], [data-slot="thread-kind-chip"])[data-kind="idea"] {
     --thread-container: #c6ebb6;
     --thread-on-container: #1f4d14;
   }
 
-  & [data-slot="thread-card"][data-kind="task"] {
+  & :is([data-slot="thread-card"], [data-slot="thread-kind-chip"])[data-kind="task"] {
     --thread-container: #b3e9df;
     --thread-on-container: #0b4a42;
   }
 
   &.dark {
-    & [data-slot="thread-card"][data-kind="general"] {
+    & :is([data-slot="thread-card"], [data-slot="thread-kind-chip"])[data-kind="general"] {
       --thread-container: #264a66;
       --thread-on-container: #b1d4f6;
     }
 
-    & [data-slot="thread-card"][data-kind="bug"] {
+    & :is([data-slot="thread-card"], [data-slot="thread-kind-chip"])[data-kind="bug"] {
       --thread-container: #5c1f23;
       --thread-on-container: #ffb4ae;
     }
 
-    & [data-slot="thread-card"][data-kind="design"] {
+    & :is([data-slot="thread-card"], [data-slot="thread-kind-chip"])[data-kind="design"] {
       --thread-container: #3a396f;
       --thread-on-container: #cfcdff;
     }
 
-    & [data-slot="thread-card"][data-kind="question"] {
+    & :is([data-slot="thread-card"], [data-slot="thread-kind-chip"])[data-kind="question"] {
       --thread-container: #5a4510;
       --thread-on-container: #ffe08a;
     }
 
-    & [data-slot="thread-card"][data-kind="idea"] {
+    & :is([data-slot="thread-card"], [data-slot="thread-kind-chip"])[data-kind="idea"] {
       --thread-container: #264d1e;
       --thread-on-container: #b9eaa6;
     }
 
-    & [data-slot="thread-card"][data-kind="task"] {
+    & :is([data-slot="thread-card"], [data-slot="thread-kind-chip"])[data-kind="task"] {
       --thread-container: #0f4a43;
       --thread-on-container: #9be8dc;
     }
