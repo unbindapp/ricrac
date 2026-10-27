@@ -26,7 +26,12 @@ import { SectionTitle } from "@/components/layout/section-title";
 import { EntityMenu, toastTrashed } from "@/components/projects/entity-menu";
 import { AvatarStack } from "@/components/projects/people";
 import { AutosaveMarkdown } from "@/components/shared/autosave-markdown";
-import { CopyLinkAction, HeaderAction, HeaderActions } from "@/components/shared/detail-actions";
+import {
+  ConfirmDeleteAction,
+  CopyLinkAction,
+  HeaderAction,
+  HeaderActions,
+} from "@/components/shared/detail-actions";
 import { InlineText } from "@/components/shared/inline-text";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Badge } from "@/components/ui/badge";
@@ -136,7 +141,7 @@ export function DiscussionActions({
   children,
 }: {
   discussion: TDiscussionDetail;
-  /** Only copying is a button of its own; the rest wait in the ⋯ menu. */
+  /** Only copying and deleting are buttons of their own; the rest wait in the ⋯ menu. */
   grouped?: boolean;
   children?: ReactNode;
 }) {
@@ -196,9 +201,8 @@ export function DiscussionActions({
     return (
       <>
         {children}
-        <CopyLinkAction url={discussion.url} />
         {(canEdit || canRewrite) && (
-          <EntityMenu noun="discussion" onTrash={canRewrite ? trash : undefined}>
+          <EntityMenu noun="discussion">
             {canEdit && (
               <>
                 <DropdownMenuItem onClick={subscribe}>
@@ -222,6 +226,8 @@ export function DiscussionActions({
             {canRewrite && thumbnailItem}
           </EntityMenu>
         )}
+        <CopyLinkAction url={discussion.url} label="Copy link to discussion" />
+        {canRewrite && <ConfirmDeleteAction label="Delete discussion" onDelete={trash} />}
         {thumbnailDialog}
       </>
     );
@@ -288,14 +294,7 @@ export function DiscussionTitle({ discussion }: { discussion: TDiscussionDetail 
 }
 
 /** Its tags, who started it and when, whether it is pinned or closed, and who follows it. */
-export function DiscussionMeta({
-  discussion,
-  tagChips = false,
-}: {
-  discussion: TDiscussionDetail;
-  /** Each tag in its own chip, instead of all of them in the picker's button. */
-  tagChips?: boolean;
-}) {
+export function DiscussionMeta({ discussion }: { discussion: TDiscussionDetail }) {
   const { workspace, canEdit } = useWorkspace();
   const { mutate: save } = useSaveDiscussionMutation(workspace.id);
   return (
@@ -303,7 +302,6 @@ export function DiscussionMeta({
       {canEdit ? (
         <DiscussionTagsPicker
           value={discussion.tags}
-          chips={tagChips}
           onChange={(tags) => save({ id: discussion.id, tags })}
         />
       ) : (

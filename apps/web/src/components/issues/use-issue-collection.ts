@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useInterval } from "usehooks-ts";
 
 import { resolveDisplay, type TDisplaySettings } from "@/components/issues/display";
 import {
@@ -11,11 +12,11 @@ import {
 import { groupIssues, type TIssueGroup } from "@/components/issues/grouping";
 import type { TNewIssueDefaults } from "@/components/issues/new-issue-store";
 import { useTeamDetail } from "@/components/issues/picker-sources";
-import { useNow } from "@/components/providers/now-provider";
 import { useWorkspaceTeam } from "@/components/workspace/teams-provider";
 import { issuesListQuery } from "@/lib/queries/issues";
 
-const HOUR_MS = 60 * 60 * 1000;
+const MINUTE_MS = 60 * 1000;
+const HOUR_MS = 60 * MINUTE_MS;
 const CLOSED = ["completed", "canceled"];
 
 export type TIssueCollectionProps = {
@@ -47,8 +48,7 @@ export function useIssueCollection({
   const workspaceTeamId = useWorkspaceTeam()?.id;
   const teamId = merged.team_ids?.length === 1 ? merged.team_ids[0] : workspaceTeamId;
   const team = useTeamDetail(teamId);
-  const now = useNow();
-  const nowMs = Math.floor(now / HOUR_MS) * HOUR_MS;
+  const nowMs = useHourStart();
 
   const pages = query.data?.pages;
   const issues = useMemo(
@@ -97,6 +97,14 @@ export function useIssueCollection({
     isLoadingMore: hasNextPage || isFetchingNextPage,
     isCapped,
   };
+}
+
+const currentHourStart = () => Math.floor(Date.now() / HOUR_MS) * HOUR_MS;
+
+function useHourStart() {
+  const [hourStart, setHourStart] = useState(currentHourStart);
+  useInterval(() => setHourStart(currentHourStart()), MINUTE_MS);
+  return hourStart;
 }
 
 export function newIssueDefaultsForGroup(group: TIssueGroup): TNewIssueDefaults {

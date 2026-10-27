@@ -48,8 +48,9 @@ export function DankForumPanes({
   filters,
   discussion,
   chat,
-  threadSwitcher,
+  threadId,
   isThreadOpen = false,
+  onBackToChat,
   fallback,
 }: TForumPanesProps) {
   const { workspace } = useWorkspace();
@@ -73,7 +74,8 @@ export function DankForumPanes({
         <DiscussionPanel
           discussion={discussion}
           chat={chat}
-          threadSwitcher={threadSwitcher}
+          threadId={threadId}
+          onBackToChat={onBackToChat ?? close}
           onClose={close}
         />
       ) : (

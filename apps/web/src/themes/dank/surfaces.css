@@ -150,17 +150,17 @@
     }
 
     & > :first-child {
-      border-start-start-radius: 9999px;
-      border-end-start-radius: 9999px;
+      border-start-start-radius: 1.25rem;
+      border-end-start-radius: 1.25rem;
     }
 
     & > :last-child {
-      border-start-end-radius: 9999px;
-      border-end-end-radius: 9999px;
+      border-start-end-radius: 1.25rem;
+      border-end-end-radius: 1.25rem;
     }
 
     & > :is([aria-checked="true"], [aria-pressed="true"], [aria-selected="true"]) {
-      border-radius: 9999px;
+      border-radius: 1.25rem;
       background-color: var(--m3-primary);
       color: var(--m3-on-primary);
     }

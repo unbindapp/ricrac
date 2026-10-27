@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import type { Comment, CommentThread, DiscussionThread } from "@/api/ops.gen";
 import { ChatDayDivider, ChatMessage, MessageTime } from "@/components/forum/chat-message";
 import { threadKindOf, threadKinds } from "@/components/forum/thread-kinds";
-import { MessagesSquareIcon, SplitIcon } from "@/components/icons";
+import { MessageSquareIcon, MessagesSquareIcon, SplitIcon } from "@/components/icons";
 import { userName } from "@/components/issues/grouping";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
@@ -138,6 +138,7 @@ function ThreadStarted({ thread }: { thread: DiscussionThread }) {
   const kindId = threadKindOf(thread.kind);
   const { label: kind, icon: KindIcon } = threadKinds[kindId];
   const count = thread.commentCount;
+  const isResolved = Boolean(thread.resolvedAt);
   const creator = thread.creator ? userName(thread.creator) : "A deleted user";
   if (chatBubbles) {
     return (
@@ -150,14 +151,22 @@ function ThreadStarted({ thread }: { thread: DiscussionThread }) {
         forceMinSize={false}
         data-slot="thread-card"
         data-kind={kindId}
-        aria-label={`${kind} thread: ${thread.title}, started by ${creator}`}
+        data-resolved={isResolved || undefined}
+        aria-label={`${kind} thread: ${thread.title}, started by ${creator}, ${count} ${count === 1 ? "reply" : "replies"}. Open thread`}
       >
         <span data-slot="thread-card-icon">
           <KindIcon className="size-5" />
         </span>
-        <span className="flex min-w-0 flex-col items-start">
+        <span className="flex min-w-0 flex-1 flex-col items-start">
           <span data-slot="thread-card-title">{thread.title}</span>
-          <span data-slot="thread-card-by">Started by {creator}</span>
+          <span data-slot="thread-card-by">
+            Started by {creator}
+            {isResolved && ", resolved"}
+          </span>
+        </span>
+        <span aria-hidden data-slot="thread-card-count">
+          <MessageSquareIcon />
+          {count}
         </span>
       </LinkButton>
     );
