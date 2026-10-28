@@ -39,6 +39,8 @@ func Serve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if strings.HasPrefix(name, "assets/") {
+		// Without it Cloudflare and browsers keep the 404 for hours, breaking pages that ask for it after a deploy.
+		w.Header().Set("Cache-Control", "no-store")
 		http.NotFound(w, r)
 		return
 	}

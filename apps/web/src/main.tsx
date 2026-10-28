@@ -6,6 +6,7 @@ import { createRoot } from "react-dom/client";
 import "@/globals.css";
 import PendingScreen from "@/components/navigation/pending-screen";
 import { toast } from "@/components/ui/toast";
+import { reloadOnStaleBuild } from "@/lib/helpers/stale-build";
 import { errorText, isApiError } from "@/lib/server/errors";
 import { routeTree } from "./routeTree.gen";
 
@@ -24,6 +25,8 @@ declare module "@tanstack/react-query" {
 }
 
 const MAX_QUERY_RETRIES = 3;
+
+reloadOnStaleBuild();
 
 const queryClient = new QueryClient({
   defaultOptions: {
