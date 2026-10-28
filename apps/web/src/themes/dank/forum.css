@@ -107,8 +107,9 @@
 
   & [data-slot="forum-item-supporting"] {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 12px;
+    gap: 4px 8px;
     color: var(--m3-on-surface-variant);
     font-size: 0.875rem;
     line-height: 1.25rem;

@@ -2,10 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { type ReactNode, useEffect, useState } from "react";
 
 import type { DiscussionDetail } from "@/api/ops.gen";
-import {
-  DiscussionActions,
-  DiscussionTitle,
-} from "@/components/forum/discussion-detail";
+import { DiscussionActions, DiscussionTitle } from "@/components/forum/discussion-detail";
 import { DiscussionTagsPicker } from "@/components/forum/discussion-tags";
 import { ArrowLeftIcon, LockIcon, PinIcon, PlusIcon, XIcon } from "@/components/icons";
 import { ChatLeadContext } from "@/components/layout/chat-layout";

@@ -412,4 +412,10 @@
       --thread-on-container: #9be8dc;
     }
   }
+
+  & :is([data-side="me"], [data-side="them"]) [data-slot="message-bubble"][data-deleted] {
+    border: 1px dashed var(--m3-outline-variant);
+    background-color: transparent;
+    color: var(--m3-on-surface-variant);
+  }
 }

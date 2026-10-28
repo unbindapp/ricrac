@@ -118,12 +118,7 @@ function ForumListPane({ filters, openId }: { filters: TForumFilters; openId?: s
     <PageSlotsContext value={{ bar: null, fab }}>
       <section aria-label="Forum" data-slot="forum-list">
         <div data-slot="forum-list-tools">
-          <ForumControls
-            filters={filters}
-            layout={layout}
-            onFilter={filter}
-            onLayout={setLayout}
-          />
+          <ForumControls filters={filters} layout={layout} onFilter={filter} onLayout={setLayout} />
         </div>
         <ListStates
           isPending={list.isPending}
