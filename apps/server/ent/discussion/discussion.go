@@ -35,6 +35,8 @@ const (
 	FieldClosedAt = "closed_at"
 	// FieldTrashedAt holds the string denoting the trashed_at field in the database.
 	FieldTrashedAt = "trashed_at"
+	// FieldEditedAt holds the string denoting the edited_at field in the database.
+	FieldEditedAt = "edited_at"
 	// FieldLastActivityAt holds the string denoting the last_activity_at field in the database.
 	FieldLastActivityAt = "last_activity_at"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -55,8 +57,14 @@ const (
 	EdgeNotifications = "notifications"
 	// EdgeSubscribers holds the string denoting the subscribers edge name in mutations.
 	EdgeSubscribers = "subscribers"
+	// EdgeVoters holds the string denoting the voters edge name in mutations.
+	EdgeVoters = "voters"
+	// EdgeVersions holds the string denoting the versions edge name in mutations.
+	EdgeVersions = "versions"
 	// EdgeDiscussionSubscribers holds the string denoting the discussion_subscribers edge name in mutations.
 	EdgeDiscussionSubscribers = "discussion_subscribers"
+	// EdgeDiscussionVotes holds the string denoting the discussion_votes edge name in mutations.
+	EdgeDiscussionVotes = "discussion_votes"
 	// Table holds the table name of the discussion in the database.
 	Table = "discussions"
 	// WorkspaceTable is the table that holds the workspace relation/edge.
@@ -106,6 +114,18 @@ const (
 	// SubscribersInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	SubscribersInverseTable = "users"
+	// VotersTable is the table that holds the voters relation/edge. The primary key declared below.
+	VotersTable = "discussion_votes"
+	// VotersInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	VotersInverseTable = "users"
+	// VersionsTable is the table that holds the versions relation/edge.
+	VersionsTable = "message_versions"
+	// VersionsInverseTable is the table name for the MessageVersion entity.
+	// It exists in this package in order to avoid circular dependency with the "messageversion" package.
+	VersionsInverseTable = "message_versions"
+	// VersionsColumn is the table column denoting the versions relation/edge.
+	VersionsColumn = "discussion_id"
 	// DiscussionSubscribersTable is the table that holds the discussion_subscribers relation/edge.
 	DiscussionSubscribersTable = "discussion_subscribers"
 	// DiscussionSubscribersInverseTable is the table name for the DiscussionSubscriber entity.
@@ -113,6 +133,13 @@ const (
 	DiscussionSubscribersInverseTable = "discussion_subscribers"
 	// DiscussionSubscribersColumn is the table column denoting the discussion_subscribers relation/edge.
 	DiscussionSubscribersColumn = "discussion_id"
+	// DiscussionVotesTable is the table that holds the discussion_votes relation/edge.
+	DiscussionVotesTable = "discussion_votes"
+	// DiscussionVotesInverseTable is the table name for the DiscussionVote entity.
+	// It exists in this package in order to avoid circular dependency with the "discussionvote" package.
+	DiscussionVotesInverseTable = "discussion_votes"
+	// DiscussionVotesColumn is the table column denoting the discussion_votes relation/edge.
+	DiscussionVotesColumn = "discussion_id"
 )
 
 // Columns holds all SQL columns for discussion fields.
@@ -129,6 +156,7 @@ var Columns = []string{
 	FieldPinnedAt,
 	FieldClosedAt,
 	FieldTrashedAt,
+	FieldEditedAt,
 	FieldLastActivityAt,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -138,6 +166,9 @@ var (
 	// SubscribersPrimaryKey and SubscribersColumn2 are the table columns denoting the
 	// primary key for the subscribers relation (M2M).
 	SubscribersPrimaryKey = []string{"discussion_id", "user_id"}
+	// VotersPrimaryKey and VotersColumn2 are the table columns denoting the
+	// primary key for the voters relation (M2M).
+	VotersPrimaryKey = []string{"discussion_id", "user_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -216,6 +247,11 @@ func ByClosedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByTrashedAt orders the results by the trashed_at field.
 func ByTrashedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTrashedAt, opts...).ToFunc()
+}
+
+// ByEditedAt orders the results by the edited_at field.
+func ByEditedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEditedAt, opts...).ToFunc()
 }
 
 // ByLastActivityAt orders the results by the last_activity_at field.
@@ -310,6 +346,34 @@ func BySubscribers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByVotersCount orders the results by voters count.
+func ByVotersCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newVotersStep(), opts...)
+	}
+}
+
+// ByVoters orders the results by voters terms.
+func ByVoters(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newVotersStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByVersionsCount orders the results by versions count.
+func ByVersionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newVersionsStep(), opts...)
+	}
+}
+
+// ByVersions orders the results by versions terms.
+func ByVersions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newVersionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByDiscussionSubscribersCount orders the results by discussion_subscribers count.
 func ByDiscussionSubscribersCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -321,6 +385,20 @@ func ByDiscussionSubscribersCount(opts ...sql.OrderTermOption) OrderOption {
 func ByDiscussionSubscribers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newDiscussionSubscribersStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByDiscussionVotesCount orders the results by discussion_votes count.
+func ByDiscussionVotesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newDiscussionVotesStep(), opts...)
+	}
+}
+
+// ByDiscussionVotes orders the results by discussion_votes terms.
+func ByDiscussionVotes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDiscussionVotesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newWorkspaceStep() *sqlgraph.Step {
@@ -372,10 +450,31 @@ func newSubscribersStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2M, false, SubscribersTable, SubscribersPrimaryKey...),
 	)
 }
+func newVotersStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(VotersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, VotersTable, VotersPrimaryKey...),
+	)
+}
+func newVersionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(VersionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, VersionsTable, VersionsColumn),
+	)
+}
 func newDiscussionSubscribersStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(DiscussionSubscribersInverseTable, DiscussionSubscribersColumn),
 		sqlgraph.Edge(sqlgraph.O2M, true, DiscussionSubscribersTable, DiscussionSubscribersColumn),
+	)
+}
+func newDiscussionVotesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DiscussionVotesInverseTable, DiscussionVotesColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, DiscussionVotesTable, DiscussionVotesColumn),
 	)
 }

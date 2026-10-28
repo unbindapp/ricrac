@@ -2,11 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { type ReactNode, useEffect, useState } from "react";
 
 import type { DiscussionDetail } from "@/api/ops.gen";
-import {
-  DiscussionActions,
-  DiscussionBody,
-  DiscussionTitle,
-} from "@/components/forum/discussion-detail";
+import { DiscussionActions, DiscussionTitle } from "@/components/forum/discussion-detail";
 import { DiscussionTagsPicker } from "@/components/forum/discussion-tags";
 import { ArrowLeftIcon, LockIcon, PinIcon, PlusIcon, XIcon } from "@/components/icons";
 import { ChatLeadContext } from "@/components/layout/chat-layout";
@@ -23,6 +19,8 @@ import {
   useSaveDiscussionMutation,
 } from "@/lib/queries/discussions";
 import { Byline } from "@/themes/dank/byline";
+import { PostBody } from "@/themes/dank/post-body";
+import { UpvoteChip } from "@/themes/dank/upvote-chip";
 import { DankThreadView } from "@/themes/dank/thread-view";
 
 type TProps = {
@@ -63,6 +61,7 @@ export function DiscussionPanel({ discussion, chat, threadId, onBackToChat, onCl
             Closed
           </span>
         )}
+        <UpvoteChip discussion={discussion} />
         {discussion.subscribers.length > 0 && (
           <span data-slot="byline-people" role="group" aria-label="Participants">
             <AvatarStack users={discussion.subscribers} max={5} />
@@ -71,7 +70,7 @@ export function DiscussionPanel({ discussion, chat, threadId, onBackToChat, onCl
       </Byline>
       <PostTags discussion={discussion} />
       {cover && <img data-slot="discussion-cover" src={cover} alt="" />}
-      <DiscussionBody discussion={discussion} />
+      <PostBody discussion={discussion} />
     </article>
   );
 

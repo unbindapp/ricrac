@@ -7,7 +7,7 @@ import { DiscussionTagBadges, DiscussionTagsPicker } from "@/components/forum/di
 import { MainChatComposer, MainChatMessages } from "@/components/forum/main-chat";
 import { ThreadBranches } from "@/components/forum/thread-branches";
 import { ThumbnailPicker } from "@/components/forum/thumbnail-picker";
-import { useCanRewrite } from "@/components/forum/use-can-rewrite";
+import { useCanClose, useCanRewrite } from "@/components/forum/use-can-rewrite";
 import {
   BellIcon,
   BellOffIcon,
@@ -147,6 +147,7 @@ export function DiscussionActions({
 }) {
   const { workspace, canEdit } = useWorkspace();
   const canRewrite = useCanRewrite(discussion.creator);
+  const canClose = useCanClose(discussion.creator);
   const { data: me } = useQuery(meQuery);
   const { mutate: save } = useSaveDiscussionMutation(workspace.id);
   const { mutateAsync: changeLifecycle } = useDiscussionLifecycleMutation(workspace.id);
@@ -217,10 +218,16 @@ export function DiscussionActions({
                   {isPinned ? <PinOffIcon className="size-4" /> : <PinIcon className="size-4" />}
                   {isPinned ? "Unpin" : "Pin to the top"}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => save({ id: discussion.id, closed: !isClosed })}>
-                  {isClosed ? <LockOpenIcon className="size-4" /> : <LockIcon className="size-4" />}
-                  {isClosed ? "Reopen discussion" : "Close discussion"}
-                </DropdownMenuItem>
+                {canClose && (
+                  <DropdownMenuItem onClick={() => save({ id: discussion.id, closed: !isClosed })}>
+                    {isClosed ? (
+                      <LockOpenIcon className="size-4" />
+                    ) : (
+                      <LockIcon className="size-4" />
+                    )}
+                    {isClosed ? "Reopen discussion" : "Close discussion"}
+                  </DropdownMenuItem>
+                )}
               </>
             )}
             {canRewrite && thumbnailItem}
@@ -248,12 +255,14 @@ export function DiscussionActions({
           >
             {isPinned ? <PinOffIcon className="size-4" /> : <PinIcon className="size-4" />}
           </HeaderAction>
-          <HeaderAction
-            label={isClosed ? "Reopen discussion" : "Close discussion"}
-            onClick={() => save({ id: discussion.id, closed: !isClosed })}
-          >
-            {isClosed ? <LockOpenIcon className="size-4" /> : <LockIcon className="size-4" />}
-          </HeaderAction>
+          {canClose && (
+            <HeaderAction
+              label={isClosed ? "Reopen discussion" : "Close discussion"}
+              onClick={() => save({ id: discussion.id, closed: !isClosed })}
+            >
+              {isClosed ? <LockOpenIcon className="size-4" /> : <LockIcon className="size-4" />}
+            </HeaderAction>
+          )}
         </>
       )}
       {canRewrite && (

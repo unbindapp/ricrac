@@ -338,6 +338,78 @@ func (_c *DiscussionServiceMock_GetThread_Call) RunAndReturn(run func(ctx contex
 	return _c
 }
 
+// History provides a mock function for the type DiscussionServiceMock
+func (_mock *DiscussionServiceMock) History(ctx context.Context, actor *auth.Actor, input *discussion_service.IDInput) (models.MessageHistory, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for History")
+	}
+
+	var r0 models.MessageHistory
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *discussion_service.IDInput) (models.MessageHistory, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *discussion_service.IDInput) models.MessageHistory); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.MessageHistory)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *discussion_service.IDInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// DiscussionServiceMock_History_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'History'
+type DiscussionServiceMock_History_Call struct {
+	*mock.Call
+}
+
+// History is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *discussion_service.IDInput
+func (_e *DiscussionServiceMock_Expecter) History(ctx any, actor any, input any) *DiscussionServiceMock_History_Call {
+	return &DiscussionServiceMock_History_Call{Call: _e.mock.On("History", ctx, actor, input)}
+}
+
+func (_c *DiscussionServiceMock_History_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *discussion_service.IDInput)) *DiscussionServiceMock_History_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *discussion_service.IDInput
+		if args[2] != nil {
+			arg2 = args[2].(*discussion_service.IDInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *DiscussionServiceMock_History_Call) Return(messageHistory models.MessageHistory, err error) *DiscussionServiceMock_History_Call {
+	_c.Call.Return(messageHistory, err)
+	return _c
+}
+
+func (_c *DiscussionServiceMock_History_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *discussion_service.IDInput) (models.MessageHistory, error)) *DiscussionServiceMock_History_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // List provides a mock function for the type DiscussionServiceMock
 func (_mock *DiscussionServiceMock) List(ctx context.Context, actor *auth.Actor, input *discussion_service.ListInput) (args.PageOf[models.Discussion], error) {
 	ret := _mock.Called(ctx, actor, input)
@@ -694,6 +766,78 @@ func (_c *DiscussionServiceMock_Tags_Call) Return(pageOf args.PageOf[models.Disc
 }
 
 func (_c *DiscussionServiceMock_Tags_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *discussion_service.TagsInput) (args.PageOf[models.DiscussionTag], error)) *DiscussionServiceMock_Tags_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Vote provides a mock function for the type DiscussionServiceMock
+func (_mock *DiscussionServiceMock) Vote(ctx context.Context, actor *auth.Actor, input *discussion_service.VoteInput) (models.DiscussionDetail, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Vote")
+	}
+
+	var r0 models.DiscussionDetail
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *discussion_service.VoteInput) (models.DiscussionDetail, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *discussion_service.VoteInput) models.DiscussionDetail); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.DiscussionDetail)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *discussion_service.VoteInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// DiscussionServiceMock_Vote_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Vote'
+type DiscussionServiceMock_Vote_Call struct {
+	*mock.Call
+}
+
+// Vote is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *discussion_service.VoteInput
+func (_e *DiscussionServiceMock_Expecter) Vote(ctx any, actor any, input any) *DiscussionServiceMock_Vote_Call {
+	return &DiscussionServiceMock_Vote_Call{Call: _e.mock.On("Vote", ctx, actor, input)}
+}
+
+func (_c *DiscussionServiceMock_Vote_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *discussion_service.VoteInput)) *DiscussionServiceMock_Vote_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *discussion_service.VoteInput
+		if args[2] != nil {
+			arg2 = args[2].(*discussion_service.VoteInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *DiscussionServiceMock_Vote_Call) Return(discussionDetail models.DiscussionDetail, err error) *DiscussionServiceMock_Vote_Call {
+	_c.Call.Return(discussionDetail, err)
+	return _c
+}
+
+func (_c *DiscussionServiceMock_Vote_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *discussion_service.VoteInput) (models.DiscussionDetail, error)) *DiscussionServiceMock_Vote_Call {
 	_c.Call.Return(run)
 	return _c
 }

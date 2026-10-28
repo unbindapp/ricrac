@@ -23,6 +23,7 @@ type CommentServiceInterface interface {
 	Remove(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, row *ent.Comment) (int, error)
 	Resolve(ctx context.Context, actor *auth.Actor, input *IDInput) (models.CommentDetail, error)
 	Unresolve(ctx context.Context, actor *auth.Actor, input *IDInput) (models.CommentDetail, error)
+	History(ctx context.Context, actor *auth.Actor, input *IDInput) (models.MessageHistory, error)
 	AddReaction(ctx context.Context, actor *auth.Actor, input *ReactionInput) (models.Reaction, error)
 	RemoveReaction(ctx context.Context, actor *auth.Actor, input *RemoveReactionInput) (models.RemovedReaction, error)
 	List(ctx context.Context, actor *auth.Actor, input *ListInput) (args.PageOf[models.CommentThread], error)

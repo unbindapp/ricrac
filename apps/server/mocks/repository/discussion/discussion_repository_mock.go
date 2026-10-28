@@ -52,6 +52,87 @@ func (_m *DiscussionRepositoryMock) EXPECT() *DiscussionRepositoryMock_Expecter 
 	return &DiscussionRepositoryMock_Expecter{mock: &_m.Mock}
 }
 
+// AddVersion provides a mock function for the type DiscussionRepositoryMock
+func (_mock *DiscussionRepositoryMock) AddVersion(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, id uuid.UUID, body string, writtenAt time.Time) error {
+	ret := _mock.Called(ctx, tx, workspace, id, body, writtenAt)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AddVersion")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, string, time.Time) error); ok {
+		r0 = returnFunc(ctx, tx, workspace, id, body, writtenAt)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// DiscussionRepositoryMock_AddVersion_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddVersion'
+type DiscussionRepositoryMock_AddVersion_Call struct {
+	*mock.Call
+}
+
+// AddVersion is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - workspace uuid.UUID
+//   - id uuid.UUID
+//   - body string
+//   - writtenAt time.Time
+func (_e *DiscussionRepositoryMock_Expecter) AddVersion(ctx any, tx any, workspace any, id any, body any, writtenAt any) *DiscussionRepositoryMock_AddVersion_Call {
+	return &DiscussionRepositoryMock_AddVersion_Call{Call: _e.mock.On("AddVersion", ctx, tx, workspace, id, body, writtenAt)}
+}
+
+func (_c *DiscussionRepositoryMock_AddVersion_Call) Run(run func(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, id uuid.UUID, body string, writtenAt time.Time)) *DiscussionRepositoryMock_AddVersion_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		var arg4 string
+		if args[4] != nil {
+			arg4 = args[4].(string)
+		}
+		var arg5 time.Time
+		if args[5] != nil {
+			arg5 = args[5].(time.Time)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+			arg5,
+		)
+	})
+	return _c
+}
+
+func (_c *DiscussionRepositoryMock_AddVersion_Call) Return(err error) *DiscussionRepositoryMock_AddVersion_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *DiscussionRepositoryMock_AddVersion_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, id uuid.UUID, body string, writtenAt time.Time) error) *DiscussionRepositoryMock_AddVersion_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Bump provides a mock function for the type DiscussionRepositoryMock
 func (_mock *DiscussionRepositoryMock) Bump(ctx context.Context, tx repository.TxInterface, id uuid.UUID, now time.Time) error {
 	ret := _mock.Called(ctx, tx, id, now)
@@ -122,8 +203,8 @@ func (_c *DiscussionRepositoryMock_Bump_Call) RunAndReturn(run func(ctx context.
 }
 
 // Counts provides a mock function for the type DiscussionRepositoryMock
-func (_mock *DiscussionRepositoryMock) Counts(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) (map[uuid.UUID]models.DiscussionCounts, error) {
-	ret := _mock.Called(ctx, tx, ids)
+func (_mock *DiscussionRepositoryMock) Counts(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID, viewer uuid.UUID) (map[uuid.UUID]models.DiscussionCounts, error) {
+	ret := _mock.Called(ctx, tx, ids, viewer)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Counts")
@@ -131,18 +212,18 @@ func (_mock *DiscussionRepositoryMock) Counts(ctx context.Context, tx repository
 
 	var r0 map[uuid.UUID]models.DiscussionCounts
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, []uuid.UUID) (map[uuid.UUID]models.DiscussionCounts, error)); ok {
-		return returnFunc(ctx, tx, ids)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, []uuid.UUID, uuid.UUID) (map[uuid.UUID]models.DiscussionCounts, error)); ok {
+		return returnFunc(ctx, tx, ids, viewer)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, []uuid.UUID) map[uuid.UUID]models.DiscussionCounts); ok {
-		r0 = returnFunc(ctx, tx, ids)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, []uuid.UUID, uuid.UUID) map[uuid.UUID]models.DiscussionCounts); ok {
+		r0 = returnFunc(ctx, tx, ids, viewer)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(map[uuid.UUID]models.DiscussionCounts)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, []uuid.UUID) error); ok {
-		r1 = returnFunc(ctx, tx, ids)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, []uuid.UUID, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, ids, viewer)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -158,11 +239,12 @@ type DiscussionRepositoryMock_Counts_Call struct {
 //   - ctx context.Context
 //   - tx repository.TxInterface
 //   - ids []uuid.UUID
-func (_e *DiscussionRepositoryMock_Expecter) Counts(ctx any, tx any, ids any) *DiscussionRepositoryMock_Counts_Call {
-	return &DiscussionRepositoryMock_Counts_Call{Call: _e.mock.On("Counts", ctx, tx, ids)}
+//   - viewer uuid.UUID
+func (_e *DiscussionRepositoryMock_Expecter) Counts(ctx any, tx any, ids any, viewer any) *DiscussionRepositoryMock_Counts_Call {
+	return &DiscussionRepositoryMock_Counts_Call{Call: _e.mock.On("Counts", ctx, tx, ids, viewer)}
 }
 
-func (_c *DiscussionRepositoryMock_Counts_Call) Run(run func(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID)) *DiscussionRepositoryMock_Counts_Call {
+func (_c *DiscussionRepositoryMock_Counts_Call) Run(run func(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID, viewer uuid.UUID)) *DiscussionRepositoryMock_Counts_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -176,10 +258,15 @@ func (_c *DiscussionRepositoryMock_Counts_Call) Run(run func(ctx context.Context
 		if args[2] != nil {
 			arg2 = args[2].([]uuid.UUID)
 		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
 		run(
 			arg0,
 			arg1,
 			arg2,
+			arg3,
 		)
 	})
 	return _c
@@ -190,7 +277,7 @@ func (_c *DiscussionRepositoryMock_Counts_Call) Return(uUIDToDiscussionCounts ma
 	return _c
 }
 
-func (_c *DiscussionRepositoryMock_Counts_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) (map[uuid.UUID]models.DiscussionCounts, error)) *DiscussionRepositoryMock_Counts_Call {
+func (_c *DiscussionRepositoryMock_Counts_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID, viewer uuid.UUID) (map[uuid.UUID]models.DiscussionCounts, error)) *DiscussionRepositoryMock_Counts_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1133,16 +1220,16 @@ func (_c *DiscussionRepositoryMock_SetTeam_Call) RunAndReturn(run func(ctx conte
 }
 
 // SetText provides a mock function for the type DiscussionRepositoryMock
-func (_mock *DiscussionRepositoryMock) SetText(ctx context.Context, tx repository.TxInterface, id uuid.UUID, title string, body string) error {
-	ret := _mock.Called(ctx, tx, id, title, body)
+func (_mock *DiscussionRepositoryMock) SetText(ctx context.Context, tx repository.TxInterface, id uuid.UUID, title string, body string, editedAt *time.Time) error {
+	ret := _mock.Called(ctx, tx, id, title, body, editedAt)
 
 	if len(ret) == 0 {
 		panic("no return value specified for SetText")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, string, string) error); ok {
-		r0 = returnFunc(ctx, tx, id, title, body)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, string, string, *time.Time) error); ok {
+		r0 = returnFunc(ctx, tx, id, title, body, editedAt)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -1160,11 +1247,12 @@ type DiscussionRepositoryMock_SetText_Call struct {
 //   - id uuid.UUID
 //   - title string
 //   - body string
-func (_e *DiscussionRepositoryMock_Expecter) SetText(ctx any, tx any, id any, title any, body any) *DiscussionRepositoryMock_SetText_Call {
-	return &DiscussionRepositoryMock_SetText_Call{Call: _e.mock.On("SetText", ctx, tx, id, title, body)}
+//   - editedAt *time.Time
+func (_e *DiscussionRepositoryMock_Expecter) SetText(ctx any, tx any, id any, title any, body any, editedAt any) *DiscussionRepositoryMock_SetText_Call {
+	return &DiscussionRepositoryMock_SetText_Call{Call: _e.mock.On("SetText", ctx, tx, id, title, body, editedAt)}
 }
 
-func (_c *DiscussionRepositoryMock_SetText_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, title string, body string)) *DiscussionRepositoryMock_SetText_Call {
+func (_c *DiscussionRepositoryMock_SetText_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, title string, body string, editedAt *time.Time)) *DiscussionRepositoryMock_SetText_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -1186,12 +1274,17 @@ func (_c *DiscussionRepositoryMock_SetText_Call) Run(run func(ctx context.Contex
 		if args[4] != nil {
 			arg4 = args[4].(string)
 		}
+		var arg5 *time.Time
+		if args[5] != nil {
+			arg5 = args[5].(*time.Time)
+		}
 		run(
 			arg0,
 			arg1,
 			arg2,
 			arg3,
 			arg4,
+			arg5,
 		)
 	})
 	return _c
@@ -1202,7 +1295,7 @@ func (_c *DiscussionRepositoryMock_SetText_Call) Return(err error) *DiscussionRe
 	return _c
 }
 
-func (_c *DiscussionRepositoryMock_SetText_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, title string, body string) error) *DiscussionRepositoryMock_SetText_Call {
+func (_c *DiscussionRepositoryMock_SetText_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, title string, body string, editedAt *time.Time) error) *DiscussionRepositoryMock_SetText_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1428,6 +1521,90 @@ func (_c *DiscussionRepositoryMock_SetTrashed_Call) Return(err error) *Discussio
 }
 
 func (_c *DiscussionRepositoryMock_SetTrashed_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, trashed bool, now time.Time) error) *DiscussionRepositoryMock_SetTrashed_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SetVote provides a mock function for the type DiscussionRepositoryMock
+func (_mock *DiscussionRepositoryMock) SetVote(ctx context.Context, tx repository.TxInterface, id uuid.UUID, user uuid.UUID, upvote bool) (bool, error) {
+	ret := _mock.Called(ctx, tx, id, user, upvote)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetVote")
+	}
+
+	var r0 bool
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, bool) (bool, error)); ok {
+		return returnFunc(ctx, tx, id, user, upvote)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, bool) bool); ok {
+		r0 = returnFunc(ctx, tx, id, user, upvote)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, bool) error); ok {
+		r1 = returnFunc(ctx, tx, id, user, upvote)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// DiscussionRepositoryMock_SetVote_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetVote'
+type DiscussionRepositoryMock_SetVote_Call struct {
+	*mock.Call
+}
+
+// SetVote is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - user uuid.UUID
+//   - upvote bool
+func (_e *DiscussionRepositoryMock_Expecter) SetVote(ctx any, tx any, id any, user any, upvote any) *DiscussionRepositoryMock_SetVote_Call {
+	return &DiscussionRepositoryMock_SetVote_Call{Call: _e.mock.On("SetVote", ctx, tx, id, user, upvote)}
+}
+
+func (_c *DiscussionRepositoryMock_SetVote_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, user uuid.UUID, upvote bool)) *DiscussionRepositoryMock_SetVote_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		var arg4 bool
+		if args[4] != nil {
+			arg4 = args[4].(bool)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+		)
+	})
+	return _c
+}
+
+func (_c *DiscussionRepositoryMock_SetVote_Call) Return(b bool, err error) *DiscussionRepositoryMock_SetVote_Call {
+	_c.Call.Return(b, err)
+	return _c
+}
+
+func (_c *DiscussionRepositoryMock_SetVote_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, user uuid.UUID, upvote bool) (bool, error)) *DiscussionRepositoryMock_SetVote_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -2258,6 +2435,80 @@ func (_c *DiscussionRepositoryMock_UpdateThread_Call) Return(err error) *Discuss
 }
 
 func (_c *DiscussionRepositoryMock_UpdateThread_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, changes discussion_repo.ThreadChanges, now time.Time) error) *DiscussionRepositoryMock_UpdateThread_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Versions provides a mock function for the type DiscussionRepositoryMock
+func (_mock *DiscussionRepositoryMock) Versions(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.MessageVersion, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Versions")
+	}
+
+	var r0 []*ent.MessageVersion
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) ([]*ent.MessageVersion, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) []*ent.MessageVersion); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ent.MessageVersion)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// DiscussionRepositoryMock_Versions_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Versions'
+type DiscussionRepositoryMock_Versions_Call struct {
+	*mock.Call
+}
+
+// Versions is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *DiscussionRepositoryMock_Expecter) Versions(ctx any, tx any, id any) *DiscussionRepositoryMock_Versions_Call {
+	return &DiscussionRepositoryMock_Versions_Call{Call: _e.mock.On("Versions", ctx, tx, id)}
+}
+
+func (_c *DiscussionRepositoryMock_Versions_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *DiscussionRepositoryMock_Versions_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *DiscussionRepositoryMock_Versions_Call) Return(messageVersions []*ent.MessageVersion, err error) *DiscussionRepositoryMock_Versions_Call {
+	_c.Call.Return(messageVersions, err)
+	return _c
+}
+
+func (_c *DiscussionRepositoryMock_Versions_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.MessageVersion, error)) *DiscussionRepositoryMock_Versions_Call {
 	_c.Call.Return(run)
 	return _c
 }

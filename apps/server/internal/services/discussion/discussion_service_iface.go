@@ -14,6 +14,8 @@ type DiscussionServiceInterface interface {
 	List(ctx context.Context, actor *auth.Actor, input *ListInput) (args.PageOf[models.Discussion], error)
 	Get(ctx context.Context, actor *auth.Actor, input *IDInput) (models.DiscussionDetail, error)
 	Save(ctx context.Context, actor *auth.Actor, input *SaveInput) (models.DiscussionDetail, error)
+	Vote(ctx context.Context, actor *auth.Actor, input *VoteInput) (models.DiscussionDetail, error)
+	History(ctx context.Context, actor *auth.Actor, input *IDInput) (models.MessageHistory, error)
 	Delete(ctx context.Context, actor *auth.Actor, input *IDInput) (models.DiscussionDetail, error)
 	Restore(ctx context.Context, actor *auth.Actor, input *IDInput) (models.DiscussionDetail, error)
 	Tags(ctx context.Context, actor *auth.Actor, input *TagsInput) (args.PageOf[models.DiscussionTag], error)

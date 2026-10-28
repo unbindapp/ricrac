@@ -1802,6 +1802,29 @@ func HasSubscribedDiscussionsWith(preds ...predicate.Discussion) predicate.User 
 	})
 }
 
+// HasVotedDiscussions applies the HasEdge predicate on the "voted_discussions" edge.
+func HasVotedDiscussions() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, VotedDiscussionsTable, VotedDiscussionsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasVotedDiscussionsWith applies the HasEdge predicate on the "voted_discussions" edge with a given conditions (other predicates).
+func HasVotedDiscussionsWith(preds ...predicate.Discussion) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newVotedDiscussionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasTeams applies the HasEdge predicate on the "teams" edge.
 func HasTeams() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
@@ -1955,6 +1978,29 @@ func HasDiscussionSubscribers() predicate.User {
 func HasDiscussionSubscribersWith(preds ...predicate.DiscussionSubscriber) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := newDiscussionSubscribersStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasDiscussionVotes applies the HasEdge predicate on the "discussion_votes" edge.
+func HasDiscussionVotes() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, DiscussionVotesTable, DiscussionVotesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDiscussionVotesWith applies the HasEdge predicate on the "discussion_votes" edge with a given conditions (other predicates).
+func HasDiscussionVotesWith(preds ...predicate.DiscussionVote) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newDiscussionVotesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

@@ -385,6 +385,78 @@ func (_c *CommentServiceMock_Delete_Call) RunAndReturn(run func(ctx context.Cont
 	return _c
 }
 
+// History provides a mock function for the type CommentServiceMock
+func (_mock *CommentServiceMock) History(ctx context.Context, actor *auth.Actor, input *comment_service.IDInput) (models.MessageHistory, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for History")
+	}
+
+	var r0 models.MessageHistory
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *comment_service.IDInput) (models.MessageHistory, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *comment_service.IDInput) models.MessageHistory); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.MessageHistory)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *comment_service.IDInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// CommentServiceMock_History_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'History'
+type CommentServiceMock_History_Call struct {
+	*mock.Call
+}
+
+// History is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *comment_service.IDInput
+func (_e *CommentServiceMock_Expecter) History(ctx any, actor any, input any) *CommentServiceMock_History_Call {
+	return &CommentServiceMock_History_Call{Call: _e.mock.On("History", ctx, actor, input)}
+}
+
+func (_c *CommentServiceMock_History_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *comment_service.IDInput)) *CommentServiceMock_History_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *comment_service.IDInput
+		if args[2] != nil {
+			arg2 = args[2].(*comment_service.IDInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *CommentServiceMock_History_Call) Return(messageHistory models.MessageHistory, err error) *CommentServiceMock_History_Call {
+	_c.Call.Return(messageHistory, err)
+	return _c
+}
+
+func (_c *CommentServiceMock_History_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *comment_service.IDInput) (models.MessageHistory, error)) *CommentServiceMock_History_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // List provides a mock function for the type CommentServiceMock
 func (_mock *CommentServiceMock) List(ctx context.Context, actor *auth.Actor, input *comment_service.ListInput) (args.PageOf[models.CommentThread], error) {
 	ret := _mock.Called(ctx, actor, input)

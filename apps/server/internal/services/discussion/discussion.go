@@ -36,12 +36,12 @@ type IDInput struct {
 	ID string `json:"id"`
 }
 
-func (self *DiscussionService) values(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID, withBody bool) ([]models.Discussion, error) {
+func (self *DiscussionService) values(ctx context.Context, tx repository.TxInterface, viewer uuid.UUID, ids []uuid.UUID, withBody bool) ([]models.Discussion, error) {
 	discussions, err := self.repo.Discussion().Load(ctx, tx, ids)
 	if err != nil {
 		return nil, err
 	}
-	counts, err := self.repo.Discussion().Counts(ctx, tx, ids)
+	counts, err := self.repo.Discussion().Counts(ctx, tx, ids, viewer)
 	if err != nil {
 		return nil, err
 	}
@@ -53,8 +53,8 @@ func (self *DiscussionService) values(ctx context.Context, tx repository.TxInter
 }
 
 // value is the discussion as reading or saving it answers, with its threads and subscribers.
-func (self *DiscussionService) value(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (models.DiscussionDetail, error) {
-	values, err := self.values(ctx, tx, []uuid.UUID{id}, true)
+func (self *DiscussionService) value(ctx context.Context, tx repository.TxInterface, viewer, id uuid.UUID) (models.DiscussionDetail, error) {
+	values, err := self.values(ctx, tx, viewer, []uuid.UUID{id}, true)
 	if err != nil {
 		return models.DiscussionDetail{}, err
 	}

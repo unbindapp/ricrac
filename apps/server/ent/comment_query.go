@@ -14,6 +14,7 @@ import (
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/initiative"
 	"ricrac/ent/issue"
+	"ricrac/ent/messageversion"
 	"ricrac/ent/notification"
 	"ricrac/ent/predicate"
 	"ricrac/ent/project"
@@ -54,6 +55,7 @@ type CommentQuery struct {
 	withReactions        *ReactionQuery
 	withNotifications    *NotificationQuery
 	withGithubOutbox     *GithubOutboxQuery
+	withVersions         *MessageVersionQuery
 	modifiers            []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -443,6 +445,28 @@ func (_q *CommentQuery) QueryGithubOutbox() *GithubOutboxQuery {
 	return query
 }
 
+// QueryVersions chains the current query on the "versions" edge.
+func (_q *CommentQuery) QueryVersions() *MessageVersionQuery {
+	query := (&MessageVersionClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(comment.Table, comment.FieldID, selector),
+			sqlgraph.To(messageversion.Table, messageversion.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, comment.VersionsTable, comment.VersionsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Comment entity from the query.
 // Returns a *NotFoundError when no Comment was found.
 func (_q *CommentQuery) First(ctx context.Context) (*Comment, error) {
@@ -651,6 +675,7 @@ func (_q *CommentQuery) Clone() *CommentQuery {
 		withReactions:        _q.withReactions.Clone(),
 		withNotifications:    _q.withNotifications.Clone(),
 		withGithubOutbox:     _q.withGithubOutbox.Clone(),
+		withVersions:         _q.withVersions.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
 		path:      _q.path,
@@ -834,6 +859,17 @@ func (_q *CommentQuery) WithGithubOutbox(opts ...func(*GithubOutboxQuery)) *Comm
 	return _q
 }
 
+// WithVersions tells the query-builder to eager-load the nodes that are connected to
+// the "versions" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *CommentQuery) WithVersions(opts ...func(*MessageVersionQuery)) *CommentQuery {
+	query := (&MessageVersionClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withVersions = query
+	return _q
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -912,7 +948,7 @@ func (_q *CommentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Comm
 	var (
 		nodes       = []*Comment{}
 		_spec       = _q.querySpec()
-		loadedTypes = [16]bool{
+		loadedTypes = [17]bool{
 			_q.withWorkspace != nil,
 			_q.withIssue != nil,
 			_q.withProject != nil,
@@ -929,6 +965,7 @@ func (_q *CommentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Comm
 			_q.withReactions != nil,
 			_q.withNotifications != nil,
 			_q.withGithubOutbox != nil,
+			_q.withVersions != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -1049,6 +1086,13 @@ func (_q *CommentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Comm
 		if err := _q.loadGithubOutbox(ctx, query, nodes,
 			func(n *Comment) { n.Edges.GithubOutbox = []*GithubOutbox{} },
 			func(n *Comment, e *GithubOutbox) { n.Edges.GithubOutbox = append(n.Edges.GithubOutbox, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withVersions; query != nil {
+		if err := _q.loadVersions(ctx, query, nodes,
+			func(n *Comment) { n.Edges.Versions = []*MessageVersion{} },
+			func(n *Comment, e *MessageVersion) { n.Edges.Versions = append(n.Edges.Versions, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1550,6 +1594,39 @@ func (_q *CommentQuery) loadGithubOutbox(ctx context.Context, query *GithubOutbo
 	}
 	query.Where(predicate.GithubOutbox(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(comment.GithubOutboxColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.CommentID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "comment_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "comment_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *CommentQuery) loadVersions(ctx context.Context, query *MessageVersionQuery, nodes []*Comment, init func(*Comment), assign func(*Comment, *MessageVersion)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Comment)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(messageversion.FieldCommentID)
+	}
+	query.Where(predicate.MessageVersion(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(comment.VersionsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

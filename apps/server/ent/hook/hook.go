@@ -164,6 +164,18 @@ func (f DiscussionThreadFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.V
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DiscussionThreadMutation", m)
 }
 
+// The DiscussionVoteFunc type is an adapter to allow the use of ordinary
+// function as DiscussionVote mutator.
+type DiscussionVoteFunc func(context.Context, *ent.DiscussionVoteMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DiscussionVoteFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.DiscussionVoteMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DiscussionVoteMutation", m)
+}
+
 // The DocumentFunc type is an adapter to allow the use of ordinary
 // function as Document mutator.
 type DocumentFunc func(context.Context, *ent.DocumentMutation) (ent.Value, error)
@@ -438,6 +450,18 @@ func (f IssueSubscriberFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Va
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.IssueSubscriberMutation", m)
+}
+
+// The MessageVersionFunc type is an adapter to allow the use of ordinary
+// function as MessageVersion mutator.
+type MessageVersionFunc func(context.Context, *ent.MessageVersionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MessageVersionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MessageVersionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MessageVersionMutation", m)
 }
 
 // The NotificationFunc type is an adapter to allow the use of ordinary

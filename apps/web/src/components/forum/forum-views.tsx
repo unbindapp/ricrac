@@ -19,8 +19,21 @@ import { discussionsQuery, useDiscussionLifecycleMutation } from "@/lib/queries/
 export const FORUM_VIEWS = ["open", "closed", "all", "trash"] as const;
 export type TForumView = (typeof FORUM_VIEWS)[number];
 
-/** What the forum lists, as its search params: open discussions when there is no status. */
-export type TForumFilters = { status?: Exclude<TForumView, "open">; tag?: string };
+export const FORUM_SORTS = ["activity", "newest", "top"] as const;
+export type TForumSort = (typeof FORUM_SORTS)[number];
+
+/** What the forum lists, as its search params: open discussions by recent activity when unset. */
+export type TForumFilters = {
+  status?: Exclude<TForumView, "open">;
+  tag?: string;
+  sort?: Exclude<TForumSort, "activity">;
+};
+
+export const forumSortOptions: { value: TForumSort; label: string }[] = [
+  { value: "activity", label: "Recent activity" },
+  { value: "newest", label: "Newest" },
+  { value: "top", label: "Most upvoted" },
+];
 
 const views: Record<TForumView, { label: string; icon: LucideIcon }> = {
   open: { label: "Open", icon: LockOpenIcon },
@@ -37,7 +50,12 @@ export function forumStatusSearch(view: TForumView): TForumFilters["status"] {
 
 export function forumDiscussionsQuery(
   workspaceId: string,
-  { status = "open", tag, query }: { status?: TForumView; tag?: string; query?: string },
+  {
+    status = "open",
+    tag,
+    query,
+    sort,
+  }: { status?: TForumView; tag?: string; query?: string; sort?: TForumSort },
 ) {
   const isTrash = status === "trash";
   return discussionsQuery(workspaceId, {
@@ -46,6 +64,7 @@ export function forumDiscussionsQuery(
     tag,
     query: query || undefined,
     includeBody: !isTrash || undefined,
+    sort: isTrash ? undefined : sort,
   });
 }
 

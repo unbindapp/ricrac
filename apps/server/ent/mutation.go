@@ -20,6 +20,7 @@ import (
 	"ricrac/ent/discussion"
 	"ricrac/ent/discussionsubscriber"
 	"ricrac/ent/discussionthread"
+	"ricrac/ent/discussionvote"
 	"ricrac/ent/document"
 	"ricrac/ent/documentversion"
 	"ricrac/ent/email"
@@ -43,6 +44,7 @@ import (
 	"ricrac/ent/issuerelease"
 	"ricrac/ent/issueshare"
 	"ricrac/ent/issuesubscriber"
+	"ricrac/ent/messageversion"
 	"ricrac/ent/notification"
 	"ricrac/ent/oauthclient"
 	"ricrac/ent/oauthcode"
@@ -106,6 +108,7 @@ const (
 	TypeDiscussion           = "Discussion"
 	TypeDiscussionSubscriber = "DiscussionSubscriber"
 	TypeDiscussionThread     = "DiscussionThread"
+	TypeDiscussionVote       = "DiscussionVote"
 	TypeDocument             = "Document"
 	TypeDocumentVersion      = "DocumentVersion"
 	TypeEmail                = "Email"
@@ -129,6 +132,7 @@ const (
 	TypeIssueRelease         = "IssueRelease"
 	TypeIssueShare           = "IssueShare"
 	TypeIssueSubscriber      = "IssueSubscriber"
+	TypeMessageVersion       = "MessageVersion"
 	TypeNotification         = "Notification"
 	TypeOAuthClient          = "OAuthClient"
 	TypeOAuthCode            = "OAuthCode"
@@ -2893,6 +2897,7 @@ type CommentMutation struct {
 	suggested_text           *string
 	suggestion_status        *string
 	edited_at                *time.Time
+	deleted_at               *time.Time
 	resolved_at              *time.Time
 	created_at               *time.Time
 	updated_at               *time.Time
@@ -2933,6 +2938,9 @@ type CommentMutation struct {
 	github_outbox            map[int64]struct{}
 	removedgithub_outbox     map[int64]struct{}
 	clearedgithub_outbox     bool
+	versions                 map[uuid.UUID]struct{}
+	removedversions          map[uuid.UUID]struct{}
+	clearedversions          bool
 	done                     bool
 	oldValue                 func(context.Context) (*Comment, error)
 	predicates               []predicate.Comment
@@ -3800,6 +3808,55 @@ func (m *CommentMutation) ResetEditedAt() {
 	delete(m.clearedFields, comment.FieldEditedAt)
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (m *CommentMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *CommentMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the Comment entity.
+// If the Comment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CommentMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *CommentMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[comment.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *CommentMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[comment.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *CommentMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, comment.FieldDeletedAt)
+}
+
 // SetResolvedAt sets the "resolved_at" field.
 func (m *CommentMutation) SetResolvedAt(t time.Time) {
 	m.resolved_at = &t
@@ -4536,6 +4593,60 @@ func (m *CommentMutation) ResetGithubOutbox() {
 	m.removedgithub_outbox = nil
 }
 
+// AddVersionIDs adds the "versions" edge to the MessageVersion entity by ids.
+func (m *CommentMutation) AddVersionIDs(ids ...uuid.UUID) {
+	if m.versions == nil {
+		m.versions = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.versions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearVersions clears the "versions" edge to the MessageVersion entity.
+func (m *CommentMutation) ClearVersions() {
+	m.clearedversions = true
+}
+
+// VersionsCleared reports if the "versions" edge to the MessageVersion entity was cleared.
+func (m *CommentMutation) VersionsCleared() bool {
+	return m.clearedversions
+}
+
+// RemoveVersionIDs removes the "versions" edge to the MessageVersion entity by IDs.
+func (m *CommentMutation) RemoveVersionIDs(ids ...uuid.UUID) {
+	if m.removedversions == nil {
+		m.removedversions = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.versions, ids[i])
+		m.removedversions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedVersions returns the removed IDs of the "versions" edge to the MessageVersion entity.
+func (m *CommentMutation) RemovedVersionsIDs() (ids []uuid.UUID) {
+	for id := range m.removedversions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// VersionsIDs returns the "versions" edge IDs in the mutation.
+func (m *CommentMutation) VersionsIDs() (ids []uuid.UUID) {
+	for id := range m.versions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetVersions resets all changes to the "versions" edge.
+func (m *CommentMutation) ResetVersions() {
+	m.versions = nil
+	m.clearedversions = false
+	m.removedversions = nil
+}
+
 // Where appends a list predicates to the CommentMutation builder.
 func (m *CommentMutation) Where(ps ...predicate.Comment) {
 	m.predicates = append(m.predicates, ps...)
@@ -4570,7 +4681,7 @@ func (m *CommentMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CommentMutation) Fields() []string {
-	fields := make([]string, 0, 20)
+	fields := make([]string, 0, 21)
 	if m.workspace != nil {
 		fields = append(fields, comment.FieldWorkspaceID)
 	}
@@ -4618,6 +4729,9 @@ func (m *CommentMutation) Fields() []string {
 	}
 	if m.edited_at != nil {
 		fields = append(fields, comment.FieldEditedAt)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, comment.FieldDeletedAt)
 	}
 	if m.resolved_at != nil {
 		fields = append(fields, comment.FieldResolvedAt)
@@ -4671,6 +4785,8 @@ func (m *CommentMutation) Field(name string) (ent.Value, bool) {
 		return m.SuggestionStatus()
 	case comment.FieldEditedAt:
 		return m.EditedAt()
+	case comment.FieldDeletedAt:
+		return m.DeletedAt()
 	case comment.FieldResolvedAt:
 		return m.ResolvedAt()
 	case comment.FieldResolvingUserID:
@@ -4720,6 +4836,8 @@ func (m *CommentMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldSuggestionStatus(ctx)
 	case comment.FieldEditedAt:
 		return m.OldEditedAt(ctx)
+	case comment.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
 	case comment.FieldResolvedAt:
 		return m.OldResolvedAt(ctx)
 	case comment.FieldResolvingUserID:
@@ -4849,6 +4967,13 @@ func (m *CommentMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetEditedAt(v)
 		return nil
+	case comment.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
 	case comment.FieldResolvedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -4949,6 +5074,9 @@ func (m *CommentMutation) ClearedFields() []string {
 	if m.FieldCleared(comment.FieldEditedAt) {
 		fields = append(fields, comment.FieldEditedAt)
 	}
+	if m.FieldCleared(comment.FieldDeletedAt) {
+		fields = append(fields, comment.FieldDeletedAt)
+	}
 	if m.FieldCleared(comment.FieldResolvedAt) {
 		fields = append(fields, comment.FieldResolvedAt)
 	}
@@ -5016,6 +5144,9 @@ func (m *CommentMutation) ClearField(name string) error {
 		return nil
 	case comment.FieldEditedAt:
 		m.ClearEditedAt()
+		return nil
+	case comment.FieldDeletedAt:
+		m.ClearDeletedAt()
 		return nil
 	case comment.FieldResolvedAt:
 		m.ClearResolvedAt()
@@ -5085,6 +5216,9 @@ func (m *CommentMutation) ResetField(name string) error {
 	case comment.FieldEditedAt:
 		m.ResetEditedAt()
 		return nil
+	case comment.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
 	case comment.FieldResolvedAt:
 		m.ResetResolvedAt()
 		return nil
@@ -5103,7 +5237,7 @@ func (m *CommentMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CommentMutation) AddedEdges() []string {
-	edges := make([]string, 0, 16)
+	edges := make([]string, 0, 17)
 	if m.workspace != nil {
 		edges = append(edges, comment.EdgeWorkspace)
 	}
@@ -5151,6 +5285,9 @@ func (m *CommentMutation) AddedEdges() []string {
 	}
 	if m.github_outbox != nil {
 		edges = append(edges, comment.EdgeGithubOutbox)
+	}
+	if m.versions != nil {
+		edges = append(edges, comment.EdgeVersions)
 	}
 	return edges
 }
@@ -5231,13 +5368,19 @@ func (m *CommentMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case comment.EdgeVersions:
+		ids := make([]ent.Value, 0, len(m.versions))
+		for id := range m.versions {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CommentMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 16)
+	edges := make([]string, 0, 17)
 	if m.removedchildren != nil {
 		edges = append(edges, comment.EdgeChildren)
 	}
@@ -5249,6 +5392,9 @@ func (m *CommentMutation) RemovedEdges() []string {
 	}
 	if m.removedgithub_outbox != nil {
 		edges = append(edges, comment.EdgeGithubOutbox)
+	}
+	if m.removedversions != nil {
+		edges = append(edges, comment.EdgeVersions)
 	}
 	return edges
 }
@@ -5281,13 +5427,19 @@ func (m *CommentMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case comment.EdgeVersions:
+		ids := make([]ent.Value, 0, len(m.removedversions))
+		for id := range m.removedversions {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CommentMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 16)
+	edges := make([]string, 0, 17)
 	if m.clearedworkspace {
 		edges = append(edges, comment.EdgeWorkspace)
 	}
@@ -5336,6 +5488,9 @@ func (m *CommentMutation) ClearedEdges() []string {
 	if m.clearedgithub_outbox {
 		edges = append(edges, comment.EdgeGithubOutbox)
 	}
+	if m.clearedversions {
+		edges = append(edges, comment.EdgeVersions)
+	}
 	return edges
 }
 
@@ -5375,6 +5530,8 @@ func (m *CommentMutation) EdgeCleared(name string) bool {
 		return m.clearednotifications
 	case comment.EdgeGithubOutbox:
 		return m.clearedgithub_outbox
+	case comment.EdgeVersions:
+		return m.clearedversions
 	}
 	return false
 }
@@ -5474,6 +5631,9 @@ func (m *CommentMutation) ResetEdge(name string) error {
 		return nil
 	case comment.EdgeGithubOutbox:
 		m.ResetGithubOutbox()
+		return nil
+	case comment.EdgeVersions:
+		m.ResetVersions()
 		return nil
 	}
 	return fmt.Errorf("unknown Comment edge %s", name)
@@ -12626,6 +12786,7 @@ type DiscussionMutation struct {
 	pinned_at            *time.Time
 	closed_at            *time.Time
 	trashed_at           *time.Time
+	edited_at            *time.Time
 	last_activity_at     *time.Time
 	created_at           *time.Time
 	updated_at           *time.Time
@@ -12648,6 +12809,12 @@ type DiscussionMutation struct {
 	subscribers          map[uuid.UUID]struct{}
 	removedsubscribers   map[uuid.UUID]struct{}
 	clearedsubscribers   bool
+	voters               map[uuid.UUID]struct{}
+	removedvoters        map[uuid.UUID]struct{}
+	clearedvoters        bool
+	versions             map[uuid.UUID]struct{}
+	removedversions      map[uuid.UUID]struct{}
+	clearedversions      bool
 	done                 bool
 	oldValue             func(context.Context) (*Discussion, error)
 	predicates           []predicate.Discussion
@@ -13257,6 +13424,55 @@ func (m *DiscussionMutation) ResetTrashedAt() {
 	delete(m.clearedFields, discussion.FieldTrashedAt)
 }
 
+// SetEditedAt sets the "edited_at" field.
+func (m *DiscussionMutation) SetEditedAt(t time.Time) {
+	m.edited_at = &t
+}
+
+// EditedAt returns the value of the "edited_at" field in the mutation.
+func (m *DiscussionMutation) EditedAt() (r time.Time, exists bool) {
+	v := m.edited_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEditedAt returns the old "edited_at" field's value of the Discussion entity.
+// If the Discussion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DiscussionMutation) OldEditedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEditedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEditedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEditedAt: %w", err)
+	}
+	return oldValue.EditedAt, nil
+}
+
+// ClearEditedAt clears the value of the "edited_at" field.
+func (m *DiscussionMutation) ClearEditedAt() {
+	m.edited_at = nil
+	m.clearedFields[discussion.FieldEditedAt] = struct{}{}
+}
+
+// EditedAtCleared returns if the "edited_at" field was cleared in this mutation.
+func (m *DiscussionMutation) EditedAtCleared() bool {
+	_, ok := m.clearedFields[discussion.FieldEditedAt]
+	return ok
+}
+
+// ResetEditedAt resets all changes to the "edited_at" field.
+func (m *DiscussionMutation) ResetEditedAt() {
+	m.edited_at = nil
+	delete(m.clearedFields, discussion.FieldEditedAt)
+}
+
 // SetLastActivityAt sets the "last_activity_at" field.
 func (m *DiscussionMutation) SetLastActivityAt(t time.Time) {
 	m.last_activity_at = &t
@@ -13701,6 +13917,114 @@ func (m *DiscussionMutation) ResetSubscribers() {
 	m.removedsubscribers = nil
 }
 
+// AddVoterIDs adds the "voters" edge to the User entity by ids.
+func (m *DiscussionMutation) AddVoterIDs(ids ...uuid.UUID) {
+	if m.voters == nil {
+		m.voters = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.voters[ids[i]] = struct{}{}
+	}
+}
+
+// ClearVoters clears the "voters" edge to the User entity.
+func (m *DiscussionMutation) ClearVoters() {
+	m.clearedvoters = true
+}
+
+// VotersCleared reports if the "voters" edge to the User entity was cleared.
+func (m *DiscussionMutation) VotersCleared() bool {
+	return m.clearedvoters
+}
+
+// RemoveVoterIDs removes the "voters" edge to the User entity by IDs.
+func (m *DiscussionMutation) RemoveVoterIDs(ids ...uuid.UUID) {
+	if m.removedvoters == nil {
+		m.removedvoters = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.voters, ids[i])
+		m.removedvoters[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedVoters returns the removed IDs of the "voters" edge to the User entity.
+func (m *DiscussionMutation) RemovedVotersIDs() (ids []uuid.UUID) {
+	for id := range m.removedvoters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// VotersIDs returns the "voters" edge IDs in the mutation.
+func (m *DiscussionMutation) VotersIDs() (ids []uuid.UUID) {
+	for id := range m.voters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetVoters resets all changes to the "voters" edge.
+func (m *DiscussionMutation) ResetVoters() {
+	m.voters = nil
+	m.clearedvoters = false
+	m.removedvoters = nil
+}
+
+// AddVersionIDs adds the "versions" edge to the MessageVersion entity by ids.
+func (m *DiscussionMutation) AddVersionIDs(ids ...uuid.UUID) {
+	if m.versions == nil {
+		m.versions = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.versions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearVersions clears the "versions" edge to the MessageVersion entity.
+func (m *DiscussionMutation) ClearVersions() {
+	m.clearedversions = true
+}
+
+// VersionsCleared reports if the "versions" edge to the MessageVersion entity was cleared.
+func (m *DiscussionMutation) VersionsCleared() bool {
+	return m.clearedversions
+}
+
+// RemoveVersionIDs removes the "versions" edge to the MessageVersion entity by IDs.
+func (m *DiscussionMutation) RemoveVersionIDs(ids ...uuid.UUID) {
+	if m.removedversions == nil {
+		m.removedversions = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.versions, ids[i])
+		m.removedversions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedVersions returns the removed IDs of the "versions" edge to the MessageVersion entity.
+func (m *DiscussionMutation) RemovedVersionsIDs() (ids []uuid.UUID) {
+	for id := range m.removedversions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// VersionsIDs returns the "versions" edge IDs in the mutation.
+func (m *DiscussionMutation) VersionsIDs() (ids []uuid.UUID) {
+	for id := range m.versions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetVersions resets all changes to the "versions" edge.
+func (m *DiscussionMutation) ResetVersions() {
+	m.versions = nil
+	m.clearedversions = false
+	m.removedversions = nil
+}
+
 // Where appends a list predicates to the DiscussionMutation builder.
 func (m *DiscussionMutation) Where(ps ...predicate.Discussion) {
 	m.predicates = append(m.predicates, ps...)
@@ -13735,7 +14059,7 @@ func (m *DiscussionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *DiscussionMutation) Fields() []string {
-	fields := make([]string, 0, 14)
+	fields := make([]string, 0, 15)
 	if m.workspace != nil {
 		fields = append(fields, discussion.FieldWorkspaceID)
 	}
@@ -13768,6 +14092,9 @@ func (m *DiscussionMutation) Fields() []string {
 	}
 	if m.trashed_at != nil {
 		fields = append(fields, discussion.FieldTrashedAt)
+	}
+	if m.edited_at != nil {
+		fields = append(fields, discussion.FieldEditedAt)
 	}
 	if m.last_activity_at != nil {
 		fields = append(fields, discussion.FieldLastActivityAt)
@@ -13808,6 +14135,8 @@ func (m *DiscussionMutation) Field(name string) (ent.Value, bool) {
 		return m.ClosedAt()
 	case discussion.FieldTrashedAt:
 		return m.TrashedAt()
+	case discussion.FieldEditedAt:
+		return m.EditedAt()
 	case discussion.FieldLastActivityAt:
 		return m.LastActivityAt()
 	case discussion.FieldCreatedAt:
@@ -13845,6 +14174,8 @@ func (m *DiscussionMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldClosedAt(ctx)
 	case discussion.FieldTrashedAt:
 		return m.OldTrashedAt(ctx)
+	case discussion.FieldEditedAt:
+		return m.OldEditedAt(ctx)
 	case discussion.FieldLastActivityAt:
 		return m.OldLastActivityAt(ctx)
 	case discussion.FieldCreatedAt:
@@ -13937,6 +14268,13 @@ func (m *DiscussionMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTrashedAt(v)
 		return nil
+	case discussion.FieldEditedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEditedAt(v)
+		return nil
 	case discussion.FieldLastActivityAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -14012,6 +14350,9 @@ func (m *DiscussionMutation) ClearedFields() []string {
 	if m.FieldCleared(discussion.FieldTrashedAt) {
 		fields = append(fields, discussion.FieldTrashedAt)
 	}
+	if m.FieldCleared(discussion.FieldEditedAt) {
+		fields = append(fields, discussion.FieldEditedAt)
+	}
 	if m.FieldCleared(discussion.FieldLastActivityAt) {
 		fields = append(fields, discussion.FieldLastActivityAt)
 	}
@@ -14058,6 +14399,9 @@ func (m *DiscussionMutation) ClearField(name string) error {
 		return nil
 	case discussion.FieldTrashedAt:
 		m.ClearTrashedAt()
+		return nil
+	case discussion.FieldEditedAt:
+		m.ClearEditedAt()
 		return nil
 	case discussion.FieldLastActivityAt:
 		m.ClearLastActivityAt()
@@ -14109,6 +14453,9 @@ func (m *DiscussionMutation) ResetField(name string) error {
 	case discussion.FieldTrashedAt:
 		m.ResetTrashedAt()
 		return nil
+	case discussion.FieldEditedAt:
+		m.ResetEditedAt()
+		return nil
 	case discussion.FieldLastActivityAt:
 		m.ResetLastActivityAt()
 		return nil
@@ -14124,7 +14471,7 @@ func (m *DiscussionMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *DiscussionMutation) AddedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 9)
 	if m.workspace != nil {
 		edges = append(edges, discussion.EdgeWorkspace)
 	}
@@ -14145,6 +14492,12 @@ func (m *DiscussionMutation) AddedEdges() []string {
 	}
 	if m.subscribers != nil {
 		edges = append(edges, discussion.EdgeSubscribers)
+	}
+	if m.voters != nil {
+		edges = append(edges, discussion.EdgeVoters)
+	}
+	if m.versions != nil {
+		edges = append(edges, discussion.EdgeVersions)
 	}
 	return edges
 }
@@ -14189,13 +14542,25 @@ func (m *DiscussionMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case discussion.EdgeVoters:
+		ids := make([]ent.Value, 0, len(m.voters))
+		for id := range m.voters {
+			ids = append(ids, id)
+		}
+		return ids
+	case discussion.EdgeVersions:
+		ids := make([]ent.Value, 0, len(m.versions))
+		for id := range m.versions {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *DiscussionMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 9)
 	if m.removedthreads != nil {
 		edges = append(edges, discussion.EdgeThreads)
 	}
@@ -14207,6 +14572,12 @@ func (m *DiscussionMutation) RemovedEdges() []string {
 	}
 	if m.removedsubscribers != nil {
 		edges = append(edges, discussion.EdgeSubscribers)
+	}
+	if m.removedvoters != nil {
+		edges = append(edges, discussion.EdgeVoters)
+	}
+	if m.removedversions != nil {
+		edges = append(edges, discussion.EdgeVersions)
 	}
 	return edges
 }
@@ -14239,13 +14610,25 @@ func (m *DiscussionMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case discussion.EdgeVoters:
+		ids := make([]ent.Value, 0, len(m.removedvoters))
+		for id := range m.removedvoters {
+			ids = append(ids, id)
+		}
+		return ids
+	case discussion.EdgeVersions:
+		ids := make([]ent.Value, 0, len(m.removedversions))
+		for id := range m.removedversions {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *DiscussionMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 9)
 	if m.clearedworkspace {
 		edges = append(edges, discussion.EdgeWorkspace)
 	}
@@ -14266,6 +14649,12 @@ func (m *DiscussionMutation) ClearedEdges() []string {
 	}
 	if m.clearedsubscribers {
 		edges = append(edges, discussion.EdgeSubscribers)
+	}
+	if m.clearedvoters {
+		edges = append(edges, discussion.EdgeVoters)
+	}
+	if m.clearedversions {
+		edges = append(edges, discussion.EdgeVersions)
 	}
 	return edges
 }
@@ -14288,6 +14677,10 @@ func (m *DiscussionMutation) EdgeCleared(name string) bool {
 		return m.clearednotifications
 	case discussion.EdgeSubscribers:
 		return m.clearedsubscribers
+	case discussion.EdgeVoters:
+		return m.clearedvoters
+	case discussion.EdgeVersions:
+		return m.clearedversions
 	}
 	return false
 }
@@ -14333,6 +14726,12 @@ func (m *DiscussionMutation) ResetEdge(name string) error {
 		return nil
 	case discussion.EdgeSubscribers:
 		m.ResetSubscribers()
+		return nil
+	case discussion.EdgeVoters:
+		m.ResetVoters()
+		return nil
+	case discussion.EdgeVersions:
+		m.ResetVersions()
 		return nil
 	}
 	return fmt.Errorf("unknown Discussion edge %s", name)
@@ -16148,6 +16547,442 @@ func (m *DiscussionThreadMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown DiscussionThread edge %s", name)
+}
+
+// DiscussionVoteMutation represents an operation that mutates the DiscussionVote nodes in the graph.
+type DiscussionVoteMutation struct {
+	config
+	op                Op
+	typ               string
+	created_at        *time.Time
+	clearedFields     map[string]struct{}
+	discussion        *uuid.UUID
+	cleareddiscussion bool
+	user              *uuid.UUID
+	cleareduser       bool
+	done              bool
+	oldValue          func(context.Context) (*DiscussionVote, error)
+	predicates        []predicate.DiscussionVote
+}
+
+var _ ent.Mutation = (*DiscussionVoteMutation)(nil)
+
+// discussionvoteOption allows management of the mutation configuration using functional options.
+type discussionvoteOption func(*DiscussionVoteMutation)
+
+// newDiscussionVoteMutation creates new mutation for the DiscussionVote entity.
+func newDiscussionVoteMutation(c config, op Op, opts ...discussionvoteOption) *DiscussionVoteMutation {
+	m := &DiscussionVoteMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeDiscussionVote,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m DiscussionVoteMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m DiscussionVoteMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetDiscussionID sets the "discussion_id" field.
+func (m *DiscussionVoteMutation) SetDiscussionID(u uuid.UUID) {
+	m.discussion = &u
+}
+
+// DiscussionID returns the value of the "discussion_id" field in the mutation.
+func (m *DiscussionVoteMutation) DiscussionID() (r uuid.UUID, exists bool) {
+	v := m.discussion
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDiscussionID resets all changes to the "discussion_id" field.
+func (m *DiscussionVoteMutation) ResetDiscussionID() {
+	m.discussion = nil
+}
+
+// SetUserID sets the "user_id" field.
+func (m *DiscussionVoteMutation) SetUserID(u uuid.UUID) {
+	m.user = &u
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *DiscussionVoteMutation) UserID() (r uuid.UUID, exists bool) {
+	v := m.user
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *DiscussionVoteMutation) ResetUserID() {
+	m.user = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *DiscussionVoteMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *DiscussionVoteMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearCreatedAt clears the value of the "created_at" field.
+func (m *DiscussionVoteMutation) ClearCreatedAt() {
+	m.created_at = nil
+	m.clearedFields[discussionvote.FieldCreatedAt] = struct{}{}
+}
+
+// CreatedAtCleared returns if the "created_at" field was cleared in this mutation.
+func (m *DiscussionVoteMutation) CreatedAtCleared() bool {
+	_, ok := m.clearedFields[discussionvote.FieldCreatedAt]
+	return ok
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *DiscussionVoteMutation) ResetCreatedAt() {
+	m.created_at = nil
+	delete(m.clearedFields, discussionvote.FieldCreatedAt)
+}
+
+// ClearDiscussion clears the "discussion" edge to the Discussion entity.
+func (m *DiscussionVoteMutation) ClearDiscussion() {
+	m.cleareddiscussion = true
+	m.clearedFields[discussionvote.FieldDiscussionID] = struct{}{}
+}
+
+// DiscussionCleared reports if the "discussion" edge to the Discussion entity was cleared.
+func (m *DiscussionVoteMutation) DiscussionCleared() bool {
+	return m.cleareddiscussion
+}
+
+// DiscussionIDs returns the "discussion" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// DiscussionID instead. It exists only for internal usage by the builders.
+func (m *DiscussionVoteMutation) DiscussionIDs() (ids []uuid.UUID) {
+	if id := m.discussion; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetDiscussion resets all changes to the "discussion" edge.
+func (m *DiscussionVoteMutation) ResetDiscussion() {
+	m.discussion = nil
+	m.cleareddiscussion = false
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (m *DiscussionVoteMutation) ClearUser() {
+	m.cleareduser = true
+	m.clearedFields[discussionvote.FieldUserID] = struct{}{}
+}
+
+// UserCleared reports if the "user" edge to the User entity was cleared.
+func (m *DiscussionVoteMutation) UserCleared() bool {
+	return m.cleareduser
+}
+
+// UserIDs returns the "user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
+func (m *DiscussionVoteMutation) UserIDs() (ids []uuid.UUID) {
+	if id := m.user; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUser resets all changes to the "user" edge.
+func (m *DiscussionVoteMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
+}
+
+// Where appends a list predicates to the DiscussionVoteMutation builder.
+func (m *DiscussionVoteMutation) Where(ps ...predicate.DiscussionVote) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the DiscussionVoteMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *DiscussionVoteMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.DiscussionVote, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *DiscussionVoteMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *DiscussionVoteMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (DiscussionVote).
+func (m *DiscussionVoteMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *DiscussionVoteMutation) Fields() []string {
+	fields := make([]string, 0, 3)
+	if m.discussion != nil {
+		fields = append(fields, discussionvote.FieldDiscussionID)
+	}
+	if m.user != nil {
+		fields = append(fields, discussionvote.FieldUserID)
+	}
+	if m.created_at != nil {
+		fields = append(fields, discussionvote.FieldCreatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *DiscussionVoteMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case discussionvote.FieldDiscussionID:
+		return m.DiscussionID()
+	case discussionvote.FieldUserID:
+		return m.UserID()
+	case discussionvote.FieldCreatedAt:
+		return m.CreatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *DiscussionVoteMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	return nil, errors.New("edge schema DiscussionVote does not support getting old values")
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DiscussionVoteMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case discussionvote.FieldDiscussionID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDiscussionID(v)
+		return nil
+	case discussionvote.FieldUserID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
+	case discussionvote.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown DiscussionVote field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *DiscussionVoteMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *DiscussionVoteMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DiscussionVoteMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown DiscussionVote numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *DiscussionVoteMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(discussionvote.FieldCreatedAt) {
+		fields = append(fields, discussionvote.FieldCreatedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *DiscussionVoteMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *DiscussionVoteMutation) ClearField(name string) error {
+	switch name {
+	case discussionvote.FieldCreatedAt:
+		m.ClearCreatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown DiscussionVote nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *DiscussionVoteMutation) ResetField(name string) error {
+	switch name {
+	case discussionvote.FieldDiscussionID:
+		m.ResetDiscussionID()
+		return nil
+	case discussionvote.FieldUserID:
+		m.ResetUserID()
+		return nil
+	case discussionvote.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown DiscussionVote field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *DiscussionVoteMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.discussion != nil {
+		edges = append(edges, discussionvote.EdgeDiscussion)
+	}
+	if m.user != nil {
+		edges = append(edges, discussionvote.EdgeUser)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *DiscussionVoteMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case discussionvote.EdgeDiscussion:
+		if id := m.discussion; id != nil {
+			return []ent.Value{*id}
+		}
+	case discussionvote.EdgeUser:
+		if id := m.user; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *DiscussionVoteMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *DiscussionVoteMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *DiscussionVoteMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.cleareddiscussion {
+		edges = append(edges, discussionvote.EdgeDiscussion)
+	}
+	if m.cleareduser {
+		edges = append(edges, discussionvote.EdgeUser)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *DiscussionVoteMutation) EdgeCleared(name string) bool {
+	switch name {
+	case discussionvote.EdgeDiscussion:
+		return m.cleareddiscussion
+	case discussionvote.EdgeUser:
+		return m.cleareduser
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *DiscussionVoteMutation) ClearEdge(name string) error {
+	switch name {
+	case discussionvote.EdgeDiscussion:
+		m.ClearDiscussion()
+		return nil
+	case discussionvote.EdgeUser:
+		m.ClearUser()
+		return nil
+	}
+	return fmt.Errorf("unknown DiscussionVote unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *DiscussionVoteMutation) ResetEdge(name string) error {
+	switch name {
+	case discussionvote.EdgeDiscussion:
+		m.ResetDiscussion()
+		return nil
+	case discussionvote.EdgeUser:
+		m.ResetUser()
+		return nil
+	}
+	return fmt.Errorf("unknown DiscussionVote edge %s", name)
 }
 
 // DocumentMutation represents an operation that mutates the Document nodes in the graph.
@@ -42407,6 +43242,814 @@ func (m *IssueSubscriberMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown IssueSubscriber edge %s", name)
+}
+
+// MessageVersionMutation represents an operation that mutates the MessageVersion nodes in the graph.
+type MessageVersionMutation struct {
+	config
+	op                Op
+	typ               string
+	id                *uuid.UUID
+	body              *string
+	written_at        *time.Time
+	created_at        *time.Time
+	clearedFields     map[string]struct{}
+	workspace         *uuid.UUID
+	clearedworkspace  bool
+	comment           *uuid.UUID
+	clearedcomment    bool
+	discussion        *uuid.UUID
+	cleareddiscussion bool
+	done              bool
+	oldValue          func(context.Context) (*MessageVersion, error)
+	predicates        []predicate.MessageVersion
+}
+
+var _ ent.Mutation = (*MessageVersionMutation)(nil)
+
+// messageversionOption allows management of the mutation configuration using functional options.
+type messageversionOption func(*MessageVersionMutation)
+
+// newMessageVersionMutation creates new mutation for the MessageVersion entity.
+func newMessageVersionMutation(c config, op Op, opts ...messageversionOption) *MessageVersionMutation {
+	m := &MessageVersionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeMessageVersion,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withMessageVersionID sets the ID field of the mutation.
+func withMessageVersionID(id uuid.UUID) messageversionOption {
+	return func(m *MessageVersionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *MessageVersion
+		)
+		m.oldValue = func(ctx context.Context) (*MessageVersion, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().MessageVersion.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withMessageVersion sets the old MessageVersion of the mutation.
+func withMessageVersion(node *MessageVersion) messageversionOption {
+	return func(m *MessageVersionMutation) {
+		m.oldValue = func(context.Context) (*MessageVersion, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m MessageVersionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m MessageVersionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of MessageVersion entities.
+func (m *MessageVersionMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *MessageVersionMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *MessageVersionMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().MessageVersion.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetWorkspaceID sets the "workspace_id" field.
+func (m *MessageVersionMutation) SetWorkspaceID(u uuid.UUID) {
+	m.workspace = &u
+}
+
+// WorkspaceID returns the value of the "workspace_id" field in the mutation.
+func (m *MessageVersionMutation) WorkspaceID() (r uuid.UUID, exists bool) {
+	v := m.workspace
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWorkspaceID returns the old "workspace_id" field's value of the MessageVersion entity.
+// If the MessageVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MessageVersionMutation) OldWorkspaceID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWorkspaceID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWorkspaceID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWorkspaceID: %w", err)
+	}
+	return oldValue.WorkspaceID, nil
+}
+
+// ResetWorkspaceID resets all changes to the "workspace_id" field.
+func (m *MessageVersionMutation) ResetWorkspaceID() {
+	m.workspace = nil
+}
+
+// SetCommentID sets the "comment_id" field.
+func (m *MessageVersionMutation) SetCommentID(u uuid.UUID) {
+	m.comment = &u
+}
+
+// CommentID returns the value of the "comment_id" field in the mutation.
+func (m *MessageVersionMutation) CommentID() (r uuid.UUID, exists bool) {
+	v := m.comment
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCommentID returns the old "comment_id" field's value of the MessageVersion entity.
+// If the MessageVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MessageVersionMutation) OldCommentID(ctx context.Context) (v *uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCommentID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCommentID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCommentID: %w", err)
+	}
+	return oldValue.CommentID, nil
+}
+
+// ClearCommentID clears the value of the "comment_id" field.
+func (m *MessageVersionMutation) ClearCommentID() {
+	m.comment = nil
+	m.clearedFields[messageversion.FieldCommentID] = struct{}{}
+}
+
+// CommentIDCleared returns if the "comment_id" field was cleared in this mutation.
+func (m *MessageVersionMutation) CommentIDCleared() bool {
+	_, ok := m.clearedFields[messageversion.FieldCommentID]
+	return ok
+}
+
+// ResetCommentID resets all changes to the "comment_id" field.
+func (m *MessageVersionMutation) ResetCommentID() {
+	m.comment = nil
+	delete(m.clearedFields, messageversion.FieldCommentID)
+}
+
+// SetDiscussionID sets the "discussion_id" field.
+func (m *MessageVersionMutation) SetDiscussionID(u uuid.UUID) {
+	m.discussion = &u
+}
+
+// DiscussionID returns the value of the "discussion_id" field in the mutation.
+func (m *MessageVersionMutation) DiscussionID() (r uuid.UUID, exists bool) {
+	v := m.discussion
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDiscussionID returns the old "discussion_id" field's value of the MessageVersion entity.
+// If the MessageVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MessageVersionMutation) OldDiscussionID(ctx context.Context) (v *uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDiscussionID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDiscussionID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDiscussionID: %w", err)
+	}
+	return oldValue.DiscussionID, nil
+}
+
+// ClearDiscussionID clears the value of the "discussion_id" field.
+func (m *MessageVersionMutation) ClearDiscussionID() {
+	m.discussion = nil
+	m.clearedFields[messageversion.FieldDiscussionID] = struct{}{}
+}
+
+// DiscussionIDCleared returns if the "discussion_id" field was cleared in this mutation.
+func (m *MessageVersionMutation) DiscussionIDCleared() bool {
+	_, ok := m.clearedFields[messageversion.FieldDiscussionID]
+	return ok
+}
+
+// ResetDiscussionID resets all changes to the "discussion_id" field.
+func (m *MessageVersionMutation) ResetDiscussionID() {
+	m.discussion = nil
+	delete(m.clearedFields, messageversion.FieldDiscussionID)
+}
+
+// SetBody sets the "body" field.
+func (m *MessageVersionMutation) SetBody(s string) {
+	m.body = &s
+}
+
+// Body returns the value of the "body" field in the mutation.
+func (m *MessageVersionMutation) Body() (r string, exists bool) {
+	v := m.body
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBody returns the old "body" field's value of the MessageVersion entity.
+// If the MessageVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MessageVersionMutation) OldBody(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBody is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBody requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBody: %w", err)
+	}
+	return oldValue.Body, nil
+}
+
+// ResetBody resets all changes to the "body" field.
+func (m *MessageVersionMutation) ResetBody() {
+	m.body = nil
+}
+
+// SetWrittenAt sets the "written_at" field.
+func (m *MessageVersionMutation) SetWrittenAt(t time.Time) {
+	m.written_at = &t
+}
+
+// WrittenAt returns the value of the "written_at" field in the mutation.
+func (m *MessageVersionMutation) WrittenAt() (r time.Time, exists bool) {
+	v := m.written_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWrittenAt returns the old "written_at" field's value of the MessageVersion entity.
+// If the MessageVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MessageVersionMutation) OldWrittenAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWrittenAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWrittenAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWrittenAt: %w", err)
+	}
+	return oldValue.WrittenAt, nil
+}
+
+// ResetWrittenAt resets all changes to the "written_at" field.
+func (m *MessageVersionMutation) ResetWrittenAt() {
+	m.written_at = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *MessageVersionMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *MessageVersionMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the MessageVersion entity.
+// If the MessageVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MessageVersionMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ClearCreatedAt clears the value of the "created_at" field.
+func (m *MessageVersionMutation) ClearCreatedAt() {
+	m.created_at = nil
+	m.clearedFields[messageversion.FieldCreatedAt] = struct{}{}
+}
+
+// CreatedAtCleared returns if the "created_at" field was cleared in this mutation.
+func (m *MessageVersionMutation) CreatedAtCleared() bool {
+	_, ok := m.clearedFields[messageversion.FieldCreatedAt]
+	return ok
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *MessageVersionMutation) ResetCreatedAt() {
+	m.created_at = nil
+	delete(m.clearedFields, messageversion.FieldCreatedAt)
+}
+
+// ClearWorkspace clears the "workspace" edge to the Workspace entity.
+func (m *MessageVersionMutation) ClearWorkspace() {
+	m.clearedworkspace = true
+	m.clearedFields[messageversion.FieldWorkspaceID] = struct{}{}
+}
+
+// WorkspaceCleared reports if the "workspace" edge to the Workspace entity was cleared.
+func (m *MessageVersionMutation) WorkspaceCleared() bool {
+	return m.clearedworkspace
+}
+
+// WorkspaceIDs returns the "workspace" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// WorkspaceID instead. It exists only for internal usage by the builders.
+func (m *MessageVersionMutation) WorkspaceIDs() (ids []uuid.UUID) {
+	if id := m.workspace; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetWorkspace resets all changes to the "workspace" edge.
+func (m *MessageVersionMutation) ResetWorkspace() {
+	m.workspace = nil
+	m.clearedworkspace = false
+}
+
+// ClearComment clears the "comment" edge to the Comment entity.
+func (m *MessageVersionMutation) ClearComment() {
+	m.clearedcomment = true
+	m.clearedFields[messageversion.FieldCommentID] = struct{}{}
+}
+
+// CommentCleared reports if the "comment" edge to the Comment entity was cleared.
+func (m *MessageVersionMutation) CommentCleared() bool {
+	return m.CommentIDCleared() || m.clearedcomment
+}
+
+// CommentIDs returns the "comment" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CommentID instead. It exists only for internal usage by the builders.
+func (m *MessageVersionMutation) CommentIDs() (ids []uuid.UUID) {
+	if id := m.comment; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetComment resets all changes to the "comment" edge.
+func (m *MessageVersionMutation) ResetComment() {
+	m.comment = nil
+	m.clearedcomment = false
+}
+
+// ClearDiscussion clears the "discussion" edge to the Discussion entity.
+func (m *MessageVersionMutation) ClearDiscussion() {
+	m.cleareddiscussion = true
+	m.clearedFields[messageversion.FieldDiscussionID] = struct{}{}
+}
+
+// DiscussionCleared reports if the "discussion" edge to the Discussion entity was cleared.
+func (m *MessageVersionMutation) DiscussionCleared() bool {
+	return m.DiscussionIDCleared() || m.cleareddiscussion
+}
+
+// DiscussionIDs returns the "discussion" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// DiscussionID instead. It exists only for internal usage by the builders.
+func (m *MessageVersionMutation) DiscussionIDs() (ids []uuid.UUID) {
+	if id := m.discussion; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetDiscussion resets all changes to the "discussion" edge.
+func (m *MessageVersionMutation) ResetDiscussion() {
+	m.discussion = nil
+	m.cleareddiscussion = false
+}
+
+// Where appends a list predicates to the MessageVersionMutation builder.
+func (m *MessageVersionMutation) Where(ps ...predicate.MessageVersion) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the MessageVersionMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *MessageVersionMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.MessageVersion, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *MessageVersionMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *MessageVersionMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (MessageVersion).
+func (m *MessageVersionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *MessageVersionMutation) Fields() []string {
+	fields := make([]string, 0, 6)
+	if m.workspace != nil {
+		fields = append(fields, messageversion.FieldWorkspaceID)
+	}
+	if m.comment != nil {
+		fields = append(fields, messageversion.FieldCommentID)
+	}
+	if m.discussion != nil {
+		fields = append(fields, messageversion.FieldDiscussionID)
+	}
+	if m.body != nil {
+		fields = append(fields, messageversion.FieldBody)
+	}
+	if m.written_at != nil {
+		fields = append(fields, messageversion.FieldWrittenAt)
+	}
+	if m.created_at != nil {
+		fields = append(fields, messageversion.FieldCreatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *MessageVersionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case messageversion.FieldWorkspaceID:
+		return m.WorkspaceID()
+	case messageversion.FieldCommentID:
+		return m.CommentID()
+	case messageversion.FieldDiscussionID:
+		return m.DiscussionID()
+	case messageversion.FieldBody:
+		return m.Body()
+	case messageversion.FieldWrittenAt:
+		return m.WrittenAt()
+	case messageversion.FieldCreatedAt:
+		return m.CreatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *MessageVersionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case messageversion.FieldWorkspaceID:
+		return m.OldWorkspaceID(ctx)
+	case messageversion.FieldCommentID:
+		return m.OldCommentID(ctx)
+	case messageversion.FieldDiscussionID:
+		return m.OldDiscussionID(ctx)
+	case messageversion.FieldBody:
+		return m.OldBody(ctx)
+	case messageversion.FieldWrittenAt:
+		return m.OldWrittenAt(ctx)
+	case messageversion.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown MessageVersion field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MessageVersionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case messageversion.FieldWorkspaceID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWorkspaceID(v)
+		return nil
+	case messageversion.FieldCommentID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCommentID(v)
+		return nil
+	case messageversion.FieldDiscussionID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDiscussionID(v)
+		return nil
+	case messageversion.FieldBody:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBody(v)
+		return nil
+	case messageversion.FieldWrittenAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWrittenAt(v)
+		return nil
+	case messageversion.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown MessageVersion field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *MessageVersionMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *MessageVersionMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MessageVersionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown MessageVersion numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *MessageVersionMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(messageversion.FieldCommentID) {
+		fields = append(fields, messageversion.FieldCommentID)
+	}
+	if m.FieldCleared(messageversion.FieldDiscussionID) {
+		fields = append(fields, messageversion.FieldDiscussionID)
+	}
+	if m.FieldCleared(messageversion.FieldCreatedAt) {
+		fields = append(fields, messageversion.FieldCreatedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *MessageVersionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *MessageVersionMutation) ClearField(name string) error {
+	switch name {
+	case messageversion.FieldCommentID:
+		m.ClearCommentID()
+		return nil
+	case messageversion.FieldDiscussionID:
+		m.ClearDiscussionID()
+		return nil
+	case messageversion.FieldCreatedAt:
+		m.ClearCreatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown MessageVersion nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *MessageVersionMutation) ResetField(name string) error {
+	switch name {
+	case messageversion.FieldWorkspaceID:
+		m.ResetWorkspaceID()
+		return nil
+	case messageversion.FieldCommentID:
+		m.ResetCommentID()
+		return nil
+	case messageversion.FieldDiscussionID:
+		m.ResetDiscussionID()
+		return nil
+	case messageversion.FieldBody:
+		m.ResetBody()
+		return nil
+	case messageversion.FieldWrittenAt:
+		m.ResetWrittenAt()
+		return nil
+	case messageversion.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown MessageVersion field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *MessageVersionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.workspace != nil {
+		edges = append(edges, messageversion.EdgeWorkspace)
+	}
+	if m.comment != nil {
+		edges = append(edges, messageversion.EdgeComment)
+	}
+	if m.discussion != nil {
+		edges = append(edges, messageversion.EdgeDiscussion)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *MessageVersionMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case messageversion.EdgeWorkspace:
+		if id := m.workspace; id != nil {
+			return []ent.Value{*id}
+		}
+	case messageversion.EdgeComment:
+		if id := m.comment; id != nil {
+			return []ent.Value{*id}
+		}
+	case messageversion.EdgeDiscussion:
+		if id := m.discussion; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *MessageVersionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *MessageVersionMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *MessageVersionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedworkspace {
+		edges = append(edges, messageversion.EdgeWorkspace)
+	}
+	if m.clearedcomment {
+		edges = append(edges, messageversion.EdgeComment)
+	}
+	if m.cleareddiscussion {
+		edges = append(edges, messageversion.EdgeDiscussion)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *MessageVersionMutation) EdgeCleared(name string) bool {
+	switch name {
+	case messageversion.EdgeWorkspace:
+		return m.clearedworkspace
+	case messageversion.EdgeComment:
+		return m.clearedcomment
+	case messageversion.EdgeDiscussion:
+		return m.cleareddiscussion
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *MessageVersionMutation) ClearEdge(name string) error {
+	switch name {
+	case messageversion.EdgeWorkspace:
+		m.ClearWorkspace()
+		return nil
+	case messageversion.EdgeComment:
+		m.ClearComment()
+		return nil
+	case messageversion.EdgeDiscussion:
+		m.ClearDiscussion()
+		return nil
+	}
+	return fmt.Errorf("unknown MessageVersion unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *MessageVersionMutation) ResetEdge(name string) error {
+	switch name {
+	case messageversion.EdgeWorkspace:
+		m.ResetWorkspace()
+		return nil
+	case messageversion.EdgeComment:
+		m.ResetComment()
+		return nil
+	case messageversion.EdgeDiscussion:
+		m.ResetDiscussion()
+		return nil
+	}
+	return fmt.Errorf("unknown MessageVersion edge %s", name)
 }
 
 // NotificationMutation represents an operation that mutates the Notification nodes in the graph.
@@ -72318,6 +73961,9 @@ type UserMutation struct {
 	subscribed_discussions                      map[uuid.UUID]struct{}
 	removedsubscribed_discussions               map[uuid.UUID]struct{}
 	clearedsubscribed_discussions               bool
+	voted_discussions                           map[uuid.UUID]struct{}
+	removedvoted_discussions                    map[uuid.UUID]struct{}
+	clearedvoted_discussions                    bool
 	teams                                       map[uuid.UUID]struct{}
 	removedteams                                map[uuid.UUID]struct{}
 	clearedteams                                bool
@@ -75422,6 +77068,60 @@ func (m *UserMutation) ResetSubscribedDiscussions() {
 	m.removedsubscribed_discussions = nil
 }
 
+// AddVotedDiscussionIDs adds the "voted_discussions" edge to the Discussion entity by ids.
+func (m *UserMutation) AddVotedDiscussionIDs(ids ...uuid.UUID) {
+	if m.voted_discussions == nil {
+		m.voted_discussions = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.voted_discussions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearVotedDiscussions clears the "voted_discussions" edge to the Discussion entity.
+func (m *UserMutation) ClearVotedDiscussions() {
+	m.clearedvoted_discussions = true
+}
+
+// VotedDiscussionsCleared reports if the "voted_discussions" edge to the Discussion entity was cleared.
+func (m *UserMutation) VotedDiscussionsCleared() bool {
+	return m.clearedvoted_discussions
+}
+
+// RemoveVotedDiscussionIDs removes the "voted_discussions" edge to the Discussion entity by IDs.
+func (m *UserMutation) RemoveVotedDiscussionIDs(ids ...uuid.UUID) {
+	if m.removedvoted_discussions == nil {
+		m.removedvoted_discussions = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.voted_discussions, ids[i])
+		m.removedvoted_discussions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedVotedDiscussions returns the removed IDs of the "voted_discussions" edge to the Discussion entity.
+func (m *UserMutation) RemovedVotedDiscussionsIDs() (ids []uuid.UUID) {
+	for id := range m.removedvoted_discussions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// VotedDiscussionsIDs returns the "voted_discussions" edge IDs in the mutation.
+func (m *UserMutation) VotedDiscussionsIDs() (ids []uuid.UUID) {
+	for id := range m.voted_discussions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetVotedDiscussions resets all changes to the "voted_discussions" edge.
+func (m *UserMutation) ResetVotedDiscussions() {
+	m.voted_discussions = nil
+	m.clearedvoted_discussions = false
+	m.removedvoted_discussions = nil
+}
+
 // AddTeamIDs adds the "teams" edge to the Team entity by ids.
 func (m *UserMutation) AddTeamIDs(ids ...uuid.UUID) {
 	if m.teams == nil {
@@ -75861,7 +77561,7 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 49)
+	edges := make([]string, 0, 50)
 	if m.invitations != nil {
 		edges = append(edges, user.EdgeInvitations)
 	}
@@ -76002,6 +77702,9 @@ func (m *UserMutation) AddedEdges() []string {
 	}
 	if m.subscribed_discussions != nil {
 		edges = append(edges, user.EdgeSubscribedDiscussions)
+	}
+	if m.voted_discussions != nil {
+		edges = append(edges, user.EdgeVotedDiscussions)
 	}
 	if m.teams != nil {
 		edges = append(edges, user.EdgeTeams)
@@ -76298,6 +78001,12 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeVotedDiscussions:
+		ids := make([]ent.Value, 0, len(m.voted_discussions))
+		for id := range m.voted_discussions {
+			ids = append(ids, id)
+		}
+		return ids
 	case user.EdgeTeams:
 		ids := make([]ent.Value, 0, len(m.teams))
 		for id := range m.teams {
@@ -76316,7 +78025,7 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 49)
+	edges := make([]string, 0, 50)
 	if m.removedinvitations != nil {
 		edges = append(edges, user.EdgeInvitations)
 	}
@@ -76457,6 +78166,9 @@ func (m *UserMutation) RemovedEdges() []string {
 	}
 	if m.removedsubscribed_discussions != nil {
 		edges = append(edges, user.EdgeSubscribedDiscussions)
+	}
+	if m.removedvoted_discussions != nil {
+		edges = append(edges, user.EdgeVotedDiscussions)
 	}
 	if m.removedteams != nil {
 		edges = append(edges, user.EdgeTeams)
@@ -76753,6 +78465,12 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeVotedDiscussions:
+		ids := make([]ent.Value, 0, len(m.removedvoted_discussions))
+		for id := range m.removedvoted_discussions {
+			ids = append(ids, id)
+		}
+		return ids
 	case user.EdgeTeams:
 		ids := make([]ent.Value, 0, len(m.removedteams))
 		for id := range m.removedteams {
@@ -76771,7 +78489,7 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 49)
+	edges := make([]string, 0, 50)
 	if m.clearedinvitations {
 		edges = append(edges, user.EdgeInvitations)
 	}
@@ -76913,6 +78631,9 @@ func (m *UserMutation) ClearedEdges() []string {
 	if m.clearedsubscribed_discussions {
 		edges = append(edges, user.EdgeSubscribedDiscussions)
 	}
+	if m.clearedvoted_discussions {
+		edges = append(edges, user.EdgeVotedDiscussions)
+	}
 	if m.clearedteams {
 		edges = append(edges, user.EdgeTeams)
 	}
@@ -77020,6 +78741,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 		return m.clearedsubscribed_projects
 	case user.EdgeSubscribedDiscussions:
 		return m.clearedsubscribed_discussions
+	case user.EdgeVotedDiscussions:
+		return m.clearedvoted_discussions
 	case user.EdgeTeams:
 		return m.clearedteams
 	case user.EdgeWorkspaces:
@@ -77180,6 +78903,9 @@ func (m *UserMutation) ResetEdge(name string) error {
 		return nil
 	case user.EdgeSubscribedDiscussions:
 		m.ResetSubscribedDiscussions()
+		return nil
+	case user.EdgeVotedDiscussions:
+		m.ResetVotedDiscussions()
 		return nil
 	case user.EdgeTeams:
 		m.ResetTeams()
@@ -80897,6 +82623,9 @@ type WorkspaceMutation struct {
 	comments                    map[uuid.UUID]struct{}
 	removedcomments             map[uuid.UUID]struct{}
 	clearedcomments             bool
+	message_versions            map[uuid.UUID]struct{}
+	removedmessage_versions     map[uuid.UUID]struct{}
+	clearedmessage_versions     bool
 	reactions                   map[uuid.UUID]struct{}
 	removedreactions            map[uuid.UUID]struct{}
 	clearedreactions            bool
@@ -82510,6 +84239,60 @@ func (m *WorkspaceMutation) ResetComments() {
 	m.removedcomments = nil
 }
 
+// AddMessageVersionIDs adds the "message_versions" edge to the MessageVersion entity by ids.
+func (m *WorkspaceMutation) AddMessageVersionIDs(ids ...uuid.UUID) {
+	if m.message_versions == nil {
+		m.message_versions = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.message_versions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearMessageVersions clears the "message_versions" edge to the MessageVersion entity.
+func (m *WorkspaceMutation) ClearMessageVersions() {
+	m.clearedmessage_versions = true
+}
+
+// MessageVersionsCleared reports if the "message_versions" edge to the MessageVersion entity was cleared.
+func (m *WorkspaceMutation) MessageVersionsCleared() bool {
+	return m.clearedmessage_versions
+}
+
+// RemoveMessageVersionIDs removes the "message_versions" edge to the MessageVersion entity by IDs.
+func (m *WorkspaceMutation) RemoveMessageVersionIDs(ids ...uuid.UUID) {
+	if m.removedmessage_versions == nil {
+		m.removedmessage_versions = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.message_versions, ids[i])
+		m.removedmessage_versions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedMessageVersions returns the removed IDs of the "message_versions" edge to the MessageVersion entity.
+func (m *WorkspaceMutation) RemovedMessageVersionsIDs() (ids []uuid.UUID) {
+	for id := range m.removedmessage_versions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// MessageVersionsIDs returns the "message_versions" edge IDs in the mutation.
+func (m *WorkspaceMutation) MessageVersionsIDs() (ids []uuid.UUID) {
+	for id := range m.message_versions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetMessageVersions resets all changes to the "message_versions" edge.
+func (m *WorkspaceMutation) ResetMessageVersions() {
+	m.message_versions = nil
+	m.clearedmessage_versions = false
+	m.removedmessage_versions = nil
+}
+
 // AddReactionIDs adds the "reactions" edge to the Reaction entity by ids.
 func (m *WorkspaceMutation) AddReactionIDs(ids ...uuid.UUID) {
 	if m.reactions == nil {
@@ -83557,7 +85340,7 @@ func (m *WorkspaceMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *WorkspaceMutation) AddedEdges() []string {
-	edges := make([]string, 0, 34)
+	edges := make([]string, 0, 35)
 	if m.invitations != nil {
 		edges = append(edges, workspace.EdgeInvitations)
 	}
@@ -83617,6 +85400,9 @@ func (m *WorkspaceMutation) AddedEdges() []string {
 	}
 	if m.comments != nil {
 		edges = append(edges, workspace.EdgeComments)
+	}
+	if m.message_versions != nil {
+		edges = append(edges, workspace.EdgeMessageVersions)
 	}
 	if m.reactions != nil {
 		edges = append(edges, workspace.EdgeReactions)
@@ -83787,6 +85573,12 @@ func (m *WorkspaceMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case workspace.EdgeMessageVersions:
+		ids := make([]ent.Value, 0, len(m.message_versions))
+		for id := range m.message_versions {
+			ids = append(ids, id)
+		}
+		return ids
 	case workspace.EdgeReactions:
 		ids := make([]ent.Value, 0, len(m.reactions))
 		for id := range m.reactions {
@@ -83877,7 +85669,7 @@ func (m *WorkspaceMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *WorkspaceMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 34)
+	edges := make([]string, 0, 35)
 	if m.removedinvitations != nil {
 		edges = append(edges, workspace.EdgeInvitations)
 	}
@@ -83937,6 +85729,9 @@ func (m *WorkspaceMutation) RemovedEdges() []string {
 	}
 	if m.removedcomments != nil {
 		edges = append(edges, workspace.EdgeComments)
+	}
+	if m.removedmessage_versions != nil {
+		edges = append(edges, workspace.EdgeMessageVersions)
 	}
 	if m.removedreactions != nil {
 		edges = append(edges, workspace.EdgeReactions)
@@ -84107,6 +85902,12 @@ func (m *WorkspaceMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case workspace.EdgeMessageVersions:
+		ids := make([]ent.Value, 0, len(m.removedmessage_versions))
+		for id := range m.removedmessage_versions {
+			ids = append(ids, id)
+		}
+		return ids
 	case workspace.EdgeReactions:
 		ids := make([]ent.Value, 0, len(m.removedreactions))
 		for id := range m.removedreactions {
@@ -84197,7 +85998,7 @@ func (m *WorkspaceMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *WorkspaceMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 34)
+	edges := make([]string, 0, 35)
 	if m.clearedinvitations {
 		edges = append(edges, workspace.EdgeInvitations)
 	}
@@ -84257,6 +86058,9 @@ func (m *WorkspaceMutation) ClearedEdges() []string {
 	}
 	if m.clearedcomments {
 		edges = append(edges, workspace.EdgeComments)
+	}
+	if m.clearedmessage_versions {
+		edges = append(edges, workspace.EdgeMessageVersions)
 	}
 	if m.clearedreactions {
 		edges = append(edges, workspace.EdgeReactions)
@@ -84347,6 +86151,8 @@ func (m *WorkspaceMutation) EdgeCleared(name string) bool {
 		return m.cleareddiscussion_threads
 	case workspace.EdgeComments:
 		return m.clearedcomments
+	case workspace.EdgeMessageVersions:
+		return m.clearedmessage_versions
 	case workspace.EdgeReactions:
 		return m.clearedreactions
 	case workspace.EdgeCustomerStatuses:
@@ -84450,6 +86256,9 @@ func (m *WorkspaceMutation) ResetEdge(name string) error {
 		return nil
 	case workspace.EdgeComments:
 		m.ResetComments()
+		return nil
+	case workspace.EdgeMessageVersions:
+		m.ResetMessageVersions()
 		return nil
 	case workspace.EdgeReactions:
 		m.ResetReactions()

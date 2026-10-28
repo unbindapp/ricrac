@@ -136,6 +136,11 @@ func EditedAt(v time.Time) predicate.Comment {
 	return predicate.Comment(sql.FieldEQ(FieldEditedAt, v))
 }
 
+// DeletedAt applies equality check predicate on the "deleted_at" field. It's identical to DeletedAtEQ.
+func DeletedAt(v time.Time) predicate.Comment {
+	return predicate.Comment(sql.FieldEQ(FieldDeletedAt, v))
+}
+
 // ResolvedAt applies equality check predicate on the "resolved_at" field. It's identical to ResolvedAtEQ.
 func ResolvedAt(v time.Time) predicate.Comment {
 	return predicate.Comment(sql.FieldEQ(FieldResolvedAt, v))
@@ -816,6 +821,56 @@ func EditedAtNotNil() predicate.Comment {
 	return predicate.Comment(sql.FieldNotNull(FieldEditedAt))
 }
 
+// DeletedAtEQ applies the EQ predicate on the "deleted_at" field.
+func DeletedAtEQ(v time.Time) predicate.Comment {
+	return predicate.Comment(sql.FieldEQ(FieldDeletedAt, v))
+}
+
+// DeletedAtNEQ applies the NEQ predicate on the "deleted_at" field.
+func DeletedAtNEQ(v time.Time) predicate.Comment {
+	return predicate.Comment(sql.FieldNEQ(FieldDeletedAt, v))
+}
+
+// DeletedAtIn applies the In predicate on the "deleted_at" field.
+func DeletedAtIn(vs ...time.Time) predicate.Comment {
+	return predicate.Comment(sql.FieldIn(FieldDeletedAt, vs...))
+}
+
+// DeletedAtNotIn applies the NotIn predicate on the "deleted_at" field.
+func DeletedAtNotIn(vs ...time.Time) predicate.Comment {
+	return predicate.Comment(sql.FieldNotIn(FieldDeletedAt, vs...))
+}
+
+// DeletedAtGT applies the GT predicate on the "deleted_at" field.
+func DeletedAtGT(v time.Time) predicate.Comment {
+	return predicate.Comment(sql.FieldGT(FieldDeletedAt, v))
+}
+
+// DeletedAtGTE applies the GTE predicate on the "deleted_at" field.
+func DeletedAtGTE(v time.Time) predicate.Comment {
+	return predicate.Comment(sql.FieldGTE(FieldDeletedAt, v))
+}
+
+// DeletedAtLT applies the LT predicate on the "deleted_at" field.
+func DeletedAtLT(v time.Time) predicate.Comment {
+	return predicate.Comment(sql.FieldLT(FieldDeletedAt, v))
+}
+
+// DeletedAtLTE applies the LTE predicate on the "deleted_at" field.
+func DeletedAtLTE(v time.Time) predicate.Comment {
+	return predicate.Comment(sql.FieldLTE(FieldDeletedAt, v))
+}
+
+// DeletedAtIsNil applies the IsNil predicate on the "deleted_at" field.
+func DeletedAtIsNil() predicate.Comment {
+	return predicate.Comment(sql.FieldIsNull(FieldDeletedAt))
+}
+
+// DeletedAtNotNil applies the NotNil predicate on the "deleted_at" field.
+func DeletedAtNotNil() predicate.Comment {
+	return predicate.Comment(sql.FieldNotNull(FieldDeletedAt))
+}
+
 // ResolvedAtEQ applies the EQ predicate on the "resolved_at" field.
 func ResolvedAtEQ(v time.Time) predicate.Comment {
 	return predicate.Comment(sql.FieldEQ(FieldResolvedAt, v))
@@ -1356,6 +1411,29 @@ func HasGithubOutbox() predicate.Comment {
 func HasGithubOutboxWith(preds ...predicate.GithubOutbox) predicate.Comment {
 	return predicate.Comment(func(s *sql.Selector) {
 		step := newGithubOutboxStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasVersions applies the HasEdge predicate on the "versions" edge.
+func HasVersions() predicate.Comment {
+	return predicate.Comment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, VersionsTable, VersionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasVersionsWith applies the HasEdge predicate on the "versions" edge with a given conditions (other predicates).
+func HasVersionsWith(preds ...predicate.MessageVersion) predicate.Comment {
+	return predicate.Comment(func(s *sql.Selector) {
+		step := newVersionsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

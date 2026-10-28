@@ -23,6 +23,7 @@ import { DropdownMenuGroup, DropdownMenuItem } from "@/components/ui/dropdown-me
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/toast";
 import { SimpleTooltip } from "@/components/ui/tooltip";
+import { useCanClose } from "@/components/forum/use-can-rewrite";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { entitySlug } from "@/lib/helpers/entity-slug";
 import { firstEmbed } from "@/lib/helpers/media";
@@ -180,6 +181,7 @@ export function DiscussionContextMenu({
   const { mutate: save } = useSaveDiscussionMutation(workspace.id);
   const isPinned = Boolean(discussion.pinnedAt);
   const isClosed = Boolean(discussion.closedAt);
+  const canClose = useCanClose(discussion.creator);
   return (
     <ContextMenu>
       <ContextMenuTrigger render={trigger}>{children}</ContextMenuTrigger>
@@ -195,7 +197,7 @@ export function DiscussionContextMenu({
               {isPinned ? "Unpin" : "Pin to the top"}
             </DropdownMenuItem>
           )}
-          {canEdit && (
+          {canClose && (
             <DropdownMenuItem onClick={() => save({ id: discussion.id, closed: !isClosed })}>
               {isClosed ? <LockOpenIcon className="size-4" /> : <LockIcon className="size-4" />}
               {isClosed ? "Reopen discussion" : "Close discussion"}

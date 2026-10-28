@@ -1,47 +1,37 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { type CSSProperties, type RefObject, useRef, useState } from "react";
+import { type CSSProperties, type RefObject, useLayoutEffect, useRef, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 import type { Discussion } from "@/api/ops.gen";
-import {
-  DiscussionContextMenu,
-  DiscussionCounts,
-  discussionCover,
-} from "@/components/forum/discussion-card";
-import { DiscussionTagBadges, DiscussionTagFilter } from "@/components/forum/discussion-tags";
+import { DiscussionContextMenu, discussionCover } from "@/components/forum/discussion-card";
 import {
   forumDiscussionsQuery,
   forumEmptyState,
-  forumStatusSearch,
-  forumViewOptions,
   type TForumFilters,
   TrashedDiscussionRow,
 } from "@/components/forum/forum-views";
 import { NewDiscussionDialog } from "@/components/forum/new-discussion-dialog";
-import { ImageIcon, LayoutGridIcon, ListIcon, PlusIcon } from "@/components/icons";
+import { ImageIcon, MessageSquareIcon, PlusIcon } from "@/components/icons";
 import { CreateButton } from "@/components/layout/create-button";
 import { List } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { PageSlotsContext } from "@/components/layout/page-container";
 import { useDeviceSize } from "@/components/providers/device-size-provider";
-import { FilterMenu } from "@/components/shared/filter-menu";
-import { LayoutToggle } from "@/components/shared/layout-toggle";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { entitySlug } from "@/lib/helpers/entity-slug";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 import { DiscussionPanel } from "@/themes/dank/discussion-panel";
+import { ForumControls, type TForumLayout } from "@/themes/dank/forum-controls";
+import { UpvoteChip } from "@/themes/dank/upvote-chip";
 import type { TForumPanesProps } from "@/themes/types";
-
-type TLayout = "grid" | "list";
 
 const MIN_LIST_WIDTH = 280;
 const MIN_DETAIL_WIDTH = 360;
 const RESIZER_WIDTH = 12;
 const RESIZE_STEP = 16;
-const MAX_ITEM_TAGS = 3;
 
 /** The forum's list in a pane, and the open discussion in a panel beside it on wide screens. */
 export function DankForumPanes({
@@ -107,12 +97,14 @@ export function DankForumPanes({
 function ForumListPane({ filters, openId }: { filters: TForumFilters; openId?: string }) {
   const { workspace, canEdit } = useWorkspace();
   const navigate = useNavigate();
-  const [layout, setLayout] = useLocalStorage<TLayout>("forum-layout", "grid");
+  const [layout, setLayout] = useLocalStorage<TForumLayout>("forum-layout", "grid");
   const [fab, setFab] = useState<HTMLElement | null>(null);
   const status = filters.status ?? "open";
   const isTrash = status === "trash";
   const isGrid = layout === "grid" && !isTrash;
-  const list = useInfiniteQuery(forumDiscussionsQuery(workspace.id, { status, tag: filters.tag }));
+  const list = useInfiniteQuery(
+    forumDiscussionsQuery(workspace.id, { status, tag: filters.tag, sort: filters.sort }),
+  );
   const discussions = list.data?.pages.flatMap((page) => page.nodes) ?? [];
   const filter = (next: TForumFilters) =>
     void navigate({
@@ -126,27 +118,7 @@ function ForumListPane({ filters, openId }: { filters: TForumFilters; openId?: s
     <PageSlotsContext value={{ bar: null, fab }}>
       <section aria-label="Forum" data-slot="forum-list">
         <div data-slot="forum-list-tools">
-          <FilterMenu
-            label="Show"
-            value={status}
-            options={forumViewOptions}
-            onChange={(value) => filter({ status: forumStatusSearch(value) })}
-          />
-          <DiscussionTagFilter
-            value={filters.tag ?? null}
-            onChange={(tag) => filter({ tag: tag ?? undefined })}
-          />
-          <span className="flex-1" />
-          {!isTrash && (
-            <LayoutToggle
-              value={layout}
-              options={[
-                { value: "list", label: "List", icon: ListIcon },
-                { value: "grid", label: "Grid", icon: LayoutGridIcon },
-              ]}
-              onChange={setLayout}
-            />
-          )}
+          <ForumControls filters={filters} layout={layout} onFilter={filter} onLayout={setLayout} />
         </div>
         <ListStates
           isPending={list.isPending}
@@ -227,13 +199,16 @@ function ForumItem({
         <span className="truncate">{discussion.title}</span>
         <span data-slot="forum-item-supporting">
           <RelativeTime value={discussion.lastActivityAt} />
-          <DiscussionCounts discussion={discussion} />
-        </span>
-        {discussion.tags.length > 0 && (
-          <span data-slot="forum-item-tags">
-            <DiscussionTagBadges tags={discussion.tags} max={MAX_ITEM_TAGS} />
+          <span
+            data-slot="count-chip"
+            aria-label={`${discussion.commentCount} ${discussion.commentCount === 1 ? "message" : "messages"}`}
+          >
+            <MessageSquareIcon />
+            {discussion.commentCount}
           </span>
-        )}
+          <UpvoteChip discussion={discussion} />
+        </span>
+        {discussion.tags.length > 0 && <FittingTags tags={discussion.tags} />}
       </span>
     </>
   );
@@ -264,6 +239,56 @@ function ForumItem({
     >
       {content}
     </DiscussionContextMenu>
+  );
+}
+
+const MORE_CHIP_WIDTH = 36;
+const TAG_GAP = 4;
+
+/** The tags on one line, with a +n chip for those that don't fit. */
+function FittingTags({ tags }: { tags: string[] }) {
+  const rowRef = useRef<HTMLSpanElement>(null);
+  const [shown, setShown] = useState(tags.length);
+  useLayoutEffect(() => {
+    const row = rowRef.current;
+    if (!row) return;
+    const fit = () => {
+      const widths = [...row.querySelectorAll<HTMLElement>("[data-tag]")].map(
+        (chip) => chip.offsetWidth,
+      );
+      let used = 0;
+      let count = 0;
+      for (const [index, width] of widths.entries()) {
+        const isLast = index === widths.length - 1;
+        const needed = used + (index > 0 ? TAG_GAP : 0) + width;
+        if (needed + (isLast ? 0 : TAG_GAP + MORE_CHIP_WIDTH) > row.clientWidth) break;
+        used = needed;
+        count += 1;
+      }
+      setShown(count);
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(row);
+    return () => observer.disconnect();
+  }, [tags]);
+  const hidden = tags.length - shown;
+  return (
+    <span ref={rowRef} data-slot="forum-item-tags">
+      {tags.map((tag, index) => (
+        <span key={tag} data-tag data-overflow={index >= shown || undefined}>
+          <span aria-hidden data-slot="tag-hash">
+            #
+          </span>
+          {tag}
+        </span>
+      ))}
+      {hidden > 0 && (
+        <span data-slot="tags-more" aria-label={`${hidden} more tags`}>
+          +{hidden}
+        </span>
+      )}
+    </span>
   );
 }
 

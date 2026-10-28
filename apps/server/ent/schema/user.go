@@ -78,6 +78,7 @@ func (User) Edges() []ent.Edge {
 		edge.From("member_projects", Project.Type).Ref("members").Through("project_members", ProjectMember.Type),
 		edge.From("subscribed_projects", Project.Type).Ref("subscribers").Through("project_subscribers", ProjectSubscriber.Type),
 		edge.From("subscribed_discussions", Discussion.Type).Ref("subscribers").Through("discussion_subscribers", DiscussionSubscriber.Type),
+		edge.From("voted_discussions", Discussion.Type).Ref("voters").Through("discussion_votes", DiscussionVote.Type),
 		edge.From("teams", Team.Type).Ref("members").Through("team_members", TeamMember.Type),
 		edge.From("workspaces", Workspace.Type).Ref("members").Through("workspace_members", WorkspaceMember.Type),
 	}

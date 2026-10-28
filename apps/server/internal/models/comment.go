@@ -13,7 +13,7 @@ func CommentOf(c *ent.Comment) Comment {
 		ID: ID(c.ID), Body: c.Body, User: UserRefOf(c.Edges.User), QuotedText: c.QuotedText,
 		SuggestedText: c.SuggestedText, SuggestionStatus: c.SuggestionStatus, Reactions: reactions,
 		CreatedAt: Time(c.CreatedAt), UpdatedAt: Time(c.UpdatedAt), EditedAt: TimePtr(c.EditedAt),
-		ResolvedAt: TimePtr(c.ResolvedAt), ResolvingUser: UserRefOf(c.Edges.ResolvingUser),
+		DeletedAt: TimePtr(c.DeletedAt), ResolvedAt: TimePtr(c.ResolvedAt), ResolvingUser: UserRefOf(c.Edges.ResolvingUser),
 	}
 }
 

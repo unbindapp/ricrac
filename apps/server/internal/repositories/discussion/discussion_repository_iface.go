@@ -15,7 +15,12 @@ import (
 // DiscussionRepositoryInterface ...
 type DiscussionRepositoryInterface interface {
 	Create(ctx context.Context, tx repository.TxInterface, input CreateInput) (uuid.UUID, error)
-	SetText(ctx context.Context, tx repository.TxInterface, id uuid.UUID, title, body string) error
+	// SetText rewrites the title and body, marking the body edited at editedAt when it is set.
+	SetText(ctx context.Context, tx repository.TxInterface, id uuid.UUID, title, body string, editedAt *time.Time) error
+	// AddVersion keeps an earlier body of the discussion, as it read from writtenAt on.
+	AddVersion(ctx context.Context, tx repository.TxInterface, workspace, id uuid.UUID, body string, writtenAt time.Time) error
+	// SetVote upvotes the discussion for the user or takes the upvote back, saying whether it changed.
+	SetVote(ctx context.Context, tx repository.TxInterface, id, user uuid.UUID, upvote bool) (bool, error)
 	SetThumbnail(ctx context.Context, tx repository.TxInterface, id uuid.UUID, url *string) error
 	SetTags(ctx context.Context, tx repository.TxInterface, id uuid.UUID, tags []string) error
 	SetTeam(ctx context.Context, tx repository.TxInterface, id uuid.UUID, team *uuid.UUID) error
@@ -36,10 +41,11 @@ type DiscussionRepositoryInterface interface {
 	DeleteThread(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error
 	// Load is the discussions with what their answer shows, in the order of ids.
 	Load(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) ([]*ent.Discussion, error)
-	// Counts is how many threads, open threads and comments of their own each discussion has.
-	Counts(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) (map[uuid.UUID]models.DiscussionCounts, error)
-	// List is the discussions that match, pinned ones first, then by their latest activity (unless
-	// only trashed ones are asked for).
+	// Counts is how many threads, open threads, comments of their own and upvotes each discussion has,
+	// and whether viewer upvoted it.
+	Counts(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID, viewer uuid.UUID) (map[uuid.UUID]models.DiscussionCounts, error)
+	// List is the discussions that match, pinned ones first, then in the filter's sort (after the most
+	// recently trashed when only trashed ones are asked for).
 	List(ctx context.Context, filter ListFilter) ([]uuid.UUID, error)
 	// Owner is the team a discussion belongs to (nil for the whole workspace) and whether it is in
 	// the trash; found is false when the workspace has no such discussion.
@@ -57,8 +63,10 @@ type DiscussionRepositoryInterface interface {
 	Thread(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.DiscussionThread, error)
 	// FindThread is a thread of the workspace, nil when there's none.
 	FindThread(ctx context.Context, workspace, id uuid.UUID) (*ent.DiscussionThread, error)
-	// ThreadCommentCounts is how many comments each thread has.
+	// ThreadCommentCounts is how many comments each thread has, leaving out deleted ones.
 	ThreadCommentCounts(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) (map[uuid.UUID]int, error)
+	// Versions is the discussion's earlier bodies, oldest first.
+	Versions(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.MessageVersion, error)
 	// Get is the discussion with its workspace.
 	Get(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.Discussion, error)
 	// Tags is the tags on the discussions the caller sees outside the trash, the most used first.

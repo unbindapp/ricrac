@@ -40,6 +40,8 @@ type Tx struct {
 	DiscussionSubscriber *DiscussionSubscriberClient
 	// DiscussionThread is the client for interacting with the DiscussionThread builders.
 	DiscussionThread *DiscussionThreadClient
+	// DiscussionVote is the client for interacting with the DiscussionVote builders.
+	DiscussionVote *DiscussionVoteClient
 	// Document is the client for interacting with the Document builders.
 	Document *DocumentClient
 	// DocumentVersion is the client for interacting with the DocumentVersion builders.
@@ -86,6 +88,8 @@ type Tx struct {
 	IssueShare *IssueShareClient
 	// IssueSubscriber is the client for interacting with the IssueSubscriber builders.
 	IssueSubscriber *IssueSubscriberClient
+	// MessageVersion is the client for interacting with the MessageVersion builders.
+	MessageVersion *MessageVersionClient
 	// Notification is the client for interacting with the Notification builders.
 	Notification *NotificationClient
 	// OAuthClient is the client for interacting with the OAuthClient builders.
@@ -292,6 +296,7 @@ func (tx *Tx) init() {
 	tx.Discussion = NewDiscussionClient(tx.config)
 	tx.DiscussionSubscriber = NewDiscussionSubscriberClient(tx.config)
 	tx.DiscussionThread = NewDiscussionThreadClient(tx.config)
+	tx.DiscussionVote = NewDiscussionVoteClient(tx.config)
 	tx.Document = NewDocumentClient(tx.config)
 	tx.DocumentVersion = NewDocumentVersionClient(tx.config)
 	tx.Email = NewEmailClient(tx.config)
@@ -315,6 +320,7 @@ func (tx *Tx) init() {
 	tx.IssueRelease = NewIssueReleaseClient(tx.config)
 	tx.IssueShare = NewIssueShareClient(tx.config)
 	tx.IssueSubscriber = NewIssueSubscriberClient(tx.config)
+	tx.MessageVersion = NewMessageVersionClient(tx.config)
 	tx.Notification = NewNotificationClient(tx.config)
 	tx.OAuthClient = NewOAuthClientClient(tx.config)
 	tx.OAuthCode = NewOAuthCodeClient(tx.config)

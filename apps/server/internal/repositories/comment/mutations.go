@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 
 	"ricrac/ent/comment"
+	"ricrac/ent/messageversion"
 	"ricrac/ent/reaction"
 	repository "ricrac/internal/repositories"
 )
@@ -86,6 +87,25 @@ func (self *CommentRepository) Decide(ctx context.Context, tx repository.TxInter
 func (self *CommentRepository) Delete(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error {
 	_, err := self.base.Client(tx).Comment.Delete().Where(comment.ID(id)).Exec(ctx)
 	return err
+}
+
+// Tombstone empties the comment and marks it deleted, dropping its reactions and earlier versions
+// and keeping its replies.
+func (self *CommentRepository) Tombstone(ctx context.Context, tx repository.TxInterface, id uuid.UUID, now time.Time) error {
+	if _, err := self.base.Client(tx).Reaction.Delete().Where(reaction.CommentID(id)).Exec(ctx); err != nil {
+		return err
+	}
+	if _, err := self.base.Client(tx).MessageVersion.Delete().Where(messageversion.CommentID(id)).Exec(ctx); err != nil {
+		return err
+	}
+	return self.base.Client(tx).Comment.UpdateOneID(id).SetBody("").ClearQuotedText().ClearSuggestedText().
+		SetDeletedAt(now).SetUpdatedAt(now).Exec(ctx)
+}
+
+// AddVersion keeps an earlier body of the comment, as it read from writtenAt on.
+func (self *CommentRepository) AddVersion(ctx context.Context, tx repository.TxInterface, workspace, id uuid.UUID, body string, writtenAt time.Time) error {
+	return self.base.Client(tx).MessageVersion.Create().
+		SetWorkspaceID(workspace).SetCommentID(id).SetBody(body).SetWrittenAt(writtenAt).Exec(ctx)
 }
 
 // AddReaction reacts unless the user already reacted so, saying whether it added one.

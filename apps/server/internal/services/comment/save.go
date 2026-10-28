@@ -83,6 +83,9 @@ func (self *CommentService) Save(ctx context.Context, actor *auth.Actor, input *
 		if err != nil {
 			return models.CommentDetail{}, err
 		}
+		if parent.DeletedAt != nil {
+			return models.CommentDetail{}, errDeleted()
+		}
 		parentTarget, err := TargetOf(parent)
 		if err != nil {
 			return models.CommentDetail{}, err
@@ -283,6 +286,9 @@ func (self *CommentService) edit(ctx context.Context, actor *auth.Actor, referen
 	if err != nil {
 		return models.CommentDetail{}, err
 	}
+	if row.DeletedAt != nil {
+		return models.CommentDetail{}, errDeleted()
+	}
 	if row.UserID == nil || *row.UserID != actor.User {
 		return models.CommentDetail{}, errdefs.Forbidden("Only its author can edit a comment")
 	}
@@ -300,6 +306,19 @@ func (self *CommentService) Change(ctx context.Context, tx repository.TxInterfac
 	if err != nil {
 		return models.CommentDetail{}, err
 	}
+	target, err := TargetOf(row)
+	if err != nil {
+		return models.CommentDetail{}, err
+	}
+	if inForum(target) && body != row.Body {
+		written := row.CreatedAt
+		if row.EditedAt != nil {
+			written = *row.EditedAt
+		}
+		if err := self.repo.Comment().AddVersion(ctx, tx, row.WorkspaceID, row.ID, row.Body, written); err != nil {
+			return models.CommentDetail{}, err
+		}
+	}
 	now, err := self.repo.Now(ctx, tx)
 	if err != nil {
 		return models.CommentDetail{}, err
@@ -316,15 +335,11 @@ func (self *CommentService) Change(ctx context.Context, tx repository.TxInterfac
 		return models.CommentDetail{}, err
 	}
 	mentioned := slices.DeleteFunc(current, func(u uuid.UUID) bool { return slices.Contains(previous, u) })
-	target, err := TargetOf(row)
-	if err != nil {
-		return models.CommentDetail{}, err
-	}
 	about, err := self.about(ctx, tx, target)
 	if err != nil {
 		return models.CommentDetail{}, err
 	}
-	if target.Column == "discussion_id" || target.Column == "discussion_thread_id" {
+	if inForum(target) {
 		discussion, err := self.discussionOf(ctx, tx, target)
 		if err != nil {
 			return models.CommentDetail{}, err

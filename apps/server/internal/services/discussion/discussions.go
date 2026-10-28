@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"ricrac/ent"
 	"ricrac/internal/auth"
 	"ricrac/internal/common/args"
 	"ricrac/internal/common/errdefs"
@@ -25,6 +26,7 @@ type ListInput struct {
 	Tag            *string `json:"tag" doc:"Only the discussions with this tag."`
 	Status         *string `json:"status" enum:"open,closed,all" doc:"open (default), closed or all."`
 	Query          *string `json:"query" doc:"Words to find in the title or body."`
+	Sort           *string `json:"sort" enum:"activity,newest,top" doc:"activity (default): pinned first, then the most recent activity; newest: pinned first, then the newest; top: pinned first, then the most upvoted, ties by recent activity."`
 	IncludeTrashed bool    `json:"includeTrashed,omitempty"`
 	OnlyTrashed    bool    `json:"onlyTrashed,omitempty" doc:"Only discussions in the trash, the most recently trashed first."`
 	IncludeBody    bool    `json:"includeBody,omitempty" doc:"Include each discussion's body."`
@@ -45,7 +47,10 @@ type SaveInput struct {
 	RemoveSubscribers []string              `json:"removeSubscribers" doc:"People to unsubscribe: ids, names, emails or \"me\"."`
 }
 
-var statuses = []string{"open", "closed", "all"}
+var (
+	statuses = []string{"open", "closed", "all"}
+	sorts    = []string{"activity", "newest", "top"}
+)
 
 func (self *DiscussionService) List(ctx context.Context, actor *auth.Actor, input *ListInput) (args.PageOf[models.Discussion], error) {
 	status := "open"
@@ -55,12 +60,19 @@ func (self *DiscussionService) List(ctx context.Context, actor *auth.Actor, inpu
 	if !slices.Contains(statuses, status) {
 		return args.PageOf[models.Discussion]{}, errdefs.BadRequest("status %q isn't open, closed or all", status)
 	}
+	sort := "activity"
+	if input.Sort != nil {
+		sort = strings.TrimSpace(*input.Sort)
+	}
+	if !slices.Contains(sorts, sort) {
+		return args.PageOf[models.Discussion]{}, errdefs.BadRequest("sort %q isn't activity, newest or top", sort)
+	}
 	teams, err := actor.TeamIDs(ctx)
 	if err != nil {
 		return args.PageOf[models.Discussion]{}, err
 	}
 	filter := discussion_repo.ListFilter{
-		Workspace: actor.Workspace, Teams: teams, Status: status, IncludeTrashed: input.IncludeTrashed, OnlyTrashed: input.OnlyTrashed,
+		Workspace: actor.Workspace, Teams: teams, Status: status, Sort: sort, IncludeTrashed: input.IncludeTrashed, OnlyTrashed: input.OnlyTrashed,
 	}
 	if filter.Team, err = self.resolve.OptionalTeam(ctx, actor, input.Team); err != nil {
 		return args.PageOf[models.Discussion]{}, err
@@ -87,7 +99,7 @@ func (self *DiscussionService) List(ctx context.Context, actor *auth.Actor, inpu
 	if err != nil {
 		return args.PageOf[models.Discussion]{}, err
 	}
-	discussions, err := self.values(ctx, nil, ids, input.IncludeBody)
+	discussions, err := self.values(ctx, nil, actor.User, ids, input.IncludeBody)
 	if err != nil {
 		return args.PageOf[models.Discussion]{}, err
 	}
@@ -99,7 +111,7 @@ func (self *DiscussionService) Get(ctx context.Context, actor *auth.Actor, input
 	if err != nil {
 		return models.DiscussionDetail{}, err
 	}
-	return self.value(ctx, nil, id)
+	return self.value(ctx, nil, actor.User, id)
 }
 
 func (self *DiscussionService) Save(ctx context.Context, actor *auth.Actor, input *SaveInput) (models.DiscussionDetail, error) {
@@ -123,7 +135,7 @@ func (self *DiscussionService) Save(ctx context.Context, actor *auth.Actor, inpu
 		if err := self.changeSubscribers(ctx, tx, actor, id, input); err != nil {
 			return err
 		}
-		if value, err = self.value(ctx, tx, id); err != nil {
+		if value, err = self.value(ctx, tx, actor.User, id); err != nil {
 			return err
 		}
 		return self.emit(ctx, tx, actor, action, value.Discussion)
@@ -182,6 +194,13 @@ func (self *DiscussionService) update(ctx context.Context, tx repository.TxInter
 	if rewrites && !isAuthor && actor.Role < auth.Admin {
 		return errdefs.Forbidden("Only its author or a workspace admin can change a discussion's title, body, thumbnail or team")
 	}
+	if input.Closed != nil && !mayClose(actor, current) {
+		return errdefs.Forbidden("Only the person who started a discussion can close or reopen it")
+	}
+	now, err := self.repo.Now(ctx, tx)
+	if err != nil {
+		return err
+	}
 	title := current.Title
 	if input.Title != nil {
 		if title, err = utils.NonEmpty(*input.Title, "title"); err != nil {
@@ -197,7 +216,11 @@ func (self *DiscussionService) update(ctx context.Context, tx repository.TxInter
 		body = *replaced
 	}
 	if title != current.Title || body != current.Body {
-		if err := self.repo.Discussion().SetText(ctx, tx, id, title, body); err != nil {
+		editedAt, err := self.markEdited(ctx, tx, current, body, now)
+		if err != nil {
+			return err
+		}
+		if err := self.repo.Discussion().SetText(ctx, tx, id, title, body, editedAt); err != nil {
 			return err
 		}
 		if err := self.notifyMentions(ctx, tx, actor, id, title, current.Body, body); err != nil {
@@ -230,11 +253,80 @@ func (self *DiscussionService) update(ctx context.Context, tx repository.TxInter
 	if err := self.setFlags(ctx, tx, id, input); err != nil {
 		return err
 	}
-	now, err := self.repo.Now(ctx, tx)
-	if err != nil {
-		return err
-	}
 	return self.repo.Discussion().Touch(ctx, tx, id, now)
+}
+
+// mayClose is whether the actor started the discussion, or is an admin once its starter is gone.
+func mayClose(actor *auth.Actor, d *ent.Discussion) bool {
+	if d.CreatorID == nil {
+		return actor.Role >= auth.Admin
+	}
+	return *d.CreatorID == actor.User
+}
+
+// editingSession is how long after an edit further edits count as the same one.
+const editingSession = 10 * time.Minute
+
+// markEdited is when the body was edited (nil when it stays), keeping the body it replaces unless
+// that was written in the same editing session.
+func (self *DiscussionService) markEdited(ctx context.Context, tx repository.TxInterface, current *ent.Discussion, body string, now time.Time) (*time.Time, error) {
+	if body == current.Body {
+		return nil, nil
+	}
+	if current.EditedAt != nil && now.Sub(*current.EditedAt) <= editingSession {
+		return &now, nil
+	}
+	written := current.CreatedAt
+	if current.EditedAt != nil {
+		written = *current.EditedAt
+	}
+	return &now, self.repo.Discussion().AddVersion(ctx, tx, current.WorkspaceID, current.ID, current.Body, written)
+}
+
+type VoteInput struct {
+	ID     string `json:"id" doc:"The discussion's id, slug, link or title."`
+	Upvote bool   `json:"upvote" doc:"true to upvote it, false to take your upvote back."`
+}
+
+func (self *DiscussionService) Vote(ctx context.Context, actor *auth.Actor, input *VoteInput) (models.DiscussionDetail, error) {
+	if err := actor.RequireMember(); err != nil {
+		return models.DiscussionDetail{}, err
+	}
+	id, err := self.find(ctx, actor, input.ID, false)
+	if err != nil {
+		return models.DiscussionDetail{}, err
+	}
+	var value models.DiscussionDetail
+	err = self.repo.WithTx(ctx, func(tx repository.TxInterface) error {
+		changed, err := self.repo.Discussion().SetVote(ctx, tx, id, actor.User, input.Upvote)
+		if err != nil {
+			return err
+		}
+		if value, err = self.value(ctx, tx, actor.User, id); err != nil {
+			return err
+		}
+		if !changed {
+			return nil
+		}
+		return self.emit(ctx, tx, actor, "update", value.Discussion)
+	})
+	return value, err
+}
+
+func (self *DiscussionService) History(ctx context.Context, actor *auth.Actor, input *IDInput) (models.MessageHistory, error) {
+	id, err := self.find(ctx, actor, input.ID, false)
+	if err != nil {
+		return models.MessageHistory{}, err
+	}
+	found, err := self.repo.Discussion().Get(ctx, nil, id)
+	if err != nil {
+		return models.MessageHistory{}, err
+	}
+	versions, err := self.repo.Discussion().Versions(ctx, nil, id)
+	if err != nil {
+		return models.MessageHistory{}, err
+	}
+	return models.MessageHistoryOf(versions, found.Body, found.EditedAt, found.CreatedAt), nil
 }
 
 // setFlags pins or closes the discussion, or takes that back, as asked.
@@ -309,7 +401,7 @@ func (self *DiscussionService) setTrashed(ctx context.Context, actor *auth.Actor
 		if err := self.repo.Discussion().SetTrashed(ctx, tx, id, trashed, now); err != nil {
 			return err
 		}
-		if value, err = self.value(ctx, tx, id); err != nil {
+		if value, err = self.value(ctx, tx, actor.User, id); err != nil {
 			return err
 		}
 		action := "update"

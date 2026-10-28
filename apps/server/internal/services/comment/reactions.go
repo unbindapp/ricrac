@@ -78,6 +78,9 @@ func (self *CommentService) reactionTarget(ctx context.Context, actor *auth.Acto
 		if err != nil {
 			return "", uuid.Nil, nil, err
 		}
+		if row.DeletedAt != nil {
+			return "", uuid.Nil, nil, errDeleted()
+		}
 		target, err := TargetOf(row)
 		if err != nil {
 			return "", uuid.Nil, nil, err

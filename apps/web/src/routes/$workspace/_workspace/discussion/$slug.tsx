@@ -29,6 +29,7 @@ const searchSchema = z.object({
   message: z.string().optional(),
   /** The forum's filters, when the discussion opens beside its list. */
   status: z.enum(["closed", "all", "trash"]).optional(),
+  sort: z.enum(["newest", "top"]).optional(),
   tag: z.string().optional(),
 });
 
@@ -39,7 +40,7 @@ export const Route = createFileRoute("/$workspace/_workspace/discussion/$slug")(
 
 function DiscussionSlugPage() {
   const { slug } = Route.useParams();
-  const { thread, message, status, tag } = Route.useSearch();
+  const { thread, message, status, tag, sort } = Route.useSearch();
   const navigate = Route.useNavigate();
   const { workspace } = useWorkspace();
   const { size } = useDeviceSize();
@@ -64,7 +65,7 @@ function DiscussionSlugPage() {
       replace: true,
     });
 
-  const filters = { status, tag };
+  const filters = { status, tag, sort };
   const placeholder = (content: ReactNode) =>
     ForumPanes ? (
       <ForumPanes filters={filters} fallback={content} />
