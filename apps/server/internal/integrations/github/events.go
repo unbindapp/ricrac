@@ -227,21 +227,25 @@ func (i Issue) IsPullRequest() bool {
 	return len(i.PullRequest) > 0 && string(i.PullRequest) != "null"
 }
 
-// Closure is whether an issue is open, closed as completed, or closed as not planned.
+// Closure is whether an issue is open, or closed as completed, not planned or a duplicate.
 type Closure int
 
 const (
 	Open Closure = iota
 	ClosedCompleted
 	ClosedNotPlanned
+	ClosedDuplicate
 )
 
 func (i Issue) Closure() Closure {
 	if i.State != StateClosed {
 		return Open
 	}
-	if i.StateReason == "not_planned" || i.StateReason == "duplicate" {
+	switch i.StateReason {
+	case "not_planned":
 		return ClosedNotPlanned
+	case "duplicate":
+		return ClosedDuplicate
 	}
 	return ClosedCompleted
 }

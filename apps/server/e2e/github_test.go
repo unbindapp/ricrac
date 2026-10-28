@@ -601,6 +601,41 @@ func TestRicracChangesGoToGitHubButNotBack(t *testing.T) {
 	eq(t, scalar[int](g.World, "SELECT count(*) FROM github_outbox"), 0)
 }
 
+func TestDuplicatesCloseAsDuplicatesOnGitHub(t *testing.T) {
+	g := withGitHub(t)
+	g.syncRepo(t, "ENG")
+	g.deliver(t, "issues", "issues_opened.json", nil)
+	g.deliver(t, "issues", "issues_opened.json", func(p M) {
+		p["issue"].(M)["id"], p["issue"].(M)["number"], p["issue"].(M)["title"] = 3500001348, 1348, "Logs stop"
+	})
+	g.deliver(t, "issues", "issues_opened.json", func(p M) {
+		p["issue"].(M)["id"], p["issue"].(M)["number"], p["issue"].(M)["title"] = 3500001349, 1349, "Logs stop again"
+	})
+
+	call(t, g.Ann, "save_issue", M{"id": "ENG-2", "duplicateOf": "ENG-1"})
+	g.runJobs(t)
+	patches := g.fake.sent("PATCH", "/repos/unbindapp/unbind/issues/1348")
+	eq(t, len(patches), 1)
+	eq(t, string(marshal(patches[0].Body)), `{"duplicate_issue_id":3500001347,"state":"closed","state_reason":"duplicate"}`)
+
+	// Closing an issue that duplicates one GitHub doesn't have reads as not planned.
+	other := call(t, g.Ann, "save_issue", M{"title": "Only in Ricrac"})
+	call(t, g.Ann, "save_issue", M{"id": "ENG-3", "duplicateOf": other.At("identifier").Str()})
+	g.runJobs(t)
+	patches = g.fake.sent("PATCH", "/repos/unbindapp/unbind/issues/1349")
+	eq(t, len(patches), 1)
+	eq(t, string(marshal(patches[0].Body)), `{"state":"closed","state_reason":"not_planned"}`)
+	eq(t, scalar[int](g.World, "SELECT count(*) FROM github_outbox"), 0)
+
+	// GitHub closing one as a duplicate lands in the Duplicate status.
+	g.deliver(t, "issues", "issues_closed_not_planned.json", func(p M) {
+		p["issue"].(M)["state_reason"] = "duplicate"
+		p["issue"].(M)["updated_at"] = time.Now().UTC().Add(time.Hour)
+	})
+	eq(t, call(t, g.Ann, "get_issue", M{"id": "ENG-1"}).At("state", "name").Str(), "Duplicate")
+	eq(t, scalar[int](g.World, "SELECT count(*) FROM github_outbox"), 0)
+}
+
 // linkGitHub links the user's GitHub account as the account settings do.
 func (g *gitHubWorld) linkGitHub(t *testing.T, user uuid.UUID) {
 	t.Helper()

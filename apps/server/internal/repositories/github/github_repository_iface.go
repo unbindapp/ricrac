@@ -63,6 +63,9 @@ type GitHubRepositoryInterface interface {
 	LinkPostedComment(ctx context.Context, tx repository.TxInterface, commentID uuid.UUID, issueID *uuid.UUID, githubID int64, postedAs *uuid.UUID) error
 	// Issue is an issue, nil when there's none.
 	Issue(ctx context.Context, id uuid.UUID) (*ent.Issue, error)
+	// DuplicateTarget is the GitHub issue, in the same repository, of the issue this one duplicates;
+	// nil when it duplicates none or that one isn't synced there.
+	DuplicateTarget(ctx context.Context, issueID, repoSync uuid.UUID) (*ent.GithubIssueLink, error)
 	// LoginOf is the GitHub login of the user with this id; false when there's no such user.
 	LoginOf(ctx context.Context, id string) (*string, bool, error)
 	// SyncedRepo is the installation's sync of a repository, nil when there's none.
@@ -82,6 +85,8 @@ type GitHubRepositoryInterface interface {
 	// CanSeeTeam says whether a user of the team's workspace sees its issues: a member of a public
 	// team's workspace who isn't a guest, or a member of the team.
 	CanSeeTeam(ctx context.Context, teamID, member uuid.UUID) (bool, error)
+	// DuplicateState is the team's unarchived canceled status named Duplicate, nil when it has none.
+	DuplicateState(ctx context.Context, teamID uuid.UUID) (*uuid.UUID, error)
 	TriageEnabled(ctx context.Context, teamID uuid.UUID) (bool, error)
 	// LabelNamed is the team's or workspace's label (not a group, not retired) with this name: the
 	// team's first, then labels outside groups, then the oldest.

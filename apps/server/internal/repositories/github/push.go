@@ -11,9 +11,11 @@ import (
 	"ricrac/ent/comment"
 	"ricrac/ent/githubcommentlink"
 	"ricrac/ent/githubinstallation"
+	"ricrac/ent/githubissuelink"
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/githubreposync"
 	"ricrac/ent/issue"
+	"ricrac/ent/issuerelation"
 	"ricrac/ent/user"
 	repository "ricrac/internal/repositories"
 )
@@ -100,6 +102,26 @@ func (self *GitHubRepository) Issue(ctx context.Context, id uuid.UUID) (*ent.Iss
 		return nil, nil
 	}
 	return found, err
+}
+
+// DuplicateTarget is the GitHub issue, in the same repository, of the issue this one duplicates;
+// nil when it duplicates none or that one isn't synced there.
+func (self *GitHubRepository) DuplicateTarget(ctx context.Context, issueID, repoSync uuid.UUID) (*ent.GithubIssueLink, error) {
+	relation, err := self.base.DB.IssueRelation.Query().
+		Where(issuerelation.IssueID(issueID), issuerelation.Type("duplicate")).
+		Select(issuerelation.FieldRelatedIssueID).First(ctx)
+	if ent.IsNotFound(err) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	link, err := self.base.DB.GithubIssueLink.Query().
+		Where(githubissuelink.ID(relation.RelatedIssueID), githubissuelink.RepoSyncID(repoSync)).Only(ctx)
+	if ent.IsNotFound(err) {
+		return nil, nil
+	}
+	return link, err
 }
 
 // LoginOf is the GitHub login of the user with this id; false when there's no such user.

@@ -131,13 +131,11 @@ func TestIssueClosure(t *testing.T) {
 		Open:             {State: "open"},
 		ClosedCompleted:  {State: "closed", StateReason: "completed"},
 		ClosedNotPlanned: {State: "closed", StateReason: "not_planned"},
+		ClosedDuplicate:  {State: "closed", StateReason: "duplicate"},
 	}
 	for want, issue := range cases {
 		if issue.Closure() != want {
 			t.Errorf("%+v: got %v", issue, issue.Closure())
 		}
-	}
-	if (Issue{State: "closed", StateReason: "duplicate"}).Closure() != ClosedNotPlanned {
-		t.Error("duplicates are not planned")
 	}
 }

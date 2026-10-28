@@ -1645,6 +1645,148 @@ func (_c *GitHubRepositoryMock_DueOutbox_Call) RunAndReturn(run func(ctx context
 	return _c
 }
 
+// DuplicateState provides a mock function for the type GitHubRepositoryMock
+func (_mock *GitHubRepositoryMock) DuplicateState(ctx context.Context, teamID uuid.UUID) (*uuid.UUID, error) {
+	ret := _mock.Called(ctx, teamID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DuplicateState")
+	}
+
+	var r0 *uuid.UUID
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*uuid.UUID, error)); ok {
+		return returnFunc(ctx, teamID)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) *uuid.UUID); ok {
+		r0 = returnFunc(ctx, teamID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, teamID)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// GitHubRepositoryMock_DuplicateState_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DuplicateState'
+type GitHubRepositoryMock_DuplicateState_Call struct {
+	*mock.Call
+}
+
+// DuplicateState is a helper method to define mock.On call
+//   - ctx context.Context
+//   - teamID uuid.UUID
+func (_e *GitHubRepositoryMock_Expecter) DuplicateState(ctx any, teamID any) *GitHubRepositoryMock_DuplicateState_Call {
+	return &GitHubRepositoryMock_DuplicateState_Call{Call: _e.mock.On("DuplicateState", ctx, teamID)}
+}
+
+func (_c *GitHubRepositoryMock_DuplicateState_Call) Run(run func(ctx context.Context, teamID uuid.UUID)) *GitHubRepositoryMock_DuplicateState_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_DuplicateState_Call) Return(uUID *uuid.UUID, err error) *GitHubRepositoryMock_DuplicateState_Call {
+	_c.Call.Return(uUID, err)
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_DuplicateState_Call) RunAndReturn(run func(ctx context.Context, teamID uuid.UUID) (*uuid.UUID, error)) *GitHubRepositoryMock_DuplicateState_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DuplicateTarget provides a mock function for the type GitHubRepositoryMock
+func (_mock *GitHubRepositoryMock) DuplicateTarget(ctx context.Context, issueID uuid.UUID, repoSync uuid.UUID) (*ent.GithubIssueLink, error) {
+	ret := _mock.Called(ctx, issueID, repoSync)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DuplicateTarget")
+	}
+
+	var r0 *ent.GithubIssueLink
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) (*ent.GithubIssueLink, error)); ok {
+		return returnFunc(ctx, issueID, repoSync)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) *ent.GithubIssueLink); ok {
+		r0 = returnFunc(ctx, issueID, repoSync)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ent.GithubIssueLink)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, issueID, repoSync)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// GitHubRepositoryMock_DuplicateTarget_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DuplicateTarget'
+type GitHubRepositoryMock_DuplicateTarget_Call struct {
+	*mock.Call
+}
+
+// DuplicateTarget is a helper method to define mock.On call
+//   - ctx context.Context
+//   - issueID uuid.UUID
+//   - repoSync uuid.UUID
+func (_e *GitHubRepositoryMock_Expecter) DuplicateTarget(ctx any, issueID any, repoSync any) *GitHubRepositoryMock_DuplicateTarget_Call {
+	return &GitHubRepositoryMock_DuplicateTarget_Call{Call: _e.mock.On("DuplicateTarget", ctx, issueID, repoSync)}
+}
+
+func (_c *GitHubRepositoryMock_DuplicateTarget_Call) Run(run func(ctx context.Context, issueID uuid.UUID, repoSync uuid.UUID)) *GitHubRepositoryMock_DuplicateTarget_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_DuplicateTarget_Call) Return(githubIssueLink *ent.GithubIssueLink, err error) *GitHubRepositoryMock_DuplicateTarget_Call {
+	_c.Call.Return(githubIssueLink, err)
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_DuplicateTarget_Call) RunAndReturn(run func(ctx context.Context, issueID uuid.UUID, repoSync uuid.UUID) (*ent.GithubIssueLink, error)) *GitHubRepositoryMock_DuplicateTarget_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // FailBackfill provides a mock function for the type GitHubRepositoryMock
 func (_mock *GitHubRepositoryMock) FailBackfill(ctx context.Context, id uuid.UUID) error {
 	ret := _mock.Called(ctx, id)
