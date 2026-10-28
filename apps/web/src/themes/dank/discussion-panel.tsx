@@ -4,7 +4,6 @@ import { type ReactNode, useEffect, useState } from "react";
 import type { DiscussionDetail } from "@/api/ops.gen";
 import {
   DiscussionActions,
-  DiscussionBody,
   DiscussionTitle,
 } from "@/components/forum/discussion-detail";
 import { DiscussionTagsPicker } from "@/components/forum/discussion-tags";
@@ -23,6 +22,7 @@ import {
   useSaveDiscussionMutation,
 } from "@/lib/queries/discussions";
 import { Byline } from "@/themes/dank/byline";
+import { PostBody } from "@/themes/dank/post-body";
 import { DankThreadView } from "@/themes/dank/thread-view";
 
 type TProps = {
@@ -71,7 +71,7 @@ export function DiscussionPanel({ discussion, chat, threadId, onBackToChat, onCl
       </Byline>
       <PostTags discussion={discussion} />
       {cover && <img data-slot="discussion-cover" src={cover} alt="" />}
-      <DiscussionBody discussion={discussion} />
+      <PostBody discussion={discussion} />
     </article>
   );
 
