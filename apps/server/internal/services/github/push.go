@@ -194,9 +194,16 @@ func names(list any) []string {
 	return all
 }
 
+// closesAsCanceled says whether the changes close the issue as canceled on GitHub.
+func closesAsCanceled(changes M) bool {
+	_, to, ok := change(changes, "state")
+	return ok && refField(to, "type") == "canceled"
+}
+
 // issuePatch is the PATCH of a GitHub issue that brings over the changes, empty when none of
-// them shows there.
-func issuePatch(changes M, title, description string) M {
+// them shows there. A canceled issue that duplicates one GitHub has (duplicateOf, its GitHub id)
+// closes as a duplicate of it instead of as not planned.
+func issuePatch(changes M, title, description string, duplicateOf *int64) M {
 	patch := M{}
 	if _, ok := changes["title"]; ok {
 		patch["title"] = title
@@ -211,6 +218,10 @@ func issuePatch(changes M, title, description string) M {
 			patch["state"] = after
 			if reason != "" {
 				patch["state_reason"] = reason
+			}
+			if reason == "not_planned" && duplicateOf != nil {
+				patch["state_reason"] = "duplicate"
+				patch["duplicate_issue_id"] = *duplicateOf
 			}
 		}
 	}
@@ -235,8 +246,18 @@ func (self *GitHubService) pushIssue(ctx context.Context, token string, entry gi
 	}
 	var changes M
 	_ = json.Unmarshal(entry.Changes, &changes)
+	var duplicateOf *int64
+	if closesAsCanceled(changes) {
+		target, err := self.github().DuplicateTarget(ctx, *entry.Issue, entry.RepoSync)
+		if err != nil {
+			return err
+		}
+		if target != nil {
+			duplicateOf = &target.GithubID
+		}
+	}
 	path := github.IssuePath(entry.FullName, entry.Number)
-	if patch := issuePatch(changes, issue.Title, issue.Description); len(patch) > 0 {
+	if patch := issuePatch(changes, issue.Title, issue.Description, duplicateOf); len(patch) > 0 {
 		var updated github.Issue
 		if _, err := self.app.Do(ctx, token, http.MethodPatch, path, patch, &updated); err != nil {
 			return err

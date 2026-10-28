@@ -17,6 +17,7 @@ import (
 	"ricrac/ent/issuelabellink"
 	"ricrac/ent/team"
 	"ricrac/ent/user"
+	"ricrac/ent/workflowstate"
 	repository "ricrac/internal/repositories"
 )
 
@@ -103,6 +104,19 @@ func (self *GitHubRepository) CanSeeTeam(ctx context.Context, teamID, member uui
 				"AND ((NOT "+private+" AND m.role <> 'guest') OR EXISTS (SELECT 1 FROM team_members tm WHERE tm.team_id = "+id+
 				" AND tm.user_id = ?)))", member, member))
 		}).Exist(ctx)
+}
+
+// DuplicateState is the team's unarchived canceled status named Duplicate, nil when it has none.
+func (self *GitHubRepository) DuplicateState(ctx context.Context, teamID uuid.UUID) (*uuid.UUID, error) {
+	ids, err := self.base.DB.WorkflowState.Query().
+		Where(workflowstate.TeamID(teamID), workflowstate.Type("canceled"), workflowstate.ArchivedAtIsNil(), func(s *entsql.Selector) {
+			s.Where(repository.Raw("lower(" + s.C(workflowstate.FieldName) + ") = 'duplicate'"))
+		}).
+		Order(ent.Asc(workflowstate.FieldPosition)).Limit(1).IDs(ctx)
+	if err != nil || len(ids) == 0 {
+		return nil, err
+	}
+	return &ids[0], nil
 }
 
 func (self *GitHubRepository) TriageEnabled(ctx context.Context, teamID uuid.UUID) (bool, error) {

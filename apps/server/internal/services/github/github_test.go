@@ -183,10 +183,20 @@ func TestRicracChangesBecomeAGitHubPatch(t *testing.T) {
 		{state("backlog", "started"), M{}},
 	}
 	for _, c := range cases {
-		got := issuePatch(c.changes, "T", "D")
+		got := issuePatch(c.changes, "T", "D", nil)
 		if fmt.Sprint(got) != fmt.Sprint(c.want) {
 			t.Errorf("%v: got %v, want %v", c.changes, got, c.want)
 		}
+	}
+	duplicateOf := int64(3500001347)
+	got := issuePatch(state("backlog", "canceled"), "T", "D", &duplicateOf)
+	want := M{"state": "closed", "state_reason": "duplicate", "duplicate_issue_id": duplicateOf}
+	if fmt.Sprint(got) != fmt.Sprint(want) {
+		t.Errorf("duplicate: got %v, want %v", got, want)
+	}
+	got = issuePatch(state("backlog", "completed"), "T", "D", &duplicateOf)
+	if got["state_reason"] != "completed" {
+		t.Errorf("a completed duplicate stays completed, got %v", got)
 	}
 }
 

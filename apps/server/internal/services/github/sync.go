@@ -178,12 +178,22 @@ func (self *GitHubService) importIssue(ctx context.Context, sync *ent.GithubRepo
 }
 
 // statusFor is the status of the team a GitHub issue in this state goes to: open issues go to
-// triage when the team uses it, else the default status.
+// triage when the team uses it, else the default status; duplicates to a canceled status named
+// Duplicate when the team has one.
 func (self *GitHubService) statusFor(ctx context.Context, team uuid.UUID, closure github.Closure) (uuid.UUID, error) {
 	var kinds []string
 	switch closure {
 	case github.ClosedCompleted:
 		kinds = []string{"completed"}
+	case github.ClosedDuplicate:
+		duplicate, err := self.github().DuplicateState(ctx, team)
+		if err != nil {
+			return uuid.Nil, err
+		}
+		if duplicate != nil {
+			return *duplicate, nil
+		}
+		kinds = []string{"canceled", "completed"}
 	case github.ClosedNotPlanned:
 		kinds = []string{"canceled", "completed"}
 	default:
@@ -212,7 +222,7 @@ func matchesClosure(kind string, closure github.Closure) bool {
 	switch closure {
 	case github.ClosedCompleted:
 		return kind == "completed"
-	case github.ClosedNotPlanned:
+	case github.ClosedNotPlanned, github.ClosedDuplicate:
 		return kind == "canceled"
 	}
 	return kind != "completed" && kind != "canceled"
