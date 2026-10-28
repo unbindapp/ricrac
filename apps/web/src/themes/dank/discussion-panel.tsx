@@ -23,6 +23,7 @@ import {
 } from "@/lib/queries/discussions";
 import { Byline } from "@/themes/dank/byline";
 import { PostBody } from "@/themes/dank/post-body";
+import { UpvoteChip } from "@/themes/dank/upvote-chip";
 import { DankThreadView } from "@/themes/dank/thread-view";
 
 type TProps = {
@@ -63,6 +64,7 @@ export function DiscussionPanel({ discussion, chat, threadId, onBackToChat, onCl
             Closed
           </span>
         )}
+        <UpvoteChip discussion={discussion} />
         {discussion.subscribers.length > 0 && (
           <span data-slot="byline-people" role="group" aria-label="Participants">
             <AvatarStack users={discussion.subscribers} max={5} />

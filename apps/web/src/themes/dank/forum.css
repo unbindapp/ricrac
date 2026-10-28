@@ -153,6 +153,38 @@
     color: inherit;
   }
 
+  & [data-slot="upvote-chip"] {
+    gap: 4px;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 11px;
+    background-color: color-mix(in srgb, currentColor 8%, transparent);
+    color: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+
+    &::after {
+      display: none;
+    }
+
+    &[aria-pressed="true"] {
+      background-color: var(--m3-primary);
+      color: var(--m3-on-primary);
+    }
+
+    &:disabled {
+      opacity: 1;
+    }
+  }
+
+  & [data-slot="byline"] [data-slot="upvote-chip"] {
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 14px;
+    font-size: 13px;
+  }
+
   & [data-slot="count-chip"] {
     display: inline-flex;
     align-items: center;

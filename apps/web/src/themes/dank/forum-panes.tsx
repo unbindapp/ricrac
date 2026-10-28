@@ -25,6 +25,7 @@ import { entitySlug } from "@/lib/helpers/entity-slug";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 import { DiscussionPanel } from "@/themes/dank/discussion-panel";
 import { ForumControls, type TForumLayout } from "@/themes/dank/forum-controls";
+import { UpvoteChip } from "@/themes/dank/upvote-chip";
 import type { TForumPanesProps } from "@/themes/types";
 
 const MIN_LIST_WIDTH = 280;
@@ -101,7 +102,9 @@ function ForumListPane({ filters, openId }: { filters: TForumFilters; openId?: s
   const status = filters.status ?? "open";
   const isTrash = status === "trash";
   const isGrid = layout === "grid" && !isTrash;
-  const list = useInfiniteQuery(forumDiscussionsQuery(workspace.id, { status, tag: filters.tag }));
+  const list = useInfiniteQuery(
+    forumDiscussionsQuery(workspace.id, { status, tag: filters.tag, sort: filters.sort }),
+  );
   const discussions = list.data?.pages.flatMap((page) => page.nodes) ?? [];
   const filter = (next: TForumFilters) =>
     void navigate({
@@ -208,6 +211,7 @@ function ForumItem({
             <MessageSquareIcon />
             {discussion.commentCount}
           </span>
+          <UpvoteChip discussion={discussion} />
         </span>
         {discussion.tags.length > 0 && <FittingTags tags={discussion.tags} />}
       </span>

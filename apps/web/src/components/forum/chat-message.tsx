@@ -12,6 +12,7 @@ import {
   CopyIcon,
   CornerDownRightIcon,
   EllipsisIcon,
+  HistoryIcon,
   ImageIcon,
   MessageSquareReplyIcon,
   PencilIcon,
@@ -22,6 +23,7 @@ import {
   Trash2Icon,
   XIcon,
 } from "@/components/icons";
+import { MessageHistoryDialog } from "@/components/forum/message-history";
 import { userName } from "@/components/issues/grouping";
 import { useWorkspaceUsers } from "@/components/issues/picker-sources";
 import { UserAvatar } from "@/components/issues/pickers";
@@ -88,6 +90,7 @@ export function ChatMessage({
   const chatReply = useChatReply();
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isShowingHistory, setIsShowingHistory] = useState(false);
   const { data: me } = useQuery(meQuery);
   const { mutateAsync: saveComment } = useSaveCommentMutation(workspace.id);
   const { mutateAsync: deleteComment } = useDeleteCommentMutation(workspace.id);
@@ -95,17 +98,27 @@ export function ChatMessage({
   const isAuthor = Boolean(me && message.user?.id === me.id);
   const authorName = message.user ? userName(message.user) : "Deleted user";
   const reactions = groupReactions(message.reactions, me?.id);
+  const isDeleted = Boolean(message.deletedAt);
+  const isEdited = Boolean(message.editedAt) && !isDeleted;
   const { text, attachments } = splitAttachments(message.body);
   const react = (emoji: string, reacted: boolean) =>
     toggleReaction({ commentId: message.id, emoji, reacted });
   const { copyToClipboard } = useCopyToClipboard();
   const replyCount = thread?.replies.length ?? 0;
-  const canStartThread = canEdit && Boolean(onNewThread);
-  const canChange = isAuthor && canEdit;
-  const canDelete = isAuthor || isAdmin;
+  const canStartThread = canEdit && Boolean(onNewThread) && !isDeleted;
+  const canChange = isAuthor && canEdit && !isDeleted;
+  const canDelete = (isAuthor || isAdmin) && !isDeleted;
   const edit = canChange ? () => setIsEditing(true) : undefined;
   const reply =
-    canEdit && chatReply ? () => chatReply.setReplyingTo(replyTo ?? message) : undefined;
+    canEdit && chatReply && !isDeleted
+      ? () => chatReply.setReplyingTo(replyTo ?? message)
+      : undefined;
+  const historyItem = isEdited && (
+    <DropdownMenuItem onClick={() => setIsShowingHistory(true)}>
+      <HistoryIcon className="size-4" />
+      History
+    </DropdownMenuItem>
+  );
 
   const actionItems = (
     <>
@@ -121,6 +134,7 @@ export function ChatMessage({
           Edit
         </DropdownMenuItem>
       )}
+      {historyItem}
       {canDelete && (
         <DropdownMenuItem className="text-destructive" onClick={() => setIsDeleting(true)}>
           <Trash2Icon className="size-4" />
@@ -130,7 +144,7 @@ export function ChatMessage({
     </>
   );
 
-  const hasActions = !isEditing && (canEdit || isAdmin);
+  const hasActions = !isEditing && !isDeleted && (canEdit || isAdmin);
   const isMine = chatBubbles && isAuthor;
 
   const actionButtons = (
@@ -150,7 +164,7 @@ export function ChatMessage({
           </Button>
         </SimpleTooltip>
       )}
-      {(canStartThread || canChange || canDelete) && (
+      {(canStartThread || canChange || canDelete || isEdited) && (
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
@@ -199,7 +213,13 @@ export function ChatMessage({
     />
   );
 
-  const edited = message.editedAt && (
+  const deletedNote = isDeleted && (
+    <div data-slot="message-bubble" data-deleted className="text-muted-foreground italic">
+      Deleted message
+    </div>
+  );
+
+  const edited = isEdited && (
     <span data-slot="message-edited" className="text-muted-foreground text-xs">
       (edited)
     </span>
@@ -247,7 +267,7 @@ export function ChatMessage({
           </Button>
         </SimpleTooltip>
       )}
-      {(canStartThread || canDelete) && (
+      {(canStartThread || canDelete || isEdited) && (
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
@@ -264,6 +284,7 @@ export function ChatMessage({
                   New thread from message
                 </DropdownMenuItem>
               )}
+              {historyItem}
               {canDelete && (
                 <DropdownMenuItem className="text-destructive" onClick={() => setIsDeleting(true)}>
                   <Trash2Icon className="size-4" />
@@ -315,6 +336,7 @@ export function ChatMessage({
               onContextMenu={keepNativeMenu}
               onDoubleClick={edit}
             >
+              {deletedNote}
               {text && (
                 <div
                   data-slot="message-bubble"
@@ -340,7 +362,7 @@ export function ChatMessage({
           )}
         </div>
       </div>
-      {!isEditing && (canEdit || canDelete) && bubbleTools}
+      {!isEditing && !isDeleted && (canEdit || canDelete) && bubbleTools}
     </>
   );
 
@@ -378,6 +400,9 @@ export function ChatMessage({
             onContextMenu={keepNativeMenu}
             onDoubleClick={edit}
           >
+            {isDeleted && (
+              <span className="text-muted-foreground text-sm italic">Deleted message</span>
+            )}
             {text && <div className="rr-chat flex min-w-0 flex-col">{textView}</div>}
             <MessageAttachments attachments={attachments} />
             {edited}
@@ -394,7 +419,7 @@ export function ChatMessage({
   );
 
   return (
-    <ContextMenu disabled={isEditing}>
+    <ContextMenu disabled={isEditing || isDeleted}>
       <ContextMenuTrigger
         render={
           <article
@@ -412,6 +437,13 @@ export function ChatMessage({
         }
       >
         {chatBubbles ? bubbleContent : rowContent}
+        {isEdited && (
+          <MessageHistoryDialog
+            target={{ commentId: message.id }}
+            open={isShowingHistory}
+            onOpenChange={setIsShowingHistory}
+          />
+        )}
         <ConfirmDialog
           open={isDeleting}
           onOpenChange={setIsDeleting}

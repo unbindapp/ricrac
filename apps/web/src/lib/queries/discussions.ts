@@ -145,3 +145,31 @@ export function useDeleteDiscussionThreadMutation(workspaceId: string) {
     onSuccess: invalidate,
   });
 }
+
+export function useVoteDiscussionMutation(workspaceId: string) {
+  const queryClient = useQueryClient();
+  const invalidate = useInvalidateDiscussions(workspaceId);
+  return useMutation({
+    mutationFn: (args: OpArgs<"vote_discussion">) => call(workspaceId, "vote_discussion", args),
+    meta: { errorTitle: "Could not vote" },
+    onSuccess: (discussion) => {
+      queryClient.setQueryData(
+        queryKeyDiscussions.detail(workspaceId, discussion.slugId),
+        discussion,
+      );
+      return invalidate();
+    },
+  });
+}
+
+export type TMessageHistoryTarget = { commentId: string } | { discussionId: string };
+
+/** A message's or post's text as it was before each edit, oldest first, ending with the current one. */
+export const messageHistoryQuery = (workspaceId: string, target: TMessageHistoryTarget) =>
+  queryOptions({
+    queryKey: [workspaceId, "discussions", "history", target] as const,
+    queryFn: () =>
+      "commentId" in target
+        ? call(workspaceId, "get_comment_history", { id: target.commentId })
+        : call(workspaceId, "get_discussion_history", { id: target.discussionId }),
+  });

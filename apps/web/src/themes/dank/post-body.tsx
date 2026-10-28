@@ -2,11 +2,18 @@ import { useState } from "react";
 
 import type { DiscussionDetail } from "@/api/ops.gen";
 import { useCanRewrite } from "@/components/forum/use-can-rewrite";
-import { PencilIcon } from "@/components/icons";
+import { MessageHistoryDialog } from "@/components/forum/message-history";
+import { EllipsisIcon, HistoryIcon, PencilIcon } from "@/components/icons";
 import { useWorkspaceUsers } from "@/components/issues/picker-sources";
 import { MarkdownEditor } from "@/components/shared/markdown-editor";
 import { MarkdownView } from "@/components/shared/markdown-view";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { SimpleTooltip } from "@/components/ui/tooltip";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { useSaveDiscussionMutation } from "@/lib/queries/discussions";
@@ -17,6 +24,8 @@ export function PostBody({ discussion }: { discussion: DiscussionDetail }) {
   const { workspace } = useWorkspace();
   const canRewrite = useCanRewrite(discussion.creator);
   const [isEditing, setIsEditing] = useState(false);
+  const [isShowingHistory, setIsShowingHistory] = useState(false);
+  const isEdited = Boolean(discussion.editedAt);
   const { mutateAsync: save } = useSaveDiscussionMutation(workspace.id);
   const body = discussion.body ?? "";
 
@@ -35,25 +44,56 @@ export function PostBody({ discussion }: { discussion: DiscussionDetail }) {
       ) : (
         canRewrite && <p className="text-muted-foreground text-sm">No description yet.</p>
       )}
-      {canRewrite && (
+      {(canRewrite || isEdited) && (
         <div
           role="toolbar"
           aria-label="Post actions"
           data-slot="message-tools"
           className="touch:hidden absolute -top-4.5 right-2 z-10 flex gap-0.5 rounded-full p-0.75 opacity-0 group-hover/message:opacity-100 focus-within:opacity-100 has-data-popup-open:opacity-100"
         >
-          <SimpleTooltip content="Edit post">
-            <Button
-              variant="ghost"
-              size="icon"
-              forceMinSize={false}
-              aria-label="Edit post"
-              onClick={() => setIsEditing(true)}
-            >
-              <PencilIcon />
-            </Button>
-          </SimpleTooltip>
+          {canRewrite && (
+            <SimpleTooltip content="Edit post">
+              <Button
+                variant="ghost"
+                size="icon"
+                forceMinSize={false}
+                aria-label="Edit post"
+                onClick={() => setIsEditing(true)}
+              >
+                <PencilIcon />
+              </Button>
+            </SimpleTooltip>
+          )}
+          {isEdited && (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    forceMinSize={false}
+                    aria-label="More post actions"
+                  >
+                    <EllipsisIcon />
+                  </Button>
+                }
+              />
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => setIsShowingHistory(true)}>
+                  <HistoryIcon className="size-4" />
+                  History
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
+      )}
+      {isEdited && (
+        <MessageHistoryDialog
+          target={{ discussionId: discussion.id }}
+          open={isShowingHistory}
+          onOpenChange={setIsShowingHistory}
+        />
       )}
     </div>
   );

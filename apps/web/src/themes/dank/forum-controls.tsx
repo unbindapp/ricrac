@@ -1,9 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 
 import {
+  forumSortOptions,
   forumStatusSearch,
   forumViewOptions,
   type TForumFilters,
+  type TForumSort,
   type TForumView,
 } from "@/components/forum/forum-views";
 import { NONE_KEY } from "@/components/issues/grouping";
@@ -39,8 +41,12 @@ export function ForumControls({ filters, layout, onFilter, onLayout }: TProps) {
   const { workspace } = useWorkspace();
   const { data: tags = [] } = useQuery(discussionTagsQuery(workspace.id));
   const status: TForumView = filters.status ?? "open";
+  const sort: TForumSort = filters.sort ?? "activity";
+  const sortLabel = forumSortOptions.find((option) => option.value === sort)?.label;
   const statusLabel = forumViewOptions.find((option) => option.value === status)?.label;
-  const summary = [statusLabel, filters.tag && `#${filters.tag}`].filter(Boolean).join(" · ");
+  const summary = [statusLabel, filters.tag && `#${filters.tag}`, status !== "trash" && sortLabel]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <DropdownMenu>
@@ -59,6 +65,26 @@ export function ForumControls({ filters, layout, onFilter, onLayout }: TProps) {
         }
       />
       <DropdownMenuContent align="start" className="w-64">
+        {status !== "trash" && (
+          <>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+              <DropdownMenuRadioGroup
+                value={sort}
+                onValueChange={(value: TForumSort) =>
+                  onFilter({ sort: value === "activity" ? undefined : value })
+                }
+              >
+                {forumSortOptions.map((option) => (
+                  <DropdownMenuRadioItem key={option.value} value={option.value}>
+                    {option.label}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+          </>
+        )}
         <DropdownMenuGroup>
           <DropdownMenuLabel>Show</DropdownMenuLabel>
           <DropdownMenuRadioGroup
