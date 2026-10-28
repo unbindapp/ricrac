@@ -51,6 +51,7 @@ func (Workspace) Edges() []ent.Edge {
 		edge.To("discussions", Discussion.Type),
 		edge.To("discussion_threads", DiscussionThread.Type),
 		edge.To("comments", Comment.Type),
+		edge.To("message_versions", MessageVersion.Type),
 		edge.To("reactions", Reaction.Type),
 		edge.To("customer_statuses", CustomerStatus.Type),
 		edge.To("customer_tiers", CustomerTier.Type),

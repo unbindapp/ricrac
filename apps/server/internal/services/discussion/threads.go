@@ -81,7 +81,11 @@ func (self *DiscussionService) threadValue(ctx context.Context, tx repository.Tx
 	count := 0
 	for i, c := range comments {
 		detail.Comments[i] = models.CommentThreadOf(c)
-		count += 1 + len(c.Edges.Children)
+		for _, written := range append([]*ent.Comment{c}, c.Edges.Children...) {
+			if written.DeletedAt == nil {
+				count++
+			}
+		}
 	}
 	detail.DiscussionThread = models.DiscussionThreadOf(found, self.cfg.PublicURL, count)
 	return detail, nil

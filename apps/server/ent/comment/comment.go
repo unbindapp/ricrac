@@ -45,6 +45,8 @@ const (
 	FieldSuggestionStatus = "suggestion_status"
 	// FieldEditedAt holds the string denoting the edited_at field in the database.
 	FieldEditedAt = "edited_at"
+	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
+	FieldDeletedAt = "deleted_at"
 	// FieldResolvedAt holds the string denoting the resolved_at field in the database.
 	FieldResolvedAt = "resolved_at"
 	// FieldResolvingUserID holds the string denoting the resolving_user_id field in the database.
@@ -85,6 +87,8 @@ const (
 	EdgeNotifications = "notifications"
 	// EdgeGithubOutbox holds the string denoting the github_outbox edge name in mutations.
 	EdgeGithubOutbox = "github_outbox"
+	// EdgeVersions holds the string denoting the versions edge name in mutations.
+	EdgeVersions = "versions"
 	// Table holds the table name of the comment in the database.
 	Table = "comments"
 	// WorkspaceTable is the table that holds the workspace relation/edge.
@@ -193,6 +197,13 @@ const (
 	GithubOutboxInverseTable = "github_outbox"
 	// GithubOutboxColumn is the table column denoting the github_outbox relation/edge.
 	GithubOutboxColumn = "comment_id"
+	// VersionsTable is the table that holds the versions relation/edge.
+	VersionsTable = "message_versions"
+	// VersionsInverseTable is the table name for the MessageVersion entity.
+	// It exists in this package in order to avoid circular dependency with the "messageversion" package.
+	VersionsInverseTable = "message_versions"
+	// VersionsColumn is the table column denoting the versions relation/edge.
+	VersionsColumn = "comment_id"
 )
 
 // Columns holds all SQL columns for comment fields.
@@ -214,6 +225,7 @@ var Columns = []string{
 	FieldSuggestedText,
 	FieldSuggestionStatus,
 	FieldEditedAt,
+	FieldDeletedAt,
 	FieldResolvedAt,
 	FieldResolvingUserID,
 	FieldCreatedAt,
@@ -321,6 +333,11 @@ func BySuggestionStatus(opts ...sql.OrderTermOption) OrderOption {
 // ByEditedAt orders the results by the edited_at field.
 func ByEditedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEditedAt, opts...).ToFunc()
+}
+
+// ByDeletedAt orders the results by the deleted_at field.
+func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeletedAt, opts...).ToFunc()
 }
 
 // ByResolvedAt orders the results by the resolved_at field.
@@ -482,6 +499,20 @@ func ByGithubOutbox(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newGithubOutboxStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByVersionsCount orders the results by versions count.
+func ByVersionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newVersionsStep(), opts...)
+	}
+}
+
+// ByVersions orders the results by versions terms.
+func ByVersions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newVersionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newWorkspaceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -592,5 +623,12 @@ func newGithubOutboxStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(GithubOutboxInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, GithubOutboxTable, GithubOutboxColumn),
+	)
+}
+func newVersionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(VersionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, VersionsTable, VersionsColumn),
 	)
 }

@@ -20,6 +20,7 @@ import (
 	"ricrac/ent/discussion"
 	"ricrac/ent/discussionsubscriber"
 	"ricrac/ent/discussionthread"
+	"ricrac/ent/discussionvote"
 	"ricrac/ent/document"
 	"ricrac/ent/documentversion"
 	"ricrac/ent/email"
@@ -43,6 +44,7 @@ import (
 	"ricrac/ent/issuerelease"
 	"ricrac/ent/issueshare"
 	"ricrac/ent/issuesubscriber"
+	"ricrac/ent/messageversion"
 	"ricrac/ent/notification"
 	"ricrac/ent/oauthclient"
 	"ricrac/ent/oauthcode"
@@ -152,6 +154,7 @@ func checkColumn(t, c string) error {
 			discussion.Table:           discussion.ValidColumn,
 			discussionsubscriber.Table: discussionsubscriber.ValidColumn,
 			discussionthread.Table:     discussionthread.ValidColumn,
+			discussionvote.Table:       discussionvote.ValidColumn,
 			document.Table:             document.ValidColumn,
 			documentversion.Table:      documentversion.ValidColumn,
 			email.Table:                email.ValidColumn,
@@ -175,6 +178,7 @@ func checkColumn(t, c string) error {
 			issuerelease.Table:         issuerelease.ValidColumn,
 			issueshare.Table:           issueshare.ValidColumn,
 			issuesubscriber.Table:      issuesubscriber.ValidColumn,
+			messageversion.Table:       messageversion.ValidColumn,
 			notification.Table:         notification.ValidColumn,
 			oauthclient.Table:          oauthclient.ValidColumn,
 			oauthcode.Table:            oauthcode.ValidColumn,

@@ -9,6 +9,7 @@ import (
 	"ricrac/ent/comment"
 	"ricrac/ent/discussion"
 	"ricrac/ent/discussionthread"
+	"ricrac/ent/messageversion"
 	"ricrac/ent/notification"
 	"ricrac/ent/predicate"
 	"ricrac/ent/schema/pgarray"
@@ -231,6 +232,26 @@ func (_u *DiscussionUpdate) ClearTrashedAt() *DiscussionUpdate {
 	return _u
 }
 
+// SetEditedAt sets the "edited_at" field.
+func (_u *DiscussionUpdate) SetEditedAt(v time.Time) *DiscussionUpdate {
+	_u.mutation.SetEditedAt(v)
+	return _u
+}
+
+// SetNillableEditedAt sets the "edited_at" field if the given value is not nil.
+func (_u *DiscussionUpdate) SetNillableEditedAt(v *time.Time) *DiscussionUpdate {
+	if v != nil {
+		_u.SetEditedAt(*v)
+	}
+	return _u
+}
+
+// ClearEditedAt clears the value of the "edited_at" field.
+func (_u *DiscussionUpdate) ClearEditedAt() *DiscussionUpdate {
+	_u.mutation.ClearEditedAt()
+	return _u
+}
+
 // SetLastActivityAt sets the "last_activity_at" field.
 func (_u *DiscussionUpdate) SetLastActivityAt(v time.Time) *DiscussionUpdate {
 	_u.mutation.SetLastActivityAt(v)
@@ -366,6 +387,36 @@ func (_u *DiscussionUpdate) AddSubscribers(v ...*User) *DiscussionUpdate {
 	return _u.AddSubscriberIDs(ids...)
 }
 
+// AddVoterIDs adds the "voters" edge to the User entity by IDs.
+func (_u *DiscussionUpdate) AddVoterIDs(ids ...uuid.UUID) *DiscussionUpdate {
+	_u.mutation.AddVoterIDs(ids...)
+	return _u
+}
+
+// AddVoters adds the "voters" edges to the User entity.
+func (_u *DiscussionUpdate) AddVoters(v ...*User) *DiscussionUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddVoterIDs(ids...)
+}
+
+// AddVersionIDs adds the "versions" edge to the MessageVersion entity by IDs.
+func (_u *DiscussionUpdate) AddVersionIDs(ids ...uuid.UUID) *DiscussionUpdate {
+	_u.mutation.AddVersionIDs(ids...)
+	return _u
+}
+
+// AddVersions adds the "versions" edges to the MessageVersion entity.
+func (_u *DiscussionUpdate) AddVersions(v ...*MessageVersion) *DiscussionUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddVersionIDs(ids...)
+}
+
 // Mutation returns the DiscussionMutation object of the builder.
 func (_u *DiscussionUpdate) Mutation() *DiscussionMutation {
 	return _u.mutation
@@ -473,6 +524,48 @@ func (_u *DiscussionUpdate) RemoveSubscribers(v ...*User) *DiscussionUpdate {
 	return _u.RemoveSubscriberIDs(ids...)
 }
 
+// ClearVoters clears all "voters" edges to the User entity.
+func (_u *DiscussionUpdate) ClearVoters() *DiscussionUpdate {
+	_u.mutation.ClearVoters()
+	return _u
+}
+
+// RemoveVoterIDs removes the "voters" edge to User entities by IDs.
+func (_u *DiscussionUpdate) RemoveVoterIDs(ids ...uuid.UUID) *DiscussionUpdate {
+	_u.mutation.RemoveVoterIDs(ids...)
+	return _u
+}
+
+// RemoveVoters removes "voters" edges to User entities.
+func (_u *DiscussionUpdate) RemoveVoters(v ...*User) *DiscussionUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveVoterIDs(ids...)
+}
+
+// ClearVersions clears all "versions" edges to the MessageVersion entity.
+func (_u *DiscussionUpdate) ClearVersions() *DiscussionUpdate {
+	_u.mutation.ClearVersions()
+	return _u
+}
+
+// RemoveVersionIDs removes the "versions" edge to MessageVersion entities by IDs.
+func (_u *DiscussionUpdate) RemoveVersionIDs(ids ...uuid.UUID) *DiscussionUpdate {
+	_u.mutation.RemoveVersionIDs(ids...)
+	return _u
+}
+
+// RemoveVersions removes "versions" edges to MessageVersion entities.
+func (_u *DiscussionUpdate) RemoveVersions(v ...*MessageVersion) *DiscussionUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveVersionIDs(ids...)
+}
+
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *DiscussionUpdate) Save(ctx context.Context) (int, error) {
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
@@ -567,6 +660,12 @@ func (_u *DiscussionUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 	}
 	if _u.mutation.TrashedAtCleared() {
 		_spec.ClearField(discussion.FieldTrashedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.EditedAt(); ok {
+		_spec.SetField(discussion.FieldEditedAt, field.TypeTime, value)
+	}
+	if _u.mutation.EditedAtCleared() {
+		_spec.ClearField(discussion.FieldEditedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.LastActivityAt(); ok {
 		_spec.SetField(discussion.FieldLastActivityAt, field.TypeTime, value)
@@ -846,6 +945,96 @@ func (_u *DiscussionUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.VotersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   discussion.VotersTable,
+			Columns: discussion.VotersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedVotersIDs(); len(nodes) > 0 && !_u.mutation.VotersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   discussion.VotersTable,
+			Columns: discussion.VotersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.VotersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   discussion.VotersTable,
+			Columns: discussion.VotersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.VersionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   discussion.VersionsTable,
+			Columns: []string{discussion.VersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedVersionsIDs(); len(nodes) > 0 && !_u.mutation.VersionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   discussion.VersionsTable,
+			Columns: []string{discussion.VersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.VersionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   discussion.VersionsTable,
+			Columns: []string{discussion.VersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -1069,6 +1258,26 @@ func (_u *DiscussionUpdateOne) ClearTrashedAt() *DiscussionUpdateOne {
 	return _u
 }
 
+// SetEditedAt sets the "edited_at" field.
+func (_u *DiscussionUpdateOne) SetEditedAt(v time.Time) *DiscussionUpdateOne {
+	_u.mutation.SetEditedAt(v)
+	return _u
+}
+
+// SetNillableEditedAt sets the "edited_at" field if the given value is not nil.
+func (_u *DiscussionUpdateOne) SetNillableEditedAt(v *time.Time) *DiscussionUpdateOne {
+	if v != nil {
+		_u.SetEditedAt(*v)
+	}
+	return _u
+}
+
+// ClearEditedAt clears the value of the "edited_at" field.
+func (_u *DiscussionUpdateOne) ClearEditedAt() *DiscussionUpdateOne {
+	_u.mutation.ClearEditedAt()
+	return _u
+}
+
 // SetLastActivityAt sets the "last_activity_at" field.
 func (_u *DiscussionUpdateOne) SetLastActivityAt(v time.Time) *DiscussionUpdateOne {
 	_u.mutation.SetLastActivityAt(v)
@@ -1204,6 +1413,36 @@ func (_u *DiscussionUpdateOne) AddSubscribers(v ...*User) *DiscussionUpdateOne {
 	return _u.AddSubscriberIDs(ids...)
 }
 
+// AddVoterIDs adds the "voters" edge to the User entity by IDs.
+func (_u *DiscussionUpdateOne) AddVoterIDs(ids ...uuid.UUID) *DiscussionUpdateOne {
+	_u.mutation.AddVoterIDs(ids...)
+	return _u
+}
+
+// AddVoters adds the "voters" edges to the User entity.
+func (_u *DiscussionUpdateOne) AddVoters(v ...*User) *DiscussionUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddVoterIDs(ids...)
+}
+
+// AddVersionIDs adds the "versions" edge to the MessageVersion entity by IDs.
+func (_u *DiscussionUpdateOne) AddVersionIDs(ids ...uuid.UUID) *DiscussionUpdateOne {
+	_u.mutation.AddVersionIDs(ids...)
+	return _u
+}
+
+// AddVersions adds the "versions" edges to the MessageVersion entity.
+func (_u *DiscussionUpdateOne) AddVersions(v ...*MessageVersion) *DiscussionUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddVersionIDs(ids...)
+}
+
 // Mutation returns the DiscussionMutation object of the builder.
 func (_u *DiscussionUpdateOne) Mutation() *DiscussionMutation {
 	return _u.mutation
@@ -1309,6 +1548,48 @@ func (_u *DiscussionUpdateOne) RemoveSubscribers(v ...*User) *DiscussionUpdateOn
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveSubscriberIDs(ids...)
+}
+
+// ClearVoters clears all "voters" edges to the User entity.
+func (_u *DiscussionUpdateOne) ClearVoters() *DiscussionUpdateOne {
+	_u.mutation.ClearVoters()
+	return _u
+}
+
+// RemoveVoterIDs removes the "voters" edge to User entities by IDs.
+func (_u *DiscussionUpdateOne) RemoveVoterIDs(ids ...uuid.UUID) *DiscussionUpdateOne {
+	_u.mutation.RemoveVoterIDs(ids...)
+	return _u
+}
+
+// RemoveVoters removes "voters" edges to User entities.
+func (_u *DiscussionUpdateOne) RemoveVoters(v ...*User) *DiscussionUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveVoterIDs(ids...)
+}
+
+// ClearVersions clears all "versions" edges to the MessageVersion entity.
+func (_u *DiscussionUpdateOne) ClearVersions() *DiscussionUpdateOne {
+	_u.mutation.ClearVersions()
+	return _u
+}
+
+// RemoveVersionIDs removes the "versions" edge to MessageVersion entities by IDs.
+func (_u *DiscussionUpdateOne) RemoveVersionIDs(ids ...uuid.UUID) *DiscussionUpdateOne {
+	_u.mutation.RemoveVersionIDs(ids...)
+	return _u
+}
+
+// RemoveVersions removes "versions" edges to MessageVersion entities.
+func (_u *DiscussionUpdateOne) RemoveVersions(v ...*MessageVersion) *DiscussionUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveVersionIDs(ids...)
 }
 
 // Where appends a list predicates to the DiscussionUpdate builder.
@@ -1435,6 +1716,12 @@ func (_u *DiscussionUpdateOne) sqlSave(ctx context.Context) (_node *Discussion, 
 	}
 	if _u.mutation.TrashedAtCleared() {
 		_spec.ClearField(discussion.FieldTrashedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.EditedAt(); ok {
+		_spec.SetField(discussion.FieldEditedAt, field.TypeTime, value)
+	}
+	if _u.mutation.EditedAtCleared() {
+		_spec.ClearField(discussion.FieldEditedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.LastActivityAt(); ok {
 		_spec.SetField(discussion.FieldLastActivityAt, field.TypeTime, value)
@@ -1714,6 +2001,96 @@ func (_u *DiscussionUpdateOne) sqlSave(ctx context.Context) (_node *Discussion, 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.VotersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   discussion.VotersTable,
+			Columns: discussion.VotersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedVotersIDs(); len(nodes) > 0 && !_u.mutation.VotersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   discussion.VotersTable,
+			Columns: discussion.VotersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.VotersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   discussion.VotersTable,
+			Columns: discussion.VotersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.VersionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   discussion.VersionsTable,
+			Columns: []string{discussion.VersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedVersionsIDs(); len(nodes) > 0 && !_u.mutation.VersionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   discussion.VersionsTable,
+			Columns: []string{discussion.VersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.VersionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   discussion.VersionsTable,
+			Columns: []string{discussion.VersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

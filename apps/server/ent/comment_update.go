@@ -13,6 +13,7 @@ import (
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/initiative"
 	"ricrac/ent/issue"
+	"ricrac/ent/messageversion"
 	"ricrac/ent/notification"
 	"ricrac/ent/predicate"
 	"ricrac/ent/project"
@@ -351,6 +352,26 @@ func (_u *CommentUpdate) ClearEditedAt() *CommentUpdate {
 	return _u
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (_u *CommentUpdate) SetDeletedAt(v time.Time) *CommentUpdate {
+	_u.mutation.SetDeletedAt(v)
+	return _u
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (_u *CommentUpdate) SetNillableDeletedAt(v *time.Time) *CommentUpdate {
+	if v != nil {
+		_u.SetDeletedAt(*v)
+	}
+	return _u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (_u *CommentUpdate) ClearDeletedAt() *CommentUpdate {
+	_u.mutation.ClearDeletedAt()
+	return _u
+}
+
 // SetResolvedAt sets the "resolved_at" field.
 func (_u *CommentUpdate) SetResolvedAt(v time.Time) *CommentUpdate {
 	_u.mutation.SetResolvedAt(v)
@@ -551,6 +572,21 @@ func (_u *CommentUpdate) AddGithubOutbox(v ...*GithubOutbox) *CommentUpdate {
 	return _u.AddGithubOutboxIDs(ids...)
 }
 
+// AddVersionIDs adds the "versions" edge to the MessageVersion entity by IDs.
+func (_u *CommentUpdate) AddVersionIDs(ids ...uuid.UUID) *CommentUpdate {
+	_u.mutation.AddVersionIDs(ids...)
+	return _u
+}
+
+// AddVersions adds the "versions" edges to the MessageVersion entity.
+func (_u *CommentUpdate) AddVersions(v ...*MessageVersion) *CommentUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddVersionIDs(ids...)
+}
+
 // Mutation returns the CommentMutation object of the builder.
 func (_u *CommentUpdate) Mutation() *CommentMutation {
 	return _u.mutation
@@ -712,6 +748,27 @@ func (_u *CommentUpdate) RemoveGithubOutbox(v ...*GithubOutbox) *CommentUpdate {
 	return _u.RemoveGithubOutboxIDs(ids...)
 }
 
+// ClearVersions clears all "versions" edges to the MessageVersion entity.
+func (_u *CommentUpdate) ClearVersions() *CommentUpdate {
+	_u.mutation.ClearVersions()
+	return _u
+}
+
+// RemoveVersionIDs removes the "versions" edge to MessageVersion entities by IDs.
+func (_u *CommentUpdate) RemoveVersionIDs(ids ...uuid.UUID) *CommentUpdate {
+	_u.mutation.RemoveVersionIDs(ids...)
+	return _u
+}
+
+// RemoveVersions removes "versions" edges to MessageVersion entities.
+func (_u *CommentUpdate) RemoveVersions(v ...*MessageVersion) *CommentUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveVersionIDs(ids...)
+}
+
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *CommentUpdate) Save(ctx context.Context) (int, error) {
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
@@ -791,6 +848,12 @@ func (_u *CommentUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.EditedAtCleared() {
 		_spec.ClearField(comment.FieldEditedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.DeletedAt(); ok {
+		_spec.SetField(comment.FieldDeletedAt, field.TypeTime, value)
+	}
+	if _u.mutation.DeletedAtCleared() {
+		_spec.ClearField(comment.FieldDeletedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.ResolvedAt(); ok {
 		_spec.SetField(comment.FieldResolvedAt, field.TypeTime, value)
@@ -1331,6 +1394,51 @@ func (_u *CommentUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(githuboutbox.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.VersionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   comment.VersionsTable,
+			Columns: []string{comment.VersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedVersionsIDs(); len(nodes) > 0 && !_u.mutation.VersionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   comment.VersionsTable,
+			Columns: []string{comment.VersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.VersionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   comment.VersionsTable,
+			Columns: []string{comment.VersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -1668,6 +1776,26 @@ func (_u *CommentUpdateOne) ClearEditedAt() *CommentUpdateOne {
 	return _u
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (_u *CommentUpdateOne) SetDeletedAt(v time.Time) *CommentUpdateOne {
+	_u.mutation.SetDeletedAt(v)
+	return _u
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (_u *CommentUpdateOne) SetNillableDeletedAt(v *time.Time) *CommentUpdateOne {
+	if v != nil {
+		_u.SetDeletedAt(*v)
+	}
+	return _u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (_u *CommentUpdateOne) ClearDeletedAt() *CommentUpdateOne {
+	_u.mutation.ClearDeletedAt()
+	return _u
+}
+
 // SetResolvedAt sets the "resolved_at" field.
 func (_u *CommentUpdateOne) SetResolvedAt(v time.Time) *CommentUpdateOne {
 	_u.mutation.SetResolvedAt(v)
@@ -1868,6 +1996,21 @@ func (_u *CommentUpdateOne) AddGithubOutbox(v ...*GithubOutbox) *CommentUpdateOn
 	return _u.AddGithubOutboxIDs(ids...)
 }
 
+// AddVersionIDs adds the "versions" edge to the MessageVersion entity by IDs.
+func (_u *CommentUpdateOne) AddVersionIDs(ids ...uuid.UUID) *CommentUpdateOne {
+	_u.mutation.AddVersionIDs(ids...)
+	return _u
+}
+
+// AddVersions adds the "versions" edges to the MessageVersion entity.
+func (_u *CommentUpdateOne) AddVersions(v ...*MessageVersion) *CommentUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddVersionIDs(ids...)
+}
+
 // Mutation returns the CommentMutation object of the builder.
 func (_u *CommentUpdateOne) Mutation() *CommentMutation {
 	return _u.mutation
@@ -2029,6 +2172,27 @@ func (_u *CommentUpdateOne) RemoveGithubOutbox(v ...*GithubOutbox) *CommentUpdat
 	return _u.RemoveGithubOutboxIDs(ids...)
 }
 
+// ClearVersions clears all "versions" edges to the MessageVersion entity.
+func (_u *CommentUpdateOne) ClearVersions() *CommentUpdateOne {
+	_u.mutation.ClearVersions()
+	return _u
+}
+
+// RemoveVersionIDs removes the "versions" edge to MessageVersion entities by IDs.
+func (_u *CommentUpdateOne) RemoveVersionIDs(ids ...uuid.UUID) *CommentUpdateOne {
+	_u.mutation.RemoveVersionIDs(ids...)
+	return _u
+}
+
+// RemoveVersions removes "versions" edges to MessageVersion entities.
+func (_u *CommentUpdateOne) RemoveVersions(v ...*MessageVersion) *CommentUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveVersionIDs(ids...)
+}
+
 // Where appends a list predicates to the CommentUpdate builder.
 func (_u *CommentUpdateOne) Where(ps ...predicate.Comment) *CommentUpdateOne {
 	_u.mutation.Where(ps...)
@@ -2138,6 +2302,12 @@ func (_u *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err er
 	}
 	if _u.mutation.EditedAtCleared() {
 		_spec.ClearField(comment.FieldEditedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.DeletedAt(); ok {
+		_spec.SetField(comment.FieldDeletedAt, field.TypeTime, value)
+	}
+	if _u.mutation.DeletedAtCleared() {
+		_spec.ClearField(comment.FieldDeletedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.ResolvedAt(); ok {
 		_spec.SetField(comment.FieldResolvedAt, field.TypeTime, value)
@@ -2678,6 +2848,51 @@ func (_u *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(githuboutbox.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.VersionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   comment.VersionsTable,
+			Columns: []string{comment.VersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedVersionsIDs(); len(nodes) > 0 && !_u.mutation.VersionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   comment.VersionsTable,
+			Columns: []string{comment.VersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.VersionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   comment.VersionsTable,
+			Columns: []string{comment.VersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

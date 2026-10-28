@@ -25,6 +25,7 @@ import (
 	"ricrac/ent/issue"
 	"ricrac/ent/issuelabel"
 	"ricrac/ent/issuerelation"
+	"ricrac/ent/messageversion"
 	"ricrac/ent/notification"
 	"ricrac/ent/oauthgrant"
 	"ricrac/ent/project"
@@ -186,6 +187,12 @@ func init() {
 	issuerelationDescID := issuerelationFields[0].Descriptor()
 	// issuerelation.DefaultID holds the default value on creation for the id field.
 	issuerelation.DefaultID = issuerelationDescID.Default.(func() uuid.UUID)
+	messageversionFields := schema.MessageVersion{}.Fields()
+	_ = messageversionFields
+	// messageversionDescID is the schema descriptor for id field.
+	messageversionDescID := messageversionFields[0].Descriptor()
+	// messageversion.DefaultID holds the default value on creation for the id field.
+	messageversion.DefaultID = messageversionDescID.Default.(func() uuid.UUID)
 	notificationFields := schema.Notification{}.Fields()
 	_ = notificationFields
 	// notificationDescID is the schema descriptor for id field.

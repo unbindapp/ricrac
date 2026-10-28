@@ -24,8 +24,15 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	}, comments.Save)
 	oapi.Register(reg, oapi.Operation{
 		Name: "delete_comment", Access: auth.Write, Routes: []string{"DELETE /comments/{id}"},
-		Description: "Delete a comment (your own, or any as a workspace admin). Deleting a thread's first comment deletes its replies.",
+		Description: "Delete a comment (your own, or any as a workspace admin). Deleting a thread's first comment deletes its " +
+			"replies, except on discussions and their threads, where a deleted comment stays with an empty body and " +
+			"deletedAt set, and keeps its replies.",
 	}, comments.Delete)
+	oapi.Register(reg, oapi.Operation{
+		Name: "get_comment_history", Access: auth.Read, Routes: []string{"GET /comments/{id}/history"},
+		Description: "Read the earlier bodies of a comment, oldest first, ending with the current one. Only comments on " +
+			"discussions and their threads keep them.",
+	}, comments.History)
 	oapi.Register(reg, oapi.Operation{
 		Name: "resolve_comment", Access: auth.Write, Routes: []string{"POST /comments/{id}/resolve"},
 		Description: "Mark a comment thread as resolved. Pass the thread's first comment.",

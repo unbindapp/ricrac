@@ -127,6 +127,8 @@ const (
 	EdgeSubscribedProjects = "subscribed_projects"
 	// EdgeSubscribedDiscussions holds the string denoting the subscribed_discussions edge name in mutations.
 	EdgeSubscribedDiscussions = "subscribed_discussions"
+	// EdgeVotedDiscussions holds the string denoting the voted_discussions edge name in mutations.
+	EdgeVotedDiscussions = "voted_discussions"
 	// EdgeTeams holds the string denoting the teams edge name in mutations.
 	EdgeTeams = "teams"
 	// EdgeWorkspaces holds the string denoting the workspaces edge name in mutations.
@@ -141,6 +143,8 @@ const (
 	EdgeProjectSubscribers = "project_subscribers"
 	// EdgeDiscussionSubscribers holds the string denoting the discussion_subscribers edge name in mutations.
 	EdgeDiscussionSubscribers = "discussion_subscribers"
+	// EdgeDiscussionVotes holds the string denoting the discussion_votes edge name in mutations.
+	EdgeDiscussionVotes = "discussion_votes"
 	// EdgeTeamMembers holds the string denoting the team_members edge name in mutations.
 	EdgeTeamMembers = "team_members"
 	// EdgeWorkspaceMembers holds the string denoting the workspace_members edge name in mutations.
@@ -468,6 +472,11 @@ const (
 	// SubscribedDiscussionsInverseTable is the table name for the Discussion entity.
 	// It exists in this package in order to avoid circular dependency with the "discussion" package.
 	SubscribedDiscussionsInverseTable = "discussions"
+	// VotedDiscussionsTable is the table that holds the voted_discussions relation/edge. The primary key declared below.
+	VotedDiscussionsTable = "discussion_votes"
+	// VotedDiscussionsInverseTable is the table name for the Discussion entity.
+	// It exists in this package in order to avoid circular dependency with the "discussion" package.
+	VotedDiscussionsInverseTable = "discussions"
 	// TeamsTable is the table that holds the teams relation/edge. The primary key declared below.
 	TeamsTable = "team_members"
 	// TeamsInverseTable is the table name for the Team entity.
@@ -513,6 +522,13 @@ const (
 	DiscussionSubscribersInverseTable = "discussion_subscribers"
 	// DiscussionSubscribersColumn is the table column denoting the discussion_subscribers relation/edge.
 	DiscussionSubscribersColumn = "user_id"
+	// DiscussionVotesTable is the table that holds the discussion_votes relation/edge.
+	DiscussionVotesTable = "discussion_votes"
+	// DiscussionVotesInverseTable is the table name for the DiscussionVote entity.
+	// It exists in this package in order to avoid circular dependency with the "discussionvote" package.
+	DiscussionVotesInverseTable = "discussion_votes"
+	// DiscussionVotesColumn is the table column denoting the discussion_votes relation/edge.
+	DiscussionVotesColumn = "user_id"
 	// TeamMembersTable is the table that holds the team_members relation/edge.
 	TeamMembersTable = "team_members"
 	// TeamMembersInverseTable is the table name for the TeamMember entity.
@@ -560,6 +576,9 @@ var (
 	// SubscribedDiscussionsPrimaryKey and SubscribedDiscussionsColumn2 are the table columns denoting the
 	// primary key for the subscribed_discussions relation (M2M).
 	SubscribedDiscussionsPrimaryKey = []string{"discussion_id", "user_id"}
+	// VotedDiscussionsPrimaryKey and VotedDiscussionsColumn2 are the table columns denoting the
+	// primary key for the voted_discussions relation (M2M).
+	VotedDiscussionsPrimaryKey = []string{"discussion_id", "user_id"}
 	// TeamsPrimaryKey and TeamsColumn2 are the table columns denoting the
 	// primary key for the teams relation (M2M).
 	TeamsPrimaryKey = []string{"team_id", "user_id"}
@@ -1299,6 +1318,20 @@ func BySubscribedDiscussions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOp
 	}
 }
 
+// ByVotedDiscussionsCount orders the results by voted_discussions count.
+func ByVotedDiscussionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newVotedDiscussionsStep(), opts...)
+	}
+}
+
+// ByVotedDiscussions orders the results by voted_discussions terms.
+func ByVotedDiscussions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newVotedDiscussionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByTeamsCount orders the results by teams count.
 func ByTeamsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -1394,6 +1427,20 @@ func ByDiscussionSubscribersCount(opts ...sql.OrderTermOption) OrderOption {
 func ByDiscussionSubscribers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newDiscussionSubscribersStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByDiscussionVotesCount orders the results by discussion_votes count.
+func ByDiscussionVotesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newDiscussionVotesStep(), opts...)
+	}
+}
+
+// ByDiscussionVotes orders the results by discussion_votes terms.
+func ByDiscussionVotes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDiscussionVotesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -1753,6 +1800,13 @@ func newSubscribedDiscussionsStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2M, true, SubscribedDiscussionsTable, SubscribedDiscussionsPrimaryKey...),
 	)
 }
+func newVotedDiscussionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(VotedDiscussionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, VotedDiscussionsTable, VotedDiscussionsPrimaryKey...),
+	)
+}
 func newTeamsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -1800,6 +1854,13 @@ func newDiscussionSubscribersStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(DiscussionSubscribersInverseTable, DiscussionSubscribersColumn),
 		sqlgraph.Edge(sqlgraph.O2M, true, DiscussionSubscribersTable, DiscussionSubscribersColumn),
+	)
+}
+func newDiscussionVotesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DiscussionVotesInverseTable, DiscussionVotesColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, DiscussionVotesTable, DiscussionVotesColumn),
 	)
 }
 func newTeamMembersStep() *sqlgraph.Step {

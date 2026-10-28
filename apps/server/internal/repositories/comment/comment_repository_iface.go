@@ -22,6 +22,11 @@ type CommentRepositoryInterface interface {
 	// Decide settles a suggestion (accepted or rejected), resolving its thread.
 	Decide(ctx context.Context, tx repository.TxInterface, id uuid.UUID, status string, by uuid.UUID, now time.Time) error
 	Delete(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error
+	// Tombstone empties the comment and marks it deleted, dropping its reactions and earlier versions
+	// and keeping its replies.
+	Tombstone(ctx context.Context, tx repository.TxInterface, id uuid.UUID, now time.Time) error
+	// AddVersion keeps an earlier body of the comment, as it read from writtenAt on.
+	AddVersion(ctx context.Context, tx repository.TxInterface, workspace, id uuid.UUID, body string, writtenAt time.Time) error
 	// AddReaction reacts unless the user already reacted so, saying whether it added one.
 	AddReaction(ctx context.Context, tx repository.TxInterface, workspace, userID uuid.UUID, emoji, column string, id uuid.UUID) (bool, error)
 	DeleteReaction(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error
@@ -31,6 +36,8 @@ type CommentRepositoryInterface interface {
 	Load(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.Comment, error)
 	// Participants is everyone who wrote in the thread that starts with root.
 	Participants(ctx context.Context, tx repository.TxInterface, root uuid.UUID) ([]uuid.UUID, error)
+	// Versions is the comment's earlier bodies, oldest first.
+	Versions(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.MessageVersion, error)
 	ReplyCount(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (int, error)
 	// StatusUpdate is the status update with its project and initiative, nil when there's none.
 	StatusUpdate(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.StatusUpdate, error)

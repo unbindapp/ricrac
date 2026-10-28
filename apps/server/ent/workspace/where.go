@@ -1016,6 +1016,29 @@ func HasCommentsWith(preds ...predicate.Comment) predicate.Workspace {
 	})
 }
 
+// HasMessageVersions applies the HasEdge predicate on the "message_versions" edge.
+func HasMessageVersions() predicate.Workspace {
+	return predicate.Workspace(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, MessageVersionsTable, MessageVersionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasMessageVersionsWith applies the HasEdge predicate on the "message_versions" edge with a given conditions (other predicates).
+func HasMessageVersionsWith(preds ...predicate.MessageVersion) predicate.Workspace {
+	return predicate.Workspace(func(s *sql.Selector) {
+		step := newMessageVersionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasReactions applies the HasEdge predicate on the "reactions" edge.
 func HasReactions() predicate.Workspace {
 	return predicate.Workspace(func(s *sql.Selector) {

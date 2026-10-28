@@ -32,6 +32,7 @@ func (Comment) Fields() []ent.Field {
 		field.Text("suggested_text").Optional().Nillable(),
 		field.Text("suggestion_status").Optional().Nillable(),
 		field.Time("edited_at").Optional().Nillable(),
+		field.Time("deleted_at").Optional().Nillable(),
 		field.Time("resolved_at").Optional().Nillable(),
 		field.UUID("resolving_user_id", uuid.UUID{}).Optional().Nillable(),
 		field.Time("created_at").Optional(),
@@ -56,6 +57,7 @@ func (Comment) Edges() []ent.Edge {
 		edge.To("reactions", Reaction.Type),
 		edge.To("notifications", Notification.Type),
 		edge.To("github_outbox", GithubOutbox.Type),
+		edge.To("versions", MessageVersion.Type),
 	}
 }
 

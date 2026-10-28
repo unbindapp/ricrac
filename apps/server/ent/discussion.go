@@ -44,6 +44,8 @@ type Discussion struct {
 	ClosedAt *time.Time `json:"closed_at,omitempty"`
 	// TrashedAt holds the value of the "trashed_at" field.
 	TrashedAt *time.Time `json:"trashed_at,omitempty"`
+	// EditedAt holds the value of the "edited_at" field.
+	EditedAt *time.Time `json:"edited_at,omitempty"`
 	// LastActivityAt holds the value of the "last_activity_at" field.
 	LastActivityAt time.Time `json:"last_activity_at,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -72,11 +74,17 @@ type DiscussionEdges struct {
 	Notifications []*Notification `json:"notifications,omitempty"`
 	// Subscribers holds the value of the subscribers edge.
 	Subscribers []*User `json:"subscribers,omitempty"`
+	// Voters holds the value of the voters edge.
+	Voters []*User `json:"voters,omitempty"`
+	// Versions holds the value of the versions edge.
+	Versions []*MessageVersion `json:"versions,omitempty"`
 	// DiscussionSubscribers holds the value of the discussion_subscribers edge.
 	DiscussionSubscribers []*DiscussionSubscriber `json:"discussion_subscribers,omitempty"`
+	// DiscussionVotes holds the value of the discussion_votes edge.
+	DiscussionVotes []*DiscussionVote `json:"discussion_votes,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [8]bool
+	loadedTypes [11]bool
 }
 
 // WorkspaceOrErr returns the Workspace value or an error if the edge
@@ -148,13 +156,40 @@ func (e DiscussionEdges) SubscribersOrErr() ([]*User, error) {
 	return nil, &NotLoadedError{edge: "subscribers"}
 }
 
+// VotersOrErr returns the Voters value or an error if the edge
+// was not loaded in eager-loading.
+func (e DiscussionEdges) VotersOrErr() ([]*User, error) {
+	if e.loadedTypes[7] {
+		return e.Voters, nil
+	}
+	return nil, &NotLoadedError{edge: "voters"}
+}
+
+// VersionsOrErr returns the Versions value or an error if the edge
+// was not loaded in eager-loading.
+func (e DiscussionEdges) VersionsOrErr() ([]*MessageVersion, error) {
+	if e.loadedTypes[8] {
+		return e.Versions, nil
+	}
+	return nil, &NotLoadedError{edge: "versions"}
+}
+
 // DiscussionSubscribersOrErr returns the DiscussionSubscribers value or an error if the edge
 // was not loaded in eager-loading.
 func (e DiscussionEdges) DiscussionSubscribersOrErr() ([]*DiscussionSubscriber, error) {
-	if e.loadedTypes[7] {
+	if e.loadedTypes[9] {
 		return e.DiscussionSubscribers, nil
 	}
 	return nil, &NotLoadedError{edge: "discussion_subscribers"}
+}
+
+// DiscussionVotesOrErr returns the DiscussionVotes value or an error if the edge
+// was not loaded in eager-loading.
+func (e DiscussionEdges) DiscussionVotesOrErr() ([]*DiscussionVote, error) {
+	if e.loadedTypes[10] {
+		return e.DiscussionVotes, nil
+	}
+	return nil, &NotLoadedError{edge: "discussion_votes"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -168,7 +203,7 @@ func (*Discussion) scanValues(columns []string) ([]any, error) {
 			values[i] = new(pgarray.Text)
 		case discussion.FieldSlugID, discussion.FieldTitle, discussion.FieldBody, discussion.FieldThumbnailURL:
 			values[i] = new(sql.NullString)
-		case discussion.FieldPinnedAt, discussion.FieldClosedAt, discussion.FieldTrashedAt, discussion.FieldLastActivityAt, discussion.FieldCreatedAt, discussion.FieldUpdatedAt:
+		case discussion.FieldPinnedAt, discussion.FieldClosedAt, discussion.FieldTrashedAt, discussion.FieldEditedAt, discussion.FieldLastActivityAt, discussion.FieldCreatedAt, discussion.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		case discussion.FieldID, discussion.FieldWorkspaceID:
 			values[i] = new(uuid.UUID)
@@ -265,6 +300,13 @@ func (_m *Discussion) assignValues(columns []string, values []any) error {
 				_m.TrashedAt = new(time.Time)
 				*_m.TrashedAt = value.Time
 			}
+		case discussion.FieldEditedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field edited_at", values[i])
+			} else if value.Valid {
+				_m.EditedAt = new(time.Time)
+				*_m.EditedAt = value.Time
+			}
 		case discussion.FieldLastActivityAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field last_activity_at", values[i])
@@ -331,9 +373,24 @@ func (_m *Discussion) QuerySubscribers() *UserQuery {
 	return NewDiscussionClient(_m.config).QuerySubscribers(_m)
 }
 
+// QueryVoters queries the "voters" edge of the Discussion entity.
+func (_m *Discussion) QueryVoters() *UserQuery {
+	return NewDiscussionClient(_m.config).QueryVoters(_m)
+}
+
+// QueryVersions queries the "versions" edge of the Discussion entity.
+func (_m *Discussion) QueryVersions() *MessageVersionQuery {
+	return NewDiscussionClient(_m.config).QueryVersions(_m)
+}
+
 // QueryDiscussionSubscribers queries the "discussion_subscribers" edge of the Discussion entity.
 func (_m *Discussion) QueryDiscussionSubscribers() *DiscussionSubscriberQuery {
 	return NewDiscussionClient(_m.config).QueryDiscussionSubscribers(_m)
+}
+
+// QueryDiscussionVotes queries the "discussion_votes" edge of the Discussion entity.
+func (_m *Discussion) QueryDiscussionVotes() *DiscussionVoteQuery {
+	return NewDiscussionClient(_m.config).QueryDiscussionVotes(_m)
 }
 
 // Update returns a builder for updating this Discussion.
@@ -401,6 +458,11 @@ func (_m *Discussion) String() string {
 	builder.WriteString(", ")
 	if v := _m.TrashedAt; v != nil {
 		builder.WriteString("trashed_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	if v := _m.EditedAt; v != nil {
+		builder.WriteString("edited_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")

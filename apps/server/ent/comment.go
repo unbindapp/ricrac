@@ -60,6 +60,8 @@ type Comment struct {
 	SuggestionStatus *string `json:"suggestion_status,omitempty"`
 	// EditedAt holds the value of the "edited_at" field.
 	EditedAt *time.Time `json:"edited_at,omitempty"`
+	// DeletedAt holds the value of the "deleted_at" field.
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// ResolvedAt holds the value of the "resolved_at" field.
 	ResolvedAt *time.Time `json:"resolved_at,omitempty"`
 	// ResolvingUserID holds the value of the "resolving_user_id" field.
@@ -108,9 +110,11 @@ type CommentEdges struct {
 	Notifications []*Notification `json:"notifications,omitempty"`
 	// GithubOutbox holds the value of the github_outbox edge.
 	GithubOutbox []*GithubOutbox `json:"github_outbox,omitempty"`
+	// Versions holds the value of the versions edge.
+	Versions []*MessageVersion `json:"versions,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [16]bool
+	loadedTypes [17]bool
 }
 
 // WorkspaceOrErr returns the Workspace value or an error if the edge
@@ -281,6 +285,15 @@ func (e CommentEdges) GithubOutboxOrErr() ([]*GithubOutbox, error) {
 	return nil, &NotLoadedError{edge: "github_outbox"}
 }
 
+// VersionsOrErr returns the Versions value or an error if the edge
+// was not loaded in eager-loading.
+func (e CommentEdges) VersionsOrErr() ([]*MessageVersion, error) {
+	if e.loadedTypes[16] {
+		return e.Versions, nil
+	}
+	return nil, &NotLoadedError{edge: "versions"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Comment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -290,7 +303,7 @@ func (*Comment) scanValues(columns []string) ([]any, error) {
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case comment.FieldBody, comment.FieldQuotedText, comment.FieldSuggestedText, comment.FieldSuggestionStatus:
 			values[i] = new(sql.NullString)
-		case comment.FieldEditedAt, comment.FieldResolvedAt, comment.FieldCreatedAt, comment.FieldUpdatedAt:
+		case comment.FieldEditedAt, comment.FieldDeletedAt, comment.FieldResolvedAt, comment.FieldCreatedAt, comment.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		case comment.FieldID, comment.FieldWorkspaceID:
 			values[i] = new(uuid.UUID)
@@ -425,6 +438,13 @@ func (_m *Comment) assignValues(columns []string, values []any) error {
 				_m.EditedAt = new(time.Time)
 				*_m.EditedAt = value.Time
 			}
+		case comment.FieldDeletedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+			} else if value.Valid {
+				_m.DeletedAt = new(time.Time)
+				*_m.DeletedAt = value.Time
+			}
 		case comment.FieldResolvedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field resolved_at", values[i])
@@ -544,6 +564,11 @@ func (_m *Comment) QueryGithubOutbox() *GithubOutboxQuery {
 	return NewCommentClient(_m.config).QueryGithubOutbox(_m)
 }
 
+// QueryVersions queries the "versions" edge of the Comment entity.
+func (_m *Comment) QueryVersions() *MessageVersionQuery {
+	return NewCommentClient(_m.config).QueryVersions(_m)
+}
+
 // Update returns a builder for updating this Comment.
 // Note that you need to call Comment.Unwrap() before calling this method if this Comment
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -640,6 +665,11 @@ func (_m *Comment) String() string {
 	builder.WriteString(", ")
 	if v := _m.EditedAt; v != nil {
 		builder.WriteString("edited_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	if v := _m.DeletedAt; v != nil {
+		builder.WriteString("deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")

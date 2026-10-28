@@ -27,6 +27,7 @@ import (
 	"ricrac/ent/invitation"
 	"ricrac/ent/issue"
 	"ricrac/ent/issuelabel"
+	"ricrac/ent/messageversion"
 	"ricrac/ent/notification"
 	"ricrac/ent/oauthclient"
 	"ricrac/ent/predicate"
@@ -510,6 +511,21 @@ func (_u *WorkspaceUpdate) AddComments(v ...*Comment) *WorkspaceUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.AddCommentIDs(ids...)
+}
+
+// AddMessageVersionIDs adds the "message_versions" edge to the MessageVersion entity by IDs.
+func (_u *WorkspaceUpdate) AddMessageVersionIDs(ids ...uuid.UUID) *WorkspaceUpdate {
+	_u.mutation.AddMessageVersionIDs(ids...)
+	return _u
+}
+
+// AddMessageVersions adds the "message_versions" edges to the MessageVersion entity.
+func (_u *WorkspaceUpdate) AddMessageVersions(v ...*MessageVersion) *WorkspaceUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddMessageVersionIDs(ids...)
 }
 
 // AddReactionIDs adds the "reactions" edge to the Reaction entity by IDs.
@@ -1145,6 +1161,27 @@ func (_u *WorkspaceUpdate) RemoveComments(v ...*Comment) *WorkspaceUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveCommentIDs(ids...)
+}
+
+// ClearMessageVersions clears all "message_versions" edges to the MessageVersion entity.
+func (_u *WorkspaceUpdate) ClearMessageVersions() *WorkspaceUpdate {
+	_u.mutation.ClearMessageVersions()
+	return _u
+}
+
+// RemoveMessageVersionIDs removes the "message_versions" edge to MessageVersion entities by IDs.
+func (_u *WorkspaceUpdate) RemoveMessageVersionIDs(ids ...uuid.UUID) *WorkspaceUpdate {
+	_u.mutation.RemoveMessageVersionIDs(ids...)
+	return _u
+}
+
+// RemoveMessageVersions removes "message_versions" edges to MessageVersion entities.
+func (_u *WorkspaceUpdate) RemoveMessageVersions(v ...*MessageVersion) *WorkspaceUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveMessageVersionIDs(ids...)
 }
 
 // ClearReactions clears all "reactions" edges to the Reaction entity.
@@ -2430,6 +2467,51 @@ func (_u *WorkspaceUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.MessageVersionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.MessageVersionsTable,
+			Columns: []string{workspace.MessageVersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedMessageVersionsIDs(); len(nodes) > 0 && !_u.mutation.MessageVersionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.MessageVersionsTable,
+			Columns: []string{workspace.MessageVersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.MessageVersionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.MessageVersionsTable,
+			Columns: []string{workspace.MessageVersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _u.mutation.ReactionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -3528,6 +3610,21 @@ func (_u *WorkspaceUpdateOne) AddComments(v ...*Comment) *WorkspaceUpdateOne {
 	return _u.AddCommentIDs(ids...)
 }
 
+// AddMessageVersionIDs adds the "message_versions" edge to the MessageVersion entity by IDs.
+func (_u *WorkspaceUpdateOne) AddMessageVersionIDs(ids ...uuid.UUID) *WorkspaceUpdateOne {
+	_u.mutation.AddMessageVersionIDs(ids...)
+	return _u
+}
+
+// AddMessageVersions adds the "message_versions" edges to the MessageVersion entity.
+func (_u *WorkspaceUpdateOne) AddMessageVersions(v ...*MessageVersion) *WorkspaceUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddMessageVersionIDs(ids...)
+}
+
 // AddReactionIDs adds the "reactions" edge to the Reaction entity by IDs.
 func (_u *WorkspaceUpdateOne) AddReactionIDs(ids ...uuid.UUID) *WorkspaceUpdateOne {
 	_u.mutation.AddReactionIDs(ids...)
@@ -4161,6 +4258,27 @@ func (_u *WorkspaceUpdateOne) RemoveComments(v ...*Comment) *WorkspaceUpdateOne 
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveCommentIDs(ids...)
+}
+
+// ClearMessageVersions clears all "message_versions" edges to the MessageVersion entity.
+func (_u *WorkspaceUpdateOne) ClearMessageVersions() *WorkspaceUpdateOne {
+	_u.mutation.ClearMessageVersions()
+	return _u
+}
+
+// RemoveMessageVersionIDs removes the "message_versions" edge to MessageVersion entities by IDs.
+func (_u *WorkspaceUpdateOne) RemoveMessageVersionIDs(ids ...uuid.UUID) *WorkspaceUpdateOne {
+	_u.mutation.RemoveMessageVersionIDs(ids...)
+	return _u
+}
+
+// RemoveMessageVersions removes "message_versions" edges to MessageVersion entities.
+func (_u *WorkspaceUpdateOne) RemoveMessageVersions(v ...*MessageVersion) *WorkspaceUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveMessageVersionIDs(ids...)
 }
 
 // ClearReactions clears all "reactions" edges to the Reaction entity.
@@ -5469,6 +5587,51 @@ func (_u *WorkspaceUpdateOne) sqlSave(ctx context.Context) (_node *Workspace, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.MessageVersionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.MessageVersionsTable,
+			Columns: []string{workspace.MessageVersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedMessageVersionsIDs(); len(nodes) > 0 && !_u.mutation.MessageVersionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.MessageVersionsTable,
+			Columns: []string{workspace.MessageVersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.MessageVersionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.MessageVersionsTable,
+			Columns: []string{workspace.MessageVersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

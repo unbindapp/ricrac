@@ -11,6 +11,7 @@ import (
 	"ricrac/ent"
 	"ricrac/ent/comment"
 	"ricrac/ent/issue"
+	"ricrac/ent/messageversion"
 	"ricrac/ent/projectmilestone"
 	"ricrac/ent/reaction"
 	"ricrac/ent/statusupdate"
@@ -56,6 +57,12 @@ func (self *CommentRepository) Participants(ctx context.Context, tx repository.T
 		users[i] = row.UserID
 	}
 	return users, nil
+}
+
+// Versions is the comment's earlier bodies, oldest first.
+func (self *CommentRepository) Versions(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.MessageVersion, error) {
+	return self.base.Client(tx).MessageVersion.Query().Where(messageversion.CommentID(id)).
+		Order(ent.Asc(messageversion.FieldWrittenAt), ent.Asc(messageversion.FieldCreatedAt)).All(ctx)
 }
 
 func (self *CommentRepository) ReplyCount(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (int, error) {

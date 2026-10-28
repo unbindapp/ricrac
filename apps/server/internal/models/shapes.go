@@ -307,6 +307,7 @@ type Comment struct {
 	CreatedAt        string            `json:"createdAt"`
 	UpdatedAt        string            `json:"updatedAt"`
 	EditedAt         *string           `json:"editedAt"`
+	DeletedAt        *string           `json:"deletedAt" doc:"When it was deleted; its body is then empty."`
 	ResolvedAt       *string           `json:"resolvedAt"`
 	ResolvingUser    *UserRef          `json:"resolvingUser"`
 }

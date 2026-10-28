@@ -113,6 +113,7 @@ var (
 		{Name: "suggested_text", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "suggestion_status", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "edited_at", Type: field.TypeTime, Nullable: true},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "resolved_at", Type: field.TypeTime, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
@@ -137,73 +138,73 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "comments_comments_children",
-				Columns:    []*schema.Column{CommentsColumns[9]},
+				Columns:    []*schema.Column{CommentsColumns[10]},
 				RefColumns: []*schema.Column{CommentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "comments_discussions_comments",
-				Columns:    []*schema.Column{CommentsColumns[10]},
+				Columns:    []*schema.Column{CommentsColumns[11]},
 				RefColumns: []*schema.Column{DiscussionsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "comments_discussion_threads_comments",
-				Columns:    []*schema.Column{CommentsColumns[11]},
+				Columns:    []*schema.Column{CommentsColumns[12]},
 				RefColumns: []*schema.Column{DiscussionThreadsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "comments_documents_comments",
-				Columns:    []*schema.Column{CommentsColumns[12]},
+				Columns:    []*schema.Column{CommentsColumns[13]},
 				RefColumns: []*schema.Column{DocumentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "comments_initiatives_comments",
-				Columns:    []*schema.Column{CommentsColumns[13]},
+				Columns:    []*schema.Column{CommentsColumns[14]},
 				RefColumns: []*schema.Column{InitiativesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "comments_issues_comments",
-				Columns:    []*schema.Column{CommentsColumns[14]},
+				Columns:    []*schema.Column{CommentsColumns[15]},
 				RefColumns: []*schema.Column{IssuesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "comments_projects_comments",
-				Columns:    []*schema.Column{CommentsColumns[15]},
+				Columns:    []*schema.Column{CommentsColumns[16]},
 				RefColumns: []*schema.Column{ProjectsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "comments_project_milestones_comments",
-				Columns:    []*schema.Column{CommentsColumns[16]},
+				Columns:    []*schema.Column{CommentsColumns[17]},
 				RefColumns: []*schema.Column{ProjectMilestonesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "comments_status_updates_comments",
-				Columns:    []*schema.Column{CommentsColumns[17]},
+				Columns:    []*schema.Column{CommentsColumns[18]},
 				RefColumns: []*schema.Column{StatusUpdatesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "comments_users_comments_by_user",
-				Columns:    []*schema.Column{CommentsColumns[18]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "comments_users_comments_by_resolving_user",
 				Columns:    []*schema.Column{CommentsColumns[19]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "comments_workspaces_comments",
+				Symbol:     "comments_users_comments_by_resolving_user",
 				Columns:    []*schema.Column{CommentsColumns[20]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "comments_workspaces_comments",
+				Columns:    []*schema.Column{CommentsColumns[21]},
 				RefColumns: []*schema.Column{WorkspacesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -442,6 +443,7 @@ var (
 		{Name: "pinned_at", Type: field.TypeTime, Nullable: true},
 		{Name: "closed_at", Type: field.TypeTime, Nullable: true},
 		{Name: "trashed_at", Type: field.TypeTime, Nullable: true},
+		{Name: "edited_at", Type: field.TypeTime, Nullable: true},
 		{Name: "last_activity_at", Type: field.TypeTime, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
@@ -457,19 +459,19 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "discussions_teams_discussions",
-				Columns:    []*schema.Column{DiscussionsColumns[12]},
+				Columns:    []*schema.Column{DiscussionsColumns[13]},
 				RefColumns: []*schema.Column{TeamsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "discussions_users_discussions_by_creator",
-				Columns:    []*schema.Column{DiscussionsColumns[13]},
+				Columns:    []*schema.Column{DiscussionsColumns[14]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "discussions_workspaces_discussions",
-				Columns:    []*schema.Column{DiscussionsColumns[14]},
+				Columns:    []*schema.Column{DiscussionsColumns[15]},
 				RefColumns: []*schema.Column{WorkspacesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -549,6 +551,32 @@ var (
 				Symbol:     "discussion_threads_workspaces_discussion_threads",
 				Columns:    []*schema.Column{DiscussionThreadsColumns[11]},
 				RefColumns: []*schema.Column{WorkspacesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// DiscussionVotesColumns holds the columns for the "discussion_votes" table.
+	DiscussionVotesColumns = []*schema.Column{
+		{Name: "created_at", Type: field.TypeTime, Nullable: true},
+		{Name: "discussion_id", Type: field.TypeUUID},
+		{Name: "user_id", Type: field.TypeUUID},
+	}
+	// DiscussionVotesTable holds the schema information for the "discussion_votes" table.
+	DiscussionVotesTable = &schema.Table{
+		Name:       "discussion_votes",
+		Columns:    DiscussionVotesColumns,
+		PrimaryKey: []*schema.Column{DiscussionVotesColumns[1], DiscussionVotesColumns[2]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "discussion_votes_discussions_discussion",
+				Columns:    []*schema.Column{DiscussionVotesColumns[1]},
+				RefColumns: []*schema.Column{DiscussionsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "discussion_votes_users_user",
+				Columns:    []*schema.Column{DiscussionVotesColumns[2]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -1411,6 +1439,42 @@ var (
 				Symbol:     "issue_subscribers_users_user",
 				Columns:    []*schema.Column{IssueSubscribersColumns[1]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// MessageVersionsColumns holds the columns for the "message_versions" table.
+	MessageVersionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "body", Type: field.TypeString, Size: 2147483647},
+		{Name: "written_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true},
+		{Name: "comment_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "discussion_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "workspace_id", Type: field.TypeUUID},
+	}
+	// MessageVersionsTable holds the schema information for the "message_versions" table.
+	MessageVersionsTable = &schema.Table{
+		Name:       "message_versions",
+		Columns:    MessageVersionsColumns,
+		PrimaryKey: []*schema.Column{MessageVersionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "message_versions_comments_versions",
+				Columns:    []*schema.Column{MessageVersionsColumns[4]},
+				RefColumns: []*schema.Column{CommentsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "message_versions_discussions_versions",
+				Columns:    []*schema.Column{MessageVersionsColumns[5]},
+				RefColumns: []*schema.Column{DiscussionsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "message_versions_workspaces_message_versions",
+				Columns:    []*schema.Column{MessageVersionsColumns[6]},
+				RefColumns: []*schema.Column{WorkspacesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -2534,6 +2598,7 @@ var (
 		DiscussionsTable,
 		DiscussionSubscribersTable,
 		DiscussionThreadsTable,
+		DiscussionVotesTable,
 		DocumentsTable,
 		DocumentVersionsTable,
 		EmailsTable,
@@ -2557,6 +2622,7 @@ var (
 		IssueReleasesTable,
 		IssueSharesTable,
 		IssueSubscribersTable,
+		MessageVersionsTable,
 		NotificationsTable,
 		OauthClientsTable,
 		OauthCodesTable,
@@ -2673,6 +2739,11 @@ func init() {
 	DiscussionThreadsTable.ForeignKeys[4].RefTable = WorkspacesTable
 	DiscussionThreadsTable.Annotation = &entsql.Annotation{
 		Table: "discussion_threads",
+	}
+	DiscussionVotesTable.ForeignKeys[0].RefTable = DiscussionsTable
+	DiscussionVotesTable.ForeignKeys[1].RefTable = UsersTable
+	DiscussionVotesTable.Annotation = &entsql.Annotation{
+		Table: "discussion_votes",
 	}
 	DocumentsTable.ForeignKeys[0].RefTable = CyclesTable
 	DocumentsTable.ForeignKeys[1].RefTable = InitiativesTable
@@ -2807,6 +2878,12 @@ func init() {
 	IssueSubscribersTable.ForeignKeys[1].RefTable = UsersTable
 	IssueSubscribersTable.Annotation = &entsql.Annotation{
 		Table: "issue_subscribers",
+	}
+	MessageVersionsTable.ForeignKeys[0].RefTable = CommentsTable
+	MessageVersionsTable.ForeignKeys[1].RefTable = DiscussionsTable
+	MessageVersionsTable.ForeignKeys[2].RefTable = WorkspacesTable
+	MessageVersionsTable.Annotation = &entsql.Annotation{
+		Table: "message_versions",
 	}
 	NotificationsTable.ForeignKeys[0].RefTable = CommentsTable
 	NotificationsTable.ForeignKeys[1].RefTable = DiscussionsTable

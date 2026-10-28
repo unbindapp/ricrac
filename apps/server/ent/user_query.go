@@ -17,6 +17,7 @@ import (
 	"ricrac/ent/discussion"
 	"ricrac/ent/discussionsubscriber"
 	"ricrac/ent/discussionthread"
+	"ricrac/ent/discussionvote"
 	"ricrac/ent/document"
 	"ricrac/ent/documentversion"
 	"ricrac/ent/entitylink"
@@ -115,6 +116,7 @@ type UserQuery struct {
 	withMemberProjects                   *ProjectQuery
 	withSubscribedProjects               *ProjectQuery
 	withSubscribedDiscussions            *DiscussionQuery
+	withVotedDiscussions                 *DiscussionQuery
 	withTeams                            *TeamQuery
 	withWorkspaces                       *WorkspaceQuery
 	withIssueShares                      *IssueShareQuery
@@ -122,6 +124,7 @@ type UserQuery struct {
 	withProjectMembers                   *ProjectMemberQuery
 	withProjectSubscribers               *ProjectSubscriberQuery
 	withDiscussionSubscribers            *DiscussionSubscriberQuery
+	withDiscussionVotes                  *DiscussionVoteQuery
 	withTeamMembers                      *TeamMemberQuery
 	withWorkspaceMembers                 *WorkspaceMemberQuery
 	modifiers                            []func(*sql.Selector)
@@ -1195,6 +1198,28 @@ func (_q *UserQuery) QuerySubscribedDiscussions() *DiscussionQuery {
 	return query
 }
 
+// QueryVotedDiscussions chains the current query on the "voted_discussions" edge.
+func (_q *UserQuery) QueryVotedDiscussions() *DiscussionQuery {
+	query := (&DiscussionClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(discussion.Table, discussion.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, user.VotedDiscussionsTable, user.VotedDiscussionsPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryTeams chains the current query on the "teams" edge.
 func (_q *UserQuery) QueryTeams() *TeamQuery {
 	query := (&TeamClient{config: _q.config}).Query()
@@ -1342,6 +1367,28 @@ func (_q *UserQuery) QueryDiscussionSubscribers() *DiscussionSubscriberQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(discussionsubscriber.Table, discussionsubscriber.UserColumn),
 			sqlgraph.Edge(sqlgraph.O2M, true, user.DiscussionSubscribersTable, user.DiscussionSubscribersColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDiscussionVotes chains the current query on the "discussion_votes" edge.
+func (_q *UserQuery) QueryDiscussionVotes() *DiscussionVoteQuery {
+	query := (&DiscussionVoteClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(discussionvote.Table, discussionvote.UserColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.DiscussionVotesTable, user.DiscussionVotesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -1632,6 +1679,7 @@ func (_q *UserQuery) Clone() *UserQuery {
 		withMemberProjects:                   _q.withMemberProjects.Clone(),
 		withSubscribedProjects:               _q.withSubscribedProjects.Clone(),
 		withSubscribedDiscussions:            _q.withSubscribedDiscussions.Clone(),
+		withVotedDiscussions:                 _q.withVotedDiscussions.Clone(),
 		withTeams:                            _q.withTeams.Clone(),
 		withWorkspaces:                       _q.withWorkspaces.Clone(),
 		withIssueShares:                      _q.withIssueShares.Clone(),
@@ -1639,6 +1687,7 @@ func (_q *UserQuery) Clone() *UserQuery {
 		withProjectMembers:                   _q.withProjectMembers.Clone(),
 		withProjectSubscribers:               _q.withProjectSubscribers.Clone(),
 		withDiscussionSubscribers:            _q.withDiscussionSubscribers.Clone(),
+		withDiscussionVotes:                  _q.withDiscussionVotes.Clone(),
 		withTeamMembers:                      _q.withTeamMembers.Clone(),
 		withWorkspaceMembers:                 _q.withWorkspaceMembers.Clone(),
 		// clone intermediate query.
@@ -2165,6 +2214,17 @@ func (_q *UserQuery) WithSubscribedDiscussions(opts ...func(*DiscussionQuery)) *
 	return _q
 }
 
+// WithVotedDiscussions tells the query-builder to eager-load the nodes that are connected to
+// the "voted_discussions" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithVotedDiscussions(opts ...func(*DiscussionQuery)) *UserQuery {
+	query := (&DiscussionClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withVotedDiscussions = query
+	return _q
+}
+
 // WithTeams tells the query-builder to eager-load the nodes that are connected to
 // the "teams" edge. The optional arguments are used to configure the query builder of the edge.
 func (_q *UserQuery) WithTeams(opts ...func(*TeamQuery)) *UserQuery {
@@ -2239,6 +2299,17 @@ func (_q *UserQuery) WithDiscussionSubscribers(opts ...func(*DiscussionSubscribe
 		opt(query)
 	}
 	_q.withDiscussionSubscribers = query
+	return _q
+}
+
+// WithDiscussionVotes tells the query-builder to eager-load the nodes that are connected to
+// the "discussion_votes" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithDiscussionVotes(opts ...func(*DiscussionVoteQuery)) *UserQuery {
+	query := (&DiscussionVoteClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withDiscussionVotes = query
 	return _q
 }
 
@@ -2342,7 +2413,7 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = _q.querySpec()
-		loadedTypes = [56]bool{
+		loadedTypes = [58]bool{
 			_q.withInvitations != nil,
 			_q.withAPIKeys != nil,
 			_q.withOauthClients != nil,
@@ -2390,6 +2461,7 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			_q.withMemberProjects != nil,
 			_q.withSubscribedProjects != nil,
 			_q.withSubscribedDiscussions != nil,
+			_q.withVotedDiscussions != nil,
 			_q.withTeams != nil,
 			_q.withWorkspaces != nil,
 			_q.withIssueShares != nil,
@@ -2397,6 +2469,7 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			_q.withProjectMembers != nil,
 			_q.withProjectSubscribers != nil,
 			_q.withDiscussionSubscribers != nil,
+			_q.withDiscussionVotes != nil,
 			_q.withTeamMembers != nil,
 			_q.withWorkspaceMembers != nil,
 		}
@@ -2759,6 +2832,13 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			return nil, err
 		}
 	}
+	if query := _q.withVotedDiscussions; query != nil {
+		if err := _q.loadVotedDiscussions(ctx, query, nodes,
+			func(n *User) { n.Edges.VotedDiscussions = []*Discussion{} },
+			func(n *User, e *Discussion) { n.Edges.VotedDiscussions = append(n.Edges.VotedDiscussions, e) }); err != nil {
+			return nil, err
+		}
+	}
 	if query := _q.withTeams; query != nil {
 		if err := _q.loadTeams(ctx, query, nodes,
 			func(n *User) { n.Edges.Teams = []*Team{} },
@@ -2809,6 +2889,13 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			func(n *User, e *DiscussionSubscriber) {
 				n.Edges.DiscussionSubscribers = append(n.Edges.DiscussionSubscribers, e)
 			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withDiscussionVotes; query != nil {
+		if err := _q.loadDiscussionVotes(ctx, query, nodes,
+			func(n *User) { n.Edges.DiscussionVotes = []*DiscussionVote{} },
+			func(n *User, e *DiscussionVote) { n.Edges.DiscussionVotes = append(n.Edges.DiscussionVotes, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -4502,6 +4589,67 @@ func (_q *UserQuery) loadSubscribedDiscussions(ctx context.Context, query *Discu
 	}
 	return nil
 }
+func (_q *UserQuery) loadVotedDiscussions(ctx context.Context, query *DiscussionQuery, nodes []*User, init func(*User), assign func(*User, *Discussion)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[uuid.UUID]*User)
+	nids := make(map[uuid.UUID]map[*User]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(user.VotedDiscussionsTable)
+		s.Join(joinT).On(s.C(discussion.FieldID), joinT.C(user.VotedDiscussionsPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(user.VotedDiscussionsPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(user.VotedDiscussionsPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(uuid.UUID)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := *values[0].(*uuid.UUID)
+				inValue := *values[1].(*uuid.UUID)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Discussion](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "voted_discussions" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
 func (_q *UserQuery) loadTeams(ctx context.Context, query *TeamQuery, nodes []*User, init func(*User), assign func(*User, *Team)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[uuid.UUID]*User)
@@ -4759,6 +4907,36 @@ func (_q *UserQuery) loadDiscussionSubscribers(ctx context.Context, query *Discu
 	}
 	query.Where(predicate.DiscussionSubscriber(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(user.DiscussionSubscribersColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.UserID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *UserQuery) loadDiscussionVotes(ctx context.Context, query *DiscussionVoteQuery, nodes []*User, init func(*User), assign func(*User, *DiscussionVote)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(discussionvote.FieldUserID)
+	}
+	query.Where(predicate.DiscussionVote(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.DiscussionVotesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

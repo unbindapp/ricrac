@@ -27,6 +27,7 @@ import (
 	"ricrac/ent/invitation"
 	"ricrac/ent/issue"
 	"ricrac/ent/issuelabel"
+	"ricrac/ent/messageversion"
 	"ricrac/ent/notification"
 	"ricrac/ent/oauthclient"
 	"ricrac/ent/project"
@@ -459,6 +460,21 @@ func (_c *WorkspaceCreate) AddComments(v ...*Comment) *WorkspaceCreate {
 		ids[i] = v[i].ID
 	}
 	return _c.AddCommentIDs(ids...)
+}
+
+// AddMessageVersionIDs adds the "message_versions" edge to the MessageVersion entity by IDs.
+func (_c *WorkspaceCreate) AddMessageVersionIDs(ids ...uuid.UUID) *WorkspaceCreate {
+	_c.mutation.AddMessageVersionIDs(ids...)
+	return _c
+}
+
+// AddMessageVersions adds the "message_versions" edges to the MessageVersion entity.
+func (_c *WorkspaceCreate) AddMessageVersions(v ...*MessageVersion) *WorkspaceCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddMessageVersionIDs(ids...)
 }
 
 // AddReactionIDs adds the "reactions" edge to the Reaction entity by IDs.
@@ -1101,6 +1117,22 @@ func (_c *WorkspaceCreate) createSpec() (*Workspace, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.MessageVersionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.MessageVersionsTable,
+			Columns: []string{workspace.MessageVersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

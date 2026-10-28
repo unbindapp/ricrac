@@ -10,7 +10,8 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	discussions := srv.DiscussionService
 	oapi.Register(reg, oapi.Operation{
 		Name: "list_discussions", Access: auth.Read, Routes: []string{"GET /discussions"},
-		Description: "List the forum's discussions: pinned ones first, then the most recently active. Open ones by default; " +
+		Description: "List the forum's discussions: pinned ones first, then the most recently active, the newest or the " +
+			"most upvoted (sort). Open ones by default; " +
 			"narrow by team, starter, tag or words in the title or body. Each has its thread and comment counts; bodies are " +
 			"left out unless includeBody is set.",
 	}, discussions.List)
@@ -31,8 +32,18 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 			"part of the body. Pass team to keep it to a team's members. Tag it, give it a thumbnail, pin, close, subscribe " +
 			"and unsubscribe people. " +
 			"Starting, commenting and being mentioned subscribe you; subscribers hear about new threads and comments. " +
-			"Only the author or an admin changes the title, body, thumbnail or team.",
+			"Only the author or an admin changes the title, body, thumbnail or team; only the author closes or reopens it. " +
+			"Earlier bodies are kept (get_discussion_history).",
 	}, discussions.Save)
+	oapi.Register(reg, oapi.Operation{
+		Name: "vote_discussion", Access: auth.Write, Routes: []string{"POST /discussions/{id}/vote"},
+		Description: "Upvote a discussion, or take your upvote back with upvote false. Voting twice the same way changes nothing.",
+	}, discussions.Vote)
+	oapi.Register(reg, oapi.Operation{
+		Name: "get_discussion_history", Access: auth.Read, Routes: []string{"GET /discussions/{id}/history"},
+		Description: "Read the earlier bodies of a discussion's post, oldest first, ending with the current one. Edits made " +
+			"within 10 minutes of each other count as one.",
+	}, discussions.History)
 	oapi.Register(reg, oapi.Operation{
 		Name: "delete_discussion", Access: auth.Write, Routes: []string{"DELETE /discussions/{id}"},
 		Description: "Move a discussion to the trash (your own, or any as an admin). It is deleted for good after 30 days; " +

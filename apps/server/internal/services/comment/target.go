@@ -40,6 +40,15 @@ func (t targetInput) given() []*string {
 	return []*string{t.IssueID, t.ProjectID, t.InitiativeID, t.DocumentID, t.MilestoneID, t.StatusUpdateID, t.DiscussionID, t.ThreadID}
 }
 
+// inForum is whether the target is a discussion or one of its threads.
+func inForum(target Target) bool {
+	return target.Column == "discussion_id" || target.Column == "discussion_thread_id"
+}
+
+func errDeleted() error {
+	return errdefs.BadRequest("That message was deleted")
+}
+
 // TargetOf is what a comment is on.
 func TargetOf(c *ent.Comment) (Target, error) {
 	for i, id := range []*uuid.UUID{c.IssueID, c.ProjectID, c.InitiativeID, c.DocumentID, c.MilestoneID, c.StatusUpdateID, c.DiscussionID, c.DiscussionThreadID} {

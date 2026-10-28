@@ -67,6 +67,7 @@ var core = []string{
 	"list_discussions",
 	"get_discussion",
 	"save_discussion",
+	"vote_discussion",
 	"get_discussion_thread",
 	"save_discussion_thread",
 	"list_custom_views",

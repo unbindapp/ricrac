@@ -140,6 +140,8 @@ type UserEdges struct {
 	SubscribedProjects []*Project `json:"subscribed_projects,omitempty"`
 	// SubscribedDiscussions holds the value of the subscribed_discussions edge.
 	SubscribedDiscussions []*Discussion `json:"subscribed_discussions,omitempty"`
+	// VotedDiscussions holds the value of the voted_discussions edge.
+	VotedDiscussions []*Discussion `json:"voted_discussions,omitempty"`
 	// Teams holds the value of the teams edge.
 	Teams []*Team `json:"teams,omitempty"`
 	// Workspaces holds the value of the workspaces edge.
@@ -154,13 +156,15 @@ type UserEdges struct {
 	ProjectSubscribers []*ProjectSubscriber `json:"project_subscribers,omitempty"`
 	// DiscussionSubscribers holds the value of the discussion_subscribers edge.
 	DiscussionSubscribers []*DiscussionSubscriber `json:"discussion_subscribers,omitempty"`
+	// DiscussionVotes holds the value of the discussion_votes edge.
+	DiscussionVotes []*DiscussionVote `json:"discussion_votes,omitempty"`
 	// TeamMembers holds the value of the team_members edge.
 	TeamMembers []*TeamMember `json:"team_members,omitempty"`
 	// WorkspaceMembers holds the value of the workspace_members edge.
 	WorkspaceMembers []*WorkspaceMember `json:"workspace_members,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [56]bool
+	loadedTypes [58]bool
 }
 
 // InvitationsOrErr returns the Invitations value or an error if the edge
@@ -586,10 +590,19 @@ func (e UserEdges) SubscribedDiscussionsOrErr() ([]*Discussion, error) {
 	return nil, &NotLoadedError{edge: "subscribed_discussions"}
 }
 
+// VotedDiscussionsOrErr returns the VotedDiscussions value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) VotedDiscussionsOrErr() ([]*Discussion, error) {
+	if e.loadedTypes[47] {
+		return e.VotedDiscussions, nil
+	}
+	return nil, &NotLoadedError{edge: "voted_discussions"}
+}
+
 // TeamsOrErr returns the Teams value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) TeamsOrErr() ([]*Team, error) {
-	if e.loadedTypes[47] {
+	if e.loadedTypes[48] {
 		return e.Teams, nil
 	}
 	return nil, &NotLoadedError{edge: "teams"}
@@ -598,7 +611,7 @@ func (e UserEdges) TeamsOrErr() ([]*Team, error) {
 // WorkspacesOrErr returns the Workspaces value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) WorkspacesOrErr() ([]*Workspace, error) {
-	if e.loadedTypes[48] {
+	if e.loadedTypes[49] {
 		return e.Workspaces, nil
 	}
 	return nil, &NotLoadedError{edge: "workspaces"}
@@ -607,7 +620,7 @@ func (e UserEdges) WorkspacesOrErr() ([]*Workspace, error) {
 // IssueSharesOrErr returns the IssueShares value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) IssueSharesOrErr() ([]*IssueShare, error) {
-	if e.loadedTypes[49] {
+	if e.loadedTypes[50] {
 		return e.IssueShares, nil
 	}
 	return nil, &NotLoadedError{edge: "issue_shares"}
@@ -616,7 +629,7 @@ func (e UserEdges) IssueSharesOrErr() ([]*IssueShare, error) {
 // IssueSubscribersOrErr returns the IssueSubscribers value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) IssueSubscribersOrErr() ([]*IssueSubscriber, error) {
-	if e.loadedTypes[50] {
+	if e.loadedTypes[51] {
 		return e.IssueSubscribers, nil
 	}
 	return nil, &NotLoadedError{edge: "issue_subscribers"}
@@ -625,7 +638,7 @@ func (e UserEdges) IssueSubscribersOrErr() ([]*IssueSubscriber, error) {
 // ProjectMembersOrErr returns the ProjectMembers value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) ProjectMembersOrErr() ([]*ProjectMember, error) {
-	if e.loadedTypes[51] {
+	if e.loadedTypes[52] {
 		return e.ProjectMembers, nil
 	}
 	return nil, &NotLoadedError{edge: "project_members"}
@@ -634,7 +647,7 @@ func (e UserEdges) ProjectMembersOrErr() ([]*ProjectMember, error) {
 // ProjectSubscribersOrErr returns the ProjectSubscribers value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) ProjectSubscribersOrErr() ([]*ProjectSubscriber, error) {
-	if e.loadedTypes[52] {
+	if e.loadedTypes[53] {
 		return e.ProjectSubscribers, nil
 	}
 	return nil, &NotLoadedError{edge: "project_subscribers"}
@@ -643,16 +656,25 @@ func (e UserEdges) ProjectSubscribersOrErr() ([]*ProjectSubscriber, error) {
 // DiscussionSubscribersOrErr returns the DiscussionSubscribers value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) DiscussionSubscribersOrErr() ([]*DiscussionSubscriber, error) {
-	if e.loadedTypes[53] {
+	if e.loadedTypes[54] {
 		return e.DiscussionSubscribers, nil
 	}
 	return nil, &NotLoadedError{edge: "discussion_subscribers"}
 }
 
+// DiscussionVotesOrErr returns the DiscussionVotes value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) DiscussionVotesOrErr() ([]*DiscussionVote, error) {
+	if e.loadedTypes[55] {
+		return e.DiscussionVotes, nil
+	}
+	return nil, &NotLoadedError{edge: "discussion_votes"}
+}
+
 // TeamMembersOrErr returns the TeamMembers value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) TeamMembersOrErr() ([]*TeamMember, error) {
-	if e.loadedTypes[54] {
+	if e.loadedTypes[56] {
 		return e.TeamMembers, nil
 	}
 	return nil, &NotLoadedError{edge: "team_members"}
@@ -661,7 +683,7 @@ func (e UserEdges) TeamMembersOrErr() ([]*TeamMember, error) {
 // WorkspaceMembersOrErr returns the WorkspaceMembers value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) WorkspaceMembersOrErr() ([]*WorkspaceMember, error) {
-	if e.loadedTypes[55] {
+	if e.loadedTypes[57] {
 		return e.WorkspaceMembers, nil
 	}
 	return nil, &NotLoadedError{edge: "workspace_members"}
@@ -1013,6 +1035,11 @@ func (_m *User) QuerySubscribedDiscussions() *DiscussionQuery {
 	return NewUserClient(_m.config).QuerySubscribedDiscussions(_m)
 }
 
+// QueryVotedDiscussions queries the "voted_discussions" edge of the User entity.
+func (_m *User) QueryVotedDiscussions() *DiscussionQuery {
+	return NewUserClient(_m.config).QueryVotedDiscussions(_m)
+}
+
 // QueryTeams queries the "teams" edge of the User entity.
 func (_m *User) QueryTeams() *TeamQuery {
 	return NewUserClient(_m.config).QueryTeams(_m)
@@ -1046,6 +1073,11 @@ func (_m *User) QueryProjectSubscribers() *ProjectSubscriberQuery {
 // QueryDiscussionSubscribers queries the "discussion_subscribers" edge of the User entity.
 func (_m *User) QueryDiscussionSubscribers() *DiscussionSubscriberQuery {
 	return NewUserClient(_m.config).QueryDiscussionSubscribers(_m)
+}
+
+// QueryDiscussionVotes queries the "discussion_votes" edge of the User entity.
+func (_m *User) QueryDiscussionVotes() *DiscussionVoteQuery {
+	return NewUserClient(_m.config).QueryDiscussionVotes(_m)
 }
 
 // QueryTeamMembers queries the "team_members" edge of the User entity.

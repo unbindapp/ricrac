@@ -147,6 +147,87 @@ func (_c *CommentRepositoryMock_AddReaction_Call) RunAndReturn(run func(ctx cont
 	return _c
 }
 
+// AddVersion provides a mock function for the type CommentRepositoryMock
+func (_mock *CommentRepositoryMock) AddVersion(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, id uuid.UUID, body string, writtenAt time.Time) error {
+	ret := _mock.Called(ctx, tx, workspace, id, body, writtenAt)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AddVersion")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, string, time.Time) error); ok {
+		r0 = returnFunc(ctx, tx, workspace, id, body, writtenAt)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// CommentRepositoryMock_AddVersion_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddVersion'
+type CommentRepositoryMock_AddVersion_Call struct {
+	*mock.Call
+}
+
+// AddVersion is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - workspace uuid.UUID
+//   - id uuid.UUID
+//   - body string
+//   - writtenAt time.Time
+func (_e *CommentRepositoryMock_Expecter) AddVersion(ctx any, tx any, workspace any, id any, body any, writtenAt any) *CommentRepositoryMock_AddVersion_Call {
+	return &CommentRepositoryMock_AddVersion_Call{Call: _e.mock.On("AddVersion", ctx, tx, workspace, id, body, writtenAt)}
+}
+
+func (_c *CommentRepositoryMock_AddVersion_Call) Run(run func(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, id uuid.UUID, body string, writtenAt time.Time)) *CommentRepositoryMock_AddVersion_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		var arg4 string
+		if args[4] != nil {
+			arg4 = args[4].(string)
+		}
+		var arg5 time.Time
+		if args[5] != nil {
+			arg5 = args[5].(time.Time)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+			arg5,
+		)
+	})
+	return _c
+}
+
+func (_c *CommentRepositoryMock_AddVersion_Call) Return(err error) *CommentRepositoryMock_AddVersion_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *CommentRepositoryMock_AddVersion_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, id uuid.UUID, body string, writtenAt time.Time) error) *CommentRepositoryMock_AddVersion_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Create provides a mock function for the type CommentRepositoryMock
 func (_mock *CommentRepositoryMock) Create(ctx context.Context, tx repository.TxInterface, input comment_repo.CreateInput) (uuid.UUID, error) {
 	ret := _mock.Called(ctx, tx, input)
@@ -1808,6 +1889,75 @@ func (_c *CommentRepositoryMock_Threads_Call) RunAndReturn(run func(ctx context.
 	return _c
 }
 
+// Tombstone provides a mock function for the type CommentRepositoryMock
+func (_mock *CommentRepositoryMock) Tombstone(ctx context.Context, tx repository.TxInterface, id uuid.UUID, now time.Time) error {
+	ret := _mock.Called(ctx, tx, id, now)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Tombstone")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, time.Time) error); ok {
+		r0 = returnFunc(ctx, tx, id, now)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// CommentRepositoryMock_Tombstone_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Tombstone'
+type CommentRepositoryMock_Tombstone_Call struct {
+	*mock.Call
+}
+
+// Tombstone is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - now time.Time
+func (_e *CommentRepositoryMock_Expecter) Tombstone(ctx any, tx any, id any, now any) *CommentRepositoryMock_Tombstone_Call {
+	return &CommentRepositoryMock_Tombstone_Call{Call: _e.mock.On("Tombstone", ctx, tx, id, now)}
+}
+
+func (_c *CommentRepositoryMock_Tombstone_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, now time.Time)) *CommentRepositoryMock_Tombstone_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 time.Time
+		if args[3] != nil {
+			arg3 = args[3].(time.Time)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *CommentRepositoryMock_Tombstone_Call) Return(err error) *CommentRepositoryMock_Tombstone_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *CommentRepositoryMock_Tombstone_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, now time.Time) error) *CommentRepositoryMock_Tombstone_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // TouchIssue provides a mock function for the type CommentRepositoryMock
 func (_mock *CommentRepositoryMock) TouchIssue(ctx context.Context, tx repository.TxInterface, issue uuid.UUID, now time.Time) error {
 	ret := _mock.Called(ctx, tx, issue, now)
@@ -1939,6 +2089,80 @@ func (_c *CommentRepositoryMock_UserName_Call) Return(s string, err error) *Comm
 }
 
 func (_c *CommentRepositoryMock_UserName_Call) RunAndReturn(run func(ctx context.Context, id uuid.UUID) (string, error)) *CommentRepositoryMock_UserName_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Versions provides a mock function for the type CommentRepositoryMock
+func (_mock *CommentRepositoryMock) Versions(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.MessageVersion, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Versions")
+	}
+
+	var r0 []*ent.MessageVersion
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) ([]*ent.MessageVersion, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) []*ent.MessageVersion); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ent.MessageVersion)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// CommentRepositoryMock_Versions_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Versions'
+type CommentRepositoryMock_Versions_Call struct {
+	*mock.Call
+}
+
+// Versions is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *CommentRepositoryMock_Expecter) Versions(ctx any, tx any, id any) *CommentRepositoryMock_Versions_Call {
+	return &CommentRepositoryMock_Versions_Call{Call: _e.mock.On("Versions", ctx, tx, id)}
+}
+
+func (_c *CommentRepositoryMock_Versions_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *CommentRepositoryMock_Versions_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *CommentRepositoryMock_Versions_Call) Return(messageVersions []*ent.MessageVersion, err error) *CommentRepositoryMock_Versions_Call {
+	_c.Call.Return(messageVersions, err)
+	return _c
+}
+
+func (_c *CommentRepositoryMock_Versions_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.MessageVersion, error)) *CommentRepositoryMock_Versions_Call {
 	_c.Call.Return(run)
 	return _c
 }
