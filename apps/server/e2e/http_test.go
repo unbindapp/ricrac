@@ -372,3 +372,11 @@ func TestMeShowsTheLogoOfEveryWorkspace(t *testing.T) {
 	eq(t, me.At("workspaces", 1, "name").Str(), "Beta")
 	check(t, me.At("workspaces", 1, "logoUrl").IsNull())
 }
+
+func TestMissingAssetsAreNotCached(t *testing.T) {
+	w := world(t)
+	recorder := httptest.NewRecorder()
+	w.Router.ServeHTTP(recorder, httptest.NewRequest("GET", "/assets/index-gone.js", nil))
+	eq(t, recorder.Code, http.StatusNotFound)
+	eq(t, recorder.Header().Get("Cache-Control"), "no-store")
+}
