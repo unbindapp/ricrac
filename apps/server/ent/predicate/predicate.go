@@ -45,6 +45,9 @@ type DiscussionSubscriber func(*sql.Selector)
 // DiscussionThread is the predicate function for discussionthread builders.
 type DiscussionThread func(*sql.Selector)
 
+// DiscussionVote is the predicate function for discussionvote builders.
+type DiscussionVote func(*sql.Selector)
+
 // Document is the predicate function for document builders.
 type Document func(*sql.Selector)
 
@@ -113,6 +116,9 @@ type IssueShare func(*sql.Selector)
 
 // IssueSubscriber is the predicate function for issuesubscriber builders.
 type IssueSubscriber func(*sql.Selector)
+
+// MessageVersion is the predicate function for messageversion builders.
+type MessageVersion func(*sql.Selector)
 
 // Notification is the predicate function for notification builders.
 type Notification func(*sql.Selector)

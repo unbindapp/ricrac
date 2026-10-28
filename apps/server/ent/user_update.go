@@ -953,6 +953,21 @@ func (_u *UserUpdate) AddSubscribedDiscussions(v ...*Discussion) *UserUpdate {
 	return _u.AddSubscribedDiscussionIDs(ids...)
 }
 
+// AddVotedDiscussionIDs adds the "voted_discussions" edge to the Discussion entity by IDs.
+func (_u *UserUpdate) AddVotedDiscussionIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.AddVotedDiscussionIDs(ids...)
+	return _u
+}
+
+// AddVotedDiscussions adds the "voted_discussions" edges to the Discussion entity.
+func (_u *UserUpdate) AddVotedDiscussions(v ...*Discussion) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddVotedDiscussionIDs(ids...)
+}
+
 // AddTeamIDs adds the "teams" edge to the Team entity by IDs.
 func (_u *UserUpdate) AddTeamIDs(ids ...uuid.UUID) *UserUpdate {
 	_u.mutation.AddTeamIDs(ids...)
@@ -1973,6 +1988,27 @@ func (_u *UserUpdate) RemoveSubscribedDiscussions(v ...*Discussion) *UserUpdate 
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveSubscribedDiscussionIDs(ids...)
+}
+
+// ClearVotedDiscussions clears all "voted_discussions" edges to the Discussion entity.
+func (_u *UserUpdate) ClearVotedDiscussions() *UserUpdate {
+	_u.mutation.ClearVotedDiscussions()
+	return _u
+}
+
+// RemoveVotedDiscussionIDs removes the "voted_discussions" edge to Discussion entities by IDs.
+func (_u *UserUpdate) RemoveVotedDiscussionIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.RemoveVotedDiscussionIDs(ids...)
+	return _u
+}
+
+// RemoveVotedDiscussions removes "voted_discussions" edges to Discussion entities.
+func (_u *UserUpdate) RemoveVotedDiscussions(v ...*Discussion) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveVotedDiscussionIDs(ids...)
 }
 
 // ClearTeams clears all "teams" edges to the Team entity.
@@ -4225,6 +4261,51 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.VotedDiscussionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.VotedDiscussionsTable,
+			Columns: user.VotedDiscussionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedVotedDiscussionsIDs(); len(nodes) > 0 && !_u.mutation.VotedDiscussionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.VotedDiscussionsTable,
+			Columns: user.VotedDiscussionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.VotedDiscussionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.VotedDiscussionsTable,
+			Columns: user.VotedDiscussionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _u.mutation.TeamsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -5222,6 +5303,21 @@ func (_u *UserUpdateOne) AddSubscribedDiscussions(v ...*Discussion) *UserUpdateO
 		ids[i] = v[i].ID
 	}
 	return _u.AddSubscribedDiscussionIDs(ids...)
+}
+
+// AddVotedDiscussionIDs adds the "voted_discussions" edge to the Discussion entity by IDs.
+func (_u *UserUpdateOne) AddVotedDiscussionIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.AddVotedDiscussionIDs(ids...)
+	return _u
+}
+
+// AddVotedDiscussions adds the "voted_discussions" edges to the Discussion entity.
+func (_u *UserUpdateOne) AddVotedDiscussions(v ...*Discussion) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddVotedDiscussionIDs(ids...)
 }
 
 // AddTeamIDs adds the "teams" edge to the Team entity by IDs.
@@ -6244,6 +6340,27 @@ func (_u *UserUpdateOne) RemoveSubscribedDiscussions(v ...*Discussion) *UserUpda
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveSubscribedDiscussionIDs(ids...)
+}
+
+// ClearVotedDiscussions clears all "voted_discussions" edges to the Discussion entity.
+func (_u *UserUpdateOne) ClearVotedDiscussions() *UserUpdateOne {
+	_u.mutation.ClearVotedDiscussions()
+	return _u
+}
+
+// RemoveVotedDiscussionIDs removes the "voted_discussions" edge to Discussion entities by IDs.
+func (_u *UserUpdateOne) RemoveVotedDiscussionIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.RemoveVotedDiscussionIDs(ids...)
+	return _u
+}
+
+// RemoveVotedDiscussions removes "voted_discussions" edges to Discussion entities.
+func (_u *UserUpdateOne) RemoveVotedDiscussions(v ...*Discussion) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveVotedDiscussionIDs(ids...)
 }
 
 // ClearTeams clears all "teams" edges to the Team entity.
@@ -8516,6 +8633,51 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 			Inverse: true,
 			Table:   user.SubscribedDiscussionsTable,
 			Columns: user.SubscribedDiscussionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.VotedDiscussionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.VotedDiscussionsTable,
+			Columns: user.VotedDiscussionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedVotedDiscussionsIDs(); len(nodes) > 0 && !_u.mutation.VotedDiscussionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.VotedDiscussionsTable,
+			Columns: user.VotedDiscussionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.VotedDiscussionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.VotedDiscussionsTable,
+			Columns: user.VotedDiscussionsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),

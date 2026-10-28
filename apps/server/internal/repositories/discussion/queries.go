@@ -11,6 +11,7 @@ import (
 	"ricrac/ent/discussion"
 	"ricrac/ent/discussionsubscriber"
 	"ricrac/ent/discussionthread"
+	"ricrac/ent/messageversion"
 	"ricrac/ent/predicate"
 	"ricrac/ent/user"
 	"ricrac/internal/common/utils"
@@ -38,8 +39,9 @@ func (self *DiscussionRepository) Load(ctx context.Context, tx repository.TxInte
 	return ordered, nil
 }
 
-// Counts is how many threads, open threads and comments of their own each discussion has.
-func (self *DiscussionRepository) Counts(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) (map[uuid.UUID]models.DiscussionCounts, error) {
+// Counts is how many threads, open threads, comments of their own and upvotes each discussion has,
+// and whether viewer upvoted it.
+func (self *DiscussionRepository) Counts(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID, viewer uuid.UUID) (map[uuid.UUID]models.DiscussionCounts, error) {
 	counts := make(map[uuid.UUID]models.DiscussionCounts, len(ids))
 	if len(ids) == 0 {
 		return counts, nil
@@ -48,8 +50,10 @@ func (self *DiscussionRepository) Counts(ctx context.Context, tx repository.TxIn
 		SELECT d.id,
 			(SELECT count(*) FROM discussion_threads t WHERE t.discussion_id = d.id),
 			(SELECT count(*) FROM discussion_threads t WHERE t.discussion_id = d.id AND t.resolved_at IS NULL),
-			(SELECT count(*) FROM comments c WHERE c.discussion_id = d.id)
-		FROM discussions d WHERE d.id = ANY($1)`, ids)
+			(SELECT count(*) FROM comments c WHERE c.discussion_id = d.id AND c.deleted_at IS NULL),
+			(SELECT count(*) FROM discussion_votes v WHERE v.discussion_id = d.id),
+			EXISTS (SELECT 1 FROM discussion_votes v WHERE v.discussion_id = d.id AND v.user_id = $2)
+		FROM discussions d WHERE d.id = ANY($1)`, ids, viewer)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +61,7 @@ func (self *DiscussionRepository) Counts(ctx context.Context, tx repository.TxIn
 	for rows.Next() {
 		var id uuid.UUID
 		var c models.DiscussionCounts
-		if err := rows.Scan(&id, &c.Threads, &c.OpenThreads, &c.Comments); err != nil {
+		if err := rows.Scan(&id, &c.Threads, &c.OpenThreads, &c.Comments, &c.Upvotes, &c.Upvoted); err != nil {
 			return nil, err
 		}
 		counts[id] = c
@@ -78,13 +82,16 @@ type ListFilter struct {
 	// Only those in the trash, the most recently trashed first.
 	OnlyTrashed bool
 	// Words to find in the title or body.
-	Query  *string
+	Query *string
+	// After the pinned ones: activity (the latest activity first), newest or top (the most
+	// upvoted first). Only trashed ones keep their own order.
+	Sort   string
 	Limit  int64
 	Offset int64
 }
 
-// List is the discussions that match, pinned ones first, then by their latest activity (unless
-// only trashed ones are asked for).
+// List is the discussions that match, pinned ones first, then in the filter's sort (after the most
+// recently trashed when only trashed ones are asked for).
 func (self *DiscussionRepository) List(ctx context.Context, filter ListFilter) ([]uuid.UUID, error) {
 	query := self.base.DB.Discussion.Query().Where(discussion.WorkspaceID(filter.Workspace), func(s *entsql.Selector) {
 		s.Where(repository.Raw(s.C(discussion.FieldTeamID)+" IS NULL OR "+s.C(discussion.FieldTeamID)+" = ANY(?)", filter.Teams))
@@ -119,9 +126,19 @@ func (self *DiscussionRepository) List(ctx context.Context, filter ListFilter) (
 				words, "%"+utils.EscapeLike(words)+"%"))
 		})
 	}
-	return query.Order(func(s *entsql.Selector) {
+	query = query.Order(func(s *entsql.Selector) {
 		s.OrderExpr(repository.RawExpr(s.C(discussion.FieldPinnedAt) + " IS NULL"))
-	}, ent.Desc(discussion.FieldLastActivityAt), ent.Asc(discussion.FieldID)).
+	})
+	switch {
+	case filter.OnlyTrashed:
+	case filter.Sort == "newest":
+		query = query.Order(ent.Desc(discussion.FieldCreatedAt))
+	case filter.Sort == "top":
+		query = query.Order(func(s *entsql.Selector) {
+			s.OrderExpr(repository.RawExpr("(SELECT count(*) FROM discussion_votes v WHERE v.discussion_id = " + s.C(discussion.FieldID) + ") DESC"))
+		})
+	}
+	return query.Order(ent.Desc(discussion.FieldLastActivityAt), ent.Asc(discussion.FieldID)).
 		Limit(int(filter.Limit)).Offset(int(filter.Offset)).IDs(ctx)
 }
 
@@ -204,13 +221,13 @@ func (self *DiscussionRepository) FindThread(ctx context.Context, workspace, id 
 	return found, err
 }
 
-// ThreadCommentCounts is how many comments each thread has.
+// ThreadCommentCounts is how many comments each thread has, leaving out deleted ones.
 func (self *DiscussionRepository) ThreadCommentCounts(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) (map[uuid.UUID]int, error) {
 	var rows []struct {
 		ID    uuid.UUID `json:"discussion_thread_id"`
 		Count int       `json:"count"`
 	}
-	err := self.base.Client(tx).Comment.Query().Where(comment.DiscussionThreadIDIn(ids...)).
+	err := self.base.Client(tx).Comment.Query().Where(comment.DiscussionThreadIDIn(ids...), comment.DeletedAtIsNil()).
 		GroupBy(comment.FieldDiscussionThreadID).Aggregate(ent.Count()).Scan(ctx, &rows)
 	if err != nil {
 		return nil, err
@@ -220,6 +237,12 @@ func (self *DiscussionRepository) ThreadCommentCounts(ctx context.Context, tx re
 		counts[r.ID] = r.Count
 	}
 	return counts, nil
+}
+
+// Versions is the discussion's earlier bodies, oldest first.
+func (self *DiscussionRepository) Versions(ctx context.Context, tx repository.TxInterface, id uuid.UUID) ([]*ent.MessageVersion, error) {
+	return self.base.Client(tx).MessageVersion.Query().Where(messageversion.DiscussionID(id)).
+		Order(ent.Asc(messageversion.FieldWrittenAt), ent.Asc(messageversion.FieldCreatedAt)).All(ctx)
 }
 
 // Get is the discussion with its workspace.

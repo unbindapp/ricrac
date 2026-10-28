@@ -29,6 +29,7 @@ func (Discussion) Fields() []ent.Field {
 		field.Time("pinned_at").Optional().Nillable(),
 		field.Time("closed_at").Optional().Nillable(),
 		field.Time("trashed_at").Optional().Nillable(),
+		field.Time("edited_at").Optional().Nillable(),
 		field.Time("last_activity_at").Optional(),
 		field.Time("created_at").Optional(),
 		field.Time("updated_at").Optional(),
@@ -44,6 +45,8 @@ func (Discussion) Edges() []ent.Edge {
 		edge.To("comments", Comment.Type),
 		edge.To("notifications", Notification.Type),
 		edge.To("subscribers", User.Type).Through("discussion_subscribers", DiscussionSubscriber.Type),
+		edge.To("voters", User.Type).Through("discussion_votes", DiscussionVote.Type),
+		edge.To("versions", MessageVersion.Type),
 	}
 }
 

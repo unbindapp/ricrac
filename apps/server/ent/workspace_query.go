@@ -27,6 +27,7 @@ import (
 	"ricrac/ent/invitation"
 	"ricrac/ent/issue"
 	"ricrac/ent/issuelabel"
+	"ricrac/ent/messageversion"
 	"ricrac/ent/notification"
 	"ricrac/ent/oauthclient"
 	"ricrac/ent/predicate"
@@ -80,6 +81,7 @@ type WorkspaceQuery struct {
 	withDiscussions         *DiscussionQuery
 	withDiscussionThreads   *DiscussionThreadQuery
 	withComments            *CommentQuery
+	withMessageVersions     *MessageVersionQuery
 	withReactions           *ReactionQuery
 	withCustomerStatuses    *CustomerStatusQuery
 	withCustomerTiers       *CustomerTierQuery
@@ -565,6 +567,28 @@ func (_q *WorkspaceQuery) QueryComments() *CommentQuery {
 			sqlgraph.From(workspace.Table, workspace.FieldID, selector),
 			sqlgraph.To(comment.Table, comment.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, workspace.CommentsTable, workspace.CommentsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryMessageVersions chains the current query on the "message_versions" edge.
+func (_q *WorkspaceQuery) QueryMessageVersions() *MessageVersionQuery {
+	query := (&MessageVersionClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(workspace.Table, workspace.FieldID, selector),
+			sqlgraph.To(messageversion.Table, messageversion.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, workspace.MessageVersionsTable, workspace.MessageVersionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -1114,6 +1138,7 @@ func (_q *WorkspaceQuery) Clone() *WorkspaceQuery {
 		withDiscussions:         _q.withDiscussions.Clone(),
 		withDiscussionThreads:   _q.withDiscussionThreads.Clone(),
 		withComments:            _q.withComments.Clone(),
+		withMessageVersions:     _q.withMessageVersions.Clone(),
 		withReactions:           _q.withReactions.Clone(),
 		withCustomerStatuses:    _q.withCustomerStatuses.Clone(),
 		withCustomerTiers:       _q.withCustomerTiers.Clone(),
@@ -1353,6 +1378,17 @@ func (_q *WorkspaceQuery) WithComments(opts ...func(*CommentQuery)) *WorkspaceQu
 		opt(query)
 	}
 	_q.withComments = query
+	return _q
+}
+
+// WithMessageVersions tells the query-builder to eager-load the nodes that are connected to
+// the "message_versions" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *WorkspaceQuery) WithMessageVersions(opts ...func(*MessageVersionQuery)) *WorkspaceQuery {
+	query := (&MessageVersionClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withMessageVersions = query
 	return _q
 }
 
@@ -1599,7 +1635,7 @@ func (_q *WorkspaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Wo
 	var (
 		nodes       = []*Workspace{}
 		_spec       = _q.querySpec()
-		loadedTypes = [35]bool{
+		loadedTypes = [36]bool{
 			_q.withInvitations != nil,
 			_q.withOauthClients != nil,
 			_q.withTeams != nil,
@@ -1620,6 +1656,7 @@ func (_q *WorkspaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Wo
 			_q.withDiscussions != nil,
 			_q.withDiscussionThreads != nil,
 			_q.withComments != nil,
+			_q.withMessageVersions != nil,
 			_q.withReactions != nil,
 			_q.withCustomerStatuses != nil,
 			_q.withCustomerTiers != nil,
@@ -1797,6 +1834,13 @@ func (_q *WorkspaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Wo
 		if err := _q.loadComments(ctx, query, nodes,
 			func(n *Workspace) { n.Edges.Comments = []*Comment{} },
 			func(n *Workspace, e *Comment) { n.Edges.Comments = append(n.Edges.Comments, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withMessageVersions; query != nil {
+		if err := _q.loadMessageVersions(ctx, query, nodes,
+			func(n *Workspace) { n.Edges.MessageVersions = []*MessageVersion{} },
+			func(n *Workspace, e *MessageVersion) { n.Edges.MessageVersions = append(n.Edges.MessageVersions, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -2498,6 +2542,36 @@ func (_q *WorkspaceQuery) loadComments(ctx context.Context, query *CommentQuery,
 	}
 	query.Where(predicate.Comment(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(workspace.CommentsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.WorkspaceID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "workspace_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *WorkspaceQuery) loadMessageVersions(ctx context.Context, query *MessageVersionQuery, nodes []*Workspace, init func(*Workspace), assign func(*Workspace, *MessageVersion)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Workspace)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(messageversion.FieldWorkspaceID)
+	}
+	query.Where(predicate.MessageVersion(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(workspace.MessageVersionsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

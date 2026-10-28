@@ -24,6 +24,7 @@ import (
 	"ricrac/ent/discussion"
 	"ricrac/ent/discussionsubscriber"
 	"ricrac/ent/discussionthread"
+	"ricrac/ent/discussionvote"
 	"ricrac/ent/document"
 	"ricrac/ent/documentversion"
 	"ricrac/ent/email"
@@ -47,6 +48,7 @@ import (
 	"ricrac/ent/issuerelease"
 	"ricrac/ent/issueshare"
 	"ricrac/ent/issuesubscriber"
+	"ricrac/ent/messageversion"
 	"ricrac/ent/notification"
 	"ricrac/ent/oauthclient"
 	"ricrac/ent/oauthcode"
@@ -119,6 +121,8 @@ type Client struct {
 	DiscussionSubscriber *DiscussionSubscriberClient
 	// DiscussionThread is the client for interacting with the DiscussionThread builders.
 	DiscussionThread *DiscussionThreadClient
+	// DiscussionVote is the client for interacting with the DiscussionVote builders.
+	DiscussionVote *DiscussionVoteClient
 	// Document is the client for interacting with the Document builders.
 	Document *DocumentClient
 	// DocumentVersion is the client for interacting with the DocumentVersion builders.
@@ -165,6 +169,8 @@ type Client struct {
 	IssueShare *IssueShareClient
 	// IssueSubscriber is the client for interacting with the IssueSubscriber builders.
 	IssueSubscriber *IssueSubscriberClient
+	// MessageVersion is the client for interacting with the MessageVersion builders.
+	MessageVersion *MessageVersionClient
 	// Notification is the client for interacting with the Notification builders.
 	Notification *NotificationClient
 	// OAuthClient is the client for interacting with the OAuthClient builders.
@@ -251,6 +257,7 @@ func (c *Client) init() {
 	c.Discussion = NewDiscussionClient(c.config)
 	c.DiscussionSubscriber = NewDiscussionSubscriberClient(c.config)
 	c.DiscussionThread = NewDiscussionThreadClient(c.config)
+	c.DiscussionVote = NewDiscussionVoteClient(c.config)
 	c.Document = NewDocumentClient(c.config)
 	c.DocumentVersion = NewDocumentVersionClient(c.config)
 	c.Email = NewEmailClient(c.config)
@@ -274,6 +281,7 @@ func (c *Client) init() {
 	c.IssueRelease = NewIssueReleaseClient(c.config)
 	c.IssueShare = NewIssueShareClient(c.config)
 	c.IssueSubscriber = NewIssueSubscriberClient(c.config)
+	c.MessageVersion = NewMessageVersionClient(c.config)
 	c.Notification = NewNotificationClient(c.config)
 	c.OAuthClient = NewOAuthClientClient(c.config)
 	c.OAuthCode = NewOAuthCodeClient(c.config)
@@ -410,6 +418,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Discussion:           NewDiscussionClient(cfg),
 		DiscussionSubscriber: NewDiscussionSubscriberClient(cfg),
 		DiscussionThread:     NewDiscussionThreadClient(cfg),
+		DiscussionVote:       NewDiscussionVoteClient(cfg),
 		Document:             NewDocumentClient(cfg),
 		DocumentVersion:      NewDocumentVersionClient(cfg),
 		Email:                NewEmailClient(cfg),
@@ -433,6 +442,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		IssueRelease:         NewIssueReleaseClient(cfg),
 		IssueShare:           NewIssueShareClient(cfg),
 		IssueSubscriber:      NewIssueSubscriberClient(cfg),
+		MessageVersion:       NewMessageVersionClient(cfg),
 		Notification:         NewNotificationClient(cfg),
 		OAuthClient:          NewOAuthClientClient(cfg),
 		OAuthCode:            NewOAuthCodeClient(cfg),
@@ -496,6 +506,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Discussion:           NewDiscussionClient(cfg),
 		DiscussionSubscriber: NewDiscussionSubscriberClient(cfg),
 		DiscussionThread:     NewDiscussionThreadClient(cfg),
+		DiscussionVote:       NewDiscussionVoteClient(cfg),
 		Document:             NewDocumentClient(cfg),
 		DocumentVersion:      NewDocumentVersionClient(cfg),
 		Email:                NewEmailClient(cfg),
@@ -519,6 +530,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		IssueRelease:         NewIssueReleaseClient(cfg),
 		IssueShare:           NewIssueShareClient(cfg),
 		IssueSubscriber:      NewIssueSubscriberClient(cfg),
+		MessageVersion:       NewMessageVersionClient(cfg),
 		Notification:         NewNotificationClient(cfg),
 		OAuthClient:          NewOAuthClientClient(cfg),
 		OAuthCode:            NewOAuthCodeClient(cfg),
@@ -581,18 +593,19 @@ func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.APIKey, c.Attachment, c.AuditEntry, c.Comment, c.CustomView, c.Customer,
 		c.CustomerNeed, c.CustomerStatus, c.CustomerTier, c.Cycle, c.Discussion,
-		c.DiscussionSubscriber, c.DiscussionThread, c.Document, c.DocumentVersion,
-		c.Email, c.EntityLink, c.Favorite, c.File, c.GithubCommentLink,
-		c.GithubInstallation, c.GithubIssueLink, c.GithubOutbox, c.GithubRepoSync,
-		c.GithubUserToken, c.Initiative, c.InitiativeProject, c.Invitation, c.Issue,
-		c.IssueHistory, c.IssueLabel, c.IssueLabelLink, c.IssueRelation,
-		c.IssueRelease, c.IssueShare, c.IssueSubscriber, c.Notification, c.OAuthClient,
-		c.OAuthCode, c.OAuthGrant, c.OAuthToken, c.Project, c.ProjectLabel,
-		c.ProjectLabelLink, c.ProjectMember, c.ProjectMilestone, c.ProjectRelation,
-		c.ProjectStatus, c.ProjectSubscriber, c.ProjectTeam, c.Reaction, c.Release,
-		c.ReleaseNote, c.ReleasePipeline, c.ReleasePipelineTeam, c.ReleaseStage,
-		c.SignInLink, c.StatusUpdate, c.Team, c.TeamMember, c.Template, c.User,
-		c.Webhook, c.WebhookDelivery, c.WorkflowState, c.Workspace, c.WorkspaceMember,
+		c.DiscussionSubscriber, c.DiscussionThread, c.DiscussionVote, c.Document,
+		c.DocumentVersion, c.Email, c.EntityLink, c.Favorite, c.File,
+		c.GithubCommentLink, c.GithubInstallation, c.GithubIssueLink, c.GithubOutbox,
+		c.GithubRepoSync, c.GithubUserToken, c.Initiative, c.InitiativeProject,
+		c.Invitation, c.Issue, c.IssueHistory, c.IssueLabel, c.IssueLabelLink,
+		c.IssueRelation, c.IssueRelease, c.IssueShare, c.IssueSubscriber,
+		c.MessageVersion, c.Notification, c.OAuthClient, c.OAuthCode, c.OAuthGrant,
+		c.OAuthToken, c.Project, c.ProjectLabel, c.ProjectLabelLink, c.ProjectMember,
+		c.ProjectMilestone, c.ProjectRelation, c.ProjectStatus, c.ProjectSubscriber,
+		c.ProjectTeam, c.Reaction, c.Release, c.ReleaseNote, c.ReleasePipeline,
+		c.ReleasePipelineTeam, c.ReleaseStage, c.SignInLink, c.StatusUpdate, c.Team,
+		c.TeamMember, c.Template, c.User, c.Webhook, c.WebhookDelivery,
+		c.WorkflowState, c.Workspace, c.WorkspaceMember,
 	} {
 		n.Use(hooks...)
 	}
@@ -604,18 +617,19 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.APIKey, c.Attachment, c.AuditEntry, c.Comment, c.CustomView, c.Customer,
 		c.CustomerNeed, c.CustomerStatus, c.CustomerTier, c.Cycle, c.Discussion,
-		c.DiscussionSubscriber, c.DiscussionThread, c.Document, c.DocumentVersion,
-		c.Email, c.EntityLink, c.Favorite, c.File, c.GithubCommentLink,
-		c.GithubInstallation, c.GithubIssueLink, c.GithubOutbox, c.GithubRepoSync,
-		c.GithubUserToken, c.Initiative, c.InitiativeProject, c.Invitation, c.Issue,
-		c.IssueHistory, c.IssueLabel, c.IssueLabelLink, c.IssueRelation,
-		c.IssueRelease, c.IssueShare, c.IssueSubscriber, c.Notification, c.OAuthClient,
-		c.OAuthCode, c.OAuthGrant, c.OAuthToken, c.Project, c.ProjectLabel,
-		c.ProjectLabelLink, c.ProjectMember, c.ProjectMilestone, c.ProjectRelation,
-		c.ProjectStatus, c.ProjectSubscriber, c.ProjectTeam, c.Reaction, c.Release,
-		c.ReleaseNote, c.ReleasePipeline, c.ReleasePipelineTeam, c.ReleaseStage,
-		c.SignInLink, c.StatusUpdate, c.Team, c.TeamMember, c.Template, c.User,
-		c.Webhook, c.WebhookDelivery, c.WorkflowState, c.Workspace, c.WorkspaceMember,
+		c.DiscussionSubscriber, c.DiscussionThread, c.DiscussionVote, c.Document,
+		c.DocumentVersion, c.Email, c.EntityLink, c.Favorite, c.File,
+		c.GithubCommentLink, c.GithubInstallation, c.GithubIssueLink, c.GithubOutbox,
+		c.GithubRepoSync, c.GithubUserToken, c.Initiative, c.InitiativeProject,
+		c.Invitation, c.Issue, c.IssueHistory, c.IssueLabel, c.IssueLabelLink,
+		c.IssueRelation, c.IssueRelease, c.IssueShare, c.IssueSubscriber,
+		c.MessageVersion, c.Notification, c.OAuthClient, c.OAuthCode, c.OAuthGrant,
+		c.OAuthToken, c.Project, c.ProjectLabel, c.ProjectLabelLink, c.ProjectMember,
+		c.ProjectMilestone, c.ProjectRelation, c.ProjectStatus, c.ProjectSubscriber,
+		c.ProjectTeam, c.Reaction, c.Release, c.ReleaseNote, c.ReleasePipeline,
+		c.ReleasePipelineTeam, c.ReleaseStage, c.SignInLink, c.StatusUpdate, c.Team,
+		c.TeamMember, c.Template, c.User, c.Webhook, c.WebhookDelivery,
+		c.WorkflowState, c.Workspace, c.WorkspaceMember,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -650,6 +664,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.DiscussionSubscriber.mutate(ctx, m)
 	case *DiscussionThreadMutation:
 		return c.DiscussionThread.mutate(ctx, m)
+	case *DiscussionVoteMutation:
+		return c.DiscussionVote.mutate(ctx, m)
 	case *DocumentMutation:
 		return c.Document.mutate(ctx, m)
 	case *DocumentVersionMutation:
@@ -696,6 +712,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.IssueShare.mutate(ctx, m)
 	case *IssueSubscriberMutation:
 		return c.IssueSubscriber.mutate(ctx, m)
+	case *MessageVersionMutation:
+		return c.MessageVersion.mutate(ctx, m)
 	case *NotificationMutation:
 		return c.Notification.mutate(ctx, m)
 	case *OAuthClientMutation:
@@ -1615,6 +1633,22 @@ func (c *CommentClient) QueryGithubOutbox(_m *Comment) *GithubOutboxQuery {
 			sqlgraph.From(comment.Table, comment.FieldID, id),
 			sqlgraph.To(githuboutbox.Table, githuboutbox.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, comment.GithubOutboxTable, comment.GithubOutboxColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryVersions queries the versions edge of a Comment.
+func (c *CommentClient) QueryVersions(_m *Comment) *MessageVersionQuery {
+	query := (&MessageVersionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(comment.Table, comment.FieldID, id),
+			sqlgraph.To(messageversion.Table, messageversion.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, comment.VersionsTable, comment.VersionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -2985,6 +3019,38 @@ func (c *DiscussionClient) QuerySubscribers(_m *Discussion) *UserQuery {
 	return query
 }
 
+// QueryVoters queries the voters edge of a Discussion.
+func (c *DiscussionClient) QueryVoters(_m *Discussion) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(discussion.Table, discussion.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, discussion.VotersTable, discussion.VotersPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryVersions queries the versions edge of a Discussion.
+func (c *DiscussionClient) QueryVersions(_m *Discussion) *MessageVersionQuery {
+	query := (&MessageVersionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(discussion.Table, discussion.FieldID, id),
+			sqlgraph.To(messageversion.Table, messageversion.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, discussion.VersionsTable, discussion.VersionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryDiscussionSubscribers queries the discussion_subscribers edge of a Discussion.
 func (c *DiscussionClient) QueryDiscussionSubscribers(_m *Discussion) *DiscussionSubscriberQuery {
 	query := (&DiscussionSubscriberClient{config: c.config}).Query()
@@ -2994,6 +3060,22 @@ func (c *DiscussionClient) QueryDiscussionSubscribers(_m *Discussion) *Discussio
 			sqlgraph.From(discussion.Table, discussion.FieldID, id),
 			sqlgraph.To(discussionsubscriber.Table, discussionsubscriber.DiscussionColumn),
 			sqlgraph.Edge(sqlgraph.O2M, true, discussion.DiscussionSubscribersTable, discussion.DiscussionSubscribersColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDiscussionVotes queries the discussion_votes edge of a Discussion.
+func (c *DiscussionClient) QueryDiscussionVotes(_m *Discussion) *DiscussionVoteQuery {
+	query := (&DiscussionVoteClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(discussion.Table, discussion.FieldID, id),
+			sqlgraph.To(discussionvote.Table, discussionvote.DiscussionColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, discussion.DiscussionVotesTable, discussion.DiscussionVotesColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -3384,6 +3466,122 @@ func (c *DiscussionThreadClient) mutate(ctx context.Context, m *DiscussionThread
 		return (&DiscussionThreadDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown DiscussionThread mutation op: %q", m.Op())
+	}
+}
+
+// DiscussionVoteClient is a client for the DiscussionVote schema.
+type DiscussionVoteClient struct {
+	config
+}
+
+// NewDiscussionVoteClient returns a client for the DiscussionVote from the given config.
+func NewDiscussionVoteClient(c config) *DiscussionVoteClient {
+	return &DiscussionVoteClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `discussionvote.Hooks(f(g(h())))`.
+func (c *DiscussionVoteClient) Use(hooks ...Hook) {
+	c.hooks.DiscussionVote = append(c.hooks.DiscussionVote, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `discussionvote.Intercept(f(g(h())))`.
+func (c *DiscussionVoteClient) Intercept(interceptors ...Interceptor) {
+	c.inters.DiscussionVote = append(c.inters.DiscussionVote, interceptors...)
+}
+
+// Create returns a builder for creating a DiscussionVote entity.
+func (c *DiscussionVoteClient) Create() *DiscussionVoteCreate {
+	mutation := newDiscussionVoteMutation(c.config, OpCreate)
+	return &DiscussionVoteCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of DiscussionVote entities.
+func (c *DiscussionVoteClient) CreateBulk(builders ...*DiscussionVoteCreate) *DiscussionVoteCreateBulk {
+	return &DiscussionVoteCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *DiscussionVoteClient) MapCreateBulk(slice any, setFunc func(*DiscussionVoteCreate, int)) *DiscussionVoteCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &DiscussionVoteCreateBulk{err: fmt.Errorf("calling to DiscussionVoteClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*DiscussionVoteCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &DiscussionVoteCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for DiscussionVote.
+func (c *DiscussionVoteClient) Update() *DiscussionVoteUpdate {
+	mutation := newDiscussionVoteMutation(c.config, OpUpdate)
+	return &DiscussionVoteUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DiscussionVoteClient) UpdateOne(_m *DiscussionVote) *DiscussionVoteUpdateOne {
+	mutation := newDiscussionVoteMutation(c.config, OpUpdateOne)
+	mutation.discussion = &_m.DiscussionID
+	mutation.user = &_m.UserID
+	return &DiscussionVoteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for DiscussionVote.
+func (c *DiscussionVoteClient) Delete() *DiscussionVoteDelete {
+	mutation := newDiscussionVoteMutation(c.config, OpDelete)
+	return &DiscussionVoteDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Query returns a query builder for DiscussionVote.
+func (c *DiscussionVoteClient) Query() *DiscussionVoteQuery {
+	return &DiscussionVoteQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeDiscussionVote},
+		inters: c.Interceptors(),
+	}
+}
+
+// QueryDiscussion queries the discussion edge of a DiscussionVote.
+func (c *DiscussionVoteClient) QueryDiscussion(_m *DiscussionVote) *DiscussionQuery {
+	return c.Query().
+		Where(discussionvote.DiscussionID(_m.DiscussionID), discussionvote.UserID(_m.UserID)).
+		QueryDiscussion()
+}
+
+// QueryUser queries the user edge of a DiscussionVote.
+func (c *DiscussionVoteClient) QueryUser(_m *DiscussionVote) *UserQuery {
+	return c.Query().
+		Where(discussionvote.DiscussionID(_m.DiscussionID), discussionvote.UserID(_m.UserID)).
+		QueryUser()
+}
+
+// Hooks returns the client hooks.
+func (c *DiscussionVoteClient) Hooks() []Hook {
+	return c.hooks.DiscussionVote
+}
+
+// Interceptors returns the client interceptors.
+func (c *DiscussionVoteClient) Interceptors() []Interceptor {
+	return c.inters.DiscussionVote
+}
+
+func (c *DiscussionVoteClient) mutate(ctx context.Context, m *DiscussionVoteMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&DiscussionVoteCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&DiscussionVoteUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&DiscussionVoteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&DiscussionVoteDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown DiscussionVote mutation op: %q", m.Op())
 	}
 }
 
@@ -7846,6 +8044,187 @@ func (c *IssueSubscriberClient) mutate(ctx context.Context, m *IssueSubscriberMu
 		return (&IssueSubscriberDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown IssueSubscriber mutation op: %q", m.Op())
+	}
+}
+
+// MessageVersionClient is a client for the MessageVersion schema.
+type MessageVersionClient struct {
+	config
+}
+
+// NewMessageVersionClient returns a client for the MessageVersion from the given config.
+func NewMessageVersionClient(c config) *MessageVersionClient {
+	return &MessageVersionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `messageversion.Hooks(f(g(h())))`.
+func (c *MessageVersionClient) Use(hooks ...Hook) {
+	c.hooks.MessageVersion = append(c.hooks.MessageVersion, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `messageversion.Intercept(f(g(h())))`.
+func (c *MessageVersionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.MessageVersion = append(c.inters.MessageVersion, interceptors...)
+}
+
+// Create returns a builder for creating a MessageVersion entity.
+func (c *MessageVersionClient) Create() *MessageVersionCreate {
+	mutation := newMessageVersionMutation(c.config, OpCreate)
+	return &MessageVersionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of MessageVersion entities.
+func (c *MessageVersionClient) CreateBulk(builders ...*MessageVersionCreate) *MessageVersionCreateBulk {
+	return &MessageVersionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MessageVersionClient) MapCreateBulk(slice any, setFunc func(*MessageVersionCreate, int)) *MessageVersionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MessageVersionCreateBulk{err: fmt.Errorf("calling to MessageVersionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MessageVersionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &MessageVersionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for MessageVersion.
+func (c *MessageVersionClient) Update() *MessageVersionUpdate {
+	mutation := newMessageVersionMutation(c.config, OpUpdate)
+	return &MessageVersionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MessageVersionClient) UpdateOne(_m *MessageVersion) *MessageVersionUpdateOne {
+	mutation := newMessageVersionMutation(c.config, OpUpdateOne, withMessageVersion(_m))
+	return &MessageVersionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MessageVersionClient) UpdateOneID(id uuid.UUID) *MessageVersionUpdateOne {
+	mutation := newMessageVersionMutation(c.config, OpUpdateOne, withMessageVersionID(id))
+	return &MessageVersionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for MessageVersion.
+func (c *MessageVersionClient) Delete() *MessageVersionDelete {
+	mutation := newMessageVersionMutation(c.config, OpDelete)
+	return &MessageVersionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MessageVersionClient) DeleteOne(_m *MessageVersion) *MessageVersionDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MessageVersionClient) DeleteOneID(id uuid.UUID) *MessageVersionDeleteOne {
+	builder := c.Delete().Where(messageversion.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MessageVersionDeleteOne{builder}
+}
+
+// Query returns a query builder for MessageVersion.
+func (c *MessageVersionClient) Query() *MessageVersionQuery {
+	return &MessageVersionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeMessageVersion},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a MessageVersion entity by its id.
+func (c *MessageVersionClient) Get(ctx context.Context, id uuid.UUID) (*MessageVersion, error) {
+	return c.Query().Where(messageversion.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MessageVersionClient) GetX(ctx context.Context, id uuid.UUID) *MessageVersion {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryWorkspace queries the workspace edge of a MessageVersion.
+func (c *MessageVersionClient) QueryWorkspace(_m *MessageVersion) *WorkspaceQuery {
+	query := (&WorkspaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(messageversion.Table, messageversion.FieldID, id),
+			sqlgraph.To(workspace.Table, workspace.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, messageversion.WorkspaceTable, messageversion.WorkspaceColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryComment queries the comment edge of a MessageVersion.
+func (c *MessageVersionClient) QueryComment(_m *MessageVersion) *CommentQuery {
+	query := (&CommentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(messageversion.Table, messageversion.FieldID, id),
+			sqlgraph.To(comment.Table, comment.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, messageversion.CommentTable, messageversion.CommentColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDiscussion queries the discussion edge of a MessageVersion.
+func (c *MessageVersionClient) QueryDiscussion(_m *MessageVersion) *DiscussionQuery {
+	query := (&DiscussionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(messageversion.Table, messageversion.FieldID, id),
+			sqlgraph.To(discussion.Table, discussion.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, messageversion.DiscussionTable, messageversion.DiscussionColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *MessageVersionClient) Hooks() []Hook {
+	return c.hooks.MessageVersion
+}
+
+// Interceptors returns the client interceptors.
+func (c *MessageVersionClient) Interceptors() []Interceptor {
+	return c.inters.MessageVersion
+}
+
+func (c *MessageVersionClient) mutate(ctx context.Context, m *MessageVersionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MessageVersionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MessageVersionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MessageVersionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MessageVersionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown MessageVersion mutation op: %q", m.Op())
 	}
 }
 
@@ -13820,6 +14199,22 @@ func (c *UserClient) QuerySubscribedDiscussions(_m *User) *DiscussionQuery {
 	return query
 }
 
+// QueryVotedDiscussions queries the voted_discussions edge of a User.
+func (c *UserClient) QueryVotedDiscussions(_m *User) *DiscussionQuery {
+	query := (&DiscussionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(discussion.Table, discussion.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, user.VotedDiscussionsTable, user.VotedDiscussionsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryTeams queries the teams edge of a User.
 func (c *UserClient) QueryTeams(_m *User) *TeamQuery {
 	query := (&TeamClient{config: c.config}).Query()
@@ -13925,6 +14320,22 @@ func (c *UserClient) QueryDiscussionSubscribers(_m *User) *DiscussionSubscriberQ
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(discussionsubscriber.Table, discussionsubscriber.UserColumn),
 			sqlgraph.Edge(sqlgraph.O2M, true, user.DiscussionSubscribersTable, user.DiscussionSubscribersColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDiscussionVotes queries the discussion_votes edge of a User.
+func (c *UserClient) QueryDiscussionVotes(_m *User) *DiscussionVoteQuery {
+	query := (&DiscussionVoteClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(discussionvote.Table, discussionvote.UserColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.DiscussionVotesTable, user.DiscussionVotesColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -14992,6 +15403,22 @@ func (c *WorkspaceClient) QueryComments(_m *Workspace) *CommentQuery {
 	return query
 }
 
+// QueryMessageVersions queries the message_versions edge of a Workspace.
+func (c *WorkspaceClient) QueryMessageVersions(_m *Workspace) *MessageVersionQuery {
+	query := (&MessageVersionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(workspace.Table, workspace.FieldID, id),
+			sqlgraph.To(messageversion.Table, messageversion.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, workspace.MessageVersionsTable, workspace.MessageVersionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryReactions queries the reactions edge of a Workspace.
 func (c *WorkspaceClient) QueryReactions(_m *Workspace) *ReactionQuery {
 	query := (&ReactionClient{config: c.config}).Query()
@@ -15378,32 +15805,32 @@ type (
 	hooks struct {
 		APIKey, Attachment, AuditEntry, Comment, CustomView, Customer, CustomerNeed,
 		CustomerStatus, CustomerTier, Cycle, Discussion, DiscussionSubscriber,
-		DiscussionThread, Document, DocumentVersion, Email, EntityLink, Favorite, File,
-		GithubCommentLink, GithubInstallation, GithubIssueLink, GithubOutbox,
-		GithubRepoSync, GithubUserToken, Initiative, InitiativeProject, Invitation,
-		Issue, IssueHistory, IssueLabel, IssueLabelLink, IssueRelation, IssueRelease,
-		IssueShare, IssueSubscriber, Notification, OAuthClient, OAuthCode, OAuthGrant,
-		OAuthToken, Project, ProjectLabel, ProjectLabelLink, ProjectMember,
-		ProjectMilestone, ProjectRelation, ProjectStatus, ProjectSubscriber,
-		ProjectTeam, Reaction, Release, ReleaseNote, ReleasePipeline,
-		ReleasePipelineTeam, ReleaseStage, SignInLink, StatusUpdate, Team, TeamMember,
-		Template, User, Webhook, WebhookDelivery, WorkflowState, Workspace,
-		WorkspaceMember []ent.Hook
+		DiscussionThread, DiscussionVote, Document, DocumentVersion, Email, EntityLink,
+		Favorite, File, GithubCommentLink, GithubInstallation, GithubIssueLink,
+		GithubOutbox, GithubRepoSync, GithubUserToken, Initiative, InitiativeProject,
+		Invitation, Issue, IssueHistory, IssueLabel, IssueLabelLink, IssueRelation,
+		IssueRelease, IssueShare, IssueSubscriber, MessageVersion, Notification,
+		OAuthClient, OAuthCode, OAuthGrant, OAuthToken, Project, ProjectLabel,
+		ProjectLabelLink, ProjectMember, ProjectMilestone, ProjectRelation,
+		ProjectStatus, ProjectSubscriber, ProjectTeam, Reaction, Release, ReleaseNote,
+		ReleasePipeline, ReleasePipelineTeam, ReleaseStage, SignInLink, StatusUpdate,
+		Team, TeamMember, Template, User, Webhook, WebhookDelivery, WorkflowState,
+		Workspace, WorkspaceMember []ent.Hook
 	}
 	inters struct {
 		APIKey, Attachment, AuditEntry, Comment, CustomView, Customer, CustomerNeed,
 		CustomerStatus, CustomerTier, Cycle, Discussion, DiscussionSubscriber,
-		DiscussionThread, Document, DocumentVersion, Email, EntityLink, Favorite, File,
-		GithubCommentLink, GithubInstallation, GithubIssueLink, GithubOutbox,
-		GithubRepoSync, GithubUserToken, Initiative, InitiativeProject, Invitation,
-		Issue, IssueHistory, IssueLabel, IssueLabelLink, IssueRelation, IssueRelease,
-		IssueShare, IssueSubscriber, Notification, OAuthClient, OAuthCode, OAuthGrant,
-		OAuthToken, Project, ProjectLabel, ProjectLabelLink, ProjectMember,
-		ProjectMilestone, ProjectRelation, ProjectStatus, ProjectSubscriber,
-		ProjectTeam, Reaction, Release, ReleaseNote, ReleasePipeline,
-		ReleasePipelineTeam, ReleaseStage, SignInLink, StatusUpdate, Team, TeamMember,
-		Template, User, Webhook, WebhookDelivery, WorkflowState, Workspace,
-		WorkspaceMember []ent.Interceptor
+		DiscussionThread, DiscussionVote, Document, DocumentVersion, Email, EntityLink,
+		Favorite, File, GithubCommentLink, GithubInstallation, GithubIssueLink,
+		GithubOutbox, GithubRepoSync, GithubUserToken, Initiative, InitiativeProject,
+		Invitation, Issue, IssueHistory, IssueLabel, IssueLabelLink, IssueRelation,
+		IssueRelease, IssueShare, IssueSubscriber, MessageVersion, Notification,
+		OAuthClient, OAuthCode, OAuthGrant, OAuthToken, Project, ProjectLabel,
+		ProjectLabelLink, ProjectMember, ProjectMilestone, ProjectRelation,
+		ProjectStatus, ProjectSubscriber, ProjectTeam, Reaction, Release, ReleaseNote,
+		ReleasePipeline, ReleasePipelineTeam, ReleaseStage, SignInLink, StatusUpdate,
+		Team, TeamMember, Template, User, Webhook, WebhookDelivery, WorkflowState,
+		Workspace, WorkspaceMember []ent.Interceptor
 	}
 )
 

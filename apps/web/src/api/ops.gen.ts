@@ -26,6 +26,8 @@ export type AuditEntry = {
 export type Comment = {
   body: string
   createdAt: string
+  /** When it was deleted; its body is then empty. */
+  deletedAt: string | null
   editedAt: string | null
   id: string
   quotedText: string | null
@@ -43,6 +45,8 @@ export type Comment = {
 export type CommentDetail = {
   body: string
   createdAt: string
+  /** When it was deleted; its body is then empty. */
+  deletedAt: string | null
   discussion: DiscussionRef | null
   discussionThread: DiscussionThreadRef | null
   document: DocumentRef | null
@@ -92,6 +96,8 @@ export type CommentSearchHit = {
 export type CommentThread = {
   body: string
   createdAt: string
+  /** When it was deleted; its body is then empty. */
+  deletedAt: string | null
   editedAt: string | null
   id: string
   quotedText: string | null
@@ -424,6 +430,8 @@ export type Discussion = {
   commentCount: number
   createdAt: string
   creator: UserRef | null
+  /** When its body last changed, if ever. */
+  editedAt: string | null
   id: string
   lastActivityAt: string
   openThreadCount: number
@@ -439,6 +447,10 @@ export type Discussion = {
   trashed: boolean
   trashedAt: string | null
   updatedAt: string
+  /** How many people upvoted it. */
+  upvoteCount: number
+  /** Whether you upvoted it. */
+  upvoted: boolean
   url: string
 }
 
@@ -450,6 +462,8 @@ export type DiscussionDetail = {
   commentCount: number
   createdAt: string
   creator: UserRef | null
+  /** When its body last changed, if ever. */
+  editedAt: string | null
   id: string
   lastActivityAt: string
   openThreadCount: number
@@ -468,6 +482,10 @@ export type DiscussionDetail = {
   trashed: boolean
   trashedAt: string | null
   updatedAt: string
+  /** How many people upvoted it. */
+  upvoteCount: number
+  /** Whether you upvoted it. */
+  upvoted: boolean
   url: string
 }
 
@@ -1119,6 +1137,19 @@ export type MarkedAllRead = {
 
 export type MarkedNotifications = {
   nodes: Notification[]
+}
+
+export type MessageHistory = {
+  /** Oldest first, ending with the current body. */
+  versions: MessageVersion[]
+}
+
+export type MessageVersion = {
+  body: string
+  /** Whether this is how it reads now. */
+  current: boolean
+  /** When it was written this way. */
+  writtenAt: string
 }
 
 export type Milestone = {
@@ -2533,6 +2564,10 @@ export type DeleteCommentArgs = {
   id: string
 }
 
+export type GetCommentHistoryArgs = {
+  id: string
+}
+
 export type ResolveCommentArgs = {
   id: string
 }
@@ -3180,6 +3215,8 @@ export type ListDiscussionsArgs = {
   onlyTrashed?: boolean
   /** Words to find in the title or body. */
   query?: string | null
+  /** activity (default): pinned first, then the most recent activity; newest: pinned first, then the newest; top: pinned first, then the most upvoted, ties by recent activity. */
+  sort?: "activity" | "newest" | "top" | null
   /** open (default), closed or all. */
   status?: "open" | "closed" | "all" | null
   /** Only the discussions with this tag. */
@@ -3245,6 +3282,17 @@ export type SaveDiscussionArgs = {
   /** Image URL the forum shows for it, such as an assetUrl from prepare_file_upload; null shows the first image in the body. */
   thumbnailUrl?: string | null
   title?: string | null
+}
+
+export type VoteDiscussionArgs = {
+  /** The discussion's id, slug, link or title. */
+  id: string
+  /** true to upvote it, false to take your upvote back. */
+  upvote: boolean
+}
+
+export type GetDiscussionHistoryArgs = {
+  id: string
 }
 
 export type DeleteDiscussionArgs = {
@@ -3934,6 +3982,7 @@ export interface Ops {
 } }
   save_comment: { args: SaveCommentArgs; result: CommentDetail }
   delete_comment: { args: DeleteCommentArgs; result: DeletedComment }
+  get_comment_history: { args: GetCommentHistoryArgs; result: MessageHistory }
   resolve_comment: { args: ResolveCommentArgs; result: CommentDetail }
   unresolve_comment: { args: UnresolveCommentArgs; result: CommentDetail }
   add_reaction: { args: AddReactionArgs; result: Reaction }
@@ -4024,6 +4073,8 @@ export interface Ops {
 } }
   get_discussion: { args: GetDiscussionArgs; result: DiscussionDetail }
   save_discussion: { args: SaveDiscussionArgs; result: DiscussionDetail }
+  vote_discussion: { args: VoteDiscussionArgs; result: DiscussionDetail }
+  get_discussion_history: { args: GetDiscussionHistoryArgs; result: MessageHistory }
   delete_discussion: { args: DeleteDiscussionArgs; result: DiscussionDetail }
   restore_discussion: { args: RestoreDiscussionArgs; result: DiscussionDetail }
   get_discussion_thread: { args: GetDiscussionThreadArgs; result: DiscussionThreadDetail }

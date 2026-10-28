@@ -112,6 +112,11 @@ func TrashedAt(v time.Time) predicate.Discussion {
 	return predicate.Discussion(sql.FieldEQ(FieldTrashedAt, v))
 }
 
+// EditedAt applies equality check predicate on the "edited_at" field. It's identical to EditedAtEQ.
+func EditedAt(v time.Time) predicate.Discussion {
+	return predicate.Discussion(sql.FieldEQ(FieldEditedAt, v))
+}
+
 // LastActivityAt applies equality check predicate on the "last_activity_at" field. It's identical to LastActivityAtEQ.
 func LastActivityAt(v time.Time) predicate.Discussion {
 	return predicate.Discussion(sql.FieldEQ(FieldLastActivityAt, v))
@@ -687,6 +692,56 @@ func TrashedAtNotNil() predicate.Discussion {
 	return predicate.Discussion(sql.FieldNotNull(FieldTrashedAt))
 }
 
+// EditedAtEQ applies the EQ predicate on the "edited_at" field.
+func EditedAtEQ(v time.Time) predicate.Discussion {
+	return predicate.Discussion(sql.FieldEQ(FieldEditedAt, v))
+}
+
+// EditedAtNEQ applies the NEQ predicate on the "edited_at" field.
+func EditedAtNEQ(v time.Time) predicate.Discussion {
+	return predicate.Discussion(sql.FieldNEQ(FieldEditedAt, v))
+}
+
+// EditedAtIn applies the In predicate on the "edited_at" field.
+func EditedAtIn(vs ...time.Time) predicate.Discussion {
+	return predicate.Discussion(sql.FieldIn(FieldEditedAt, vs...))
+}
+
+// EditedAtNotIn applies the NotIn predicate on the "edited_at" field.
+func EditedAtNotIn(vs ...time.Time) predicate.Discussion {
+	return predicate.Discussion(sql.FieldNotIn(FieldEditedAt, vs...))
+}
+
+// EditedAtGT applies the GT predicate on the "edited_at" field.
+func EditedAtGT(v time.Time) predicate.Discussion {
+	return predicate.Discussion(sql.FieldGT(FieldEditedAt, v))
+}
+
+// EditedAtGTE applies the GTE predicate on the "edited_at" field.
+func EditedAtGTE(v time.Time) predicate.Discussion {
+	return predicate.Discussion(sql.FieldGTE(FieldEditedAt, v))
+}
+
+// EditedAtLT applies the LT predicate on the "edited_at" field.
+func EditedAtLT(v time.Time) predicate.Discussion {
+	return predicate.Discussion(sql.FieldLT(FieldEditedAt, v))
+}
+
+// EditedAtLTE applies the LTE predicate on the "edited_at" field.
+func EditedAtLTE(v time.Time) predicate.Discussion {
+	return predicate.Discussion(sql.FieldLTE(FieldEditedAt, v))
+}
+
+// EditedAtIsNil applies the IsNil predicate on the "edited_at" field.
+func EditedAtIsNil() predicate.Discussion {
+	return predicate.Discussion(sql.FieldIsNull(FieldEditedAt))
+}
+
+// EditedAtNotNil applies the NotNil predicate on the "edited_at" field.
+func EditedAtNotNil() predicate.Discussion {
+	return predicate.Discussion(sql.FieldNotNull(FieldEditedAt))
+}
+
 // LastActivityAtEQ applies the EQ predicate on the "last_activity_at" field.
 func LastActivityAtEQ(v time.Time) predicate.Discussion {
 	return predicate.Discussion(sql.FieldEQ(FieldLastActivityAt, v))
@@ -998,6 +1053,52 @@ func HasSubscribersWith(preds ...predicate.User) predicate.Discussion {
 	})
 }
 
+// HasVoters applies the HasEdge predicate on the "voters" edge.
+func HasVoters() predicate.Discussion {
+	return predicate.Discussion(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, VotersTable, VotersPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasVotersWith applies the HasEdge predicate on the "voters" edge with a given conditions (other predicates).
+func HasVotersWith(preds ...predicate.User) predicate.Discussion {
+	return predicate.Discussion(func(s *sql.Selector) {
+		step := newVotersStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasVersions applies the HasEdge predicate on the "versions" edge.
+func HasVersions() predicate.Discussion {
+	return predicate.Discussion(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, VersionsTable, VersionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasVersionsWith applies the HasEdge predicate on the "versions" edge with a given conditions (other predicates).
+func HasVersionsWith(preds ...predicate.MessageVersion) predicate.Discussion {
+	return predicate.Discussion(func(s *sql.Selector) {
+		step := newVersionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasDiscussionSubscribers applies the HasEdge predicate on the "discussion_subscribers" edge.
 func HasDiscussionSubscribers() predicate.Discussion {
 	return predicate.Discussion(func(s *sql.Selector) {
@@ -1013,6 +1114,29 @@ func HasDiscussionSubscribers() predicate.Discussion {
 func HasDiscussionSubscribersWith(preds ...predicate.DiscussionSubscriber) predicate.Discussion {
 	return predicate.Discussion(func(s *sql.Selector) {
 		step := newDiscussionSubscribersStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasDiscussionVotes applies the HasEdge predicate on the "discussion_votes" edge.
+func HasDiscussionVotes() predicate.Discussion {
+	return predicate.Discussion(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, DiscussionVotesTable, DiscussionVotesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDiscussionVotesWith applies the HasEdge predicate on the "discussion_votes" edge with a given conditions (other predicates).
+func HasDiscussionVotesWith(preds ...predicate.DiscussionVote) predicate.Discussion {
+	return predicate.Discussion(func(s *sql.Selector) {
+		step := newDiscussionVotesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

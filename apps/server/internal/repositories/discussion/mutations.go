@@ -9,6 +9,7 @@ import (
 	"ricrac/ent"
 	"ricrac/ent/discussionsubscriber"
 	"ricrac/ent/discussionthread"
+	"ricrac/ent/discussionvote"
 	"ricrac/ent/schema/pgarray"
 	repository "ricrac/internal/repositories"
 )
@@ -34,8 +35,31 @@ func (self *DiscussionRepository) Create(ctx context.Context, tx repository.TxIn
 	return created.ID, nil
 }
 
-func (self *DiscussionRepository) SetText(ctx context.Context, tx repository.TxInterface, id uuid.UUID, title, body string) error {
-	return self.base.Client(tx).Discussion.UpdateOneID(id).SetTitle(title).SetBody(body).Exec(ctx)
+// SetText rewrites the title and body, marking the body edited at editedAt when it is set.
+func (self *DiscussionRepository) SetText(ctx context.Context, tx repository.TxInterface, id uuid.UUID, title, body string, editedAt *time.Time) error {
+	return self.base.Client(tx).Discussion.UpdateOneID(id).SetTitle(title).SetBody(body).SetNillableEditedAt(editedAt).Exec(ctx)
+}
+
+// AddVersion keeps an earlier body of the discussion, as it read from writtenAt on.
+func (self *DiscussionRepository) AddVersion(ctx context.Context, tx repository.TxInterface, workspace, id uuid.UUID, body string, writtenAt time.Time) error {
+	return self.base.Client(tx).MessageVersion.Create().
+		SetWorkspaceID(workspace).SetDiscussionID(id).SetBody(body).SetWrittenAt(writtenAt).Exec(ctx)
+}
+
+// SetVote upvotes the discussion for the user or takes the upvote back, saying whether it changed.
+func (self *DiscussionRepository) SetVote(ctx context.Context, tx repository.TxInterface, id, user uuid.UUID, upvote bool) (bool, error) {
+	if !upvote {
+		removed, err := self.base.Client(tx).DiscussionVote.Delete().
+			Where(discussionvote.DiscussionID(id), discussionvote.UserID(user)).Exec(ctx)
+		return removed > 0, err
+	}
+	result, err := self.base.Client(tx).ExecContext(ctx,
+		`INSERT INTO discussion_votes (discussion_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`, id, user)
+	if err != nil {
+		return false, err
+	}
+	added, err := result.RowsAffected()
+	return added > 0, err
 }
 
 func (self *DiscussionRepository) SetThumbnail(ctx context.Context, tx repository.TxInterface, id uuid.UUID, url *string) error {

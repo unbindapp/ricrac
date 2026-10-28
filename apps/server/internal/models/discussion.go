@@ -34,6 +34,9 @@ type Discussion struct {
 	ThreadCount     int      `json:"threadCount"`
 	OpenThreadCount int      `json:"openThreadCount"`
 	CommentCount    int      `json:"commentCount" doc:"Comments on the discussion itself, not in its threads."`
+	UpvoteCount     int      `json:"upvoteCount" doc:"How many people upvoted it."`
+	Upvoted         bool     `json:"upvoted" doc:"Whether you upvoted it."`
+	EditedAt        *string  `json:"editedAt" doc:"When its body last changed, if ever."`
 	LastActivityAt  string   `json:"lastActivityAt"`
 	CreatedAt       string   `json:"createdAt"`
 	UpdatedAt       string   `json:"updatedAt"`
@@ -75,9 +78,11 @@ type DeletedDiscussionThread struct {
 	Deleted string `json:"deleted"`
 }
 
-// DiscussionCounts is how many threads, open threads and comments a discussion has.
+// DiscussionCounts is how many threads, open threads, comments and upvotes a discussion has, and
+// whether the caller upvoted it.
 type DiscussionCounts struct {
-	Threads, OpenThreads, Comments int
+	Threads, OpenThreads, Comments, Upvotes int
+	Upvoted                                 bool
 }
 
 // DiscussionURL is the discussion's page in the web app: its title's slug, if any, and its slug
@@ -116,7 +121,8 @@ func DiscussionOf(d *ent.Discussion, publicURL string, counts DiscussionCounts, 
 		ID: ID(d.ID), SlugID: d.SlugID, Title: d.Title, URL: DiscussionURL(publicURL, e.Workspace.URLKey, d.Title, d.SlugID),
 		ThumbnailURL: d.ThumbnailURL, Tags: append([]string{}, d.Tags...), Team: TeamRefOf(e.Team), Creator: UserRefOf(e.Creator), PinnedAt: TimePtr(d.PinnedAt), ClosedAt: TimePtr(d.ClosedAt),
 		Trashed: d.TrashedAt != nil, TrashedAt: TimePtr(d.TrashedAt), ThreadCount: counts.Threads,
-		OpenThreadCount: counts.OpenThreads, CommentCount: counts.Comments, LastActivityAt: Time(d.LastActivityAt),
+		OpenThreadCount: counts.OpenThreads, CommentCount: counts.Comments, UpvoteCount: counts.Upvotes, Upvoted: counts.Upvoted,
+		EditedAt: TimePtr(d.EditedAt), LastActivityAt: Time(d.LastActivityAt),
 		CreatedAt: Time(d.CreatedAt), UpdatedAt: Time(d.UpdatedAt),
 	}
 	if withBody {

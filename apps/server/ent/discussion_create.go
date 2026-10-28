@@ -9,6 +9,7 @@ import (
 	"ricrac/ent/comment"
 	"ricrac/ent/discussion"
 	"ricrac/ent/discussionthread"
+	"ricrac/ent/messageversion"
 	"ricrac/ent/notification"
 	"ricrac/ent/schema/pgarray"
 	"ricrac/ent/team"
@@ -153,6 +154,20 @@ func (_c *DiscussionCreate) SetNillableTrashedAt(v *time.Time) *DiscussionCreate
 	return _c
 }
 
+// SetEditedAt sets the "edited_at" field.
+func (_c *DiscussionCreate) SetEditedAt(v time.Time) *DiscussionCreate {
+	_c.mutation.SetEditedAt(v)
+	return _c
+}
+
+// SetNillableEditedAt sets the "edited_at" field if the given value is not nil.
+func (_c *DiscussionCreate) SetNillableEditedAt(v *time.Time) *DiscussionCreate {
+	if v != nil {
+		_c.SetEditedAt(*v)
+	}
+	return _c
+}
+
 // SetLastActivityAt sets the "last_activity_at" field.
 func (_c *DiscussionCreate) SetLastActivityAt(v time.Time) *DiscussionCreate {
 	_c.mutation.SetLastActivityAt(v)
@@ -284,6 +299,36 @@ func (_c *DiscussionCreate) AddSubscribers(v ...*User) *DiscussionCreate {
 	return _c.AddSubscriberIDs(ids...)
 }
 
+// AddVoterIDs adds the "voters" edge to the User entity by IDs.
+func (_c *DiscussionCreate) AddVoterIDs(ids ...uuid.UUID) *DiscussionCreate {
+	_c.mutation.AddVoterIDs(ids...)
+	return _c
+}
+
+// AddVoters adds the "voters" edges to the User entity.
+func (_c *DiscussionCreate) AddVoters(v ...*User) *DiscussionCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddVoterIDs(ids...)
+}
+
+// AddVersionIDs adds the "versions" edge to the MessageVersion entity by IDs.
+func (_c *DiscussionCreate) AddVersionIDs(ids ...uuid.UUID) *DiscussionCreate {
+	_c.mutation.AddVersionIDs(ids...)
+	return _c
+}
+
+// AddVersions adds the "versions" edges to the MessageVersion entity.
+func (_c *DiscussionCreate) AddVersions(v ...*MessageVersion) *DiscussionCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddVersionIDs(ids...)
+}
+
 // Mutation returns the DiscussionMutation object of the builder.
 func (_c *DiscussionCreate) Mutation() *DiscussionMutation {
 	return _c.mutation
@@ -407,6 +452,10 @@ func (_c *DiscussionCreate) createSpec() (*Discussion, *sqlgraph.CreateSpec) {
 		_spec.SetField(discussion.FieldTrashedAt, field.TypeTime, value)
 		_node.TrashedAt = &value
 	}
+	if value, ok := _c.mutation.EditedAt(); ok {
+		_spec.SetField(discussion.FieldEditedAt, field.TypeTime, value)
+		_node.EditedAt = &value
+	}
 	if value, ok := _c.mutation.LastActivityAt(); ok {
 		_spec.SetField(discussion.FieldLastActivityAt, field.TypeTime, value)
 		_node.LastActivityAt = value
@@ -527,6 +576,38 @@ func (_c *DiscussionCreate) createSpec() (*Discussion, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.VotersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   discussion.VotersTable,
+			Columns: discussion.VotersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.VersionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   discussion.VersionsTable,
+			Columns: []string{discussion.VersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -763,6 +844,24 @@ func (u *DiscussionUpsert) UpdateTrashedAt() *DiscussionUpsert {
 // ClearTrashedAt clears the value of the "trashed_at" field.
 func (u *DiscussionUpsert) ClearTrashedAt() *DiscussionUpsert {
 	u.SetNull(discussion.FieldTrashedAt)
+	return u
+}
+
+// SetEditedAt sets the "edited_at" field.
+func (u *DiscussionUpsert) SetEditedAt(v time.Time) *DiscussionUpsert {
+	u.Set(discussion.FieldEditedAt, v)
+	return u
+}
+
+// UpdateEditedAt sets the "edited_at" field to the value that was provided on create.
+func (u *DiscussionUpsert) UpdateEditedAt() *DiscussionUpsert {
+	u.SetExcluded(discussion.FieldEditedAt)
+	return u
+}
+
+// ClearEditedAt clears the value of the "edited_at" field.
+func (u *DiscussionUpsert) ClearEditedAt() *DiscussionUpsert {
+	u.SetNull(discussion.FieldEditedAt)
 	return u
 }
 
@@ -1075,6 +1174,27 @@ func (u *DiscussionUpsertOne) UpdateTrashedAt() *DiscussionUpsertOne {
 func (u *DiscussionUpsertOne) ClearTrashedAt() *DiscussionUpsertOne {
 	return u.Update(func(s *DiscussionUpsert) {
 		s.ClearTrashedAt()
+	})
+}
+
+// SetEditedAt sets the "edited_at" field.
+func (u *DiscussionUpsertOne) SetEditedAt(v time.Time) *DiscussionUpsertOne {
+	return u.Update(func(s *DiscussionUpsert) {
+		s.SetEditedAt(v)
+	})
+}
+
+// UpdateEditedAt sets the "edited_at" field to the value that was provided on create.
+func (u *DiscussionUpsertOne) UpdateEditedAt() *DiscussionUpsertOne {
+	return u.Update(func(s *DiscussionUpsert) {
+		s.UpdateEditedAt()
+	})
+}
+
+// ClearEditedAt clears the value of the "edited_at" field.
+func (u *DiscussionUpsertOne) ClearEditedAt() *DiscussionUpsertOne {
+	return u.Update(func(s *DiscussionUpsert) {
+		s.ClearEditedAt()
 	})
 }
 
@@ -1563,6 +1683,27 @@ func (u *DiscussionUpsertBulk) UpdateTrashedAt() *DiscussionUpsertBulk {
 func (u *DiscussionUpsertBulk) ClearTrashedAt() *DiscussionUpsertBulk {
 	return u.Update(func(s *DiscussionUpsert) {
 		s.ClearTrashedAt()
+	})
+}
+
+// SetEditedAt sets the "edited_at" field.
+func (u *DiscussionUpsertBulk) SetEditedAt(v time.Time) *DiscussionUpsertBulk {
+	return u.Update(func(s *DiscussionUpsert) {
+		s.SetEditedAt(v)
+	})
+}
+
+// UpdateEditedAt sets the "edited_at" field to the value that was provided on create.
+func (u *DiscussionUpsertBulk) UpdateEditedAt() *DiscussionUpsertBulk {
+	return u.Update(func(s *DiscussionUpsert) {
+		s.UpdateEditedAt()
+	})
+}
+
+// ClearEditedAt clears the value of the "edited_at" field.
+func (u *DiscussionUpsertBulk) ClearEditedAt() *DiscussionUpsertBulk {
+	return u.Update(func(s *DiscussionUpsert) {
+		s.ClearEditedAt()
 	})
 }
 

@@ -895,6 +895,21 @@ func (_c *UserCreate) AddSubscribedDiscussions(v ...*Discussion) *UserCreate {
 	return _c.AddSubscribedDiscussionIDs(ids...)
 }
 
+// AddVotedDiscussionIDs adds the "voted_discussions" edge to the Discussion entity by IDs.
+func (_c *UserCreate) AddVotedDiscussionIDs(ids ...uuid.UUID) *UserCreate {
+	_c.mutation.AddVotedDiscussionIDs(ids...)
+	return _c
+}
+
+// AddVotedDiscussions adds the "voted_discussions" edges to the Discussion entity.
+func (_c *UserCreate) AddVotedDiscussions(v ...*Discussion) *UserCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddVotedDiscussionIDs(ids...)
+}
+
 // AddTeamIDs adds the "teams" edge to the Team entity by IDs.
 func (_c *UserCreate) AddTeamIDs(ids ...uuid.UUID) *UserCreate {
 	_c.mutation.AddTeamIDs(ids...)
@@ -1795,6 +1810,22 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Inverse: true,
 			Table:   user.SubscribedDiscussionsTable,
 			Columns: user.SubscribedDiscussionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.VotedDiscussionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.VotedDiscussionsTable,
+			Columns: user.VotedDiscussionsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),

@@ -13,6 +13,7 @@ import (
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/initiative"
 	"ricrac/ent/issue"
+	"ricrac/ent/messageversion"
 	"ricrac/ent/notification"
 	"ricrac/ent/project"
 	"ricrac/ent/projectmilestone"
@@ -245,6 +246,20 @@ func (_c *CommentCreate) SetNillableEditedAt(v *time.Time) *CommentCreate {
 	return _c
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (_c *CommentCreate) SetDeletedAt(v time.Time) *CommentCreate {
+	_c.mutation.SetDeletedAt(v)
+	return _c
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (_c *CommentCreate) SetNillableDeletedAt(v *time.Time) *CommentCreate {
+	if v != nil {
+		_c.SetDeletedAt(*v)
+	}
+	return _c
+}
+
 // SetResolvedAt sets the "resolved_at" field.
 func (_c *CommentCreate) SetResolvedAt(v time.Time) *CommentCreate {
 	_c.mutation.SetResolvedAt(v)
@@ -435,6 +450,21 @@ func (_c *CommentCreate) AddGithubOutbox(v ...*GithubOutbox) *CommentCreate {
 	return _c.AddGithubOutboxIDs(ids...)
 }
 
+// AddVersionIDs adds the "versions" edge to the MessageVersion entity by IDs.
+func (_c *CommentCreate) AddVersionIDs(ids ...uuid.UUID) *CommentCreate {
+	_c.mutation.AddVersionIDs(ids...)
+	return _c
+}
+
+// AddVersions adds the "versions" edges to the MessageVersion entity.
+func (_c *CommentCreate) AddVersions(v ...*MessageVersion) *CommentCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddVersionIDs(ids...)
+}
+
 // Mutation returns the CommentMutation object of the builder.
 func (_c *CommentCreate) Mutation() *CommentMutation {
 	return _c.mutation
@@ -542,6 +572,10 @@ func (_c *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.EditedAt(); ok {
 		_spec.SetField(comment.FieldEditedAt, field.TypeTime, value)
 		_node.EditedAt = &value
+	}
+	if value, ok := _c.mutation.DeletedAt(); ok {
+		_spec.SetField(comment.FieldDeletedAt, field.TypeTime, value)
+		_node.DeletedAt = &value
 	}
 	if value, ok := _c.mutation.ResolvedAt(); ok {
 		_spec.SetField(comment.FieldResolvedAt, field.TypeTime, value)
@@ -816,6 +850,22 @@ func (_c *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(githuboutbox.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.VersionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   comment.VersionsTable,
+			Columns: []string{comment.VersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -1148,6 +1198,24 @@ func (u *CommentUpsert) UpdateEditedAt() *CommentUpsert {
 // ClearEditedAt clears the value of the "edited_at" field.
 func (u *CommentUpsert) ClearEditedAt() *CommentUpsert {
 	u.SetNull(comment.FieldEditedAt)
+	return u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *CommentUpsert) SetDeletedAt(v time.Time) *CommentUpsert {
+	u.Set(comment.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *CommentUpsert) UpdateDeletedAt() *CommentUpsert {
+	u.SetExcluded(comment.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *CommentUpsert) ClearDeletedAt() *CommentUpsert {
+	u.SetNull(comment.FieldDeletedAt)
 	return u
 }
 
@@ -1590,6 +1658,27 @@ func (u *CommentUpsertOne) UpdateEditedAt() *CommentUpsertOne {
 func (u *CommentUpsertOne) ClearEditedAt() *CommentUpsertOne {
 	return u.Update(func(s *CommentUpsert) {
 		s.ClearEditedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *CommentUpsertOne) SetDeletedAt(v time.Time) *CommentUpsertOne {
+	return u.Update(func(s *CommentUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *CommentUpsertOne) UpdateDeletedAt() *CommentUpsertOne {
+	return u.Update(func(s *CommentUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *CommentUpsertOne) ClearDeletedAt() *CommentUpsertOne {
+	return u.Update(func(s *CommentUpsert) {
+		s.ClearDeletedAt()
 	})
 }
 
@@ -2211,6 +2300,27 @@ func (u *CommentUpsertBulk) UpdateEditedAt() *CommentUpsertBulk {
 func (u *CommentUpsertBulk) ClearEditedAt() *CommentUpsertBulk {
 	return u.Update(func(s *CommentUpsert) {
 		s.ClearEditedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *CommentUpsertBulk) SetDeletedAt(v time.Time) *CommentUpsertBulk {
+	return u.Update(func(s *CommentUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *CommentUpsertBulk) UpdateDeletedAt() *CommentUpsertBulk {
+	return u.Update(func(s *CommentUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *CommentUpsertBulk) ClearDeletedAt() *CommentUpsertBulk {
+	return u.Update(func(s *CommentUpsert) {
+		s.ClearDeletedAt()
 	})
 }
 

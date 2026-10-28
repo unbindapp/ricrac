@@ -69,6 +69,8 @@ const (
 	EdgeDiscussionThreads = "discussion_threads"
 	// EdgeComments holds the string denoting the comments edge name in mutations.
 	EdgeComments = "comments"
+	// EdgeMessageVersions holds the string denoting the message_versions edge name in mutations.
+	EdgeMessageVersions = "message_versions"
 	// EdgeReactions holds the string denoting the reactions edge name in mutations.
 	EdgeReactions = "reactions"
 	// EdgeCustomerStatuses holds the string denoting the customer_statuses edge name in mutations.
@@ -241,6 +243,13 @@ const (
 	CommentsInverseTable = "comments"
 	// CommentsColumn is the table column denoting the comments relation/edge.
 	CommentsColumn = "workspace_id"
+	// MessageVersionsTable is the table that holds the message_versions relation/edge.
+	MessageVersionsTable = "message_versions"
+	// MessageVersionsInverseTable is the table name for the MessageVersion entity.
+	// It exists in this package in order to avoid circular dependency with the "messageversion" package.
+	MessageVersionsInverseTable = "message_versions"
+	// MessageVersionsColumn is the table column denoting the message_versions relation/edge.
+	MessageVersionsColumn = "workspace_id"
 	// ReactionsTable is the table that holds the reactions relation/edge.
 	ReactionsTable = "reactions"
 	// ReactionsInverseTable is the table name for the Reaction entity.
@@ -703,6 +712,20 @@ func ByComments(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByMessageVersionsCount orders the results by message_versions count.
+func ByMessageVersionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newMessageVersionsStep(), opts...)
+	}
+}
+
+// ByMessageVersions orders the results by message_versions terms.
+func ByMessageVersions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newMessageVersionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByReactionsCount orders the results by reactions count.
 func ByReactionsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -1050,6 +1073,13 @@ func newCommentsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CommentsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, CommentsTable, CommentsColumn),
+	)
+}
+func newMessageVersionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(MessageVersionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, MessageVersionsTable, MessageVersionsColumn),
 	)
 }
 func newReactionsStep() *sqlgraph.Step {

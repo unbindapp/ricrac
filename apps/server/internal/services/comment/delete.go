@@ -18,15 +18,45 @@ func (self *CommentService) Delete(ctx context.Context, actor *auth.Actor, input
 	if (row.UserID == nil || *row.UserID != actor.User) && actor.Role < auth.Admin {
 		return models.DeletedComment{}, errdefs.Forbidden("Only its author or a workspace admin can delete a comment")
 	}
-	var replies int
+	deleted := models.DeletedComment{Deleted: models.ID(row.ID)}
+	if row.DeletedAt != nil {
+		return deleted, nil
+	}
+	target, err := TargetOf(row)
+	if err != nil {
+		return models.DeletedComment{}, err
+	}
 	err = self.repo.WithTx(ctx, func(tx repository.TxInterface) error {
-		replies, err = self.Remove(ctx, tx, actor, row)
+		if inForum(target) {
+			return self.tombstone(ctx, tx, actor, row, target)
+		}
+		deleted.DeletedReplies, err = self.Remove(ctx, tx, actor, row)
 		return err
 	})
 	if err != nil {
 		return models.DeletedComment{}, err
 	}
-	return models.DeletedComment{Deleted: models.ID(row.ID), DeletedReplies: replies}, nil
+	return deleted, nil
+}
+
+// tombstone empties a forum message and marks it deleted, keeping its place and its replies.
+func (self *CommentService) tombstone(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, row *ent.Comment, target Target) error {
+	value, err := self.detail(ctx, tx, row.ID)
+	if err != nil {
+		return err
+	}
+	now, err := self.repo.Now(ctx, tx)
+	if err != nil {
+		return err
+	}
+	if err := self.repo.Comment().Tombstone(ctx, tx, row.ID, now); err != nil {
+		return err
+	}
+	team, err := self.teamOf(ctx, tx, target)
+	if err != nil {
+		return err
+	}
+	return self.events.Emit(ctx, tx, actor, "Comment", "remove", value, nil, team)
 }
 
 // Remove deletes a comment and its replies, answering how many replies went with it.
