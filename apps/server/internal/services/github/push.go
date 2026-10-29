@@ -82,9 +82,37 @@ func (self *GitHubService) pushLinkBack(ctx context.Context, token string, entry
 	if err != nil || identifier == "" {
 		return err
 	}
-	body := github.LinkBackBody(identifier, models.IssueURL(self.cfg.PublicURL, workspaceKey, identifier))
-	_, err = self.app.Do(ctx, token, http.MethodPost, github.IssuePath(entry.FullName, entry.Number)+"/comments", M{"body": body}, nil)
+	link := models.IssueURL(self.cfg.PublicURL, workspaceKey, identifier)
+	filled, err := self.fillRicracField(ctx, token, entry, link)
+	if err != nil || filled {
+		return err
+	}
+	_, err = self.app.Do(ctx, token, http.MethodPost, github.IssuePath(entry.FullName, entry.Number)+"/comments",
+		M{"body": github.LinkBackBody(identifier, link)}, nil)
 	return err
+}
+
+// fillRicracField puts the link in the organization's Ricrac issue field, false when it has none
+// or the app can't use it.
+func (self *GitHubService) fillRicracField(ctx context.Context, token string, entry github_repo.OutboxEntry, link string) (bool, error) {
+	var fields []github.IssueField
+	_, err := self.app.Do(ctx, token, http.MethodGet, github.IssueFieldsPath(entry.FullName), nil, &fields)
+	if github.IsUnavailable(err) {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	field := github.RicracField(fields)
+	if field == nil {
+		return false, nil
+	}
+	values := M{"issue_field_values": []M{{"field_id": field.ID, "value": link}}}
+	_, err = self.app.Do(ctx, token, http.MethodPost, github.IssuePath(entry.FullName, entry.Number)+"/issue-field-values", values, nil)
+	if github.IsUnavailable(err) {
+		return false, nil
+	}
+	return err == nil, err
 }
 
 // bodyForApp is a comment's body as the app posts it as itself, with its author's name.

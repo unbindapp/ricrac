@@ -296,6 +296,23 @@ func FromRicrac(body string) bool {
 	return fromRicrac.MatchString(body)
 }
 
+// IssueField is a field an organization's issues have.
+type IssueField struct {
+	ID       int64  `json:"id"`
+	Name     string `json:"name"`
+	DataType string `json:"data_type"`
+}
+
+// RicracField is the text field named Ricrac, which holds the link to an issue's Ricrac issue.
+func RicracField(fields []IssueField) *IssueField {
+	for i, field := range fields {
+		if field.DataType == "text" && strings.EqualFold(strings.TrimSpace(field.Name), "Ricrac") {
+			return &fields[i]
+		}
+	}
+	return nil
+}
+
 // LinkBackBody is the comment the app leaves on a GitHub issue it imported.
 func LinkBackBody(identifier, url string) string {
 	return "Tracked in Ricrac as [" + identifier + "](" + url + ")."

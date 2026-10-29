@@ -250,6 +250,12 @@ func IsNotFound(err error) bool {
 	return errors.As(err, &apiErr) && (apiErr.Status == http.StatusNotFound || apiErr.Status == http.StatusGone)
 }
 
+// IsUnavailable says GitHub has no such thing or won't let the app use it.
+func IsUnavailable(err error) bool {
+	var apiErr *APIError
+	return IsNotFound(err) || errors.As(err, &apiErr) && apiErr.Status == http.StatusForbidden
+}
+
 // Do calls the REST API with a token, sending body as JSON and decoding the answer into out. It
 // answers the next page, or 0 when there's none.
 func (a *App) Do(ctx context.Context, token, method, path string, body, out any) (int, error) {
@@ -327,6 +333,12 @@ func RepoPath(fullName string) string {
 
 func IssuePath(fullName string, number int) string {
 	return RepoPath(fullName) + "/issues/" + strconv.Itoa(number)
+}
+
+// IssueFieldsPath is the issue fields of the organization that owns the repository.
+func IssueFieldsPath(fullName string) string {
+	owner, _, _ := strings.Cut(fullName, "/")
+	return "/orgs/" + url.PathEscape(owner) + "/issue-fields"
 }
 
 func CommentPath(fullName string, comment int64) string {
