@@ -26,19 +26,19 @@ export function useTeamStates(teamId: string | undefined) {
 
 /** Active members of the workspace. */
 export function useWorkspaceUsers() {
-  const { workspace } = useWorkspace();
-  const { data, isPending } = useQuery(usersQuery(workspace.id));
+  const { workspace, isVisitor } = useWorkspace();
+  const { data, isPending } = useQuery({ ...usersQuery(workspace.id), enabled: !isVisitor });
   const users = useMemo(() => (data ?? []).filter((user) => user.active), [data]);
   return { users, isPending };
 }
 
 /** The member's avatar, which refs in issues and comments don't carry. */
 export function useAvatarUrl(user: Pick<UserRef, "id"> | null | undefined) {
-  const { workspace } = useWorkspace();
+  const { workspace, isVisitor } = useWorkspace();
   const { data } = useQuery({
     ...usersQuery(workspace.id),
     select: (users: WorkspaceUser[]) => users.find((item) => item.id === user?.id)?.avatarUrl,
-    enabled: Boolean(user),
+    enabled: Boolean(user) && !isVisitor,
   });
   return data ?? null;
 }
@@ -57,8 +57,11 @@ export function useLabels(teamId: string | undefined) {
 
 /** Open projects, the team's first. */
 export function useProjects(teamId: string | undefined) {
-  const { workspace } = useWorkspace();
-  const { data, isPending } = useQuery(issueProjectsQuery(workspace.id));
+  const { workspace, isVisitor } = useWorkspace();
+  const { data, isPending } = useQuery({
+    ...issueProjectsQuery(workspace.id),
+    enabled: !isVisitor,
+  });
   const projects = useMemo(() => {
     const open = (data ?? []).filter(
       (project) =>
@@ -73,8 +76,8 @@ export function useProjects(teamId: string | undefined) {
 
 /** Every project by id, for icons and colors that project refs don't carry. */
 export function useProjectLookup() {
-  const { workspace } = useWorkspace();
-  const { data } = useQuery(issueProjectsQuery(workspace.id));
+  const { workspace, isVisitor } = useWorkspace();
+  const { data } = useQuery({ ...issueProjectsQuery(workspace.id), enabled: !isVisitor });
   return useMemo(() => new Map((data ?? []).map((project) => [project.id, project])), [data]);
 }
 
@@ -89,9 +92,9 @@ export function useMilestones(projectId: string | undefined) {
 
 /** The team's current and upcoming cycles, when it uses cycles. */
 export function useCycles(teamId: string | undefined) {
-  const { workspace } = useWorkspace();
+  const { workspace, isVisitor } = useWorkspace();
   const team = useTeamDetail(teamId);
-  const enabled = Boolean(teamId && team?.cyclesEnabled);
+  const enabled = Boolean(teamId && team?.cyclesEnabled) && !isVisitor;
   const { data, isPending } = useQuery({
     ...cyclesQuery(workspace.id, teamId ?? ""),
     enabled,

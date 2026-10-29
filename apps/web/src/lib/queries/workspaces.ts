@@ -1,4 +1,4 @@
-import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
+import { type QueryClient, queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 
 import type { CreateWorkspace, WorkspaceSummary } from "@/api/account.gen";
@@ -6,6 +6,7 @@ import type { Invitation, Workspace } from "@/api/ops.gen";
 import { workspaceUrlKeyPattern } from "@/lib/helpers/identifiers";
 import { queryKeyMe } from "@/lib/queries/me";
 import { account, call, callAll, type OpArgs } from "@/lib/server/client";
+import { isApiError } from "@/lib/server/errors";
 
 export type TWorkspaceRole = Workspace["role"];
 
@@ -46,6 +47,22 @@ export const workspaceQuery = (workspaceId: string) =>
     queryKey: queryKeyWorkspace.detail(workspaceId),
     queryFn: () => call(workspaceId, "get_workspace", {}),
   });
+
+/** A public workspace by URL key, read as a visitor; null when it isn't one. */
+export async function fetchPublicWorkspace(
+  queryClient: QueryClient,
+  urlKey: string,
+): Promise<WorkspaceSummary | null> {
+  try {
+    const workspace = await call(urlKey, "get_workspace", {});
+    queryClient.setQueryData(queryKeyWorkspace.detail(workspace.id), workspace);
+    const { id, name, logoUrl, theme } = workspace;
+    return { id, name, urlKey: workspace.urlKey, logoUrl, theme, role: "guest" };
+  } catch (error) {
+    if (isApiError(error) && error.status < 500) return null;
+    throw error;
+  }
+}
 
 export const invitationsQuery = (workspaceId: string) =>
   queryOptions({
