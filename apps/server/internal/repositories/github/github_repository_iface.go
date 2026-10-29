@@ -41,7 +41,7 @@ type GitHubRepositoryInterface interface {
 	RepoTaken(ctx context.Context, repoID int64) (bool, error)
 	CreateRepoSync(ctx context.Context, input NewRepoSync) (uuid.UUID, error)
 	// ChangeRepoSync moves a sync to team when given and, when setProject, to project.
-	ChangeRepoSync(ctx context.Context, id uuid.UUID, team *uuid.UUID, setProject bool, project *uuid.UUID) error
+	ChangeRepoSync(ctx context.Context, id uuid.UUID, team *uuid.UUID, setProject bool, project *uuid.UUID, linkBack *bool) error
 	// RequestBackfill sets the sync's import of existing issues to start over.
 	RequestBackfill(ctx context.Context, id uuid.UUID, includeClosed *bool) error
 	DeleteRepoSync(ctx context.Context, id uuid.UUID) error
@@ -63,6 +63,8 @@ type GitHubRepositoryInterface interface {
 	LinkPostedComment(ctx context.Context, tx repository.TxInterface, commentID uuid.UUID, issueID *uuid.UUID, githubID int64, postedAs *uuid.UUID) error
 	// Issue is an issue, nil when there's none.
 	Issue(ctx context.Context, id uuid.UUID) (*ent.Issue, error)
+	// IssueAddress is an issue's identifier and its workspace's URL key, empty when it's gone.
+	IssueAddress(ctx context.Context, id uuid.UUID) (string, string, error)
 	// DuplicateTarget is the GitHub issue, in the same repository, of the issue this one duplicates;
 	// nil when it duplicates none or that one isn't synced there.
 	DuplicateTarget(ctx context.Context, issueID, repoSync uuid.UUID) (*ent.GithubIssueLink, error)
@@ -101,8 +103,10 @@ type GitHubRepositoryInterface interface {
 	// LinkedComment is the comment a GitHub comment is linked to.
 	LinkedComment(ctx context.Context, githubID int64) (uuid.UUID, bool, error)
 	AddCommentLink(ctx context.Context, tx repository.TxInterface, commentID, issueID uuid.UUID, githubID int64) error
-	// DateComment sets when a comment was written.
-	DateComment(ctx context.Context, tx repository.TxInterface, id uuid.UUID, at time.Time) error
+	// StampImportedComment sets when a comment was written on GitHub and, without a Ricrac account, by whom.
+	StampImportedComment(ctx context.Context, tx repository.TxInterface, id uuid.UUID, at time.Time, githubAuthor *string) error
+	// QueueLinkBack queues the comment linking a GitHub issue to the Ricrac issue it was imported as.
+	QueueLinkBack(ctx context.Context, tx repository.TxInterface, issueID uuid.UUID) error
 	// DueBackfills is up to five syncs waiting to import issues, of installations that aren't
 	// suspended, least recently touched first.
 	DueBackfills(ctx context.Context) ([]uuid.UUID, error)

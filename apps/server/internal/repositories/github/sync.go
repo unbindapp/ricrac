@@ -185,9 +185,20 @@ func (self *GitHubRepository) AddCommentLink(ctx context.Context, tx repository.
 	return self.base.Client(tx).GithubCommentLink.Create().SetID(commentID).SetIssueID(issueID).SetGithubID(githubID).Exec(ctx)
 }
 
-// DateComment sets when a comment was written.
-func (self *GitHubRepository) DateComment(ctx context.Context, tx repository.TxInterface, id uuid.UUID, at time.Time) error {
-	return self.base.Client(tx).Comment.Update().Where(comment.ID(id)).SetCreatedAt(at).SetUpdatedAt(at).Exec(ctx)
+// StampImportedComment sets when a comment was written on GitHub and, without a Ricrac account, by whom.
+func (self *GitHubRepository) StampImportedComment(ctx context.Context, tx repository.TxInterface, id uuid.UUID, at time.Time, githubAuthor *string) error {
+	return self.base.Client(tx).Comment.Update().Where(comment.ID(id)).SetCreatedAt(at).SetUpdatedAt(at).
+		SetNillableGithubAuthor(githubAuthor).Exec(ctx)
+}
+
+// QueueLinkBack queues the comment linking a GitHub issue to the Ricrac issue it was imported as.
+func (self *GitHubRepository) QueueLinkBack(ctx context.Context, tx repository.TxInterface, issueID uuid.UUID) error {
+	link, err := self.base.Client(tx).GithubIssueLink.Get(ctx, issueID)
+	if err != nil {
+		return err
+	}
+	return self.base.Client(tx).GithubOutbox.Create().SetRepoSyncID(link.RepoSyncID).SetGithubNumber(link.GithubNumber).
+		SetIssueID(issueID).SetKind("link_back").Exec(ctx)
 }
 
 // DueBackfills is up to five syncs waiting to import issues, of installations that aren't

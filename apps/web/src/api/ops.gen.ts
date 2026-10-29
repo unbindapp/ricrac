@@ -29,6 +29,8 @@ export type Comment = {
   /** When it was deleted; its body is then empty. */
   deletedAt: string | null
   editedAt: string | null
+  /** The GitHub login of who wrote it on GitHub without a Ricrac account; user is then null. */
+  githubAuthor: string | null
   id: string
   quotedText: string | null
   reactions: CommentReaction[]
@@ -51,6 +53,8 @@ export type CommentDetail = {
   discussionThread: DiscussionThreadRef | null
   document: DocumentRef | null
   editedAt: string | null
+  /** The GitHub login of who wrote it on GitHub without a Ricrac account; user is then null. */
+  githubAuthor: string | null
   id: string
   initiative: InitiativeRef | null
   issue: IssueRef | null
@@ -99,6 +103,8 @@ export type CommentThread = {
   /** When it was deleted; its body is then empty. */
   deletedAt: string | null
   editedAt: string | null
+  /** The GitHub login of who wrote it on GitHub without a Ricrac account; user is then null. */
+  githubAuthor: string | null
   id: string
   quotedText: string | null
   reactions: CommentReaction[]
@@ -738,6 +744,8 @@ export type GitHubRepoSync = {
   /** Why the last change from or to GitHub failed; null after one succeeds. */
   lastError: string | null
   lastSyncedAt: string | null
+  /** Issues opened on GitHub get a comment linking their Ricrac issue. */
+  linkBack: boolean
   linkedIssueCount: number
   project: ProjectRef | null
   repository: GitHubRepositoryRef
@@ -3900,6 +3908,8 @@ export type SaveGithubRepoSyncArgs = {
   id?: string | null
   /** The import includes closed issues too (default false). */
   includeClosed?: boolean | null
+  /** Comment on each issue opened on GitHub with a link to its Ricrac issue (default false). */
+  linkBack?: boolean | null
   /** Project name, slug or id issues from GitHub join; null for none. */
   project?: string | null
   /** The repository as owner/name or GitHub id, among list_github_repositories. Required to create. */

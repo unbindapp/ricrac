@@ -86,6 +86,11 @@ func ProjectID(v uuid.UUID) predicate.GithubRepoSync {
 	return predicate.GithubRepoSync(sql.FieldEQ(FieldProjectID, v))
 }
 
+// LinkBack applies equality check predicate on the "link_back" field. It's identical to LinkBackEQ.
+func LinkBack(v bool) predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldEQ(FieldLinkBack, v))
+}
+
 // BackfillStatus applies equality check predicate on the "backfill_status" field. It's identical to BackfillStatusEQ.
 func BackfillStatus(v string) predicate.GithubRepoSync {
 	return predicate.GithubRepoSync(sql.FieldEQ(FieldBackfillStatus, v))
@@ -334,6 +339,26 @@ func ProjectIDIsNil() predicate.GithubRepoSync {
 // ProjectIDNotNil applies the NotNil predicate on the "project_id" field.
 func ProjectIDNotNil() predicate.GithubRepoSync {
 	return predicate.GithubRepoSync(sql.FieldNotNull(FieldProjectID))
+}
+
+// LinkBackEQ applies the EQ predicate on the "link_back" field.
+func LinkBackEQ(v bool) predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldEQ(FieldLinkBack, v))
+}
+
+// LinkBackNEQ applies the NEQ predicate on the "link_back" field.
+func LinkBackNEQ(v bool) predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldNEQ(FieldLinkBack, v))
+}
+
+// LinkBackIsNil applies the IsNil predicate on the "link_back" field.
+func LinkBackIsNil() predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldIsNull(FieldLinkBack))
+}
+
+// LinkBackNotNil applies the NotNil predicate on the "link_back" field.
+func LinkBackNotNil() predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldNotNull(FieldLinkBack))
 }
 
 // BackfillStatusEQ applies the EQ predicate on the "backfill_status" field.

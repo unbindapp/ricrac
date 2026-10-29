@@ -258,6 +258,26 @@ func (_u *CommentUpdate) ClearUserID() *CommentUpdate {
 	return _u
 }
 
+// SetGithubAuthor sets the "github_author" field.
+func (_u *CommentUpdate) SetGithubAuthor(v string) *CommentUpdate {
+	_u.mutation.SetGithubAuthor(v)
+	return _u
+}
+
+// SetNillableGithubAuthor sets the "github_author" field if the given value is not nil.
+func (_u *CommentUpdate) SetNillableGithubAuthor(v *string) *CommentUpdate {
+	if v != nil {
+		_u.SetGithubAuthor(*v)
+	}
+	return _u
+}
+
+// ClearGithubAuthor clears the value of the "github_author" field.
+func (_u *CommentUpdate) ClearGithubAuthor() *CommentUpdate {
+	_u.mutation.ClearGithubAuthor()
+	return _u
+}
+
 // SetBody sets the "body" field.
 func (_u *CommentUpdate) SetBody(v string) *CommentUpdate {
 	_u.mutation.SetBody(v)
@@ -821,6 +841,12 @@ func (_u *CommentUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.GithubAuthor(); ok {
+		_spec.SetField(comment.FieldGithubAuthor, field.TypeString, value)
+	}
+	if _u.mutation.GithubAuthorCleared() {
+		_spec.ClearField(comment.FieldGithubAuthor, field.TypeString)
 	}
 	if value, ok := _u.mutation.Body(); ok {
 		_spec.SetField(comment.FieldBody, field.TypeString, value)
@@ -1682,6 +1708,26 @@ func (_u *CommentUpdateOne) ClearUserID() *CommentUpdateOne {
 	return _u
 }
 
+// SetGithubAuthor sets the "github_author" field.
+func (_u *CommentUpdateOne) SetGithubAuthor(v string) *CommentUpdateOne {
+	_u.mutation.SetGithubAuthor(v)
+	return _u
+}
+
+// SetNillableGithubAuthor sets the "github_author" field if the given value is not nil.
+func (_u *CommentUpdateOne) SetNillableGithubAuthor(v *string) *CommentUpdateOne {
+	if v != nil {
+		_u.SetGithubAuthor(*v)
+	}
+	return _u
+}
+
+// ClearGithubAuthor clears the value of the "github_author" field.
+func (_u *CommentUpdateOne) ClearGithubAuthor() *CommentUpdateOne {
+	_u.mutation.ClearGithubAuthor()
+	return _u
+}
+
 // SetBody sets the "body" field.
 func (_u *CommentUpdateOne) SetBody(v string) *CommentUpdateOne {
 	_u.mutation.SetBody(v)
@@ -2275,6 +2321,12 @@ func (_u *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err er
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.GithubAuthor(); ok {
+		_spec.SetField(comment.FieldGithubAuthor, field.TypeString, value)
+	}
+	if _u.mutation.GithubAuthorCleared() {
+		_spec.ClearField(comment.FieldGithubAuthor, field.TypeString)
 	}
 	if value, ok := _u.mutation.Body(); ok {
 		_spec.SetField(comment.FieldBody, field.TypeString, value)

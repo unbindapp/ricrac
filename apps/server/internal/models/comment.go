@@ -10,7 +10,7 @@ func CommentOf(c *ent.Comment) Comment {
 		reactions[i] = CommentReaction{ID: ID(r.ID), Emoji: r.Emoji, User: UserRefOf(r.Edges.User)}
 	}
 	return Comment{
-		ID: ID(c.ID), Body: c.Body, User: UserRefOf(c.Edges.User), QuotedText: c.QuotedText,
+		ID: ID(c.ID), Body: c.Body, User: UserRefOf(c.Edges.User), GitHubAuthor: c.GithubAuthor, QuotedText: c.QuotedText,
 		SuggestedText: c.SuggestedText, SuggestionStatus: c.SuggestionStatus, Reactions: reactions,
 		CreatedAt: Time(c.CreatedAt), UpdatedAt: Time(c.UpdatedAt), EditedAt: TimePtr(c.EditedAt),
 		DeletedAt: TimePtr(c.DeletedAt), ResolvedAt: TimePtr(c.ResolvedAt), ResolvingUser: UserRefOf(c.Edges.ResolvingUser),

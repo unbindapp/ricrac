@@ -300,6 +300,7 @@ type Comment struct {
 	ID               string            `json:"id"`
 	Body             string            `json:"body"`
 	User             *UserRef          `json:"user"`
+	GitHubAuthor     *string           `json:"githubAuthor" doc:"The GitHub login of who wrote it on GitHub without a Ricrac account; user is then null."`
 	QuotedText       *string           `json:"quotedText"`
 	SuggestedText    *string           `json:"suggestedText" doc:"On a document: the text suggested in place of quotedText."`
 	SuggestionStatus *string           `json:"suggestionStatus" doc:"For a suggestion: pending, accepted or rejected."`

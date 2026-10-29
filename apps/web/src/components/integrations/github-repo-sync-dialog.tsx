@@ -32,6 +32,7 @@ const formSchema = z.object({
   project: z.string(),
   includeClosed: z.boolean(),
   backfill: z.boolean(),
+  linkBack: z.boolean(),
 });
 
 type TProps = { trigger: ReactElement; repoSync?: GitHubRepoSync };
@@ -69,11 +70,12 @@ function RepoSyncForm({ repoSync, onDone }: { repoSync?: GitHubRepoSync; onDone:
       project: repoSync?.project?.id ?? NO_PROJECT,
       includeClosed: repoSync?.backfill?.includeClosed ?? false,
       backfill: !repoSync,
+      linkBack: repoSync?.linkBack ?? false,
     },
     validators: { onSubmit: formSchema },
     onSubmit: async ({ value }) => {
       const project = value.project === NO_PROJECT ? null : value.project;
-      const fields = { project, includeClosed: value.includeClosed };
+      const fields = { project, includeClosed: value.includeClosed, linkBack: value.linkBack };
       if (repoSync) {
         await save({ id: repoSync.id, ...fields, backfill: value.backfill || undefined });
         onDone();
@@ -158,6 +160,15 @@ function RepoSyncForm({ repoSync, onDone }: { repoSync?: GitHubRepoSync; onDone:
           <field.SwitchField
             label="Include closed issues"
             description="Imports bring closed issues too, not only open ones."
+          />
+        )}
+      />
+      <form.AppField
+        name="linkBack"
+        children={(field) => (
+          <field.SwitchField
+            label="Link back from GitHub"
+            description="Issues opened on GitHub get a comment with a link to their Ricrac issue."
           />
         )}
       />

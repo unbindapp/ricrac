@@ -17,6 +17,7 @@ import (
 	"ricrac/ent/issue"
 	"ricrac/ent/issuerelation"
 	"ricrac/ent/user"
+	"ricrac/internal/models"
 	repository "ricrac/internal/repositories"
 )
 
@@ -102,6 +103,18 @@ func (self *GitHubRepository) Issue(ctx context.Context, id uuid.UUID) (*ent.Iss
 		return nil, nil
 	}
 	return found, err
+}
+
+// IssueAddress is an issue's identifier and its workspace's URL key, empty when it's gone.
+func (self *GitHubRepository) IssueAddress(ctx context.Context, id uuid.UUID) (string, string, error) {
+	found, err := self.base.DB.Issue.Query().Where(issue.ID(id)).WithTeam().WithWorkspace().Only(ctx)
+	if ent.IsNotFound(err) {
+		return "", "", nil
+	}
+	if err != nil {
+		return "", "", err
+	}
+	return models.Identifier(found.Edges.Team.Key, found.Number), found.Edges.Workspace.URLKey, nil
 }
 
 // DuplicateTarget is the GitHub issue, in the same repository, of the issue this one duplicates;

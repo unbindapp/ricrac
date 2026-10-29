@@ -133,6 +133,26 @@ func (_u *GithubRepoSyncUpdate) ClearProjectID() *GithubRepoSyncUpdate {
 	return _u
 }
 
+// SetLinkBack sets the "link_back" field.
+func (_u *GithubRepoSyncUpdate) SetLinkBack(v bool) *GithubRepoSyncUpdate {
+	_u.mutation.SetLinkBack(v)
+	return _u
+}
+
+// SetNillableLinkBack sets the "link_back" field if the given value is not nil.
+func (_u *GithubRepoSyncUpdate) SetNillableLinkBack(v *bool) *GithubRepoSyncUpdate {
+	if v != nil {
+		_u.SetLinkBack(*v)
+	}
+	return _u
+}
+
+// ClearLinkBack clears the value of the "link_back" field.
+func (_u *GithubRepoSyncUpdate) ClearLinkBack() *GithubRepoSyncUpdate {
+	_u.mutation.ClearLinkBack()
+	return _u
+}
+
 // SetBackfillStatus sets the "backfill_status" field.
 func (_u *GithubRepoSyncUpdate) SetBackfillStatus(v string) *GithubRepoSyncUpdate {
 	_u.mutation.SetBackfillStatus(v)
@@ -577,6 +597,12 @@ func (_u *GithubRepoSyncUpdate) sqlSave(ctx context.Context) (_node int, err err
 	if value, ok := _u.mutation.FullName(); ok {
 		_spec.SetField(githubreposync.FieldFullName, field.TypeString, value)
 	}
+	if value, ok := _u.mutation.LinkBack(); ok {
+		_spec.SetField(githubreposync.FieldLinkBack, field.TypeBool, value)
+	}
+	if _u.mutation.LinkBackCleared() {
+		_spec.ClearField(githubreposync.FieldLinkBack, field.TypeBool)
+	}
 	if value, ok := _u.mutation.BackfillStatus(); ok {
 		_spec.SetField(githubreposync.FieldBackfillStatus, field.TypeString, value)
 	}
@@ -980,6 +1006,26 @@ func (_u *GithubRepoSyncUpdateOne) SetNillableProjectID(v *uuid.UUID) *GithubRep
 // ClearProjectID clears the value of the "project_id" field.
 func (_u *GithubRepoSyncUpdateOne) ClearProjectID() *GithubRepoSyncUpdateOne {
 	_u.mutation.ClearProjectID()
+	return _u
+}
+
+// SetLinkBack sets the "link_back" field.
+func (_u *GithubRepoSyncUpdateOne) SetLinkBack(v bool) *GithubRepoSyncUpdateOne {
+	_u.mutation.SetLinkBack(v)
+	return _u
+}
+
+// SetNillableLinkBack sets the "link_back" field if the given value is not nil.
+func (_u *GithubRepoSyncUpdateOne) SetNillableLinkBack(v *bool) *GithubRepoSyncUpdateOne {
+	if v != nil {
+		_u.SetLinkBack(*v)
+	}
+	return _u
+}
+
+// ClearLinkBack clears the value of the "link_back" field.
+func (_u *GithubRepoSyncUpdateOne) ClearLinkBack() *GithubRepoSyncUpdateOne {
+	_u.mutation.ClearLinkBack()
 	return _u
 }
 
@@ -1456,6 +1502,12 @@ func (_u *GithubRepoSyncUpdateOne) sqlSave(ctx context.Context) (_node *GithubRe
 	}
 	if value, ok := _u.mutation.FullName(); ok {
 		_spec.SetField(githubreposync.FieldFullName, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.LinkBack(); ok {
+		_spec.SetField(githubreposync.FieldLinkBack, field.TypeBool, value)
+	}
+	if _u.mutation.LinkBackCleared() {
+		_spec.ClearField(githubreposync.FieldLinkBack, field.TypeBool)
 	}
 	if value, ok := _u.mutation.BackfillStatus(); ok {
 		_spec.SetField(githubreposync.FieldBackfillStatus, field.TypeString, value)

@@ -34,6 +34,8 @@ type GithubRepoSync struct {
 	TeamID uuid.UUID `json:"team_id,omitempty"`
 	// ProjectID holds the value of the "project_id" field.
 	ProjectID *uuid.UUID `json:"project_id,omitempty"`
+	// LinkBack holds the value of the "link_back" field.
+	LinkBack bool `json:"link_back,omitempty"`
 	// BackfillStatus holds the value of the "backfill_status" field.
 	BackfillStatus *string `json:"backfill_status,omitempty"`
 	// BackfillClosed holds the value of the "backfill_closed" field.
@@ -150,7 +152,7 @@ func (*GithubRepoSync) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case githubreposync.FieldProjectID:
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case githubreposync.FieldBackfillClosed:
+		case githubreposync.FieldLinkBack, githubreposync.FieldBackfillClosed:
 			values[i] = new(sql.NullBool)
 		case githubreposync.FieldInstallationID, githubreposync.FieldRepoID, githubreposync.FieldBackfillPage, githubreposync.FieldIssuesCreated, githubreposync.FieldIssuesUpdated, githubreposync.FieldCommentsCreated, githubreposync.FieldSkipped:
 			values[i] = new(sql.NullInt64)
@@ -217,6 +219,12 @@ func (_m *GithubRepoSync) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.ProjectID = new(uuid.UUID)
 				*_m.ProjectID = *value.S.(*uuid.UUID)
+			}
+		case githubreposync.FieldLinkBack:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field link_back", values[i])
+			} else if value.Valid {
+				_m.LinkBack = value.Bool
 			}
 		case githubreposync.FieldBackfillStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -372,6 +380,9 @@ func (_m *GithubRepoSync) String() string {
 		builder.WriteString("project_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
+	builder.WriteString(", ")
+	builder.WriteString("link_back=")
+	builder.WriteString(fmt.Sprintf("%v", _m.LinkBack))
 	builder.WriteString(", ")
 	if v := _m.BackfillStatus; v != nil {
 		builder.WriteString("backfill_status=")

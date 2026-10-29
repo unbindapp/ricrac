@@ -74,6 +74,20 @@ func (_c *GithubRepoSyncCreate) SetNillableProjectID(v *uuid.UUID) *GithubRepoSy
 	return _c
 }
 
+// SetLinkBack sets the "link_back" field.
+func (_c *GithubRepoSyncCreate) SetLinkBack(v bool) *GithubRepoSyncCreate {
+	_c.mutation.SetLinkBack(v)
+	return _c
+}
+
+// SetNillableLinkBack sets the "link_back" field if the given value is not nil.
+func (_c *GithubRepoSyncCreate) SetNillableLinkBack(v *bool) *GithubRepoSyncCreate {
+	if v != nil {
+		_c.SetLinkBack(*v)
+	}
+	return _c
+}
+
 // SetBackfillStatus sets the "backfill_status" field.
 func (_c *GithubRepoSyncCreate) SetBackfillStatus(v string) *GithubRepoSyncCreate {
 	_c.mutation.SetBackfillStatus(v)
@@ -403,6 +417,10 @@ func (_c *GithubRepoSyncCreate) createSpec() (*GithubRepoSync, *sqlgraph.CreateS
 		_spec.SetField(githubreposync.FieldFullName, field.TypeString, value)
 		_node.FullName = value
 	}
+	if value, ok := _c.mutation.LinkBack(); ok {
+		_spec.SetField(githubreposync.FieldLinkBack, field.TypeBool, value)
+		_node.LinkBack = value
+	}
 	if value, ok := _c.mutation.BackfillStatus(); ok {
 		_spec.SetField(githubreposync.FieldBackfillStatus, field.TypeString, value)
 		_node.BackfillStatus = &value
@@ -680,6 +698,24 @@ func (u *GithubRepoSyncUpsert) UpdateProjectID() *GithubRepoSyncUpsert {
 // ClearProjectID clears the value of the "project_id" field.
 func (u *GithubRepoSyncUpsert) ClearProjectID() *GithubRepoSyncUpsert {
 	u.SetNull(githubreposync.FieldProjectID)
+	return u
+}
+
+// SetLinkBack sets the "link_back" field.
+func (u *GithubRepoSyncUpsert) SetLinkBack(v bool) *GithubRepoSyncUpsert {
+	u.Set(githubreposync.FieldLinkBack, v)
+	return u
+}
+
+// UpdateLinkBack sets the "link_back" field to the value that was provided on create.
+func (u *GithubRepoSyncUpsert) UpdateLinkBack() *GithubRepoSyncUpsert {
+	u.SetExcluded(githubreposync.FieldLinkBack)
+	return u
+}
+
+// ClearLinkBack clears the value of the "link_back" field.
+func (u *GithubRepoSyncUpsert) ClearLinkBack() *GithubRepoSyncUpsert {
+	u.SetNull(githubreposync.FieldLinkBack)
 	return u
 }
 
@@ -1054,6 +1090,27 @@ func (u *GithubRepoSyncUpsertOne) UpdateProjectID() *GithubRepoSyncUpsertOne {
 func (u *GithubRepoSyncUpsertOne) ClearProjectID() *GithubRepoSyncUpsertOne {
 	return u.Update(func(s *GithubRepoSyncUpsert) {
 		s.ClearProjectID()
+	})
+}
+
+// SetLinkBack sets the "link_back" field.
+func (u *GithubRepoSyncUpsertOne) SetLinkBack(v bool) *GithubRepoSyncUpsertOne {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.SetLinkBack(v)
+	})
+}
+
+// UpdateLinkBack sets the "link_back" field to the value that was provided on create.
+func (u *GithubRepoSyncUpsertOne) UpdateLinkBack() *GithubRepoSyncUpsertOne {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.UpdateLinkBack()
+	})
+}
+
+// ClearLinkBack clears the value of the "link_back" field.
+func (u *GithubRepoSyncUpsertOne) ClearLinkBack() *GithubRepoSyncUpsertOne {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.ClearLinkBack()
 	})
 }
 
@@ -1633,6 +1690,27 @@ func (u *GithubRepoSyncUpsertBulk) UpdateProjectID() *GithubRepoSyncUpsertBulk {
 func (u *GithubRepoSyncUpsertBulk) ClearProjectID() *GithubRepoSyncUpsertBulk {
 	return u.Update(func(s *GithubRepoSyncUpsert) {
 		s.ClearProjectID()
+	})
+}
+
+// SetLinkBack sets the "link_back" field.
+func (u *GithubRepoSyncUpsertBulk) SetLinkBack(v bool) *GithubRepoSyncUpsertBulk {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.SetLinkBack(v)
+	})
+}
+
+// UpdateLinkBack sets the "link_back" field to the value that was provided on create.
+func (u *GithubRepoSyncUpsertBulk) UpdateLinkBack() *GithubRepoSyncUpsertBulk {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.UpdateLinkBack()
+	})
+}
+
+// ClearLinkBack clears the value of the "link_back" field.
+func (u *GithubRepoSyncUpsertBulk) ClearLinkBack() *GithubRepoSyncUpsertBulk {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.ClearLinkBack()
 	})
 }
 

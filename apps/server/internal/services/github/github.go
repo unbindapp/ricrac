@@ -94,4 +94,5 @@ type SaveRepoSyncInput struct {
 	Project       args.Nullable[string] `json:"project" doc:"Project name, slug or id issues from GitHub join; null for none."`
 	Backfill      *bool                 `json:"backfill" doc:"Import the repository's existing issues and comments: on create unless false; true imports again."`
 	IncludeClosed *bool                 `json:"includeClosed" doc:"The import includes closed issues too (default false)."`
+	LinkBack      *bool                 `json:"linkBack" doc:"Comment on each issue opened on GitHub with a link to its Ricrac issue (default false)."`
 }

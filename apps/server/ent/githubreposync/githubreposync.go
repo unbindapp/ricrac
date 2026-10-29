@@ -25,6 +25,8 @@ const (
 	FieldTeamID = "team_id"
 	// FieldProjectID holds the string denoting the project_id field in the database.
 	FieldProjectID = "project_id"
+	// FieldLinkBack holds the string denoting the link_back field in the database.
+	FieldLinkBack = "link_back"
 	// FieldBackfillStatus holds the string denoting the backfill_status field in the database.
 	FieldBackfillStatus = "backfill_status"
 	// FieldBackfillClosed holds the string denoting the backfill_closed field in the database.
@@ -116,6 +118,7 @@ var Columns = []string{
 	FieldFullName,
 	FieldTeamID,
 	FieldProjectID,
+	FieldLinkBack,
 	FieldBackfillStatus,
 	FieldBackfillClosed,
 	FieldBackfillPage,
@@ -180,6 +183,11 @@ func ByTeamID(opts ...sql.OrderTermOption) OrderOption {
 // ByProjectID orders the results by the project_id field.
 func ByProjectID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldProjectID, opts...).ToFunc()
+}
+
+// ByLinkBack orders the results by the link_back field.
+func ByLinkBack(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLinkBack, opts...).ToFunc()
 }
 
 // ByBackfillStatus orders the results by the backfill_status field.

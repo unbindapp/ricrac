@@ -27,6 +27,7 @@ func (Comment) Fields() []ent.Field {
 		field.UUID("discussion_thread_id", uuid.UUID{}).Optional().Nillable(),
 		field.UUID("parent_id", uuid.UUID{}).Optional().Nillable(),
 		field.UUID("user_id", uuid.UUID{}).Optional().Nillable(),
+		field.Text("github_author").Optional().Nillable(),
 		field.Text("body"),
 		field.Text("quoted_text").Optional().Nillable(),
 		field.Text("suggested_text").Optional().Nillable(),
