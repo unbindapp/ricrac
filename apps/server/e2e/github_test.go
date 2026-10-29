@@ -65,6 +65,8 @@ type fakeGitHub struct {
 	repositories  []M
 	issuePages    [][]M
 	comments      map[int][]M
+	// The organization's issue fields; nil answers 404, as for a user's repositories.
+	issueFields []M
 	// Refuse what the app does with its installation token.
 	failing bool
 	// What GitHub answers to what the app does with a user's token, 0 for the usual.
@@ -130,6 +132,12 @@ func (f *fakeGitHub) serve(w http.ResponseWriter, r *http.Request) {
 		answer(M{"installations": f.installations})
 	case path == "/installation/repositories":
 		answer(M{"repositories": f.repositories})
+	case strings.HasSuffix(path, "/issue-fields"):
+		if f.issueFields == nil {
+			writeJSON(w, http.StatusNotFound, M{"message": "Not Found"})
+			return
+		}
+		answer(f.issueFields)
 	case r.Method == http.MethodGet && strings.HasSuffix(path, "/comments"):
 		number, _ := strconv.Atoi(strings.Split(path, "/")[5])
 		answer(f.comments[number])
@@ -566,6 +574,16 @@ func TestIssuesOpenedOnGitHubLinkBackWhenTheSyncAsks(t *testing.T) {
 		p["comment"].(M)["user"] = M{"login": "ricrac-test[bot]", "type": "Bot"}
 	})
 	eq(t, call(t, g.Ann, "list_comments", M{"issueId": identifier}).At("nodes").Len(), 0, "the app's link doesn't come back")
+
+	g.fake.issueFields = []M{{"id": 7, "name": "Priority", "data_type": "single_select"}, {"id": 8, "name": "Ricrac", "data_type": "text"}}
+	g.deliver(t, "issues", "issues_opened.json", func(p M) { p["issue"].(M)["number"], p["issue"].(M)["id"] = 1400, 1400 })
+	g.runJobs(t)
+	eq(t, len(g.fake.sent("POST", "/issues/1400/comments")), 0, "the organization's Ricrac field takes the link instead")
+	filled := g.fake.sent("POST", "/repos/unbindapp/unbind/issues/1400/issue-field-values")
+	eq(t, len(filled), 1)
+	value := filled[0].Body["issue_field_values"].([]any)[0].(M)
+	eq(t, value["field_id"], any(8.0))
+	contains(t, value["value"].(string), "/acme/issue/ENG-3")
 }
 
 func TestRicracChangesGoToGitHubButNotBack(t *testing.T) {
