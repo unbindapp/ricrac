@@ -22,6 +22,7 @@ func (GithubRepoSync) Fields() []ent.Field {
 		field.Text("full_name"),
 		field.UUID("team_id", uuid.UUID{}),
 		field.UUID("project_id", uuid.UUID{}).Optional().Nillable(),
+		field.Bool("link_back").Optional(),
 		field.Text("backfill_status").Optional().Nillable(),
 		field.Bool("backfill_closed").Optional(),
 		field.Int("backfill_page").SchemaType(integer).Optional(),

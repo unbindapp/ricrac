@@ -2892,6 +2892,7 @@ type CommentMutation struct {
 	op                       Op
 	typ                      string
 	id                       *uuid.UUID
+	github_author            *string
 	body                     *string
 	quoted_text              *string
 	suggested_text           *string
@@ -3574,6 +3575,55 @@ func (m *CommentMutation) UserIDCleared() bool {
 func (m *CommentMutation) ResetUserID() {
 	m.user = nil
 	delete(m.clearedFields, comment.FieldUserID)
+}
+
+// SetGithubAuthor sets the "github_author" field.
+func (m *CommentMutation) SetGithubAuthor(s string) {
+	m.github_author = &s
+}
+
+// GithubAuthor returns the value of the "github_author" field in the mutation.
+func (m *CommentMutation) GithubAuthor() (r string, exists bool) {
+	v := m.github_author
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGithubAuthor returns the old "github_author" field's value of the Comment entity.
+// If the Comment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CommentMutation) OldGithubAuthor(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGithubAuthor is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGithubAuthor requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGithubAuthor: %w", err)
+	}
+	return oldValue.GithubAuthor, nil
+}
+
+// ClearGithubAuthor clears the value of the "github_author" field.
+func (m *CommentMutation) ClearGithubAuthor() {
+	m.github_author = nil
+	m.clearedFields[comment.FieldGithubAuthor] = struct{}{}
+}
+
+// GithubAuthorCleared returns if the "github_author" field was cleared in this mutation.
+func (m *CommentMutation) GithubAuthorCleared() bool {
+	_, ok := m.clearedFields[comment.FieldGithubAuthor]
+	return ok
+}
+
+// ResetGithubAuthor resets all changes to the "github_author" field.
+func (m *CommentMutation) ResetGithubAuthor() {
+	m.github_author = nil
+	delete(m.clearedFields, comment.FieldGithubAuthor)
 }
 
 // SetBody sets the "body" field.
@@ -4681,7 +4731,7 @@ func (m *CommentMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CommentMutation) Fields() []string {
-	fields := make([]string, 0, 21)
+	fields := make([]string, 0, 22)
 	if m.workspace != nil {
 		fields = append(fields, comment.FieldWorkspaceID)
 	}
@@ -4714,6 +4764,9 @@ func (m *CommentMutation) Fields() []string {
 	}
 	if m.user != nil {
 		fields = append(fields, comment.FieldUserID)
+	}
+	if m.github_author != nil {
+		fields = append(fields, comment.FieldGithubAuthor)
 	}
 	if m.body != nil {
 		fields = append(fields, comment.FieldBody)
@@ -4775,6 +4828,8 @@ func (m *CommentMutation) Field(name string) (ent.Value, bool) {
 		return m.ParentID()
 	case comment.FieldUserID:
 		return m.UserID()
+	case comment.FieldGithubAuthor:
+		return m.GithubAuthor()
 	case comment.FieldBody:
 		return m.Body()
 	case comment.FieldQuotedText:
@@ -4826,6 +4881,8 @@ func (m *CommentMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldParentID(ctx)
 	case comment.FieldUserID:
 		return m.OldUserID(ctx)
+	case comment.FieldGithubAuthor:
+		return m.OldGithubAuthor(ctx)
 	case comment.FieldBody:
 		return m.OldBody(ctx)
 	case comment.FieldQuotedText:
@@ -4931,6 +4988,13 @@ func (m *CommentMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUserID(v)
+		return nil
+	case comment.FieldGithubAuthor:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGithubAuthor(v)
 		return nil
 	case comment.FieldBody:
 		v, ok := value.(string)
@@ -5062,6 +5126,9 @@ func (m *CommentMutation) ClearedFields() []string {
 	if m.FieldCleared(comment.FieldUserID) {
 		fields = append(fields, comment.FieldUserID)
 	}
+	if m.FieldCleared(comment.FieldGithubAuthor) {
+		fields = append(fields, comment.FieldGithubAuthor)
+	}
 	if m.FieldCleared(comment.FieldQuotedText) {
 		fields = append(fields, comment.FieldQuotedText)
 	}
@@ -5133,6 +5200,9 @@ func (m *CommentMutation) ClearField(name string) error {
 	case comment.FieldUserID:
 		m.ClearUserID()
 		return nil
+	case comment.FieldGithubAuthor:
+		m.ClearGithubAuthor()
+		return nil
 	case comment.FieldQuotedText:
 		m.ClearQuotedText()
 		return nil
@@ -5200,6 +5270,9 @@ func (m *CommentMutation) ResetField(name string) error {
 		return nil
 	case comment.FieldUserID:
 		m.ResetUserID()
+		return nil
+	case comment.FieldGithubAuthor:
+		m.ResetGithubAuthor()
 		return nil
 	case comment.FieldBody:
 		m.ResetBody()
@@ -27590,6 +27663,7 @@ type GithubRepoSyncMutation struct {
 	repo_id                   *int64
 	addrepo_id                *int64
 	full_name                 *string
+	link_back                 *bool
 	backfill_status           *string
 	backfill_closed           *bool
 	backfill_page             *int
@@ -27977,6 +28051,55 @@ func (m *GithubRepoSyncMutation) ProjectIDCleared() bool {
 func (m *GithubRepoSyncMutation) ResetProjectID() {
 	m.project = nil
 	delete(m.clearedFields, githubreposync.FieldProjectID)
+}
+
+// SetLinkBack sets the "link_back" field.
+func (m *GithubRepoSyncMutation) SetLinkBack(b bool) {
+	m.link_back = &b
+}
+
+// LinkBack returns the value of the "link_back" field in the mutation.
+func (m *GithubRepoSyncMutation) LinkBack() (r bool, exists bool) {
+	v := m.link_back
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLinkBack returns the old "link_back" field's value of the GithubRepoSync entity.
+// If the GithubRepoSync object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GithubRepoSyncMutation) OldLinkBack(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLinkBack is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLinkBack requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLinkBack: %w", err)
+	}
+	return oldValue.LinkBack, nil
+}
+
+// ClearLinkBack clears the value of the "link_back" field.
+func (m *GithubRepoSyncMutation) ClearLinkBack() {
+	m.link_back = nil
+	m.clearedFields[githubreposync.FieldLinkBack] = struct{}{}
+}
+
+// LinkBackCleared returns if the "link_back" field was cleared in this mutation.
+func (m *GithubRepoSyncMutation) LinkBackCleared() bool {
+	_, ok := m.clearedFields[githubreposync.FieldLinkBack]
+	return ok
+}
+
+// ResetLinkBack resets all changes to the "link_back" field.
+func (m *GithubRepoSyncMutation) ResetLinkBack() {
+	m.link_back = nil
+	delete(m.clearedFields, githubreposync.FieldLinkBack)
 }
 
 // SetBackfillStatus sets the "backfill_status" field.
@@ -28873,7 +28996,7 @@ func (m *GithubRepoSyncMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *GithubRepoSyncMutation) Fields() []string {
-	fields := make([]string, 0, 17)
+	fields := make([]string, 0, 18)
 	if m.workspace != nil {
 		fields = append(fields, githubreposync.FieldWorkspaceID)
 	}
@@ -28891,6 +29014,9 @@ func (m *GithubRepoSyncMutation) Fields() []string {
 	}
 	if m.project != nil {
 		fields = append(fields, githubreposync.FieldProjectID)
+	}
+	if m.link_back != nil {
+		fields = append(fields, githubreposync.FieldLinkBack)
 	}
 	if m.backfill_status != nil {
 		fields = append(fields, githubreposync.FieldBackfillStatus)
@@ -28945,6 +29071,8 @@ func (m *GithubRepoSyncMutation) Field(name string) (ent.Value, bool) {
 		return m.TeamID()
 	case githubreposync.FieldProjectID:
 		return m.ProjectID()
+	case githubreposync.FieldLinkBack:
+		return m.LinkBack()
 	case githubreposync.FieldBackfillStatus:
 		return m.BackfillStatus()
 	case githubreposync.FieldBackfillClosed:
@@ -28988,6 +29116,8 @@ func (m *GithubRepoSyncMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldTeamID(ctx)
 	case githubreposync.FieldProjectID:
 		return m.OldProjectID(ctx)
+	case githubreposync.FieldLinkBack:
+		return m.OldLinkBack(ctx)
 	case githubreposync.FieldBackfillStatus:
 		return m.OldBackfillStatus(ctx)
 	case githubreposync.FieldBackfillClosed:
@@ -29060,6 +29190,13 @@ func (m *GithubRepoSyncMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetProjectID(v)
+		return nil
+	case githubreposync.FieldLinkBack:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLinkBack(v)
 		return nil
 	case githubreposync.FieldBackfillStatus:
 		v, ok := value.(string)
@@ -29246,6 +29383,9 @@ func (m *GithubRepoSyncMutation) ClearedFields() []string {
 	if m.FieldCleared(githubreposync.FieldProjectID) {
 		fields = append(fields, githubreposync.FieldProjectID)
 	}
+	if m.FieldCleared(githubreposync.FieldLinkBack) {
+		fields = append(fields, githubreposync.FieldLinkBack)
+	}
 	if m.FieldCleared(githubreposync.FieldBackfillStatus) {
 		fields = append(fields, githubreposync.FieldBackfillStatus)
 	}
@@ -29295,6 +29435,9 @@ func (m *GithubRepoSyncMutation) ClearField(name string) error {
 	switch name {
 	case githubreposync.FieldProjectID:
 		m.ClearProjectID()
+		return nil
+	case githubreposync.FieldLinkBack:
+		m.ClearLinkBack()
 		return nil
 	case githubreposync.FieldBackfillStatus:
 		m.ClearBackfillStatus()
@@ -29354,6 +29497,9 @@ func (m *GithubRepoSyncMutation) ResetField(name string) error {
 		return nil
 	case githubreposync.FieldProjectID:
 		m.ResetProjectID()
+		return nil
+	case githubreposync.FieldLinkBack:
+		m.ResetLinkBack()
 		return nil
 	case githubreposync.FieldBackfillStatus:
 		m.ResetBackfillStatus()

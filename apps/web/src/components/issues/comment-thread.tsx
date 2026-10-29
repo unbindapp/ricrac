@@ -14,8 +14,10 @@ import {
 } from "@/components/icons";
 import { userName } from "@/components/issues/grouping";
 import { useWorkspaceUsers } from "@/components/issues/picker-sources";
+import { GithubIcon } from "@/components/icons/github";
 import { UserAvatar } from "@/components/issues/pickers";
 import { AddReactionButton, groupReactions, ReactionBar } from "@/components/issues/reaction-bar";
+import { Avatar } from "@/components/shared/avatar";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { MarkdownEditor } from "@/components/shared/markdown-editor";
 import { MarkdownView } from "@/components/shared/markdown-view";
@@ -211,7 +213,7 @@ function CommentItem({
   const { mutate: setResolved } = useResolveCommentMutation(workspace.id);
   const { mutate: toggleReaction } = useCommentReactionMutation(workspace.id);
   const isAuthor = Boolean(me && comment.user?.id === me.id);
-  const authorName = comment.user ? userName(comment.user) : "Deleted user";
+  const authorName = commentAuthorName(comment);
   const reactions = groupReactions(comment.reactions, me?.id);
   const react = (emoji: string, reacted: boolean) =>
     toggleReaction({ commentId: comment.id, emoji, reacted });
@@ -229,8 +231,19 @@ function CommentItem({
       className="group/comment group/reactable dank:p-4 flex flex-col gap-2 p-3"
     >
       <header className="flex min-h-7 items-center gap-2">
-        {comment.user && <UserAvatar user={comment.user} size="sm" />}
+        <CommentAvatar comment={comment} />
         <span className="dank:type-title-small truncate text-sm font-medium">{authorName}</span>
+        {comment.githubAuthor && (
+          <a
+            href={`https://github.com/${comment.githubAuthor}`}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`${authorName} on GitHub`}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <GithubIcon className="size-3.5" />
+          </a>
+        )}
         <span className="text-muted-foreground text-xs">
           <RelativeTime value={comment.createdAt} />
         </span>
@@ -359,5 +372,24 @@ function CommentItem({
         onConfirm={() => deleteComment(comment.id)}
       />
     </article>
+  );
+}
+
+function commentAuthorName(comment: Comment) {
+  if (comment.user) return userName(comment.user);
+  if (comment.githubAuthor) return `@${comment.githubAuthor}`;
+  return "Deleted user";
+}
+
+function CommentAvatar({ comment }: { comment: Comment }) {
+  if (comment.user) return <UserAvatar user={comment.user} size="sm" />;
+  if (!comment.githubAuthor) return null;
+  return (
+    <Avatar
+      id={comment.githubAuthor}
+      name={comment.githubAuthor}
+      src={`https://github.com/${comment.githubAuthor}.png?size=64`}
+      size="sm"
+    />
   );
 }

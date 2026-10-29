@@ -97,7 +97,7 @@ func (self *GitHubService) backfillIssue(ctx context.Context, sync *ent.GithubRe
 		return err
 	}
 	if link == nil {
-		created, err := self.importIssue(ctx, sync, issue)
+		created, err := self.importIssue(ctx, sync, issue, false)
 		if err != nil {
 			return err
 		}

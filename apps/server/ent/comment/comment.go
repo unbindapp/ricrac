@@ -35,6 +35,8 @@ const (
 	FieldParentID = "parent_id"
 	// FieldUserID holds the string denoting the user_id field in the database.
 	FieldUserID = "user_id"
+	// FieldGithubAuthor holds the string denoting the github_author field in the database.
+	FieldGithubAuthor = "github_author"
 	// FieldBody holds the string denoting the body field in the database.
 	FieldBody = "body"
 	// FieldQuotedText holds the string denoting the quoted_text field in the database.
@@ -220,6 +222,7 @@ var Columns = []string{
 	FieldDiscussionThreadID,
 	FieldParentID,
 	FieldUserID,
+	FieldGithubAuthor,
 	FieldBody,
 	FieldQuotedText,
 	FieldSuggestedText,
@@ -308,6 +311,11 @@ func ByParentID(opts ...sql.OrderTermOption) OrderOption {
 // ByUserID orders the results by the user_id field.
 func ByUserID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUserID, opts...).ToFunc()
+}
+
+// ByGithubAuthor orders the results by the github_author field.
+func ByGithubAuthor(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldGithubAuthor, opts...).ToFunc()
 }
 
 // ByBody orders the results by the body field.

@@ -56,7 +56,7 @@ func (h *hook) issuesEvent(event *github.IssuesEvent) error {
 		return nil
 	}
 	if link == nil {
-		_, err := h.importIssue(h.ctx, sync, &event.Issue)
+		_, err := h.importIssue(h.ctx, sync, &event.Issue, event.Action == "opened")
 		return h.recordSync(h.ctx, sync.ID, err)
 	}
 	return h.recordSync(h.ctx, sync.ID, h.applyIssueEvent(h.ctx, sync, link, event))
@@ -138,8 +138,8 @@ func samePtr[T comparable](a, b *T) bool {
 }
 
 // importIssue creates the Ricrac issue of a GitHub issue, linked to it; false when another
-// delivery linked it first.
-func (self *GitHubService) importIssue(ctx context.Context, sync *ent.GithubRepoSync, issue *github.Issue) (bool, error) {
+// delivery linked it first. A newly opened one gets a comment linking back when the sync wants it.
+func (self *GitHubService) importIssue(ctx context.Context, sync *ent.GithubRepoSync, issue *github.Issue, opened bool) (bool, error) {
 	member := self.memberByLogin(ctx, sync.WorkspaceID, &issue.User)
 	label := byLine("Synced from GitHub #"+strconv.Itoa(issue.Number), member, issue.User.Login)
 	actor := self.access.System(sync.WorkspaceID, member, auth.Origin{Label: label, URL: issue.HTMLURL, FromGitHubIssue: true})
@@ -169,12 +169,24 @@ func (self *GitHubService) importIssue(ctx context.Context, sync *ent.GithubRepo
 		if err != nil {
 			return err
 		}
-		return self.github().AddIssueLink(ctx, tx, id, sync.ID, issue.ID, issue.Number, issue.NodeID, issue.HTMLURL, issue.UpdatedAt)
+		if err := self.github().AddIssueLink(ctx, tx, id, sync.ID, issue.ID, issue.Number, issue.NodeID, issue.HTMLURL, issue.UpdatedAt); err != nil {
+			return err
+		}
+		if !opened || !sync.LinkBack {
+			return nil
+		}
+		return self.github().QueueLinkBack(ctx, tx, id)
 	})
 	if isUniqueViolation(err) {
 		return false, nil
 	}
-	return err == nil, err
+	if err != nil {
+		return false, err
+	}
+	if opened && sync.LinkBack {
+		self.waker.WakeGitHub()
+	}
+	return true, nil
 }
 
 // statusFor is the status of the team a GitHub issue in this state goes to: open issues go to
@@ -403,7 +415,7 @@ func (h *hook) issueComment(event *github.IssueCommentEvent) error {
 		return nil
 	}
 	if link == nil {
-		if _, err := h.importIssue(h.ctx, sync, &event.Issue); err != nil {
+		if _, err := h.importIssue(h.ctx, sync, &event.Issue, false); err != nil {
 			return h.recordSync(h.ctx, sync.ID, err)
 		}
 		if link, err = h.github().IssueLink(h.ctx, sync.ID, event.Issue.ID); link == nil || err != nil {
@@ -421,11 +433,12 @@ func (h *hook) issueComment(event *github.IssueCommentEvent) error {
 	return h.recordSync(h.ctx, sync.ID, err)
 }
 
-func commentFromGitHub(actor uuid.UUID, comment *github.Comment) string {
-	if actor != uuid.Nil {
-		return comment.Body
+// githubAuthor is the login of a GitHub comment's author when they have no Ricrac account.
+func githubAuthor(member uuid.UUID, comment *github.Comment) *string {
+	if member != uuid.Nil || comment.User.Login == "" {
+		return nil
 	}
-	return github.GitHubCommentBody(strings.ToLower(comment.User.Login), comment.Body)
+	return &comment.User.Login
 }
 
 // importComment adds a GitHub comment to the linked issue, unless the app posted it or it is
@@ -446,11 +459,11 @@ func (self *GitHubService) importComment(ctx context.Context, sync *ent.GithubRe
 			return err
 		}
 		imported = true
-		id, _, err := self.comments.Create(ctx, tx, actor, comment_service.Target{Column: "issue_id", ID: link.ID}, nil, commentFromGitHub(member, comment), nil)
+		id, _, err := self.comments.Create(ctx, tx, actor, comment_service.Target{Column: "issue_id", ID: link.ID}, nil, comment.Body, nil)
 		if err != nil {
 			return err
 		}
-		if err := self.github().DateComment(ctx, tx, id, comment.CreatedAt); err != nil {
+		if err := self.github().StampImportedComment(ctx, tx, id, comment.CreatedAt, githubAuthor(member, comment)); err != nil {
 			return err
 		}
 		return self.github().AddCommentLink(ctx, tx, id, link.ID, comment.ID)
@@ -479,12 +492,11 @@ func (h *hook) editComment(sync *ent.GithubRepoSync, link *ent.GithubIssueLink, 
 	if err != nil {
 		return err
 	}
-	body := commentFromGitHub(member, comment)
-	if body == row.Body {
+	if comment.Body == row.Body {
 		return nil
 	}
 	return h.repo.WithTx(h.ctx, func(tx repository.TxInterface) error {
-		_, err := h.comments.Change(h.ctx, tx, actor, row, body)
+		_, err := h.comments.Change(h.ctx, tx, actor, row, comment.Body)
 		return err
 	})
 }

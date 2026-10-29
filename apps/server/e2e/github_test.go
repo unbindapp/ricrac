@@ -467,11 +467,12 @@ func TestGitHubIssuesAndCommentsSyncIntoRicrac(t *testing.T) {
 	}
 	comments := call(t, g.Ann, "list_comments", M{"issueId": "ENG-1"}).At("nodes")
 	eq(t, comments.Len(), 1, comments.JSON())
-	eq(t, comments.At(0, "body").Str(), "**@octocat on GitHub**\n\nSame here on the staging cluster.")
+	eq(t, comments.At(0, "body").Str(), "Same here on the staging cluster.")
+	eq(t, comments.At(0, "githubAuthor").Str(), "octocat")
 	check(t, comments.At(0, "user").IsNull())
 	g.deliver(t, "issue_comment", "issue_comment_edited.json", nil)
 	eq(t, call(t, g.Ann, "list_comments", M{"issueId": "ENG-1"}).At("nodes", 0, "body").Str(),
-		"**@octocat on GitHub**\n\nSame here on the staging and production clusters.")
+		"Same here on the staging and production clusters.")
 	g.deliver(t, "issue_comment", "issue_comment_created.json", func(p M) {
 		comment := p["comment"].(M)
 		comment["id"], comment["user"], comment["body"] = 2400000002, M{"login": "Eve-GH"}, "Looking into it."
@@ -480,9 +481,10 @@ func TestGitHubIssuesAndCommentsSyncIntoRicrac(t *testing.T) {
 	byEve := call(t, g.Ann, "list_comments", M{"issueId": "ENG-1"}).At("nodes", 1)
 	eq(t, byEve.At("body").Str(), "Looking into it.")
 	eq(t, byEve.At("user", "email").Str(), "eve@acme.test")
+	check(t, byEve.At("githubAuthor").IsNull())
 	g.deliver(t, "issue_comment", "issue_comment_deleted.json", nil)
 	eq(t, call(t, g.Ann, "list_comments", M{"issueId": "ENG-1"}).At("nodes").Len(), 1)
-	eq(t, scalar[int](g.World, "SELECT count(*) FROM github_outbox"), 0)
+	eq(t, scalar[int](g.World, "SELECT count(*) FROM github_outbox"), 0, "no link back unless the sync asks")
 	check(t, call(t, g.Ann, "list_github_repo_syncs", nil).At("nodes", 0, "lastError").IsNull())
 
 	g.deliver(t, "issues", "issues_deleted.json", nil)
@@ -539,6 +541,31 @@ func TestPullRequestsLinkSyncedGitHubIssues(t *testing.T) {
 	eq(t, merged.At("state", "type").Str(), "completed", merged.JSON())
 	eq(t, merged.At("attachments", 0, "metadata", "merged_at").Str(), "2026-10-16T10:00:00Z")
 	eq(t, call(t, g.Ann, "get_issue", M{"id": "ENG-2"}).At("state", "name").Str(), before)
+}
+
+func TestIssuesOpenedOnGitHubLinkBackWhenTheSyncAsks(t *testing.T) {
+	g := withGitHub(t)
+	sync := g.syncRepo(t, "ENG")
+	check(t, !sync.At("linkBack").Bool())
+	eq(t, call(t, g.Ann, "save_github_repo_sync", M{"id": "unbindapp/unbind", "linkBack": true}).At("linkBack").Bool(), true)
+
+	g.deliver(t, "issues", "issues_edited_stale.json", func(p M) { p["issue"].(M)["number"], p["issue"].(M)["id"] = 1300, 1300 })
+	for range 2 {
+		g.deliver(t, "issues", "issues_opened.json", nil)
+	}
+	g.runJobs(t)
+	eq(t, len(g.fake.sent("POST", "/issues/1300/comments")), 0, "only issues opened while synced link back")
+	posted := g.fake.sent("POST", "/issues/1347/comments")
+	eq(t, len(posted), 1, "once per issue")
+	identifier := "ENG-2"
+	body := posted[0].Body["body"].(string)
+	contains(t, body, "Tracked in Ricrac as ["+identifier+"](", "/acme/issue/"+identifier+").")
+
+	g.deliver(t, "issue_comment", "issue_comment_created.json", func(p M) {
+		p["comment"].(M)["id"], p["comment"].(M)["body"] = 9001, body
+		p["comment"].(M)["user"] = M{"login": "ricrac-test[bot]", "type": "Bot"}
+	})
+	eq(t, call(t, g.Ann, "list_comments", M{"issueId": identifier}).At("nodes").Len(), 0, "the app's link doesn't come back")
 }
 
 func TestRicracChangesGoToGitHubButNotBack(t *testing.T) {
@@ -762,7 +789,8 @@ func TestBackfillImportsARepositorysIssues(t *testing.T) {
 	closed := call(t, g.Ann, "get_issue", M{"id": "ENG-2", "includeComments": true})
 	eq(t, closed.At("title").Str(), "Closed one")
 	eq(t, closed.At("state", "type").Str(), "completed")
-	eq(t, closed.At("comments", 0, "body").Str(), "**@octocat on GitHub**\n\nDone in v2.")
+	eq(t, closed.At("comments", 0, "body").Str(), "Done in v2.")
+	eq(t, closed.At("comments", 0, "githubAuthor").Str(), "octocat")
 	contains(t, closed.At("comments", 0, "createdAt").Str(), "2026-10-02")
 
 	g.fake.issuePages = [][]M{{issue(1, 1, "First, renamed", M{"updated_at": "2026-10-03T10:00:00Z"})}}

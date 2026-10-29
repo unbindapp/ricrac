@@ -111,6 +111,11 @@ func UserID(v uuid.UUID) predicate.Comment {
 	return predicate.Comment(sql.FieldEQ(FieldUserID, v))
 }
 
+// GithubAuthor applies equality check predicate on the "github_author" field. It's identical to GithubAuthorEQ.
+func GithubAuthor(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldEQ(FieldGithubAuthor, v))
+}
+
 // Body applies equality check predicate on the "body" field. It's identical to BodyEQ.
 func Body(v string) predicate.Comment {
 	return predicate.Comment(sql.FieldEQ(FieldBody, v))
@@ -479,6 +484,81 @@ func UserIDIsNil() predicate.Comment {
 // UserIDNotNil applies the NotNil predicate on the "user_id" field.
 func UserIDNotNil() predicate.Comment {
 	return predicate.Comment(sql.FieldNotNull(FieldUserID))
+}
+
+// GithubAuthorEQ applies the EQ predicate on the "github_author" field.
+func GithubAuthorEQ(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldEQ(FieldGithubAuthor, v))
+}
+
+// GithubAuthorNEQ applies the NEQ predicate on the "github_author" field.
+func GithubAuthorNEQ(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldNEQ(FieldGithubAuthor, v))
+}
+
+// GithubAuthorIn applies the In predicate on the "github_author" field.
+func GithubAuthorIn(vs ...string) predicate.Comment {
+	return predicate.Comment(sql.FieldIn(FieldGithubAuthor, vs...))
+}
+
+// GithubAuthorNotIn applies the NotIn predicate on the "github_author" field.
+func GithubAuthorNotIn(vs ...string) predicate.Comment {
+	return predicate.Comment(sql.FieldNotIn(FieldGithubAuthor, vs...))
+}
+
+// GithubAuthorGT applies the GT predicate on the "github_author" field.
+func GithubAuthorGT(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldGT(FieldGithubAuthor, v))
+}
+
+// GithubAuthorGTE applies the GTE predicate on the "github_author" field.
+func GithubAuthorGTE(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldGTE(FieldGithubAuthor, v))
+}
+
+// GithubAuthorLT applies the LT predicate on the "github_author" field.
+func GithubAuthorLT(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldLT(FieldGithubAuthor, v))
+}
+
+// GithubAuthorLTE applies the LTE predicate on the "github_author" field.
+func GithubAuthorLTE(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldLTE(FieldGithubAuthor, v))
+}
+
+// GithubAuthorContains applies the Contains predicate on the "github_author" field.
+func GithubAuthorContains(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldContains(FieldGithubAuthor, v))
+}
+
+// GithubAuthorHasPrefix applies the HasPrefix predicate on the "github_author" field.
+func GithubAuthorHasPrefix(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldHasPrefix(FieldGithubAuthor, v))
+}
+
+// GithubAuthorHasSuffix applies the HasSuffix predicate on the "github_author" field.
+func GithubAuthorHasSuffix(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldHasSuffix(FieldGithubAuthor, v))
+}
+
+// GithubAuthorIsNil applies the IsNil predicate on the "github_author" field.
+func GithubAuthorIsNil() predicate.Comment {
+	return predicate.Comment(sql.FieldIsNull(FieldGithubAuthor))
+}
+
+// GithubAuthorNotNil applies the NotNil predicate on the "github_author" field.
+func GithubAuthorNotNil() predicate.Comment {
+	return predicate.Comment(sql.FieldNotNull(FieldGithubAuthor))
+}
+
+// GithubAuthorEqualFold applies the EqualFold predicate on the "github_author" field.
+func GithubAuthorEqualFold(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldEqualFold(FieldGithubAuthor, v))
+}
+
+// GithubAuthorContainsFold applies the ContainsFold predicate on the "github_author" field.
+func GithubAuthorContainsFold(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldContainsFold(FieldGithubAuthor, v))
 }
 
 // BodyEQ applies the EQ predicate on the "body" field.

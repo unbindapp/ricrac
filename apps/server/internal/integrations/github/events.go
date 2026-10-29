@@ -284,7 +284,7 @@ func NormalizeLogin(raw string) (string, bool) {
 	return login, loginPattern.MatchString(login)
 }
 
-var fromRicrac = regexp.MustCompile(`^\*\*[^*\n]+ on Ricrac\*\*\n`)
+var fromRicrac = regexp.MustCompile(`^(\*\*[^*\n]+ on Ricrac\*\*\n|Tracked in Ricrac as \[)`)
 
 // RicracCommentBody is how a Ricrac comment reads on GitHub, where the app posts it.
 func RicracCommentBody(author, body string) string {
@@ -296,9 +296,9 @@ func FromRicrac(body string) bool {
 	return fromRicrac.MatchString(body)
 }
 
-// GitHubCommentBody is how a comment from someone without a Ricrac account reads in Ricrac.
-func GitHubCommentBody(login, body string) string {
-	return "**@" + login + " on GitHub**\n\n" + body
+// LinkBackBody is the comment the app leaves on a GitHub issue it imported.
+func LinkBackBody(identifier, url string) string {
+	return "Tracked in Ricrac as [" + identifier + "](" + url + ")."
 }
 
 var hexColor = regexp.MustCompile(`^[0-9a-f]{6}$`)

@@ -118,8 +118,11 @@ func TestNormalizeLogin(t *testing.T) {
 }
 
 func TestCommentBodies(t *testing.T) {
-	if !FromRicrac(RicracCommentBody("Ann *Smith*", "Hi")) || FromRicrac("Hi") || FromRicrac(GitHubCommentBody("octocat", "Hi")) {
+	if !FromRicrac(RicracCommentBody("Ann *Smith*", "Hi")) || FromRicrac("Hi") || FromRicrac("**@octocat on GitHub**\n\nHi") {
 		t.Fatal("the app's own comments are recognized, nothing else")
+	}
+	if !FromRicrac(LinkBackBody("ENG-1", "https://ricrac.app/acme/issue/ENG-1")) {
+		t.Fatal("the app's link back is its own")
 	}
 	if got := RicracCommentBody("Ann", "Hi"); got != "**Ann on Ricrac**\n\nHi" {
 		t.Fatalf("got %q", got)

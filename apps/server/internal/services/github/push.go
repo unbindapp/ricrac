@@ -10,6 +10,7 @@ import (
 
 	"ricrac/ent"
 	"ricrac/internal/integrations/github"
+	"ricrac/internal/models"
 	repository "ricrac/internal/repositories"
 	github_repo "ricrac/internal/repositories/github"
 )
@@ -61,6 +62,8 @@ func (self *GitHubService) pushEntry(ctx context.Context, entry github_repo.Outb
 	switch entry.Kind {
 	case "issue":
 		return self.pushIssue(ctx, token, entry)
+	case "link_back":
+		return self.pushLinkBack(ctx, token, entry)
 	case "comment_created":
 		return self.pushNewComment(ctx, token, entry)
 	case "comment_edited":
@@ -69,6 +72,19 @@ func (self *GitHubService) pushEntry(ctx context.Context, entry github_repo.Outb
 		return self.pushCommentDeletion(ctx, token, entry)
 	}
 	return nil
+}
+
+func (self *GitHubService) pushLinkBack(ctx context.Context, token string, entry github_repo.OutboxEntry) error {
+	if entry.Issue == nil {
+		return nil
+	}
+	identifier, workspaceKey, err := self.github().IssueAddress(ctx, *entry.Issue)
+	if err != nil || identifier == "" {
+		return err
+	}
+	body := github.LinkBackBody(identifier, models.IssueURL(self.cfg.PublicURL, workspaceKey, identifier))
+	_, err = self.app.Do(ctx, token, http.MethodPost, github.IssuePath(entry.FullName, entry.Number)+"/comments", M{"body": body}, nil)
+	return err
 }
 
 // bodyForApp is a comment's body as the app posts it as itself, with its author's name.

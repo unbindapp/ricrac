@@ -184,6 +184,20 @@ func (_c *CommentCreate) SetNillableUserID(v *uuid.UUID) *CommentCreate {
 	return _c
 }
 
+// SetGithubAuthor sets the "github_author" field.
+func (_c *CommentCreate) SetGithubAuthor(v string) *CommentCreate {
+	_c.mutation.SetGithubAuthor(v)
+	return _c
+}
+
+// SetNillableGithubAuthor sets the "github_author" field if the given value is not nil.
+func (_c *CommentCreate) SetNillableGithubAuthor(v *string) *CommentCreate {
+	if v != nil {
+		_c.SetGithubAuthor(*v)
+	}
+	return _c
+}
+
 // SetBody sets the "body" field.
 func (_c *CommentCreate) SetBody(v string) *CommentCreate {
 	_c.mutation.SetBody(v)
@@ -552,6 +566,10 @@ func (_c *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
+	}
+	if value, ok := _c.mutation.GithubAuthor(); ok {
+		_spec.SetField(comment.FieldGithubAuthor, field.TypeString, value)
+		_node.GithubAuthor = &value
 	}
 	if value, ok := _c.mutation.Body(); ok {
 		_spec.SetField(comment.FieldBody, field.TypeString, value)
@@ -1117,6 +1135,24 @@ func (u *CommentUpsert) ClearUserID() *CommentUpsert {
 	return u
 }
 
+// SetGithubAuthor sets the "github_author" field.
+func (u *CommentUpsert) SetGithubAuthor(v string) *CommentUpsert {
+	u.Set(comment.FieldGithubAuthor, v)
+	return u
+}
+
+// UpdateGithubAuthor sets the "github_author" field to the value that was provided on create.
+func (u *CommentUpsert) UpdateGithubAuthor() *CommentUpsert {
+	u.SetExcluded(comment.FieldGithubAuthor)
+	return u
+}
+
+// ClearGithubAuthor clears the value of the "github_author" field.
+func (u *CommentUpsert) ClearGithubAuthor() *CommentUpsert {
+	u.SetNull(comment.FieldGithubAuthor)
+	return u
+}
+
 // SetBody sets the "body" field.
 func (u *CommentUpsert) SetBody(v string) *CommentUpsert {
 	u.Set(comment.FieldBody, v)
@@ -1560,6 +1596,27 @@ func (u *CommentUpsertOne) UpdateUserID() *CommentUpsertOne {
 func (u *CommentUpsertOne) ClearUserID() *CommentUpsertOne {
 	return u.Update(func(s *CommentUpsert) {
 		s.ClearUserID()
+	})
+}
+
+// SetGithubAuthor sets the "github_author" field.
+func (u *CommentUpsertOne) SetGithubAuthor(v string) *CommentUpsertOne {
+	return u.Update(func(s *CommentUpsert) {
+		s.SetGithubAuthor(v)
+	})
+}
+
+// UpdateGithubAuthor sets the "github_author" field to the value that was provided on create.
+func (u *CommentUpsertOne) UpdateGithubAuthor() *CommentUpsertOne {
+	return u.Update(func(s *CommentUpsert) {
+		s.UpdateGithubAuthor()
+	})
+}
+
+// ClearGithubAuthor clears the value of the "github_author" field.
+func (u *CommentUpsertOne) ClearGithubAuthor() *CommentUpsertOne {
+	return u.Update(func(s *CommentUpsert) {
+		s.ClearGithubAuthor()
 	})
 }
 
@@ -2202,6 +2259,27 @@ func (u *CommentUpsertBulk) UpdateUserID() *CommentUpsertBulk {
 func (u *CommentUpsertBulk) ClearUserID() *CommentUpsertBulk {
 	return u.Update(func(s *CommentUpsert) {
 		s.ClearUserID()
+	})
+}
+
+// SetGithubAuthor sets the "github_author" field.
+func (u *CommentUpsertBulk) SetGithubAuthor(v string) *CommentUpsertBulk {
+	return u.Update(func(s *CommentUpsert) {
+		s.SetGithubAuthor(v)
+	})
+}
+
+// UpdateGithubAuthor sets the "github_author" field to the value that was provided on create.
+func (u *CommentUpsertBulk) UpdateGithubAuthor() *CommentUpsertBulk {
+	return u.Update(func(s *CommentUpsert) {
+		s.UpdateGithubAuthor()
+	})
+}
+
+// ClearGithubAuthor clears the value of the "github_author" field.
+func (u *CommentUpsertBulk) ClearGithubAuthor() *CommentUpsertBulk {
+	return u.Update(func(s *CommentUpsert) {
+		s.ClearGithubAuthor()
 	})
 }
 

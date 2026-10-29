@@ -107,12 +107,13 @@ type NewRepoSync struct {
 	FullName     string
 	Team         uuid.UUID
 	Project      *uuid.UUID
+	LinkBack     bool
 }
 
 func (self *GitHubRepository) CreateRepoSync(ctx context.Context, input NewRepoSync) (uuid.UUID, error) {
 	created, err := self.base.DB.GithubRepoSync.Create().
 		SetWorkspaceID(input.Workspace).SetInstallationID(input.Installation).SetRepoID(input.RepoID).
-		SetFullName(input.FullName).SetTeamID(input.Team).SetNillableProjectID(input.Project).Save(ctx)
+		SetFullName(input.FullName).SetTeamID(input.Team).SetNillableProjectID(input.Project).SetLinkBack(input.LinkBack).Save(ctx)
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -120,8 +121,8 @@ func (self *GitHubRepository) CreateRepoSync(ctx context.Context, input NewRepoS
 }
 
 // ChangeRepoSync moves a sync to team when given and, when setProject, to project.
-func (self *GitHubRepository) ChangeRepoSync(ctx context.Context, id uuid.UUID, team *uuid.UUID, setProject bool, project *uuid.UUID) error {
-	update := self.base.DB.GithubRepoSync.Update().Where(githubreposync.ID(id)).SetNillableTeamID(team).
+func (self *GitHubRepository) ChangeRepoSync(ctx context.Context, id uuid.UUID, team *uuid.UUID, setProject bool, project *uuid.UUID, linkBack *bool) error {
+	update := self.base.DB.GithubRepoSync.Update().Where(githubreposync.ID(id)).SetNillableTeamID(team).SetNillableLinkBack(linkBack).
 		Modify(func(u *entsql.UpdateBuilder) { u.Set(githubreposync.FieldUpdatedAt, now()) })
 	if setProject {
 		update.SetNillableProjectID(project)

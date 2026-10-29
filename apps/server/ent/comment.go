@@ -50,6 +50,8 @@ type Comment struct {
 	ParentID *uuid.UUID `json:"parent_id,omitempty"`
 	// UserID holds the value of the "user_id" field.
 	UserID *uuid.UUID `json:"user_id,omitempty"`
+	// GithubAuthor holds the value of the "github_author" field.
+	GithubAuthor *string `json:"github_author,omitempty"`
 	// Body holds the value of the "body" field.
 	Body string `json:"body,omitempty"`
 	// QuotedText holds the value of the "quoted_text" field.
@@ -301,7 +303,7 @@ func (*Comment) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case comment.FieldIssueID, comment.FieldProjectID, comment.FieldInitiativeID, comment.FieldDocumentID, comment.FieldMilestoneID, comment.FieldStatusUpdateID, comment.FieldDiscussionID, comment.FieldDiscussionThreadID, comment.FieldParentID, comment.FieldUserID, comment.FieldResolvingUserID:
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case comment.FieldBody, comment.FieldQuotedText, comment.FieldSuggestedText, comment.FieldSuggestionStatus:
+		case comment.FieldGithubAuthor, comment.FieldBody, comment.FieldQuotedText, comment.FieldSuggestedText, comment.FieldSuggestionStatus:
 			values[i] = new(sql.NullString)
 		case comment.FieldEditedAt, comment.FieldDeletedAt, comment.FieldResolvedAt, comment.FieldCreatedAt, comment.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -403,6 +405,13 @@ func (_m *Comment) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.UserID = new(uuid.UUID)
 				*_m.UserID = *value.S.(*uuid.UUID)
+			}
+		case comment.FieldGithubAuthor:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field github_author", values[i])
+			} else if value.Valid {
+				_m.GithubAuthor = new(string)
+				*_m.GithubAuthor = value.String
 			}
 		case comment.FieldBody:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -643,6 +652,11 @@ func (_m *Comment) String() string {
 	if v := _m.UserID; v != nil {
 		builder.WriteString("user_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.GithubAuthor; v != nil {
+		builder.WriteString("github_author=")
+		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
 	builder.WriteString("body=")
