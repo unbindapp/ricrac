@@ -189,6 +189,11 @@ func (self *IssueService) simpleFilters(ctx context.Context, actor *auth.Actor, 
 }
 
 func (self *IssueService) List(ctx context.Context, actor *auth.Actor, input *ListInput) (args.PageOf[models.Issue], error) {
+	if actor.Visitor {
+		if err := checkVisitorFilters(input); err != nil {
+			return args.PageOf[models.Issue]{}, err
+		}
+	}
 	parts, err := self.simpleFilters(ctx, actor, input)
 	if err != nil {
 		return args.PageOf[models.Issue]{}, err

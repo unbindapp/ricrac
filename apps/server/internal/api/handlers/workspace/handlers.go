@@ -14,7 +14,7 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 			"the URL key as `workspace` to the other operations.",
 	}, workspaces.List)
 	oapi.Register(reg, oapi.Operation{
-		Name: "get_workspace", Access: auth.Read, Routes: []string{"GET /workspace"},
+		Name: "get_workspace", Access: auth.Read, Public: true, Routes: []string{"GET /workspace"},
 		Description: "The workspace: its name, URL key and link, your role, its team (whose key is the issue prefix, ENG in " +
 			"ENG-123) and how many members and issues it has.",
 	}, workspaces.Get)

@@ -17,6 +17,7 @@ type WorkspaceRepositoryInterface interface {
 	SetURLKey(ctx context.Context, tx repository.TxInterface, id uuid.UUID, key string) error
 	SetLogoURL(ctx context.Context, tx repository.TxInterface, id uuid.UUID, logo *string) error
 	SetTheme(ctx context.Context, tx repository.TxInterface, id uuid.UUID, theme string) error
+	SetPublic(ctx context.Context, tx repository.TxInterface, id uuid.UUID, public bool) error
 	Touch(ctx context.Context, tx repository.TxInterface, id uuid.UUID, now time.Time) error
 	SetRole(ctx context.Context, tx repository.TxInterface, id, user uuid.UUID, role string) error
 	// JoinTeam adds the user to the workspace's team.

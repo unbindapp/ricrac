@@ -79,6 +79,15 @@ func (a *Auth) RESTCaller(w http.ResponseWriter, r *http.Request) (*auth.Caller,
 	return auth.SessionCaller(user), workspace, true
 }
 
+// SignedOut says the request has no credentials: no Authorization header and no valid session.
+func (a *Auth) SignedOut(r *http.Request) bool {
+	if r.Header.Get("Authorization") != "" {
+		return false
+	}
+	_, ok := a.keys.SessionUser(r)
+	return !ok
+}
+
 // RequireBearer rejects requests without a valid token, pointing clients at the OAuth metadata.
 func (a *Auth) RequireBearer(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

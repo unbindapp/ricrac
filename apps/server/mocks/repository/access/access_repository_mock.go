@@ -184,6 +184,74 @@ func (_c *AccessRepositoryMock_AccessTokenCaller_Call) RunAndReturn(run func(ctx
 	return _c
 }
 
+// PublicWorkspace provides a mock function for the type AccessRepositoryMock
+func (_mock *AccessRepositoryMock) PublicWorkspace(ctx context.Context, named string) (uuid.UUID, error) {
+	ret := _mock.Called(ctx, named)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PublicWorkspace")
+	}
+
+	var r0 uuid.UUID
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string) (uuid.UUID, error)); ok {
+		return returnFunc(ctx, named)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string) uuid.UUID); ok {
+		r0 = returnFunc(ctx, named)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = returnFunc(ctx, named)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// AccessRepositoryMock_PublicWorkspace_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PublicWorkspace'
+type AccessRepositoryMock_PublicWorkspace_Call struct {
+	*mock.Call
+}
+
+// PublicWorkspace is a helper method to define mock.On call
+//   - ctx context.Context
+//   - named string
+func (_e *AccessRepositoryMock_Expecter) PublicWorkspace(ctx any, named any) *AccessRepositoryMock_PublicWorkspace_Call {
+	return &AccessRepositoryMock_PublicWorkspace_Call{Call: _e.mock.On("PublicWorkspace", ctx, named)}
+}
+
+func (_c *AccessRepositoryMock_PublicWorkspace_Call) Run(run func(ctx context.Context, named string)) *AccessRepositoryMock_PublicWorkspace_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *AccessRepositoryMock_PublicWorkspace_Call) Return(uUID uuid.UUID, err error) *AccessRepositoryMock_PublicWorkspace_Call {
+	_c.Call.Return(uUID, err)
+	return _c
+}
+
+func (_c *AccessRepositoryMock_PublicWorkspace_Call) RunAndReturn(run func(ctx context.Context, named string) (uuid.UUID, error)) *AccessRepositoryMock_PublicWorkspace_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Reachable provides a mock function for the type AccessRepositoryMock
 func (_mock *AccessRepositoryMock) Reachable(ctx context.Context, user uuid.UUID, workspaces []uuid.UUID) ([]auth.Reached, error) {
 	ret := _mock.Called(ctx, user, workspaces)

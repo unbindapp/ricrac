@@ -61,6 +61,8 @@ type Actor struct {
 	Scopes    []Access
 	// Set for changes that come from elsewhere, like GitHub, rather than a caller.
 	Origin *Origin
+	// Someone who isn't a member reading a public workspace: no user, reading only.
+	Visitor bool
 
 	loadTeams TeamLoader
 	teamsOnce sync.Once
@@ -70,6 +72,13 @@ type Actor struct {
 
 func NewActor(user, workspace uuid.UUID, role Role, scopes []Access, origin *Origin, teams TeamLoader) *Actor {
 	return &Actor{User: user, Workspace: workspace, Role: role, Scopes: scopes, Origin: origin, loadTeams: teams}
+}
+
+// NewVisitor is someone reading a public workspace without being a member of it.
+func NewVisitor(workspace uuid.UUID, teams TeamLoader) *Actor {
+	actor := NewActor(uuid.Nil, workspace, Guest, []Access{Read}, nil, teams)
+	actor.Visitor = true
+	return actor
 }
 
 // ActorID is the user making the change, nil when Ricrac makes it on its own.
@@ -82,7 +91,9 @@ func (a *Actor) ActorID() *uuid.UUID {
 
 // Fresh is the same actor with nothing cached, as a new request would see it.
 func (a *Actor) Fresh() *Actor {
-	return NewActor(a.User, a.Workspace, a.Role, a.Scopes, a.Origin, a.loadTeams)
+	fresh := NewActor(a.User, a.Workspace, a.Role, a.Scopes, a.Origin, a.loadTeams)
+	fresh.Visitor = a.Visitor
+	return fresh
 }
 
 func (a *Actor) Allows(access Access) bool {

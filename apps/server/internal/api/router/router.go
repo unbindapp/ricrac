@@ -99,7 +99,7 @@ func New(srv *server.Server, fallback Fallback) (http.Handler, *oapi.Registry) {
 		reg.Order(fallback.Order())
 	}
 	authn := middleware.NewAuth(srv.Cfg, srv.Keys, srv.AccessService)
-	reg.Mount(authn.RESTCaller)
+	reg.Mount(oapi.Gate{Authenticate: authn.RESTCaller, SignedOut: authn.SignedOut})
 	account_handler.RegisterHandlers(srv, api)
 	oauthserver_handler.Mount(r, srv)
 	signin_handler.Mount(r, srv)

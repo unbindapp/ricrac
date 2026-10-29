@@ -203,10 +203,13 @@ func (self *ResolveRepository) IssueSyncedAs(ctx context.Context, workspace uuid
 }
 
 // IssueVisible says whether the issue is in one of teams or shared with the user.
-func (self *ResolveRepository) IssueVisible(ctx context.Context, id uuid.UUID, teams []uuid.UUID, viewer uuid.UUID) (bool, error) {
-	return self.base.DB.Issue.Query().
-		Where(issue.ID(id), issue.Or(issue.TeamIDIn(teams...), issue.HasIssueSharesWith(issueshare.UserID(viewer)))).
-		Exist(ctx)
+func (self *ResolveRepository) IssueVisible(ctx context.Context, id uuid.UUID, teams []uuid.UUID, viewer uuid.UUID, withTrashed bool) (bool, error) {
+	query := self.base.DB.Issue.Query().
+		Where(issue.ID(id), issue.Or(issue.TeamIDIn(teams...), issue.HasIssueSharesWith(issueshare.UserID(viewer))))
+	if !withTrashed {
+		query = query.Where(issue.TrashedAtIsNil())
+	}
+	return query.Exist(ctx)
 }
 
 type LabelRow struct {

@@ -82,8 +82,23 @@ func (self *AccessService) System(workspace, actor uuid.UUID, origin auth.Origin
 	return auth.NewActor(actor, workspace, auth.Owner, auth.EveryAccess, &origin, self.visibleTeams)
 }
 
+// Visitor is someone who isn't a member reading the public workspace named (URL key or id), nil
+// when no such workspace is public.
+func (self *AccessService) Visitor(ctx context.Context, named string) (*auth.Actor, error) {
+	name := strings.ToLower(strings.TrimSpace(named))
+	if name == "" {
+		return nil, nil
+	}
+	workspace, err := self.repo.Access().PublicWorkspace(ctx, name)
+	if err != nil || workspace == uuid.Nil {
+		return nil, err
+	}
+	return auth.NewVisitor(workspace, self.visibleTeams), nil
+}
+
 func (self *AccessService) visibleTeams(ctx context.Context, actor *auth.Actor) ([]uuid.UUID, error) {
-	return self.repo.Access().VisibleTeams(ctx, actor.Workspace, actor.User, actor.Role == auth.Guest, actor.Origin != nil)
+	guest := actor.Role == auth.Guest && !actor.Visitor
+	return self.repo.Access().VisibleTeams(ctx, actor.Workspace, actor.User, guest, actor.Origin != nil)
 }
 
 // Authenticate is the caller of a bearer token (an API key or an OAuth access token), nil when

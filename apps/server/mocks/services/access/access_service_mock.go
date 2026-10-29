@@ -408,3 +408,71 @@ func (_c *AccessServiceMock_System_Call) RunAndReturn(run func(workspace uuid.UU
 	_c.Call.Return(run)
 	return _c
 }
+
+// Visitor provides a mock function for the type AccessServiceMock
+func (_mock *AccessServiceMock) Visitor(ctx context.Context, named string) (*auth.Actor, error) {
+	ret := _mock.Called(ctx, named)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Visitor")
+	}
+
+	var r0 *auth.Actor
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string) (*auth.Actor, error)); ok {
+		return returnFunc(ctx, named)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string) *auth.Actor); ok {
+		r0 = returnFunc(ctx, named)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*auth.Actor)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = returnFunc(ctx, named)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// AccessServiceMock_Visitor_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Visitor'
+type AccessServiceMock_Visitor_Call struct {
+	*mock.Call
+}
+
+// Visitor is a helper method to define mock.On call
+//   - ctx context.Context
+//   - named string
+func (_e *AccessServiceMock_Expecter) Visitor(ctx any, named any) *AccessServiceMock_Visitor_Call {
+	return &AccessServiceMock_Visitor_Call{Call: _e.mock.On("Visitor", ctx, named)}
+}
+
+func (_c *AccessServiceMock_Visitor_Call) Run(run func(ctx context.Context, named string)) *AccessServiceMock_Visitor_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *AccessServiceMock_Visitor_Call) Return(actor *auth.Actor, err error) *AccessServiceMock_Visitor_Call {
+	_c.Call.Return(actor, err)
+	return _c
+}
+
+func (_c *AccessServiceMock_Visitor_Call) RunAndReturn(run func(ctx context.Context, named string) (*auth.Actor, error)) *AccessServiceMock_Visitor_Call {
+	_c.Call.Return(run)
+	return _c
+}

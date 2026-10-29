@@ -22,6 +22,9 @@ type AccessServiceInterface interface {
 	// System is Ricrac itself acting in a workspace, as actor (a member, or uuid.Nil for nobody),
 	// seeing every team.
 	System(workspace, actor uuid.UUID, origin auth.Origin) *auth.Actor
+	// Visitor is someone who isn't a member reading the public workspace named (URL key or id), nil
+	// when no such workspace is public.
+	Visitor(ctx context.Context, named string) (*auth.Actor, error)
 	// Authenticate is the caller of a bearer token (an API key or an OAuth access token), nil when
 	// it isn't a valid one.
 	Authenticate(ctx context.Context, token string) (*auth.Caller, error)

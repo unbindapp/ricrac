@@ -9,7 +9,7 @@ import (
 func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	labels := srv.LabelService
 	oapi.Register(reg, oapi.Operation{
-		Name: "list_issue_labels", Access: auth.Read, Routes: []string{"GET /labels"},
+		Name: "list_issue_labels", Access: auth.Read, Public: true, Routes: []string{"GET /labels"},
 		Description: "List issue labels: the workspace labels and the team labels (team is optional). Groups (isGroup) hold child labels; an " +
 			"issue takes one child of a singleSelect group. Retired labels are left out unless includeRetired is set.",
 	}, labels.List)

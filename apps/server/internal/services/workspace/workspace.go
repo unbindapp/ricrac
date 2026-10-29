@@ -89,6 +89,7 @@ type UpdateInput struct {
 	URLKey  *string               `json:"urlKey" doc:"2 to 32 lowercase letters, digits and dashes; must not be taken by another workspace."`
 	LogoURL args.Nullable[string] `json:"logoUrl" doc:"Image URL; null removes the logo."`
 	Theme   *string               `json:"theme" enum:"default,dank" doc:"The look of the web app for everyone in the workspace."`
+	Public  *bool                 `json:"public" doc:"Let anyone with a link read its issues without signing in."`
 }
 
 var themes = []string{"default", "dank"}
@@ -160,6 +161,12 @@ func (self *WorkspaceService) Update(ctx context.Context, actor *auth.Actor, inp
 				if err := self.repo.Workspace().SetTheme(ctx, tx, actor.Workspace, *input.Theme); err != nil {
 					return err
 				}
+			}
+		}
+		if input.Public != nil && *input.Public != was.Public {
+			changes["public"] = M{"from": was.Public, "to": *input.Public}
+			if err := self.repo.Workspace().SetPublic(ctx, tx, actor.Workspace, *input.Public); err != nil {
+				return err
 			}
 		}
 		if len(changes) > 0 {

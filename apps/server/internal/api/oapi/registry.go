@@ -35,6 +35,8 @@ type Operation struct {
 	Access      auth.Access
 	Routes      []string
 	Description string
+	// Visitors of public workspaces may run it too (see auth.NewVisitor).
+	Public bool
 }
 
 // Op is a registered operation.
@@ -49,6 +51,7 @@ type Op struct {
 	Result M
 	// Runs for the caller, not in one workspace.
 	Account bool
+	Public  bool
 
 	inWorkspace func(ctx context.Context, actor *auth.Actor, raw M) (any, error)
 	forAccount  func(ctx context.Context, caller *auth.Caller, raw M) (any, error)
@@ -57,6 +60,7 @@ type Op struct {
 // Picker puts a caller in the workspace a call acts in.
 type Picker interface {
 	Pick(ctx context.Context, caller *auth.Caller, named string, args map[string]any) (*auth.Actor, error)
+	Visitor(ctx context.Context, named string) (*auth.Actor, error)
 }
 
 // Registry is every operation, in the order they are listed.
@@ -95,7 +99,7 @@ func resultSchema[R any]() M {
 func Register[A, R any](reg *Registry, operation Operation, handler func(ctx context.Context, actor *auth.Actor, args *A) (R, error)) {
 	reg.Add(&Op{
 		Name: operation.Name, Description: operation.Description, Access: operation.Access, Routes: routes(operation.Routes),
-		Schema: args.SchemaOf[A](), Result: resultSchema[R](),
+		Schema: args.SchemaOf[A](), Result: resultSchema[R](), Public: operation.Public,
 		inWorkspace: func(ctx context.Context, actor *auth.Actor, raw M) (any, error) {
 			parsed, err := args.Parse[A](raw)
 			if err != nil {
@@ -181,13 +185,20 @@ func (o *Op) SchemaWithWorkspace(required bool) M {
 
 // Call runs the operation as actor in their workspace.
 func (o *Op) Call(ctx context.Context, actor *auth.Actor, raw M) (any, error) {
+	if actor.Visitor && !o.Public {
+		return nil, errdefs.Unauthorized()
+	}
 	if err := actor.Require(o.Access); err != nil {
 		return nil, err
 	}
 	if o.forAccount != nil {
 		return o.forAccount(ctx, actor.Caller(), raw)
 	}
-	return o.inWorkspace(ctx, actor, raw)
+	value, err := o.inWorkspace(ctx, actor, raw)
+	if err != nil || !actor.Visitor {
+		return value, err
+	}
+	return forVisitors(value), nil
 }
 
 // CallAs runs the operation for a caller of the API or MCP, in the workspace named by the
@@ -210,10 +221,25 @@ func (reg *Registry) CallAs(ctx context.Context, o *Op, caller *auth.Caller, raw
 		named = fallback
 	}
 	actor, err := reg.picker.Pick(ctx, caller, named, raw)
+	if err != nil && o.Public {
+		actor, err = reg.visitorOr(ctx, named, err)
+	}
 	if err != nil {
 		return nil, err
 	}
 	return o.Call(ctx, actor, raw)
+}
+
+// visitorOr lets callers who aren't members read a public workspace, else fails with err.
+func (reg *Registry) visitorOr(ctx context.Context, named string, err error) (*auth.Actor, error) {
+	visitor, visitorErr := reg.picker.Visitor(ctx, named)
+	if visitorErr != nil {
+		return nil, visitorErr
+	}
+	if visitor == nil {
+		return nil, err
+	}
+	return visitor, nil
 }
 
 // takeWorkspace removes the workspace argument, which every operation takes besides its own.
