@@ -98,6 +98,7 @@ organization's settings):
 | Webhook URL | `https://ricrac.example.com/github/webhook` |
 | Webhook secret | a long random string, also set as `GITHUB_WEBHOOK_SECRET` |
 | Repository permissions | Metadata: Read-only, Contents: Read-only, Issues: Read and write, Pull requests: Read-only |
+| Organization permissions | Issue fields: Read-only, so link back can find an organization's Ricrac issue field; without it the app comments instead |
 | Subscribe to events | Issues, Issue comment, Pull request, Push |
 | Where can this GitHub App be installed? | Any account, unless every workspace's repositories live under the app's owner |
 
