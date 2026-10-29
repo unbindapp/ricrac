@@ -173,6 +173,26 @@ func (_u *WorkspaceUpdate) ClearTheme() *WorkspaceUpdate {
 	return _u
 }
 
+// SetPublic sets the "public" field.
+func (_u *WorkspaceUpdate) SetPublic(v bool) *WorkspaceUpdate {
+	_u.mutation.SetPublic(v)
+	return _u
+}
+
+// SetNillablePublic sets the "public" field if the given value is not nil.
+func (_u *WorkspaceUpdate) SetNillablePublic(v *bool) *WorkspaceUpdate {
+	if v != nil {
+		_u.SetPublic(*v)
+	}
+	return _u
+}
+
+// ClearPublic clears the value of the "public" field.
+func (_u *WorkspaceUpdate) ClearPublic() *WorkspaceUpdate {
+	_u.mutation.ClearPublic()
+	return _u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_u *WorkspaceUpdate) SetCreatedAt(v time.Time) *WorkspaceUpdate {
 	_u.mutation.SetCreatedAt(v)
@@ -1554,6 +1574,12 @@ func (_u *WorkspaceUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.ThemeCleared() {
 		_spec.ClearField(workspace.FieldTheme, field.TypeString)
+	}
+	if value, ok := _u.mutation.Public(); ok {
+		_spec.SetField(workspace.FieldPublic, field.TypeBool, value)
+	}
+	if _u.mutation.PublicCleared() {
+		_spec.ClearField(workspace.FieldPublic, field.TypeBool)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(workspace.FieldCreatedAt, field.TypeTime, value)
@@ -3270,6 +3296,26 @@ func (_u *WorkspaceUpdateOne) ClearTheme() *WorkspaceUpdateOne {
 	return _u
 }
 
+// SetPublic sets the "public" field.
+func (_u *WorkspaceUpdateOne) SetPublic(v bool) *WorkspaceUpdateOne {
+	_u.mutation.SetPublic(v)
+	return _u
+}
+
+// SetNillablePublic sets the "public" field if the given value is not nil.
+func (_u *WorkspaceUpdateOne) SetNillablePublic(v *bool) *WorkspaceUpdateOne {
+	if v != nil {
+		_u.SetPublic(*v)
+	}
+	return _u
+}
+
+// ClearPublic clears the value of the "public" field.
+func (_u *WorkspaceUpdateOne) ClearPublic() *WorkspaceUpdateOne {
+	_u.mutation.ClearPublic()
+	return _u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_u *WorkspaceUpdateOne) SetCreatedAt(v time.Time) *WorkspaceUpdateOne {
 	_u.mutation.SetCreatedAt(v)
@@ -4681,6 +4727,12 @@ func (_u *WorkspaceUpdateOne) sqlSave(ctx context.Context) (_node *Workspace, er
 	}
 	if _u.mutation.ThemeCleared() {
 		_spec.ClearField(workspace.FieldTheme, field.TypeString)
+	}
+	if value, ok := _u.mutation.Public(); ok {
+		_spec.SetField(workspace.FieldPublic, field.TypeBool, value)
+	}
+	if _u.mutation.PublicCleared() {
+		_spec.ClearField(workspace.FieldPublic, field.TypeBool)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(workspace.FieldCreatedAt, field.TypeTime, value)

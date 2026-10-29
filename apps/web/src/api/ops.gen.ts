@@ -1883,6 +1883,8 @@ export type Workspace = {
   logoUrl: string | null
   memberCount: number
   name: string
+  /** Anyone with a link can read its issues without signing in. */
+  public: boolean
   /** Your role. */
   role: "owner" | "admin" | "member" | "guest"
   /** The workspace's team (a workspace has one), when you can see it; its key is the issue prefix. */
@@ -1951,6 +1953,8 @@ export type UpdateWorkspaceArgs = {
   logoUrl?: string | null
   /** 1 to 80 characters. */
   name?: string | null
+  /** Let anyone with a link read its issues without signing in. */
+  public?: boolean | null
   /** The look of the web app for everyone in the workspace. */
   theme?: "default" | "dank" | null
   /** 2 to 32 lowercase letters, digits and dashes; must not be taken by another workspace. */

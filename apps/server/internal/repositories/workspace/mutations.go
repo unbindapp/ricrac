@@ -33,6 +33,10 @@ func (self *WorkspaceRepository) SetTheme(ctx context.Context, tx repository.TxI
 	return self.base.Client(tx).Workspace.UpdateOneID(id).SetTheme(theme).Exec(ctx)
 }
 
+func (self *WorkspaceRepository) SetPublic(ctx context.Context, tx repository.TxInterface, id uuid.UUID, public bool) error {
+	return self.base.Client(tx).Workspace.UpdateOneID(id).SetPublic(public).Exec(ctx)
+}
+
 func (self *WorkspaceRepository) Touch(ctx context.Context, tx repository.TxInterface, id uuid.UUID, now time.Time) error {
 	return self.base.Client(tx).Workspace.UpdateOneID(id).SetUpdatedAt(now).Exec(ctx)
 }

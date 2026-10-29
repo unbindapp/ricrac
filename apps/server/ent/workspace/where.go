@@ -81,6 +81,11 @@ func Theme(v string) predicate.Workspace {
 	return predicate.Workspace(sql.FieldEQ(FieldTheme, v))
 }
 
+// Public applies equality check predicate on the "public" field. It's identical to PublicEQ.
+func Public(v bool) predicate.Workspace {
+	return predicate.Workspace(sql.FieldEQ(FieldPublic, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Workspace {
 	return predicate.Workspace(sql.FieldEQ(FieldCreatedAt, v))
@@ -454,6 +459,26 @@ func ThemeEqualFold(v string) predicate.Workspace {
 // ThemeContainsFold applies the ContainsFold predicate on the "theme" field.
 func ThemeContainsFold(v string) predicate.Workspace {
 	return predicate.Workspace(sql.FieldContainsFold(FieldTheme, v))
+}
+
+// PublicEQ applies the EQ predicate on the "public" field.
+func PublicEQ(v bool) predicate.Workspace {
+	return predicate.Workspace(sql.FieldEQ(FieldPublic, v))
+}
+
+// PublicNEQ applies the NEQ predicate on the "public" field.
+func PublicNEQ(v bool) predicate.Workspace {
+	return predicate.Workspace(sql.FieldNEQ(FieldPublic, v))
+}
+
+// PublicIsNil applies the IsNil predicate on the "public" field.
+func PublicIsNil() predicate.Workspace {
+	return predicate.Workspace(sql.FieldIsNull(FieldPublic))
+}
+
+// PublicNotNil applies the NotNil predicate on the "public" field.
+func PublicNotNil() predicate.Workspace {
+	return predicate.Workspace(sql.FieldNotNull(FieldPublic))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

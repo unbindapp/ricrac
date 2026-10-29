@@ -1740,6 +1740,75 @@ func (_c *WorkspaceRepositoryMock_SetName_Call) RunAndReturn(run func(ctx contex
 	return _c
 }
 
+// SetPublic provides a mock function for the type WorkspaceRepositoryMock
+func (_mock *WorkspaceRepositoryMock) SetPublic(ctx context.Context, tx repository.TxInterface, id uuid.UUID, public bool) error {
+	ret := _mock.Called(ctx, tx, id, public)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetPublic")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, bool) error); ok {
+		r0 = returnFunc(ctx, tx, id, public)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// WorkspaceRepositoryMock_SetPublic_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetPublic'
+type WorkspaceRepositoryMock_SetPublic_Call struct {
+	*mock.Call
+}
+
+// SetPublic is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+//   - public bool
+func (_e *WorkspaceRepositoryMock_Expecter) SetPublic(ctx any, tx any, id any, public any) *WorkspaceRepositoryMock_SetPublic_Call {
+	return &WorkspaceRepositoryMock_SetPublic_Call{Call: _e.mock.On("SetPublic", ctx, tx, id, public)}
+}
+
+func (_c *WorkspaceRepositoryMock_SetPublic_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, public bool)) *WorkspaceRepositoryMock_SetPublic_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 bool
+		if args[3] != nil {
+			arg3 = args[3].(bool)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *WorkspaceRepositoryMock_SetPublic_Call) Return(err error) *WorkspaceRepositoryMock_SetPublic_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *WorkspaceRepositoryMock_SetPublic_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID, public bool) error) *WorkspaceRepositoryMock_SetPublic_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // SetRole provides a mock function for the type WorkspaceRepositoryMock
 func (_mock *WorkspaceRepositoryMock) SetRole(ctx context.Context, tx repository.TxInterface, id uuid.UUID, user uuid.UUID, role string) error {
 	ret := _mock.Called(ctx, tx, id, user, role)

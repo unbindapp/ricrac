@@ -25,6 +25,7 @@ type Workspace struct {
 	LogoURL     *string         `json:"logoUrl"`
 	URL         string          `json:"url"`
 	Theme       string          `json:"theme" enum:"default,dank" doc:"The look of the web app for everyone in the workspace."`
+	Public      bool            `json:"public" doc:"Anyone with a link can read its issues without signing in."`
 	CreatedAt   string          `json:"createdAt"`
 	Role        string          `json:"role" enum:"owner,admin,member,guest" doc:"Your role."`
 	Teams       []WorkspaceTeam `json:"teams" doc:"The workspace's team (a workspace has one), when you can see it; its key is the issue prefix."`
@@ -89,7 +90,7 @@ func WorkspaceOf(w *ent.Workspace, publicURL, role string, teams []*ent.Team, me
 	}
 	return Workspace{
 		ID: ID(w.ID), Name: w.Name, URLKey: w.URLKey, LogoURL: w.LogoURL, URL: publicURL + "/" + w.URLKey, Theme: w.Theme,
-		CreatedAt: Time(w.CreatedAt), Role: role, Teams: workspaceTeams, MemberCount: memberCount, IssueCount: issueCount,
+		Public: w.Public, CreatedAt: Time(w.CreatedAt), Role: role, Teams: workspaceTeams, MemberCount: memberCount, IssueCount: issueCount,
 	}
 }
 

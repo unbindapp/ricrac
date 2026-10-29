@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { type ReactNode, useEffect, useState } from "react";
 
-import type { IssueDetail as TIssueDetail } from "@/api/ops.gen";
+import type { IssueDetail as TIssueDetail, UserRef } from "@/api/ops.gen";
 import { CustomerNeedDialog } from "@/components/customers/customer-need-dialog";
 import { CustomerNeedsSection } from "@/components/customers/customer-needs-section";
 import {
@@ -21,7 +21,7 @@ import { IssueActivity } from "@/components/issues/issue-activity";
 import { AttachMenu, IssueAttachments } from "@/components/issues/issue-attachments";
 import { IssueDetailHeader } from "@/components/issues/issue-detail-header";
 import { draftFromIssue } from "@/components/issues/issue-draft";
-import { IssueProperties } from "@/components/issues/issue-properties";
+import { IssueProperties, type TPropertyKey } from "@/components/issues/issue-properties";
 import {
   AddRelationPicker,
   hasRelations,
@@ -58,6 +58,9 @@ import {
 import { customerNeedsQuery } from "@/lib/queries/customers";
 import { meQuery } from "@/lib/queries/me";
 import { isApiError } from "@/lib/server/errors";
+
+/** Visitors of a public workspace don't see its projects and cycles. */
+const MEMBERS_ONLY_PROPERTIES: TPropertyKey[] = ["project", "milestone", "cycle"];
 
 type TProps = {
   identifier: string;
@@ -116,7 +119,7 @@ function IssueDetailContent({
   onClose?: () => void;
   shortcuts: boolean;
 }) {
-  const { workspace, canEdit } = useWorkspace();
+  const { workspace, canEdit, isVisitor } = useWorkspace();
   const { data: me } = useQuery(meQuery);
   const patch = useIssuePatch();
   const { mutate: updateIssue } = useUpdateIssueMutation(workspace.id);
@@ -136,6 +139,17 @@ function IssueDetailContent({
   const reactions = groupReactions(issue.reactions, me?.id);
   const react = (emoji: string, reacted: boolean) =>
     toggleReaction({ issueId: issue.id, emoji, reacted });
+  const subscribers = {
+    users: issue.subscribers,
+    onChange: (added: UserRef[], removed: UserRef[]) => {
+      if (added.length > 0) {
+        setSubscribed({ id: issue.id, users: added.map((u) => u.id), subscribed: true });
+      }
+      if (removed.length > 0) {
+        setSubscribed({ id: issue.id, users: removed.map((u) => u.id), subscribed: false });
+      }
+    },
+  };
   const properties = (
     <IssueProperties
       teamId={issue.team.id}
@@ -146,17 +160,8 @@ function IssueDetailContent({
       onChange={(next) => patch(issue, next)}
       disabled={!canEdit}
       shortcutsEnabled={shortcuts}
-      subscribers={{
-        users: issue.subscribers,
-        onChange: (added, removed) => {
-          if (added.length > 0) {
-            setSubscribed({ id: issue.id, users: added.map((u) => u.id), subscribed: true });
-          }
-          if (removed.length > 0) {
-            setSubscribed({ id: issue.id, users: removed.map((u) => u.id), subscribed: false });
-          }
-        },
-      }}
+      omit={isVisitor ? MEMBERS_ONLY_PROPERTIES : undefined}
+      subscribers={isVisitor ? undefined : subscribers}
     >
       <GitHubIssueRow issue={issue} />
       <SharedWithRow issue={issue} />

@@ -43,6 +43,7 @@ function GeneralSettingsPage() {
     >
       {isAdmin && <WorkspaceSection />}
       {isAdmin && <ThemeSection />}
+      {isAdmin && <VisibilitySection />}
       <IssuesSection />
     </SettingsPage>
   );
@@ -74,6 +75,26 @@ function ThemeSection() {
             description={
               isUiThemeId(field.state.value) ? uiThemes[field.state.value].description : undefined
             }
+          />
+        )}
+      />
+    </SettingsSection>
+  );
+}
+
+function VisibilitySection() {
+  const { workspace } = useWorkspace();
+  const { mutate: update } = useUpdateWorkspaceMutation(workspace.id);
+  const form = useAppForm({ defaultValues: { public: workspace.public } });
+  return (
+    <SettingsSection title="Visibility">
+      <form.AppField
+        name="public"
+        listeners={{ onChange: ({ value }) => update({ public: value }) }}
+        children={(field) => (
+          <field.SwitchField
+            label="Public"
+            description="Anyone with a link can read its issues and comments without signing in. Everything else stays private."
           />
         )}
       />

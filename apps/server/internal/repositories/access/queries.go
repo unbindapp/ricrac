@@ -59,6 +59,19 @@ func (self *AccessRepository) Role(ctx context.Context, workspaceID, user uuid.U
 	return member.Role, true, nil
 }
 
+// PublicWorkspace is the public workspace with this URL key or id, uuid.Nil when there's none.
+func (self *AccessRepository) PublicWorkspace(ctx context.Context, named string) (uuid.UUID, error) {
+	match := workspace.URLKey(named)
+	if id, err := uuid.Parse(named); err == nil {
+		match = workspace.Or(match, workspace.ID(id))
+	}
+	ids, err := self.base.DB.Workspace.Query().Where(match, workspace.Public(true)).IDs(ctx)
+	if err != nil || len(ids) == 0 {
+		return uuid.Nil, err
+	}
+	return ids[0], nil
+}
+
 // VisibleTeams is the teams of the workspace whose issues the user sees: public ones unless
 // they're a guest, the ones they belong to, or every team for Ricrac itself.
 func (self *AccessRepository) VisibleTeams(ctx context.Context, workspaceID, user uuid.UUID, guest, everything bool) ([]uuid.UUID, error) {

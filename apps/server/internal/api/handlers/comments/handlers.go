@@ -9,7 +9,7 @@ import (
 func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	comments := srv.CommentService
 	oapi.Register(reg, oapi.Operation{
-		Name: "list_comments", Access: auth.Read, Routes: []string{"GET /comments"},
+		Name: "list_comments", Access: auth.Read, Public: true, Routes: []string{"GET /comments"},
 		Description: "List the comment threads on one issue, project, initiative, document, milestone, status update, " +
 			"discussion or discussion thread, oldest first. Each thread is its first comment with its replies, reactions, " +
 			"whether it was resolved and, on documents, the passage it quotes and any suggested replacement.",

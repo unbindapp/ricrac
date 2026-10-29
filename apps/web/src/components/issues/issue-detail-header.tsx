@@ -69,7 +69,7 @@ function snoozeOptions(now: Date) {
 }
 
 export function IssueDetailHeader({ issue, variant, onClose, onSetSla }: TProps) {
-  const { workspace, canEdit } = useWorkspace();
+  const { workspace, canEdit, isVisitor } = useWorkspace();
   const { data: me } = useQuery(meQuery);
   const now = useNow();
   const { copyLink, copyBranch, copyIdentifier } = useCopyIssue();
@@ -105,7 +105,7 @@ export function IssueDetailHeader({ issue, variant, onClose, onSetSla }: TProps)
         />
       </div>
       <HeaderActions>
-        {variant === "page" && <FavoriteButton kind="issue" entityId={issue.id} />}
+        {variant === "page" && !isVisitor && <FavoriteButton kind="issue" entityId={issue.id} />}
         <HeaderAction label="Copy link" onClick={() => copyLink(issue)}>
           <LinkIcon className="size-4" />
         </HeaderAction>

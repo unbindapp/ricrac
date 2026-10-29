@@ -21,21 +21,28 @@ import (
 // it writes the error answer and says false when there's none.
 type Authenticate func(w http.ResponseWriter, r *http.Request) (*auth.Caller, string, bool)
 
+// Gate is how requests get in: Authenticate, and SignedOut for requests without credentials,
+// which may only read public workspaces.
+type Gate struct {
+	Authenticate Authenticate
+	SignedOut    func(r *http.Request) bool
+}
+
 // Mount puts every operation on the API: POST /v1/ops/<name> and its REST routes.
-func (reg *Registry) Mount(authenticate Authenticate) {
+func (reg *Registry) Mount(gate Gate) {
 	for _, op := range reg.ops {
-		reg.handle(op, http.MethodPost, "/v1/ops/"+op.Name, "call_"+op.Name, authenticate)
+		reg.handle(op, http.MethodPost, "/v1/ops/"+op.Name, "call_"+op.Name, gate)
 		for n, route := range op.Routes {
 			id := op.Name
 			if n > 0 {
 				id = op.Name + "_" + strings.ToLower(route.Method)
 			}
-			reg.handle(op, route.Method, "/v1"+route.Path, id, authenticate)
+			reg.handle(op, route.Method, "/v1"+route.Path, id, gate)
 		}
 	}
 }
 
-func (reg *Registry) handle(op *Op, method, path, id string, authenticate Authenticate) {
+func (reg *Registry) handle(op *Op, method, path, id string, gate Gate) {
 	params := pathParams(path)
 	operation := &huma.Operation{
 		OperationID: id,
@@ -58,7 +65,11 @@ func (reg *Registry) handle(op *Op, method, path, id string, authenticate Authen
 		} else {
 			values = nil
 		}
-		reg.serve(w, r, op, values, query, authenticate)
+		if op.Public && gate.SignedOut(r) {
+			reg.serveVisitor(w, r, op, values, query, gate.Authenticate)
+			return
+		}
+		reg.serve(w, r, op, values, query, gate.Authenticate)
 	})
 }
 
@@ -67,17 +78,51 @@ func (reg *Registry) serve(w http.ResponseWriter, r *http.Request, op *Op, path 
 	if !ok {
 		return
 	}
-	body, err := ReadBody(r)
-	if err != nil {
-		errdefs.Write(w, err)
-		return
-	}
-	raw, err := arguments(op, path, query, body)
+	raw, err := requestArguments(r, op, path, query)
 	if err != nil {
 		errdefs.Write(w, err)
 		return
 	}
 	value, err := reg.CallAs(r.Context(), op, caller, raw, workspace)
+	writeResult(w, value, err)
+}
+
+// serveVisitor runs the operation for someone signed out, in the public workspace named by the
+// workspace argument or x-ricrac-workspace; any other workspace gets authenticate's answer.
+func (reg *Registry) serveVisitor(w http.ResponseWriter, r *http.Request, op *Op, path map[string]string, query string, authenticate Authenticate) {
+	raw, argsErr := requestArguments(r, op, path, query)
+	named := r.Header.Get("X-Ricrac-Workspace")
+	if argsErr == nil {
+		if argument, err := takeWorkspace(raw); err == nil && argument != "" {
+			named = argument
+		}
+	}
+	actor, err := reg.picker.Visitor(r.Context(), named)
+	if err != nil {
+		errdefs.Write(w, err)
+		return
+	}
+	if actor == nil {
+		authenticate(w, r)
+		return
+	}
+	if argsErr != nil {
+		errdefs.Write(w, argsErr)
+		return
+	}
+	value, err := op.Call(r.Context(), actor, raw)
+	writeResult(w, value, err)
+}
+
+func requestArguments(r *http.Request, op *Op, path map[string]string, query string) (M, error) {
+	body, err := ReadBody(r)
+	if err != nil {
+		return nil, err
+	}
+	return arguments(op, path, query, body)
+}
+
+func writeResult(w http.ResponseWriter, value any, err error) {
 	if err != nil {
 		errdefs.Write(w, err)
 		return

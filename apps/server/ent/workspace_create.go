@@ -120,6 +120,20 @@ func (_c *WorkspaceCreate) SetNillableTheme(v *string) *WorkspaceCreate {
 	return _c
 }
 
+// SetPublic sets the "public" field.
+func (_c *WorkspaceCreate) SetPublic(v bool) *WorkspaceCreate {
+	_c.mutation.SetPublic(v)
+	return _c
+}
+
+// SetNillablePublic sets the "public" field if the given value is not nil.
+func (_c *WorkspaceCreate) SetNillablePublic(v *bool) *WorkspaceCreate {
+	if v != nil {
+		_c.SetPublic(*v)
+	}
+	return _c
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_c *WorkspaceCreate) SetCreatedAt(v time.Time) *WorkspaceCreate {
 	_c.mutation.SetCreatedAt(v)
@@ -795,6 +809,10 @@ func (_c *WorkspaceCreate) createSpec() (*Workspace, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Theme(); ok {
 		_spec.SetField(workspace.FieldTheme, field.TypeString, value)
 		_node.Theme = value
+	}
+	if value, ok := _c.mutation.Public(); ok {
+		_spec.SetField(workspace.FieldPublic, field.TypeBool, value)
+		_node.Public = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(workspace.FieldCreatedAt, field.TypeTime, value)
@@ -1512,6 +1530,24 @@ func (u *WorkspaceUpsert) ClearTheme() *WorkspaceUpsert {
 	return u
 }
 
+// SetPublic sets the "public" field.
+func (u *WorkspaceUpsert) SetPublic(v bool) *WorkspaceUpsert {
+	u.Set(workspace.FieldPublic, v)
+	return u
+}
+
+// UpdatePublic sets the "public" field to the value that was provided on create.
+func (u *WorkspaceUpsert) UpdatePublic() *WorkspaceUpsert {
+	u.SetExcluded(workspace.FieldPublic)
+	return u
+}
+
+// ClearPublic clears the value of the "public" field.
+func (u *WorkspaceUpsert) ClearPublic() *WorkspaceUpsert {
+	u.SetNull(workspace.FieldPublic)
+	return u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (u *WorkspaceUpsert) SetCreatedAt(v time.Time) *WorkspaceUpsert {
 	u.Set(workspace.FieldCreatedAt, v)
@@ -1705,6 +1741,27 @@ func (u *WorkspaceUpsertOne) UpdateTheme() *WorkspaceUpsertOne {
 func (u *WorkspaceUpsertOne) ClearTheme() *WorkspaceUpsertOne {
 	return u.Update(func(s *WorkspaceUpsert) {
 		s.ClearTheme()
+	})
+}
+
+// SetPublic sets the "public" field.
+func (u *WorkspaceUpsertOne) SetPublic(v bool) *WorkspaceUpsertOne {
+	return u.Update(func(s *WorkspaceUpsert) {
+		s.SetPublic(v)
+	})
+}
+
+// UpdatePublic sets the "public" field to the value that was provided on create.
+func (u *WorkspaceUpsertOne) UpdatePublic() *WorkspaceUpsertOne {
+	return u.Update(func(s *WorkspaceUpsert) {
+		s.UpdatePublic()
+	})
+}
+
+// ClearPublic clears the value of the "public" field.
+func (u *WorkspaceUpsertOne) ClearPublic() *WorkspaceUpsertOne {
+	return u.Update(func(s *WorkspaceUpsert) {
+		s.ClearPublic()
 	})
 }
 
@@ -2074,6 +2131,27 @@ func (u *WorkspaceUpsertBulk) UpdateTheme() *WorkspaceUpsertBulk {
 func (u *WorkspaceUpsertBulk) ClearTheme() *WorkspaceUpsertBulk {
 	return u.Update(func(s *WorkspaceUpsert) {
 		s.ClearTheme()
+	})
+}
+
+// SetPublic sets the "public" field.
+func (u *WorkspaceUpsertBulk) SetPublic(v bool) *WorkspaceUpsertBulk {
+	return u.Update(func(s *WorkspaceUpsert) {
+		s.SetPublic(v)
+	})
+}
+
+// UpdatePublic sets the "public" field to the value that was provided on create.
+func (u *WorkspaceUpsertBulk) UpdatePublic() *WorkspaceUpsertBulk {
+	return u.Update(func(s *WorkspaceUpsert) {
+		s.UpdatePublic()
+	})
+}
+
+// ClearPublic clears the value of the "public" field.
+func (u *WorkspaceUpsertBulk) ClearPublic() *WorkspaceUpsertBulk {
+	return u.Update(func(s *WorkspaceUpsert) {
+		s.ClearPublic()
 	})
 }
 

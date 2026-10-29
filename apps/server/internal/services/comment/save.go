@@ -39,6 +39,9 @@ type IDInput struct {
 }
 
 func (self *CommentService) List(ctx context.Context, actor *auth.Actor, input *ListInput) (args.PageOf[models.CommentThread], error) {
+	if actor.Visitor && input.IssueID == nil {
+		return args.PageOf[models.CommentThread]{}, errdefs.Unauthorized()
+	}
 	target, err := self.namedTarget(ctx, actor, input.targetInput)
 	if err != nil {
 		return args.PageOf[models.CommentThread]{}, err

@@ -20,16 +20,23 @@ export type RouterContext = {
 
 const PUBLIC_PATHS = new Set(["/", "/sign-in", "/sign-in/email", "/privacy", "/terms"]);
 
+/** Paths outside workspaces that need signing in; workspaces decide for themselves. */
+const ACCOUNT_PATHS = ["create-workspace", "oauth"];
+
 function isPublicPath(pathname: string) {
   const normalized = pathname.length > 1 ? pathname.replace(/\/$/, "") : pathname;
   return PUBLIC_PATHS.has(normalized);
+}
+
+function isAccountPath(pathname: string) {
+  return ACCOUNT_PATHS.includes(pathname.split("/")[1] ?? "");
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   beforeLoad: async ({ context, location }) => {
     if (isPublicPath(location.pathname)) return;
     const me = await context.queryClient.ensureQueryData(meQuery);
-    if (!me) {
+    if (!me && isAccountPath(location.pathname)) {
       throw redirect({ to: "/sign-in", search: { redirect: location.href } });
     }
     return { me };

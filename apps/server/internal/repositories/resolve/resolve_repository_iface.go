@@ -27,7 +27,7 @@ type ResolveRepositoryInterface interface {
 	// IssueSyncedAs is the workspace's issue synced with this GitHub issue.
 	IssueSyncedAs(ctx context.Context, workspace uuid.UUID, repo string, number int) (uuid.UUID, bool, error)
 	// IssueVisible says whether the issue is in one of teams or shared with the user.
-	IssueVisible(ctx context.Context, id uuid.UUID, teams []uuid.UUID, viewer uuid.UUID) (bool, error)
+	IssueVisible(ctx context.Context, id uuid.UUID, teams []uuid.UUID, viewer uuid.UUID, withTrashed bool) (bool, error)
 	// IssueLabels is the unretired labels of the workspace and of the team, if any.
 	IssueLabels(ctx context.Context, workspace uuid.UUID, teamID *uuid.UUID) ([]LabelRow, error)
 	// AllIssueLabels is every label (retired too) of the workspace and of teams, by name.

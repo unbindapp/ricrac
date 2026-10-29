@@ -82706,6 +82706,7 @@ type WorkspaceMutation struct {
 	appenddefault_team_settings jsontext.Value
 	project_update_reminder_day *string
 	theme                       *string
+	public                      *bool
 	created_at                  *time.Time
 	updated_at                  *time.Time
 	clearedFields               map[string]struct{}
@@ -83205,6 +83206,55 @@ func (m *WorkspaceMutation) ThemeCleared() bool {
 func (m *WorkspaceMutation) ResetTheme() {
 	m.theme = nil
 	delete(m.clearedFields, workspace.FieldTheme)
+}
+
+// SetPublic sets the "public" field.
+func (m *WorkspaceMutation) SetPublic(b bool) {
+	m.public = &b
+}
+
+// Public returns the value of the "public" field in the mutation.
+func (m *WorkspaceMutation) Public() (r bool, exists bool) {
+	v := m.public
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPublic returns the old "public" field's value of the Workspace entity.
+// If the Workspace object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WorkspaceMutation) OldPublic(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPublic is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPublic requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPublic: %w", err)
+	}
+	return oldValue.Public, nil
+}
+
+// ClearPublic clears the value of the "public" field.
+func (m *WorkspaceMutation) ClearPublic() {
+	m.public = nil
+	m.clearedFields[workspace.FieldPublic] = struct{}{}
+}
+
+// PublicCleared returns if the "public" field was cleared in this mutation.
+func (m *WorkspaceMutation) PublicCleared() bool {
+	_, ok := m.clearedFields[workspace.FieldPublic]
+	return ok
+}
+
+// ResetPublic resets all changes to the "public" field.
+func (m *WorkspaceMutation) ResetPublic() {
+	m.public = nil
+	delete(m.clearedFields, workspace.FieldPublic)
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -85229,7 +85279,7 @@ func (m *WorkspaceMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *WorkspaceMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.name != nil {
 		fields = append(fields, workspace.FieldName)
 	}
@@ -85247,6 +85297,9 @@ func (m *WorkspaceMutation) Fields() []string {
 	}
 	if m.theme != nil {
 		fields = append(fields, workspace.FieldTheme)
+	}
+	if m.public != nil {
+		fields = append(fields, workspace.FieldPublic)
 	}
 	if m.created_at != nil {
 		fields = append(fields, workspace.FieldCreatedAt)
@@ -85274,6 +85327,8 @@ func (m *WorkspaceMutation) Field(name string) (ent.Value, bool) {
 		return m.ProjectUpdateReminderDay()
 	case workspace.FieldTheme:
 		return m.Theme()
+	case workspace.FieldPublic:
+		return m.Public()
 	case workspace.FieldCreatedAt:
 		return m.CreatedAt()
 	case workspace.FieldUpdatedAt:
@@ -85299,6 +85354,8 @@ func (m *WorkspaceMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldProjectUpdateReminderDay(ctx)
 	case workspace.FieldTheme:
 		return m.OldTheme(ctx)
+	case workspace.FieldPublic:
+		return m.OldPublic(ctx)
 	case workspace.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case workspace.FieldUpdatedAt:
@@ -85353,6 +85410,13 @@ func (m *WorkspaceMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTheme(v)
+		return nil
+	case workspace.FieldPublic:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPublic(v)
 		return nil
 	case workspace.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -85410,6 +85474,9 @@ func (m *WorkspaceMutation) ClearedFields() []string {
 	if m.FieldCleared(workspace.FieldTheme) {
 		fields = append(fields, workspace.FieldTheme)
 	}
+	if m.FieldCleared(workspace.FieldPublic) {
+		fields = append(fields, workspace.FieldPublic)
+	}
 	if m.FieldCleared(workspace.FieldCreatedAt) {
 		fields = append(fields, workspace.FieldCreatedAt)
 	}
@@ -85442,6 +85509,9 @@ func (m *WorkspaceMutation) ClearField(name string) error {
 	case workspace.FieldTheme:
 		m.ClearTheme()
 		return nil
+	case workspace.FieldPublic:
+		m.ClearPublic()
+		return nil
 	case workspace.FieldCreatedAt:
 		m.ClearCreatedAt()
 		return nil
@@ -85473,6 +85543,9 @@ func (m *WorkspaceMutation) ResetField(name string) error {
 		return nil
 	case workspace.FieldTheme:
 		m.ResetTheme()
+		return nil
+	case workspace.FieldPublic:
+		m.ResetPublic()
 		return nil
 	case workspace.FieldCreatedAt:
 		m.ResetCreatedAt()

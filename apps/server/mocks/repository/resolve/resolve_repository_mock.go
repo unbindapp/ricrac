@@ -1059,8 +1059,8 @@ func (_c *ResolveRepositoryMock_IssueSyncedAs_Call) RunAndReturn(run func(ctx co
 }
 
 // IssueVisible provides a mock function for the type ResolveRepositoryMock
-func (_mock *ResolveRepositoryMock) IssueVisible(ctx context.Context, id uuid.UUID, teams []uuid.UUID, viewer uuid.UUID) (bool, error) {
-	ret := _mock.Called(ctx, id, teams, viewer)
+func (_mock *ResolveRepositoryMock) IssueVisible(ctx context.Context, id uuid.UUID, teams []uuid.UUID, viewer uuid.UUID, withTrashed bool) (bool, error) {
+	ret := _mock.Called(ctx, id, teams, viewer, withTrashed)
 
 	if len(ret) == 0 {
 		panic("no return value specified for IssueVisible")
@@ -1068,16 +1068,16 @@ func (_mock *ResolveRepositoryMock) IssueVisible(ctx context.Context, id uuid.UU
 
 	var r0 bool
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, []uuid.UUID, uuid.UUID) (bool, error)); ok {
-		return returnFunc(ctx, id, teams, viewer)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, []uuid.UUID, uuid.UUID, bool) (bool, error)); ok {
+		return returnFunc(ctx, id, teams, viewer, withTrashed)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, []uuid.UUID, uuid.UUID) bool); ok {
-		r0 = returnFunc(ctx, id, teams, viewer)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, []uuid.UUID, uuid.UUID, bool) bool); ok {
+		r0 = returnFunc(ctx, id, teams, viewer, withTrashed)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID, []uuid.UUID, uuid.UUID) error); ok {
-		r1 = returnFunc(ctx, id, teams, viewer)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID, []uuid.UUID, uuid.UUID, bool) error); ok {
+		r1 = returnFunc(ctx, id, teams, viewer, withTrashed)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -1094,11 +1094,12 @@ type ResolveRepositoryMock_IssueVisible_Call struct {
 //   - id uuid.UUID
 //   - teams []uuid.UUID
 //   - viewer uuid.UUID
-func (_e *ResolveRepositoryMock_Expecter) IssueVisible(ctx any, id any, teams any, viewer any) *ResolveRepositoryMock_IssueVisible_Call {
-	return &ResolveRepositoryMock_IssueVisible_Call{Call: _e.mock.On("IssueVisible", ctx, id, teams, viewer)}
+//   - withTrashed bool
+func (_e *ResolveRepositoryMock_Expecter) IssueVisible(ctx any, id any, teams any, viewer any, withTrashed any) *ResolveRepositoryMock_IssueVisible_Call {
+	return &ResolveRepositoryMock_IssueVisible_Call{Call: _e.mock.On("IssueVisible", ctx, id, teams, viewer, withTrashed)}
 }
 
-func (_c *ResolveRepositoryMock_IssueVisible_Call) Run(run func(ctx context.Context, id uuid.UUID, teams []uuid.UUID, viewer uuid.UUID)) *ResolveRepositoryMock_IssueVisible_Call {
+func (_c *ResolveRepositoryMock_IssueVisible_Call) Run(run func(ctx context.Context, id uuid.UUID, teams []uuid.UUID, viewer uuid.UUID, withTrashed bool)) *ResolveRepositoryMock_IssueVisible_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -1116,11 +1117,16 @@ func (_c *ResolveRepositoryMock_IssueVisible_Call) Run(run func(ctx context.Cont
 		if args[3] != nil {
 			arg3 = args[3].(uuid.UUID)
 		}
+		var arg4 bool
+		if args[4] != nil {
+			arg4 = args[4].(bool)
+		}
 		run(
 			arg0,
 			arg1,
 			arg2,
 			arg3,
+			arg4,
 		)
 	})
 	return _c
@@ -1131,7 +1137,7 @@ func (_c *ResolveRepositoryMock_IssueVisible_Call) Return(b bool, err error) *Re
 	return _c
 }
 
-func (_c *ResolveRepositoryMock_IssueVisible_Call) RunAndReturn(run func(ctx context.Context, id uuid.UUID, teams []uuid.UUID, viewer uuid.UUID) (bool, error)) *ResolveRepositoryMock_IssueVisible_Call {
+func (_c *ResolveRepositoryMock_IssueVisible_Call) RunAndReturn(run func(ctx context.Context, id uuid.UUID, teams []uuid.UUID, viewer uuid.UUID, withTrashed bool) (bool, error)) *ResolveRepositoryMock_IssueVisible_Call {
 	_c.Call.Return(run)
 	return _c
 }

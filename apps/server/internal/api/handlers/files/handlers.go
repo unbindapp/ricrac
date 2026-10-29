@@ -69,17 +69,22 @@ func (h *Handler) caller(r *http.Request) (*auth.Caller, error) {
 	return auth.SessionCaller(user), nil
 }
 
-// Download serves a file to members of its workspace, in ranges for players that seek.
+// Download serves a file to members of its workspace, and to anyone when the workspace is public,
+// in ranges for players that seek.
 func (h *Handler) Download(w http.ResponseWriter, r *http.Request) {
 	caller, err := h.caller(r)
-	if err != nil {
+	signedOut := err != nil && h.authn.SignedOut(r)
+	if err != nil && !signedOut {
 		errdefs.Write(w, err)
 		return
 	}
-	notFound := errdefs.NotFound("No such file")
+	var hidden error = errdefs.NotFound("No such file")
+	if signedOut {
+		hidden = err
+	}
 	id, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
-		errdefs.Write(w, notFound)
+		errdefs.Write(w, hidden)
 		return
 	}
 	file, err := h.srv.AttachmentService.File(r.Context(), id)
@@ -88,16 +93,16 @@ func (h *Handler) Download(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if file == nil {
-		errdefs.Write(w, notFound)
+		errdefs.Write(w, hidden)
 		return
 	}
-	reachable, err := h.srv.AccessService.Reachable(r.Context(), caller)
+	readable, err := h.readable(r, caller, file.WorkspaceID)
 	if err != nil {
 		errdefs.Write(w, err)
 		return
 	}
-	if !slices.ContainsFunc(reachable, func(w auth.Reached) bool { return w.ID == file.WorkspaceID }) {
-		errdefs.Write(w, notFound)
+	if !readable {
+		errdefs.Write(w, hidden)
 		return
 	}
 	header := w.Header()
@@ -107,6 +112,21 @@ func (h *Handler) Download(w http.ResponseWriter, r *http.Request) {
 	header.Set("Content-Security-Policy", "sandbox")
 	header.Set("Cache-Control", "private, max-age=3600")
 	http.ServeContent(w, r, "", file.CreatedAt, bytes.NewReader(*file.Data))
+}
+
+// readable says whether the caller (nil when signed out) may read the workspace's files.
+func (h *Handler) readable(r *http.Request, caller *auth.Caller, workspace uuid.UUID) (bool, error) {
+	if caller != nil {
+		reachable, err := h.srv.AccessService.Reachable(r.Context(), caller)
+		if err != nil {
+			return false, err
+		}
+		if slices.ContainsFunc(reachable, func(w auth.Reached) bool { return w.ID == workspace }) {
+			return true, nil
+		}
+	}
+	visitor, err := h.srv.AccessService.Visitor(r.Context(), workspace.String())
+	return visitor != nil, err
 }
 
 // disposition downloads types a browser would run instead of showing them.

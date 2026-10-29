@@ -9,7 +9,7 @@ import (
 func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	states := srv.StateService
 	oapi.Register(reg, oapi.Operation{
-		Name: "list_issue_statuses", Access: auth.Read, Routes: []string{"GET /teams/{team}/statuses"},
+		Name: "list_issue_statuses", Access: auth.Read, Public: true, Routes: []string{"GET /teams/{team}/statuses"},
 		Description: "List the workspace's workflow statuses in board order (triage, backlog, unstarted, started, completed, canceled, " +
 			"then position): name, type, color, how many issues are in each and which is the default for new issues.",
 	}, states.List)

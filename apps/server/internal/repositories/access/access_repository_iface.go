@@ -15,6 +15,8 @@ type AccessRepositoryInterface interface {
 	Reachable(ctx context.Context, user uuid.UUID, workspaces []uuid.UUID) ([]auth.Reached, error)
 	// Role is the user's role in the workspace while they're an active member.
 	Role(ctx context.Context, workspaceID, user uuid.UUID) (string, bool, error)
+	// PublicWorkspace is the public workspace with this URL key or id, uuid.Nil when there's none.
+	PublicWorkspace(ctx context.Context, named string) (uuid.UUID, error)
 	// VisibleTeams is the teams of the workspace whose issues the user sees: public ones unless
 	// they're a guest, the ones they belong to, or every team for Ricrac itself.
 	VisibleTeams(ctx context.Context, workspaceID, user uuid.UUID, guest, everything bool) ([]uuid.UUID, error)

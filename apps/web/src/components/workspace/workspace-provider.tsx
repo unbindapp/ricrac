@@ -11,6 +11,8 @@ type TWorkspaceContext = {
   canEdit: boolean;
   /** Owners and admins. */
   isAdmin: boolean;
+  /** Someone who isn't a member reading a public workspace: its issues only, read-only. */
+  isVisitor: boolean;
 };
 
 const WorkspaceContext = createContext<TWorkspaceContext | null>(null);
@@ -18,15 +20,23 @@ const WorkspaceContext = createContext<TWorkspaceContext | null>(null);
 export function WorkspaceProvider({
   workspace,
   role,
+  isVisitor,
   children,
 }: {
   workspace: Workspace;
   role: TWorkspaceRole;
+  isVisitor: boolean;
   children: ReactNode;
 }) {
   const value = useMemo<TWorkspaceContext>(
-    () => ({ workspace, role, canEdit: canEditRole(role), isAdmin: isAdminRole(role) }),
-    [workspace, role],
+    () => ({
+      workspace,
+      role,
+      canEdit: !isVisitor && canEditRole(role),
+      isAdmin: !isVisitor && isAdminRole(role),
+      isVisitor,
+    }),
+    [workspace, role, isVisitor],
   );
   return <WorkspaceContext.Provider value={value}>{children}</WorkspaceContext.Provider>;
 }

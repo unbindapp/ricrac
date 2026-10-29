@@ -342,7 +342,7 @@ func (self *ResolveService) CanSeeIssue(ctx context.Context, actor *auth.Actor, 
 	if err != nil {
 		return false, err
 	}
-	return self.lookups().IssueVisible(ctx, issue, teams, actor.User)
+	return self.lookups().IssueVisible(ctx, issue, teams, actor.User, !actor.Visitor)
 }
 
 func (self *ResolveService) Issues(ctx context.Context, actor *auth.Actor, values []string) ([]uuid.UUID, error) {

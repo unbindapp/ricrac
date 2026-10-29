@@ -9,12 +9,12 @@ import (
 func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	teams := srv.TeamService
 	oapi.Register(reg, oapi.Operation{
-		Name: "list_teams", Access: auth.Read, Routes: []string{"GET /teams"},
+		Name: "list_teams", Access: auth.Read, Public: true, Routes: []string{"GET /teams"},
 		Description: "List the workspace's team (a workspace has one) with key, name, whether you're a member, " +
 			"member and open issue counts and whether cycles and triage are on. Narrow with query (name or key) or mine.",
 	}, teams.List)
 	oapi.Register(reg, oapi.Operation{
-		Name: "get_team", Access: auth.Read, Routes: []string{"GET /teams/{id}"},
+		Name: "get_team", Access: auth.Read, Public: true, Routes: []string{"GET /teams/{id}"},
 		Description: "Read the workspace's team by key, name or id (earlier keys and names, and those of teams merged into it, " +
 			"work too): the issue prefix (key), all its settings (estimates, cycles, triage, auto-archive and auto-close), " +
 			"its statuses in order, members (with owners), current cycle, default status and who is on triage.",

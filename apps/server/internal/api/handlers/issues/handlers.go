@@ -9,13 +9,13 @@ import (
 func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	issues := srv.IssueService
 	oapi.Register(reg, oapi.Operation{
-		Name: "list_issues", Access: auth.Read, Routes: []string{"GET /issues"},
+		Name: "list_issues", Access: auth.Read, Public: true, Routes: []string{"GET /issues"},
 		Description: "List issues, newest update first. Narrow with the simple arguments (team, assignee \"me\", state, label, " +
 			"project, cycle, ...) and/or a `filter` object for anything more (and/or, comparators, relations). Archived " +
 			"and trashed issues are left out unless asked for. Descriptions are left out unless includeDescription is set.",
 	}, issues.List)
 	oapi.Register(reg, oapi.Operation{
-		Name: "get_issue", Access: auth.Read, Routes: []string{"GET /issues/{id}"},
+		Name: "get_issue", Access: auth.Read, Public: true, Routes: []string{"GET /issues/{id}"},
 		Description: "Read an issue by identifier (ENG-123), id or link: its fields, description, sub-issues, relations " +
 			"(blocks, blocked by, related, duplicates), attachments, subscribers and releases. Set includeComments or " +
 			"includeHistory to also get its comment threads or change history.",
@@ -52,7 +52,7 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 		Description: "Bring an archived issue back.",
 	}, issues.Unarchive)
 	oapi.Register(reg, oapi.Operation{
-		Name: "get_issue_history", Access: auth.Read, Routes: []string{"GET /issues/{id}/history"},
+		Name: "get_issue_history", Access: auth.Read, Public: true, Routes: []string{"GET /issues/{id}/history"},
 		Description: "The change history of an issue, oldest first: who changed which field from what to what, and when.",
 	}, issues.History)
 	oapi.Register(reg, oapi.Operation{
