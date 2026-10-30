@@ -23,6 +23,8 @@ import { signOut } from "@/lib/queries/me";
 import { useUpdateUserMutation, workspaceMeQuery } from "@/lib/queries/users";
 import { useAccentHueStore } from "@/lib/stores/accent-hue";
 import { BASELINE_HUE, paletteVariables } from "@/themes/dank/palette";
+import { uiThemeOf, uiThemes } from "@/themes/registry";
+import { isUiThemeId, UI_THEME_IDS } from "@/themes/types";
 import { useUiTheme } from "@/themes/ui-theme-provider";
 
 export const Route = createFileRoute("/$workspace/_workspace/settings/account/")({
@@ -103,7 +105,7 @@ function AccountProfileSettingsPage() {
           <ProfileSection me={me} />
           <NotificationsSection me={me} />
           <GithubAccountSection />
-          <AppearanceSection />
+          <AppearanceSection me={me} />
           <SignOutSection me={me} />
         </>
       )}
@@ -215,13 +217,50 @@ function SignOutSection({ me }: { me: WorkspaceUserDetail }) {
   );
 }
 
-function AppearanceSection() {
+function AppearanceSection({ me }: { me: WorkspaceUserDetail }) {
   const { theme, setTheme } = useTheme();
   return (
-    <SettingsSection title="Appearance" description="Saved in this browser.">
+    <SettingsSection
+      title="Appearance"
+      description="Style is yours in this workspace; light or dark and the accent color stay in this browser."
+    >
+      <StyleField me={me} />
       <ThemeField key={theme} theme={theme ?? defaultTheme} onChange={setTheme} />
       <AccentField />
     </SettingsSection>
+  );
+}
+
+const WORKSPACE_STYLE = "workspace";
+
+function StyleField({ me }: { me: WorkspaceUserDetail }) {
+  const { workspace } = useWorkspace();
+  const { mutate: update } = useUpdateUserMutation(workspace.id);
+  const form = useAppForm({ defaultValues: { style: me.theme ?? WORKSPACE_STYLE } });
+  const items = [
+    {
+      value: WORKSPACE_STYLE,
+      label: `Workspace default (${uiThemeOf(workspace.theme).label})`,
+    },
+    ...UI_THEME_IDS.map((id) => ({ value: id, label: uiThemes[id].label })),
+  ];
+  return (
+    <form.AppField
+      name="style"
+      listeners={{
+        onChange: ({ value }) => update({ id: "me", theme: isUiThemeId(value) ? value : null }),
+      }}
+      children={(field) => (
+        <field.SelectField
+          label="Style"
+          items={items}
+          description={
+            uiThemeOf(isUiThemeId(field.state.value) ? field.state.value : workspace.theme)
+              .description
+          }
+        />
+      )}
+    />
   );
 }
 

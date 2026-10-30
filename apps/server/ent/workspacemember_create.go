@@ -71,6 +71,20 @@ func (_c *WorkspaceMemberCreate) SetNillableJoinedAt(v *time.Time) *WorkspaceMem
 	return _c
 }
 
+// SetTheme sets the "theme" field.
+func (_c *WorkspaceMemberCreate) SetTheme(v string) *WorkspaceMemberCreate {
+	_c.mutation.SetTheme(v)
+	return _c
+}
+
+// SetNillableTheme sets the "theme" field if the given value is not nil.
+func (_c *WorkspaceMemberCreate) SetNillableTheme(v *string) *WorkspaceMemberCreate {
+	if v != nil {
+		_c.SetTheme(*v)
+	}
+	return _c
+}
+
 // SetWorkspace sets the "workspace" edge to the Workspace entity.
 func (_c *WorkspaceMemberCreate) SetWorkspace(v *Workspace) *WorkspaceMemberCreate {
 	return _c.SetWorkspaceID(v.ID)
@@ -164,6 +178,10 @@ func (_c *WorkspaceMemberCreate) createSpec() (*WorkspaceMember, *sqlgraph.Creat
 	if value, ok := _c.mutation.JoinedAt(); ok {
 		_spec.SetField(workspacemember.FieldJoinedAt, field.TypeTime, value)
 		_node.JoinedAt = value
+	}
+	if value, ok := _c.mutation.Theme(); ok {
+		_spec.SetField(workspacemember.FieldTheme, field.TypeString, value)
+		_node.Theme = &value
 	}
 	if nodes := _c.mutation.WorkspaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -323,6 +341,24 @@ func (u *WorkspaceMemberUpsert) ClearJoinedAt() *WorkspaceMemberUpsert {
 	return u
 }
 
+// SetTheme sets the "theme" field.
+func (u *WorkspaceMemberUpsert) SetTheme(v string) *WorkspaceMemberUpsert {
+	u.Set(workspacemember.FieldTheme, v)
+	return u
+}
+
+// UpdateTheme sets the "theme" field to the value that was provided on create.
+func (u *WorkspaceMemberUpsert) UpdateTheme() *WorkspaceMemberUpsert {
+	u.SetExcluded(workspacemember.FieldTheme)
+	return u
+}
+
+// ClearTheme clears the value of the "theme" field.
+func (u *WorkspaceMemberUpsert) ClearTheme() *WorkspaceMemberUpsert {
+	u.SetNull(workspacemember.FieldTheme)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -444,6 +480,27 @@ func (u *WorkspaceMemberUpsertOne) UpdateJoinedAt() *WorkspaceMemberUpsertOne {
 func (u *WorkspaceMemberUpsertOne) ClearJoinedAt() *WorkspaceMemberUpsertOne {
 	return u.Update(func(s *WorkspaceMemberUpsert) {
 		s.ClearJoinedAt()
+	})
+}
+
+// SetTheme sets the "theme" field.
+func (u *WorkspaceMemberUpsertOne) SetTheme(v string) *WorkspaceMemberUpsertOne {
+	return u.Update(func(s *WorkspaceMemberUpsert) {
+		s.SetTheme(v)
+	})
+}
+
+// UpdateTheme sets the "theme" field to the value that was provided on create.
+func (u *WorkspaceMemberUpsertOne) UpdateTheme() *WorkspaceMemberUpsertOne {
+	return u.Update(func(s *WorkspaceMemberUpsert) {
+		s.UpdateTheme()
+	})
+}
+
+// ClearTheme clears the value of the "theme" field.
+func (u *WorkspaceMemberUpsertOne) ClearTheme() *WorkspaceMemberUpsertOne {
+	return u.Update(func(s *WorkspaceMemberUpsert) {
+		s.ClearTheme()
 	})
 }
 
@@ -708,6 +765,27 @@ func (u *WorkspaceMemberUpsertBulk) UpdateJoinedAt() *WorkspaceMemberUpsertBulk 
 func (u *WorkspaceMemberUpsertBulk) ClearJoinedAt() *WorkspaceMemberUpsertBulk {
 	return u.Update(func(s *WorkspaceMemberUpsert) {
 		s.ClearJoinedAt()
+	})
+}
+
+// SetTheme sets the "theme" field.
+func (u *WorkspaceMemberUpsertBulk) SetTheme(v string) *WorkspaceMemberUpsertBulk {
+	return u.Update(func(s *WorkspaceMemberUpsert) {
+		s.SetTheme(v)
+	})
+}
+
+// UpdateTheme sets the "theme" field to the value that was provided on create.
+func (u *WorkspaceMemberUpsertBulk) UpdateTheme() *WorkspaceMemberUpsertBulk {
+	return u.Update(func(s *WorkspaceMemberUpsert) {
+		s.UpdateTheme()
+	})
+}
+
+// ClearTheme clears the value of the "theme" field.
+func (u *WorkspaceMemberUpsertBulk) ClearTheme() *WorkspaceMemberUpsertBulk {
+	return u.Update(func(s *WorkspaceMemberUpsert) {
+		s.ClearTheme()
 	})
 }
 

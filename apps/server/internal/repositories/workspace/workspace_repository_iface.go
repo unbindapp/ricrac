@@ -26,6 +26,7 @@ type WorkspaceRepositoryInterface interface {
 	SetDisplayName(ctx context.Context, tx repository.TxInterface, user uuid.UUID, displayName string) error
 	SetTimezone(ctx context.Context, tx repository.TxInterface, user uuid.UUID, timezone *string) error
 	SetEmailNotifications(ctx context.Context, tx repository.TxInterface, user uuid.UUID, on bool) error
+	SetMemberTheme(ctx context.Context, tx repository.TxInterface, id, user uuid.UUID, theme *string) error
 	// Deactivate takes the member out of the workspace: inactive, off its teams and their triage.
 	Deactivate(ctx context.Context, tx repository.TxInterface, id, user uuid.UUID) error
 	// UpsertInvitation invites the email, or renews its invitation, for 14 days from now.

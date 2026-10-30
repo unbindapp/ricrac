@@ -88244,6 +88244,7 @@ type WorkspaceMemberMutation struct {
 	role             *string
 	active           *bool
 	joined_at        *time.Time
+	theme            *string
 	clearedFields    map[string]struct{}
 	workspace        *uuid.UUID
 	clearedworkspace bool
@@ -88413,6 +88414,38 @@ func (m *WorkspaceMemberMutation) ResetJoinedAt() {
 	delete(m.clearedFields, workspacemember.FieldJoinedAt)
 }
 
+// SetTheme sets the "theme" field.
+func (m *WorkspaceMemberMutation) SetTheme(s string) {
+	m.theme = &s
+}
+
+// Theme returns the value of the "theme" field in the mutation.
+func (m *WorkspaceMemberMutation) Theme() (r string, exists bool) {
+	v := m.theme
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearTheme clears the value of the "theme" field.
+func (m *WorkspaceMemberMutation) ClearTheme() {
+	m.theme = nil
+	m.clearedFields[workspacemember.FieldTheme] = struct{}{}
+}
+
+// ThemeCleared returns if the "theme" field was cleared in this mutation.
+func (m *WorkspaceMemberMutation) ThemeCleared() bool {
+	_, ok := m.clearedFields[workspacemember.FieldTheme]
+	return ok
+}
+
+// ResetTheme resets all changes to the "theme" field.
+func (m *WorkspaceMemberMutation) ResetTheme() {
+	m.theme = nil
+	delete(m.clearedFields, workspacemember.FieldTheme)
+}
+
 // ClearWorkspace clears the "workspace" edge to the Workspace entity.
 func (m *WorkspaceMemberMutation) ClearWorkspace() {
 	m.clearedworkspace = true
@@ -88501,7 +88534,7 @@ func (m *WorkspaceMemberMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *WorkspaceMemberMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.workspace != nil {
 		fields = append(fields, workspacemember.FieldWorkspaceID)
 	}
@@ -88516,6 +88549,9 @@ func (m *WorkspaceMemberMutation) Fields() []string {
 	}
 	if m.joined_at != nil {
 		fields = append(fields, workspacemember.FieldJoinedAt)
+	}
+	if m.theme != nil {
+		fields = append(fields, workspacemember.FieldTheme)
 	}
 	return fields
 }
@@ -88535,6 +88571,8 @@ func (m *WorkspaceMemberMutation) Field(name string) (ent.Value, bool) {
 		return m.Active()
 	case workspacemember.FieldJoinedAt:
 		return m.JoinedAt()
+	case workspacemember.FieldTheme:
+		return m.Theme()
 	}
 	return nil, false
 }
@@ -88586,6 +88624,13 @@ func (m *WorkspaceMemberMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetJoinedAt(v)
 		return nil
+	case workspacemember.FieldTheme:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTheme(v)
+		return nil
 	}
 	return fmt.Errorf("unknown WorkspaceMember field %s", name)
 }
@@ -88622,6 +88667,9 @@ func (m *WorkspaceMemberMutation) ClearedFields() []string {
 	if m.FieldCleared(workspacemember.FieldJoinedAt) {
 		fields = append(fields, workspacemember.FieldJoinedAt)
 	}
+	if m.FieldCleared(workspacemember.FieldTheme) {
+		fields = append(fields, workspacemember.FieldTheme)
+	}
 	return fields
 }
 
@@ -88641,6 +88689,9 @@ func (m *WorkspaceMemberMutation) ClearField(name string) error {
 		return nil
 	case workspacemember.FieldJoinedAt:
 		m.ClearJoinedAt()
+		return nil
+	case workspacemember.FieldTheme:
+		m.ClearTheme()
 		return nil
 	}
 	return fmt.Errorf("unknown WorkspaceMember nullable field %s", name)
@@ -88664,6 +88715,9 @@ func (m *WorkspaceMemberMutation) ResetField(name string) error {
 		return nil
 	case workspacemember.FieldJoinedAt:
 		m.ResetJoinedAt()
+		return nil
+	case workspacemember.FieldTheme:
+		m.ResetTheme()
 		return nil
 	}
 	return fmt.Errorf("unknown WorkspaceMember field %s", name)

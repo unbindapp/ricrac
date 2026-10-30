@@ -63,7 +63,10 @@ function WorkspaceLayout() {
 
   return (
     <WorkspaceProvider workspace={workspace} role={workspaceRole(summary)} isVisitor={isVisitor}>
-      <UiThemeProvider themeId={workspace.theme} workspaceUrlKey={workspace.urlKey}>
+      <UiThemeProvider
+        themeId={summary.ownTheme ?? workspace.theme}
+        workspaceUrlKey={workspace.urlKey}
+      >
         <TeamsProvider>
           <Shell>
             <Outlet />

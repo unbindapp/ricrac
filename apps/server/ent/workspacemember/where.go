@@ -36,6 +36,11 @@ func JoinedAt(v time.Time) predicate.WorkspaceMember {
 	return predicate.WorkspaceMember(sql.FieldEQ(FieldJoinedAt, v))
 }
 
+// Theme applies equality check predicate on the "theme" field. It's identical to ThemeEQ.
+func Theme(v string) predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldEQ(FieldTheme, v))
+}
+
 // WorkspaceIDEQ applies the EQ predicate on the "workspace_id" field.
 func WorkspaceIDEQ(v uuid.UUID) predicate.WorkspaceMember {
 	return predicate.WorkspaceMember(sql.FieldEQ(FieldWorkspaceID, v))
@@ -209,6 +214,81 @@ func JoinedAtIsNil() predicate.WorkspaceMember {
 // JoinedAtNotNil applies the NotNil predicate on the "joined_at" field.
 func JoinedAtNotNil() predicate.WorkspaceMember {
 	return predicate.WorkspaceMember(sql.FieldNotNull(FieldJoinedAt))
+}
+
+// ThemeEQ applies the EQ predicate on the "theme" field.
+func ThemeEQ(v string) predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldEQ(FieldTheme, v))
+}
+
+// ThemeNEQ applies the NEQ predicate on the "theme" field.
+func ThemeNEQ(v string) predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldNEQ(FieldTheme, v))
+}
+
+// ThemeIn applies the In predicate on the "theme" field.
+func ThemeIn(vs ...string) predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldIn(FieldTheme, vs...))
+}
+
+// ThemeNotIn applies the NotIn predicate on the "theme" field.
+func ThemeNotIn(vs ...string) predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldNotIn(FieldTheme, vs...))
+}
+
+// ThemeGT applies the GT predicate on the "theme" field.
+func ThemeGT(v string) predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldGT(FieldTheme, v))
+}
+
+// ThemeGTE applies the GTE predicate on the "theme" field.
+func ThemeGTE(v string) predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldGTE(FieldTheme, v))
+}
+
+// ThemeLT applies the LT predicate on the "theme" field.
+func ThemeLT(v string) predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldLT(FieldTheme, v))
+}
+
+// ThemeLTE applies the LTE predicate on the "theme" field.
+func ThemeLTE(v string) predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldLTE(FieldTheme, v))
+}
+
+// ThemeContains applies the Contains predicate on the "theme" field.
+func ThemeContains(v string) predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldContains(FieldTheme, v))
+}
+
+// ThemeHasPrefix applies the HasPrefix predicate on the "theme" field.
+func ThemeHasPrefix(v string) predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldHasPrefix(FieldTheme, v))
+}
+
+// ThemeHasSuffix applies the HasSuffix predicate on the "theme" field.
+func ThemeHasSuffix(v string) predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldHasSuffix(FieldTheme, v))
+}
+
+// ThemeIsNil applies the IsNil predicate on the "theme" field.
+func ThemeIsNil() predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldIsNull(FieldTheme))
+}
+
+// ThemeNotNil applies the NotNil predicate on the "theme" field.
+func ThemeNotNil() predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldNotNull(FieldTheme))
+}
+
+// ThemeEqualFold applies the EqualFold predicate on the "theme" field.
+func ThemeEqualFold(v string) predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldEqualFold(FieldTheme, v))
+}
+
+// ThemeContainsFold applies the ContainsFold predicate on the "theme" field.
+func ThemeContainsFold(v string) predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldContainsFold(FieldTheme, v))
 }
 
 // HasWorkspace applies the HasEdge predicate on the "workspace" edge.

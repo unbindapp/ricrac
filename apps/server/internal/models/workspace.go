@@ -51,6 +51,7 @@ type WorkspaceUser struct {
 	Active             bool      `json:"active" doc:"False once removed from the workspace."`
 	IsMe               bool      `json:"isMe"`
 	EmailNotifications *bool     `json:"emailNotifications" doc:"Only shown for yourself."`
+	Theme              *string   `json:"theme" enum:"default,dank" doc:"Your look of the web app in this workspace, over the workspace's theme; null follows it. Only shown for yourself."`
 	JoinedAt           string    `json:"joinedAt"`
 	Teams              []TeamRef `json:"teams" doc:"Their teams that you can see."`
 }
@@ -108,6 +109,7 @@ func WorkspaceUserOf(m *ent.WorkspaceMember, viewer string, teams []*ent.Team) W
 	}
 	if value.IsMe {
 		value.EmailNotifications = &u.EmailNotifications
+		value.Theme = m.Theme
 	}
 	return value
 }

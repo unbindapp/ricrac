@@ -61,6 +61,31 @@ func TestSetsTheWorkspaceTheme(t *testing.T) {
 	eq(t, log.At("nodes", 0, "metadata", "theme").JSON(), `{"from":"default","to":"dank"}`)
 }
 
+func TestEachMemberMayOverrideTheWorkspaceTheme(t *testing.T) {
+	w := world(t)
+	bob := w.member("bob@acme.test", "Bob Jones", "member")
+	call(t, w.Ann, "update_workspace", M{"theme": "dank"})
+	ownTheme := func(c *Actor) J {
+		req := httptest.NewRequest("GET", "/api/me", nil)
+		req.Header.Set("Cookie", w.session(c.User))
+		_, me := send(w.Router, req)
+		return me.At("workspaces", 0, "ownTheme")
+	}
+	check(t, call(t, bob, "get_user", M{"id": "me"}).At("theme").IsNull())
+	check(t, ownTheme(bob).IsNull(), "follows the workspace")
+
+	contains(t, fails(t, bob, "update_user", M{"id": "me", "theme": "neon"}), "theme")
+	contains(t, fails(t, bob, "update_user", M{"id": "ann", "theme": "default"}), "your own")
+	eq(t, call(t, bob, "update_user", M{"id": "me", "theme": "default"}).At("theme").Str(), "default")
+	eq(t, ownTheme(bob).Str(), "default")
+	check(t, ownTheme(w.Ann).IsNull(), "others keep following")
+	check(t, call(t, w.Ann, "get_user", M{"id": "bob"}).At("theme").IsNull(), "only shown for yourself")
+	eq(t, call(t, bob, "get_workspace", M{}).At("theme").Str(), "dank")
+
+	check(t, call(t, bob, "update_user", M{"id": "me", "theme": nil}).At("theme").IsNull())
+	check(t, ownTheme(bob).IsNull())
+}
+
 func TestListsAndReadsMembers(t *testing.T) {
 	w := world(t)
 	bob := w.member("bob@acme.test", "Bob Jones", "member")

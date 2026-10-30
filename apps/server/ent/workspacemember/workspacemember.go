@@ -20,6 +20,8 @@ const (
 	FieldActive = "active"
 	// FieldJoinedAt holds the string denoting the joined_at field in the database.
 	FieldJoinedAt = "joined_at"
+	// FieldTheme holds the string denoting the theme field in the database.
+	FieldTheme = "theme"
 	// EdgeWorkspace holds the string denoting the workspace edge name in mutations.
 	EdgeWorkspace = "workspace"
 	// EdgeUser holds the string denoting the user edge name in mutations.
@@ -53,6 +55,7 @@ var Columns = []string{
 	FieldRole,
 	FieldActive,
 	FieldJoinedAt,
+	FieldTheme,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -91,6 +94,11 @@ func ByActive(opts ...sql.OrderTermOption) OrderOption {
 // ByJoinedAt orders the results by the joined_at field.
 func ByJoinedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldJoinedAt, opts...).ToFunc()
+}
+
+// ByTheme orders the results by the theme field.
+func ByTheme(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTheme, opts...).ToFunc()
 }
 
 // ByWorkspaceField orders the results by workspace field.

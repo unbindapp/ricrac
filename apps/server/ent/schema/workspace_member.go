@@ -20,6 +20,7 @@ func (WorkspaceMember) Fields() []ent.Field {
 		field.Text("role"),
 		field.Bool("active").Optional(),
 		field.Time("joined_at").Optional(),
+		field.Text("theme").Optional().Nillable(),
 	}
 }
 

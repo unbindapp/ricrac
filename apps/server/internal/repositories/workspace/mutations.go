@@ -75,6 +75,14 @@ func (self *WorkspaceRepository) SetEmailNotifications(ctx context.Context, tx r
 	return self.base.Client(tx).User.UpdateOneID(user).SetEmailNotifications(on).Exec(ctx)
 }
 
+func (self *WorkspaceRepository) SetMemberTheme(ctx context.Context, tx repository.TxInterface, id, user uuid.UUID, theme *string) error {
+	update := self.base.Client(tx).WorkspaceMember.Update().Where(workspacemember.WorkspaceID(id), workspacemember.UserID(user))
+	if theme == nil {
+		return update.ClearTheme().Exec(ctx)
+	}
+	return update.SetTheme(*theme).Exec(ctx)
+}
+
 // Deactivate takes the member out of the workspace: inactive, off its teams and their triage.
 func (self *WorkspaceRepository) Deactivate(ctx context.Context, tx repository.TxInterface, id, user uuid.UUID) error {
 	client := self.base.Client(tx)
