@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"ricrac/ent/githubinstallation"
 	"ricrac/ent/githubissuelink"
+	"ricrac/ent/githubmilestonelink"
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/githubreposync"
 	"ricrac/ent/predicate"
@@ -150,6 +151,46 @@ func (_u *GithubRepoSyncUpdate) SetNillableLinkBack(v *bool) *GithubRepoSyncUpda
 // ClearLinkBack clears the value of the "link_back" field.
 func (_u *GithubRepoSyncUpdate) ClearLinkBack() *GithubRepoSyncUpdate {
 	_u.mutation.ClearLinkBack()
+	return _u
+}
+
+// SetCreateIssues sets the "create_issues" field.
+func (_u *GithubRepoSyncUpdate) SetCreateIssues(v bool) *GithubRepoSyncUpdate {
+	_u.mutation.SetCreateIssues(v)
+	return _u
+}
+
+// SetNillableCreateIssues sets the "create_issues" field if the given value is not nil.
+func (_u *GithubRepoSyncUpdate) SetNillableCreateIssues(v *bool) *GithubRepoSyncUpdate {
+	if v != nil {
+		_u.SetCreateIssues(*v)
+	}
+	return _u
+}
+
+// ClearCreateIssues clears the value of the "create_issues" field.
+func (_u *GithubRepoSyncUpdate) ClearCreateIssues() *GithubRepoSyncUpdate {
+	_u.mutation.ClearCreateIssues()
+	return _u
+}
+
+// SetSyncFields sets the "sync_fields" field.
+func (_u *GithubRepoSyncUpdate) SetSyncFields(v bool) *GithubRepoSyncUpdate {
+	_u.mutation.SetSyncFields(v)
+	return _u
+}
+
+// SetNillableSyncFields sets the "sync_fields" field if the given value is not nil.
+func (_u *GithubRepoSyncUpdate) SetNillableSyncFields(v *bool) *GithubRepoSyncUpdate {
+	if v != nil {
+		_u.SetSyncFields(*v)
+	}
+	return _u
+}
+
+// ClearSyncFields clears the value of the "sync_fields" field.
+func (_u *GithubRepoSyncUpdate) ClearSyncFields() *GithubRepoSyncUpdate {
+	_u.mutation.ClearSyncFields()
 	return _u
 }
 
@@ -368,6 +409,26 @@ func (_u *GithubRepoSyncUpdate) ClearLastSyncedAt() *GithubRepoSyncUpdate {
 	return _u
 }
 
+// SetMilestonesSyncedAt sets the "milestones_synced_at" field.
+func (_u *GithubRepoSyncUpdate) SetMilestonesSyncedAt(v time.Time) *GithubRepoSyncUpdate {
+	_u.mutation.SetMilestonesSyncedAt(v)
+	return _u
+}
+
+// SetNillableMilestonesSyncedAt sets the "milestones_synced_at" field if the given value is not nil.
+func (_u *GithubRepoSyncUpdate) SetNillableMilestonesSyncedAt(v *time.Time) *GithubRepoSyncUpdate {
+	if v != nil {
+		_u.SetMilestonesSyncedAt(*v)
+	}
+	return _u
+}
+
+// ClearMilestonesSyncedAt clears the value of the "milestones_synced_at" field.
+func (_u *GithubRepoSyncUpdate) ClearMilestonesSyncedAt() *GithubRepoSyncUpdate {
+	_u.mutation.ClearMilestonesSyncedAt()
+	return _u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_u *GithubRepoSyncUpdate) SetCreatedAt(v time.Time) *GithubRepoSyncUpdate {
 	_u.mutation.SetCreatedAt(v)
@@ -458,6 +519,21 @@ func (_u *GithubRepoSyncUpdate) AddGithubOutbox(v ...*GithubOutbox) *GithubRepoS
 	return _u.AddGithubOutboxIDs(ids...)
 }
 
+// AddGithubMilestoneLinkIDs adds the "github_milestone_links" edge to the GithubMilestoneLink entity by IDs.
+func (_u *GithubRepoSyncUpdate) AddGithubMilestoneLinkIDs(ids ...uuid.UUID) *GithubRepoSyncUpdate {
+	_u.mutation.AddGithubMilestoneLinkIDs(ids...)
+	return _u
+}
+
+// AddGithubMilestoneLinks adds the "github_milestone_links" edges to the GithubMilestoneLink entity.
+func (_u *GithubRepoSyncUpdate) AddGithubMilestoneLinks(v ...*GithubMilestoneLink) *GithubRepoSyncUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddGithubMilestoneLinkIDs(ids...)
+}
+
 // Mutation returns the GithubRepoSyncMutation object of the builder.
 func (_u *GithubRepoSyncUpdate) Mutation() *GithubRepoSyncMutation {
 	return _u.mutation
@@ -527,6 +603,27 @@ func (_u *GithubRepoSyncUpdate) RemoveGithubOutbox(v ...*GithubOutbox) *GithubRe
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveGithubOutboxIDs(ids...)
+}
+
+// ClearGithubMilestoneLinks clears all "github_milestone_links" edges to the GithubMilestoneLink entity.
+func (_u *GithubRepoSyncUpdate) ClearGithubMilestoneLinks() *GithubRepoSyncUpdate {
+	_u.mutation.ClearGithubMilestoneLinks()
+	return _u
+}
+
+// RemoveGithubMilestoneLinkIDs removes the "github_milestone_links" edge to GithubMilestoneLink entities by IDs.
+func (_u *GithubRepoSyncUpdate) RemoveGithubMilestoneLinkIDs(ids ...uuid.UUID) *GithubRepoSyncUpdate {
+	_u.mutation.RemoveGithubMilestoneLinkIDs(ids...)
+	return _u
+}
+
+// RemoveGithubMilestoneLinks removes "github_milestone_links" edges to GithubMilestoneLink entities.
+func (_u *GithubRepoSyncUpdate) RemoveGithubMilestoneLinks(v ...*GithubMilestoneLink) *GithubRepoSyncUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveGithubMilestoneLinkIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -603,6 +700,18 @@ func (_u *GithubRepoSyncUpdate) sqlSave(ctx context.Context) (_node int, err err
 	if _u.mutation.LinkBackCleared() {
 		_spec.ClearField(githubreposync.FieldLinkBack, field.TypeBool)
 	}
+	if value, ok := _u.mutation.CreateIssues(); ok {
+		_spec.SetField(githubreposync.FieldCreateIssues, field.TypeBool, value)
+	}
+	if _u.mutation.CreateIssuesCleared() {
+		_spec.ClearField(githubreposync.FieldCreateIssues, field.TypeBool)
+	}
+	if value, ok := _u.mutation.SyncFields(); ok {
+		_spec.SetField(githubreposync.FieldSyncFields, field.TypeBool, value)
+	}
+	if _u.mutation.SyncFieldsCleared() {
+		_spec.ClearField(githubreposync.FieldSyncFields, field.TypeBool)
+	}
 	if value, ok := _u.mutation.BackfillStatus(); ok {
 		_spec.SetField(githubreposync.FieldBackfillStatus, field.TypeString, value)
 	}
@@ -671,6 +780,12 @@ func (_u *GithubRepoSyncUpdate) sqlSave(ctx context.Context) (_node int, err err
 	}
 	if _u.mutation.LastSyncedAtCleared() {
 		_spec.ClearField(githubreposync.FieldLastSyncedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.MilestonesSyncedAt(); ok {
+		_spec.SetField(githubreposync.FieldMilestonesSyncedAt, field.TypeTime, value)
+	}
+	if _u.mutation.MilestonesSyncedAtCleared() {
+		_spec.ClearField(githubreposync.FieldMilestonesSyncedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(githubreposync.FieldCreatedAt, field.TypeTime, value)
@@ -890,6 +1005,51 @@ func (_u *GithubRepoSyncUpdate) sqlSave(ctx context.Context) (_node int, err err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.GithubMilestoneLinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   githubreposync.GithubMilestoneLinksTable,
+			Columns: []string{githubreposync.GithubMilestoneLinksColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githubmilestonelink.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedGithubMilestoneLinksIDs(); len(nodes) > 0 && !_u.mutation.GithubMilestoneLinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   githubreposync.GithubMilestoneLinksTable,
+			Columns: []string{githubreposync.GithubMilestoneLinksColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githubmilestonelink.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.GithubMilestoneLinksIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   githubreposync.GithubMilestoneLinksTable,
+			Columns: []string{githubreposync.GithubMilestoneLinksColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githubmilestonelink.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -1026,6 +1186,46 @@ func (_u *GithubRepoSyncUpdateOne) SetNillableLinkBack(v *bool) *GithubRepoSyncU
 // ClearLinkBack clears the value of the "link_back" field.
 func (_u *GithubRepoSyncUpdateOne) ClearLinkBack() *GithubRepoSyncUpdateOne {
 	_u.mutation.ClearLinkBack()
+	return _u
+}
+
+// SetCreateIssues sets the "create_issues" field.
+func (_u *GithubRepoSyncUpdateOne) SetCreateIssues(v bool) *GithubRepoSyncUpdateOne {
+	_u.mutation.SetCreateIssues(v)
+	return _u
+}
+
+// SetNillableCreateIssues sets the "create_issues" field if the given value is not nil.
+func (_u *GithubRepoSyncUpdateOne) SetNillableCreateIssues(v *bool) *GithubRepoSyncUpdateOne {
+	if v != nil {
+		_u.SetCreateIssues(*v)
+	}
+	return _u
+}
+
+// ClearCreateIssues clears the value of the "create_issues" field.
+func (_u *GithubRepoSyncUpdateOne) ClearCreateIssues() *GithubRepoSyncUpdateOne {
+	_u.mutation.ClearCreateIssues()
+	return _u
+}
+
+// SetSyncFields sets the "sync_fields" field.
+func (_u *GithubRepoSyncUpdateOne) SetSyncFields(v bool) *GithubRepoSyncUpdateOne {
+	_u.mutation.SetSyncFields(v)
+	return _u
+}
+
+// SetNillableSyncFields sets the "sync_fields" field if the given value is not nil.
+func (_u *GithubRepoSyncUpdateOne) SetNillableSyncFields(v *bool) *GithubRepoSyncUpdateOne {
+	if v != nil {
+		_u.SetSyncFields(*v)
+	}
+	return _u
+}
+
+// ClearSyncFields clears the value of the "sync_fields" field.
+func (_u *GithubRepoSyncUpdateOne) ClearSyncFields() *GithubRepoSyncUpdateOne {
+	_u.mutation.ClearSyncFields()
 	return _u
 }
 
@@ -1244,6 +1444,26 @@ func (_u *GithubRepoSyncUpdateOne) ClearLastSyncedAt() *GithubRepoSyncUpdateOne 
 	return _u
 }
 
+// SetMilestonesSyncedAt sets the "milestones_synced_at" field.
+func (_u *GithubRepoSyncUpdateOne) SetMilestonesSyncedAt(v time.Time) *GithubRepoSyncUpdateOne {
+	_u.mutation.SetMilestonesSyncedAt(v)
+	return _u
+}
+
+// SetNillableMilestonesSyncedAt sets the "milestones_synced_at" field if the given value is not nil.
+func (_u *GithubRepoSyncUpdateOne) SetNillableMilestonesSyncedAt(v *time.Time) *GithubRepoSyncUpdateOne {
+	if v != nil {
+		_u.SetMilestonesSyncedAt(*v)
+	}
+	return _u
+}
+
+// ClearMilestonesSyncedAt clears the value of the "milestones_synced_at" field.
+func (_u *GithubRepoSyncUpdateOne) ClearMilestonesSyncedAt() *GithubRepoSyncUpdateOne {
+	_u.mutation.ClearMilestonesSyncedAt()
+	return _u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_u *GithubRepoSyncUpdateOne) SetCreatedAt(v time.Time) *GithubRepoSyncUpdateOne {
 	_u.mutation.SetCreatedAt(v)
@@ -1334,6 +1554,21 @@ func (_u *GithubRepoSyncUpdateOne) AddGithubOutbox(v ...*GithubOutbox) *GithubRe
 	return _u.AddGithubOutboxIDs(ids...)
 }
 
+// AddGithubMilestoneLinkIDs adds the "github_milestone_links" edge to the GithubMilestoneLink entity by IDs.
+func (_u *GithubRepoSyncUpdateOne) AddGithubMilestoneLinkIDs(ids ...uuid.UUID) *GithubRepoSyncUpdateOne {
+	_u.mutation.AddGithubMilestoneLinkIDs(ids...)
+	return _u
+}
+
+// AddGithubMilestoneLinks adds the "github_milestone_links" edges to the GithubMilestoneLink entity.
+func (_u *GithubRepoSyncUpdateOne) AddGithubMilestoneLinks(v ...*GithubMilestoneLink) *GithubRepoSyncUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddGithubMilestoneLinkIDs(ids...)
+}
+
 // Mutation returns the GithubRepoSyncMutation object of the builder.
 func (_u *GithubRepoSyncUpdateOne) Mutation() *GithubRepoSyncMutation {
 	return _u.mutation
@@ -1403,6 +1638,27 @@ func (_u *GithubRepoSyncUpdateOne) RemoveGithubOutbox(v ...*GithubOutbox) *Githu
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveGithubOutboxIDs(ids...)
+}
+
+// ClearGithubMilestoneLinks clears all "github_milestone_links" edges to the GithubMilestoneLink entity.
+func (_u *GithubRepoSyncUpdateOne) ClearGithubMilestoneLinks() *GithubRepoSyncUpdateOne {
+	_u.mutation.ClearGithubMilestoneLinks()
+	return _u
+}
+
+// RemoveGithubMilestoneLinkIDs removes the "github_milestone_links" edge to GithubMilestoneLink entities by IDs.
+func (_u *GithubRepoSyncUpdateOne) RemoveGithubMilestoneLinkIDs(ids ...uuid.UUID) *GithubRepoSyncUpdateOne {
+	_u.mutation.RemoveGithubMilestoneLinkIDs(ids...)
+	return _u
+}
+
+// RemoveGithubMilestoneLinks removes "github_milestone_links" edges to GithubMilestoneLink entities.
+func (_u *GithubRepoSyncUpdateOne) RemoveGithubMilestoneLinks(v ...*GithubMilestoneLink) *GithubRepoSyncUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveGithubMilestoneLinkIDs(ids...)
 }
 
 // Where appends a list predicates to the GithubRepoSyncUpdate builder.
@@ -1509,6 +1765,18 @@ func (_u *GithubRepoSyncUpdateOne) sqlSave(ctx context.Context) (_node *GithubRe
 	if _u.mutation.LinkBackCleared() {
 		_spec.ClearField(githubreposync.FieldLinkBack, field.TypeBool)
 	}
+	if value, ok := _u.mutation.CreateIssues(); ok {
+		_spec.SetField(githubreposync.FieldCreateIssues, field.TypeBool, value)
+	}
+	if _u.mutation.CreateIssuesCleared() {
+		_spec.ClearField(githubreposync.FieldCreateIssues, field.TypeBool)
+	}
+	if value, ok := _u.mutation.SyncFields(); ok {
+		_spec.SetField(githubreposync.FieldSyncFields, field.TypeBool, value)
+	}
+	if _u.mutation.SyncFieldsCleared() {
+		_spec.ClearField(githubreposync.FieldSyncFields, field.TypeBool)
+	}
 	if value, ok := _u.mutation.BackfillStatus(); ok {
 		_spec.SetField(githubreposync.FieldBackfillStatus, field.TypeString, value)
 	}
@@ -1577,6 +1845,12 @@ func (_u *GithubRepoSyncUpdateOne) sqlSave(ctx context.Context) (_node *GithubRe
 	}
 	if _u.mutation.LastSyncedAtCleared() {
 		_spec.ClearField(githubreposync.FieldLastSyncedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.MilestonesSyncedAt(); ok {
+		_spec.SetField(githubreposync.FieldMilestonesSyncedAt, field.TypeTime, value)
+	}
+	if _u.mutation.MilestonesSyncedAtCleared() {
+		_spec.ClearField(githubreposync.FieldMilestonesSyncedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(githubreposync.FieldCreatedAt, field.TypeTime, value)
@@ -1789,6 +2063,51 @@ func (_u *GithubRepoSyncUpdateOne) sqlSave(ctx context.Context) (_node *GithubRe
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(githuboutbox.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.GithubMilestoneLinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   githubreposync.GithubMilestoneLinksTable,
+			Columns: []string{githubreposync.GithubMilestoneLinksColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githubmilestonelink.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedGithubMilestoneLinksIDs(); len(nodes) > 0 && !_u.mutation.GithubMilestoneLinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   githubreposync.GithubMilestoneLinksTable,
+			Columns: []string{githubreposync.GithubMilestoneLinksColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githubmilestonelink.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.GithubMilestoneLinksIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   githubreposync.GithubMilestoneLinksTable,
+			Columns: []string{githubreposync.GithubMilestoneLinksColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githubmilestonelink.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

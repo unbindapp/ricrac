@@ -384,7 +384,7 @@ func (self *IssueService) insertImported(ctx context.Context, tx repository.TxIn
 			return uuid.Nil, err
 		}
 		if found != nil {
-			issueProject = &found.ProjectID
+			issueProject = found.ProjectID
 		}
 	}
 	id, err := self.repo.Issue().InsertImported(ctx, tx, issue_repo.ImportedIssue{

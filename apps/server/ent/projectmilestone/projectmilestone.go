@@ -13,6 +13,8 @@ const (
 	Label = "project_milestone"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldWorkspaceID holds the string denoting the workspace_id field in the database.
+	FieldWorkspaceID = "workspace_id"
 	// FieldProjectID holds the string denoting the project_id field in the database.
 	FieldProjectID = "project_id"
 	// FieldName holds the string denoting the name field in the database.
@@ -23,18 +25,33 @@ const (
 	FieldTargetDate = "target_date"
 	// FieldSortOrder holds the string denoting the sort_order field in the database.
 	FieldSortOrder = "sort_order"
+	// FieldClosedAt holds the string denoting the closed_at field in the database.
+	FieldClosedAt = "closed_at"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// EdgeWorkspace holds the string denoting the workspace edge name in mutations.
+	EdgeWorkspace = "workspace"
 	// EdgeProject holds the string denoting the project edge name in mutations.
 	EdgeProject = "project"
 	// EdgeIssues holds the string denoting the issues edge name in mutations.
 	EdgeIssues = "issues"
 	// EdgeComments holds the string denoting the comments edge name in mutations.
 	EdgeComments = "comments"
+	// EdgeGithubMilestoneLinks holds the string denoting the github_milestone_links edge name in mutations.
+	EdgeGithubMilestoneLinks = "github_milestone_links"
+	// EdgeGithubOutbox holds the string denoting the github_outbox edge name in mutations.
+	EdgeGithubOutbox = "github_outbox"
 	// Table holds the table name of the projectmilestone in the database.
 	Table = "project_milestones"
+	// WorkspaceTable is the table that holds the workspace relation/edge.
+	WorkspaceTable = "project_milestones"
+	// WorkspaceInverseTable is the table name for the Workspace entity.
+	// It exists in this package in order to avoid circular dependency with the "workspace" package.
+	WorkspaceInverseTable = "workspaces"
+	// WorkspaceColumn is the table column denoting the workspace relation/edge.
+	WorkspaceColumn = "workspace_id"
 	// ProjectTable is the table that holds the project relation/edge.
 	ProjectTable = "project_milestones"
 	// ProjectInverseTable is the table name for the Project entity.
@@ -56,16 +73,32 @@ const (
 	CommentsInverseTable = "comments"
 	// CommentsColumn is the table column denoting the comments relation/edge.
 	CommentsColumn = "milestone_id"
+	// GithubMilestoneLinksTable is the table that holds the github_milestone_links relation/edge.
+	GithubMilestoneLinksTable = "github_milestone_links"
+	// GithubMilestoneLinksInverseTable is the table name for the GithubMilestoneLink entity.
+	// It exists in this package in order to avoid circular dependency with the "githubmilestonelink" package.
+	GithubMilestoneLinksInverseTable = "github_milestone_links"
+	// GithubMilestoneLinksColumn is the table column denoting the github_milestone_links relation/edge.
+	GithubMilestoneLinksColumn = "milestone_id"
+	// GithubOutboxTable is the table that holds the github_outbox relation/edge.
+	GithubOutboxTable = "github_outbox"
+	// GithubOutboxInverseTable is the table name for the GithubOutbox entity.
+	// It exists in this package in order to avoid circular dependency with the "githuboutbox" package.
+	GithubOutboxInverseTable = "github_outbox"
+	// GithubOutboxColumn is the table column denoting the github_outbox relation/edge.
+	GithubOutboxColumn = "milestone_id"
 )
 
 // Columns holds all SQL columns for projectmilestone fields.
 var Columns = []string{
 	FieldID,
+	FieldWorkspaceID,
 	FieldProjectID,
 	FieldName,
 	FieldDescription,
 	FieldTargetDate,
 	FieldSortOrder,
+	FieldClosedAt,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -93,6 +126,11 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
+// ByWorkspaceID orders the results by the workspace_id field.
+func ByWorkspaceID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldWorkspaceID, opts...).ToFunc()
+}
+
 // ByProjectID orders the results by the project_id field.
 func ByProjectID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldProjectID, opts...).ToFunc()
@@ -118,6 +156,11 @@ func BySortOrder(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSortOrder, opts...).ToFunc()
 }
 
+// ByClosedAt orders the results by the closed_at field.
+func ByClosedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldClosedAt, opts...).ToFunc()
+}
+
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
@@ -126,6 +169,13 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByUpdatedAt orders the results by the updated_at field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByWorkspaceField orders the results by workspace field.
+func ByWorkspaceField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newWorkspaceStep(), sql.OrderByField(field, opts...))
+	}
 }
 
 // ByProjectField orders the results by project field.
@@ -162,6 +212,41 @@ func ByComments(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newCommentsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByGithubMilestoneLinksCount orders the results by github_milestone_links count.
+func ByGithubMilestoneLinksCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newGithubMilestoneLinksStep(), opts...)
+	}
+}
+
+// ByGithubMilestoneLinks orders the results by github_milestone_links terms.
+func ByGithubMilestoneLinks(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newGithubMilestoneLinksStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByGithubOutboxCount orders the results by github_outbox count.
+func ByGithubOutboxCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newGithubOutboxStep(), opts...)
+	}
+}
+
+// ByGithubOutbox orders the results by github_outbox terms.
+func ByGithubOutbox(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newGithubOutboxStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newWorkspaceStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(WorkspaceInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, WorkspaceTable, WorkspaceColumn),
+	)
+}
 func newProjectStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -181,5 +266,19 @@ func newCommentsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CommentsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, CommentsTable, CommentsColumn),
+	)
+}
+func newGithubMilestoneLinksStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(GithubMilestoneLinksInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, GithubMilestoneLinksTable, GithubMilestoneLinksColumn),
+	)
+}
+func newGithubOutboxStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(GithubOutboxInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, GithubOutboxTable, GithubOutboxColumn),
 	)
 }

@@ -9,6 +9,7 @@ import type {
   IssueLabel,
   IssueRef,
   LabelRef,
+  Milestone,
   MilestoneRef,
   ProjectRef,
   StateRef,
@@ -529,26 +530,33 @@ export function ProjectPicker({
 }
 
 export function MilestonePicker({
-  projectId,
+  project,
   milestone,
   onChange,
   appearance = "row",
   className,
   ...control
 }: TPickerControl & {
-  projectId: string | undefined;
+  project: ProjectRef | null | undefined;
   milestone: MilestoneRef | null | undefined;
   onChange: (milestone: MilestoneRef | null) => void;
 }) {
-  const { milestones, isPending } = useMilestones(projectId);
+  const { workspaceMilestones, projectMilestones, isPending } = useMilestones(
+    project?.id,
+    milestone?.id,
+  );
+  const milestones = [...projectMilestones, ...workspaceMilestones];
+  const option = (item: Milestone, group: string): TPickerOption => ({
+    value: item.id,
+    label: item.name,
+    group,
+    description: item.targetDate ? formatDate(parseISO(item.targetDate)) : undefined,
+    icon: <DiamondIcon className="size-4" />,
+  });
   const options: TPickerOption[] = [
     { value: NONE_KEY, label: "No milestone", icon: <MutedIcon icon={DiamondIcon} /> },
-    ...milestones.map((item) => ({
-      value: item.id,
-      label: item.name,
-      description: item.targetDate ? formatDate(parseISO(item.targetDate)) : undefined,
-      icon: <DiamondIcon className="size-4" />,
-    })),
+    ...projectMilestones.map((item) => option(item, project?.name ?? "Project")),
+    ...workspaceMilestones.map((item) => option(item, "Workspace")),
   ];
   return (
     <PropertyPicker
@@ -556,14 +564,22 @@ export function MilestonePicker({
       options={options}
       value={[milestone?.id ?? NONE_KEY]}
       isPending={isPending}
-      emptyText="This project has no milestones"
+      emptyText="No milestones yet"
       onChange={([id]) => {
         if (id === (milestone?.id ?? NONE_KEY)) return;
         const next = milestones.find((item) => item.id === id);
-        onChange(next ? { id: next.id, name: next.name, targetDate: next.targetDate } : null);
+        onChange(
+          next
+            ? {
+                id: next.id,
+                name: next.name,
+                targetDate: next.targetDate,
+                projectId: next.project?.id ?? null,
+              }
+            : null,
+        );
       }}
       {...control}
-      disabled={!projectId || control.disabled}
       trigger={
         <PickerTrigger
           appearance={appearance}

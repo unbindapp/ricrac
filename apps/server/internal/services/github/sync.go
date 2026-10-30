@@ -51,7 +51,7 @@ func (h *hook) issuesEvent(event *github.IssuesEvent) error {
 	switch event.Action {
 	case "deleted", "transferred":
 		return h.recordSync(h.ctx, sync.ID, h.unlink(link, event))
-	case "opened", "edited", "labeled", "unlabeled", "assigned", "unassigned", "closed", "reopened":
+	case "opened", "edited", "labeled", "unlabeled", "assigned", "unassigned", "closed", "reopened", "milestoned", "demilestoned", "field_added", "field_removed":
 	default:
 		return nil
 	}
@@ -137,6 +137,10 @@ func samePtr[T comparable](a, b *T) bool {
 	return *a == *b
 }
 
+// errLinkedAlready is a GitHub issue found linked once the import waited its turn, like one Ricrac
+// opened there.
+var errLinkedAlready = errors.New("the GitHub issue is linked already")
+
 // importIssue creates the Ricrac issue of a GitHub issue, linked to it; false when another
 // delivery linked it first. A newly opened one gets a comment linking back when the sync wants it.
 func (self *GitHubService) importIssue(ctx context.Context, sync *ent.GithubRepoSync, issue *github.Issue, opened bool) (bool, error) {
@@ -164,7 +168,20 @@ func (self *GitHubService) importIssue(ctx context.Context, sync *ent.GithubRepo
 	if sync.ProjectID != nil {
 		input.Project = some(sync.ProjectID.String())
 	}
+	milestone, err := self.issueMilestone(ctx, sync, issue)
+	if err != nil {
+		return false, err
+	}
+	if milestone != nil {
+		input.Milestone = some(milestone.String())
+	}
 	err = self.repo.WithTx(ctx, func(tx repository.TxInterface) error {
+		if err := self.github().LockNewIssues(ctx, tx, sync.ID); err != nil {
+			return err
+		}
+		if link, err := self.github().IssueLink(ctx, sync.ID, issue.ID); err != nil || link != nil {
+			return errors.Join(err, errLinkedAlready)
+		}
 		id, err := self.issues.Create(ctx, tx, actor, input)
 		if err != nil {
 			return err
@@ -177,7 +194,7 @@ func (self *GitHubService) importIssue(ctx context.Context, sync *ent.GithubRepo
 		}
 		return self.github().QueueLinkBack(ctx, tx, id)
 	})
-	if isUniqueViolation(err) {
+	if isUniqueViolation(err) || errors.Is(err, errLinkedAlready) {
 		return false, nil
 	}
 	if err != nil {
@@ -300,7 +317,7 @@ func (self *GitHubService) applyIssueEvent(ctx context.Context, sync *ent.Github
 	if err != nil {
 		return err
 	}
-	input, label, err := self.issueChange(ctx, actor, row, event)
+	input, label, err := self.issueChange(ctx, actor, sync, row, event)
 	if err != nil || input == nil {
 		return err
 	}
@@ -314,7 +331,7 @@ func (self *GitHubService) applyIssueEvent(ctx context.Context, sync *ent.Github
 }
 
 // issueChange is what an issues event changes on the Ricrac issue, nil when nothing.
-func (self *GitHubService) issueChange(ctx context.Context, actor *auth.Actor, row *ent.Issue, event *github.IssuesEvent) (*issue_service.SaveInput, string, error) {
+func (self *GitHubService) issueChange(ctx context.Context, actor *auth.Actor, sync *ent.GithubRepoSync, row *ent.Issue, event *github.IssuesEvent) (*issue_service.SaveInput, string, error) {
 	issue := &event.Issue
 	input := &issue_service.SaveInput{}
 	switch event.Action {
@@ -388,6 +405,19 @@ func (self *GitHubService) issueChange(ctx context.Context, actor *auth.Actor, r
 			return input, "Reopened on GitHub", nil
 		}
 		return input, "Closed on GitHub", nil
+	case "field_added", "field_removed":
+		input, err := self.fieldChange(ctx, actor, sync, row, issue.Number)
+		return input, "Fields changed on GitHub", err
+	case "milestoned", "demilestoned":
+		milestone, err := self.issueMilestone(ctx, sync, issue)
+		if err != nil || samePtr(milestone, row.MilestoneID) {
+			return nil, "", err
+		}
+		input.Milestone = milestoneInput(milestone)
+		if milestone == nil {
+			return input, "Milestone removed on GitHub", nil
+		}
+		return input, "Milestone set on GitHub", nil
 	}
 	return nil, "", nil
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"ricrac/ent/project"
 	"ricrac/ent/projectmilestone"
+	"ricrac/ent/workspace"
 	"strings"
 	"time"
 
@@ -19,8 +20,10 @@ type ProjectMilestone struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
+	// WorkspaceID holds the value of the "workspace_id" field.
+	WorkspaceID uuid.UUID `json:"workspace_id,omitempty"`
 	// ProjectID holds the value of the "project_id" field.
-	ProjectID uuid.UUID `json:"project_id,omitempty"`
+	ProjectID *uuid.UUID `json:"project_id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
@@ -29,6 +32,8 @@ type ProjectMilestone struct {
 	TargetDate *time.Time `json:"target_date,omitempty"`
 	// SortOrder holds the value of the "sort_order" field.
 	SortOrder float64 `json:"sort_order,omitempty"`
+	// ClosedAt holds the value of the "closed_at" field.
+	ClosedAt *time.Time `json:"closed_at,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -41,15 +46,32 @@ type ProjectMilestone struct {
 
 // ProjectMilestoneEdges holds the relations/edges for other nodes in the graph.
 type ProjectMilestoneEdges struct {
+	// Workspace holds the value of the workspace edge.
+	Workspace *Workspace `json:"workspace,omitempty"`
 	// Project holds the value of the project edge.
 	Project *Project `json:"project,omitempty"`
 	// Issues holds the value of the issues edge.
 	Issues []*Issue `json:"issues,omitempty"`
 	// Comments holds the value of the comments edge.
 	Comments []*Comment `json:"comments,omitempty"`
+	// GithubMilestoneLinks holds the value of the github_milestone_links edge.
+	GithubMilestoneLinks []*GithubMilestoneLink `json:"github_milestone_links,omitempty"`
+	// GithubOutbox holds the value of the github_outbox edge.
+	GithubOutbox []*GithubOutbox `json:"github_outbox,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [6]bool
+}
+
+// WorkspaceOrErr returns the Workspace value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ProjectMilestoneEdges) WorkspaceOrErr() (*Workspace, error) {
+	if e.Workspace != nil {
+		return e.Workspace, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: workspace.Label}
+	}
+	return nil, &NotLoadedError{edge: "workspace"}
 }
 
 // ProjectOrErr returns the Project value or an error if the edge
@@ -57,7 +79,7 @@ type ProjectMilestoneEdges struct {
 func (e ProjectMilestoneEdges) ProjectOrErr() (*Project, error) {
 	if e.Project != nil {
 		return e.Project, nil
-	} else if e.loadedTypes[0] {
+	} else if e.loadedTypes[1] {
 		return nil, &NotFoundError{label: project.Label}
 	}
 	return nil, &NotLoadedError{edge: "project"}
@@ -66,7 +88,7 @@ func (e ProjectMilestoneEdges) ProjectOrErr() (*Project, error) {
 // IssuesOrErr returns the Issues value or an error if the edge
 // was not loaded in eager-loading.
 func (e ProjectMilestoneEdges) IssuesOrErr() ([]*Issue, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.Issues, nil
 	}
 	return nil, &NotLoadedError{edge: "issues"}
@@ -75,10 +97,28 @@ func (e ProjectMilestoneEdges) IssuesOrErr() ([]*Issue, error) {
 // CommentsOrErr returns the Comments value or an error if the edge
 // was not loaded in eager-loading.
 func (e ProjectMilestoneEdges) CommentsOrErr() ([]*Comment, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		return e.Comments, nil
 	}
 	return nil, &NotLoadedError{edge: "comments"}
+}
+
+// GithubMilestoneLinksOrErr returns the GithubMilestoneLinks value or an error if the edge
+// was not loaded in eager-loading.
+func (e ProjectMilestoneEdges) GithubMilestoneLinksOrErr() ([]*GithubMilestoneLink, error) {
+	if e.loadedTypes[4] {
+		return e.GithubMilestoneLinks, nil
+	}
+	return nil, &NotLoadedError{edge: "github_milestone_links"}
+}
+
+// GithubOutboxOrErr returns the GithubOutbox value or an error if the edge
+// was not loaded in eager-loading.
+func (e ProjectMilestoneEdges) GithubOutboxOrErr() ([]*GithubOutbox, error) {
+	if e.loadedTypes[5] {
+		return e.GithubOutbox, nil
+	}
+	return nil, &NotLoadedError{edge: "github_outbox"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -86,13 +126,15 @@ func (*ProjectMilestone) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case projectmilestone.FieldProjectID:
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case projectmilestone.FieldSortOrder:
 			values[i] = new(sql.NullFloat64)
 		case projectmilestone.FieldName, projectmilestone.FieldDescription:
 			values[i] = new(sql.NullString)
-		case projectmilestone.FieldTargetDate, projectmilestone.FieldCreatedAt, projectmilestone.FieldUpdatedAt:
+		case projectmilestone.FieldTargetDate, projectmilestone.FieldClosedAt, projectmilestone.FieldCreatedAt, projectmilestone.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case projectmilestone.FieldID, projectmilestone.FieldProjectID:
+		case projectmilestone.FieldID, projectmilestone.FieldWorkspaceID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -115,11 +157,18 @@ func (_m *ProjectMilestone) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				_m.ID = *value
 			}
-		case projectmilestone.FieldProjectID:
+		case projectmilestone.FieldWorkspaceID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field project_id", values[i])
+				return fmt.Errorf("unexpected type %T for field workspace_id", values[i])
 			} else if value != nil {
-				_m.ProjectID = *value
+				_m.WorkspaceID = *value
+			}
+		case projectmilestone.FieldProjectID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field project_id", values[i])
+			} else if value.Valid {
+				_m.ProjectID = new(uuid.UUID)
+				*_m.ProjectID = *value.S.(*uuid.UUID)
 			}
 		case projectmilestone.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -147,6 +196,13 @@ func (_m *ProjectMilestone) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.SortOrder = value.Float64
 			}
+		case projectmilestone.FieldClosedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field closed_at", values[i])
+			} else if value.Valid {
+				_m.ClosedAt = new(time.Time)
+				*_m.ClosedAt = value.Time
+			}
 		case projectmilestone.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -172,6 +228,11 @@ func (_m *ProjectMilestone) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
 }
 
+// QueryWorkspace queries the "workspace" edge of the ProjectMilestone entity.
+func (_m *ProjectMilestone) QueryWorkspace() *WorkspaceQuery {
+	return NewProjectMilestoneClient(_m.config).QueryWorkspace(_m)
+}
+
 // QueryProject queries the "project" edge of the ProjectMilestone entity.
 func (_m *ProjectMilestone) QueryProject() *ProjectQuery {
 	return NewProjectMilestoneClient(_m.config).QueryProject(_m)
@@ -185,6 +246,16 @@ func (_m *ProjectMilestone) QueryIssues() *IssueQuery {
 // QueryComments queries the "comments" edge of the ProjectMilestone entity.
 func (_m *ProjectMilestone) QueryComments() *CommentQuery {
 	return NewProjectMilestoneClient(_m.config).QueryComments(_m)
+}
+
+// QueryGithubMilestoneLinks queries the "github_milestone_links" edge of the ProjectMilestone entity.
+func (_m *ProjectMilestone) QueryGithubMilestoneLinks() *GithubMilestoneLinkQuery {
+	return NewProjectMilestoneClient(_m.config).QueryGithubMilestoneLinks(_m)
+}
+
+// QueryGithubOutbox queries the "github_outbox" edge of the ProjectMilestone entity.
+func (_m *ProjectMilestone) QueryGithubOutbox() *GithubOutboxQuery {
+	return NewProjectMilestoneClient(_m.config).QueryGithubOutbox(_m)
 }
 
 // Update returns a builder for updating this ProjectMilestone.
@@ -210,8 +281,13 @@ func (_m *ProjectMilestone) String() string {
 	var builder strings.Builder
 	builder.WriteString("ProjectMilestone(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
-	builder.WriteString("project_id=")
-	builder.WriteString(fmt.Sprintf("%v", _m.ProjectID))
+	builder.WriteString("workspace_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.WorkspaceID))
+	builder.WriteString(", ")
+	if v := _m.ProjectID; v != nil {
+		builder.WriteString("project_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(_m.Name)
@@ -228,6 +304,11 @@ func (_m *ProjectMilestone) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("sort_order=")
 	builder.WriteString(fmt.Sprintf("%v", _m.SortOrder))
+	builder.WriteString(", ")
+	if v := _m.ClosedAt; v != nil {
+		builder.WriteString("closed_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

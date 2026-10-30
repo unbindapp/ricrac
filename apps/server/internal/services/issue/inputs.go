@@ -11,7 +11,7 @@ type ListInput struct {
 	State              *string `json:"state" doc:"Status name, type (triage, backlog, unstarted, started, completed, canceled) or id."`
 	Label              *string `json:"label" doc:"Label name or id."`
 	Project            *string `json:"project" doc:"Project name, slug or id, or \"null\" for issues in no project."`
-	Milestone          *string `json:"milestone" doc:"Project milestone name or id (name needs project)."`
+	Milestone          *string `json:"milestone" doc:"Milestone name or id."`
 	Cycle              *string `json:"cycle" doc:"Cycle number, name or id, or \"current\", \"next\", \"previous\"."`
 	Release            *string `json:"release" doc:"Release name, slug or id."`
 	ParentID           *string `json:"parentId" doc:"Sub-issues of this issue (identifier or id)."`
@@ -54,7 +54,7 @@ type SaveInput struct {
 	AddLabels         []string               `json:"addLabels"`
 	RemoveLabels      []string               `json:"removeLabels"`
 	Project           args.Nullable[string]  `json:"project" doc:"Project name, slug or id; null removes the issue from its project."`
-	Milestone         args.Nullable[string]  `json:"milestone" doc:"Project milestone name or id; null clears it."`
+	Milestone         args.Nullable[string]  `json:"milestone" doc:"Milestone name or id: the project's, or one of the workspace's own; null clears it."`
 	Cycle             args.Nullable[string]  `json:"cycle" doc:"Cycle number, name or id, or \"current\" / \"next\"; null removes it from its cycle."`
 	ParentID          args.Nullable[string]  `json:"parentId" doc:"Parent issue (identifier or id), making this a sub-issue; null detaches it."`
 	DueDate           args.Nullable[string]  `json:"dueDate" doc:"YYYY-MM-DD; null clears it."`
@@ -77,6 +77,8 @@ type SaveInput struct {
 	SortOrder         *float64               `json:"sortOrder" doc:"Position on the team's board (lower is higher up)."`
 	SubIssueSortOrder *float64               `json:"subIssueSortOrder" doc:"Position among its parent's sub-issues."`
 	Template          *string                `json:"template" doc:"Issue template name or id, applied on create: it fills in fields and sub-issues the arguments don't set."`
+	Preview           *bool                  `json:"preview" doc:"true answers the issue as it would be saved, and where it would open on GitHub, without saving anything: to show it to the user before they confirm."`
+	GitHubRepository  *string                `json:"githubRepository" doc:"Only on create, when the team's synced repositories open Ricrac issues on GitHub: the one (owner/name) to open it in, or \"none\" to keep it off GitHub. By default the one synced with the issue's project, else the one with the most synced issues."`
 }
 
 type UpdateManyInput struct {

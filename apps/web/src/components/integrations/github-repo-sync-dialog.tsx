@@ -33,6 +33,8 @@ const formSchema = z.object({
   includeClosed: z.boolean(),
   backfill: z.boolean(),
   linkBack: z.boolean(),
+  createIssues: z.boolean(),
+  syncFields: z.boolean(),
 });
 
 type TProps = { trigger: ReactElement; repoSync?: GitHubRepoSync };
@@ -71,11 +73,19 @@ function RepoSyncForm({ repoSync, onDone }: { repoSync?: GitHubRepoSync; onDone:
       includeClosed: repoSync?.backfill?.includeClosed ?? false,
       backfill: !repoSync,
       linkBack: repoSync?.linkBack ?? false,
+      createIssues: repoSync?.createIssues ?? false,
+      syncFields: repoSync?.syncFields ?? false,
     },
     validators: { onSubmit: formSchema },
     onSubmit: async ({ value }) => {
       const project = value.project === NO_PROJECT ? null : value.project;
-      const fields = { project, includeClosed: value.includeClosed, linkBack: value.linkBack };
+      const fields = {
+        project,
+        includeClosed: value.includeClosed,
+        linkBack: value.linkBack,
+        createIssues: value.createIssues,
+        syncFields: value.syncFields,
+      };
       if (repoSync) {
         await save({ id: repoSync.id, ...fields, backfill: value.backfill || undefined });
         onDone();
@@ -169,6 +179,24 @@ function RepoSyncForm({ repoSync, onDone }: { repoSync?: GitHubRepoSync; onDone:
           <field.SwitchField
             label="Link back from GitHub"
             description="Issues opened on GitHub get a comment with a link to their Ricrac issue."
+          />
+        )}
+      />
+      <form.AppField
+        name="createIssues"
+        children={(field) => (
+          <field.SwitchField
+            label="Open Ricrac issues on GitHub"
+            description="Issues created in Ricrac open in this repository too. With several such repositories, new issues pick one."
+          />
+        )}
+      />
+      <form.AppField
+        name="syncFields"
+        children={(field) => (
+          <field.SwitchField
+            label="Sync priority, estimate, due date and cycle with GitHub issue fields"
+            description="Uses the organization's issue fields named Priority, Estimate, Due date (or Target date) and Cycle."
           />
         )}
       />

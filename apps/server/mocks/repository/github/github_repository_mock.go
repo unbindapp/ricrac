@@ -367,6 +367,93 @@ func (_c *GitHubRepositoryMock_AddIssueLink_Call) RunAndReturn(run func(ctx cont
 	return _c
 }
 
+// AddMilestoneLink provides a mock function for the type GitHubRepositoryMock
+func (_mock *GitHubRepositoryMock) AddMilestoneLink(ctx context.Context, milestone uuid.UUID, repoSync uuid.UUID, githubID int64, number int, url string, updatedAt time.Time) error {
+	ret := _mock.Called(ctx, milestone, repoSync, githubID, number, url, updatedAt)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AddMilestoneLink")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID, int64, int, string, time.Time) error); ok {
+		r0 = returnFunc(ctx, milestone, repoSync, githubID, number, url, updatedAt)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// GitHubRepositoryMock_AddMilestoneLink_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddMilestoneLink'
+type GitHubRepositoryMock_AddMilestoneLink_Call struct {
+	*mock.Call
+}
+
+// AddMilestoneLink is a helper method to define mock.On call
+//   - ctx context.Context
+//   - milestone uuid.UUID
+//   - repoSync uuid.UUID
+//   - githubID int64
+//   - number int
+//   - url string
+//   - updatedAt time.Time
+func (_e *GitHubRepositoryMock_Expecter) AddMilestoneLink(ctx any, milestone any, repoSync any, githubID any, number any, url any, updatedAt any) *GitHubRepositoryMock_AddMilestoneLink_Call {
+	return &GitHubRepositoryMock_AddMilestoneLink_Call{Call: _e.mock.On("AddMilestoneLink", ctx, milestone, repoSync, githubID, number, url, updatedAt)}
+}
+
+func (_c *GitHubRepositoryMock_AddMilestoneLink_Call) Run(run func(ctx context.Context, milestone uuid.UUID, repoSync uuid.UUID, githubID int64, number int, url string, updatedAt time.Time)) *GitHubRepositoryMock_AddMilestoneLink_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 int64
+		if args[3] != nil {
+			arg3 = args[3].(int64)
+		}
+		var arg4 int
+		if args[4] != nil {
+			arg4 = args[4].(int)
+		}
+		var arg5 string
+		if args[5] != nil {
+			arg5 = args[5].(string)
+		}
+		var arg6 time.Time
+		if args[6] != nil {
+			arg6 = args[6].(time.Time)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+			arg5,
+			arg6,
+		)
+	})
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_AddMilestoneLink_Call) Return(err error) *GitHubRepositoryMock_AddMilestoneLink_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_AddMilestoneLink_Call) RunAndReturn(run func(ctx context.Context, milestone uuid.UUID, repoSync uuid.UUID, githubID int64, number int, url string, updatedAt time.Time) error) *GitHubRepositoryMock_AddMilestoneLink_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // AdvanceBackfill provides a mock function for the type GitHubRepositoryMock
 func (_mock *GitHubRepositoryMock) AdvanceBackfill(ctx context.Context, id uuid.UUID, progress github_repo.BackfillProgress) error {
 	ret := _mock.Called(ctx, id, progress)
@@ -652,16 +739,16 @@ func (_c *GitHubRepositoryMock_ChangeAttachment_Call) RunAndReturn(run func(ctx 
 }
 
 // ChangeRepoSync provides a mock function for the type GitHubRepositoryMock
-func (_mock *GitHubRepositoryMock) ChangeRepoSync(ctx context.Context, id uuid.UUID, team *uuid.UUID, setProject bool, project *uuid.UUID, linkBack *bool) error {
-	ret := _mock.Called(ctx, id, team, setProject, project, linkBack)
+func (_mock *GitHubRepositoryMock) ChangeRepoSync(ctx context.Context, id uuid.UUID, change github_repo.RepoSyncChange) error {
+	ret := _mock.Called(ctx, id, change)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ChangeRepoSync")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, *uuid.UUID, bool, *uuid.UUID, *bool) error); ok {
-		r0 = returnFunc(ctx, id, team, setProject, project, linkBack)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, github_repo.RepoSyncChange) error); ok {
+		r0 = returnFunc(ctx, id, change)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -676,15 +763,12 @@ type GitHubRepositoryMock_ChangeRepoSync_Call struct {
 // ChangeRepoSync is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id uuid.UUID
-//   - team *uuid.UUID
-//   - setProject bool
-//   - project *uuid.UUID
-//   - linkBack *bool
-func (_e *GitHubRepositoryMock_Expecter) ChangeRepoSync(ctx any, id any, team any, setProject any, project any, linkBack any) *GitHubRepositoryMock_ChangeRepoSync_Call {
-	return &GitHubRepositoryMock_ChangeRepoSync_Call{Call: _e.mock.On("ChangeRepoSync", ctx, id, team, setProject, project, linkBack)}
+//   - change github_repo.RepoSyncChange
+func (_e *GitHubRepositoryMock_Expecter) ChangeRepoSync(ctx any, id any, change any) *GitHubRepositoryMock_ChangeRepoSync_Call {
+	return &GitHubRepositoryMock_ChangeRepoSync_Call{Call: _e.mock.On("ChangeRepoSync", ctx, id, change)}
 }
 
-func (_c *GitHubRepositoryMock_ChangeRepoSync_Call) Run(run func(ctx context.Context, id uuid.UUID, team *uuid.UUID, setProject bool, project *uuid.UUID, linkBack *bool)) *GitHubRepositoryMock_ChangeRepoSync_Call {
+func (_c *GitHubRepositoryMock_ChangeRepoSync_Call) Run(run func(ctx context.Context, id uuid.UUID, change github_repo.RepoSyncChange)) *GitHubRepositoryMock_ChangeRepoSync_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -694,29 +778,14 @@ func (_c *GitHubRepositoryMock_ChangeRepoSync_Call) Run(run func(ctx context.Con
 		if args[1] != nil {
 			arg1 = args[1].(uuid.UUID)
 		}
-		var arg2 *uuid.UUID
+		var arg2 github_repo.RepoSyncChange
 		if args[2] != nil {
-			arg2 = args[2].(*uuid.UUID)
-		}
-		var arg3 bool
-		if args[3] != nil {
-			arg3 = args[3].(bool)
-		}
-		var arg4 *uuid.UUID
-		if args[4] != nil {
-			arg4 = args[4].(*uuid.UUID)
-		}
-		var arg5 *bool
-		if args[5] != nil {
-			arg5 = args[5].(*bool)
+			arg2 = args[2].(github_repo.RepoSyncChange)
 		}
 		run(
 			arg0,
 			arg1,
 			arg2,
-			arg3,
-			arg4,
-			arg5,
 		)
 	})
 	return _c
@@ -727,7 +796,7 @@ func (_c *GitHubRepositoryMock_ChangeRepoSync_Call) Return(err error) *GitHubRep
 	return _c
 }
 
-func (_c *GitHubRepositoryMock_ChangeRepoSync_Call) RunAndReturn(run func(ctx context.Context, id uuid.UUID, team *uuid.UUID, setProject bool, project *uuid.UUID, linkBack *bool) error) *GitHubRepositoryMock_ChangeRepoSync_Call {
+func (_c *GitHubRepositoryMock_ChangeRepoSync_Call) RunAndReturn(run func(ctx context.Context, id uuid.UUID, change github_repo.RepoSyncChange) error) *GitHubRepositoryMock_ChangeRepoSync_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1277,6 +1346,63 @@ func (_c *GitHubRepositoryMock_DeleteIssueLink_Call) Return(err error) *GitHubRe
 }
 
 func (_c *GitHubRepositoryMock_DeleteIssueLink_Call) RunAndReturn(run func(ctx context.Context, issueID uuid.UUID) error) *GitHubRepositoryMock_DeleteIssueLink_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteMilestoneLink provides a mock function for the type GitHubRepositoryMock
+func (_mock *GitHubRepositoryMock) DeleteMilestoneLink(ctx context.Context, id uuid.UUID) error {
+	ret := _mock.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteMilestoneLink")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// GitHubRepositoryMock_DeleteMilestoneLink_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteMilestoneLink'
+type GitHubRepositoryMock_DeleteMilestoneLink_Call struct {
+	*mock.Call
+}
+
+// DeleteMilestoneLink is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+func (_e *GitHubRepositoryMock_Expecter) DeleteMilestoneLink(ctx any, id any) *GitHubRepositoryMock_DeleteMilestoneLink_Call {
+	return &GitHubRepositoryMock_DeleteMilestoneLink_Call{Call: _e.mock.On("DeleteMilestoneLink", ctx, id)}
+}
+
+func (_c *GitHubRepositoryMock_DeleteMilestoneLink_Call) Run(run func(ctx context.Context, id uuid.UUID)) *GitHubRepositoryMock_DeleteMilestoneLink_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_DeleteMilestoneLink_Call) Return(err error) *GitHubRepositoryMock_DeleteMilestoneLink_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_DeleteMilestoneLink_Call) RunAndReturn(run func(ctx context.Context, id uuid.UUID) error) *GitHubRepositoryMock_DeleteMilestoneLink_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -2371,6 +2497,78 @@ func (_c *GitHubRepositoryMock_IssueLink_Call) RunAndReturn(run func(ctx context
 	return _c
 }
 
+// IssueLinked provides a mock function for the type GitHubRepositoryMock
+func (_mock *GitHubRepositoryMock) IssueLinked(ctx context.Context, tx repository.TxInterface, issue uuid.UUID) (bool, error) {
+	ret := _mock.Called(ctx, tx, issue)
+
+	if len(ret) == 0 {
+		panic("no return value specified for IssueLinked")
+	}
+
+	var r0 bool
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) (bool, error)); ok {
+		return returnFunc(ctx, tx, issue)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) bool); ok {
+		r0 = returnFunc(ctx, tx, issue)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, issue)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// GitHubRepositoryMock_IssueLinked_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'IssueLinked'
+type GitHubRepositoryMock_IssueLinked_Call struct {
+	*mock.Call
+}
+
+// IssueLinked is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - issue uuid.UUID
+func (_e *GitHubRepositoryMock_Expecter) IssueLinked(ctx any, tx any, issue any) *GitHubRepositoryMock_IssueLinked_Call {
+	return &GitHubRepositoryMock_IssueLinked_Call{Call: _e.mock.On("IssueLinked", ctx, tx, issue)}
+}
+
+func (_c *GitHubRepositoryMock_IssueLinked_Call) Run(run func(ctx context.Context, tx repository.TxInterface, issue uuid.UUID)) *GitHubRepositoryMock_IssueLinked_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_IssueLinked_Call) Return(b bool, err error) *GitHubRepositoryMock_IssueLinked_Call {
+	_c.Call.Return(b, err)
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_IssueLinked_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, issue uuid.UUID) (bool, error)) *GitHubRepositoryMock_IssueLinked_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // IssuesNamed provides a mock function for the type GitHubRepositoryMock
 func (_mock *GitHubRepositoryMock) IssuesNamed(ctx context.Context, workspace uuid.UUID, key string, number int, identifier string) ([]uuid.UUID, error) {
 	ret := _mock.Called(ctx, workspace, key, number, identifier)
@@ -2983,6 +3181,69 @@ func (_c *GitHubRepositoryMock_LockIssueComments_Call) RunAndReturn(run func(ctx
 	return _c
 }
 
+// LockNewIssues provides a mock function for the type GitHubRepositoryMock
+func (_mock *GitHubRepositoryMock) LockNewIssues(ctx context.Context, tx repository.TxInterface, repoSync uuid.UUID) error {
+	ret := _mock.Called(ctx, tx, repoSync)
+
+	if len(ret) == 0 {
+		panic("no return value specified for LockNewIssues")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, tx, repoSync)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// GitHubRepositoryMock_LockNewIssues_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LockNewIssues'
+type GitHubRepositoryMock_LockNewIssues_Call struct {
+	*mock.Call
+}
+
+// LockNewIssues is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - repoSync uuid.UUID
+func (_e *GitHubRepositoryMock_Expecter) LockNewIssues(ctx any, tx any, repoSync any) *GitHubRepositoryMock_LockNewIssues_Call {
+	return &GitHubRepositoryMock_LockNewIssues_Call{Call: _e.mock.On("LockNewIssues", ctx, tx, repoSync)}
+}
+
+func (_c *GitHubRepositoryMock_LockNewIssues_Call) Run(run func(ctx context.Context, tx repository.TxInterface, repoSync uuid.UUID)) *GitHubRepositoryMock_LockNewIssues_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_LockNewIssues_Call) Return(err error) *GitHubRepositoryMock_LockNewIssues_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_LockNewIssues_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, repoSync uuid.UUID) error) *GitHubRepositoryMock_LockNewIssues_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // LoginOf provides a mock function for the type GitHubRepositoryMock
 func (_mock *GitHubRepositoryMock) LoginOf(ctx context.Context, id string) (*string, bool, error) {
 	ret := _mock.Called(ctx, id)
@@ -3053,6 +3314,63 @@ func (_c *GitHubRepositoryMock_LoginOf_Call) Return(s *string, b bool, err error
 }
 
 func (_c *GitHubRepositoryMock_LoginOf_Call) RunAndReturn(run func(ctx context.Context, id string) (*string, bool, error)) *GitHubRepositoryMock_LoginOf_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// MarkMilestonesSynced provides a mock function for the type GitHubRepositoryMock
+func (_mock *GitHubRepositoryMock) MarkMilestonesSynced(ctx context.Context, id uuid.UUID) error {
+	ret := _mock.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for MarkMilestonesSynced")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) error); ok {
+		r0 = returnFunc(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// GitHubRepositoryMock_MarkMilestonesSynced_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'MarkMilestonesSynced'
+type GitHubRepositoryMock_MarkMilestonesSynced_Call struct {
+	*mock.Call
+}
+
+// MarkMilestonesSynced is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+func (_e *GitHubRepositoryMock_Expecter) MarkMilestonesSynced(ctx any, id any) *GitHubRepositoryMock_MarkMilestonesSynced_Call {
+	return &GitHubRepositoryMock_MarkMilestonesSynced_Call{Call: _e.mock.On("MarkMilestonesSynced", ctx, id)}
+}
+
+func (_c *GitHubRepositoryMock_MarkMilestonesSynced_Call) Run(run func(ctx context.Context, id uuid.UUID)) *GitHubRepositoryMock_MarkMilestonesSynced_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_MarkMilestonesSynced_Call) Return(err error) *GitHubRepositoryMock_MarkMilestonesSynced_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_MarkMilestonesSynced_Call) RunAndReturn(run func(ctx context.Context, id uuid.UUID) error) *GitHubRepositoryMock_MarkMilestonesSynced_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -3133,6 +3451,362 @@ func (_c *GitHubRepositoryMock_MemberByLogin_Call) Return(uUID uuid.UUID, b bool
 }
 
 func (_c *GitHubRepositoryMock_MemberByLogin_Call) RunAndReturn(run func(ctx context.Context, workspace uuid.UUID, login string) (uuid.UUID, bool, error)) *GitHubRepositoryMock_MemberByLogin_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// MilestoneLink provides a mock function for the type GitHubRepositoryMock
+func (_mock *GitHubRepositoryMock) MilestoneLink(ctx context.Context, repoSync uuid.UUID, githubID int64) (*ent.GithubMilestoneLink, error) {
+	ret := _mock.Called(ctx, repoSync, githubID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for MilestoneLink")
+	}
+
+	var r0 *ent.GithubMilestoneLink
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, int64) (*ent.GithubMilestoneLink, error)); ok {
+		return returnFunc(ctx, repoSync, githubID)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, int64) *ent.GithubMilestoneLink); ok {
+		r0 = returnFunc(ctx, repoSync, githubID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ent.GithubMilestoneLink)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID, int64) error); ok {
+		r1 = returnFunc(ctx, repoSync, githubID)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// GitHubRepositoryMock_MilestoneLink_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'MilestoneLink'
+type GitHubRepositoryMock_MilestoneLink_Call struct {
+	*mock.Call
+}
+
+// MilestoneLink is a helper method to define mock.On call
+//   - ctx context.Context
+//   - repoSync uuid.UUID
+//   - githubID int64
+func (_e *GitHubRepositoryMock_Expecter) MilestoneLink(ctx any, repoSync any, githubID any) *GitHubRepositoryMock_MilestoneLink_Call {
+	return &GitHubRepositoryMock_MilestoneLink_Call{Call: _e.mock.On("MilestoneLink", ctx, repoSync, githubID)}
+}
+
+func (_c *GitHubRepositoryMock_MilestoneLink_Call) Run(run func(ctx context.Context, repoSync uuid.UUID, githubID int64)) *GitHubRepositoryMock_MilestoneLink_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		var arg2 int64
+		if args[2] != nil {
+			arg2 = args[2].(int64)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_MilestoneLink_Call) Return(githubMilestoneLink *ent.GithubMilestoneLink, err error) *GitHubRepositoryMock_MilestoneLink_Call {
+	_c.Call.Return(githubMilestoneLink, err)
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_MilestoneLink_Call) RunAndReturn(run func(ctx context.Context, repoSync uuid.UUID, githubID int64) (*ent.GithubMilestoneLink, error)) *GitHubRepositoryMock_MilestoneLink_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// MilestoneLinkIn provides a mock function for the type GitHubRepositoryMock
+func (_mock *GitHubRepositoryMock) MilestoneLinkIn(ctx context.Context, milestone uuid.UUID, repoSync uuid.UUID) (*ent.GithubMilestoneLink, error) {
+	ret := _mock.Called(ctx, milestone, repoSync)
+
+	if len(ret) == 0 {
+		panic("no return value specified for MilestoneLinkIn")
+	}
+
+	var r0 *ent.GithubMilestoneLink
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) (*ent.GithubMilestoneLink, error)); ok {
+		return returnFunc(ctx, milestone, repoSync)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) *ent.GithubMilestoneLink); ok {
+		r0 = returnFunc(ctx, milestone, repoSync)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ent.GithubMilestoneLink)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, milestone, repoSync)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// GitHubRepositoryMock_MilestoneLinkIn_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'MilestoneLinkIn'
+type GitHubRepositoryMock_MilestoneLinkIn_Call struct {
+	*mock.Call
+}
+
+// MilestoneLinkIn is a helper method to define mock.On call
+//   - ctx context.Context
+//   - milestone uuid.UUID
+//   - repoSync uuid.UUID
+func (_e *GitHubRepositoryMock_Expecter) MilestoneLinkIn(ctx any, milestone any, repoSync any) *GitHubRepositoryMock_MilestoneLinkIn_Call {
+	return &GitHubRepositoryMock_MilestoneLinkIn_Call{Call: _e.mock.On("MilestoneLinkIn", ctx, milestone, repoSync)}
+}
+
+func (_c *GitHubRepositoryMock_MilestoneLinkIn_Call) Run(run func(ctx context.Context, milestone uuid.UUID, repoSync uuid.UUID)) *GitHubRepositoryMock_MilestoneLinkIn_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_MilestoneLinkIn_Call) Return(githubMilestoneLink *ent.GithubMilestoneLink, err error) *GitHubRepositoryMock_MilestoneLinkIn_Call {
+	_c.Call.Return(githubMilestoneLink, err)
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_MilestoneLinkIn_Call) RunAndReturn(run func(ctx context.Context, milestone uuid.UUID, repoSync uuid.UUID) (*ent.GithubMilestoneLink, error)) *GitHubRepositoryMock_MilestoneLinkIn_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// MilestoneLinks provides a mock function for the type GitHubRepositoryMock
+func (_mock *GitHubRepositoryMock) MilestoneLinks(ctx context.Context, repoSync uuid.UUID) ([]*ent.GithubMilestoneLink, error) {
+	ret := _mock.Called(ctx, repoSync)
+
+	if len(ret) == 0 {
+		panic("no return value specified for MilestoneLinks")
+	}
+
+	var r0 []*ent.GithubMilestoneLink
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]*ent.GithubMilestoneLink, error)); ok {
+		return returnFunc(ctx, repoSync)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) []*ent.GithubMilestoneLink); ok {
+		r0 = returnFunc(ctx, repoSync)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ent.GithubMilestoneLink)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, repoSync)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// GitHubRepositoryMock_MilestoneLinks_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'MilestoneLinks'
+type GitHubRepositoryMock_MilestoneLinks_Call struct {
+	*mock.Call
+}
+
+// MilestoneLinks is a helper method to define mock.On call
+//   - ctx context.Context
+//   - repoSync uuid.UUID
+func (_e *GitHubRepositoryMock_Expecter) MilestoneLinks(ctx any, repoSync any) *GitHubRepositoryMock_MilestoneLinks_Call {
+	return &GitHubRepositoryMock_MilestoneLinks_Call{Call: _e.mock.On("MilestoneLinks", ctx, repoSync)}
+}
+
+func (_c *GitHubRepositoryMock_MilestoneLinks_Call) Run(run func(ctx context.Context, repoSync uuid.UUID)) *GitHubRepositoryMock_MilestoneLinks_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_MilestoneLinks_Call) Return(githubMilestoneLinks []*ent.GithubMilestoneLink, err error) *GitHubRepositoryMock_MilestoneLinks_Call {
+	_c.Call.Return(githubMilestoneLinks, err)
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_MilestoneLinks_Call) RunAndReturn(run func(ctx context.Context, repoSync uuid.UUID) ([]*ent.GithubMilestoneLink, error)) *GitHubRepositoryMock_MilestoneLinks_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// MilestoneSyncsDue provides a mock function for the type GitHubRepositoryMock
+func (_mock *GitHubRepositoryMock) MilestoneSyncsDue(ctx context.Context, limit int) ([]*ent.GithubRepoSync, error) {
+	ret := _mock.Called(ctx, limit)
+
+	if len(ret) == 0 {
+		panic("no return value specified for MilestoneSyncsDue")
+	}
+
+	var r0 []*ent.GithubRepoSync
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) ([]*ent.GithubRepoSync, error)); ok {
+		return returnFunc(ctx, limit)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) []*ent.GithubRepoSync); ok {
+		r0 = returnFunc(ctx, limit)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ent.GithubRepoSync)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, int) error); ok {
+		r1 = returnFunc(ctx, limit)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// GitHubRepositoryMock_MilestoneSyncsDue_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'MilestoneSyncsDue'
+type GitHubRepositoryMock_MilestoneSyncsDue_Call struct {
+	*mock.Call
+}
+
+// MilestoneSyncsDue is a helper method to define mock.On call
+//   - ctx context.Context
+//   - limit int
+func (_e *GitHubRepositoryMock_Expecter) MilestoneSyncsDue(ctx any, limit any) *GitHubRepositoryMock_MilestoneSyncsDue_Call {
+	return &GitHubRepositoryMock_MilestoneSyncsDue_Call{Call: _e.mock.On("MilestoneSyncsDue", ctx, limit)}
+}
+
+func (_c *GitHubRepositoryMock_MilestoneSyncsDue_Call) Run(run func(ctx context.Context, limit int)) *GitHubRepositoryMock_MilestoneSyncsDue_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 int
+		if args[1] != nil {
+			arg1 = args[1].(int)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_MilestoneSyncsDue_Call) Return(githubRepoSyncs []*ent.GithubRepoSync, err error) *GitHubRepositoryMock_MilestoneSyncsDue_Call {
+	_c.Call.Return(githubRepoSyncs, err)
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_MilestoneSyncsDue_Call) RunAndReturn(run func(ctx context.Context, limit int) ([]*ent.GithubRepoSync, error)) *GitHubRepositoryMock_MilestoneSyncsDue_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// OtherMilestoneLinks provides a mock function for the type GitHubRepositoryMock
+func (_mock *GitHubRepositoryMock) OtherMilestoneLinks(ctx context.Context, milestone uuid.UUID, link uuid.UUID) (bool, error) {
+	ret := _mock.Called(ctx, milestone, link)
+
+	if len(ret) == 0 {
+		panic("no return value specified for OtherMilestoneLinks")
+	}
+
+	var r0 bool
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) (bool, error)); ok {
+		return returnFunc(ctx, milestone, link)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) bool); ok {
+		r0 = returnFunc(ctx, milestone, link)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, milestone, link)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// GitHubRepositoryMock_OtherMilestoneLinks_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'OtherMilestoneLinks'
+type GitHubRepositoryMock_OtherMilestoneLinks_Call struct {
+	*mock.Call
+}
+
+// OtherMilestoneLinks is a helper method to define mock.On call
+//   - ctx context.Context
+//   - milestone uuid.UUID
+//   - link uuid.UUID
+func (_e *GitHubRepositoryMock_Expecter) OtherMilestoneLinks(ctx any, milestone any, link any) *GitHubRepositoryMock_OtherMilestoneLinks_Call {
+	return &GitHubRepositoryMock_OtherMilestoneLinks_Call{Call: _e.mock.On("OtherMilestoneLinks", ctx, milestone, link)}
+}
+
+func (_c *GitHubRepositoryMock_OtherMilestoneLinks_Call) Run(run func(ctx context.Context, milestone uuid.UUID, link uuid.UUID)) *GitHubRepositoryMock_OtherMilestoneLinks_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_OtherMilestoneLinks_Call) Return(b bool, err error) *GitHubRepositoryMock_OtherMilestoneLinks_Call {
+	_c.Call.Return(b, err)
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_OtherMilestoneLinks_Call) RunAndReturn(run func(ctx context.Context, milestone uuid.UUID, link uuid.UUID) (bool, error)) *GitHubRepositoryMock_OtherMilestoneLinks_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -4559,6 +5233,69 @@ func (_c *GitHubRepositoryMock_TouchIssueLink_Call) Return(err error) *GitHubRep
 }
 
 func (_c *GitHubRepositoryMock_TouchIssueLink_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, issueID uuid.UUID, updatedAt time.Time) error) *GitHubRepositoryMock_TouchIssueLink_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// TouchMilestoneLink provides a mock function for the type GitHubRepositoryMock
+func (_mock *GitHubRepositoryMock) TouchMilestoneLink(ctx context.Context, id uuid.UUID, updatedAt time.Time) error {
+	ret := _mock.Called(ctx, id, updatedAt)
+
+	if len(ret) == 0 {
+		panic("no return value specified for TouchMilestoneLink")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, time.Time) error); ok {
+		r0 = returnFunc(ctx, id, updatedAt)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// GitHubRepositoryMock_TouchMilestoneLink_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TouchMilestoneLink'
+type GitHubRepositoryMock_TouchMilestoneLink_Call struct {
+	*mock.Call
+}
+
+// TouchMilestoneLink is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+//   - updatedAt time.Time
+func (_e *GitHubRepositoryMock_Expecter) TouchMilestoneLink(ctx any, id any, updatedAt any) *GitHubRepositoryMock_TouchMilestoneLink_Call {
+	return &GitHubRepositoryMock_TouchMilestoneLink_Call{Call: _e.mock.On("TouchMilestoneLink", ctx, id, updatedAt)}
+}
+
+func (_c *GitHubRepositoryMock_TouchMilestoneLink_Call) Run(run func(ctx context.Context, id uuid.UUID, updatedAt time.Time)) *GitHubRepositoryMock_TouchMilestoneLink_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		var arg2 time.Time
+		if args[2] != nil {
+			arg2 = args[2].(time.Time)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_TouchMilestoneLink_Call) Return(err error) *GitHubRepositoryMock_TouchMilestoneLink_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *GitHubRepositoryMock_TouchMilestoneLink_Call) RunAndReturn(run func(ctx context.Context, id uuid.UUID, updatedAt time.Time) error) *GitHubRepositoryMock_TouchMilestoneLink_Call {
 	_c.Call.Return(run)
 	return _c
 }

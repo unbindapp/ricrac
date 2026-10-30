@@ -24,6 +24,7 @@ import { Route as WorkspaceWorkspaceForumRouteImport } from './routes/$workspace
 import { Route as WorkspaceWorkspaceInboxRouteImport } from './routes/$workspace/_workspace/inbox'
 import { Route as WorkspaceWorkspaceInitiativesRouteImport } from './routes/$workspace/_workspace/initiatives'
 import { Route as WorkspaceWorkspaceIssuesRouteImport } from './routes/$workspace/_workspace/issues'
+import { Route as WorkspaceWorkspaceMilestonesRouteImport } from './routes/$workspace/_workspace/milestones'
 import { Route as WorkspaceWorkspaceMyIssuesRouteImport } from './routes/$workspace/_workspace/my-issues'
 import { Route as WorkspaceWorkspaceProjectsRouteImport } from './routes/$workspace/_workspace/projects'
 import { Route as WorkspaceWorkspaceReleasesRouteImport } from './routes/$workspace/_workspace/releases'
@@ -37,6 +38,7 @@ import { Route as WorkspaceWorkspaceDiscussionSlugRouteImport } from './routes/$
 import { Route as WorkspaceWorkspaceDocumentSlugRouteImport } from './routes/$workspace/_workspace/document/$slug'
 import { Route as WorkspaceWorkspaceInitiativeSlugRouteImport } from './routes/$workspace/_workspace/initiative/$slug'
 import { Route as WorkspaceWorkspaceIssueIdentifierRouteImport } from './routes/$workspace/_workspace/issue/$identifier'
+import { Route as WorkspaceWorkspaceMilestoneIdRouteImport } from './routes/$workspace/_workspace/milestone/$id'
 import { Route as WorkspaceWorkspaceReleaseNoteSlugRouteImport } from './routes/$workspace/_workspace/release-note/$slug'
 import { Route as WorkspaceWorkspaceReleaseSlugRouteImport } from './routes/$workspace/_workspace/release/$slug'
 import { Route as WorkspaceWorkspaceSettingsWorkspaceSettingsRouteRouteImport } from './routes/$workspace/_workspace/settings/_workspace-settings/route'
@@ -158,6 +160,12 @@ const WorkspaceWorkspaceIssuesRoute =
     path: '/issues',
     getParentRoute: () => WorkspaceWorkspaceRouteRoute,
   } as any)
+const WorkspaceWorkspaceMilestonesRoute =
+  WorkspaceWorkspaceMilestonesRouteImport.update({
+    id: '/milestones',
+    path: '/milestones',
+    getParentRoute: () => WorkspaceWorkspaceRouteRoute,
+  } as any)
 const WorkspaceWorkspaceMyIssuesRoute =
   WorkspaceWorkspaceMyIssuesRouteImport.update({
     id: '/my-issues',
@@ -232,6 +240,12 @@ const WorkspaceWorkspaceIssueIdentifierRoute =
   WorkspaceWorkspaceIssueIdentifierRouteImport.update({
     id: '/issue/$identifier',
     path: '/issue/$identifier',
+    getParentRoute: () => WorkspaceWorkspaceRouteRoute,
+  } as any)
+const WorkspaceWorkspaceMilestoneIdRoute =
+  WorkspaceWorkspaceMilestoneIdRouteImport.update({
+    id: '/milestone/$id',
+    path: '/milestone/$id',
     getParentRoute: () => WorkspaceWorkspaceRouteRoute,
   } as any)
 const WorkspaceWorkspaceReleaseNoteSlugRoute =
@@ -505,6 +519,7 @@ export interface FileRoutesByFullPath {
   '/$workspace/inbox': typeof WorkspaceWorkspaceInboxRoute
   '/$workspace/initiatives': typeof WorkspaceWorkspaceInitiativesRoute
   '/$workspace/issues': typeof WorkspaceWorkspaceIssuesRoute
+  '/$workspace/milestones': typeof WorkspaceWorkspaceMilestonesRoute
   '/$workspace/my-issues': typeof WorkspaceWorkspaceMyIssuesRoute
   '/$workspace/projects': typeof WorkspaceWorkspaceProjectsRoute
   '/$workspace/releases': typeof WorkspaceWorkspaceReleasesRoute
@@ -518,6 +533,7 @@ export interface FileRoutesByFullPath {
   '/$workspace/document/$slug': typeof WorkspaceWorkspaceDocumentSlugRoute
   '/$workspace/initiative/$slug': typeof WorkspaceWorkspaceInitiativeSlugRoute
   '/$workspace/issue/$identifier': typeof WorkspaceWorkspaceIssueIdentifierRoute
+  '/$workspace/milestone/$id': typeof WorkspaceWorkspaceMilestoneIdRoute
   '/$workspace/release-note/$slug': typeof WorkspaceWorkspaceReleaseNoteSlugRoute
   '/$workspace/release/$slug': typeof WorkspaceWorkspaceReleaseSlugRoute
   '/$workspace/settings/teams': typeof WorkspaceWorkspaceSettingsTeamsRoute
@@ -572,6 +588,7 @@ export interface FileRoutesByTo {
   '/$workspace/inbox': typeof WorkspaceWorkspaceInboxRoute
   '/$workspace/initiatives': typeof WorkspaceWorkspaceInitiativesRoute
   '/$workspace/issues': typeof WorkspaceWorkspaceIssuesRoute
+  '/$workspace/milestones': typeof WorkspaceWorkspaceMilestonesRoute
   '/$workspace/my-issues': typeof WorkspaceWorkspaceMyIssuesRoute
   '/$workspace/projects': typeof WorkspaceWorkspaceProjectsRoute
   '/$workspace/releases': typeof WorkspaceWorkspaceReleasesRoute
@@ -585,6 +602,7 @@ export interface FileRoutesByTo {
   '/$workspace/document/$slug': typeof WorkspaceWorkspaceDocumentSlugRoute
   '/$workspace/initiative/$slug': typeof WorkspaceWorkspaceInitiativeSlugRoute
   '/$workspace/issue/$identifier': typeof WorkspaceWorkspaceIssueIdentifierRoute
+  '/$workspace/milestone/$id': typeof WorkspaceWorkspaceMilestoneIdRoute
   '/$workspace/release-note/$slug': typeof WorkspaceWorkspaceReleaseNoteSlugRoute
   '/$workspace/release/$slug': typeof WorkspaceWorkspaceReleaseSlugRoute
   '/$workspace/settings/teams': typeof WorkspaceWorkspaceSettingsTeamsRoute
@@ -640,6 +658,7 @@ export interface FileRoutesById {
   '/$workspace/_workspace/inbox': typeof WorkspaceWorkspaceInboxRoute
   '/$workspace/_workspace/initiatives': typeof WorkspaceWorkspaceInitiativesRoute
   '/$workspace/_workspace/issues': typeof WorkspaceWorkspaceIssuesRoute
+  '/$workspace/_workspace/milestones': typeof WorkspaceWorkspaceMilestonesRoute
   '/$workspace/_workspace/my-issues': typeof WorkspaceWorkspaceMyIssuesRoute
   '/$workspace/_workspace/projects': typeof WorkspaceWorkspaceProjectsRoute
   '/$workspace/_workspace/releases': typeof WorkspaceWorkspaceReleasesRoute
@@ -654,6 +673,7 @@ export interface FileRoutesById {
   '/$workspace/_workspace/document/$slug': typeof WorkspaceWorkspaceDocumentSlugRoute
   '/$workspace/_workspace/initiative/$slug': typeof WorkspaceWorkspaceInitiativeSlugRoute
   '/$workspace/_workspace/issue/$identifier': typeof WorkspaceWorkspaceIssueIdentifierRoute
+  '/$workspace/_workspace/milestone/$id': typeof WorkspaceWorkspaceMilestoneIdRoute
   '/$workspace/_workspace/release-note/$slug': typeof WorkspaceWorkspaceReleaseNoteSlugRoute
   '/$workspace/_workspace/release/$slug': typeof WorkspaceWorkspaceReleaseSlugRoute
   '/$workspace/_workspace/settings_/teams': typeof WorkspaceWorkspaceSettingsTeamsRoute
@@ -712,6 +732,7 @@ export interface FileRouteTypes {
     | '/$workspace/inbox'
     | '/$workspace/initiatives'
     | '/$workspace/issues'
+    | '/$workspace/milestones'
     | '/$workspace/my-issues'
     | '/$workspace/projects'
     | '/$workspace/releases'
@@ -725,6 +746,7 @@ export interface FileRouteTypes {
     | '/$workspace/document/$slug'
     | '/$workspace/initiative/$slug'
     | '/$workspace/issue/$identifier'
+    | '/$workspace/milestone/$id'
     | '/$workspace/release-note/$slug'
     | '/$workspace/release/$slug'
     | '/$workspace/settings/teams'
@@ -779,6 +801,7 @@ export interface FileRouteTypes {
     | '/$workspace/inbox'
     | '/$workspace/initiatives'
     | '/$workspace/issues'
+    | '/$workspace/milestones'
     | '/$workspace/my-issues'
     | '/$workspace/projects'
     | '/$workspace/releases'
@@ -792,6 +815,7 @@ export interface FileRouteTypes {
     | '/$workspace/document/$slug'
     | '/$workspace/initiative/$slug'
     | '/$workspace/issue/$identifier'
+    | '/$workspace/milestone/$id'
     | '/$workspace/release-note/$slug'
     | '/$workspace/release/$slug'
     | '/$workspace/settings/teams'
@@ -846,6 +870,7 @@ export interface FileRouteTypes {
     | '/$workspace/_workspace/inbox'
     | '/$workspace/_workspace/initiatives'
     | '/$workspace/_workspace/issues'
+    | '/$workspace/_workspace/milestones'
     | '/$workspace/_workspace/my-issues'
     | '/$workspace/_workspace/projects'
     | '/$workspace/_workspace/releases'
@@ -860,6 +885,7 @@ export interface FileRouteTypes {
     | '/$workspace/_workspace/document/$slug'
     | '/$workspace/_workspace/initiative/$slug'
     | '/$workspace/_workspace/issue/$identifier'
+    | '/$workspace/_workspace/milestone/$id'
     | '/$workspace/_workspace/release-note/$slug'
     | '/$workspace/_workspace/release/$slug'
     | '/$workspace/_workspace/settings_/teams'
@@ -1019,6 +1045,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceWorkspaceIssuesRouteImport
       parentRoute: typeof WorkspaceWorkspaceRouteRoute
     }
+    '/$workspace/_workspace/milestones': {
+      id: '/$workspace/_workspace/milestones'
+      path: '/milestones'
+      fullPath: '/$workspace/milestones'
+      preLoaderRoute: typeof WorkspaceWorkspaceMilestonesRouteImport
+      parentRoute: typeof WorkspaceWorkspaceRouteRoute
+    }
     '/$workspace/_workspace/my-issues': {
       id: '/$workspace/_workspace/my-issues'
       path: '/my-issues'
@@ -1108,6 +1141,13 @@ declare module '@tanstack/react-router' {
       path: '/issue/$identifier'
       fullPath: '/$workspace/issue/$identifier'
       preLoaderRoute: typeof WorkspaceWorkspaceIssueIdentifierRouteImport
+      parentRoute: typeof WorkspaceWorkspaceRouteRoute
+    }
+    '/$workspace/_workspace/milestone/$id': {
+      id: '/$workspace/_workspace/milestone/$id'
+      path: '/milestone/$id'
+      fullPath: '/$workspace/milestone/$id'
+      preLoaderRoute: typeof WorkspaceWorkspaceMilestoneIdRouteImport
       parentRoute: typeof WorkspaceWorkspaceRouteRoute
     }
     '/$workspace/_workspace/release-note/$slug': {
@@ -1513,6 +1553,7 @@ interface WorkspaceWorkspaceRouteRouteChildren {
   WorkspaceWorkspaceInboxRoute: typeof WorkspaceWorkspaceInboxRoute
   WorkspaceWorkspaceInitiativesRoute: typeof WorkspaceWorkspaceInitiativesRoute
   WorkspaceWorkspaceIssuesRoute: typeof WorkspaceWorkspaceIssuesRoute
+  WorkspaceWorkspaceMilestonesRoute: typeof WorkspaceWorkspaceMilestonesRoute
   WorkspaceWorkspaceMyIssuesRoute: typeof WorkspaceWorkspaceMyIssuesRoute
   WorkspaceWorkspaceProjectsRoute: typeof WorkspaceWorkspaceProjectsRoute
   WorkspaceWorkspaceReleasesRoute: typeof WorkspaceWorkspaceReleasesRoute
@@ -1525,6 +1566,7 @@ interface WorkspaceWorkspaceRouteRouteChildren {
   WorkspaceWorkspaceDocumentSlugRoute: typeof WorkspaceWorkspaceDocumentSlugRoute
   WorkspaceWorkspaceInitiativeSlugRoute: typeof WorkspaceWorkspaceInitiativeSlugRoute
   WorkspaceWorkspaceIssueIdentifierRoute: typeof WorkspaceWorkspaceIssueIdentifierRoute
+  WorkspaceWorkspaceMilestoneIdRoute: typeof WorkspaceWorkspaceMilestoneIdRoute
   WorkspaceWorkspaceReleaseNoteSlugRoute: typeof WorkspaceWorkspaceReleaseNoteSlugRoute
   WorkspaceWorkspaceReleaseSlugRoute: typeof WorkspaceWorkspaceReleaseSlugRoute
   WorkspaceWorkspaceSettingsTeamsRoute: typeof WorkspaceWorkspaceSettingsTeamsRoute
@@ -1553,6 +1595,7 @@ const WorkspaceWorkspaceRouteRouteChildren: WorkspaceWorkspaceRouteRouteChildren
     WorkspaceWorkspaceInboxRoute: WorkspaceWorkspaceInboxRoute,
     WorkspaceWorkspaceInitiativesRoute: WorkspaceWorkspaceInitiativesRoute,
     WorkspaceWorkspaceIssuesRoute: WorkspaceWorkspaceIssuesRoute,
+    WorkspaceWorkspaceMilestonesRoute: WorkspaceWorkspaceMilestonesRoute,
     WorkspaceWorkspaceMyIssuesRoute: WorkspaceWorkspaceMyIssuesRoute,
     WorkspaceWorkspaceProjectsRoute: WorkspaceWorkspaceProjectsRoute,
     WorkspaceWorkspaceReleasesRoute: WorkspaceWorkspaceReleasesRoute,
@@ -1568,6 +1611,7 @@ const WorkspaceWorkspaceRouteRouteChildren: WorkspaceWorkspaceRouteRouteChildren
       WorkspaceWorkspaceInitiativeSlugRoute,
     WorkspaceWorkspaceIssueIdentifierRoute:
       WorkspaceWorkspaceIssueIdentifierRoute,
+    WorkspaceWorkspaceMilestoneIdRoute: WorkspaceWorkspaceMilestoneIdRoute,
     WorkspaceWorkspaceReleaseNoteSlugRoute:
       WorkspaceWorkspaceReleaseNoteSlugRoute,
     WorkspaceWorkspaceReleaseSlugRoute: WorkspaceWorkspaceReleaseSlugRoute,

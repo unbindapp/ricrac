@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { githubErrorMessage, githubEventLabel, importSummary, isImporting } from "./github-sync.ts";
+import {
+  githubErrorMessage,
+  githubEventLabel,
+  importSummary,
+  isImporting,
+  issueRepositories,
+} from "./github-sync.ts";
 
 const backfill = {
   status: "completed" as const,
@@ -39,4 +45,25 @@ test("known errors explain themselves and unknown ones fall back", () => {
 test("webhook events read as sentences", () => {
   assert.equal(githubEventLabel("pull_request.opened"), "Pull request opened");
   assert.equal(githubEventLabel("push"), "Push");
+});
+
+const repoSync = (name: string, linkedIssueCount: number, project: string | null = null) => ({
+  name,
+  createIssues: true,
+  linkedIssueCount,
+  createdAt: "2026-01-01T00:00:00Z",
+  project: project ? { id: project } : null,
+});
+
+test("new issues open in the project's repository, else the one with the most issues", () => {
+  const syncs = [
+    repoSync("api", 10),
+    repoSync("web", 4, "p1"),
+    { ...repoSync("docs", 50), createIssues: false },
+  ];
+  const names = (projectId?: string) =>
+    issueRepositories(syncs, projectId).map((item) => item.name);
+  assert.deepEqual(names("p1"), ["web", "api"]);
+  assert.deepEqual(names(), ["api", "web"]);
+  assert.deepEqual(names("p2"), ["api", "web"]);
 });

@@ -32,6 +32,7 @@ import (
 	"ricrac/ent/oauthclient"
 	"ricrac/ent/project"
 	"ricrac/ent/projectlabel"
+	"ricrac/ent/projectmilestone"
 	"ricrac/ent/projectstatus"
 	"ricrac/ent/reaction"
 	"ricrac/ent/release"
@@ -279,6 +280,21 @@ func (_c *WorkspaceCreate) AddProjects(v ...*Project) *WorkspaceCreate {
 		ids[i] = v[i].ID
 	}
 	return _c.AddProjectIDs(ids...)
+}
+
+// AddProjectMilestoneIDs adds the "project_milestones" edge to the ProjectMilestone entity by IDs.
+func (_c *WorkspaceCreate) AddProjectMilestoneIDs(ids ...uuid.UUID) *WorkspaceCreate {
+	_c.mutation.AddProjectMilestoneIDs(ids...)
+	return _c
+}
+
+// AddProjectMilestones adds the "project_milestones" edges to the ProjectMilestone entity.
+func (_c *WorkspaceCreate) AddProjectMilestones(v ...*ProjectMilestone) *WorkspaceCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddProjectMilestoneIDs(ids...)
 }
 
 // AddInitiativeIDs adds the "initiatives" edge to the Initiative entity by IDs.
@@ -927,6 +943,22 @@ func (_c *WorkspaceCreate) createSpec() (*Workspace, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(project.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.ProjectMilestonesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.ProjectMilestonesTable,
+			Columns: []string{workspace.ProjectMilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(projectmilestone.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

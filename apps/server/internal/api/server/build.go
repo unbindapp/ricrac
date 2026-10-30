@@ -82,6 +82,6 @@ func New(cfg config.Config, db *ent.Client, waker events_service.Waker) *Server 
 	srv.IssueService.Uses(srv.AttachmentService, srv.CommentService)
 	srv.ViewService = view_service.NewViewService(cfg, repo, srv.ResolveService, srv.EventsService, srv.IssueService)
 	srv.GitHubService = github_service.NewGitHubService(cfg, srv.Keys, repo, srv.AccessService, srv.ResolveService, srv.EventsService,
-		srv.IssueService, srv.CommentService, srv.AttachmentService, waker)
+		srv.IssueService, srv.CommentService, srv.AttachmentService, srv.MilestoneService, waker)
 	return srv
 }

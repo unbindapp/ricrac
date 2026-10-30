@@ -218,6 +218,7 @@ type Issue struct {
 	Labels      []Label         `json:"labels"`
 	Assignee    *Account        `json:"assignee"`
 	Comments    int             `json:"comments"`
+	Milestone   *Milestone      `json:"milestone"`
 	CreatedAt   time.Time       `json:"created_at"`
 	UpdatedAt   time.Time       `json:"updated_at"`
 	PullRequest json.RawMessage `json:"pull_request,omitempty"`
@@ -268,6 +269,46 @@ type IssuesEvent struct {
 	Sender     Account    `json:"sender"`
 }
 
+type Milestone struct {
+	ID          int64      `json:"id"`
+	Number      int        `json:"number"`
+	Title       string     `json:"title"`
+	Description string     `json:"description"`
+	State       string     `json:"state"`
+	DueOn       *time.Time `json:"due_on"`
+	HTMLURL     string     `json:"html_url"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+}
+
+// DueDate is the due date as YYYY-MM-DD, nil when it has none.
+func (m Milestone) DueDate() *string {
+	if m.DueOn == nil {
+		return nil
+	}
+	date := m.DueOn.UTC().Format(time.DateOnly)
+	return &date
+}
+
+func (m Milestone) Closed() bool {
+	return m.State == StateClosed
+}
+
+// DueOn is a YYYY-MM-DD date as a milestone's due_on, nil for none.
+func DueOn(date *string) any {
+	if date == nil {
+		return nil
+	}
+	// Noon UTC keeps the calendar day in any timezone within 11 hours of UTC.
+	return *date + "T12:00:00Z"
+}
+
+type MilestoneEvent struct {
+	Action     string     `json:"action"`
+	Milestone  Milestone  `json:"milestone"`
+	Repository Repository `json:"repository"`
+	Sender     Account    `json:"sender"`
+}
+
 type IssueCommentEvent struct {
 	Action     string     `json:"action"`
 	Issue      Issue      `json:"issue"`
@@ -301,6 +342,19 @@ type IssueField struct {
 	ID       int64  `json:"id"`
 	Name     string `json:"name"`
 	DataType string `json:"data_type"`
+	Options  []struct {
+		Name string `json:"name"`
+	} `json:"options"`
+}
+
+// HasOption says whether a select field offers an option of this name.
+func (f IssueField) HasOption(name string) bool {
+	for _, option := range f.Options {
+		if strings.EqualFold(option.Name, name) {
+			return true
+		}
+	}
+	return false
 }
 
 // RicracField is the text field named Ricrac, which holds the link to an issue's Ricrac issue.

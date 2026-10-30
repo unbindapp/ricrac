@@ -9,6 +9,7 @@ import (
 	"math"
 	"ricrac/ent/githubinstallation"
 	"ricrac/ent/githubissuelink"
+	"ricrac/ent/githubmilestonelink"
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/githubreposync"
 	"ricrac/ent/predicate"
@@ -27,17 +28,18 @@ import (
 // GithubRepoSyncQuery is the builder for querying GithubRepoSync entities.
 type GithubRepoSyncQuery struct {
 	config
-	ctx                  *QueryContext
-	order                []githubreposync.OrderOption
-	inters               []Interceptor
-	predicates           []predicate.GithubRepoSync
-	withWorkspace        *WorkspaceQuery
-	withInstallation     *GithubInstallationQuery
-	withTeam             *TeamQuery
-	withProject          *ProjectQuery
-	withGithubIssueLinks *GithubIssueLinkQuery
-	withGithubOutbox     *GithubOutboxQuery
-	modifiers            []func(*sql.Selector)
+	ctx                      *QueryContext
+	order                    []githubreposync.OrderOption
+	inters                   []Interceptor
+	predicates               []predicate.GithubRepoSync
+	withWorkspace            *WorkspaceQuery
+	withInstallation         *GithubInstallationQuery
+	withTeam                 *TeamQuery
+	withProject              *ProjectQuery
+	withGithubIssueLinks     *GithubIssueLinkQuery
+	withGithubOutbox         *GithubOutboxQuery
+	withGithubMilestoneLinks *GithubMilestoneLinkQuery
+	modifiers                []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -199,6 +201,28 @@ func (_q *GithubRepoSyncQuery) QueryGithubOutbox() *GithubOutboxQuery {
 			sqlgraph.From(githubreposync.Table, githubreposync.FieldID, selector),
 			sqlgraph.To(githuboutbox.Table, githuboutbox.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, githubreposync.GithubOutboxTable, githubreposync.GithubOutboxColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryGithubMilestoneLinks chains the current query on the "github_milestone_links" edge.
+func (_q *GithubRepoSyncQuery) QueryGithubMilestoneLinks() *GithubMilestoneLinkQuery {
+	query := (&GithubMilestoneLinkClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(githubreposync.Table, githubreposync.FieldID, selector),
+			sqlgraph.To(githubmilestonelink.Table, githubmilestonelink.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, githubreposync.GithubMilestoneLinksTable, githubreposync.GithubMilestoneLinksColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -393,17 +417,18 @@ func (_q *GithubRepoSyncQuery) Clone() *GithubRepoSyncQuery {
 		return nil
 	}
 	return &GithubRepoSyncQuery{
-		config:               _q.config,
-		ctx:                  _q.ctx.Clone(),
-		order:                append([]githubreposync.OrderOption{}, _q.order...),
-		inters:               append([]Interceptor{}, _q.inters...),
-		predicates:           append([]predicate.GithubRepoSync{}, _q.predicates...),
-		withWorkspace:        _q.withWorkspace.Clone(),
-		withInstallation:     _q.withInstallation.Clone(),
-		withTeam:             _q.withTeam.Clone(),
-		withProject:          _q.withProject.Clone(),
-		withGithubIssueLinks: _q.withGithubIssueLinks.Clone(),
-		withGithubOutbox:     _q.withGithubOutbox.Clone(),
+		config:                   _q.config,
+		ctx:                      _q.ctx.Clone(),
+		order:                    append([]githubreposync.OrderOption{}, _q.order...),
+		inters:                   append([]Interceptor{}, _q.inters...),
+		predicates:               append([]predicate.GithubRepoSync{}, _q.predicates...),
+		withWorkspace:            _q.withWorkspace.Clone(),
+		withInstallation:         _q.withInstallation.Clone(),
+		withTeam:                 _q.withTeam.Clone(),
+		withProject:              _q.withProject.Clone(),
+		withGithubIssueLinks:     _q.withGithubIssueLinks.Clone(),
+		withGithubOutbox:         _q.withGithubOutbox.Clone(),
+		withGithubMilestoneLinks: _q.withGithubMilestoneLinks.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
 		path:      _q.path,
@@ -474,6 +499,17 @@ func (_q *GithubRepoSyncQuery) WithGithubOutbox(opts ...func(*GithubOutboxQuery)
 		opt(query)
 	}
 	_q.withGithubOutbox = query
+	return _q
+}
+
+// WithGithubMilestoneLinks tells the query-builder to eager-load the nodes that are connected to
+// the "github_milestone_links" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *GithubRepoSyncQuery) WithGithubMilestoneLinks(opts ...func(*GithubMilestoneLinkQuery)) *GithubRepoSyncQuery {
+	query := (&GithubMilestoneLinkClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withGithubMilestoneLinks = query
 	return _q
 }
 
@@ -555,13 +591,14 @@ func (_q *GithubRepoSyncQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 	var (
 		nodes       = []*GithubRepoSync{}
 		_spec       = _q.querySpec()
-		loadedTypes = [6]bool{
+		loadedTypes = [7]bool{
 			_q.withWorkspace != nil,
 			_q.withInstallation != nil,
 			_q.withTeam != nil,
 			_q.withProject != nil,
 			_q.withGithubIssueLinks != nil,
 			_q.withGithubOutbox != nil,
+			_q.withGithubMilestoneLinks != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -622,6 +659,15 @@ func (_q *GithubRepoSyncQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 		if err := _q.loadGithubOutbox(ctx, query, nodes,
 			func(n *GithubRepoSync) { n.Edges.GithubOutbox = []*GithubOutbox{} },
 			func(n *GithubRepoSync, e *GithubOutbox) { n.Edges.GithubOutbox = append(n.Edges.GithubOutbox, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withGithubMilestoneLinks; query != nil {
+		if err := _q.loadGithubMilestoneLinks(ctx, query, nodes,
+			func(n *GithubRepoSync) { n.Edges.GithubMilestoneLinks = []*GithubMilestoneLink{} },
+			func(n *GithubRepoSync, e *GithubMilestoneLink) {
+				n.Edges.GithubMilestoneLinks = append(n.Edges.GithubMilestoneLinks, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
@@ -792,6 +838,36 @@ func (_q *GithubRepoSyncQuery) loadGithubOutbox(ctx context.Context, query *Gith
 	}
 	query.Where(predicate.GithubOutbox(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(githubreposync.GithubOutboxColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.RepoSyncID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "repo_sync_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *GithubRepoSyncQuery) loadGithubMilestoneLinks(ctx context.Context, query *GithubMilestoneLinkQuery, nodes []*GithubRepoSync, init func(*GithubRepoSync), assign func(*GithubRepoSync, *GithubMilestoneLink)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*GithubRepoSync)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(githubmilestonelink.FieldRepoSyncID)
+	}
+	query.Where(predicate.GithubMilestoneLink(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(githubreposync.GithubMilestoneLinksColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

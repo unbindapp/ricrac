@@ -52,8 +52,8 @@ func (_m *MilestoneRepositoryMock) EXPECT() *MilestoneRepositoryMock_Expecter {
 }
 
 // Create provides a mock function for the type MilestoneRepositoryMock
-func (_mock *MilestoneRepositoryMock) Create(ctx context.Context, tx repository.TxInterface, project uuid.UUID, name string) (uuid.UUID, error) {
-	ret := _mock.Called(ctx, tx, project, name)
+func (_mock *MilestoneRepositoryMock) Create(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, project *uuid.UUID, name string) (uuid.UUID, error) {
+	ret := _mock.Called(ctx, tx, workspace, project, name)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
@@ -61,18 +61,18 @@ func (_mock *MilestoneRepositoryMock) Create(ctx context.Context, tx repository.
 
 	var r0 uuid.UUID
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, string) (uuid.UUID, error)); ok {
-		return returnFunc(ctx, tx, project, name)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, *uuid.UUID, string) (uuid.UUID, error)); ok {
+		return returnFunc(ctx, tx, workspace, project, name)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, string) uuid.UUID); ok {
-		r0 = returnFunc(ctx, tx, project, name)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, *uuid.UUID, string) uuid.UUID); ok {
+		r0 = returnFunc(ctx, tx, workspace, project, name)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(uuid.UUID)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, string) error); ok {
-		r1 = returnFunc(ctx, tx, project, name)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, *uuid.UUID, string) error); ok {
+		r1 = returnFunc(ctx, tx, workspace, project, name)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -87,13 +87,14 @@ type MilestoneRepositoryMock_Create_Call struct {
 // Create is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tx repository.TxInterface
-//   - project uuid.UUID
+//   - workspace uuid.UUID
+//   - project *uuid.UUID
 //   - name string
-func (_e *MilestoneRepositoryMock_Expecter) Create(ctx any, tx any, project any, name any) *MilestoneRepositoryMock_Create_Call {
-	return &MilestoneRepositoryMock_Create_Call{Call: _e.mock.On("Create", ctx, tx, project, name)}
+func (_e *MilestoneRepositoryMock_Expecter) Create(ctx any, tx any, workspace any, project any, name any) *MilestoneRepositoryMock_Create_Call {
+	return &MilestoneRepositoryMock_Create_Call{Call: _e.mock.On("Create", ctx, tx, workspace, project, name)}
 }
 
-func (_c *MilestoneRepositoryMock_Create_Call) Run(run func(ctx context.Context, tx repository.TxInterface, project uuid.UUID, name string)) *MilestoneRepositoryMock_Create_Call {
+func (_c *MilestoneRepositoryMock_Create_Call) Run(run func(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, project *uuid.UUID, name string)) *MilestoneRepositoryMock_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -107,15 +108,20 @@ func (_c *MilestoneRepositoryMock_Create_Call) Run(run func(ctx context.Context,
 		if args[2] != nil {
 			arg2 = args[2].(uuid.UUID)
 		}
-		var arg3 string
+		var arg3 *uuid.UUID
 		if args[3] != nil {
-			arg3 = args[3].(string)
+			arg3 = args[3].(*uuid.UUID)
+		}
+		var arg4 string
+		if args[4] != nil {
+			arg4 = args[4].(string)
 		}
 		run(
 			arg0,
 			arg1,
 			arg2,
 			arg3,
+			arg4,
 		)
 	})
 	return _c
@@ -126,14 +132,14 @@ func (_c *MilestoneRepositoryMock_Create_Call) Return(uUID uuid.UUID, err error)
 	return _c
 }
 
-func (_c *MilestoneRepositoryMock_Create_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, project uuid.UUID, name string) (uuid.UUID, error)) *MilestoneRepositoryMock_Create_Call {
+func (_c *MilestoneRepositoryMock_Create_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, project *uuid.UUID, name string) (uuid.UUID, error)) *MilestoneRepositoryMock_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // CreateFull provides a mock function for the type MilestoneRepositoryMock
-func (_mock *MilestoneRepositoryMock) CreateFull(ctx context.Context, tx repository.TxInterface, project uuid.UUID, name string, description *string, target *time.Time, sortOrder float64) (uuid.UUID, error) {
-	ret := _mock.Called(ctx, tx, project, name, description, target, sortOrder)
+func (_mock *MilestoneRepositoryMock) CreateFull(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, project uuid.UUID, name string, description *string, target *time.Time, sortOrder float64) (uuid.UUID, error) {
+	ret := _mock.Called(ctx, tx, workspace, project, name, description, target, sortOrder)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateFull")
@@ -141,18 +147,18 @@ func (_mock *MilestoneRepositoryMock) CreateFull(ctx context.Context, tx reposit
 
 	var r0 uuid.UUID
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, string, *string, *time.Time, float64) (uuid.UUID, error)); ok {
-		return returnFunc(ctx, tx, project, name, description, target, sortOrder)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, string, *string, *time.Time, float64) (uuid.UUID, error)); ok {
+		return returnFunc(ctx, tx, workspace, project, name, description, target, sortOrder)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, string, *string, *time.Time, float64) uuid.UUID); ok {
-		r0 = returnFunc(ctx, tx, project, name, description, target, sortOrder)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, string, *string, *time.Time, float64) uuid.UUID); ok {
+		r0 = returnFunc(ctx, tx, workspace, project, name, description, target, sortOrder)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(uuid.UUID)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, string, *string, *time.Time, float64) error); ok {
-		r1 = returnFunc(ctx, tx, project, name, description, target, sortOrder)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, string, *string, *time.Time, float64) error); ok {
+		r1 = returnFunc(ctx, tx, workspace, project, name, description, target, sortOrder)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -167,16 +173,17 @@ type MilestoneRepositoryMock_CreateFull_Call struct {
 // CreateFull is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tx repository.TxInterface
+//   - workspace uuid.UUID
 //   - project uuid.UUID
 //   - name string
 //   - description *string
 //   - target *time.Time
 //   - sortOrder float64
-func (_e *MilestoneRepositoryMock_Expecter) CreateFull(ctx any, tx any, project any, name any, description any, target any, sortOrder any) *MilestoneRepositoryMock_CreateFull_Call {
-	return &MilestoneRepositoryMock_CreateFull_Call{Call: _e.mock.On("CreateFull", ctx, tx, project, name, description, target, sortOrder)}
+func (_e *MilestoneRepositoryMock_Expecter) CreateFull(ctx any, tx any, workspace any, project any, name any, description any, target any, sortOrder any) *MilestoneRepositoryMock_CreateFull_Call {
+	return &MilestoneRepositoryMock_CreateFull_Call{Call: _e.mock.On("CreateFull", ctx, tx, workspace, project, name, description, target, sortOrder)}
 }
 
-func (_c *MilestoneRepositoryMock_CreateFull_Call) Run(run func(ctx context.Context, tx repository.TxInterface, project uuid.UUID, name string, description *string, target *time.Time, sortOrder float64)) *MilestoneRepositoryMock_CreateFull_Call {
+func (_c *MilestoneRepositoryMock_CreateFull_Call) Run(run func(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, project uuid.UUID, name string, description *string, target *time.Time, sortOrder float64)) *MilestoneRepositoryMock_CreateFull_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -190,21 +197,25 @@ func (_c *MilestoneRepositoryMock_CreateFull_Call) Run(run func(ctx context.Cont
 		if args[2] != nil {
 			arg2 = args[2].(uuid.UUID)
 		}
-		var arg3 string
+		var arg3 uuid.UUID
 		if args[3] != nil {
-			arg3 = args[3].(string)
+			arg3 = args[3].(uuid.UUID)
 		}
-		var arg4 *string
+		var arg4 string
 		if args[4] != nil {
-			arg4 = args[4].(*string)
+			arg4 = args[4].(string)
 		}
-		var arg5 *time.Time
+		var arg5 *string
 		if args[5] != nil {
-			arg5 = args[5].(*time.Time)
+			arg5 = args[5].(*string)
 		}
-		var arg6 float64
+		var arg6 *time.Time
 		if args[6] != nil {
-			arg6 = args[6].(float64)
+			arg6 = args[6].(*time.Time)
+		}
+		var arg7 float64
+		if args[7] != nil {
+			arg7 = args[7].(float64)
 		}
 		run(
 			arg0,
@@ -214,6 +225,7 @@ func (_c *MilestoneRepositoryMock_CreateFull_Call) Run(run func(ctx context.Cont
 			arg4,
 			arg5,
 			arg6,
+			arg7,
 		)
 	})
 	return _c
@@ -224,7 +236,7 @@ func (_c *MilestoneRepositoryMock_CreateFull_Call) Return(uUID uuid.UUID, err er
 	return _c
 }
 
-func (_c *MilestoneRepositoryMock_CreateFull_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, project uuid.UUID, name string, description *string, target *time.Time, sortOrder float64) (uuid.UUID, error)) *MilestoneRepositoryMock_CreateFull_Call {
+func (_c *MilestoneRepositoryMock_CreateFull_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, project uuid.UUID, name string, description *string, target *time.Time, sortOrder float64) (uuid.UUID, error)) *MilestoneRepositoryMock_CreateFull_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -678,6 +690,92 @@ func (_c *MilestoneRepositoryMock_OfProject_Call) RunAndReturn(run func(ctx cont
 	return _c
 }
 
+// OfWorkspace provides a mock function for the type MilestoneRepositoryMock
+func (_mock *MilestoneRepositoryMock) OfWorkspace(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, limit int64, offset int64) ([]uuid.UUID, error) {
+	ret := _mock.Called(ctx, tx, workspace, limit, offset)
+
+	if len(ret) == 0 {
+		panic("no return value specified for OfWorkspace")
+	}
+
+	var r0 []uuid.UUID
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, int64, int64) ([]uuid.UUID, error)); ok {
+		return returnFunc(ctx, tx, workspace, limit, offset)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, int64, int64) []uuid.UUID); ok {
+		r0 = returnFunc(ctx, tx, workspace, limit, offset)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, int64, int64) error); ok {
+		r1 = returnFunc(ctx, tx, workspace, limit, offset)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MilestoneRepositoryMock_OfWorkspace_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'OfWorkspace'
+type MilestoneRepositoryMock_OfWorkspace_Call struct {
+	*mock.Call
+}
+
+// OfWorkspace is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - workspace uuid.UUID
+//   - limit int64
+//   - offset int64
+func (_e *MilestoneRepositoryMock_Expecter) OfWorkspace(ctx any, tx any, workspace any, limit any, offset any) *MilestoneRepositoryMock_OfWorkspace_Call {
+	return &MilestoneRepositoryMock_OfWorkspace_Call{Call: _e.mock.On("OfWorkspace", ctx, tx, workspace, limit, offset)}
+}
+
+func (_c *MilestoneRepositoryMock_OfWorkspace_Call) Run(run func(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, limit int64, offset int64)) *MilestoneRepositoryMock_OfWorkspace_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 int64
+		if args[3] != nil {
+			arg3 = args[3].(int64)
+		}
+		var arg4 int64
+		if args[4] != nil {
+			arg4 = args[4].(int64)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+		)
+	})
+	return _c
+}
+
+func (_c *MilestoneRepositoryMock_OfWorkspace_Call) Return(uUIDs []uuid.UUID, err error) *MilestoneRepositoryMock_OfWorkspace_Call {
+	_c.Call.Return(uUIDs, err)
+	return _c
+}
+
+func (_c *MilestoneRepositoryMock_OfWorkspace_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, limit int64, offset int64) ([]uuid.UUID, error)) *MilestoneRepositoryMock_OfWorkspace_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Stats provides a mock function for the type MilestoneRepositoryMock
 func (_mock *MilestoneRepositoryMock) Stats(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID, viewer uuid.UUID) (map[uuid.UUID]models.ProjectIssueStats, error) {
 	ret := _mock.Called(ctx, tx, ids, viewer)
@@ -813,6 +911,86 @@ func (_c *MilestoneRepositoryMock_Update_Call) Return(projectMilestoneUpdateOne 
 }
 
 func (_c *MilestoneRepositoryMock_Update_Call) RunAndReturn(run func(tx repository.TxInterface, id uuid.UUID) *ent.ProjectMilestoneUpdateOne) *MilestoneRepositoryMock_Update_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// WorkspaceNamed provides a mock function for the type MilestoneRepositoryMock
+func (_mock *MilestoneRepositoryMock) WorkspaceNamed(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, name string) (*ent.ProjectMilestone, error) {
+	ret := _mock.Called(ctx, tx, workspace, name)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WorkspaceNamed")
+	}
+
+	var r0 *ent.ProjectMilestone
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, string) (*ent.ProjectMilestone, error)); ok {
+		return returnFunc(ctx, tx, workspace, name)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, string) *ent.ProjectMilestone); ok {
+		r0 = returnFunc(ctx, tx, workspace, name)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ent.ProjectMilestone)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, string) error); ok {
+		r1 = returnFunc(ctx, tx, workspace, name)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MilestoneRepositoryMock_WorkspaceNamed_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WorkspaceNamed'
+type MilestoneRepositoryMock_WorkspaceNamed_Call struct {
+	*mock.Call
+}
+
+// WorkspaceNamed is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - workspace uuid.UUID
+//   - name string
+func (_e *MilestoneRepositoryMock_Expecter) WorkspaceNamed(ctx any, tx any, workspace any, name any) *MilestoneRepositoryMock_WorkspaceNamed_Call {
+	return &MilestoneRepositoryMock_WorkspaceNamed_Call{Call: _e.mock.On("WorkspaceNamed", ctx, tx, workspace, name)}
+}
+
+func (_c *MilestoneRepositoryMock_WorkspaceNamed_Call) Run(run func(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, name string)) *MilestoneRepositoryMock_WorkspaceNamed_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 string
+		if args[3] != nil {
+			arg3 = args[3].(string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *MilestoneRepositoryMock_WorkspaceNamed_Call) Return(projectMilestone *ent.ProjectMilestone, err error) *MilestoneRepositoryMock_WorkspaceNamed_Call {
+	_c.Call.Return(projectMilestone, err)
+	return _c
+}
+
+func (_c *MilestoneRepositoryMock_WorkspaceNamed_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, name string) (*ent.ProjectMilestone, error)) *MilestoneRepositoryMock_WorkspaceNamed_Call {
 	_c.Call.Return(run)
 	return _c
 }

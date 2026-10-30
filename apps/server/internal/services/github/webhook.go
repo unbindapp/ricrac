@@ -86,6 +86,11 @@ func (self *GitHubService) HandleWebhook(ctx context.Context, event, signature s
 			return nil
 		}
 		return decodeAnd(body, h.issueComment)
+	case "milestone":
+		if fromApp {
+			return nil
+		}
+		return decodeAnd(body, h.milestoneEvent)
 	}
 	return nil
 }

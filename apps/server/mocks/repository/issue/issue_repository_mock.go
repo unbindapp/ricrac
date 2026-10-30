@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"ricrac/ent"
+	"ricrac/internal/models"
 	"ricrac/internal/repositories"
 	"ricrac/internal/repositories/issue"
 	"time"
@@ -3035,6 +3036,80 @@ func (_c *IssueRepositoryMock_OpenChildren_Call) Return(issues []*ent.Issue, err
 }
 
 func (_c *IssueRepositoryMock_OpenChildren_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, parent uuid.UUID) ([]*ent.Issue, error)) *IssueRepositoryMock_OpenChildren_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// PendingGitHub provides a mock function for the type IssueRepositoryMock
+func (_mock *IssueRepositoryMock) PendingGitHub(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*models.GitHubPreview, error) {
+	ret := _mock.Called(ctx, tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PendingGitHub")
+	}
+
+	var r0 *models.GitHubPreview
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) (*models.GitHubPreview, error)); ok {
+		return returnFunc(ctx, tx, id)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) *models.GitHubPreview); ok {
+		r0 = returnFunc(ctx, tx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.GitHubPreview)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// IssueRepositoryMock_PendingGitHub_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PendingGitHub'
+type IssueRepositoryMock_PendingGitHub_Call struct {
+	*mock.Call
+}
+
+// PendingGitHub is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - id uuid.UUID
+func (_e *IssueRepositoryMock_Expecter) PendingGitHub(ctx any, tx any, id any) *IssueRepositoryMock_PendingGitHub_Call {
+	return &IssueRepositoryMock_PendingGitHub_Call{Call: _e.mock.On("PendingGitHub", ctx, tx, id)}
+}
+
+func (_c *IssueRepositoryMock_PendingGitHub_Call) Run(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID)) *IssueRepositoryMock_PendingGitHub_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *IssueRepositoryMock_PendingGitHub_Call) Return(gitHubPreview *models.GitHubPreview, err error) *IssueRepositoryMock_PendingGitHub_Call {
+	_c.Call.Return(gitHubPreview, err)
+	return _c
+}
+
+func (_c *IssueRepositoryMock_PendingGitHub_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*models.GitHubPreview, error)) *IssueRepositoryMock_PendingGitHub_Call {
 	_c.Call.Return(run)
 	return _c
 }

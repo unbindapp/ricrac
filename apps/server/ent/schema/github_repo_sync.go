@@ -23,6 +23,8 @@ func (GithubRepoSync) Fields() []ent.Field {
 		field.UUID("team_id", uuid.UUID{}),
 		field.UUID("project_id", uuid.UUID{}).Optional().Nillable(),
 		field.Bool("link_back").Optional(),
+		field.Bool("create_issues").Optional(),
+		field.Bool("sync_fields").Optional(),
 		field.Text("backfill_status").Optional().Nillable(),
 		field.Bool("backfill_closed").Optional(),
 		field.Int("backfill_page").SchemaType(integer).Optional(),
@@ -32,6 +34,7 @@ func (GithubRepoSync) Fields() []ent.Field {
 		field.Int("skipped").SchemaType(integer).Optional(),
 		field.Text("last_error").Optional().Nillable(),
 		field.Time("last_synced_at").Optional().Nillable(),
+		field.Time("milestones_synced_at").Optional().Nillable(),
 		field.Time("created_at").Optional(),
 		field.Time("updated_at").Optional(),
 	}
@@ -45,6 +48,7 @@ func (GithubRepoSync) Edges() []ent.Edge {
 		edge.From("project", Project.Type).Ref("github_repo_syncs").Field("project_id").Unique(),
 		edge.To("github_issue_links", GithubIssueLink.Type),
 		edge.To("github_outbox", GithubOutbox.Type),
+		edge.To("github_milestone_links", GithubMilestoneLink.Type),
 	}
 }
 

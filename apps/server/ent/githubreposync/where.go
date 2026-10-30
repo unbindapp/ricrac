@@ -91,6 +91,16 @@ func LinkBack(v bool) predicate.GithubRepoSync {
 	return predicate.GithubRepoSync(sql.FieldEQ(FieldLinkBack, v))
 }
 
+// CreateIssues applies equality check predicate on the "create_issues" field. It's identical to CreateIssuesEQ.
+func CreateIssues(v bool) predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldEQ(FieldCreateIssues, v))
+}
+
+// SyncFields applies equality check predicate on the "sync_fields" field. It's identical to SyncFieldsEQ.
+func SyncFields(v bool) predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldEQ(FieldSyncFields, v))
+}
+
 // BackfillStatus applies equality check predicate on the "backfill_status" field. It's identical to BackfillStatusEQ.
 func BackfillStatus(v string) predicate.GithubRepoSync {
 	return predicate.GithubRepoSync(sql.FieldEQ(FieldBackfillStatus, v))
@@ -134,6 +144,11 @@ func LastError(v string) predicate.GithubRepoSync {
 // LastSyncedAt applies equality check predicate on the "last_synced_at" field. It's identical to LastSyncedAtEQ.
 func LastSyncedAt(v time.Time) predicate.GithubRepoSync {
 	return predicate.GithubRepoSync(sql.FieldEQ(FieldLastSyncedAt, v))
+}
+
+// MilestonesSyncedAt applies equality check predicate on the "milestones_synced_at" field. It's identical to MilestonesSyncedAtEQ.
+func MilestonesSyncedAt(v time.Time) predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldEQ(FieldMilestonesSyncedAt, v))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
@@ -359,6 +374,46 @@ func LinkBackIsNil() predicate.GithubRepoSync {
 // LinkBackNotNil applies the NotNil predicate on the "link_back" field.
 func LinkBackNotNil() predicate.GithubRepoSync {
 	return predicate.GithubRepoSync(sql.FieldNotNull(FieldLinkBack))
+}
+
+// CreateIssuesEQ applies the EQ predicate on the "create_issues" field.
+func CreateIssuesEQ(v bool) predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldEQ(FieldCreateIssues, v))
+}
+
+// CreateIssuesNEQ applies the NEQ predicate on the "create_issues" field.
+func CreateIssuesNEQ(v bool) predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldNEQ(FieldCreateIssues, v))
+}
+
+// CreateIssuesIsNil applies the IsNil predicate on the "create_issues" field.
+func CreateIssuesIsNil() predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldIsNull(FieldCreateIssues))
+}
+
+// CreateIssuesNotNil applies the NotNil predicate on the "create_issues" field.
+func CreateIssuesNotNil() predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldNotNull(FieldCreateIssues))
+}
+
+// SyncFieldsEQ applies the EQ predicate on the "sync_fields" field.
+func SyncFieldsEQ(v bool) predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldEQ(FieldSyncFields, v))
+}
+
+// SyncFieldsNEQ applies the NEQ predicate on the "sync_fields" field.
+func SyncFieldsNEQ(v bool) predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldNEQ(FieldSyncFields, v))
+}
+
+// SyncFieldsIsNil applies the IsNil predicate on the "sync_fields" field.
+func SyncFieldsIsNil() predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldIsNull(FieldSyncFields))
+}
+
+// SyncFieldsNotNil applies the NotNil predicate on the "sync_fields" field.
+func SyncFieldsNotNil() predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldNotNull(FieldSyncFields))
 }
 
 // BackfillStatusEQ applies the EQ predicate on the "backfill_status" field.
@@ -831,6 +886,56 @@ func LastSyncedAtNotNil() predicate.GithubRepoSync {
 	return predicate.GithubRepoSync(sql.FieldNotNull(FieldLastSyncedAt))
 }
 
+// MilestonesSyncedAtEQ applies the EQ predicate on the "milestones_synced_at" field.
+func MilestonesSyncedAtEQ(v time.Time) predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldEQ(FieldMilestonesSyncedAt, v))
+}
+
+// MilestonesSyncedAtNEQ applies the NEQ predicate on the "milestones_synced_at" field.
+func MilestonesSyncedAtNEQ(v time.Time) predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldNEQ(FieldMilestonesSyncedAt, v))
+}
+
+// MilestonesSyncedAtIn applies the In predicate on the "milestones_synced_at" field.
+func MilestonesSyncedAtIn(vs ...time.Time) predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldIn(FieldMilestonesSyncedAt, vs...))
+}
+
+// MilestonesSyncedAtNotIn applies the NotIn predicate on the "milestones_synced_at" field.
+func MilestonesSyncedAtNotIn(vs ...time.Time) predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldNotIn(FieldMilestonesSyncedAt, vs...))
+}
+
+// MilestonesSyncedAtGT applies the GT predicate on the "milestones_synced_at" field.
+func MilestonesSyncedAtGT(v time.Time) predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldGT(FieldMilestonesSyncedAt, v))
+}
+
+// MilestonesSyncedAtGTE applies the GTE predicate on the "milestones_synced_at" field.
+func MilestonesSyncedAtGTE(v time.Time) predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldGTE(FieldMilestonesSyncedAt, v))
+}
+
+// MilestonesSyncedAtLT applies the LT predicate on the "milestones_synced_at" field.
+func MilestonesSyncedAtLT(v time.Time) predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldLT(FieldMilestonesSyncedAt, v))
+}
+
+// MilestonesSyncedAtLTE applies the LTE predicate on the "milestones_synced_at" field.
+func MilestonesSyncedAtLTE(v time.Time) predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldLTE(FieldMilestonesSyncedAt, v))
+}
+
+// MilestonesSyncedAtIsNil applies the IsNil predicate on the "milestones_synced_at" field.
+func MilestonesSyncedAtIsNil() predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldIsNull(FieldMilestonesSyncedAt))
+}
+
+// MilestonesSyncedAtNotNil applies the NotNil predicate on the "milestones_synced_at" field.
+func MilestonesSyncedAtNotNil() predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(sql.FieldNotNull(FieldMilestonesSyncedAt))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.GithubRepoSync {
 	return predicate.GithubRepoSync(sql.FieldEQ(FieldCreatedAt, v))
@@ -1061,6 +1166,29 @@ func HasGithubOutbox() predicate.GithubRepoSync {
 func HasGithubOutboxWith(preds ...predicate.GithubOutbox) predicate.GithubRepoSync {
 	return predicate.GithubRepoSync(func(s *sql.Selector) {
 		step := newGithubOutboxStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasGithubMilestoneLinks applies the HasEdge predicate on the "github_milestone_links" edge.
+func HasGithubMilestoneLinks() predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, GithubMilestoneLinksTable, GithubMilestoneLinksColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasGithubMilestoneLinksWith applies the HasEdge predicate on the "github_milestone_links" edge with a given conditions (other predicates).
+func HasGithubMilestoneLinksWith(preds ...predicate.GithubMilestoneLink) predicate.GithubRepoSync {
+	return predicate.GithubRepoSync(func(s *sql.Selector) {
+		step := newGithubMilestoneLinksStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

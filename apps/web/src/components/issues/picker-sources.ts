@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
-import type { IssueLabel, UserRef, WorkspaceUser } from "@/api/ops.gen";
+import type { IssueLabel, Milestone, UserRef, WorkspaceUser } from "@/api/ops.gen";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { cyclesQuery } from "@/lib/queries/cycles";
 import { issueProjectsQuery, projectMilestonesQuery } from "@/lib/queries/issue-options";
 import { labelsQuery } from "@/lib/queries/labels";
+import { milestonesQuery } from "@/lib/queries/milestones";
 import { teamQuery } from "@/lib/queries/teams";
 import { usersQuery } from "@/lib/queries/users";
 
@@ -81,13 +82,31 @@ export function useProjectLookup() {
   return useMemo(() => new Map((data ?? []).map((project) => [project.id, project])), [data]);
 }
 
-export function useMilestones(projectId: string | undefined) {
-  const { workspace } = useWorkspace();
-  const { data, isPending } = useQuery({
+/** Open milestones of the project and of the workspace's own, and the current one even when closed. */
+export function useMilestones(projectId: string | undefined, currentId: string | undefined) {
+  const { workspace, isVisitor } = useWorkspace();
+  const hasProject = Boolean(projectId) && !isVisitor;
+  const own = useQuery({ ...milestonesQuery(workspace.id), enabled: !isVisitor });
+  const project = useQuery({
     ...projectMilestonesQuery(workspace.id, projectId ?? ""),
-    enabled: Boolean(projectId),
+    enabled: hasProject,
   });
-  return { milestones: data ?? [], isPending: Boolean(projectId) && isPending };
+  const workspaceMilestones = useMemo(() => pickable(own.data, currentId), [own.data, currentId]);
+  const projectMilestones = useMemo(
+    () => (hasProject ? pickable(project.data, currentId) : []),
+    [hasProject, project.data, currentId],
+  );
+  return {
+    workspaceMilestones,
+    projectMilestones,
+    isPending: (!isVisitor && own.isPending) || (hasProject && project.isPending),
+  };
+}
+
+function pickable(milestones: Milestone[] | undefined, currentId: string | undefined) {
+  return (milestones ?? []).filter(
+    (milestone) => !milestone.closedAt || milestone.id === currentId,
+  );
 }
 
 /** The team's current and upcoming cycles, when it uses cycles. */

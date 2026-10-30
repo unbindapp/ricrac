@@ -22,6 +22,8 @@ const (
 	FieldCommentID = "comment_id"
 	// FieldGithubCommentID holds the string denoting the github_comment_id field in the database.
 	FieldGithubCommentID = "github_comment_id"
+	// FieldMilestoneID holds the string denoting the milestone_id field in the database.
+	FieldMilestoneID = "milestone_id"
 	// FieldKind holds the string denoting the kind field in the database.
 	FieldKind = "kind"
 	// FieldChanges holds the string denoting the changes field in the database.
@@ -40,6 +42,8 @@ const (
 	EdgeIssue = "issue"
 	// EdgeComment holds the string denoting the comment edge name in mutations.
 	EdgeComment = "comment"
+	// EdgeMilestone holds the string denoting the milestone edge name in mutations.
+	EdgeMilestone = "milestone"
 	// Table holds the table name of the githuboutbox in the database.
 	Table = "github_outbox"
 	// RepoSyncTable is the table that holds the repo_sync relation/edge.
@@ -63,6 +67,13 @@ const (
 	CommentInverseTable = "comments"
 	// CommentColumn is the table column denoting the comment relation/edge.
 	CommentColumn = "comment_id"
+	// MilestoneTable is the table that holds the milestone relation/edge.
+	MilestoneTable = "github_outbox"
+	// MilestoneInverseTable is the table name for the ProjectMilestone entity.
+	// It exists in this package in order to avoid circular dependency with the "projectmilestone" package.
+	MilestoneInverseTable = "project_milestones"
+	// MilestoneColumn is the table column denoting the milestone relation/edge.
+	MilestoneColumn = "milestone_id"
 )
 
 // Columns holds all SQL columns for githuboutbox fields.
@@ -73,6 +84,7 @@ var Columns = []string{
 	FieldIssueID,
 	FieldCommentID,
 	FieldGithubCommentID,
+	FieldMilestoneID,
 	FieldKind,
 	FieldChanges,
 	FieldAttempts,
@@ -124,6 +136,11 @@ func ByGithubCommentID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldGithubCommentID, opts...).ToFunc()
 }
 
+// ByMilestoneID orders the results by the milestone_id field.
+func ByMilestoneID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMilestoneID, opts...).ToFunc()
+}
+
 // ByKind orders the results by the kind field.
 func ByKind(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldKind, opts...).ToFunc()
@@ -169,6 +186,13 @@ func ByCommentField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newCommentStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByMilestoneField orders the results by milestone field.
+func ByMilestoneField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newMilestoneStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newRepoSyncStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -188,5 +212,12 @@ func newCommentStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CommentInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, CommentTable, CommentColumn),
+	)
+}
+func newMilestoneStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(MilestoneInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, MilestoneTable, MilestoneColumn),
 	)
 }

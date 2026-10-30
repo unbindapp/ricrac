@@ -33,6 +33,7 @@ import (
 	"ricrac/ent/predicate"
 	"ricrac/ent/project"
 	"ricrac/ent/projectlabel"
+	"ricrac/ent/projectmilestone"
 	"ricrac/ent/projectstatus"
 	"ricrac/ent/reaction"
 	"ricrac/ent/release"
@@ -336,6 +337,21 @@ func (_u *WorkspaceUpdate) AddProjects(v ...*Project) *WorkspaceUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.AddProjectIDs(ids...)
+}
+
+// AddProjectMilestoneIDs adds the "project_milestones" edge to the ProjectMilestone entity by IDs.
+func (_u *WorkspaceUpdate) AddProjectMilestoneIDs(ids ...uuid.UUID) *WorkspaceUpdate {
+	_u.mutation.AddProjectMilestoneIDs(ids...)
+	return _u
+}
+
+// AddProjectMilestones adds the "project_milestones" edges to the ProjectMilestone entity.
+func (_u *WorkspaceUpdate) AddProjectMilestones(v ...*ProjectMilestone) *WorkspaceUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddProjectMilestoneIDs(ids...)
 }
 
 // AddInitiativeIDs adds the "initiatives" edge to the Initiative entity by IDs.
@@ -908,6 +924,27 @@ func (_u *WorkspaceUpdate) RemoveProjects(v ...*Project) *WorkspaceUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveProjectIDs(ids...)
+}
+
+// ClearProjectMilestones clears all "project_milestones" edges to the ProjectMilestone entity.
+func (_u *WorkspaceUpdate) ClearProjectMilestones() *WorkspaceUpdate {
+	_u.mutation.ClearProjectMilestones()
+	return _u
+}
+
+// RemoveProjectMilestoneIDs removes the "project_milestones" edge to ProjectMilestone entities by IDs.
+func (_u *WorkspaceUpdate) RemoveProjectMilestoneIDs(ids ...uuid.UUID) *WorkspaceUpdate {
+	_u.mutation.RemoveProjectMilestoneIDs(ids...)
+	return _u
+}
+
+// RemoveProjectMilestones removes "project_milestones" edges to ProjectMilestone entities.
+func (_u *WorkspaceUpdate) RemoveProjectMilestones(v ...*ProjectMilestone) *WorkspaceUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveProjectMilestoneIDs(ids...)
 }
 
 // ClearInitiatives clears all "initiatives" edges to the Initiative entity.
@@ -1901,6 +1938,51 @@ func (_u *WorkspaceUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(project.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ProjectMilestonesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.ProjectMilestonesTable,
+			Columns: []string{workspace.ProjectMilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(projectmilestone.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedProjectMilestonesIDs(); len(nodes) > 0 && !_u.mutation.ProjectMilestonesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.ProjectMilestonesTable,
+			Columns: []string{workspace.ProjectMilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(projectmilestone.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ProjectMilestonesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.ProjectMilestonesTable,
+			Columns: []string{workspace.ProjectMilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(projectmilestone.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -3461,6 +3543,21 @@ func (_u *WorkspaceUpdateOne) AddProjects(v ...*Project) *WorkspaceUpdateOne {
 	return _u.AddProjectIDs(ids...)
 }
 
+// AddProjectMilestoneIDs adds the "project_milestones" edge to the ProjectMilestone entity by IDs.
+func (_u *WorkspaceUpdateOne) AddProjectMilestoneIDs(ids ...uuid.UUID) *WorkspaceUpdateOne {
+	_u.mutation.AddProjectMilestoneIDs(ids...)
+	return _u
+}
+
+// AddProjectMilestones adds the "project_milestones" edges to the ProjectMilestone entity.
+func (_u *WorkspaceUpdateOne) AddProjectMilestones(v ...*ProjectMilestone) *WorkspaceUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddProjectMilestoneIDs(ids...)
+}
+
 // AddInitiativeIDs adds the "initiatives" edge to the Initiative entity by IDs.
 func (_u *WorkspaceUpdateOne) AddInitiativeIDs(ids ...uuid.UUID) *WorkspaceUpdateOne {
 	_u.mutation.AddInitiativeIDs(ids...)
@@ -4031,6 +4128,27 @@ func (_u *WorkspaceUpdateOne) RemoveProjects(v ...*Project) *WorkspaceUpdateOne 
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveProjectIDs(ids...)
+}
+
+// ClearProjectMilestones clears all "project_milestones" edges to the ProjectMilestone entity.
+func (_u *WorkspaceUpdateOne) ClearProjectMilestones() *WorkspaceUpdateOne {
+	_u.mutation.ClearProjectMilestones()
+	return _u
+}
+
+// RemoveProjectMilestoneIDs removes the "project_milestones" edge to ProjectMilestone entities by IDs.
+func (_u *WorkspaceUpdateOne) RemoveProjectMilestoneIDs(ids ...uuid.UUID) *WorkspaceUpdateOne {
+	_u.mutation.RemoveProjectMilestoneIDs(ids...)
+	return _u
+}
+
+// RemoveProjectMilestones removes "project_milestones" edges to ProjectMilestone entities.
+func (_u *WorkspaceUpdateOne) RemoveProjectMilestones(v ...*ProjectMilestone) *WorkspaceUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveProjectMilestoneIDs(ids...)
 }
 
 // ClearInitiatives clears all "initiatives" edges to the Initiative entity.
@@ -5054,6 +5172,51 @@ func (_u *WorkspaceUpdateOne) sqlSave(ctx context.Context) (_node *Workspace, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(project.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ProjectMilestonesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.ProjectMilestonesTable,
+			Columns: []string{workspace.ProjectMilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(projectmilestone.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedProjectMilestonesIDs(); len(nodes) > 0 && !_u.mutation.ProjectMilestonesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.ProjectMilestonesTable,
+			Columns: []string{workspace.ProjectMilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(projectmilestone.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ProjectMilestonesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.ProjectMilestonesTable,
+			Columns: []string{workspace.ProjectMilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(projectmilestone.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

@@ -41,7 +41,8 @@ type ResolveServiceInterface interface {
 	// Project is a project by id, slug, link or name.
 	Project(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error)
 	Projects(ctx context.Context, actor *auth.Actor, values []string) ([]uuid.UUID, error)
-	// Milestone is a milestone by id, or by name within the project.
+	// Milestone is a milestone by id, or by name among the project's (when given) and then the
+	// workspace's own.
 	Milestone(ctx context.Context, actor *auth.Actor, project *uuid.UUID, value string) (uuid.UUID, error)
 	// Cycle is a cycle of the team by id, number, name, or "current", "next" or "previous".
 	Cycle(ctx context.Context, actor *auth.Actor, team *uuid.UUID, value string) (uuid.UUID, error)

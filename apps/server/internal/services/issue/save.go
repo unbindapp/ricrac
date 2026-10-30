@@ -3,6 +3,7 @@ package issue_service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"slices"
 	"strings"
 
@@ -19,23 +20,60 @@ import (
 	events_service "ricrac/internal/services/events"
 )
 
+// errPreviewed rolls back a save made only to preview it.
+var errPreviewed = errors.New("previewed")
+
 func (self *IssueService) Save(ctx context.Context, actor *auth.Actor, input *SaveInput) (models.IssueDetail, error) {
 	var id uuid.UUID
+	var preview models.IssueDetail
 	err := self.repo.WithTx(ctx, func(tx repository.TxInterface) error {
 		var err error
-		if input.ID != nil {
-			if id, err = self.resolve.Issue(ctx, actor, *input.ID); err != nil {
-				return err
-			}
-			return self.Update(ctx, tx, actor, id, *input)
+		if id, err = self.save(ctx, tx, actor, input); err != nil {
+			return err
 		}
-		id, err = self.Create(ctx, tx, actor, *input)
-		return err
+		if input.Preview == nil || !*input.Preview {
+			return nil
+		}
+		if preview, err = self.preview(ctx, tx, actor.Fresh(), id); err != nil {
+			return err
+		}
+		return errPreviewed
 	})
+	if errors.Is(err, errPreviewed) {
+		return preview, nil
+	}
 	if err != nil {
 		return models.IssueDetail{}, err
 	}
 	return self.Detail(ctx, actor.Fresh(), id, false, false)
+}
+
+func (self *IssueService) save(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, input *SaveInput) (uuid.UUID, error) {
+	if input.ID == nil {
+		return self.Create(ctx, tx, actor, *input)
+	}
+	if input.GitHubRepository != nil {
+		return uuid.Nil, errdefs.BadRequest("githubRepository only applies when creating an issue")
+	}
+	id, err := self.resolve.Issue(ctx, actor, *input.ID)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	return id, self.Update(ctx, tx, actor, id, *input)
+}
+
+// preview is the issue as tx saved it, with where it would open on GitHub.
+func (self *IssueService) preview(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, id uuid.UUID) (models.IssueDetail, error) {
+	detail, err := self.detailIn(ctx, tx, actor, id, false, false)
+	if err != nil {
+		return models.IssueDetail{}, err
+	}
+	github, err := self.repo.Issue().PendingGitHub(ctx, tx, id)
+	if err != nil {
+		return models.IssueDetail{}, err
+	}
+	detail.Preview = &models.IssuePreview{GitHub: github}
+	return detail, nil
 }
 
 func (self *IssueService) UpdateMany(ctx context.Context, actor *auth.Actor, input *UpdateManyInput) (models.UpdatedIssues, error) {
@@ -233,6 +271,9 @@ func (self *IssueService) Create(ctx context.Context, tx repository.TxInterface,
 	}
 	input.State, input.Title, input.Team = nil, nil, nil
 	if err := self.applyChanges(ctx, tx, actor, id, input, true); err != nil {
+		return uuid.Nil, err
+	}
+	if err := self.events.QueueNewIssueForGitHub(ctx, tx, actor, id, team, input.GitHubRepository); err != nil {
 		return uuid.Nil, err
 	}
 	if newType == "triage" && settings.TriageEnabled {

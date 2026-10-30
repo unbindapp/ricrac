@@ -38,8 +38,10 @@ type ResolveRepositoryInterface interface {
 	// recently changed first.
 	Projects(ctx context.Context, workspace uuid.UUID, teams []uuid.UUID) ([]Named, error)
 	ProjectBySlug(ctx context.Context, workspace uuid.UUID, slug string) (uuid.UUID, bool, error)
-	// MilestoneProject is the project of a milestone of the workspace.
-	MilestoneProject(ctx context.Context, workspace, id uuid.UUID) (uuid.UUID, bool, error)
+	// MilestoneProject is the project of a milestone of the workspace, nil when it is in none.
+	MilestoneProject(ctx context.Context, workspace, id uuid.UUID) (*uuid.UUID, bool, error)
+	// WorkspaceMilestones is the workspace's milestones in no project.
+	WorkspaceMilestones(ctx context.Context, workspace uuid.UUID) ([]Named, error)
 	// Milestones is the project's milestones in their order.
 	Milestones(ctx context.Context, projectID uuid.UUID) ([]Named, error)
 	CycleTeam(ctx context.Context, id uuid.UUID) (uuid.UUID, bool, error)

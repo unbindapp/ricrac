@@ -603,6 +603,162 @@ func (_c *EventsServiceMock_QueueCommentForGitHub_Call) RunAndReturn(run func(ct
 	return _c
 }
 
+// QueueMilestoneForGitHub provides a mock function for the type EventsServiceMock
+func (_mock *EventsServiceMock) QueueMilestoneForGitHub(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, milestone uuid.UUID, kind string) error {
+	ret := _mock.Called(ctx, tx, actor, milestone, kind)
+
+	if len(ret) == 0 {
+		panic("no return value specified for QueueMilestoneForGitHub")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *auth.Actor, uuid.UUID, string) error); ok {
+		r0 = returnFunc(ctx, tx, actor, milestone, kind)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// EventsServiceMock_QueueMilestoneForGitHub_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'QueueMilestoneForGitHub'
+type EventsServiceMock_QueueMilestoneForGitHub_Call struct {
+	*mock.Call
+}
+
+// QueueMilestoneForGitHub is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - actor *auth.Actor
+//   - milestone uuid.UUID
+//   - kind string
+func (_e *EventsServiceMock_Expecter) QueueMilestoneForGitHub(ctx any, tx any, actor any, milestone any, kind any) *EventsServiceMock_QueueMilestoneForGitHub_Call {
+	return &EventsServiceMock_QueueMilestoneForGitHub_Call{Call: _e.mock.On("QueueMilestoneForGitHub", ctx, tx, actor, milestone, kind)}
+}
+
+func (_c *EventsServiceMock_QueueMilestoneForGitHub_Call) Run(run func(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, milestone uuid.UUID, kind string)) *EventsServiceMock_QueueMilestoneForGitHub_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 *auth.Actor
+		if args[2] != nil {
+			arg2 = args[2].(*auth.Actor)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		var arg4 string
+		if args[4] != nil {
+			arg4 = args[4].(string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+		)
+	})
+	return _c
+}
+
+func (_c *EventsServiceMock_QueueMilestoneForGitHub_Call) Return(err error) *EventsServiceMock_QueueMilestoneForGitHub_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *EventsServiceMock_QueueMilestoneForGitHub_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, milestone uuid.UUID, kind string) error) *EventsServiceMock_QueueMilestoneForGitHub_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// QueueNewIssueForGitHub provides a mock function for the type EventsServiceMock
+func (_mock *EventsServiceMock) QueueNewIssueForGitHub(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, issue uuid.UUID, team uuid.UUID, repository1 *string) error {
+	ret := _mock.Called(ctx, tx, actor, issue, team, repository1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for QueueNewIssueForGitHub")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, *auth.Actor, uuid.UUID, uuid.UUID, *string) error); ok {
+		r0 = returnFunc(ctx, tx, actor, issue, team, repository1)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// EventsServiceMock_QueueNewIssueForGitHub_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'QueueNewIssueForGitHub'
+type EventsServiceMock_QueueNewIssueForGitHub_Call struct {
+	*mock.Call
+}
+
+// QueueNewIssueForGitHub is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - actor *auth.Actor
+//   - issue uuid.UUID
+//   - team uuid.UUID
+//   - repository1 *string
+func (_e *EventsServiceMock_Expecter) QueueNewIssueForGitHub(ctx any, tx any, actor any, issue any, team any, repository1 any) *EventsServiceMock_QueueNewIssueForGitHub_Call {
+	return &EventsServiceMock_QueueNewIssueForGitHub_Call{Call: _e.mock.On("QueueNewIssueForGitHub", ctx, tx, actor, issue, team, repository1)}
+}
+
+func (_c *EventsServiceMock_QueueNewIssueForGitHub_Call) Run(run func(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, issue uuid.UUID, team uuid.UUID, repository1 *string)) *EventsServiceMock_QueueNewIssueForGitHub_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 *auth.Actor
+		if args[2] != nil {
+			arg2 = args[2].(*auth.Actor)
+		}
+		var arg3 uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].(uuid.UUID)
+		}
+		var arg4 uuid.UUID
+		if args[4] != nil {
+			arg4 = args[4].(uuid.UUID)
+		}
+		var arg5 *string
+		if args[5] != nil {
+			arg5 = args[5].(*string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+			arg5,
+		)
+	})
+	return _c
+}
+
+func (_c *EventsServiceMock_QueueNewIssueForGitHub_Call) Return(err error) *EventsServiceMock_QueueNewIssueForGitHub_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *EventsServiceMock_QueueNewIssueForGitHub_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, issue uuid.UUID, team uuid.UUID, repository1 *string) error) *EventsServiceMock_QueueNewIssueForGitHub_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Subscribe provides a mock function for the type EventsServiceMock
 func (_mock *EventsServiceMock) Subscribe(ctx context.Context, tx repository.TxInterface, issue uuid.UUID, users []uuid.UUID) error {
 	ret := _mock.Called(ctx, tx, issue, users)

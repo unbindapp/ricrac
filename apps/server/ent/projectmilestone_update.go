@@ -7,10 +7,13 @@ import (
 	"errors"
 	"fmt"
 	"ricrac/ent/comment"
+	"ricrac/ent/githubmilestonelink"
+	"ricrac/ent/githuboutbox"
 	"ricrac/ent/issue"
 	"ricrac/ent/predicate"
 	"ricrac/ent/project"
 	"ricrac/ent/projectmilestone"
+	"ricrac/ent/workspace"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -33,6 +36,20 @@ func (_u *ProjectMilestoneUpdate) Where(ps ...predicate.ProjectMilestone) *Proje
 	return _u
 }
 
+// SetWorkspaceID sets the "workspace_id" field.
+func (_u *ProjectMilestoneUpdate) SetWorkspaceID(v uuid.UUID) *ProjectMilestoneUpdate {
+	_u.mutation.SetWorkspaceID(v)
+	return _u
+}
+
+// SetNillableWorkspaceID sets the "workspace_id" field if the given value is not nil.
+func (_u *ProjectMilestoneUpdate) SetNillableWorkspaceID(v *uuid.UUID) *ProjectMilestoneUpdate {
+	if v != nil {
+		_u.SetWorkspaceID(*v)
+	}
+	return _u
+}
+
 // SetProjectID sets the "project_id" field.
 func (_u *ProjectMilestoneUpdate) SetProjectID(v uuid.UUID) *ProjectMilestoneUpdate {
 	_u.mutation.SetProjectID(v)
@@ -44,6 +61,12 @@ func (_u *ProjectMilestoneUpdate) SetNillableProjectID(v *uuid.UUID) *ProjectMil
 	if v != nil {
 		_u.SetProjectID(*v)
 	}
+	return _u
+}
+
+// ClearProjectID clears the value of the "project_id" field.
+func (_u *ProjectMilestoneUpdate) ClearProjectID() *ProjectMilestoneUpdate {
+	_u.mutation.ClearProjectID()
 	return _u
 }
 
@@ -128,6 +151,26 @@ func (_u *ProjectMilestoneUpdate) ClearSortOrder() *ProjectMilestoneUpdate {
 	return _u
 }
 
+// SetClosedAt sets the "closed_at" field.
+func (_u *ProjectMilestoneUpdate) SetClosedAt(v time.Time) *ProjectMilestoneUpdate {
+	_u.mutation.SetClosedAt(v)
+	return _u
+}
+
+// SetNillableClosedAt sets the "closed_at" field if the given value is not nil.
+func (_u *ProjectMilestoneUpdate) SetNillableClosedAt(v *time.Time) *ProjectMilestoneUpdate {
+	if v != nil {
+		_u.SetClosedAt(*v)
+	}
+	return _u
+}
+
+// ClearClosedAt clears the value of the "closed_at" field.
+func (_u *ProjectMilestoneUpdate) ClearClosedAt() *ProjectMilestoneUpdate {
+	_u.mutation.ClearClosedAt()
+	return _u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_u *ProjectMilestoneUpdate) SetCreatedAt(v time.Time) *ProjectMilestoneUpdate {
 	_u.mutation.SetCreatedAt(v)
@@ -168,6 +211,11 @@ func (_u *ProjectMilestoneUpdate) ClearUpdatedAt() *ProjectMilestoneUpdate {
 	return _u
 }
 
+// SetWorkspace sets the "workspace" edge to the Workspace entity.
+func (_u *ProjectMilestoneUpdate) SetWorkspace(v *Workspace) *ProjectMilestoneUpdate {
+	return _u.SetWorkspaceID(v.ID)
+}
+
 // SetProject sets the "project" edge to the Project entity.
 func (_u *ProjectMilestoneUpdate) SetProject(v *Project) *ProjectMilestoneUpdate {
 	return _u.SetProjectID(v.ID)
@@ -203,9 +251,45 @@ func (_u *ProjectMilestoneUpdate) AddComments(v ...*Comment) *ProjectMilestoneUp
 	return _u.AddCommentIDs(ids...)
 }
 
+// AddGithubMilestoneLinkIDs adds the "github_milestone_links" edge to the GithubMilestoneLink entity by IDs.
+func (_u *ProjectMilestoneUpdate) AddGithubMilestoneLinkIDs(ids ...uuid.UUID) *ProjectMilestoneUpdate {
+	_u.mutation.AddGithubMilestoneLinkIDs(ids...)
+	return _u
+}
+
+// AddGithubMilestoneLinks adds the "github_milestone_links" edges to the GithubMilestoneLink entity.
+func (_u *ProjectMilestoneUpdate) AddGithubMilestoneLinks(v ...*GithubMilestoneLink) *ProjectMilestoneUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddGithubMilestoneLinkIDs(ids...)
+}
+
+// AddGithubOutboxIDs adds the "github_outbox" edge to the GithubOutbox entity by IDs.
+func (_u *ProjectMilestoneUpdate) AddGithubOutboxIDs(ids ...int64) *ProjectMilestoneUpdate {
+	_u.mutation.AddGithubOutboxIDs(ids...)
+	return _u
+}
+
+// AddGithubOutbox adds the "github_outbox" edges to the GithubOutbox entity.
+func (_u *ProjectMilestoneUpdate) AddGithubOutbox(v ...*GithubOutbox) *ProjectMilestoneUpdate {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddGithubOutboxIDs(ids...)
+}
+
 // Mutation returns the ProjectMilestoneMutation object of the builder.
 func (_u *ProjectMilestoneUpdate) Mutation() *ProjectMilestoneMutation {
 	return _u.mutation
+}
+
+// ClearWorkspace clears the "workspace" edge to the Workspace entity.
+func (_u *ProjectMilestoneUpdate) ClearWorkspace() *ProjectMilestoneUpdate {
+	_u.mutation.ClearWorkspace()
+	return _u
 }
 
 // ClearProject clears the "project" edge to the Project entity.
@@ -256,6 +340,48 @@ func (_u *ProjectMilestoneUpdate) RemoveComments(v ...*Comment) *ProjectMileston
 	return _u.RemoveCommentIDs(ids...)
 }
 
+// ClearGithubMilestoneLinks clears all "github_milestone_links" edges to the GithubMilestoneLink entity.
+func (_u *ProjectMilestoneUpdate) ClearGithubMilestoneLinks() *ProjectMilestoneUpdate {
+	_u.mutation.ClearGithubMilestoneLinks()
+	return _u
+}
+
+// RemoveGithubMilestoneLinkIDs removes the "github_milestone_links" edge to GithubMilestoneLink entities by IDs.
+func (_u *ProjectMilestoneUpdate) RemoveGithubMilestoneLinkIDs(ids ...uuid.UUID) *ProjectMilestoneUpdate {
+	_u.mutation.RemoveGithubMilestoneLinkIDs(ids...)
+	return _u
+}
+
+// RemoveGithubMilestoneLinks removes "github_milestone_links" edges to GithubMilestoneLink entities.
+func (_u *ProjectMilestoneUpdate) RemoveGithubMilestoneLinks(v ...*GithubMilestoneLink) *ProjectMilestoneUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveGithubMilestoneLinkIDs(ids...)
+}
+
+// ClearGithubOutbox clears all "github_outbox" edges to the GithubOutbox entity.
+func (_u *ProjectMilestoneUpdate) ClearGithubOutbox() *ProjectMilestoneUpdate {
+	_u.mutation.ClearGithubOutbox()
+	return _u
+}
+
+// RemoveGithubOutboxIDs removes the "github_outbox" edge to GithubOutbox entities by IDs.
+func (_u *ProjectMilestoneUpdate) RemoveGithubOutboxIDs(ids ...int64) *ProjectMilestoneUpdate {
+	_u.mutation.RemoveGithubOutboxIDs(ids...)
+	return _u
+}
+
+// RemoveGithubOutbox removes "github_outbox" edges to GithubOutbox entities.
+func (_u *ProjectMilestoneUpdate) RemoveGithubOutbox(v ...*GithubOutbox) *ProjectMilestoneUpdate {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveGithubOutboxIDs(ids...)
+}
+
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *ProjectMilestoneUpdate) Save(ctx context.Context) (int, error) {
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
@@ -285,8 +411,8 @@ func (_u *ProjectMilestoneUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *ProjectMilestoneUpdate) check() error {
-	if _u.mutation.ProjectCleared() && len(_u.mutation.ProjectIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "ProjectMilestone.project"`)
+	if _u.mutation.WorkspaceCleared() && len(_u.mutation.WorkspaceIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "ProjectMilestone.workspace"`)
 	}
 	return nil
 }
@@ -333,6 +459,12 @@ func (_u *ProjectMilestoneUpdate) sqlSave(ctx context.Context) (_node int, err e
 	if _u.mutation.SortOrderCleared() {
 		_spec.ClearField(projectmilestone.FieldSortOrder, field.TypeFloat64)
 	}
+	if value, ok := _u.mutation.ClosedAt(); ok {
+		_spec.SetField(projectmilestone.FieldClosedAt, field.TypeTime, value)
+	}
+	if _u.mutation.ClosedAtCleared() {
+		_spec.ClearField(projectmilestone.FieldClosedAt, field.TypeTime)
+	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(projectmilestone.FieldCreatedAt, field.TypeTime, value)
 	}
@@ -344,6 +476,35 @@ func (_u *ProjectMilestoneUpdate) sqlSave(ctx context.Context) (_node int, err e
 	}
 	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(projectmilestone.FieldUpdatedAt, field.TypeTime)
+	}
+	if _u.mutation.WorkspaceCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   projectmilestone.WorkspaceTable,
+			Columns: []string{projectmilestone.WorkspaceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workspace.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.WorkspaceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   projectmilestone.WorkspaceTable,
+			Columns: []string{projectmilestone.WorkspaceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workspace.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if _u.mutation.ProjectCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -464,6 +625,96 @@ func (_u *ProjectMilestoneUpdate) sqlSave(ctx context.Context) (_node int, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.GithubMilestoneLinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   projectmilestone.GithubMilestoneLinksTable,
+			Columns: []string{projectmilestone.GithubMilestoneLinksColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githubmilestonelink.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedGithubMilestoneLinksIDs(); len(nodes) > 0 && !_u.mutation.GithubMilestoneLinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   projectmilestone.GithubMilestoneLinksTable,
+			Columns: []string{projectmilestone.GithubMilestoneLinksColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githubmilestonelink.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.GithubMilestoneLinksIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   projectmilestone.GithubMilestoneLinksTable,
+			Columns: []string{projectmilestone.GithubMilestoneLinksColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githubmilestonelink.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.GithubOutboxCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   projectmilestone.GithubOutboxTable,
+			Columns: []string{projectmilestone.GithubOutboxColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githuboutbox.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedGithubOutboxIDs(); len(nodes) > 0 && !_u.mutation.GithubOutboxCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   projectmilestone.GithubOutboxTable,
+			Columns: []string{projectmilestone.GithubOutboxColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githuboutbox.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.GithubOutboxIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   projectmilestone.GithubOutboxTable,
+			Columns: []string{projectmilestone.GithubOutboxColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githuboutbox.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -486,6 +737,20 @@ type ProjectMilestoneUpdateOne struct {
 	modifiers []func(*sql.UpdateBuilder)
 }
 
+// SetWorkspaceID sets the "workspace_id" field.
+func (_u *ProjectMilestoneUpdateOne) SetWorkspaceID(v uuid.UUID) *ProjectMilestoneUpdateOne {
+	_u.mutation.SetWorkspaceID(v)
+	return _u
+}
+
+// SetNillableWorkspaceID sets the "workspace_id" field if the given value is not nil.
+func (_u *ProjectMilestoneUpdateOne) SetNillableWorkspaceID(v *uuid.UUID) *ProjectMilestoneUpdateOne {
+	if v != nil {
+		_u.SetWorkspaceID(*v)
+	}
+	return _u
+}
+
 // SetProjectID sets the "project_id" field.
 func (_u *ProjectMilestoneUpdateOne) SetProjectID(v uuid.UUID) *ProjectMilestoneUpdateOne {
 	_u.mutation.SetProjectID(v)
@@ -497,6 +762,12 @@ func (_u *ProjectMilestoneUpdateOne) SetNillableProjectID(v *uuid.UUID) *Project
 	if v != nil {
 		_u.SetProjectID(*v)
 	}
+	return _u
+}
+
+// ClearProjectID clears the value of the "project_id" field.
+func (_u *ProjectMilestoneUpdateOne) ClearProjectID() *ProjectMilestoneUpdateOne {
+	_u.mutation.ClearProjectID()
 	return _u
 }
 
@@ -581,6 +852,26 @@ func (_u *ProjectMilestoneUpdateOne) ClearSortOrder() *ProjectMilestoneUpdateOne
 	return _u
 }
 
+// SetClosedAt sets the "closed_at" field.
+func (_u *ProjectMilestoneUpdateOne) SetClosedAt(v time.Time) *ProjectMilestoneUpdateOne {
+	_u.mutation.SetClosedAt(v)
+	return _u
+}
+
+// SetNillableClosedAt sets the "closed_at" field if the given value is not nil.
+func (_u *ProjectMilestoneUpdateOne) SetNillableClosedAt(v *time.Time) *ProjectMilestoneUpdateOne {
+	if v != nil {
+		_u.SetClosedAt(*v)
+	}
+	return _u
+}
+
+// ClearClosedAt clears the value of the "closed_at" field.
+func (_u *ProjectMilestoneUpdateOne) ClearClosedAt() *ProjectMilestoneUpdateOne {
+	_u.mutation.ClearClosedAt()
+	return _u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_u *ProjectMilestoneUpdateOne) SetCreatedAt(v time.Time) *ProjectMilestoneUpdateOne {
 	_u.mutation.SetCreatedAt(v)
@@ -621,6 +912,11 @@ func (_u *ProjectMilestoneUpdateOne) ClearUpdatedAt() *ProjectMilestoneUpdateOne
 	return _u
 }
 
+// SetWorkspace sets the "workspace" edge to the Workspace entity.
+func (_u *ProjectMilestoneUpdateOne) SetWorkspace(v *Workspace) *ProjectMilestoneUpdateOne {
+	return _u.SetWorkspaceID(v.ID)
+}
+
 // SetProject sets the "project" edge to the Project entity.
 func (_u *ProjectMilestoneUpdateOne) SetProject(v *Project) *ProjectMilestoneUpdateOne {
 	return _u.SetProjectID(v.ID)
@@ -656,9 +952,45 @@ func (_u *ProjectMilestoneUpdateOne) AddComments(v ...*Comment) *ProjectMileston
 	return _u.AddCommentIDs(ids...)
 }
 
+// AddGithubMilestoneLinkIDs adds the "github_milestone_links" edge to the GithubMilestoneLink entity by IDs.
+func (_u *ProjectMilestoneUpdateOne) AddGithubMilestoneLinkIDs(ids ...uuid.UUID) *ProjectMilestoneUpdateOne {
+	_u.mutation.AddGithubMilestoneLinkIDs(ids...)
+	return _u
+}
+
+// AddGithubMilestoneLinks adds the "github_milestone_links" edges to the GithubMilestoneLink entity.
+func (_u *ProjectMilestoneUpdateOne) AddGithubMilestoneLinks(v ...*GithubMilestoneLink) *ProjectMilestoneUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddGithubMilestoneLinkIDs(ids...)
+}
+
+// AddGithubOutboxIDs adds the "github_outbox" edge to the GithubOutbox entity by IDs.
+func (_u *ProjectMilestoneUpdateOne) AddGithubOutboxIDs(ids ...int64) *ProjectMilestoneUpdateOne {
+	_u.mutation.AddGithubOutboxIDs(ids...)
+	return _u
+}
+
+// AddGithubOutbox adds the "github_outbox" edges to the GithubOutbox entity.
+func (_u *ProjectMilestoneUpdateOne) AddGithubOutbox(v ...*GithubOutbox) *ProjectMilestoneUpdateOne {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddGithubOutboxIDs(ids...)
+}
+
 // Mutation returns the ProjectMilestoneMutation object of the builder.
 func (_u *ProjectMilestoneUpdateOne) Mutation() *ProjectMilestoneMutation {
 	return _u.mutation
+}
+
+// ClearWorkspace clears the "workspace" edge to the Workspace entity.
+func (_u *ProjectMilestoneUpdateOne) ClearWorkspace() *ProjectMilestoneUpdateOne {
+	_u.mutation.ClearWorkspace()
+	return _u
 }
 
 // ClearProject clears the "project" edge to the Project entity.
@@ -709,6 +1041,48 @@ func (_u *ProjectMilestoneUpdateOne) RemoveComments(v ...*Comment) *ProjectMiles
 	return _u.RemoveCommentIDs(ids...)
 }
 
+// ClearGithubMilestoneLinks clears all "github_milestone_links" edges to the GithubMilestoneLink entity.
+func (_u *ProjectMilestoneUpdateOne) ClearGithubMilestoneLinks() *ProjectMilestoneUpdateOne {
+	_u.mutation.ClearGithubMilestoneLinks()
+	return _u
+}
+
+// RemoveGithubMilestoneLinkIDs removes the "github_milestone_links" edge to GithubMilestoneLink entities by IDs.
+func (_u *ProjectMilestoneUpdateOne) RemoveGithubMilestoneLinkIDs(ids ...uuid.UUID) *ProjectMilestoneUpdateOne {
+	_u.mutation.RemoveGithubMilestoneLinkIDs(ids...)
+	return _u
+}
+
+// RemoveGithubMilestoneLinks removes "github_milestone_links" edges to GithubMilestoneLink entities.
+func (_u *ProjectMilestoneUpdateOne) RemoveGithubMilestoneLinks(v ...*GithubMilestoneLink) *ProjectMilestoneUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveGithubMilestoneLinkIDs(ids...)
+}
+
+// ClearGithubOutbox clears all "github_outbox" edges to the GithubOutbox entity.
+func (_u *ProjectMilestoneUpdateOne) ClearGithubOutbox() *ProjectMilestoneUpdateOne {
+	_u.mutation.ClearGithubOutbox()
+	return _u
+}
+
+// RemoveGithubOutboxIDs removes the "github_outbox" edge to GithubOutbox entities by IDs.
+func (_u *ProjectMilestoneUpdateOne) RemoveGithubOutboxIDs(ids ...int64) *ProjectMilestoneUpdateOne {
+	_u.mutation.RemoveGithubOutboxIDs(ids...)
+	return _u
+}
+
+// RemoveGithubOutbox removes "github_outbox" edges to GithubOutbox entities.
+func (_u *ProjectMilestoneUpdateOne) RemoveGithubOutbox(v ...*GithubOutbox) *ProjectMilestoneUpdateOne {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveGithubOutboxIDs(ids...)
+}
+
 // Where appends a list predicates to the ProjectMilestoneUpdate builder.
 func (_u *ProjectMilestoneUpdateOne) Where(ps ...predicate.ProjectMilestone) *ProjectMilestoneUpdateOne {
 	_u.mutation.Where(ps...)
@@ -751,8 +1125,8 @@ func (_u *ProjectMilestoneUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *ProjectMilestoneUpdateOne) check() error {
-	if _u.mutation.ProjectCleared() && len(_u.mutation.ProjectIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "ProjectMilestone.project"`)
+	if _u.mutation.WorkspaceCleared() && len(_u.mutation.WorkspaceIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "ProjectMilestone.workspace"`)
 	}
 	return nil
 }
@@ -816,6 +1190,12 @@ func (_u *ProjectMilestoneUpdateOne) sqlSave(ctx context.Context) (_node *Projec
 	if _u.mutation.SortOrderCleared() {
 		_spec.ClearField(projectmilestone.FieldSortOrder, field.TypeFloat64)
 	}
+	if value, ok := _u.mutation.ClosedAt(); ok {
+		_spec.SetField(projectmilestone.FieldClosedAt, field.TypeTime, value)
+	}
+	if _u.mutation.ClosedAtCleared() {
+		_spec.ClearField(projectmilestone.FieldClosedAt, field.TypeTime)
+	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(projectmilestone.FieldCreatedAt, field.TypeTime, value)
 	}
@@ -827,6 +1207,35 @@ func (_u *ProjectMilestoneUpdateOne) sqlSave(ctx context.Context) (_node *Projec
 	}
 	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(projectmilestone.FieldUpdatedAt, field.TypeTime)
+	}
+	if _u.mutation.WorkspaceCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   projectmilestone.WorkspaceTable,
+			Columns: []string{projectmilestone.WorkspaceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workspace.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.WorkspaceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   projectmilestone.WorkspaceTable,
+			Columns: []string{projectmilestone.WorkspaceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workspace.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if _u.mutation.ProjectCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -940,6 +1349,96 @@ func (_u *ProjectMilestoneUpdateOne) sqlSave(ctx context.Context) (_node *Projec
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.GithubMilestoneLinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   projectmilestone.GithubMilestoneLinksTable,
+			Columns: []string{projectmilestone.GithubMilestoneLinksColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githubmilestonelink.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedGithubMilestoneLinksIDs(); len(nodes) > 0 && !_u.mutation.GithubMilestoneLinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   projectmilestone.GithubMilestoneLinksTable,
+			Columns: []string{projectmilestone.GithubMilestoneLinksColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githubmilestonelink.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.GithubMilestoneLinksIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   projectmilestone.GithubMilestoneLinksTable,
+			Columns: []string{projectmilestone.GithubMilestoneLinksColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githubmilestonelink.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.GithubOutboxCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   projectmilestone.GithubOutboxTable,
+			Columns: []string{projectmilestone.GithubOutboxColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githuboutbox.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedGithubOutboxIDs(); len(nodes) > 0 && !_u.mutation.GithubOutboxCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   projectmilestone.GithubOutboxTable,
+			Columns: []string{projectmilestone.GithubOutboxColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githuboutbox.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.GithubOutboxIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   projectmilestone.GithubOutboxTable,
+			Columns: []string{projectmilestone.GithubOutboxColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githuboutbox.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

@@ -108,25 +108,36 @@ type NewRepoSync struct {
 	Team         uuid.UUID
 	Project      *uuid.UUID
 	LinkBack     bool
+	CreateIssues bool
+	SyncFields   bool
 }
 
 func (self *GitHubRepository) CreateRepoSync(ctx context.Context, input NewRepoSync) (uuid.UUID, error) {
 	created, err := self.base.DB.GithubRepoSync.Create().
 		SetWorkspaceID(input.Workspace).SetInstallationID(input.Installation).SetRepoID(input.RepoID).
-		SetFullName(input.FullName).SetTeamID(input.Team).SetNillableProjectID(input.Project).SetLinkBack(input.LinkBack).Save(ctx)
+		SetFullName(input.FullName).SetTeamID(input.Team).SetNillableProjectID(input.Project).SetLinkBack(input.LinkBack).
+		SetCreateIssues(input.CreateIssues).SetSyncFields(input.SyncFields).Save(ctx)
 	if err != nil {
 		return uuid.Nil, err
 	}
 	return created.ID, nil
 }
 
-// ChangeRepoSync moves a sync to team when given and, when setProject, to project.
-func (self *GitHubRepository) ChangeRepoSync(ctx context.Context, id uuid.UUID, team *uuid.UUID, setProject bool, project *uuid.UUID, linkBack *bool) error {
-	update := self.base.DB.GithubRepoSync.Update().Where(githubreposync.ID(id)).SetNillableTeamID(team).SetNillableLinkBack(linkBack).
+// RepoSyncChange is what changes on a sync; nil fields stay, the project only when SetProject.
+type RepoSyncChange struct {
+	Team                               *uuid.UUID
+	SetProject                         bool
+	Project                            *uuid.UUID
+	LinkBack, CreateIssues, SyncFields *bool
+}
+
+func (self *GitHubRepository) ChangeRepoSync(ctx context.Context, id uuid.UUID, change RepoSyncChange) error {
+	update := self.base.DB.GithubRepoSync.Update().Where(githubreposync.ID(id)).SetNillableTeamID(change.Team).
+		SetNillableLinkBack(change.LinkBack).SetNillableCreateIssues(change.CreateIssues).SetNillableSyncFields(change.SyncFields).
 		Modify(func(u *entsql.UpdateBuilder) { u.Set(githubreposync.FieldUpdatedAt, now()) })
-	if setProject {
-		update.SetNillableProjectID(project)
-		if project == nil {
+	if change.SetProject {
+		update.SetNillableProjectID(change.Project)
+		if change.Project == nil {
 			update.ClearProjectID()
 		}
 	}

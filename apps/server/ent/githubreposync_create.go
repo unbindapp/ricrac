@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"ricrac/ent/githubinstallation"
 	"ricrac/ent/githubissuelink"
+	"ricrac/ent/githubmilestonelink"
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/githubreposync"
 	"ricrac/ent/project"
@@ -84,6 +85,34 @@ func (_c *GithubRepoSyncCreate) SetLinkBack(v bool) *GithubRepoSyncCreate {
 func (_c *GithubRepoSyncCreate) SetNillableLinkBack(v *bool) *GithubRepoSyncCreate {
 	if v != nil {
 		_c.SetLinkBack(*v)
+	}
+	return _c
+}
+
+// SetCreateIssues sets the "create_issues" field.
+func (_c *GithubRepoSyncCreate) SetCreateIssues(v bool) *GithubRepoSyncCreate {
+	_c.mutation.SetCreateIssues(v)
+	return _c
+}
+
+// SetNillableCreateIssues sets the "create_issues" field if the given value is not nil.
+func (_c *GithubRepoSyncCreate) SetNillableCreateIssues(v *bool) *GithubRepoSyncCreate {
+	if v != nil {
+		_c.SetCreateIssues(*v)
+	}
+	return _c
+}
+
+// SetSyncFields sets the "sync_fields" field.
+func (_c *GithubRepoSyncCreate) SetSyncFields(v bool) *GithubRepoSyncCreate {
+	_c.mutation.SetSyncFields(v)
+	return _c
+}
+
+// SetNillableSyncFields sets the "sync_fields" field if the given value is not nil.
+func (_c *GithubRepoSyncCreate) SetNillableSyncFields(v *bool) *GithubRepoSyncCreate {
+	if v != nil {
+		_c.SetSyncFields(*v)
 	}
 	return _c
 }
@@ -214,6 +243,20 @@ func (_c *GithubRepoSyncCreate) SetNillableLastSyncedAt(v *time.Time) *GithubRep
 	return _c
 }
 
+// SetMilestonesSyncedAt sets the "milestones_synced_at" field.
+func (_c *GithubRepoSyncCreate) SetMilestonesSyncedAt(v time.Time) *GithubRepoSyncCreate {
+	_c.mutation.SetMilestonesSyncedAt(v)
+	return _c
+}
+
+// SetNillableMilestonesSyncedAt sets the "milestones_synced_at" field if the given value is not nil.
+func (_c *GithubRepoSyncCreate) SetNillableMilestonesSyncedAt(v *time.Time) *GithubRepoSyncCreate {
+	if v != nil {
+		_c.SetMilestonesSyncedAt(*v)
+	}
+	return _c
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_c *GithubRepoSyncCreate) SetCreatedAt(v time.Time) *GithubRepoSyncCreate {
 	_c.mutation.SetCreatedAt(v)
@@ -304,6 +347,21 @@ func (_c *GithubRepoSyncCreate) AddGithubOutbox(v ...*GithubOutbox) *GithubRepoS
 		ids[i] = v[i].ID
 	}
 	return _c.AddGithubOutboxIDs(ids...)
+}
+
+// AddGithubMilestoneLinkIDs adds the "github_milestone_links" edge to the GithubMilestoneLink entity by IDs.
+func (_c *GithubRepoSyncCreate) AddGithubMilestoneLinkIDs(ids ...uuid.UUID) *GithubRepoSyncCreate {
+	_c.mutation.AddGithubMilestoneLinkIDs(ids...)
+	return _c
+}
+
+// AddGithubMilestoneLinks adds the "github_milestone_links" edges to the GithubMilestoneLink entity.
+func (_c *GithubRepoSyncCreate) AddGithubMilestoneLinks(v ...*GithubMilestoneLink) *GithubRepoSyncCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddGithubMilestoneLinkIDs(ids...)
 }
 
 // Mutation returns the GithubRepoSyncMutation object of the builder.
@@ -421,6 +479,14 @@ func (_c *GithubRepoSyncCreate) createSpec() (*GithubRepoSync, *sqlgraph.CreateS
 		_spec.SetField(githubreposync.FieldLinkBack, field.TypeBool, value)
 		_node.LinkBack = value
 	}
+	if value, ok := _c.mutation.CreateIssues(); ok {
+		_spec.SetField(githubreposync.FieldCreateIssues, field.TypeBool, value)
+		_node.CreateIssues = value
+	}
+	if value, ok := _c.mutation.SyncFields(); ok {
+		_spec.SetField(githubreposync.FieldSyncFields, field.TypeBool, value)
+		_node.SyncFields = value
+	}
 	if value, ok := _c.mutation.BackfillStatus(); ok {
 		_spec.SetField(githubreposync.FieldBackfillStatus, field.TypeString, value)
 		_node.BackfillStatus = &value
@@ -456,6 +522,10 @@ func (_c *GithubRepoSyncCreate) createSpec() (*GithubRepoSync, *sqlgraph.CreateS
 	if value, ok := _c.mutation.LastSyncedAt(); ok {
 		_spec.SetField(githubreposync.FieldLastSyncedAt, field.TypeTime, value)
 		_node.LastSyncedAt = &value
+	}
+	if value, ok := _c.mutation.MilestonesSyncedAt(); ok {
+		_spec.SetField(githubreposync.FieldMilestonesSyncedAt, field.TypeTime, value)
+		_node.MilestonesSyncedAt = &value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(githubreposync.FieldCreatedAt, field.TypeTime, value)
@@ -558,6 +628,22 @@ func (_c *GithubRepoSyncCreate) createSpec() (*GithubRepoSync, *sqlgraph.CreateS
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(githuboutbox.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.GithubMilestoneLinksIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   githubreposync.GithubMilestoneLinksTable,
+			Columns: []string{githubreposync.GithubMilestoneLinksColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githubmilestonelink.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -716,6 +802,42 @@ func (u *GithubRepoSyncUpsert) UpdateLinkBack() *GithubRepoSyncUpsert {
 // ClearLinkBack clears the value of the "link_back" field.
 func (u *GithubRepoSyncUpsert) ClearLinkBack() *GithubRepoSyncUpsert {
 	u.SetNull(githubreposync.FieldLinkBack)
+	return u
+}
+
+// SetCreateIssues sets the "create_issues" field.
+func (u *GithubRepoSyncUpsert) SetCreateIssues(v bool) *GithubRepoSyncUpsert {
+	u.Set(githubreposync.FieldCreateIssues, v)
+	return u
+}
+
+// UpdateCreateIssues sets the "create_issues" field to the value that was provided on create.
+func (u *GithubRepoSyncUpsert) UpdateCreateIssues() *GithubRepoSyncUpsert {
+	u.SetExcluded(githubreposync.FieldCreateIssues)
+	return u
+}
+
+// ClearCreateIssues clears the value of the "create_issues" field.
+func (u *GithubRepoSyncUpsert) ClearCreateIssues() *GithubRepoSyncUpsert {
+	u.SetNull(githubreposync.FieldCreateIssues)
+	return u
+}
+
+// SetSyncFields sets the "sync_fields" field.
+func (u *GithubRepoSyncUpsert) SetSyncFields(v bool) *GithubRepoSyncUpsert {
+	u.Set(githubreposync.FieldSyncFields, v)
+	return u
+}
+
+// UpdateSyncFields sets the "sync_fields" field to the value that was provided on create.
+func (u *GithubRepoSyncUpsert) UpdateSyncFields() *GithubRepoSyncUpsert {
+	u.SetExcluded(githubreposync.FieldSyncFields)
+	return u
+}
+
+// ClearSyncFields clears the value of the "sync_fields" field.
+func (u *GithubRepoSyncUpsert) ClearSyncFields() *GithubRepoSyncUpsert {
+	u.SetNull(githubreposync.FieldSyncFields)
 	return u
 }
 
@@ -908,6 +1030,24 @@ func (u *GithubRepoSyncUpsert) UpdateLastSyncedAt() *GithubRepoSyncUpsert {
 // ClearLastSyncedAt clears the value of the "last_synced_at" field.
 func (u *GithubRepoSyncUpsert) ClearLastSyncedAt() *GithubRepoSyncUpsert {
 	u.SetNull(githubreposync.FieldLastSyncedAt)
+	return u
+}
+
+// SetMilestonesSyncedAt sets the "milestones_synced_at" field.
+func (u *GithubRepoSyncUpsert) SetMilestonesSyncedAt(v time.Time) *GithubRepoSyncUpsert {
+	u.Set(githubreposync.FieldMilestonesSyncedAt, v)
+	return u
+}
+
+// UpdateMilestonesSyncedAt sets the "milestones_synced_at" field to the value that was provided on create.
+func (u *GithubRepoSyncUpsert) UpdateMilestonesSyncedAt() *GithubRepoSyncUpsert {
+	u.SetExcluded(githubreposync.FieldMilestonesSyncedAt)
+	return u
+}
+
+// ClearMilestonesSyncedAt clears the value of the "milestones_synced_at" field.
+func (u *GithubRepoSyncUpsert) ClearMilestonesSyncedAt() *GithubRepoSyncUpsert {
+	u.SetNull(githubreposync.FieldMilestonesSyncedAt)
 	return u
 }
 
@@ -1111,6 +1251,48 @@ func (u *GithubRepoSyncUpsertOne) UpdateLinkBack() *GithubRepoSyncUpsertOne {
 func (u *GithubRepoSyncUpsertOne) ClearLinkBack() *GithubRepoSyncUpsertOne {
 	return u.Update(func(s *GithubRepoSyncUpsert) {
 		s.ClearLinkBack()
+	})
+}
+
+// SetCreateIssues sets the "create_issues" field.
+func (u *GithubRepoSyncUpsertOne) SetCreateIssues(v bool) *GithubRepoSyncUpsertOne {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.SetCreateIssues(v)
+	})
+}
+
+// UpdateCreateIssues sets the "create_issues" field to the value that was provided on create.
+func (u *GithubRepoSyncUpsertOne) UpdateCreateIssues() *GithubRepoSyncUpsertOne {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.UpdateCreateIssues()
+	})
+}
+
+// ClearCreateIssues clears the value of the "create_issues" field.
+func (u *GithubRepoSyncUpsertOne) ClearCreateIssues() *GithubRepoSyncUpsertOne {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.ClearCreateIssues()
+	})
+}
+
+// SetSyncFields sets the "sync_fields" field.
+func (u *GithubRepoSyncUpsertOne) SetSyncFields(v bool) *GithubRepoSyncUpsertOne {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.SetSyncFields(v)
+	})
+}
+
+// UpdateSyncFields sets the "sync_fields" field to the value that was provided on create.
+func (u *GithubRepoSyncUpsertOne) UpdateSyncFields() *GithubRepoSyncUpsertOne {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.UpdateSyncFields()
+	})
+}
+
+// ClearSyncFields clears the value of the "sync_fields" field.
+func (u *GithubRepoSyncUpsertOne) ClearSyncFields() *GithubRepoSyncUpsertOne {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.ClearSyncFields()
 	})
 }
 
@@ -1335,6 +1517,27 @@ func (u *GithubRepoSyncUpsertOne) UpdateLastSyncedAt() *GithubRepoSyncUpsertOne 
 func (u *GithubRepoSyncUpsertOne) ClearLastSyncedAt() *GithubRepoSyncUpsertOne {
 	return u.Update(func(s *GithubRepoSyncUpsert) {
 		s.ClearLastSyncedAt()
+	})
+}
+
+// SetMilestonesSyncedAt sets the "milestones_synced_at" field.
+func (u *GithubRepoSyncUpsertOne) SetMilestonesSyncedAt(v time.Time) *GithubRepoSyncUpsertOne {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.SetMilestonesSyncedAt(v)
+	})
+}
+
+// UpdateMilestonesSyncedAt sets the "milestones_synced_at" field to the value that was provided on create.
+func (u *GithubRepoSyncUpsertOne) UpdateMilestonesSyncedAt() *GithubRepoSyncUpsertOne {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.UpdateMilestonesSyncedAt()
+	})
+}
+
+// ClearMilestonesSyncedAt clears the value of the "milestones_synced_at" field.
+func (u *GithubRepoSyncUpsertOne) ClearMilestonesSyncedAt() *GithubRepoSyncUpsertOne {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.ClearMilestonesSyncedAt()
 	})
 }
 
@@ -1714,6 +1917,48 @@ func (u *GithubRepoSyncUpsertBulk) ClearLinkBack() *GithubRepoSyncUpsertBulk {
 	})
 }
 
+// SetCreateIssues sets the "create_issues" field.
+func (u *GithubRepoSyncUpsertBulk) SetCreateIssues(v bool) *GithubRepoSyncUpsertBulk {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.SetCreateIssues(v)
+	})
+}
+
+// UpdateCreateIssues sets the "create_issues" field to the value that was provided on create.
+func (u *GithubRepoSyncUpsertBulk) UpdateCreateIssues() *GithubRepoSyncUpsertBulk {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.UpdateCreateIssues()
+	})
+}
+
+// ClearCreateIssues clears the value of the "create_issues" field.
+func (u *GithubRepoSyncUpsertBulk) ClearCreateIssues() *GithubRepoSyncUpsertBulk {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.ClearCreateIssues()
+	})
+}
+
+// SetSyncFields sets the "sync_fields" field.
+func (u *GithubRepoSyncUpsertBulk) SetSyncFields(v bool) *GithubRepoSyncUpsertBulk {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.SetSyncFields(v)
+	})
+}
+
+// UpdateSyncFields sets the "sync_fields" field to the value that was provided on create.
+func (u *GithubRepoSyncUpsertBulk) UpdateSyncFields() *GithubRepoSyncUpsertBulk {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.UpdateSyncFields()
+	})
+}
+
+// ClearSyncFields clears the value of the "sync_fields" field.
+func (u *GithubRepoSyncUpsertBulk) ClearSyncFields() *GithubRepoSyncUpsertBulk {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.ClearSyncFields()
+	})
+}
+
 // SetBackfillStatus sets the "backfill_status" field.
 func (u *GithubRepoSyncUpsertBulk) SetBackfillStatus(v string) *GithubRepoSyncUpsertBulk {
 	return u.Update(func(s *GithubRepoSyncUpsert) {
@@ -1935,6 +2180,27 @@ func (u *GithubRepoSyncUpsertBulk) UpdateLastSyncedAt() *GithubRepoSyncUpsertBul
 func (u *GithubRepoSyncUpsertBulk) ClearLastSyncedAt() *GithubRepoSyncUpsertBulk {
 	return u.Update(func(s *GithubRepoSyncUpsert) {
 		s.ClearLastSyncedAt()
+	})
+}
+
+// SetMilestonesSyncedAt sets the "milestones_synced_at" field.
+func (u *GithubRepoSyncUpsertBulk) SetMilestonesSyncedAt(v time.Time) *GithubRepoSyncUpsertBulk {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.SetMilestonesSyncedAt(v)
+	})
+}
+
+// UpdateMilestonesSyncedAt sets the "milestones_synced_at" field to the value that was provided on create.
+func (u *GithubRepoSyncUpsertBulk) UpdateMilestonesSyncedAt() *GithubRepoSyncUpsertBulk {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.UpdateMilestonesSyncedAt()
+	})
+}
+
+// ClearMilestonesSyncedAt clears the value of the "milestones_synced_at" field.
+func (u *GithubRepoSyncUpsertBulk) ClearMilestonesSyncedAt() *GithubRepoSyncUpsertBulk {
+	return u.Update(func(s *GithubRepoSyncUpsert) {
+		s.ClearMilestonesSyncedAt()
 	})
 }
 

@@ -11,6 +11,7 @@ import (
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/githubreposync"
 	"ricrac/ent/issue"
+	"ricrac/ent/projectmilestone"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -77,6 +78,20 @@ func (_c *GithubOutboxCreate) SetGithubCommentID(v int64) *GithubOutboxCreate {
 func (_c *GithubOutboxCreate) SetNillableGithubCommentID(v *int64) *GithubOutboxCreate {
 	if v != nil {
 		_c.SetGithubCommentID(*v)
+	}
+	return _c
+}
+
+// SetMilestoneID sets the "milestone_id" field.
+func (_c *GithubOutboxCreate) SetMilestoneID(v uuid.UUID) *GithubOutboxCreate {
+	_c.mutation.SetMilestoneID(v)
+	return _c
+}
+
+// SetNillableMilestoneID sets the "milestone_id" field if the given value is not nil.
+func (_c *GithubOutboxCreate) SetNillableMilestoneID(v *uuid.UUID) *GithubOutboxCreate {
+	if v != nil {
+		_c.SetMilestoneID(*v)
 	}
 	return _c
 }
@@ -168,6 +183,11 @@ func (_c *GithubOutboxCreate) SetIssue(v *Issue) *GithubOutboxCreate {
 // SetComment sets the "comment" edge to the Comment entity.
 func (_c *GithubOutboxCreate) SetComment(v *Comment) *GithubOutboxCreate {
 	return _c.SetCommentID(v.ID)
+}
+
+// SetMilestone sets the "milestone" edge to the ProjectMilestone entity.
+func (_c *GithubOutboxCreate) SetMilestone(v *ProjectMilestone) *GithubOutboxCreate {
+	return _c.SetMilestoneID(v.ID)
 }
 
 // Mutation returns the GithubOutboxMutation object of the builder.
@@ -332,6 +352,23 @@ func (_c *GithubOutboxCreate) createSpec() (*GithubOutbox, *sqlgraph.CreateSpec)
 		_node.CommentID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := _c.mutation.MilestoneIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   githuboutbox.MilestoneTable,
+			Columns: []string{githuboutbox.MilestoneColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(projectmilestone.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.MilestoneID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	return _node, _spec
 }
 
@@ -471,6 +508,24 @@ func (u *GithubOutboxUpsert) AddGithubCommentID(v int64) *GithubOutboxUpsert {
 // ClearGithubCommentID clears the value of the "github_comment_id" field.
 func (u *GithubOutboxUpsert) ClearGithubCommentID() *GithubOutboxUpsert {
 	u.SetNull(githuboutbox.FieldGithubCommentID)
+	return u
+}
+
+// SetMilestoneID sets the "milestone_id" field.
+func (u *GithubOutboxUpsert) SetMilestoneID(v uuid.UUID) *GithubOutboxUpsert {
+	u.Set(githuboutbox.FieldMilestoneID, v)
+	return u
+}
+
+// UpdateMilestoneID sets the "milestone_id" field to the value that was provided on create.
+func (u *GithubOutboxUpsert) UpdateMilestoneID() *GithubOutboxUpsert {
+	u.SetExcluded(githuboutbox.FieldMilestoneID)
+	return u
+}
+
+// ClearMilestoneID clears the value of the "milestone_id" field.
+func (u *GithubOutboxUpsert) ClearMilestoneID() *GithubOutboxUpsert {
+	u.SetNull(githuboutbox.FieldMilestoneID)
 	return u
 }
 
@@ -732,6 +787,27 @@ func (u *GithubOutboxUpsertOne) UpdateGithubCommentID() *GithubOutboxUpsertOne {
 func (u *GithubOutboxUpsertOne) ClearGithubCommentID() *GithubOutboxUpsertOne {
 	return u.Update(func(s *GithubOutboxUpsert) {
 		s.ClearGithubCommentID()
+	})
+}
+
+// SetMilestoneID sets the "milestone_id" field.
+func (u *GithubOutboxUpsertOne) SetMilestoneID(v uuid.UUID) *GithubOutboxUpsertOne {
+	return u.Update(func(s *GithubOutboxUpsert) {
+		s.SetMilestoneID(v)
+	})
+}
+
+// UpdateMilestoneID sets the "milestone_id" field to the value that was provided on create.
+func (u *GithubOutboxUpsertOne) UpdateMilestoneID() *GithubOutboxUpsertOne {
+	return u.Update(func(s *GithubOutboxUpsert) {
+		s.UpdateMilestoneID()
+	})
+}
+
+// ClearMilestoneID clears the value of the "milestone_id" field.
+func (u *GithubOutboxUpsertOne) ClearMilestoneID() *GithubOutboxUpsertOne {
+	return u.Update(func(s *GithubOutboxUpsert) {
+		s.ClearMilestoneID()
 	})
 }
 
@@ -1176,6 +1252,27 @@ func (u *GithubOutboxUpsertBulk) UpdateGithubCommentID() *GithubOutboxUpsertBulk
 func (u *GithubOutboxUpsertBulk) ClearGithubCommentID() *GithubOutboxUpsertBulk {
 	return u.Update(func(s *GithubOutboxUpsert) {
 		s.ClearGithubCommentID()
+	})
+}
+
+// SetMilestoneID sets the "milestone_id" field.
+func (u *GithubOutboxUpsertBulk) SetMilestoneID(v uuid.UUID) *GithubOutboxUpsertBulk {
+	return u.Update(func(s *GithubOutboxUpsert) {
+		s.SetMilestoneID(v)
+	})
+}
+
+// UpdateMilestoneID sets the "milestone_id" field to the value that was provided on create.
+func (u *GithubOutboxUpsertBulk) UpdateMilestoneID() *GithubOutboxUpsertBulk {
+	return u.Update(func(s *GithubOutboxUpsert) {
+		s.UpdateMilestoneID()
+	})
+}
+
+// ClearMilestoneID clears the value of the "milestone_id" field.
+func (u *GithubOutboxUpsertBulk) ClearMilestoneID() *GithubOutboxUpsertBulk {
+	return u.Update(func(s *GithubOutboxUpsert) {
+		s.ClearMilestoneID()
 	})
 }
 

@@ -9,6 +9,7 @@ import {
   EMPTY_DRAFT,
   type TIssueDraft,
 } from "@/components/issues/issue-draft";
+import { GithubRepositoryPicker } from "@/components/issues/github-repository-picker";
 import { IssueProperties } from "@/components/issues/issue-properties";
 import { type TNewIssueDefaults, useNewIssueStore } from "@/components/issues/new-issue-store";
 import { useTeamDetail, useWorkspaceUsers } from "@/components/issues/picker-sources";
@@ -45,6 +46,7 @@ function NewIssueForm({ defaults, onClose }: { defaults: TNewIssueDefaults; onCl
   const [patch, setPatch] = useState<Partial<TIssueDraft>>({});
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [githubRepository, setGithubRepository] = useState<string>();
   const [createMore, setCreateMore] = useState(false);
   const [formKey, setFormKey] = useState(0);
   const titleRef = useRef<HTMLInputElement>(null);
@@ -69,7 +71,8 @@ function NewIssueForm({ defaults, onClose }: { defaults: TNewIssueDefaults; onCl
   const submit = async () => {
     if (!teamId || !title.trim() || submittingRef.current || uploads.isUploading) return;
     submittingRef.current = true;
-    const created = await createIssue(draftToCreateArgs({ teamId, title, description, draft }))
+    const args = draftToCreateArgs({ teamId, title, description, draft });
+    const created = await createIssue(githubRepository ? { ...args, githubRepository } : args)
       .catch(() => null)
       .finally(() => {
         submittingRef.current = false;
@@ -164,6 +167,14 @@ function NewIssueForm({ defaults, onClose }: { defaults: TNewIssueDefaults; onCl
           value={draft}
           omit={["parent"]}
           onChange={(next) => setPatch((current) => ({ ...current, ...next }))}
+          extraChips={
+            <GithubRepositoryPicker
+              teamId={teamId}
+              projectId={draft.project?.id}
+              value={githubRepository}
+              onChange={setGithubRepository}
+            />
+          }
         />
       )}
       <DialogFooter className="dank:border-t-0 dank:pt-0 items-center border-t pt-4">

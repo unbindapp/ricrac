@@ -22,6 +22,7 @@ import (
 	mocks_services_comment "ricrac/mocks/services/comment"
 	mocks_services_events "ricrac/mocks/services/events"
 	mocks_services_issue "ricrac/mocks/services/issue"
+	mocks_services_milestone "ricrac/mocks/services/milestone"
 	mocks_services_resolve "ricrac/mocks/services/resolve"
 )
 
@@ -38,7 +39,8 @@ func (suite *GitHubServiceSuite) SetupTest() {
 	suite.issues = mocks_services_issue.NewIssueServiceMock(suite.T())
 	suite.service = NewGitHubService(cfg, auth.NewKeys(cfg), suite.MockRepo, mocks_services_access.NewAccessServiceMock(suite.T()),
 		mocks_services_resolve.NewResolveServiceMock(suite.T()), mocks_services_events.NewEventsServiceMock(suite.T()), suite.issues,
-		mocks_services_comment.NewCommentServiceMock(suite.T()), mocks_services_attachment.NewAttachmentServiceMock(suite.T()), nil)
+		mocks_services_comment.NewCommentServiceMock(suite.T()), mocks_services_attachment.NewAttachmentServiceMock(suite.T()),
+		mocks_services_milestone.NewMilestoneServiceMock(suite.T()), nil)
 	suite.service.SetApp(github.NewApp(github.Config{Slug: "ricrac", WebhookSecret: "whsec", WebURL: "https://github.com"}, nil))
 	suite.actor = auth.NewActor(uuid.New(), uuid.New(), auth.Admin, auth.EveryAccess, nil,
 		func(context.Context, *auth.Actor) ([]uuid.UUID, error) { return nil, nil })
@@ -135,12 +137,12 @@ func (suite *GitHubServiceSuite) TestSyncsKeepTheirRepository() {
 func (suite *GitHubServiceSuite) TestEditsOnGitHubChangeOnlyWhatDiffers() {
 	row := &ent.Issue{ID: uuid.New(), Title: "Logs stop", Description: "After ten minutes."}
 	event := &github.IssuesEvent{Action: "edited", Issue: github.Issue{Title: "  Logs stop ", Body: "After ten minutes."}}
-	input, _, err := suite.service.issueChange(suite.Ctx, suite.actor, row, event)
+	input, _, err := suite.service.issueChange(suite.Ctx, suite.actor, nil, row, event)
 	suite.NoError(err)
 	suite.Nil(input)
 
 	event.Issue.Body = "After 10 minutes."
-	input, label, err := suite.service.issueChange(suite.Ctx, suite.actor, row, event)
+	input, label, err := suite.service.issueChange(suite.Ctx, suite.actor, nil, row, event)
 	suite.NoError(err)
 	suite.Equal("Edited on GitHub", label)
 	suite.Nil(input.Title)
@@ -151,7 +153,7 @@ func (suite *GitHubServiceSuite) TestClosingOnGitHubLeavesIssuesClosedTheSameWay
 	row := &ent.Issue{ID: uuid.New(), StateID: uuid.New(), TeamID: uuid.New()}
 	suite.issues.EXPECT().StateType(mock.Anything, mock.Anything, row.StateID).Return("canceled", nil)
 	event := &github.IssuesEvent{Action: "closed", Issue: github.Issue{State: "closed", StateReason: "duplicate"}}
-	input, _, err := suite.service.issueChange(suite.Ctx, suite.actor, row, event)
+	input, _, err := suite.service.issueChange(suite.Ctx, suite.actor, nil, row, event)
 	suite.NoError(err)
 	suite.Nil(input)
 }
@@ -162,7 +164,7 @@ func (suite *GitHubServiceSuite) TestAssigningOnGitHubSkipsTheCurrentAssignee() 
 	suite.MockGitHubRepo.EXPECT().MemberByLogin(mock.Anything, suite.actor.Workspace, "eve-gh").Return(assignee, true, nil)
 	suite.MockGitHubRepo.EXPECT().CanSeeTeam(mock.Anything, row.TeamID, assignee).Return(true, nil)
 	event := &github.IssuesEvent{Action: "assigned", Assignee: &github.Account{Login: "Eve-GH"}}
-	input, _, err := suite.service.issueChange(suite.Ctx, suite.actor, row, event)
+	input, _, err := suite.service.issueChange(suite.Ctx, suite.actor, nil, row, event)
 	suite.NoError(err)
 	suite.Nil(input)
 }

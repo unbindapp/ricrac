@@ -7,9 +7,12 @@ import (
 	"errors"
 	"fmt"
 	"ricrac/ent/comment"
+	"ricrac/ent/githubmilestonelink"
+	"ricrac/ent/githuboutbox"
 	"ricrac/ent/issue"
 	"ricrac/ent/project"
 	"ricrac/ent/projectmilestone"
+	"ricrac/ent/workspace"
 	"time"
 
 	"entgo.io/ent/dialect"
@@ -27,9 +30,23 @@ type ProjectMilestoneCreate struct {
 	conflict []sql.ConflictOption
 }
 
+// SetWorkspaceID sets the "workspace_id" field.
+func (_c *ProjectMilestoneCreate) SetWorkspaceID(v uuid.UUID) *ProjectMilestoneCreate {
+	_c.mutation.SetWorkspaceID(v)
+	return _c
+}
+
 // SetProjectID sets the "project_id" field.
 func (_c *ProjectMilestoneCreate) SetProjectID(v uuid.UUID) *ProjectMilestoneCreate {
 	_c.mutation.SetProjectID(v)
+	return _c
+}
+
+// SetNillableProjectID sets the "project_id" field if the given value is not nil.
+func (_c *ProjectMilestoneCreate) SetNillableProjectID(v *uuid.UUID) *ProjectMilestoneCreate {
+	if v != nil {
+		_c.SetProjectID(*v)
+	}
 	return _c
 }
 
@@ -81,6 +98,20 @@ func (_c *ProjectMilestoneCreate) SetNillableSortOrder(v *float64) *ProjectMiles
 	return _c
 }
 
+// SetClosedAt sets the "closed_at" field.
+func (_c *ProjectMilestoneCreate) SetClosedAt(v time.Time) *ProjectMilestoneCreate {
+	_c.mutation.SetClosedAt(v)
+	return _c
+}
+
+// SetNillableClosedAt sets the "closed_at" field if the given value is not nil.
+func (_c *ProjectMilestoneCreate) SetNillableClosedAt(v *time.Time) *ProjectMilestoneCreate {
+	if v != nil {
+		_c.SetClosedAt(*v)
+	}
+	return _c
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_c *ProjectMilestoneCreate) SetCreatedAt(v time.Time) *ProjectMilestoneCreate {
 	_c.mutation.SetCreatedAt(v)
@@ -123,6 +154,11 @@ func (_c *ProjectMilestoneCreate) SetNillableID(v *uuid.UUID) *ProjectMilestoneC
 	return _c
 }
 
+// SetWorkspace sets the "workspace" edge to the Workspace entity.
+func (_c *ProjectMilestoneCreate) SetWorkspace(v *Workspace) *ProjectMilestoneCreate {
+	return _c.SetWorkspaceID(v.ID)
+}
+
 // SetProject sets the "project" edge to the Project entity.
 func (_c *ProjectMilestoneCreate) SetProject(v *Project) *ProjectMilestoneCreate {
 	return _c.SetProjectID(v.ID)
@@ -156,6 +192,36 @@ func (_c *ProjectMilestoneCreate) AddComments(v ...*Comment) *ProjectMilestoneCr
 		ids[i] = v[i].ID
 	}
 	return _c.AddCommentIDs(ids...)
+}
+
+// AddGithubMilestoneLinkIDs adds the "github_milestone_links" edge to the GithubMilestoneLink entity by IDs.
+func (_c *ProjectMilestoneCreate) AddGithubMilestoneLinkIDs(ids ...uuid.UUID) *ProjectMilestoneCreate {
+	_c.mutation.AddGithubMilestoneLinkIDs(ids...)
+	return _c
+}
+
+// AddGithubMilestoneLinks adds the "github_milestone_links" edges to the GithubMilestoneLink entity.
+func (_c *ProjectMilestoneCreate) AddGithubMilestoneLinks(v ...*GithubMilestoneLink) *ProjectMilestoneCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddGithubMilestoneLinkIDs(ids...)
+}
+
+// AddGithubOutboxIDs adds the "github_outbox" edge to the GithubOutbox entity by IDs.
+func (_c *ProjectMilestoneCreate) AddGithubOutboxIDs(ids ...int64) *ProjectMilestoneCreate {
+	_c.mutation.AddGithubOutboxIDs(ids...)
+	return _c
+}
+
+// AddGithubOutbox adds the "github_outbox" edges to the GithubOutbox entity.
+func (_c *ProjectMilestoneCreate) AddGithubOutbox(v ...*GithubOutbox) *ProjectMilestoneCreate {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddGithubOutboxIDs(ids...)
 }
 
 // Mutation returns the ProjectMilestoneMutation object of the builder.
@@ -201,14 +267,14 @@ func (_c *ProjectMilestoneCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *ProjectMilestoneCreate) check() error {
-	if _, ok := _c.mutation.ProjectID(); !ok {
-		return &ValidationError{Name: "project_id", err: errors.New(`ent: missing required field "ProjectMilestone.project_id"`)}
+	if _, ok := _c.mutation.WorkspaceID(); !ok {
+		return &ValidationError{Name: "workspace_id", err: errors.New(`ent: missing required field "ProjectMilestone.workspace_id"`)}
 	}
 	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "ProjectMilestone.name"`)}
 	}
-	if len(_c.mutation.ProjectIDs()) == 0 {
-		return &ValidationError{Name: "project", err: errors.New(`ent: missing required edge "ProjectMilestone.project"`)}
+	if len(_c.mutation.WorkspaceIDs()) == 0 {
+		return &ValidationError{Name: "workspace", err: errors.New(`ent: missing required edge "ProjectMilestone.workspace"`)}
 	}
 	return nil
 }
@@ -262,6 +328,10 @@ func (_c *ProjectMilestoneCreate) createSpec() (*ProjectMilestone, *sqlgraph.Cre
 		_spec.SetField(projectmilestone.FieldSortOrder, field.TypeFloat64, value)
 		_node.SortOrder = value
 	}
+	if value, ok := _c.mutation.ClosedAt(); ok {
+		_spec.SetField(projectmilestone.FieldClosedAt, field.TypeTime, value)
+		_node.ClosedAt = &value
+	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(projectmilestone.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -269,6 +339,23 @@ func (_c *ProjectMilestoneCreate) createSpec() (*ProjectMilestone, *sqlgraph.Cre
 	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(projectmilestone.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if nodes := _c.mutation.WorkspaceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   projectmilestone.WorkspaceTable,
+			Columns: []string{projectmilestone.WorkspaceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workspace.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.WorkspaceID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.ProjectIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -284,7 +371,7 @@ func (_c *ProjectMilestoneCreate) createSpec() (*ProjectMilestone, *sqlgraph.Cre
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.ProjectID = nodes[0]
+		_node.ProjectID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.IssuesIDs(); len(nodes) > 0 {
@@ -319,6 +406,38 @@ func (_c *ProjectMilestoneCreate) createSpec() (*ProjectMilestone, *sqlgraph.Cre
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := _c.mutation.GithubMilestoneLinksIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   projectmilestone.GithubMilestoneLinksTable,
+			Columns: []string{projectmilestone.GithubMilestoneLinksColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githubmilestonelink.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.GithubOutboxIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   projectmilestone.GithubOutboxTable,
+			Columns: []string{projectmilestone.GithubOutboxColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(githuboutbox.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	return _node, _spec
 }
 
@@ -326,7 +445,7 @@ func (_c *ProjectMilestoneCreate) createSpec() (*ProjectMilestone, *sqlgraph.Cre
 // of the `INSERT` statement. For example:
 //
 //	client.ProjectMilestone.Create().
-//		SetProjectID(v).
+//		SetWorkspaceID(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -335,7 +454,7 @@ func (_c *ProjectMilestoneCreate) createSpec() (*ProjectMilestone, *sqlgraph.Cre
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.ProjectMilestoneUpsert) {
-//			SetProjectID(v+v).
+//			SetWorkspaceID(v+v).
 //		}).
 //		Exec(ctx)
 func (_c *ProjectMilestoneCreate) OnConflict(opts ...sql.ConflictOption) *ProjectMilestoneUpsertOne {
@@ -371,6 +490,18 @@ type (
 	}
 )
 
+// SetWorkspaceID sets the "workspace_id" field.
+func (u *ProjectMilestoneUpsert) SetWorkspaceID(v uuid.UUID) *ProjectMilestoneUpsert {
+	u.Set(projectmilestone.FieldWorkspaceID, v)
+	return u
+}
+
+// UpdateWorkspaceID sets the "workspace_id" field to the value that was provided on create.
+func (u *ProjectMilestoneUpsert) UpdateWorkspaceID() *ProjectMilestoneUpsert {
+	u.SetExcluded(projectmilestone.FieldWorkspaceID)
+	return u
+}
+
 // SetProjectID sets the "project_id" field.
 func (u *ProjectMilestoneUpsert) SetProjectID(v uuid.UUID) *ProjectMilestoneUpsert {
 	u.Set(projectmilestone.FieldProjectID, v)
@@ -380,6 +511,12 @@ func (u *ProjectMilestoneUpsert) SetProjectID(v uuid.UUID) *ProjectMilestoneUpse
 // UpdateProjectID sets the "project_id" field to the value that was provided on create.
 func (u *ProjectMilestoneUpsert) UpdateProjectID() *ProjectMilestoneUpsert {
 	u.SetExcluded(projectmilestone.FieldProjectID)
+	return u
+}
+
+// ClearProjectID clears the value of the "project_id" field.
+func (u *ProjectMilestoneUpsert) ClearProjectID() *ProjectMilestoneUpsert {
+	u.SetNull(projectmilestone.FieldProjectID)
 	return u
 }
 
@@ -452,6 +589,24 @@ func (u *ProjectMilestoneUpsert) AddSortOrder(v float64) *ProjectMilestoneUpsert
 // ClearSortOrder clears the value of the "sort_order" field.
 func (u *ProjectMilestoneUpsert) ClearSortOrder() *ProjectMilestoneUpsert {
 	u.SetNull(projectmilestone.FieldSortOrder)
+	return u
+}
+
+// SetClosedAt sets the "closed_at" field.
+func (u *ProjectMilestoneUpsert) SetClosedAt(v time.Time) *ProjectMilestoneUpsert {
+	u.Set(projectmilestone.FieldClosedAt, v)
+	return u
+}
+
+// UpdateClosedAt sets the "closed_at" field to the value that was provided on create.
+func (u *ProjectMilestoneUpsert) UpdateClosedAt() *ProjectMilestoneUpsert {
+	u.SetExcluded(projectmilestone.FieldClosedAt)
+	return u
+}
+
+// ClearClosedAt clears the value of the "closed_at" field.
+func (u *ProjectMilestoneUpsert) ClearClosedAt() *ProjectMilestoneUpsert {
+	u.SetNull(projectmilestone.FieldClosedAt)
 	return u
 }
 
@@ -539,6 +694,20 @@ func (u *ProjectMilestoneUpsertOne) Update(set func(*ProjectMilestoneUpsert)) *P
 	return u
 }
 
+// SetWorkspaceID sets the "workspace_id" field.
+func (u *ProjectMilestoneUpsertOne) SetWorkspaceID(v uuid.UUID) *ProjectMilestoneUpsertOne {
+	return u.Update(func(s *ProjectMilestoneUpsert) {
+		s.SetWorkspaceID(v)
+	})
+}
+
+// UpdateWorkspaceID sets the "workspace_id" field to the value that was provided on create.
+func (u *ProjectMilestoneUpsertOne) UpdateWorkspaceID() *ProjectMilestoneUpsertOne {
+	return u.Update(func(s *ProjectMilestoneUpsert) {
+		s.UpdateWorkspaceID()
+	})
+}
+
 // SetProjectID sets the "project_id" field.
 func (u *ProjectMilestoneUpsertOne) SetProjectID(v uuid.UUID) *ProjectMilestoneUpsertOne {
 	return u.Update(func(s *ProjectMilestoneUpsert) {
@@ -550,6 +719,13 @@ func (u *ProjectMilestoneUpsertOne) SetProjectID(v uuid.UUID) *ProjectMilestoneU
 func (u *ProjectMilestoneUpsertOne) UpdateProjectID() *ProjectMilestoneUpsertOne {
 	return u.Update(func(s *ProjectMilestoneUpsert) {
 		s.UpdateProjectID()
+	})
+}
+
+// ClearProjectID clears the value of the "project_id" field.
+func (u *ProjectMilestoneUpsertOne) ClearProjectID() *ProjectMilestoneUpsertOne {
+	return u.Update(func(s *ProjectMilestoneUpsert) {
+		s.ClearProjectID()
 	})
 }
 
@@ -634,6 +810,27 @@ func (u *ProjectMilestoneUpsertOne) UpdateSortOrder() *ProjectMilestoneUpsertOne
 func (u *ProjectMilestoneUpsertOne) ClearSortOrder() *ProjectMilestoneUpsertOne {
 	return u.Update(func(s *ProjectMilestoneUpsert) {
 		s.ClearSortOrder()
+	})
+}
+
+// SetClosedAt sets the "closed_at" field.
+func (u *ProjectMilestoneUpsertOne) SetClosedAt(v time.Time) *ProjectMilestoneUpsertOne {
+	return u.Update(func(s *ProjectMilestoneUpsert) {
+		s.SetClosedAt(v)
+	})
+}
+
+// UpdateClosedAt sets the "closed_at" field to the value that was provided on create.
+func (u *ProjectMilestoneUpsertOne) UpdateClosedAt() *ProjectMilestoneUpsertOne {
+	return u.Update(func(s *ProjectMilestoneUpsert) {
+		s.UpdateClosedAt()
+	})
+}
+
+// ClearClosedAt clears the value of the "closed_at" field.
+func (u *ProjectMilestoneUpsertOne) ClearClosedAt() *ProjectMilestoneUpsertOne {
+	return u.Update(func(s *ProjectMilestoneUpsert) {
+		s.ClearClosedAt()
 	})
 }
 
@@ -815,7 +1012,7 @@ func (_c *ProjectMilestoneCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.ProjectMilestoneUpsert) {
-//			SetProjectID(v+v).
+//			SetWorkspaceID(v+v).
 //		}).
 //		Exec(ctx)
 func (_c *ProjectMilestoneCreateBulk) OnConflict(opts ...sql.ConflictOption) *ProjectMilestoneUpsertBulk {
@@ -894,6 +1091,20 @@ func (u *ProjectMilestoneUpsertBulk) Update(set func(*ProjectMilestoneUpsert)) *
 	return u
 }
 
+// SetWorkspaceID sets the "workspace_id" field.
+func (u *ProjectMilestoneUpsertBulk) SetWorkspaceID(v uuid.UUID) *ProjectMilestoneUpsertBulk {
+	return u.Update(func(s *ProjectMilestoneUpsert) {
+		s.SetWorkspaceID(v)
+	})
+}
+
+// UpdateWorkspaceID sets the "workspace_id" field to the value that was provided on create.
+func (u *ProjectMilestoneUpsertBulk) UpdateWorkspaceID() *ProjectMilestoneUpsertBulk {
+	return u.Update(func(s *ProjectMilestoneUpsert) {
+		s.UpdateWorkspaceID()
+	})
+}
+
 // SetProjectID sets the "project_id" field.
 func (u *ProjectMilestoneUpsertBulk) SetProjectID(v uuid.UUID) *ProjectMilestoneUpsertBulk {
 	return u.Update(func(s *ProjectMilestoneUpsert) {
@@ -905,6 +1116,13 @@ func (u *ProjectMilestoneUpsertBulk) SetProjectID(v uuid.UUID) *ProjectMilestone
 func (u *ProjectMilestoneUpsertBulk) UpdateProjectID() *ProjectMilestoneUpsertBulk {
 	return u.Update(func(s *ProjectMilestoneUpsert) {
 		s.UpdateProjectID()
+	})
+}
+
+// ClearProjectID clears the value of the "project_id" field.
+func (u *ProjectMilestoneUpsertBulk) ClearProjectID() *ProjectMilestoneUpsertBulk {
+	return u.Update(func(s *ProjectMilestoneUpsert) {
+		s.ClearProjectID()
 	})
 }
 
@@ -989,6 +1207,27 @@ func (u *ProjectMilestoneUpsertBulk) UpdateSortOrder() *ProjectMilestoneUpsertBu
 func (u *ProjectMilestoneUpsertBulk) ClearSortOrder() *ProjectMilestoneUpsertBulk {
 	return u.Update(func(s *ProjectMilestoneUpsert) {
 		s.ClearSortOrder()
+	})
+}
+
+// SetClosedAt sets the "closed_at" field.
+func (u *ProjectMilestoneUpsertBulk) SetClosedAt(v time.Time) *ProjectMilestoneUpsertBulk {
+	return u.Update(func(s *ProjectMilestoneUpsert) {
+		s.SetClosedAt(v)
+	})
+}
+
+// UpdateClosedAt sets the "closed_at" field to the value that was provided on create.
+func (u *ProjectMilestoneUpsertBulk) UpdateClosedAt() *ProjectMilestoneUpsertBulk {
+	return u.Update(func(s *ProjectMilestoneUpsert) {
+		s.UpdateClosedAt()
+	})
+}
+
+// ClearClosedAt clears the value of the "closed_at" field.
+func (u *ProjectMilestoneUpsertBulk) ClearClosedAt() *ProjectMilestoneUpsertBulk {
+	return u.Update(func(s *ProjectMilestoneUpsert) {
+		s.ClearClosedAt()
 	})
 }
 

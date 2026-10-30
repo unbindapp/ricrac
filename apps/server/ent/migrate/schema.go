@@ -901,6 +901,37 @@ var (
 			},
 		},
 	}
+	// GithubMilestoneLinksColumns holds the columns for the "github_milestone_links" table.
+	GithubMilestoneLinksColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "github_id", Type: field.TypeInt64},
+		{Name: "github_number", Type: field.TypeInt, SchemaType: map[string]string{"postgres": "integer"}},
+		{Name: "github_url", Type: field.TypeString, Size: 2147483647},
+		{Name: "github_updated_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true},
+		{Name: "repo_sync_id", Type: field.TypeUUID},
+		{Name: "milestone_id", Type: field.TypeUUID},
+	}
+	// GithubMilestoneLinksTable holds the schema information for the "github_milestone_links" table.
+	GithubMilestoneLinksTable = &schema.Table{
+		Name:       "github_milestone_links",
+		Columns:    GithubMilestoneLinksColumns,
+		PrimaryKey: []*schema.Column{GithubMilestoneLinksColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "github_milestone_links_github_repo_syncs_github_milestone_links",
+				Columns:    []*schema.Column{GithubMilestoneLinksColumns[6]},
+				RefColumns: []*schema.Column{GithubRepoSyncsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "github_milestone_links_project_milestones_github_milestone_links",
+				Columns:    []*schema.Column{GithubMilestoneLinksColumns[7]},
+				RefColumns: []*schema.Column{ProjectMilestonesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// GithubOutboxColumns holds the columns for the "github_outbox" table.
 	GithubOutboxColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
@@ -915,6 +946,7 @@ var (
 		{Name: "comment_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "repo_sync_id", Type: field.TypeUUID},
 		{Name: "issue_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "milestone_id", Type: field.TypeUUID, Nullable: true},
 	}
 	// GithubOutboxTable holds the schema information for the "github_outbox" table.
 	GithubOutboxTable = &schema.Table{
@@ -940,6 +972,12 @@ var (
 				RefColumns: []*schema.Column{IssuesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
+			{
+				Symbol:     "github_outbox_project_milestones_github_outbox",
+				Columns:    []*schema.Column{GithubOutboxColumns[12]},
+				RefColumns: []*schema.Column{ProjectMilestonesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
 		},
 	}
 	// GithubRepoSyncsColumns holds the columns for the "github_repo_syncs" table.
@@ -948,6 +986,8 @@ var (
 		{Name: "repo_id", Type: field.TypeInt64},
 		{Name: "full_name", Type: field.TypeString, Size: 2147483647},
 		{Name: "link_back", Type: field.TypeBool, Nullable: true},
+		{Name: "create_issues", Type: field.TypeBool, Nullable: true},
+		{Name: "sync_fields", Type: field.TypeBool, Nullable: true},
 		{Name: "backfill_status", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "backfill_closed", Type: field.TypeBool, Nullable: true},
 		{Name: "backfill_page", Type: field.TypeInt, Nullable: true, SchemaType: map[string]string{"postgres": "integer"}},
@@ -957,6 +997,7 @@ var (
 		{Name: "skipped", Type: field.TypeInt, Nullable: true, SchemaType: map[string]string{"postgres": "integer"}},
 		{Name: "last_error", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "last_synced_at", Type: field.TypeTime, Nullable: true},
+		{Name: "milestones_synced_at", Type: field.TypeTime, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "installation_id", Type: field.TypeInt64},
@@ -972,25 +1013,25 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "github_repo_syncs_github_installations_github_repo_syncs",
-				Columns:    []*schema.Column{GithubRepoSyncsColumns[15]},
+				Columns:    []*schema.Column{GithubRepoSyncsColumns[18]},
 				RefColumns: []*schema.Column{GithubInstallationsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "github_repo_syncs_projects_github_repo_syncs",
-				Columns:    []*schema.Column{GithubRepoSyncsColumns[16]},
+				Columns:    []*schema.Column{GithubRepoSyncsColumns[19]},
 				RefColumns: []*schema.Column{ProjectsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "github_repo_syncs_teams_github_repo_syncs",
-				Columns:    []*schema.Column{GithubRepoSyncsColumns[17]},
+				Columns:    []*schema.Column{GithubRepoSyncsColumns[20]},
 				RefColumns: []*schema.Column{TeamsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "github_repo_syncs_workspaces_github_repo_syncs",
-				Columns:    []*schema.Column{GithubRepoSyncsColumns[18]},
+				Columns:    []*schema.Column{GithubRepoSyncsColumns[21]},
 				RefColumns: []*schema.Column{WorkspacesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -1857,9 +1898,11 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "target_date", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"postgres": "date"}},
 		{Name: "sort_order", Type: field.TypeFloat64, Nullable: true},
+		{Name: "closed_at", Type: field.TypeTime, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
-		{Name: "project_id", Type: field.TypeUUID},
+		{Name: "project_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "workspace_id", Type: field.TypeUUID},
 	}
 	// ProjectMilestonesTable holds the schema information for the "project_milestones" table.
 	ProjectMilestonesTable = &schema.Table{
@@ -1869,8 +1912,14 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "project_milestones_projects_project_milestones",
-				Columns:    []*schema.Column{ProjectMilestonesColumns[7]},
+				Columns:    []*schema.Column{ProjectMilestonesColumns[8]},
 				RefColumns: []*schema.Column{ProjectsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "project_milestones_workspaces_project_milestones",
+				Columns:    []*schema.Column{ProjectMilestonesColumns[9]},
+				RefColumns: []*schema.Column{WorkspacesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -2611,6 +2660,7 @@ var (
 		GithubCommentLinksTable,
 		GithubInstallationsTable,
 		GithubIssueLinksTable,
+		GithubMilestoneLinksTable,
 		GithubOutboxTable,
 		GithubRepoSyncsTable,
 		GithubUserTokensTable,
@@ -2798,9 +2848,15 @@ func init() {
 	GithubIssueLinksTable.Annotation = &entsql.Annotation{
 		Table: "github_issue_links",
 	}
+	GithubMilestoneLinksTable.ForeignKeys[0].RefTable = GithubRepoSyncsTable
+	GithubMilestoneLinksTable.ForeignKeys[1].RefTable = ProjectMilestonesTable
+	GithubMilestoneLinksTable.Annotation = &entsql.Annotation{
+		Table: "github_milestone_links",
+	}
 	GithubOutboxTable.ForeignKeys[0].RefTable = CommentsTable
 	GithubOutboxTable.ForeignKeys[1].RefTable = GithubRepoSyncsTable
 	GithubOutboxTable.ForeignKeys[2].RefTable = IssuesTable
+	GithubOutboxTable.ForeignKeys[3].RefTable = ProjectMilestonesTable
 	GithubOutboxTable.Annotation = &entsql.Annotation{
 		Table: "github_outbox",
 	}
@@ -2946,6 +3002,7 @@ func init() {
 		Table: "project_members",
 	}
 	ProjectMilestonesTable.ForeignKeys[0].RefTable = ProjectsTable
+	ProjectMilestonesTable.ForeignKeys[1].RefTable = WorkspacesTable
 	ProjectMilestonesTable.Annotation = &entsql.Annotation{
 		Table: "project_milestones",
 	}

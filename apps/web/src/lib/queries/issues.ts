@@ -88,6 +88,7 @@ export function invalidateIssues(queryClient: QueryClient, workspaceId: string) 
     queryClient.invalidateQueries({ queryKey: [workspaceId, "teams", "statuses"] }),
     queryClient.invalidateQueries({ queryKey: [workspaceId, "projects"] }),
     queryClient.invalidateQueries({ queryKey: [workspaceId, "cycles"] }),
+    queryClient.invalidateQueries({ queryKey: [workspaceId, "milestones"] }),
   ]);
 }
 

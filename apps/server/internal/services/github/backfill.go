@@ -180,6 +180,13 @@ func (self *GitHubService) reconcileIssue(ctx context.Context, sync *ent.GithubR
 			input.AddLabels, changed = append(input.AddLabels, id.String()), true
 		}
 	}
+	milestone, err := self.issueMilestone(ctx, sync, issue)
+	if err != nil {
+		return false, err
+	}
+	if !samePtr(milestone, row.MilestoneID) {
+		input.Milestone, changed = milestoneInput(milestone), true
+	}
 	assignee := self.assignable(ctx, self.memberByLogin(ctx, sync.WorkspaceID, issue.Assignee), row.TeamID)
 	if assignee != uuid.Nil && !samePtr(row.AssigneeID, &assignee) {
 		input.Assignee, changed = some(assignee.String()), true

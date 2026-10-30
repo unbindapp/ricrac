@@ -10,6 +10,7 @@ import (
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/githubreposync"
 	"ricrac/ent/issue"
+	"ricrac/ent/projectmilestone"
 	"strings"
 	"time"
 
@@ -33,6 +34,8 @@ type GithubOutbox struct {
 	CommentID *uuid.UUID `json:"comment_id,omitempty"`
 	// GithubCommentID holds the value of the "github_comment_id" field.
 	GithubCommentID *int64 `json:"github_comment_id,omitempty"`
+	// MilestoneID holds the value of the "milestone_id" field.
+	MilestoneID *uuid.UUID `json:"milestone_id,omitempty"`
 	// Kind holds the value of the "kind" field.
 	Kind string `json:"kind,omitempty"`
 	// Changes holds the value of the "changes" field.
@@ -59,9 +62,11 @@ type GithubOutboxEdges struct {
 	Issue *Issue `json:"issue,omitempty"`
 	// Comment holds the value of the comment edge.
 	Comment *Comment `json:"comment,omitempty"`
+	// Milestone holds the value of the milestone edge.
+	Milestone *ProjectMilestone `json:"milestone,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // RepoSyncOrErr returns the RepoSync value or an error if the edge
@@ -97,12 +102,23 @@ func (e GithubOutboxEdges) CommentOrErr() (*Comment, error) {
 	return nil, &NotLoadedError{edge: "comment"}
 }
 
+// MilestoneOrErr returns the Milestone value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e GithubOutboxEdges) MilestoneOrErr() (*ProjectMilestone, error) {
+	if e.Milestone != nil {
+		return e.Milestone, nil
+	} else if e.loadedTypes[3] {
+		return nil, &NotFoundError{label: projectmilestone.Label}
+	}
+	return nil, &NotLoadedError{edge: "milestone"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*GithubOutbox) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case githuboutbox.FieldIssueID, githuboutbox.FieldCommentID, githuboutbox.FieldActAs:
+		case githuboutbox.FieldIssueID, githuboutbox.FieldCommentID, githuboutbox.FieldMilestoneID, githuboutbox.FieldActAs:
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case githuboutbox.FieldChanges:
 			values[i] = new([]byte)
@@ -167,6 +183,13 @@ func (_m *GithubOutbox) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.GithubCommentID = new(int64)
 				*_m.GithubCommentID = value.Int64
+			}
+		case githuboutbox.FieldMilestoneID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field milestone_id", values[i])
+			} else if value.Valid {
+				_m.MilestoneID = new(uuid.UUID)
+				*_m.MilestoneID = *value.S.(*uuid.UUID)
 			}
 		case githuboutbox.FieldKind:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -235,6 +258,11 @@ func (_m *GithubOutbox) QueryComment() *CommentQuery {
 	return NewGithubOutboxClient(_m.config).QueryComment(_m)
 }
 
+// QueryMilestone queries the "milestone" edge of the GithubOutbox entity.
+func (_m *GithubOutbox) QueryMilestone() *ProjectMilestoneQuery {
+	return NewGithubOutboxClient(_m.config).QueryMilestone(_m)
+}
+
 // Update returns a builder for updating this GithubOutbox.
 // Note that you need to call GithubOutbox.Unwrap() before calling this method if this GithubOutbox
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -276,6 +304,11 @@ func (_m *GithubOutbox) String() string {
 	builder.WriteString(", ")
 	if v := _m.GithubCommentID; v != nil {
 		builder.WriteString("github_comment_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.MilestoneID; v != nil {
+		builder.WriteString("milestone_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")

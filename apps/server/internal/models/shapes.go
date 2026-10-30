@@ -64,6 +64,7 @@ type MilestoneRef struct {
 	ID         string  `json:"id"`
 	Name       string  `json:"name"`
 	TargetDate *string `json:"targetDate"`
+	ProjectID  *string `json:"projectId"`
 }
 
 type CycleRef struct {
@@ -179,6 +180,7 @@ type Issue struct {
 
 type IssueDetail struct {
 	Issue
+	Preview      *IssuePreview     `json:"preview,omitempty" doc:"Only with preview: nothing was saved."`
 	Children     []IssueChild      `json:"children"`
 	Relations    IssueRelations    `json:"relations"`
 	GitHub       *GitHubIssueRef   `json:"github" doc:"The GitHub issue it syncs with; null when none."`
@@ -208,6 +210,15 @@ type IssueRelations struct {
 	Related     []IssueRef `json:"related"`
 	DuplicateOf *IssueRef  `json:"duplicateOf"`
 	Duplicates  []IssueRef `json:"duplicates"`
+}
+
+type IssuePreview struct {
+	GitHub *GitHubPreview `json:"github" doc:"Where the new issue would open on GitHub; null when it stays off GitHub."`
+}
+
+type GitHubPreview struct {
+	Repository string  `json:"repository" doc:"owner/name"`
+	OpenedAs   *string `json:"openedAs" doc:"The GitHub login it would be opened as; null when the Ricrac app opens it."`
 }
 
 type GitHubIssueRef struct {

@@ -1,5 +1,5 @@
-// Package milestone_service is project milestones: the stages of a project, each with its
-// issues' progress.
+// Package milestone_service is milestones: the stages of a project, or the workspace's own (like
+// those synced with GitHub), each with its issues' progress.
 package milestone_service
 
 import (
@@ -31,23 +31,24 @@ func NewMilestoneService(repo repositories.RepositoriesInterface, resolve resolv
 }
 
 type ListInput struct {
-	Project string  `json:"project" doc:"Project name, slug, link or id."`
+	Project *string `json:"project" doc:"Project name, slug, link or id; omit for the workspace's own milestones, those in no project."`
 	Limit   *int64  `json:"limit" doc:"How many to return, 50 by default, at most 250."`
 	Cursor  *string `json:"cursor" doc:"The endCursor of the previous page."`
 }
 
 type MilestoneInput struct {
-	ID      string  `json:"id" doc:"The milestone's id, or its name together with project."`
-	Project *string `json:"project" doc:"Project name, slug or id; needed when id is a name."`
+	ID      string  `json:"id" doc:"The milestone's id or name."`
+	Project *string `json:"project" doc:"Project name, slug or id, when id names one of its milestones."`
 }
 
 type SaveInput struct {
-	ID          *string               `json:"id" doc:"Only to change a milestone: its id, or its name together with project. Omit to create one."`
-	Project     *string               `json:"project" doc:"Project name, slug or id. Required to create."`
-	Name        *string               `json:"name" doc:"Required to create; unique within the project."`
+	ID          *string               `json:"id" doc:"Only to change a milestone: its id or name. Omit to create one."`
+	Project     *string               `json:"project" doc:"Project name, slug or id. To create: the project it is in; omit for one of the workspace's own."`
+	Name        *string               `json:"name" doc:"Required to create; unique within the project, or among the workspace's own."`
 	Description args.Nullable[string] `json:"description" doc:"Markdown; null clears it."`
 	TargetDate  args.Nullable[string] `json:"targetDate" doc:"YYYY-MM-DD; null clears it."`
-	SortOrder   *float64              `json:"sortOrder" doc:"Position among the project's milestones (lower comes first; ties go by target date)."`
+	SortOrder   *float64              `json:"sortOrder" doc:"Position among its sibling milestones (lower comes first; ties go by target date)."`
+	Closed      *bool                 `json:"closed" doc:"true closes the milestone, false opens it again."`
 }
 
 // Values is the milestones with the progress of the issues actor sees, in the order of ids,
@@ -89,16 +90,12 @@ func (self *MilestoneService) value(ctx context.Context, tx repository.TxInterfa
 }
 
 func (self *MilestoneService) List(ctx context.Context, actor *auth.Actor, input *ListInput) (args.PageOf[models.Milestone], error) {
-	project, err := self.resolve.Project(ctx, actor, input.Project)
-	if err != nil {
-		return args.PageOf[models.Milestone]{}, err
-	}
 	page := args.Page{Limit: input.Limit, Cursor: input.Cursor}
 	offset, err := page.Offset()
 	if err != nil {
 		return args.PageOf[models.Milestone]{}, err
 	}
-	ids, err := self.repo.Milestone().OfProject(ctx, nil, project, page.Size()+1, offset)
+	ids, err := self.listed(ctx, actor, input.Project, page.Size()+1, offset)
 	if err != nil {
 		return args.PageOf[models.Milestone]{}, err
 	}
@@ -107,6 +104,17 @@ func (self *MilestoneService) List(ctx context.Context, actor *auth.Actor, input
 		return args.PageOf[models.Milestone]{}, err
 	}
 	return args.WrapOf(page, values)
+}
+
+func (self *MilestoneService) listed(ctx context.Context, actor *auth.Actor, project *string, limit, offset int64) ([]uuid.UUID, error) {
+	if project == nil {
+		return self.repo.Milestone().OfWorkspace(ctx, nil, actor.Workspace, limit, offset)
+	}
+	id, err := self.resolve.Project(ctx, actor, *project)
+	if err != nil {
+		return nil, err
+	}
+	return self.repo.Milestone().OfProject(ctx, nil, id, limit, offset)
 }
 
 func (self *MilestoneService) find(ctx context.Context, actor *auth.Actor, id string, project *string) (uuid.UUID, error) {
@@ -169,11 +177,12 @@ func (self *MilestoneService) Save(ctx context.Context, actor *auth.Actor, input
 		if value, err = self.value(ctx, tx, actor, id); err != nil {
 			return err
 		}
-		milestone, err := self.repo.Milestone().Get(ctx, tx, id)
-		if err != nil {
-			return err
+		if existing != nil && showsOnGitHub(input) {
+			if err := self.events.QueueMilestoneForGitHub(ctx, tx, actor, id, "milestone"); err != nil {
+				return err
+			}
 		}
-		team, err := self.repo.Project().WebhookTeam(ctx, tx, milestone.ProjectID)
+		team, err := self.webhookTeam(ctx, tx, id)
 		if err != nil {
 			return err
 		}
@@ -189,19 +198,34 @@ func (self *MilestoneService) Save(ctx context.Context, actor *auth.Actor, input
 	return value, nil
 }
 
-func (self *MilestoneService) create(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, input *SaveInput) (uuid.UUID, error) {
-	if input.Project == nil {
-		return uuid.Nil, errdefs.BadRequest("project is required to create a milestone")
+// showsOnGitHub says whether the input changes what GitHub milestones have too.
+func showsOnGitHub(input *SaveInput) bool {
+	return input.Name != nil || input.Description.Set || input.TargetDate.Set || input.Closed != nil
+}
+
+// webhookTeam is the team of the milestone's project, nil for the workspace's own.
+func (self *MilestoneService) webhookTeam(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*uuid.UUID, error) {
+	milestone, err := self.repo.Milestone().Get(ctx, tx, id)
+	if err != nil || milestone.ProjectID == nil {
+		return nil, err
 	}
-	project, err := self.resolve.Project(ctx, actor, *input.Project)
-	if err != nil {
-		return uuid.Nil, err
+	return self.repo.Project().WebhookTeam(ctx, tx, *milestone.ProjectID)
+}
+
+func (self *MilestoneService) create(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, input *SaveInput) (uuid.UUID, error) {
+	var project *uuid.UUID
+	if input.Project != nil {
+		id, err := self.resolve.Project(ctx, actor, *input.Project)
+		if err != nil {
+			return uuid.Nil, err
+		}
+		project = &id
 	}
 	name, err := utils.NonEmpty(utils.OrEmpty(input.Name), "name")
 	if err != nil {
 		return uuid.Nil, err
 	}
-	return self.repo.Milestone().Create(ctx, tx, project, name)
+	return self.repo.Milestone().Create(ctx, tx, actor.Workspace, project, name)
 }
 
 func (self *MilestoneService) apply(ctx context.Context, tx repository.TxInterface, id uuid.UUID, input *SaveInput) error {
@@ -215,7 +239,7 @@ func (self *MilestoneService) apply(ctx context.Context, tx repository.TxInterfa
 			return err
 		}
 		if taken {
-			return errdefs.Conflict("The project already has a milestone \"%s\"", name)
+			return errdefs.Conflict("There is a milestone \"%s\" already", name)
 		}
 		if err := self.repo.Milestone().Update(tx, id).SetName(name).Exec(ctx); err != nil {
 			return err
@@ -260,7 +284,15 @@ func (self *MilestoneService) apply(ctx context.Context, tx repository.TxInterfa
 	if err != nil {
 		return err
 	}
-	return self.repo.Milestone().Update(tx, id).SetUpdatedAt(now).Exec(ctx)
+	update := self.repo.Milestone().Update(tx, id).SetUpdatedAt(now)
+	if input.Closed != nil {
+		if *input.Closed {
+			update.SetClosedAt(now)
+		} else {
+			update.ClearClosedAt()
+		}
+	}
+	return update.Exec(ctx)
 }
 
 func (self *MilestoneService) Delete(ctx context.Context, actor *auth.Actor, input *MilestoneInput) (models.DeletedMilestone, error) {
@@ -274,15 +306,14 @@ func (self *MilestoneService) Delete(ctx context.Context, actor *auth.Actor, inp
 		if value, err = self.value(ctx, tx, actor, id); err != nil {
 			return err
 		}
-		milestone, err := self.repo.Milestone().Get(ctx, tx, id)
+		team, err := self.webhookTeam(ctx, tx, id)
 		if err != nil {
+			return err
+		}
+		if err := self.events.QueueMilestoneForGitHub(ctx, tx, actor, id, "milestone_deleted"); err != nil {
 			return err
 		}
 		if err := self.repo.Milestone().Delete(ctx, tx, id); err != nil {
-			return err
-		}
-		team, err := self.repo.Project().WebhookTeam(ctx, tx, milestone.ProjectID)
-		if err != nil {
 			return err
 		}
 		return self.events.Emit(ctx, tx, actor, "ProjectMilestone", "remove", value, nil, team)

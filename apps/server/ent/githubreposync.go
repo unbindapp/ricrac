@@ -36,6 +36,10 @@ type GithubRepoSync struct {
 	ProjectID *uuid.UUID `json:"project_id,omitempty"`
 	// LinkBack holds the value of the "link_back" field.
 	LinkBack bool `json:"link_back,omitempty"`
+	// CreateIssues holds the value of the "create_issues" field.
+	CreateIssues bool `json:"create_issues,omitempty"`
+	// SyncFields holds the value of the "sync_fields" field.
+	SyncFields bool `json:"sync_fields,omitempty"`
 	// BackfillStatus holds the value of the "backfill_status" field.
 	BackfillStatus *string `json:"backfill_status,omitempty"`
 	// BackfillClosed holds the value of the "backfill_closed" field.
@@ -54,6 +58,8 @@ type GithubRepoSync struct {
 	LastError *string `json:"last_error,omitempty"`
 	// LastSyncedAt holds the value of the "last_synced_at" field.
 	LastSyncedAt *time.Time `json:"last_synced_at,omitempty"`
+	// MilestonesSyncedAt holds the value of the "milestones_synced_at" field.
+	MilestonesSyncedAt *time.Time `json:"milestones_synced_at,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -78,9 +84,11 @@ type GithubRepoSyncEdges struct {
 	GithubIssueLinks []*GithubIssueLink `json:"github_issue_links,omitempty"`
 	// GithubOutbox holds the value of the github_outbox edge.
 	GithubOutbox []*GithubOutbox `json:"github_outbox,omitempty"`
+	// GithubMilestoneLinks holds the value of the github_milestone_links edge.
+	GithubMilestoneLinks []*GithubMilestoneLink `json:"github_milestone_links,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [6]bool
+	loadedTypes [7]bool
 }
 
 // WorkspaceOrErr returns the Workspace value or an error if the edge
@@ -145,6 +153,15 @@ func (e GithubRepoSyncEdges) GithubOutboxOrErr() ([]*GithubOutbox, error) {
 	return nil, &NotLoadedError{edge: "github_outbox"}
 }
 
+// GithubMilestoneLinksOrErr returns the GithubMilestoneLinks value or an error if the edge
+// was not loaded in eager-loading.
+func (e GithubRepoSyncEdges) GithubMilestoneLinksOrErr() ([]*GithubMilestoneLink, error) {
+	if e.loadedTypes[6] {
+		return e.GithubMilestoneLinks, nil
+	}
+	return nil, &NotLoadedError{edge: "github_milestone_links"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*GithubRepoSync) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -152,13 +169,13 @@ func (*GithubRepoSync) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case githubreposync.FieldProjectID:
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case githubreposync.FieldLinkBack, githubreposync.FieldBackfillClosed:
+		case githubreposync.FieldLinkBack, githubreposync.FieldCreateIssues, githubreposync.FieldSyncFields, githubreposync.FieldBackfillClosed:
 			values[i] = new(sql.NullBool)
 		case githubreposync.FieldInstallationID, githubreposync.FieldRepoID, githubreposync.FieldBackfillPage, githubreposync.FieldIssuesCreated, githubreposync.FieldIssuesUpdated, githubreposync.FieldCommentsCreated, githubreposync.FieldSkipped:
 			values[i] = new(sql.NullInt64)
 		case githubreposync.FieldFullName, githubreposync.FieldBackfillStatus, githubreposync.FieldLastError:
 			values[i] = new(sql.NullString)
-		case githubreposync.FieldLastSyncedAt, githubreposync.FieldCreatedAt, githubreposync.FieldUpdatedAt:
+		case githubreposync.FieldLastSyncedAt, githubreposync.FieldMilestonesSyncedAt, githubreposync.FieldCreatedAt, githubreposync.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		case githubreposync.FieldID, githubreposync.FieldWorkspaceID, githubreposync.FieldTeamID:
 			values[i] = new(uuid.UUID)
@@ -226,6 +243,18 @@ func (_m *GithubRepoSync) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.LinkBack = value.Bool
 			}
+		case githubreposync.FieldCreateIssues:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field create_issues", values[i])
+			} else if value.Valid {
+				_m.CreateIssues = value.Bool
+			}
+		case githubreposync.FieldSyncFields:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field sync_fields", values[i])
+			} else if value.Valid {
+				_m.SyncFields = value.Bool
+			}
 		case githubreposync.FieldBackfillStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field backfill_status", values[i])
@@ -283,6 +312,13 @@ func (_m *GithubRepoSync) assignValues(columns []string, values []any) error {
 				_m.LastSyncedAt = new(time.Time)
 				*_m.LastSyncedAt = value.Time
 			}
+		case githubreposync.FieldMilestonesSyncedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field milestones_synced_at", values[i])
+			} else if value.Valid {
+				_m.MilestonesSyncedAt = new(time.Time)
+				*_m.MilestonesSyncedAt = value.Time
+			}
 		case githubreposync.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -338,6 +374,11 @@ func (_m *GithubRepoSync) QueryGithubOutbox() *GithubOutboxQuery {
 	return NewGithubRepoSyncClient(_m.config).QueryGithubOutbox(_m)
 }
 
+// QueryGithubMilestoneLinks queries the "github_milestone_links" edge of the GithubRepoSync entity.
+func (_m *GithubRepoSync) QueryGithubMilestoneLinks() *GithubMilestoneLinkQuery {
+	return NewGithubRepoSyncClient(_m.config).QueryGithubMilestoneLinks(_m)
+}
+
 // Update returns a builder for updating this GithubRepoSync.
 // Note that you need to call GithubRepoSync.Unwrap() before calling this method if this GithubRepoSync
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -384,6 +425,12 @@ func (_m *GithubRepoSync) String() string {
 	builder.WriteString("link_back=")
 	builder.WriteString(fmt.Sprintf("%v", _m.LinkBack))
 	builder.WriteString(", ")
+	builder.WriteString("create_issues=")
+	builder.WriteString(fmt.Sprintf("%v", _m.CreateIssues))
+	builder.WriteString(", ")
+	builder.WriteString("sync_fields=")
+	builder.WriteString(fmt.Sprintf("%v", _m.SyncFields))
+	builder.WriteString(", ")
 	if v := _m.BackfillStatus; v != nil {
 		builder.WriteString("backfill_status=")
 		builder.WriteString(*v)
@@ -414,6 +461,11 @@ func (_m *GithubRepoSync) String() string {
 	builder.WriteString(", ")
 	if v := _m.LastSyncedAt; v != nil {
 		builder.WriteString("last_synced_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	if v := _m.MilestonesSyncedAt; v != nil {
+		builder.WriteString("milestones_synced_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")

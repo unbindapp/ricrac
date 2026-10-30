@@ -36,6 +36,7 @@ operations and permissions.
   initiatives, documents, milestones, status updates and discussions. **@mentions** notify people.
 - **Projects** with statuses, lead, members, labels, dates, priority, milestones,
   dependencies, links, status updates with health, and progress.
+- **Milestones** of the workspace's own, beside those of projects, with progress and target dates.
 - **Initiatives** grouping projects, with sub-initiatives and status updates.
 - **Cycles**, created and completed automatically, with rollover of unfinished issues and daily
   progress history.
@@ -52,7 +53,8 @@ operations and permissions.
 - **GitHub**, as a GitHub App admins install on their repositories: pull requests, branches and
   commits that mention ENG-123 are attached to the issue and move it (opened, then done when a
   pull request that fixes it merges or a fixing commit lands on the default branch), and
-  synced repositories keep their issues and comments in step both ways. See
+  synced repositories keep their issues, comments and milestones in step both ways, and can open
+  issues created in Ricrac on GitHub as their author. See
   [docs/github-app.md](docs/github-app.md).
 
 ## Connecting agents

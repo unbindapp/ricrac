@@ -326,7 +326,7 @@ func (self *GitHubService) saveRepoSync(ctx context.Context, actor *auth.Actor, 
 		if input.Repository == nil {
 			return uuid.Nil, false, errdefs.BadRequest("Pass repository to sync a repository")
 		}
-		id, err := self.createRepoSync(ctx, actor, *input.Repository, *team, project, input.LinkBack != nil && *input.LinkBack)
+		id, err := self.createRepoSync(ctx, actor, *input.Repository, *team, project, input)
 		return id, input.Backfill == nil || *input.Backfill, err
 	}
 	if input.Repository != nil {
@@ -336,13 +336,17 @@ func (self *GitHubService) saveRepoSync(ctx context.Context, actor *auth.Actor, 
 	if err != nil {
 		return uuid.Nil, false, err
 	}
-	if err := self.github().ChangeRepoSync(ctx, id, team, input.Project.Set, project, input.LinkBack); err != nil {
+	change := github_repo.RepoSyncChange{
+		Team: team, SetProject: input.Project.Set, Project: project, LinkBack: input.LinkBack, CreateIssues: input.CreateIssues,
+		SyncFields: input.SyncFields,
+	}
+	if err := self.github().ChangeRepoSync(ctx, id, change); err != nil {
 		return uuid.Nil, false, err
 	}
 	return id, input.Backfill != nil && *input.Backfill, nil
 }
 
-func (self *GitHubService) createRepoSync(ctx context.Context, actor *auth.Actor, reference string, team uuid.UUID, project *uuid.UUID, linkBack bool) (uuid.UUID, error) {
+func (self *GitHubService) createRepoSync(ctx context.Context, actor *auth.Actor, reference string, team uuid.UUID, project *uuid.UUID, input *SaveRepoSyncInput) (uuid.UUID, error) {
 	repository, installation, err := self.findInstalledRepository(ctx, actor, reference)
 	if err != nil {
 		return uuid.Nil, err
@@ -356,7 +360,8 @@ func (self *GitHubService) createRepoSync(ctx context.Context, actor *auth.Actor
 	}
 	return self.github().CreateRepoSync(ctx, github_repo.NewRepoSync{
 		Workspace: actor.Workspace, Installation: installation, RepoID: repository.ID, FullName: repository.FullName,
-		Team: team, Project: project, LinkBack: linkBack,
+		Team: team, Project: project, LinkBack: input.LinkBack != nil && *input.LinkBack,
+		CreateIssues: input.CreateIssues != nil && *input.CreateIssues, SyncFields: input.SyncFields != nil && *input.SyncFields,
 	})
 }
 

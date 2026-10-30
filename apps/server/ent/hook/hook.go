@@ -284,6 +284,18 @@ func (f GithubIssueLinkFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Va
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GithubIssueLinkMutation", m)
 }
 
+// The GithubMilestoneLinkFunc type is an adapter to allow the use of ordinary
+// function as GithubMilestoneLink mutator.
+type GithubMilestoneLinkFunc func(context.Context, *ent.GithubMilestoneLinkMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f GithubMilestoneLinkFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.GithubMilestoneLinkMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GithubMilestoneLinkMutation", m)
+}
+
 // The GithubOutboxFunc type is an adapter to allow the use of ordinary
 // function as GithubOutbox mutator.
 type GithubOutboxFunc func(context.Context, *ent.GithubOutboxMutation) (ent.Value, error)

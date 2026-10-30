@@ -23,6 +23,12 @@ type EventsServiceInterface interface {
 	// QueueCommentForGitHub queues a new comment on a linked issue (kind comment_created), or the
 	// edit or deletion of a comment the app posted.
 	QueueCommentForGitHub(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, issue, comment uuid.UUID, kind string) error
+	// QueueMilestoneForGitHub queues a milestone's change (kind milestone) or deletion
+	// (milestone_deleted) for each GitHub milestone it is linked to.
+	QueueMilestoneForGitHub(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, milestone uuid.UUID, kind string) error
+	// QueueNewIssueForGitHub queues an issue created in Ricrac for the team's synced repository it
+	// opens in on GitHub (see save_issue's githubRepository), if any.
+	QueueNewIssueForGitHub(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, issue, team uuid.UUID, repository *string) error
 	Audit(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, kind string, metadata any) error
 	// Notify notifies each of users once, except the actor, who doesn't need to hear about their
 	// own change, and anyone no longer in the workspace.

@@ -14,22 +14,29 @@ import (
 
 // MilestoneRepositoryInterface ...
 type MilestoneRepositoryInterface interface {
-	// Load is the milestones with their projects, in the order of ids.
+	// Load is the milestones with their projects and GitHub milestones, in the order of ids.
 	Load(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) ([]*ent.ProjectMilestone, error)
 	// Stats is each milestone's issue counts and progress, counting the issues viewer can see.
 	Stats(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID, viewer uuid.UUID) (map[uuid.UUID]models.ProjectIssueStats, error)
 	// OfProject is the project's milestones in order; limit 0 is all of them.
 	OfProject(ctx context.Context, tx repository.TxInterface, project uuid.UUID, limit, offset int64) ([]uuid.UUID, error)
+	// OfWorkspace is the workspace's milestones that are in no project, open ones first, in order.
+	OfWorkspace(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, limit, offset int64) ([]uuid.UUID, error)
 	Get(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.ProjectMilestone, error)
 	// Issues is the milestone's issues not in the trash, in one of teams, in their order, with their
 	// team, state and assignee.
 	Issues(ctx context.Context, id uuid.UUID, teams []uuid.UUID) ([]*ent.Issue, error)
-	Create(ctx context.Context, tx repository.TxInterface, project uuid.UUID, name string) (uuid.UUID, error)
+	// Create adds a milestone to the project, or to the workspace when project is nil.
+	Create(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, project *uuid.UUID, name string) (uuid.UUID, error)
 	// CreateFull adds a milestone with its description, target date and position.
-	CreateFull(ctx context.Context, tx repository.TxInterface, project uuid.UUID, name string, description *string, target *time.Time, sortOrder float64) (uuid.UUID, error)
+	CreateFull(ctx context.Context, tx repository.TxInterface, workspace, project uuid.UUID, name string, description *string, target *time.Time, sortOrder float64) (uuid.UUID, error)
 	// Update is the milestone's update builder, to set fields on.
 	Update(tx repository.TxInterface, id uuid.UUID) *ent.ProjectMilestoneUpdateOne
-	// NameTaken says whether another milestone of the same project has this name, in any case.
+	// NameTaken says whether another milestone of the same project, or of the workspace when it is
+	// in none, has this name, in any case.
 	NameTaken(ctx context.Context, tx repository.TxInterface, id uuid.UUID, name string) (bool, error)
+	// WorkspaceNamed is the workspace's milestone in no project with this name, in any case; nil when
+	// there's none.
+	WorkspaceNamed(ctx context.Context, tx repository.TxInterface, workspace uuid.UUID, name string) (*ent.ProjectMilestone, error)
 	Delete(ctx context.Context, tx repository.TxInterface, id uuid.UUID) error
 }

@@ -10,6 +10,7 @@ import {
   BoxIcon,
   CheckIcon,
   CircleDotIcon,
+  DiamondIcon,
   FileTextIcon,
   InboxIcon,
   KeyboardIcon,
@@ -54,9 +55,13 @@ import { useHotkeySequenceScope } from "@/lib/hotkeys/use-hotkey-sequences";
 import { meQuery, signOut } from "@/lib/queries/me";
 
 type TShortcutDestination = keyof typeof GO_TO_KEYS;
-type TDestination = TShortcutDestination | "cycles";
+type TDestination = TShortcutDestination | "cycles" | "milestones";
 
 const shortcutDestinations = Object.keys(GO_TO_KEYS) as TShortcutDestination[];
+
+function isShortcutDestination(destination: TDestination): destination is TShortcutDestination {
+  return destination in GO_TO_KEYS;
+}
 
 /** The pages G then a letter, and the panel's Go to group, lead to. */
 function useDestinations(): Record<
@@ -99,6 +104,11 @@ function useDestinations(): Record<
       label: "Projects",
       icon: <BoxIcon />,
       link: { to: "/$workspace/projects", params },
+    },
+    milestones: {
+      label: "Milestones",
+      icon: <DiamondIcon />,
+      link: { to: "/$workspace/milestones", params },
     },
     views: { label: "Views", icon: <LayersIcon />, link: { to: "/$workspace/views", params } },
     initiatives: {
@@ -230,7 +240,7 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
     .filter((destination) => !destinations[destination].isHidden)
     .map((destination) => {
       const { label, icon, link } = destinations[destination];
-      const key = destination === "cycles" ? undefined : GO_TO_KEYS[destination];
+      const key = isShortcutDestination(destination) ? GO_TO_KEYS[destination] : undefined;
       return {
         id: `go-${destination}`,
         label: `Go to ${label.toLowerCase()}`,

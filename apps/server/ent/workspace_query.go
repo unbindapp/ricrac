@@ -33,6 +33,7 @@ import (
 	"ricrac/ent/predicate"
 	"ricrac/ent/project"
 	"ricrac/ent/projectlabel"
+	"ricrac/ent/projectmilestone"
 	"ricrac/ent/projectstatus"
 	"ricrac/ent/reaction"
 	"ricrac/ent/release"
@@ -68,6 +69,7 @@ type WorkspaceQuery struct {
 	withProjectStatuses     *ProjectStatusQuery
 	withProjectLabels       *ProjectLabelQuery
 	withProjects            *ProjectQuery
+	withProjectMilestones   *ProjectMilestoneQuery
 	withInitiatives         *InitiativeQuery
 	withStatusUpdates       *StatusUpdateQuery
 	withEntityLinks         *EntityLinkQuery
@@ -281,6 +283,28 @@ func (_q *WorkspaceQuery) QueryProjects() *ProjectQuery {
 			sqlgraph.From(workspace.Table, workspace.FieldID, selector),
 			sqlgraph.To(project.Table, project.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, workspace.ProjectsTable, workspace.ProjectsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryProjectMilestones chains the current query on the "project_milestones" edge.
+func (_q *WorkspaceQuery) QueryProjectMilestones() *ProjectMilestoneQuery {
+	query := (&ProjectMilestoneClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(workspace.Table, workspace.FieldID, selector),
+			sqlgraph.To(projectmilestone.Table, projectmilestone.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, workspace.ProjectMilestonesTable, workspace.ProjectMilestonesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -1125,6 +1149,7 @@ func (_q *WorkspaceQuery) Clone() *WorkspaceQuery {
 		withProjectStatuses:     _q.withProjectStatuses.Clone(),
 		withProjectLabels:       _q.withProjectLabels.Clone(),
 		withProjects:            _q.withProjects.Clone(),
+		withProjectMilestones:   _q.withProjectMilestones.Clone(),
 		withInitiatives:         _q.withInitiatives.Clone(),
 		withStatusUpdates:       _q.withStatusUpdates.Clone(),
 		withEntityLinks:         _q.withEntityLinks.Clone(),
@@ -1235,6 +1260,17 @@ func (_q *WorkspaceQuery) WithProjects(opts ...func(*ProjectQuery)) *WorkspaceQu
 		opt(query)
 	}
 	_q.withProjects = query
+	return _q
+}
+
+// WithProjectMilestones tells the query-builder to eager-load the nodes that are connected to
+// the "project_milestones" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *WorkspaceQuery) WithProjectMilestones(opts ...func(*ProjectMilestoneQuery)) *WorkspaceQuery {
+	query := (&ProjectMilestoneClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withProjectMilestones = query
 	return _q
 }
 
@@ -1635,7 +1671,7 @@ func (_q *WorkspaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Wo
 	var (
 		nodes       = []*Workspace{}
 		_spec       = _q.querySpec()
-		loadedTypes = [36]bool{
+		loadedTypes = [37]bool{
 			_q.withInvitations != nil,
 			_q.withOauthClients != nil,
 			_q.withTeams != nil,
@@ -1643,6 +1679,7 @@ func (_q *WorkspaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Wo
 			_q.withProjectStatuses != nil,
 			_q.withProjectLabels != nil,
 			_q.withProjects != nil,
+			_q.withProjectMilestones != nil,
 			_q.withInitiatives != nil,
 			_q.withStatusUpdates != nil,
 			_q.withEntityLinks != nil,
@@ -1741,6 +1778,15 @@ func (_q *WorkspaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Wo
 		if err := _q.loadProjects(ctx, query, nodes,
 			func(n *Workspace) { n.Edges.Projects = []*Project{} },
 			func(n *Workspace, e *Project) { n.Edges.Projects = append(n.Edges.Projects, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withProjectMilestones; query != nil {
+		if err := _q.loadProjectMilestones(ctx, query, nodes,
+			func(n *Workspace) { n.Edges.ProjectMilestones = []*ProjectMilestone{} },
+			func(n *Workspace, e *ProjectMilestone) {
+				n.Edges.ProjectMilestones = append(n.Edges.ProjectMilestones, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
@@ -2152,6 +2198,36 @@ func (_q *WorkspaceQuery) loadProjects(ctx context.Context, query *ProjectQuery,
 	}
 	query.Where(predicate.Project(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(workspace.ProjectsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.WorkspaceID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "workspace_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *WorkspaceQuery) loadProjectMilestones(ctx context.Context, query *ProjectMilestoneQuery, nodes []*Workspace, init func(*Workspace), assign func(*Workspace, *ProjectMilestone)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Workspace)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(projectmilestone.FieldWorkspaceID)
+	}
+	query.Where(predicate.ProjectMilestone(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(workspace.ProjectMilestonesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

@@ -1,17 +1,22 @@
 import { Link } from "@tanstack/react-router";
 
 import type { Milestone, ProjectDetail } from "@/api/ops.gen";
-import { DiamondIcon, PencilIcon, PlusIcon, Trash2Icon } from "@/components/icons";
+import { PencilIcon, PlusIcon, Trash2Icon } from "@/components/icons";
 import { List } from "@/components/layout/list";
 import { SectionTitle } from "@/components/layout/section-title";
+import {
+  isMilestoneLate,
+  MilestoneIcon,
+  milestoneIssueCount,
+} from "@/components/milestones/milestone-status";
 import { MilestoneDialog } from "@/components/projects/milestone-dialog";
 import { ProgressBar } from "@/components/projects/progress-bar";
-import { formatProjectDate, isPastTarget } from "@/components/projects/project-dates";
+import { formatProjectDate } from "@/components/projects/project-dates";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { entitySlug } from "@/lib/helpers/entity-slug";
-import { useDeleteMilestoneMutation } from "@/lib/queries/projects";
+import { useDeleteMilestoneMutation } from "@/lib/queries/milestones";
 
 export function MilestonesSection({ project }: { project: ProjectDetail }) {
   const { canEdit } = useWorkspace();
@@ -61,19 +66,13 @@ function MilestoneRow({
 }) {
   const { workspace } = useWorkspace();
   const { mutateAsync: deleteMilestone } = useDeleteMilestoneMutation(workspace.id);
-  const open = milestone.issueCount - milestone.completedIssueCount - milestone.canceledIssueCount;
-  const isDone = milestone.issueCount > 0 && open === 0;
-  const isLate = !isDone && milestone.targetDate !== null && isPastTarget(milestone.targetDate);
   return (
     <div
       role="listitem"
       data-interactive
       className="group/row has-hover:hover:bg-accent flex h-9 w-full items-center gap-3 border-b px-3 text-sm last:border-b-0"
     >
-      <DiamondIcon
-        data-done={isDone || undefined}
-        className="text-muted-foreground data-done:fill-primary data-done:text-primary dank:size-5 size-3.5 shrink-0"
-      />
+      <MilestoneIcon milestone={milestone} />
       <Link
         to="/$workspace/project/$slug/issues"
         params={{ workspace: workspace.urlKey, slug: entitySlug(project) }}
@@ -84,11 +83,10 @@ function MilestoneRow({
         {milestone.name}
       </Link>
       <span className="text-muted-foreground hidden w-20 shrink-0 text-right text-xs tabular-nums sm:block">
-        {milestone.issueCount > 0 &&
-          `${milestone.completedIssueCount} / ${milestone.issueCount - milestone.canceledIssueCount}`}
+        {milestoneIssueCount(milestone)}
       </span>
       <span
-        data-late={isLate || undefined}
+        data-late={isMilestoneLate(milestone) || undefined}
         className="text-muted-foreground data-late:text-destructive hidden w-24 shrink-0 truncate text-xs tabular-nums sm:block"
       >
         {milestone.targetDate && formatProjectDate(milestone.targetDate)}

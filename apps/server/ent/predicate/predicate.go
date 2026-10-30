@@ -75,6 +75,9 @@ type GithubInstallation func(*sql.Selector)
 // GithubIssueLink is the predicate function for githubissuelink builders.
 type GithubIssueLink func(*sql.Selector)
 
+// GithubMilestoneLink is the predicate function for githubmilestonelink builders.
+type GithubMilestoneLink func(*sql.Selector)
+
 // GithubOutbox is the predicate function for githuboutbox builders.
 type GithubOutbox func(*sql.Selector)
 

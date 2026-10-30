@@ -17,6 +17,19 @@ With the app installed:
   issues opened, edited, labeled, assigned, closed, reopened, deleted or commented on GitHub
   change the Ricrac issue, and title, description, status, labels, assignee and comments changed
   in Ricrac go back to GitHub. Existing issues are imported when the sync is created.
+- Syncs with `createIssues` open the issues created in Ricrac on GitHub too, as their author when
+  they linked GitHub, else as the app. With several such repositories, `save_issue` takes
+  `githubRepository`; by default an issue goes to the repository synced with its project, else
+  the one with the most synced issues.
+- Syncs with `syncFields` keep priority, estimate, due date and cycle in step both ways with the
+  organization's issue fields named `Priority` (options Urgent, High, Medium, Low), `Estimate`
+  (number), `Due date` or `Target date` (date) and `Cycle` (text), where the organization has
+  them. Organization owners create the fields under the organization's settings, or with
+  `POST /orgs/{org}/issue-fields`.
+- GitHub milestones of synced repositories are the workspace's own milestones in Ricrac, matched
+  by name across repositories. Names, descriptions, due dates, closing, deleting and the issues
+  in them go both ways. Ricrac reads each repository's milestones every ten minutes; subscribing
+  the app to the `milestone` event brings changes made on GitHub over right away.
 - People link their GitHub account in their settings (or when they install the app). GitHub
   authors and assignees map to them; others show as `@login on GitHub`.
 
@@ -56,7 +69,7 @@ form's action to `https://github.com/organizations/<org>/settings/apps/new`.
       "issues": "write",
       "pull_requests": "read"
     },
-    "default_events": ["issues", "issue_comment", "pull_request", "push"]
+    "default_events": ["issues", "issue_comment", "milestone", "pull_request", "push"]
   })
 </script>
 ```
@@ -98,7 +111,7 @@ organization's settings):
 | Webhook URL | `https://ricrac.example.com/github/webhook` |
 | Webhook secret | a long random string, also set as `GITHUB_WEBHOOK_SECRET` |
 | Repository permissions | Metadata: Read-only, Contents: Read-only, Issues: Read and write, Pull requests: Read-only |
-| Organization permissions | Issue fields: Read-only, so link back can find an organization's Ricrac issue field; without it the app comments instead |
+| Organization permissions | Issue fields: Read-only, so link back can find an organization's Ricrac issue field (without it the app comments instead) and synced fields find theirs |
 | Subscribe to events | Issues, Issue comment, Pull request, Push |
 | Where can this GitHub App be installed? | Any account, unless every workspace's repositories live under the app's owner |
 

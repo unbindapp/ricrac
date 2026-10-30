@@ -742,6 +742,29 @@ func HasProjectsWith(preds ...predicate.Project) predicate.Workspace {
 	})
 }
 
+// HasProjectMilestones applies the HasEdge predicate on the "project_milestones" edge.
+func HasProjectMilestones() predicate.Workspace {
+	return predicate.Workspace(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ProjectMilestonesTable, ProjectMilestonesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasProjectMilestonesWith applies the HasEdge predicate on the "project_milestones" edge with a given conditions (other predicates).
+func HasProjectMilestonesWith(preds ...predicate.ProjectMilestone) predicate.Workspace {
+	return predicate.Workspace(func(s *sql.Selector) {
+		step := newProjectMilestonesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasInitiatives applies the HasEdge predicate on the "initiatives" edge.
 func HasInitiatives() predicate.Workspace {
 	return predicate.Workspace(func(s *sql.Selector) {
