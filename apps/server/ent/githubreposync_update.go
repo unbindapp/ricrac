@@ -154,46 +154,6 @@ func (_u *GithubRepoSyncUpdate) ClearLinkBack() *GithubRepoSyncUpdate {
 	return _u
 }
 
-// SetCreateIssues sets the "create_issues" field.
-func (_u *GithubRepoSyncUpdate) SetCreateIssues(v bool) *GithubRepoSyncUpdate {
-	_u.mutation.SetCreateIssues(v)
-	return _u
-}
-
-// SetNillableCreateIssues sets the "create_issues" field if the given value is not nil.
-func (_u *GithubRepoSyncUpdate) SetNillableCreateIssues(v *bool) *GithubRepoSyncUpdate {
-	if v != nil {
-		_u.SetCreateIssues(*v)
-	}
-	return _u
-}
-
-// ClearCreateIssues clears the value of the "create_issues" field.
-func (_u *GithubRepoSyncUpdate) ClearCreateIssues() *GithubRepoSyncUpdate {
-	_u.mutation.ClearCreateIssues()
-	return _u
-}
-
-// SetSyncFields sets the "sync_fields" field.
-func (_u *GithubRepoSyncUpdate) SetSyncFields(v bool) *GithubRepoSyncUpdate {
-	_u.mutation.SetSyncFields(v)
-	return _u
-}
-
-// SetNillableSyncFields sets the "sync_fields" field if the given value is not nil.
-func (_u *GithubRepoSyncUpdate) SetNillableSyncFields(v *bool) *GithubRepoSyncUpdate {
-	if v != nil {
-		_u.SetSyncFields(*v)
-	}
-	return _u
-}
-
-// ClearSyncFields clears the value of the "sync_fields" field.
-func (_u *GithubRepoSyncUpdate) ClearSyncFields() *GithubRepoSyncUpdate {
-	_u.mutation.ClearSyncFields()
-	return _u
-}
-
 // SetBackfillStatus sets the "backfill_status" field.
 func (_u *GithubRepoSyncUpdate) SetBackfillStatus(v string) *GithubRepoSyncUpdate {
 	_u.mutation.SetBackfillStatus(v)
@@ -700,18 +660,6 @@ func (_u *GithubRepoSyncUpdate) sqlSave(ctx context.Context) (_node int, err err
 	if _u.mutation.LinkBackCleared() {
 		_spec.ClearField(githubreposync.FieldLinkBack, field.TypeBool)
 	}
-	if value, ok := _u.mutation.CreateIssues(); ok {
-		_spec.SetField(githubreposync.FieldCreateIssues, field.TypeBool, value)
-	}
-	if _u.mutation.CreateIssuesCleared() {
-		_spec.ClearField(githubreposync.FieldCreateIssues, field.TypeBool)
-	}
-	if value, ok := _u.mutation.SyncFields(); ok {
-		_spec.SetField(githubreposync.FieldSyncFields, field.TypeBool, value)
-	}
-	if _u.mutation.SyncFieldsCleared() {
-		_spec.ClearField(githubreposync.FieldSyncFields, field.TypeBool)
-	}
 	if value, ok := _u.mutation.BackfillStatus(); ok {
 		_spec.SetField(githubreposync.FieldBackfillStatus, field.TypeString, value)
 	}
@@ -1186,46 +1134,6 @@ func (_u *GithubRepoSyncUpdateOne) SetNillableLinkBack(v *bool) *GithubRepoSyncU
 // ClearLinkBack clears the value of the "link_back" field.
 func (_u *GithubRepoSyncUpdateOne) ClearLinkBack() *GithubRepoSyncUpdateOne {
 	_u.mutation.ClearLinkBack()
-	return _u
-}
-
-// SetCreateIssues sets the "create_issues" field.
-func (_u *GithubRepoSyncUpdateOne) SetCreateIssues(v bool) *GithubRepoSyncUpdateOne {
-	_u.mutation.SetCreateIssues(v)
-	return _u
-}
-
-// SetNillableCreateIssues sets the "create_issues" field if the given value is not nil.
-func (_u *GithubRepoSyncUpdateOne) SetNillableCreateIssues(v *bool) *GithubRepoSyncUpdateOne {
-	if v != nil {
-		_u.SetCreateIssues(*v)
-	}
-	return _u
-}
-
-// ClearCreateIssues clears the value of the "create_issues" field.
-func (_u *GithubRepoSyncUpdateOne) ClearCreateIssues() *GithubRepoSyncUpdateOne {
-	_u.mutation.ClearCreateIssues()
-	return _u
-}
-
-// SetSyncFields sets the "sync_fields" field.
-func (_u *GithubRepoSyncUpdateOne) SetSyncFields(v bool) *GithubRepoSyncUpdateOne {
-	_u.mutation.SetSyncFields(v)
-	return _u
-}
-
-// SetNillableSyncFields sets the "sync_fields" field if the given value is not nil.
-func (_u *GithubRepoSyncUpdateOne) SetNillableSyncFields(v *bool) *GithubRepoSyncUpdateOne {
-	if v != nil {
-		_u.SetSyncFields(*v)
-	}
-	return _u
-}
-
-// ClearSyncFields clears the value of the "sync_fields" field.
-func (_u *GithubRepoSyncUpdateOne) ClearSyncFields() *GithubRepoSyncUpdateOne {
-	_u.mutation.ClearSyncFields()
 	return _u
 }
 
@@ -1764,18 +1672,6 @@ func (_u *GithubRepoSyncUpdateOne) sqlSave(ctx context.Context) (_node *GithubRe
 	}
 	if _u.mutation.LinkBackCleared() {
 		_spec.ClearField(githubreposync.FieldLinkBack, field.TypeBool)
-	}
-	if value, ok := _u.mutation.CreateIssues(); ok {
-		_spec.SetField(githubreposync.FieldCreateIssues, field.TypeBool, value)
-	}
-	if _u.mutation.CreateIssuesCleared() {
-		_spec.ClearField(githubreposync.FieldCreateIssues, field.TypeBool)
-	}
-	if value, ok := _u.mutation.SyncFields(); ok {
-		_spec.SetField(githubreposync.FieldSyncFields, field.TypeBool, value)
-	}
-	if _u.mutation.SyncFieldsCleared() {
-		_spec.ClearField(githubreposync.FieldSyncFields, field.TypeBool)
 	}
 	if value, ok := _u.mutation.BackfillStatus(); ok {
 		_spec.SetField(githubreposync.FieldBackfillStatus, field.TypeString, value)

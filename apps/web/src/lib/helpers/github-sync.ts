@@ -57,21 +57,18 @@ export function githubEventLabel(event: string) {
 }
 
 type TIssueRepoSync = {
-  createIssues: boolean;
   linkedIssueCount: number;
   createdAt: string;
   project: { id: string } | null;
 };
 
-/** The synced repositories new Ricrac issues can open in, the server's default for the project first. */
+/** The synced repositories a new issue can open in, the one the server picks for its project first. */
 export function issueRepositories<T extends TIssueRepoSync>(repoSyncs: T[], projectId?: string) {
   const isProjects = (repoSync: T) => Boolean(projectId) && repoSync.project?.id === projectId;
-  return repoSyncs
-    .filter((repoSync) => repoSync.createIssues)
-    .sort(
-      (a, b) =>
-        Number(isProjects(b)) - Number(isProjects(a)) ||
-        b.linkedIssueCount - a.linkedIssueCount ||
-        a.createdAt.localeCompare(b.createdAt),
-    );
+  return [...repoSyncs].sort(
+    (a, b) =>
+      Number(isProjects(b)) - Number(isProjects(a)) ||
+      b.linkedIssueCount - a.linkedIssueCount ||
+      a.createdAt.localeCompare(b.createdAt),
+  );
 }

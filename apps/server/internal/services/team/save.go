@@ -58,6 +58,8 @@ type SaveInput struct {
 	DefaultIssueState            *string                `json:"defaultIssueState" doc:"The status new issues start in (a backlog or unstarted status: name or id)."`
 	GitHubPROpenedState          args.Nullable[string]  `json:"githubPrOpenedState" doc:"The status issues move to when a GitHub pull request or branch mentioning them opens (name or id); null for the first started status."`
 	GitHubPRMergedState          args.Nullable[string]  `json:"githubPrMergedState" doc:"The status issues move to when a pull request that fixes them merges (name or id); null for the first completed status."`
+	GitHubOpenIssues             *bool                  `json:"githubOpenIssues" doc:"New issues open on GitHub too, in one of the synced repositories (see save_issue's githubRepository), unless save_issue says githubRepository \"none\". Off (the default), only issues that name a githubRepository do."`
+	GitHubSyncFields             *bool                  `json:"githubSyncFields" doc:"Priority, estimate, due date and cycle of issues synced with GitHub sync both ways with the organization's issue fields named Priority (Urgent, High, Medium, Low), Estimate, Due date (or Target date) and Cycle, where it has them (default off)."`
 	AddMembers                   []string               `json:"addMembers" doc:"Guests to let see the workspace's issues (everyone else is a member already): id, name, email or \"me\"."`
 	RemoveMembers                []string               `json:"removeMembers" doc:"Guests to take off the team; other people leave it by leaving the workspace."`
 }
@@ -250,6 +252,8 @@ func (self *TeamService) apply(ctx context.Context, tx repository.TxInterface, a
 		{input.RequirePriorityToLeaveTriage, (*ent.TeamUpdateOne).SetRequirePriorityToLeaveTriage},
 		{input.AutoCloseParentIssues, (*ent.TeamUpdateOne).SetAutoCloseParentIssues},
 		{input.AutoCloseChildIssues, (*ent.TeamUpdateOne).SetAutoCloseChildIssues},
+		{input.GitHubOpenIssues, (*ent.TeamUpdateOne).SetGithubOpenIssues},
+		{input.GitHubSyncFields, (*ent.TeamUpdateOne).SetGithubSyncFields},
 	} {
 		if flag.value == nil {
 			continue

@@ -595,6 +595,34 @@ func (_c *TeamCreate) SetNillableGithubPrMergedStateID(v *uuid.UUID) *TeamCreate
 	return _c
 }
 
+// SetGithubOpenIssues sets the "github_open_issues" field.
+func (_c *TeamCreate) SetGithubOpenIssues(v bool) *TeamCreate {
+	_c.mutation.SetGithubOpenIssues(v)
+	return _c
+}
+
+// SetNillableGithubOpenIssues sets the "github_open_issues" field if the given value is not nil.
+func (_c *TeamCreate) SetNillableGithubOpenIssues(v *bool) *TeamCreate {
+	if v != nil {
+		_c.SetGithubOpenIssues(*v)
+	}
+	return _c
+}
+
+// SetGithubSyncFields sets the "github_sync_fields" field.
+func (_c *TeamCreate) SetGithubSyncFields(v bool) *TeamCreate {
+	_c.mutation.SetGithubSyncFields(v)
+	return _c
+}
+
+// SetNillableGithubSyncFields sets the "github_sync_fields" field if the given value is not nil.
+func (_c *TeamCreate) SetNillableGithubSyncFields(v *bool) *TeamCreate {
+	if v != nil {
+		_c.SetGithubSyncFields(*v)
+	}
+	return _c
+}
+
 // SetPreviousKeys sets the "previous_keys" field.
 func (_c *TeamCreate) SetPreviousKeys(v pgarray.Text) *TeamCreate {
 	_c.mutation.SetPreviousKeys(v)
@@ -1116,6 +1144,14 @@ func (_c *TeamCreate) createSpec() (*Team, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(team.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if value, ok := _c.mutation.GithubOpenIssues(); ok {
+		_spec.SetField(team.FieldGithubOpenIssues, field.TypeBool, value)
+		_node.GithubOpenIssues = value
+	}
+	if value, ok := _c.mutation.GithubSyncFields(); ok {
+		_spec.SetField(team.FieldGithubSyncFields, field.TypeBool, value)
+		_node.GithubSyncFields = value
 	}
 	if value, ok := _c.mutation.PreviousKeys(); ok {
 		_spec.SetField(team.FieldPreviousKeys, field.TypeOther, value)
@@ -2315,6 +2351,42 @@ func (u *TeamUpsert) ClearGithubPrMergedStateID() *TeamUpsert {
 	return u
 }
 
+// SetGithubOpenIssues sets the "github_open_issues" field.
+func (u *TeamUpsert) SetGithubOpenIssues(v bool) *TeamUpsert {
+	u.Set(team.FieldGithubOpenIssues, v)
+	return u
+}
+
+// UpdateGithubOpenIssues sets the "github_open_issues" field to the value that was provided on create.
+func (u *TeamUpsert) UpdateGithubOpenIssues() *TeamUpsert {
+	u.SetExcluded(team.FieldGithubOpenIssues)
+	return u
+}
+
+// ClearGithubOpenIssues clears the value of the "github_open_issues" field.
+func (u *TeamUpsert) ClearGithubOpenIssues() *TeamUpsert {
+	u.SetNull(team.FieldGithubOpenIssues)
+	return u
+}
+
+// SetGithubSyncFields sets the "github_sync_fields" field.
+func (u *TeamUpsert) SetGithubSyncFields(v bool) *TeamUpsert {
+	u.Set(team.FieldGithubSyncFields, v)
+	return u
+}
+
+// UpdateGithubSyncFields sets the "github_sync_fields" field to the value that was provided on create.
+func (u *TeamUpsert) UpdateGithubSyncFields() *TeamUpsert {
+	u.SetExcluded(team.FieldGithubSyncFields)
+	return u
+}
+
+// ClearGithubSyncFields clears the value of the "github_sync_fields" field.
+func (u *TeamUpsert) ClearGithubSyncFields() *TeamUpsert {
+	u.SetNull(team.FieldGithubSyncFields)
+	return u
+}
+
 // SetPreviousKeys sets the "previous_keys" field.
 func (u *TeamUpsert) SetPreviousKeys(v pgarray.Text) *TeamUpsert {
 	u.Set(team.FieldPreviousKeys, v)
@@ -3338,6 +3410,48 @@ func (u *TeamUpsertOne) UpdateGithubPrMergedStateID() *TeamUpsertOne {
 func (u *TeamUpsertOne) ClearGithubPrMergedStateID() *TeamUpsertOne {
 	return u.Update(func(s *TeamUpsert) {
 		s.ClearGithubPrMergedStateID()
+	})
+}
+
+// SetGithubOpenIssues sets the "github_open_issues" field.
+func (u *TeamUpsertOne) SetGithubOpenIssues(v bool) *TeamUpsertOne {
+	return u.Update(func(s *TeamUpsert) {
+		s.SetGithubOpenIssues(v)
+	})
+}
+
+// UpdateGithubOpenIssues sets the "github_open_issues" field to the value that was provided on create.
+func (u *TeamUpsertOne) UpdateGithubOpenIssues() *TeamUpsertOne {
+	return u.Update(func(s *TeamUpsert) {
+		s.UpdateGithubOpenIssues()
+	})
+}
+
+// ClearGithubOpenIssues clears the value of the "github_open_issues" field.
+func (u *TeamUpsertOne) ClearGithubOpenIssues() *TeamUpsertOne {
+	return u.Update(func(s *TeamUpsert) {
+		s.ClearGithubOpenIssues()
+	})
+}
+
+// SetGithubSyncFields sets the "github_sync_fields" field.
+func (u *TeamUpsertOne) SetGithubSyncFields(v bool) *TeamUpsertOne {
+	return u.Update(func(s *TeamUpsert) {
+		s.SetGithubSyncFields(v)
+	})
+}
+
+// UpdateGithubSyncFields sets the "github_sync_fields" field to the value that was provided on create.
+func (u *TeamUpsertOne) UpdateGithubSyncFields() *TeamUpsertOne {
+	return u.Update(func(s *TeamUpsert) {
+		s.UpdateGithubSyncFields()
+	})
+}
+
+// ClearGithubSyncFields clears the value of the "github_sync_fields" field.
+func (u *TeamUpsertOne) ClearGithubSyncFields() *TeamUpsertOne {
+	return u.Update(func(s *TeamUpsert) {
+		s.ClearGithubSyncFields()
 	})
 }
 
@@ -4540,6 +4654,48 @@ func (u *TeamUpsertBulk) UpdateGithubPrMergedStateID() *TeamUpsertBulk {
 func (u *TeamUpsertBulk) ClearGithubPrMergedStateID() *TeamUpsertBulk {
 	return u.Update(func(s *TeamUpsert) {
 		s.ClearGithubPrMergedStateID()
+	})
+}
+
+// SetGithubOpenIssues sets the "github_open_issues" field.
+func (u *TeamUpsertBulk) SetGithubOpenIssues(v bool) *TeamUpsertBulk {
+	return u.Update(func(s *TeamUpsert) {
+		s.SetGithubOpenIssues(v)
+	})
+}
+
+// UpdateGithubOpenIssues sets the "github_open_issues" field to the value that was provided on create.
+func (u *TeamUpsertBulk) UpdateGithubOpenIssues() *TeamUpsertBulk {
+	return u.Update(func(s *TeamUpsert) {
+		s.UpdateGithubOpenIssues()
+	})
+}
+
+// ClearGithubOpenIssues clears the value of the "github_open_issues" field.
+func (u *TeamUpsertBulk) ClearGithubOpenIssues() *TeamUpsertBulk {
+	return u.Update(func(s *TeamUpsert) {
+		s.ClearGithubOpenIssues()
+	})
+}
+
+// SetGithubSyncFields sets the "github_sync_fields" field.
+func (u *TeamUpsertBulk) SetGithubSyncFields(v bool) *TeamUpsertBulk {
+	return u.Update(func(s *TeamUpsert) {
+		s.SetGithubSyncFields(v)
+	})
+}
+
+// UpdateGithubSyncFields sets the "github_sync_fields" field to the value that was provided on create.
+func (u *TeamUpsertBulk) UpdateGithubSyncFields() *TeamUpsertBulk {
+	return u.Update(func(s *TeamUpsert) {
+		s.UpdateGithubSyncFields()
+	})
+}
+
+// ClearGithubSyncFields clears the value of the "github_sync_fields" field.
+func (u *TeamUpsertBulk) ClearGithubSyncFields() *TeamUpsertBulk {
+	return u.Update(func(s *TeamUpsert) {
+		s.ClearGithubSyncFields()
 	})
 }
 

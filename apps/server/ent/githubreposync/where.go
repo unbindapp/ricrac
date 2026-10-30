@@ -91,16 +91,6 @@ func LinkBack(v bool) predicate.GithubRepoSync {
 	return predicate.GithubRepoSync(sql.FieldEQ(FieldLinkBack, v))
 }
 
-// CreateIssues applies equality check predicate on the "create_issues" field. It's identical to CreateIssuesEQ.
-func CreateIssues(v bool) predicate.GithubRepoSync {
-	return predicate.GithubRepoSync(sql.FieldEQ(FieldCreateIssues, v))
-}
-
-// SyncFields applies equality check predicate on the "sync_fields" field. It's identical to SyncFieldsEQ.
-func SyncFields(v bool) predicate.GithubRepoSync {
-	return predicate.GithubRepoSync(sql.FieldEQ(FieldSyncFields, v))
-}
-
 // BackfillStatus applies equality check predicate on the "backfill_status" field. It's identical to BackfillStatusEQ.
 func BackfillStatus(v string) predicate.GithubRepoSync {
 	return predicate.GithubRepoSync(sql.FieldEQ(FieldBackfillStatus, v))
@@ -374,46 +364,6 @@ func LinkBackIsNil() predicate.GithubRepoSync {
 // LinkBackNotNil applies the NotNil predicate on the "link_back" field.
 func LinkBackNotNil() predicate.GithubRepoSync {
 	return predicate.GithubRepoSync(sql.FieldNotNull(FieldLinkBack))
-}
-
-// CreateIssuesEQ applies the EQ predicate on the "create_issues" field.
-func CreateIssuesEQ(v bool) predicate.GithubRepoSync {
-	return predicate.GithubRepoSync(sql.FieldEQ(FieldCreateIssues, v))
-}
-
-// CreateIssuesNEQ applies the NEQ predicate on the "create_issues" field.
-func CreateIssuesNEQ(v bool) predicate.GithubRepoSync {
-	return predicate.GithubRepoSync(sql.FieldNEQ(FieldCreateIssues, v))
-}
-
-// CreateIssuesIsNil applies the IsNil predicate on the "create_issues" field.
-func CreateIssuesIsNil() predicate.GithubRepoSync {
-	return predicate.GithubRepoSync(sql.FieldIsNull(FieldCreateIssues))
-}
-
-// CreateIssuesNotNil applies the NotNil predicate on the "create_issues" field.
-func CreateIssuesNotNil() predicate.GithubRepoSync {
-	return predicate.GithubRepoSync(sql.FieldNotNull(FieldCreateIssues))
-}
-
-// SyncFieldsEQ applies the EQ predicate on the "sync_fields" field.
-func SyncFieldsEQ(v bool) predicate.GithubRepoSync {
-	return predicate.GithubRepoSync(sql.FieldEQ(FieldSyncFields, v))
-}
-
-// SyncFieldsNEQ applies the NEQ predicate on the "sync_fields" field.
-func SyncFieldsNEQ(v bool) predicate.GithubRepoSync {
-	return predicate.GithubRepoSync(sql.FieldNEQ(FieldSyncFields, v))
-}
-
-// SyncFieldsIsNil applies the IsNil predicate on the "sync_fields" field.
-func SyncFieldsIsNil() predicate.GithubRepoSync {
-	return predicate.GithubRepoSync(sql.FieldIsNull(FieldSyncFields))
-}
-
-// SyncFieldsNotNil applies the NotNil predicate on the "sync_fields" field.
-func SyncFieldsNotNil() predicate.GithubRepoSync {
-	return predicate.GithubRepoSync(sql.FieldNotNull(FieldSyncFields))
 }
 
 // BackfillStatusEQ applies the EQ predicate on the "backfill_status" field.

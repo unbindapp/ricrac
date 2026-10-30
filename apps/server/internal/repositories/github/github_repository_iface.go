@@ -63,6 +63,9 @@ type GitHubRepositoryInterface interface {
 	// minutes, of installations that aren't suspended, the longest waiting first.
 	MilestoneSyncsDue(ctx context.Context, limit int) ([]*ent.GithubRepoSync, error)
 	MarkMilestonesSynced(ctx context.Context, id uuid.UUID) error
+	// TeamSyncsFields says whether the team syncs priority, estimate, due date and cycle with GitHub's
+	// issue fields.
+	TeamSyncsFields(ctx context.Context, team uuid.UUID) (bool, error)
 	// LockNewIssues waits for the sync's issues being opened on GitHub to be linked, until tx ends.
 	LockNewIssues(ctx context.Context, tx repository.TxInterface, repoSync uuid.UUID) error
 	// IssueLinked says whether the issue is linked to a GitHub issue.

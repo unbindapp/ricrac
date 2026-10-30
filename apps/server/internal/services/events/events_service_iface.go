@@ -26,8 +26,8 @@ type EventsServiceInterface interface {
 	// QueueMilestoneForGitHub queues a milestone's change (kind milestone) or deletion
 	// (milestone_deleted) for each GitHub milestone it is linked to.
 	QueueMilestoneForGitHub(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, milestone uuid.UUID, kind string) error
-	// QueueNewIssueForGitHub queues an issue created in Ricrac for the team's synced repository it
-	// opens in on GitHub (see save_issue's githubRepository), if any.
+	// QueueNewIssueForGitHub queues an issue created in Ricrac for the synced repository it opens in
+	// on GitHub: the one named, or by default when the team opens new issues on GitHub.
 	QueueNewIssueForGitHub(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, issue, team uuid.UUID, repository *string) error
 	Audit(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, kind string, metadata any) error
 	// Notify notifies each of users once, except the actor, who doesn't need to hear about their

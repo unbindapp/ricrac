@@ -337,8 +337,7 @@ func (self *GitHubService) saveRepoSync(ctx context.Context, actor *auth.Actor, 
 		return uuid.Nil, false, err
 	}
 	change := github_repo.RepoSyncChange{
-		Team: team, SetProject: input.Project.Set, Project: project, LinkBack: input.LinkBack, CreateIssues: input.CreateIssues,
-		SyncFields: input.SyncFields,
+		Team: team, SetProject: input.Project.Set, Project: project, LinkBack: input.LinkBack,
 	}
 	if err := self.github().ChangeRepoSync(ctx, id, change); err != nil {
 		return uuid.Nil, false, err
@@ -361,7 +360,6 @@ func (self *GitHubService) createRepoSync(ctx context.Context, actor *auth.Actor
 	return self.github().CreateRepoSync(ctx, github_repo.NewRepoSync{
 		Workspace: actor.Workspace, Installation: installation, RepoID: repository.ID, FullName: repository.FullName,
 		Team: team, Project: project, LinkBack: input.LinkBack != nil && *input.LinkBack,
-		CreateIssues: input.CreateIssues != nil && *input.CreateIssues, SyncFields: input.SyncFields != nil && *input.SyncFields,
 	})
 }
 

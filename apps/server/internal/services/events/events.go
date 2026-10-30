@@ -152,8 +152,8 @@ func (self *EventsService) QueueMilestoneForGitHub(ctx context.Context, tx repos
 	return nil
 }
 
-// QueueNewIssueForGitHub queues an issue created in Ricrac for the team's synced repository it
-// opens in on GitHub (see save_issue's githubRepository), if any.
+// QueueNewIssueForGitHub queues an issue created in Ricrac for the synced repository it opens in
+// on GitHub: the one named, or by default when the team opens new issues on GitHub.
 func (self *EventsService) QueueNewIssueForGitHub(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, issue, team uuid.UUID, repository *string) error {
 	if mirrorsGitHub(actor) || repository != nil && utils.IsNoneWord(*repository) {
 		return nil
@@ -173,11 +173,11 @@ func (self *EventsService) QueueNewIssueForGitHub(ctx context.Context, tx reposi
 	if repository == nil {
 		return nil
 	}
-	names, err := self.events().IssueCreatingRepos(ctx, tx, team)
+	names, err := self.events().TeamRepos(ctx, tx, team)
 	if err != nil {
 		return err
 	}
-	return errdefs.BadRequest("No synced repository %q opens the team's issues on GitHub. %s", *repository, utils.Options(names))
+	return errdefs.BadRequest("No repository %q syncs with the team. %s", *repository, utils.Options(names))
 }
 
 func (self *EventsService) Audit(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, kind string, metadata any) error {

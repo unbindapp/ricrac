@@ -751,8 +751,6 @@ export type GitHubPreview = {
 export type GitHubRepoSync = {
   /** The import of the repository's existing issues; null when none was asked for. */
   backfill: GitHubBackfill | null
-  /** Issues created in Ricrac open on GitHub in this repository too. */
-  createIssues: boolean
   createdAt: string
   id: string
   installationId: number
@@ -764,8 +762,6 @@ export type GitHubRepoSync = {
   linkedIssueCount: number
   project: ProjectRef | null
   repository: GitHubRepositoryRef
-  /** Priority, estimate, due date and cycle sync with the organization's issue fields. */
-  syncFields: boolean
   team: TeamRef
   updatedAt: string
 }
@@ -1709,10 +1705,14 @@ export type TeamDetail = {
   estimateAllowZero: boolean
   estimateExtended: boolean
   estimateType: "notUsed" | "exponential" | "fibonacci" | "linear" | "tShirt"
+  /** New issues open on GitHub too unless they say otherwise. */
+  githubOpenIssues: boolean
   /** Where merged pull requests that fix issues move them; null for the first completed status. */
   githubPrMergedState: StateRef | null
   /** Where GitHub pull requests and branches move issues; null for the first started status. */
   githubPrOpenedState: StateRef | null
+  /** Priority, estimate, due date and cycle sync with the GitHub organization's issue fields. */
+  githubSyncFields: boolean
   icon: string | null
   id: string
   isMember: boolean
@@ -2117,10 +2117,14 @@ export type SaveTeamArgs = {
   estimateExtended?: boolean | null
   /** notUsed, exponential, fibonacci, linear or tShirt. */
   estimateType?: string | null
+  /** New issues open on GitHub too, in one of the synced repositories (see save_issue's githubRepository), unless save_issue says githubRepository "none". Off (the default), only issues that name a githubRepository do. */
+  githubOpenIssues?: boolean | null
   /** The status issues move to when a pull request that fixes them merges (name or id); null for the first completed status. */
   githubPrMergedState?: string | null
   /** The status issues move to when a GitHub pull request or branch mentioning them opens (name or id); null for the first started status. */
   githubPrOpenedState?: string | null
+  /** Priority, estimate, due date and cycle of issues synced with GitHub sync both ways with the organization's issue fields named Priority (Urgent, High, Medium, Low), Estimate, Due date (or Target date) and Cycle, where it has them (default off). */
+  githubSyncFields?: boolean | null
   /** An emoji or icon name; null clears it. */
   icon?: string | null
   /** The workspace's team: its key, name or id. A workspace has one team, so omitting it (creating another) fails. */
@@ -2362,7 +2366,7 @@ export type SaveIssueArgs = {
   duplicateOf?: string | null
   /** Estimate points on the team's scale; null clears it. T-shirt sizes are XS=1, S=2, M=3, L=5, XL=8, XXL=13, XXXL=21. */
   estimate?: number | null
-  /** Only on create, when the team's synced repositories open Ricrac issues on GitHub: the one (owner/name) to open it in, or "none" to keep it off GitHub. By default the one synced with the issue's project, else the one with the most synced issues. */
+  /** Only on create: the synced repository (owner/name, or name) to open the issue in on GitHub too, or "none" to keep it off GitHub. Omitted, it opens on GitHub only when the team's githubOpenIssues is on, in the repository synced with the issue's project, else the one with the most synced issues. */
   githubRepository?: string | null
   /** Only to update an issue: its identifier (ENG-123), id or link. Omit to create one. */
   id?: string | null
@@ -3947,8 +3951,6 @@ export type ListGithubRepoSyncsArgs = {
 export type SaveGithubRepoSyncArgs = {
   /** Import the repository's existing issues and comments: on create unless false; true imports again. */
   backfill?: boolean | null
-  /** Issues created in Ricrac in the team open on GitHub in this repository too (default false); with several such repositories, see save_issue's githubRepository. */
-  createIssues?: boolean | null
   /** Only to change a sync: its id or the repository (owner/name). Omit to create one. */
   id?: string | null
   /** The import includes closed issues too (default false). */
@@ -3959,8 +3961,6 @@ export type SaveGithubRepoSyncArgs = {
   project?: string | null
   /** The repository as owner/name or GitHub id, among list_github_repositories. Required to create. */
   repository?: string | null
-  /** Priority, estimate, due date and cycle sync both ways with the organization's issue fields named Priority, Estimate, Due date (or Target date) and Cycle, where it has them (default false). */
-  syncFields?: boolean | null
   /** Optional: the workspace's team by default. Its key, name or id. The team whose issues the repository's are. */
   team?: string | null
 }

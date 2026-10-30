@@ -47,23 +47,22 @@ test("webhook events read as sentences", () => {
   assert.equal(githubEventLabel("push"), "Push");
 });
 
-const repoSync = (name: string, linkedIssueCount: number, project: string | null = null) => ({
-  name,
-  createIssues: true,
-  linkedIssueCount,
-  createdAt: "2026-01-01T00:00:00Z",
-  project: project ? { id: project } : null,
-});
+const repoSync = (
+  name: string,
+  linkedIssueCount: number,
+  project: string | null = null,
+  createdAt = "2026-01-01T00:00:00Z",
+) => ({ name, linkedIssueCount, createdAt, project: project ? { id: project } : null });
 
 test("new issues open in the project's repository, else the one with the most issues", () => {
   const syncs = [
     repoSync("api", 10),
     repoSync("web", 4, "p1"),
-    { ...repoSync("docs", 50), createIssues: false },
+    repoSync("docs", 10, null, "2025-06-01T00:00:00Z"),
   ];
   const names = (projectId?: string) =>
     issueRepositories(syncs, projectId).map((item) => item.name);
-  assert.deepEqual(names("p1"), ["web", "api"]);
-  assert.deepEqual(names(), ["api", "web"]);
-  assert.deepEqual(names("p2"), ["api", "web"]);
+  assert.deepEqual(names("p1"), ["web", "docs", "api"]);
+  assert.deepEqual(names(), ["docs", "api", "web"]);
+  assert.deepEqual(names("p2"), ["docs", "api", "web"]);
 });

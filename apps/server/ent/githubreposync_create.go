@@ -89,34 +89,6 @@ func (_c *GithubRepoSyncCreate) SetNillableLinkBack(v *bool) *GithubRepoSyncCrea
 	return _c
 }
 
-// SetCreateIssues sets the "create_issues" field.
-func (_c *GithubRepoSyncCreate) SetCreateIssues(v bool) *GithubRepoSyncCreate {
-	_c.mutation.SetCreateIssues(v)
-	return _c
-}
-
-// SetNillableCreateIssues sets the "create_issues" field if the given value is not nil.
-func (_c *GithubRepoSyncCreate) SetNillableCreateIssues(v *bool) *GithubRepoSyncCreate {
-	if v != nil {
-		_c.SetCreateIssues(*v)
-	}
-	return _c
-}
-
-// SetSyncFields sets the "sync_fields" field.
-func (_c *GithubRepoSyncCreate) SetSyncFields(v bool) *GithubRepoSyncCreate {
-	_c.mutation.SetSyncFields(v)
-	return _c
-}
-
-// SetNillableSyncFields sets the "sync_fields" field if the given value is not nil.
-func (_c *GithubRepoSyncCreate) SetNillableSyncFields(v *bool) *GithubRepoSyncCreate {
-	if v != nil {
-		_c.SetSyncFields(*v)
-	}
-	return _c
-}
-
 // SetBackfillStatus sets the "backfill_status" field.
 func (_c *GithubRepoSyncCreate) SetBackfillStatus(v string) *GithubRepoSyncCreate {
 	_c.mutation.SetBackfillStatus(v)
@@ -479,14 +451,6 @@ func (_c *GithubRepoSyncCreate) createSpec() (*GithubRepoSync, *sqlgraph.CreateS
 		_spec.SetField(githubreposync.FieldLinkBack, field.TypeBool, value)
 		_node.LinkBack = value
 	}
-	if value, ok := _c.mutation.CreateIssues(); ok {
-		_spec.SetField(githubreposync.FieldCreateIssues, field.TypeBool, value)
-		_node.CreateIssues = value
-	}
-	if value, ok := _c.mutation.SyncFields(); ok {
-		_spec.SetField(githubreposync.FieldSyncFields, field.TypeBool, value)
-		_node.SyncFields = value
-	}
 	if value, ok := _c.mutation.BackfillStatus(); ok {
 		_spec.SetField(githubreposync.FieldBackfillStatus, field.TypeString, value)
 		_node.BackfillStatus = &value
@@ -802,42 +766,6 @@ func (u *GithubRepoSyncUpsert) UpdateLinkBack() *GithubRepoSyncUpsert {
 // ClearLinkBack clears the value of the "link_back" field.
 func (u *GithubRepoSyncUpsert) ClearLinkBack() *GithubRepoSyncUpsert {
 	u.SetNull(githubreposync.FieldLinkBack)
-	return u
-}
-
-// SetCreateIssues sets the "create_issues" field.
-func (u *GithubRepoSyncUpsert) SetCreateIssues(v bool) *GithubRepoSyncUpsert {
-	u.Set(githubreposync.FieldCreateIssues, v)
-	return u
-}
-
-// UpdateCreateIssues sets the "create_issues" field to the value that was provided on create.
-func (u *GithubRepoSyncUpsert) UpdateCreateIssues() *GithubRepoSyncUpsert {
-	u.SetExcluded(githubreposync.FieldCreateIssues)
-	return u
-}
-
-// ClearCreateIssues clears the value of the "create_issues" field.
-func (u *GithubRepoSyncUpsert) ClearCreateIssues() *GithubRepoSyncUpsert {
-	u.SetNull(githubreposync.FieldCreateIssues)
-	return u
-}
-
-// SetSyncFields sets the "sync_fields" field.
-func (u *GithubRepoSyncUpsert) SetSyncFields(v bool) *GithubRepoSyncUpsert {
-	u.Set(githubreposync.FieldSyncFields, v)
-	return u
-}
-
-// UpdateSyncFields sets the "sync_fields" field to the value that was provided on create.
-func (u *GithubRepoSyncUpsert) UpdateSyncFields() *GithubRepoSyncUpsert {
-	u.SetExcluded(githubreposync.FieldSyncFields)
-	return u
-}
-
-// ClearSyncFields clears the value of the "sync_fields" field.
-func (u *GithubRepoSyncUpsert) ClearSyncFields() *GithubRepoSyncUpsert {
-	u.SetNull(githubreposync.FieldSyncFields)
 	return u
 }
 
@@ -1251,48 +1179,6 @@ func (u *GithubRepoSyncUpsertOne) UpdateLinkBack() *GithubRepoSyncUpsertOne {
 func (u *GithubRepoSyncUpsertOne) ClearLinkBack() *GithubRepoSyncUpsertOne {
 	return u.Update(func(s *GithubRepoSyncUpsert) {
 		s.ClearLinkBack()
-	})
-}
-
-// SetCreateIssues sets the "create_issues" field.
-func (u *GithubRepoSyncUpsertOne) SetCreateIssues(v bool) *GithubRepoSyncUpsertOne {
-	return u.Update(func(s *GithubRepoSyncUpsert) {
-		s.SetCreateIssues(v)
-	})
-}
-
-// UpdateCreateIssues sets the "create_issues" field to the value that was provided on create.
-func (u *GithubRepoSyncUpsertOne) UpdateCreateIssues() *GithubRepoSyncUpsertOne {
-	return u.Update(func(s *GithubRepoSyncUpsert) {
-		s.UpdateCreateIssues()
-	})
-}
-
-// ClearCreateIssues clears the value of the "create_issues" field.
-func (u *GithubRepoSyncUpsertOne) ClearCreateIssues() *GithubRepoSyncUpsertOne {
-	return u.Update(func(s *GithubRepoSyncUpsert) {
-		s.ClearCreateIssues()
-	})
-}
-
-// SetSyncFields sets the "sync_fields" field.
-func (u *GithubRepoSyncUpsertOne) SetSyncFields(v bool) *GithubRepoSyncUpsertOne {
-	return u.Update(func(s *GithubRepoSyncUpsert) {
-		s.SetSyncFields(v)
-	})
-}
-
-// UpdateSyncFields sets the "sync_fields" field to the value that was provided on create.
-func (u *GithubRepoSyncUpsertOne) UpdateSyncFields() *GithubRepoSyncUpsertOne {
-	return u.Update(func(s *GithubRepoSyncUpsert) {
-		s.UpdateSyncFields()
-	})
-}
-
-// ClearSyncFields clears the value of the "sync_fields" field.
-func (u *GithubRepoSyncUpsertOne) ClearSyncFields() *GithubRepoSyncUpsertOne {
-	return u.Update(func(s *GithubRepoSyncUpsert) {
-		s.ClearSyncFields()
 	})
 }
 
@@ -1914,48 +1800,6 @@ func (u *GithubRepoSyncUpsertBulk) UpdateLinkBack() *GithubRepoSyncUpsertBulk {
 func (u *GithubRepoSyncUpsertBulk) ClearLinkBack() *GithubRepoSyncUpsertBulk {
 	return u.Update(func(s *GithubRepoSyncUpsert) {
 		s.ClearLinkBack()
-	})
-}
-
-// SetCreateIssues sets the "create_issues" field.
-func (u *GithubRepoSyncUpsertBulk) SetCreateIssues(v bool) *GithubRepoSyncUpsertBulk {
-	return u.Update(func(s *GithubRepoSyncUpsert) {
-		s.SetCreateIssues(v)
-	})
-}
-
-// UpdateCreateIssues sets the "create_issues" field to the value that was provided on create.
-func (u *GithubRepoSyncUpsertBulk) UpdateCreateIssues() *GithubRepoSyncUpsertBulk {
-	return u.Update(func(s *GithubRepoSyncUpsert) {
-		s.UpdateCreateIssues()
-	})
-}
-
-// ClearCreateIssues clears the value of the "create_issues" field.
-func (u *GithubRepoSyncUpsertBulk) ClearCreateIssues() *GithubRepoSyncUpsertBulk {
-	return u.Update(func(s *GithubRepoSyncUpsert) {
-		s.ClearCreateIssues()
-	})
-}
-
-// SetSyncFields sets the "sync_fields" field.
-func (u *GithubRepoSyncUpsertBulk) SetSyncFields(v bool) *GithubRepoSyncUpsertBulk {
-	return u.Update(func(s *GithubRepoSyncUpsert) {
-		s.SetSyncFields(v)
-	})
-}
-
-// UpdateSyncFields sets the "sync_fields" field to the value that was provided on create.
-func (u *GithubRepoSyncUpsertBulk) UpdateSyncFields() *GithubRepoSyncUpsertBulk {
-	return u.Update(func(s *GithubRepoSyncUpsert) {
-		s.UpdateSyncFields()
-	})
-}
-
-// ClearSyncFields clears the value of the "sync_fields" field.
-func (u *GithubRepoSyncUpsertBulk) ClearSyncFields() *GithubRepoSyncUpsertBulk {
-	return u.Update(func(s *GithubRepoSyncUpsert) {
-		s.ClearSyncFields()
 	})
 }
 

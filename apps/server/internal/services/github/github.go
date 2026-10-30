@@ -98,6 +98,4 @@ type SaveRepoSyncInput struct {
 	Backfill      *bool                 `json:"backfill" doc:"Import the repository's existing issues and comments: on create unless false; true imports again."`
 	IncludeClosed *bool                 `json:"includeClosed" doc:"The import includes closed issues too (default false)."`
 	LinkBack      *bool                 `json:"linkBack" doc:"Comment on each issue opened on GitHub with a link to its Ricrac issue (default false)."`
-	SyncFields    *bool                 `json:"syncFields" doc:"Priority, estimate, due date and cycle sync both ways with the organization's issue fields named Priority, Estimate, Due date (or Target date) and Cycle, where it has them (default false)."`
-	CreateIssues  *bool                 `json:"createIssues" doc:"Issues created in Ricrac in the team open on GitHub in this repository too (default false); with several such repositories, see save_issue's githubRepository."`
 }

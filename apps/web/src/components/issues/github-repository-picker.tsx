@@ -12,13 +12,21 @@ export const NOT_ON_GITHUB = "none";
 type TProps = {
   teamId: string;
   projectId: string | undefined;
+  /** The team opens new issues on GitHub unless they say otherwise. */
+  opensByDefault: boolean;
   /** The repository picked (owner/name or NOT_ON_GITHUB); undefined leaves it to the server. */
   value: string | undefined;
   onChange: (value: string | undefined) => void;
 };
 
-/** Which synced repository a new issue opens in on GitHub, when the team's repositories open issues. */
-export function GithubRepositoryPicker({ teamId, projectId, value, onChange }: TProps) {
+/** Which synced repository a new issue opens in on GitHub, if any. */
+export function GithubRepositoryPicker({
+  teamId,
+  projectId,
+  opensByDefault,
+  value,
+  onChange,
+}: TProps) {
   const { workspace } = useWorkspace();
   const { data } = useQuery(githubRepoSyncsQuery(workspace.id));
   const repositories = issueRepositories(
@@ -27,7 +35,7 @@ export function GithubRepositoryPicker({ teamId, projectId, value, onChange }: T
   );
   if (repositories.length === 0) return null;
 
-  const fallback = repositories[0].repository.fullName;
+  const fallback = opensByDefault ? repositories[0].repository.fullName : NOT_ON_GITHUB;
   const current = value ?? fallback;
   const isOff = current === NOT_ON_GITHUB;
   const options: TPickerOption[] = [

@@ -60,6 +60,8 @@ func (Team) Fields() []ent.Field {
 		field.Time("updated_at").Optional(),
 		field.UUID("github_pr_opened_state_id", uuid.UUID{}).Optional().Nillable(),
 		field.UUID("github_pr_merged_state_id", uuid.UUID{}).Optional().Nillable(),
+		field.Bool("github_open_issues").Optional(),
+		field.Bool("github_sync_fields").Optional(),
 		field.Other("previous_keys", pgarray.Text{}).SchemaType(textArray).Optional(),
 		field.Other("previous_names", pgarray.Text{}).SchemaType(textArray).Optional(),
 		field.Other("merged_team_ids", pgarray.UUID{}).SchemaType(uuidArray).Optional(),

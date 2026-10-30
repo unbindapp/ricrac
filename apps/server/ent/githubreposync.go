@@ -36,10 +36,6 @@ type GithubRepoSync struct {
 	ProjectID *uuid.UUID `json:"project_id,omitempty"`
 	// LinkBack holds the value of the "link_back" field.
 	LinkBack bool `json:"link_back,omitempty"`
-	// CreateIssues holds the value of the "create_issues" field.
-	CreateIssues bool `json:"create_issues,omitempty"`
-	// SyncFields holds the value of the "sync_fields" field.
-	SyncFields bool `json:"sync_fields,omitempty"`
 	// BackfillStatus holds the value of the "backfill_status" field.
 	BackfillStatus *string `json:"backfill_status,omitempty"`
 	// BackfillClosed holds the value of the "backfill_closed" field.
@@ -169,7 +165,7 @@ func (*GithubRepoSync) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case githubreposync.FieldProjectID:
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case githubreposync.FieldLinkBack, githubreposync.FieldCreateIssues, githubreposync.FieldSyncFields, githubreposync.FieldBackfillClosed:
+		case githubreposync.FieldLinkBack, githubreposync.FieldBackfillClosed:
 			values[i] = new(sql.NullBool)
 		case githubreposync.FieldInstallationID, githubreposync.FieldRepoID, githubreposync.FieldBackfillPage, githubreposync.FieldIssuesCreated, githubreposync.FieldIssuesUpdated, githubreposync.FieldCommentsCreated, githubreposync.FieldSkipped:
 			values[i] = new(sql.NullInt64)
@@ -242,18 +238,6 @@ func (_m *GithubRepoSync) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field link_back", values[i])
 			} else if value.Valid {
 				_m.LinkBack = value.Bool
-			}
-		case githubreposync.FieldCreateIssues:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field create_issues", values[i])
-			} else if value.Valid {
-				_m.CreateIssues = value.Bool
-			}
-		case githubreposync.FieldSyncFields:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field sync_fields", values[i])
-			} else if value.Valid {
-				_m.SyncFields = value.Bool
 			}
 		case githubreposync.FieldBackfillStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -424,12 +408,6 @@ func (_m *GithubRepoSync) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("link_back=")
 	builder.WriteString(fmt.Sprintf("%v", _m.LinkBack))
-	builder.WriteString(", ")
-	builder.WriteString("create_issues=")
-	builder.WriteString(fmt.Sprintf("%v", _m.CreateIssues))
-	builder.WriteString(", ")
-	builder.WriteString("sync_fields=")
-	builder.WriteString(fmt.Sprintf("%v", _m.SyncFields))
 	builder.WriteString(", ")
 	if v := _m.BackfillStatus; v != nil {
 		builder.WriteString("backfill_status=")

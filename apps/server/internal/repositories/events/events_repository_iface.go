@@ -32,12 +32,12 @@ type EventsRepositoryInterface interface {
 	// QueueMilestoneForGitHub queues a milestone's change or deletion for each GitHub milestone it is
 	// linked to but the one of except, saying whether anything was queued.
 	QueueMilestoneForGitHub(ctx context.Context, tx repository.TxInterface, milestone uuid.UUID, kind string, except *uuid.UUID) (bool, error)
-	// QueueNewIssueForGitHub queues a new issue for one of the team's synced repositories that open
-	// Ricrac issues: the one named, else the one synced with the issue's project, else the one with
-	// the most linked issues. It says whether there was one.
+	// QueueNewIssueForGitHub queues a new issue for one of the team's synced repositories: the one
+	// named, else (when the team opens new issues on GitHub) the one synced with the issue's project,
+	// else the one with the most linked issues. It says whether there was one.
 	QueueNewIssueForGitHub(ctx context.Context, tx repository.TxInterface, issue, team uuid.UUID, named *string, actAs *uuid.UUID) (bool, error)
-	// IssueCreatingRepos is the names of the team's synced repositories that open Ricrac issues.
-	IssueCreatingRepos(ctx context.Context, tx repository.TxInterface, team uuid.UUID) ([]string, error)
+	// TeamRepos is the names of the team's synced repositories.
+	TeamRepos(ctx context.Context, tx repository.TxInterface, team uuid.UUID) ([]string, error)
 	// QueueCommentForGitHub queues a new comment on a linked issue, or the edit or deletion of a
 	// comment the app posted (with its replies), saying whether anything was queued.
 	QueueCommentForGitHub(ctx context.Context, tx repository.TxInterface, issue, comment uuid.UUID, kind string) (bool, error)

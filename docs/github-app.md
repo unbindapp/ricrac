@@ -17,12 +17,13 @@ With the app installed:
   issues opened, edited, labeled, assigned, closed, reopened, deleted or commented on GitHub
   change the Ricrac issue, and title, description, status, labels, assignee and comments changed
   in Ricrac go back to GitHub. Existing issues are imported when the sync is created.
-- Syncs with `createIssues` open the issues created in Ricrac on GitHub too, as their author when
-  they linked GitHub, else as the app. With several such repositories, `save_issue` takes
-  `githubRepository`; by default an issue goes to the repository synced with its project, else
-  the one with the most synced issues.
-- Syncs with `syncFields` keep priority, estimate, due date and cycle in step both ways with the
-  organization's issue fields named `Priority` (options Urgent, High, Medium, Low), `Estimate`
+- Issues created in Ricrac can open on GitHub too, as their author when they linked GitHub, else as
+  the app: those that name a synced repository (`save_issue`'s `githubRepository`), or all new
+  issues when the team's `githubOpenIssues` is on (off by default; `save_team`). Those go to the
+  repository synced with the issue's project, else the one with the most synced issues, unless
+  they say `githubRepository: "none"`.
+- With the team's `githubSyncFields` on (off by default; `save_team`), synced issues keep
+  priority, estimate, due date and cycle in step both ways with the organization's issue fields named `Priority` (options Urgent, High, Medium, Low), `Estimate`
   (number), `Due date` or `Target date` (date) and `Cycle` (text), where the organization has
   them. Organization owners create the fields under the organization's settings, or with
   `POST /orgs/{org}/issue-fields`.

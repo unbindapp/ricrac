@@ -21,8 +21,9 @@ CREATE TABLE github_milestone_links (
 );
 
 ALTER TABLE github_repo_syncs ADD COLUMN milestones_synced_at TIMESTAMPTZ;
-ALTER TABLE github_repo_syncs ADD COLUMN create_issues BOOLEAN NOT NULL DEFAULT false;
-ALTER TABLE github_repo_syncs ADD COLUMN sync_fields BOOLEAN NOT NULL DEFAULT false;
-UPDATE github_repo_syncs SET create_issues = link_back, sync_fields = link_back;
+ALTER TABLE teams ADD COLUMN github_open_issues BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE teams ADD COLUMN github_sync_fields BOOLEAN NOT NULL DEFAULT false;
+UPDATE teams t SET github_open_issues = true, github_sync_fields = true
+WHERE EXISTS (SELECT 1 FROM github_repo_syncs s WHERE s.team_id = t.id AND s.link_back);
 ALTER TABLE github_outbox ADD COLUMN milestone_id UUID REFERENCES project_milestones(id) ON DELETE SET NULL;
 -- +goose StatementEnd

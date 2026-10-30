@@ -27,10 +27,6 @@ const (
 	FieldProjectID = "project_id"
 	// FieldLinkBack holds the string denoting the link_back field in the database.
 	FieldLinkBack = "link_back"
-	// FieldCreateIssues holds the string denoting the create_issues field in the database.
-	FieldCreateIssues = "create_issues"
-	// FieldSyncFields holds the string denoting the sync_fields field in the database.
-	FieldSyncFields = "sync_fields"
 	// FieldBackfillStatus holds the string denoting the backfill_status field in the database.
 	FieldBackfillStatus = "backfill_status"
 	// FieldBackfillClosed holds the string denoting the backfill_closed field in the database.
@@ -134,8 +130,6 @@ var Columns = []string{
 	FieldTeamID,
 	FieldProjectID,
 	FieldLinkBack,
-	FieldCreateIssues,
-	FieldSyncFields,
 	FieldBackfillStatus,
 	FieldBackfillClosed,
 	FieldBackfillPage,
@@ -206,16 +200,6 @@ func ByProjectID(opts ...sql.OrderTermOption) OrderOption {
 // ByLinkBack orders the results by the link_back field.
 func ByLinkBack(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLinkBack, opts...).ToFunc()
-}
-
-// ByCreateIssues orders the results by the create_issues field.
-func ByCreateIssues(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreateIssues, opts...).ToFunc()
-}
-
-// BySyncFields orders the results by the sync_fields field.
-func BySyncFields(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldSyncFields, opts...).ToFunc()
 }
 
 // ByBackfillStatus orders the results by the backfill_status field.

@@ -12,6 +12,7 @@ import (
 	"ricrac/ent/githubissuelink"
 	"ricrac/ent/githubmilestonelink"
 	"ricrac/ent/githubreposync"
+	team_ent "ricrac/ent/team"
 	repository "ricrac/internal/repositories"
 )
 
@@ -80,6 +81,12 @@ func (self *GitHubRepository) MilestoneSyncsDue(ctx context.Context, limit int) 
 func (self *GitHubRepository) MarkMilestonesSynced(ctx context.Context, id uuid.UUID) error {
 	return self.base.DB.GithubRepoSync.Update().Where(githubreposync.ID(id)).
 		Modify(func(u *entsql.UpdateBuilder) { u.Set(githubreposync.FieldMilestonesSyncedAt, now()) }).Exec(ctx)
+}
+
+// TeamSyncsFields says whether the team syncs priority, estimate, due date and cycle with GitHub's
+// issue fields.
+func (self *GitHubRepository) TeamSyncsFields(ctx context.Context, team uuid.UUID) (bool, error) {
+	return self.base.DB.Team.Query().Where(team_ent.ID(team), team_ent.GithubSyncFields(true)).Exist(ctx)
 }
 
 // LockNewIssues waits for the sync's issues being opened on GitHub to be linked, until tx ends.

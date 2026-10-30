@@ -26,7 +26,7 @@ func (self *GitHubService) orgFields(ctx context.Context, token, fullName string
 }
 
 // pushIssueFields brings the changed priority, estimate, due date and cycle over to the
-// organization's issue fields holding them, when the sync wants it.
+// organization's issue fields holding them, when the team syncs fields.
 func (self *GitHubService) pushIssueFields(ctx context.Context, token string, entry github_repo.OutboxEntry, changes M) error {
 	var slots []github.FieldSlot
 	for _, slot := range github.FieldSlots {
@@ -38,7 +38,10 @@ func (self *GitHubService) pushIssueFields(ctx context.Context, token string, en
 		return nil
 	}
 	sync, err := self.github().SyncOf(ctx, entry.RepoSync)
-	if err != nil || sync == nil || !sync.SyncFields {
+	if err != nil || sync == nil {
+		return err
+	}
+	if synced, err := self.github().TeamSyncsFields(ctx, sync.TeamID); err != nil || !synced {
 		return err
 	}
 	fields, err := self.orgFields(ctx, token, entry.FullName)
@@ -106,10 +109,10 @@ func fieldValue(key string, issue models.Issue, field *github.IssueField) (any, 
 }
 
 // fieldChange is what the GitHub issue's field values change on the Ricrac issue, nil when
-// nothing or the sync doesn't want it.
+// nothing or the team doesn't sync fields.
 func (self *GitHubService) fieldChange(ctx context.Context, actor *auth.Actor, sync *ent.GithubRepoSync, row *ent.Issue, number int) (*issue_service.SaveInput, error) {
-	if !sync.SyncFields {
-		return nil, nil
+	if synced, err := self.github().TeamSyncsFields(ctx, sync.TeamID); err != nil || !synced {
+		return nil, err
 	}
 	token, err := self.app.InstallationToken(ctx, sync.InstallationID)
 	if err != nil {

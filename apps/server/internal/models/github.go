@@ -50,8 +50,6 @@ type GitHubRepoSync struct {
 	Project          *ProjectRef         `json:"project"`
 	Backfill         *GitHubBackfill     `json:"backfill" doc:"The import of the repository's existing issues; null when none was asked for."`
 	LinkBack         bool                `json:"linkBack" doc:"Issues opened on GitHub get a comment linking their Ricrac issue."`
-	SyncFields       bool                `json:"syncFields" doc:"Priority, estimate, due date and cycle sync with the organization's issue fields."`
-	CreateIssues     bool                `json:"createIssues" doc:"Issues created in Ricrac open on GitHub in this repository too."`
 	LinkedIssueCount int                 `json:"linkedIssueCount"`
 	LastError        *string             `json:"lastError" doc:"Why the last change from or to GitHub failed; null after one succeeds."`
 	LastSyncedAt     *string             `json:"lastSyncedAt"`
@@ -105,8 +103,6 @@ func GitHubRepoSyncOf(r *ent.GithubRepoSync, linkedIssues int, webURL string) Gi
 		Team:             *TeamRefOf(r.Edges.Team),
 		Project:          ProjectRefOf(r.Edges.Project),
 		LinkBack:         r.LinkBack,
-		CreateIssues:     r.CreateIssues,
-		SyncFields:       r.SyncFields,
 		LinkedIssueCount: linkedIssues,
 		LastError:        r.LastError,
 		LastSyncedAt:     TimePtr(r.LastSyncedAt),

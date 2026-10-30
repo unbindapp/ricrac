@@ -11,6 +11,7 @@ import {
 } from "@/components/icons";
 import { GithubIcon } from "@/components/icons/github";
 import { GithubRepoSyncs } from "@/components/integrations/github-repo-syncs";
+import { GithubTeamSettings } from "@/components/integrations/github-team-settings";
 import { ErrorCard } from "@/components/layout/error-card";
 import { List, ListRow } from "@/components/layout/list";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
@@ -137,6 +138,7 @@ function GithubConnected({ integration }: { integration: GitHubIntegration }) {
         )}
       </SettingsSection>
       <GithubRepoSyncs repoSyncs={integration.repoSyncs} />
+      {integration.repoSyncs.length > 0 && <GithubTeamSettings />}
       <PullRequestStatuses />
     </>
   );

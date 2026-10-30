@@ -78,7 +78,7 @@ type SaveInput struct {
 	SubIssueSortOrder *float64               `json:"subIssueSortOrder" doc:"Position among its parent's sub-issues."`
 	Template          *string                `json:"template" doc:"Issue template name or id, applied on create: it fills in fields and sub-issues the arguments don't set."`
 	Preview           *bool                  `json:"preview" doc:"true answers the issue as it would be saved, and where it would open on GitHub, without saving anything: to show it to the user before they confirm."`
-	GitHubRepository  *string                `json:"githubRepository" doc:"Only on create, when the team's synced repositories open Ricrac issues on GitHub: the one (owner/name) to open it in, or \"none\" to keep it off GitHub. By default the one synced with the issue's project, else the one with the most synced issues."`
+	GitHubRepository  *string                `json:"githubRepository" doc:"Only on create: the synced repository (owner/name, or name) to open the issue in on GitHub too, or \"none\" to keep it off GitHub. Omitted, it opens on GitHub only when the team's githubOpenIssues is on, in the repository synced with the issue's project, else the one with the most synced issues."`
 }
 
 type UpdateManyInput struct {

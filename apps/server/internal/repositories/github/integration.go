@@ -108,15 +108,12 @@ type NewRepoSync struct {
 	Team         uuid.UUID
 	Project      *uuid.UUID
 	LinkBack     bool
-	CreateIssues bool
-	SyncFields   bool
 }
 
 func (self *GitHubRepository) CreateRepoSync(ctx context.Context, input NewRepoSync) (uuid.UUID, error) {
 	created, err := self.base.DB.GithubRepoSync.Create().
 		SetWorkspaceID(input.Workspace).SetInstallationID(input.Installation).SetRepoID(input.RepoID).
-		SetFullName(input.FullName).SetTeamID(input.Team).SetNillableProjectID(input.Project).SetLinkBack(input.LinkBack).
-		SetCreateIssues(input.CreateIssues).SetSyncFields(input.SyncFields).Save(ctx)
+		SetFullName(input.FullName).SetTeamID(input.Team).SetNillableProjectID(input.Project).SetLinkBack(input.LinkBack).Save(ctx)
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -125,15 +122,15 @@ func (self *GitHubRepository) CreateRepoSync(ctx context.Context, input NewRepoS
 
 // RepoSyncChange is what changes on a sync; nil fields stay, the project only when SetProject.
 type RepoSyncChange struct {
-	Team                               *uuid.UUID
-	SetProject                         bool
-	Project                            *uuid.UUID
-	LinkBack, CreateIssues, SyncFields *bool
+	Team       *uuid.UUID
+	SetProject bool
+	Project    *uuid.UUID
+	LinkBack   *bool
 }
 
 func (self *GitHubRepository) ChangeRepoSync(ctx context.Context, id uuid.UUID, change RepoSyncChange) error {
 	update := self.base.DB.GithubRepoSync.Update().Where(githubreposync.ID(id)).SetNillableTeamID(change.Team).
-		SetNillableLinkBack(change.LinkBack).SetNillableCreateIssues(change.CreateIssues).SetNillableSyncFields(change.SyncFields).
+		SetNillableLinkBack(change.LinkBack).
 		Modify(func(u *entsql.UpdateBuilder) { u.Set(githubreposync.FieldUpdatedAt, now()) })
 	if change.SetProject {
 		update.SetNillableProjectID(change.Project)

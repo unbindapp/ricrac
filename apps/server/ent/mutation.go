@@ -28632,8 +28632,6 @@ type GithubRepoSyncMutation struct {
 	addrepo_id                    *int64
 	full_name                     *string
 	link_back                     *bool
-	create_issues                 *bool
-	sync_fields                   *bool
 	backfill_status               *string
 	backfill_closed               *bool
 	backfill_page                 *int
@@ -29074,104 +29072,6 @@ func (m *GithubRepoSyncMutation) LinkBackCleared() bool {
 func (m *GithubRepoSyncMutation) ResetLinkBack() {
 	m.link_back = nil
 	delete(m.clearedFields, githubreposync.FieldLinkBack)
-}
-
-// SetCreateIssues sets the "create_issues" field.
-func (m *GithubRepoSyncMutation) SetCreateIssues(b bool) {
-	m.create_issues = &b
-}
-
-// CreateIssues returns the value of the "create_issues" field in the mutation.
-func (m *GithubRepoSyncMutation) CreateIssues() (r bool, exists bool) {
-	v := m.create_issues
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCreateIssues returns the old "create_issues" field's value of the GithubRepoSync entity.
-// If the GithubRepoSync object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *GithubRepoSyncMutation) OldCreateIssues(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCreateIssues is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreateIssues requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreateIssues: %w", err)
-	}
-	return oldValue.CreateIssues, nil
-}
-
-// ClearCreateIssues clears the value of the "create_issues" field.
-func (m *GithubRepoSyncMutation) ClearCreateIssues() {
-	m.create_issues = nil
-	m.clearedFields[githubreposync.FieldCreateIssues] = struct{}{}
-}
-
-// CreateIssuesCleared returns if the "create_issues" field was cleared in this mutation.
-func (m *GithubRepoSyncMutation) CreateIssuesCleared() bool {
-	_, ok := m.clearedFields[githubreposync.FieldCreateIssues]
-	return ok
-}
-
-// ResetCreateIssues resets all changes to the "create_issues" field.
-func (m *GithubRepoSyncMutation) ResetCreateIssues() {
-	m.create_issues = nil
-	delete(m.clearedFields, githubreposync.FieldCreateIssues)
-}
-
-// SetSyncFields sets the "sync_fields" field.
-func (m *GithubRepoSyncMutation) SetSyncFields(b bool) {
-	m.sync_fields = &b
-}
-
-// SyncFields returns the value of the "sync_fields" field in the mutation.
-func (m *GithubRepoSyncMutation) SyncFields() (r bool, exists bool) {
-	v := m.sync_fields
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSyncFields returns the old "sync_fields" field's value of the GithubRepoSync entity.
-// If the GithubRepoSync object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *GithubRepoSyncMutation) OldSyncFields(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSyncFields is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSyncFields requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSyncFields: %w", err)
-	}
-	return oldValue.SyncFields, nil
-}
-
-// ClearSyncFields clears the value of the "sync_fields" field.
-func (m *GithubRepoSyncMutation) ClearSyncFields() {
-	m.sync_fields = nil
-	m.clearedFields[githubreposync.FieldSyncFields] = struct{}{}
-}
-
-// SyncFieldsCleared returns if the "sync_fields" field was cleared in this mutation.
-func (m *GithubRepoSyncMutation) SyncFieldsCleared() bool {
-	_, ok := m.clearedFields[githubreposync.FieldSyncFields]
-	return ok
-}
-
-// ResetSyncFields resets all changes to the "sync_fields" field.
-func (m *GithubRepoSyncMutation) ResetSyncFields() {
-	m.sync_fields = nil
-	delete(m.clearedFields, githubreposync.FieldSyncFields)
 }
 
 // SetBackfillStatus sets the "backfill_status" field.
@@ -30171,7 +30071,7 @@ func (m *GithubRepoSyncMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *GithubRepoSyncMutation) Fields() []string {
-	fields := make([]string, 0, 21)
+	fields := make([]string, 0, 19)
 	if m.workspace != nil {
 		fields = append(fields, githubreposync.FieldWorkspaceID)
 	}
@@ -30192,12 +30092,6 @@ func (m *GithubRepoSyncMutation) Fields() []string {
 	}
 	if m.link_back != nil {
 		fields = append(fields, githubreposync.FieldLinkBack)
-	}
-	if m.create_issues != nil {
-		fields = append(fields, githubreposync.FieldCreateIssues)
-	}
-	if m.sync_fields != nil {
-		fields = append(fields, githubreposync.FieldSyncFields)
 	}
 	if m.backfill_status != nil {
 		fields = append(fields, githubreposync.FieldBackfillStatus)
@@ -30257,10 +30151,6 @@ func (m *GithubRepoSyncMutation) Field(name string) (ent.Value, bool) {
 		return m.ProjectID()
 	case githubreposync.FieldLinkBack:
 		return m.LinkBack()
-	case githubreposync.FieldCreateIssues:
-		return m.CreateIssues()
-	case githubreposync.FieldSyncFields:
-		return m.SyncFields()
 	case githubreposync.FieldBackfillStatus:
 		return m.BackfillStatus()
 	case githubreposync.FieldBackfillClosed:
@@ -30308,10 +30198,6 @@ func (m *GithubRepoSyncMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldProjectID(ctx)
 	case githubreposync.FieldLinkBack:
 		return m.OldLinkBack(ctx)
-	case githubreposync.FieldCreateIssues:
-		return m.OldCreateIssues(ctx)
-	case githubreposync.FieldSyncFields:
-		return m.OldSyncFields(ctx)
 	case githubreposync.FieldBackfillStatus:
 		return m.OldBackfillStatus(ctx)
 	case githubreposync.FieldBackfillClosed:
@@ -30393,20 +30279,6 @@ func (m *GithubRepoSyncMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetLinkBack(v)
-		return nil
-	case githubreposync.FieldCreateIssues:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCreateIssues(v)
-		return nil
-	case githubreposync.FieldSyncFields:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSyncFields(v)
 		return nil
 	case githubreposync.FieldBackfillStatus:
 		v, ok := value.(string)
@@ -30603,12 +30475,6 @@ func (m *GithubRepoSyncMutation) ClearedFields() []string {
 	if m.FieldCleared(githubreposync.FieldLinkBack) {
 		fields = append(fields, githubreposync.FieldLinkBack)
 	}
-	if m.FieldCleared(githubreposync.FieldCreateIssues) {
-		fields = append(fields, githubreposync.FieldCreateIssues)
-	}
-	if m.FieldCleared(githubreposync.FieldSyncFields) {
-		fields = append(fields, githubreposync.FieldSyncFields)
-	}
 	if m.FieldCleared(githubreposync.FieldBackfillStatus) {
 		fields = append(fields, githubreposync.FieldBackfillStatus)
 	}
@@ -30664,12 +30530,6 @@ func (m *GithubRepoSyncMutation) ClearField(name string) error {
 		return nil
 	case githubreposync.FieldLinkBack:
 		m.ClearLinkBack()
-		return nil
-	case githubreposync.FieldCreateIssues:
-		m.ClearCreateIssues()
-		return nil
-	case githubreposync.FieldSyncFields:
-		m.ClearSyncFields()
 		return nil
 	case githubreposync.FieldBackfillStatus:
 		m.ClearBackfillStatus()
@@ -30735,12 +30595,6 @@ func (m *GithubRepoSyncMutation) ResetField(name string) error {
 		return nil
 	case githubreposync.FieldLinkBack:
 		m.ResetLinkBack()
-		return nil
-	case githubreposync.FieldCreateIssues:
-		m.ResetCreateIssues()
-		return nil
-	case githubreposync.FieldSyncFields:
-		m.ResetSyncFields()
 		return nil
 	case githubreposync.FieldBackfillStatus:
 		m.ResetBackfillStatus()
@@ -68582,6 +68436,8 @@ type TeamMutation struct {
 	archived_at                      *time.Time
 	created_at                       *time.Time
 	updated_at                       *time.Time
+	github_open_issues               *bool
+	github_sync_fields               *bool
 	previous_keys                    *pgarray.Text
 	previous_names                   *pgarray.Text
 	merged_team_ids                  *pgarray.UUID
@@ -70960,6 +70816,104 @@ func (m *TeamMutation) ResetGithubPrMergedStateID() {
 	delete(m.clearedFields, team.FieldGithubPrMergedStateID)
 }
 
+// SetGithubOpenIssues sets the "github_open_issues" field.
+func (m *TeamMutation) SetGithubOpenIssues(b bool) {
+	m.github_open_issues = &b
+}
+
+// GithubOpenIssues returns the value of the "github_open_issues" field in the mutation.
+func (m *TeamMutation) GithubOpenIssues() (r bool, exists bool) {
+	v := m.github_open_issues
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGithubOpenIssues returns the old "github_open_issues" field's value of the Team entity.
+// If the Team object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TeamMutation) OldGithubOpenIssues(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGithubOpenIssues is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGithubOpenIssues requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGithubOpenIssues: %w", err)
+	}
+	return oldValue.GithubOpenIssues, nil
+}
+
+// ClearGithubOpenIssues clears the value of the "github_open_issues" field.
+func (m *TeamMutation) ClearGithubOpenIssues() {
+	m.github_open_issues = nil
+	m.clearedFields[team.FieldGithubOpenIssues] = struct{}{}
+}
+
+// GithubOpenIssuesCleared returns if the "github_open_issues" field was cleared in this mutation.
+func (m *TeamMutation) GithubOpenIssuesCleared() bool {
+	_, ok := m.clearedFields[team.FieldGithubOpenIssues]
+	return ok
+}
+
+// ResetGithubOpenIssues resets all changes to the "github_open_issues" field.
+func (m *TeamMutation) ResetGithubOpenIssues() {
+	m.github_open_issues = nil
+	delete(m.clearedFields, team.FieldGithubOpenIssues)
+}
+
+// SetGithubSyncFields sets the "github_sync_fields" field.
+func (m *TeamMutation) SetGithubSyncFields(b bool) {
+	m.github_sync_fields = &b
+}
+
+// GithubSyncFields returns the value of the "github_sync_fields" field in the mutation.
+func (m *TeamMutation) GithubSyncFields() (r bool, exists bool) {
+	v := m.github_sync_fields
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGithubSyncFields returns the old "github_sync_fields" field's value of the Team entity.
+// If the Team object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TeamMutation) OldGithubSyncFields(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGithubSyncFields is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGithubSyncFields requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGithubSyncFields: %w", err)
+	}
+	return oldValue.GithubSyncFields, nil
+}
+
+// ClearGithubSyncFields clears the value of the "github_sync_fields" field.
+func (m *TeamMutation) ClearGithubSyncFields() {
+	m.github_sync_fields = nil
+	m.clearedFields[team.FieldGithubSyncFields] = struct{}{}
+}
+
+// GithubSyncFieldsCleared returns if the "github_sync_fields" field was cleared in this mutation.
+func (m *TeamMutation) GithubSyncFieldsCleared() bool {
+	_, ok := m.clearedFields[team.FieldGithubSyncFields]
+	return ok
+}
+
+// ResetGithubSyncFields resets all changes to the "github_sync_fields" field.
+func (m *TeamMutation) ResetGithubSyncFields() {
+	m.github_sync_fields = nil
+	delete(m.clearedFields, team.FieldGithubSyncFields)
+}
+
 // SetPreviousKeys sets the "previous_keys" field.
 func (m *TeamMutation) SetPreviousKeys(pg pgarray.Text) {
 	m.previous_keys = &pg
@@ -72113,7 +72067,7 @@ func (m *TeamMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TeamMutation) Fields() []string {
-	fields := make([]string, 0, 45)
+	fields := make([]string, 0, 47)
 	if m.workspace != nil {
 		fields = append(fields, team.FieldWorkspaceID)
 	}
@@ -72240,6 +72194,12 @@ func (m *TeamMutation) Fields() []string {
 	if m.github_pr_merged_state != nil {
 		fields = append(fields, team.FieldGithubPrMergedStateID)
 	}
+	if m.github_open_issues != nil {
+		fields = append(fields, team.FieldGithubOpenIssues)
+	}
+	if m.github_sync_fields != nil {
+		fields = append(fields, team.FieldGithubSyncFields)
+	}
 	if m.previous_keys != nil {
 		fields = append(fields, team.FieldPreviousKeys)
 	}
@@ -72341,6 +72301,10 @@ func (m *TeamMutation) Field(name string) (ent.Value, bool) {
 		return m.GithubPrOpenedStateID()
 	case team.FieldGithubPrMergedStateID:
 		return m.GithubPrMergedStateID()
+	case team.FieldGithubOpenIssues:
+		return m.GithubOpenIssues()
+	case team.FieldGithubSyncFields:
+		return m.GithubSyncFields()
 	case team.FieldPreviousKeys:
 		return m.PreviousKeys()
 	case team.FieldPreviousNames:
@@ -72440,6 +72404,10 @@ func (m *TeamMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldGithubPrOpenedStateID(ctx)
 	case team.FieldGithubPrMergedStateID:
 		return m.OldGithubPrMergedStateID(ctx)
+	case team.FieldGithubOpenIssues:
+		return m.OldGithubOpenIssues(ctx)
+	case team.FieldGithubSyncFields:
+		return m.OldGithubSyncFields(ctx)
 	case team.FieldPreviousKeys:
 		return m.OldPreviousKeys(ctx)
 	case team.FieldPreviousNames:
@@ -72749,6 +72717,20 @@ func (m *TeamMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetGithubPrMergedStateID(v)
 		return nil
+	case team.FieldGithubOpenIssues:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGithubOpenIssues(v)
+		return nil
+	case team.FieldGithubSyncFields:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGithubSyncFields(v)
+		return nil
 	case team.FieldPreviousKeys:
 		v, ok := value.(pgarray.Text)
 		if !ok {
@@ -73028,6 +73010,12 @@ func (m *TeamMutation) ClearedFields() []string {
 	if m.FieldCleared(team.FieldGithubPrMergedStateID) {
 		fields = append(fields, team.FieldGithubPrMergedStateID)
 	}
+	if m.FieldCleared(team.FieldGithubOpenIssues) {
+		fields = append(fields, team.FieldGithubOpenIssues)
+	}
+	if m.FieldCleared(team.FieldGithubSyncFields) {
+		fields = append(fields, team.FieldGithubSyncFields)
+	}
 	if m.FieldCleared(team.FieldPreviousKeys) {
 		fields = append(fields, team.FieldPreviousKeys)
 	}
@@ -73167,6 +73155,12 @@ func (m *TeamMutation) ClearField(name string) error {
 		return nil
 	case team.FieldGithubPrMergedStateID:
 		m.ClearGithubPrMergedStateID()
+		return nil
+	case team.FieldGithubOpenIssues:
+		m.ClearGithubOpenIssues()
+		return nil
+	case team.FieldGithubSyncFields:
+		m.ClearGithubSyncFields()
 		return nil
 	case team.FieldPreviousKeys:
 		m.ClearPreviousKeys()
@@ -73310,6 +73304,12 @@ func (m *TeamMutation) ResetField(name string) error {
 		return nil
 	case team.FieldGithubPrMergedStateID:
 		m.ResetGithubPrMergedStateID()
+		return nil
+	case team.FieldGithubOpenIssues:
+		m.ResetGithubOpenIssues()
+		return nil
+	case team.FieldGithubSyncFields:
+		m.ResetGithubSyncFields()
 		return nil
 	case team.FieldPreviousKeys:
 		m.ResetPreviousKeys()

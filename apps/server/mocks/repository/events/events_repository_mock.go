@@ -353,80 +353,6 @@ func (_c *EventsRepositoryMock_IsActiveMember_Call) RunAndReturn(run func(ctx co
 	return _c
 }
 
-// IssueCreatingRepos provides a mock function for the type EventsRepositoryMock
-func (_mock *EventsRepositoryMock) IssueCreatingRepos(ctx context.Context, tx repository.TxInterface, team uuid.UUID) ([]string, error) {
-	ret := _mock.Called(ctx, tx, team)
-
-	if len(ret) == 0 {
-		panic("no return value specified for IssueCreatingRepos")
-	}
-
-	var r0 []string
-	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) ([]string, error)); ok {
-		return returnFunc(ctx, tx, team)
-	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) []string); ok {
-		r0 = returnFunc(ctx, tx, team)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]string)
-		}
-	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
-		r1 = returnFunc(ctx, tx, team)
-	} else {
-		r1 = ret.Error(1)
-	}
-	return r0, r1
-}
-
-// EventsRepositoryMock_IssueCreatingRepos_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'IssueCreatingRepos'
-type EventsRepositoryMock_IssueCreatingRepos_Call struct {
-	*mock.Call
-}
-
-// IssueCreatingRepos is a helper method to define mock.On call
-//   - ctx context.Context
-//   - tx repository.TxInterface
-//   - team uuid.UUID
-func (_e *EventsRepositoryMock_Expecter) IssueCreatingRepos(ctx any, tx any, team any) *EventsRepositoryMock_IssueCreatingRepos_Call {
-	return &EventsRepositoryMock_IssueCreatingRepos_Call{Call: _e.mock.On("IssueCreatingRepos", ctx, tx, team)}
-}
-
-func (_c *EventsRepositoryMock_IssueCreatingRepos_Call) Run(run func(ctx context.Context, tx repository.TxInterface, team uuid.UUID)) *EventsRepositoryMock_IssueCreatingRepos_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 context.Context
-		if args[0] != nil {
-			arg0 = args[0].(context.Context)
-		}
-		var arg1 repository.TxInterface
-		if args[1] != nil {
-			arg1 = args[1].(repository.TxInterface)
-		}
-		var arg2 uuid.UUID
-		if args[2] != nil {
-			arg2 = args[2].(uuid.UUID)
-		}
-		run(
-			arg0,
-			arg1,
-			arg2,
-		)
-	})
-	return _c
-}
-
-func (_c *EventsRepositoryMock_IssueCreatingRepos_Call) Return(strings []string, err error) *EventsRepositoryMock_IssueCreatingRepos_Call {
-	_c.Call.Return(strings, err)
-	return _c
-}
-
-func (_c *EventsRepositoryMock_IssueCreatingRepos_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, team uuid.UUID) ([]string, error)) *EventsRepositoryMock_IssueCreatingRepos_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // IssueSubscribers provides a mock function for the type EventsRepositoryMock
 func (_mock *EventsRepositoryMock) IssueSubscribers(ctx context.Context, tx repository.TxInterface, issue uuid.UUID) ([]uuid.UUID, error) {
 	ret := _mock.Called(ctx, tx, issue)
@@ -1045,6 +971,80 @@ func (_c *EventsRepositoryMock_Subscribe_Call) Return(err error) *EventsReposito
 }
 
 func (_c *EventsRepositoryMock_Subscribe_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, issue uuid.UUID, users []uuid.UUID) error) *EventsRepositoryMock_Subscribe_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// TeamRepos provides a mock function for the type EventsRepositoryMock
+func (_mock *EventsRepositoryMock) TeamRepos(ctx context.Context, tx repository.TxInterface, team uuid.UUID) ([]string, error) {
+	ret := _mock.Called(ctx, tx, team)
+
+	if len(ret) == 0 {
+		panic("no return value specified for TeamRepos")
+	}
+
+	var r0 []string
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) ([]string, error)); ok {
+		return returnFunc(ctx, tx, team)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID) []string); ok {
+		r0 = returnFunc(ctx, tx, team)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]string)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, tx, team)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// EventsRepositoryMock_TeamRepos_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TeamRepos'
+type EventsRepositoryMock_TeamRepos_Call struct {
+	*mock.Call
+}
+
+// TeamRepos is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - team uuid.UUID
+func (_e *EventsRepositoryMock_Expecter) TeamRepos(ctx any, tx any, team any) *EventsRepositoryMock_TeamRepos_Call {
+	return &EventsRepositoryMock_TeamRepos_Call{Call: _e.mock.On("TeamRepos", ctx, tx, team)}
+}
+
+func (_c *EventsRepositoryMock_TeamRepos_Call) Run(run func(ctx context.Context, tx repository.TxInterface, team uuid.UUID)) *EventsRepositoryMock_TeamRepos_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *EventsRepositoryMock_TeamRepos_Call) Return(strings []string, err error) *EventsRepositoryMock_TeamRepos_Call {
+	_c.Call.Return(strings, err)
+	return _c
+}
+
+func (_c *EventsRepositoryMock_TeamRepos_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, team uuid.UUID) ([]string, error)) *EventsRepositoryMock_TeamRepos_Call {
 	_c.Call.Return(run)
 	return _c
 }

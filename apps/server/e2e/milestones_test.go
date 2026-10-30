@@ -140,9 +140,11 @@ func TestRicracIssuesOpenOnGitHubAsTheirAuthor(t *testing.T) {
 	sync := g.syncRepo(t, "ENG")
 	call(t, g.Ann, "save_issue", M{"title": "Not synced yet"})
 	g.runJobs(t)
-	eq(t, len(g.fake.opened()), 0, "syncs don't open Ricrac issues unless asked")
+	eq(t, len(g.fake.opened()), 0, "new issues stay off GitHub unless the team or the issue asks")
+	check(t, !call(t, g.Ann, "get_team", M{"id": "ENG"}).At("githubOpenIssues").Bool())
 
-	call(t, g.Ann, "save_github_repo_sync", M{"id": sync.At("id").Str(), "createIssues": true, "linkBack": true})
+	call(t, g.Ann, "save_github_repo_sync", M{"id": sync.At("id").Str(), "linkBack": true})
+	call(t, g.Ann, "save_team", M{"id": "ENG", "githubOpenIssues": true})
 	g.linkGitHub(t, g.Ann.User)
 	g.exec("UPDATE users SET github_login = 'ann-gh' WHERE id = $1", g.Ann.User)
 	call(t, g.Ann, "save_issue_label", M{"name": "ui"})
@@ -197,7 +199,7 @@ func TestRicracIssuesOpenOnGitHubAsTheirAuthor(t *testing.T) {
 
 func TestFieldsSyncWithTheOrganizationsIssueFields(t *testing.T) {
 	g := withGitHub(t)
-	sync := g.syncRepo(t, "ENG")
+	g.syncRepo(t, "ENG")
 	call(t, g.Ann, "save_team", M{"id": "ENG", "estimateType": "fibonacci"})
 	g.fake.issueFields = []M{
 		{"id": 11, "name": "Priority", "data_type": "single_select", "options": []M{{"name": "Urgent"}, {"name": "High"}, {"name": "Medium"}, {"name": "Low"}}},
@@ -208,9 +210,9 @@ func TestFieldsSyncWithTheOrganizationsIssueFields(t *testing.T) {
 	g.deliver(t, "issues", "issues_opened.json", nil)
 	call(t, g.Ann, "save_issue", M{"id": "ENG-1", "priority": 2})
 	g.runJobs(t)
-	eq(t, len(g.fake.sent("POST", "/issue-field-values")), 0, "only syncs that ask")
+	eq(t, len(g.fake.sent("POST", "/issue-field-values")), 0, "only teams that ask")
 
-	call(t, g.Ann, "save_github_repo_sync", M{"id": sync.At("id").Str(), "syncFields": true})
+	call(t, g.Ann, "save_team", M{"id": "ENG", "githubSyncFields": true})
 	call(t, g.Ann, "save_issue", M{"id": "ENG-1", "priority": 1, "estimate": 3, "dueDate": "2026-12-24"})
 	g.runJobs(t)
 	set := g.fake.sent("POST", "/repos/unbindapp/unbind/issues/1347/issue-field-values")
@@ -236,8 +238,12 @@ func TestFieldsSyncWithTheOrganizationsIssueFields(t *testing.T) {
 
 func TestPreviewingAnIssueSavesNothing(t *testing.T) {
 	g := withGitHub(t)
-	sync := g.syncRepo(t, "ENG")
-	call(t, g.Ann, "save_github_repo_sync", M{"id": sync.At("id").Str(), "createIssues": true})
+	g.syncRepo(t, "ENG")
+	check(t, call(t, g.Ann, "save_issue", M{"title": "Dark mode", "preview": true}).At("preview", "github").IsNull(),
+		"off GitHub while the team doesn't open issues there")
+	eq(t, call(t, g.Ann, "save_issue", M{"title": "Dark mode", "githubRepository": "unbind", "preview": true}).
+		At("preview", "github", "repository").Str(), "unbindapp/unbind", "unless the issue asks")
+	call(t, g.Ann, "save_team", M{"id": "ENG", "githubOpenIssues": true})
 	preview := call(t, g.Ann, "save_issue", M{"title": "Dark mode", "description": "Follow the system.", "priority": 2, "preview": true})
 	eq(t, preview.At("identifier").Str(), "ENG-1")
 	eq(t, preview.At("description").Str(), "Follow the system.")

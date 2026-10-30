@@ -171,6 +171,7 @@ function NewIssueForm({ defaults, onClose }: { defaults: TNewIssueDefaults; onCl
             <GithubRepositoryPicker
               teamId={teamId}
               projectId={draft.project?.id}
+              opensByDefault={team?.githubOpenIssues ?? false}
               value={githubRepository}
               onChange={setGithubRepository}
             />
