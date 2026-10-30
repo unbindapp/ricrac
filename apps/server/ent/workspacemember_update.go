@@ -134,6 +134,26 @@ func (_u *WorkspaceMemberUpdate) ClearTheme() *WorkspaceMemberUpdate {
 	return _u
 }
 
+// SetAssistant sets the "assistant" field.
+func (_u *WorkspaceMemberUpdate) SetAssistant(v bool) *WorkspaceMemberUpdate {
+	_u.mutation.SetAssistant(v)
+	return _u
+}
+
+// SetNillableAssistant sets the "assistant" field if the given value is not nil.
+func (_u *WorkspaceMemberUpdate) SetNillableAssistant(v *bool) *WorkspaceMemberUpdate {
+	if v != nil {
+		_u.SetAssistant(*v)
+	}
+	return _u
+}
+
+// ClearAssistant clears the value of the "assistant" field.
+func (_u *WorkspaceMemberUpdate) ClearAssistant() *WorkspaceMemberUpdate {
+	_u.mutation.ClearAssistant()
+	return _u
+}
+
 // SetWorkspace sets the "workspace" edge to the Workspace entity.
 func (_u *WorkspaceMemberUpdate) SetWorkspace(v *Workspace) *WorkspaceMemberUpdate {
 	return _u.SetWorkspaceID(v.ID)
@@ -237,6 +257,12 @@ func (_u *WorkspaceMemberUpdate) sqlSave(ctx context.Context) (_node int, err er
 	}
 	if _u.mutation.ThemeCleared() {
 		_spec.ClearField(workspacemember.FieldTheme, field.TypeString)
+	}
+	if value, ok := _u.mutation.Assistant(); ok {
+		_spec.SetField(workspacemember.FieldAssistant, field.TypeBool, value)
+	}
+	if _u.mutation.AssistantCleared() {
+		_spec.ClearField(workspacemember.FieldAssistant, field.TypeBool)
 	}
 	if _u.mutation.WorkspaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -420,6 +446,26 @@ func (_u *WorkspaceMemberUpdateOne) ClearTheme() *WorkspaceMemberUpdateOne {
 	return _u
 }
 
+// SetAssistant sets the "assistant" field.
+func (_u *WorkspaceMemberUpdateOne) SetAssistant(v bool) *WorkspaceMemberUpdateOne {
+	_u.mutation.SetAssistant(v)
+	return _u
+}
+
+// SetNillableAssistant sets the "assistant" field if the given value is not nil.
+func (_u *WorkspaceMemberUpdateOne) SetNillableAssistant(v *bool) *WorkspaceMemberUpdateOne {
+	if v != nil {
+		_u.SetAssistant(*v)
+	}
+	return _u
+}
+
+// ClearAssistant clears the value of the "assistant" field.
+func (_u *WorkspaceMemberUpdateOne) ClearAssistant() *WorkspaceMemberUpdateOne {
+	_u.mutation.ClearAssistant()
+	return _u
+}
+
 // SetWorkspace sets the "workspace" edge to the Workspace entity.
 func (_u *WorkspaceMemberUpdateOne) SetWorkspace(v *Workspace) *WorkspaceMemberUpdateOne {
 	return _u.SetWorkspaceID(v.ID)
@@ -555,6 +601,12 @@ func (_u *WorkspaceMemberUpdateOne) sqlSave(ctx context.Context) (_node *Workspa
 	}
 	if _u.mutation.ThemeCleared() {
 		_spec.ClearField(workspacemember.FieldTheme, field.TypeString)
+	}
+	if value, ok := _u.mutation.Assistant(); ok {
+		_spec.SetField(workspacemember.FieldAssistant, field.TypeBool, value)
+	}
+	if _u.mutation.AssistantCleared() {
+		_spec.ClearField(workspacemember.FieldAssistant, field.TypeBool)
 	}
 	if _u.mutation.WorkspaceCleared() {
 		edge := &sqlgraph.EdgeSpec{

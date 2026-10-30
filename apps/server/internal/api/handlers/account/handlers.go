@@ -18,13 +18,15 @@ import (
 	"ricrac/internal/auth"
 	"ricrac/internal/common/errdefs"
 	account_service "ricrac/internal/services/account"
+	assistant_service "ricrac/internal/services/assistant"
 	oauth_service "ricrac/internal/services/oauth"
 )
 
 type handlers struct {
-	keys    auth.Keys
-	account *account_service.AccountService
-	oauth   *oauth_service.OAuthService
+	keys      auth.Keys
+	account   *account_service.AccountService
+	oauth     *oauth_service.OAuthService
+	assistant *assistant_service.AssistantService
 }
 
 type signedInHandler func(w http.ResponseWriter, r *http.Request, user uuid.UUID) error
@@ -32,7 +34,7 @@ type signedInHandler func(w http.ResponseWriter, r *http.Request, user uuid.UUID
 type memberHandler func(w http.ResponseWriter, r *http.Request, actor *auth.Actor) error
 
 func RegisterHandlers(srv *server.Server, api huma.API) {
-	h := &handlers{keys: srv.Keys, account: srv.AccountService, oauth: srv.OAuthService}
+	h := &handlers{keys: srv.Keys, account: srv.AccountService, oauth: srv.OAuthService, assistant: srv.AssistantService}
 	plain := func(method, path string, handler http.HandlerFunc) {
 		operation := &huma.Operation{
 			OperationID: "account_" + strings.ToLower(method) + strings.NewReplacer("/", "_", "{", "", "}", "").Replace(path),
@@ -78,6 +80,9 @@ func RegisterHandlers(srv *server.Server, api huma.API) {
 	signedIn(http.MethodPost, "/api/api-keys", h.createAPIKey)
 	signedIn(http.MethodDelete, "/api/api-keys/{id}", h.deleteAPIKey)
 	member(http.MethodGet, "/api/oauth-apps", h.listOAuthApps)
+	member(http.MethodPost, "/api/assistant", h.ask)
+	member(http.MethodGet, "/api/assistant/settings", h.assistantSettings)
+	member(http.MethodPatch, "/api/assistant/settings", h.saveAssistantSettings)
 	member(http.MethodPost, "/api/oauth-apps", h.createOAuthApp)
 	member(http.MethodPatch, "/api/oauth-apps/{id}", h.updateOAuthApp)
 	member(http.MethodDelete, "/api/oauth-apps/{id}", h.deleteOAuthApp)

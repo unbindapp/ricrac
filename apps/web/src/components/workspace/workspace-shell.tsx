@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 
+import { AssistantPanel } from "@/components/assistant/assistant-panel";
 import { CommandPanel } from "@/components/command-panel/command-panel";
 import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
 import { SearchIcon } from "@/components/icons";
@@ -33,9 +34,12 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
       <div className="dank:md:gap-3 dank:md:p-0 flex min-w-0 flex-1 flex-col md:gap-2 md:py-2 md:pr-2 md:group-data-sidebar-collapsed/shell:pl-2">
         <FallbackMobileBar />
         {TopBar && <TopBar />}
-        <main className="bg-background dank:border-0 flex min-h-0 flex-1 flex-col overflow-hidden has-data-[slot=split-view]:border-0 has-data-[slot=split-view]:bg-transparent md:rounded-lg md:border">
-          {children}
-        </main>
+        <div className="dank:gap-3 flex min-h-0 flex-1 gap-2">
+          <main className="bg-background dank:border-0 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden has-data-[slot=split-view]:border-0 has-data-[slot=split-view]:bg-transparent md:rounded-lg md:border">
+            {children}
+          </main>
+          <AssistantPanel />
+        </div>
       </div>
       <MobileNavDrawer />
       {SettingsWindow && <SettingsWindow />}

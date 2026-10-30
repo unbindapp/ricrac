@@ -41,6 +41,11 @@ func Theme(v string) predicate.WorkspaceMember {
 	return predicate.WorkspaceMember(sql.FieldEQ(FieldTheme, v))
 }
 
+// Assistant applies equality check predicate on the "assistant" field. It's identical to AssistantEQ.
+func Assistant(v bool) predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldEQ(FieldAssistant, v))
+}
+
 // WorkspaceIDEQ applies the EQ predicate on the "workspace_id" field.
 func WorkspaceIDEQ(v uuid.UUID) predicate.WorkspaceMember {
 	return predicate.WorkspaceMember(sql.FieldEQ(FieldWorkspaceID, v))
@@ -289,6 +294,26 @@ func ThemeEqualFold(v string) predicate.WorkspaceMember {
 // ThemeContainsFold applies the ContainsFold predicate on the "theme" field.
 func ThemeContainsFold(v string) predicate.WorkspaceMember {
 	return predicate.WorkspaceMember(sql.FieldContainsFold(FieldTheme, v))
+}
+
+// AssistantEQ applies the EQ predicate on the "assistant" field.
+func AssistantEQ(v bool) predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldEQ(FieldAssistant, v))
+}
+
+// AssistantNEQ applies the NEQ predicate on the "assistant" field.
+func AssistantNEQ(v bool) predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldNEQ(FieldAssistant, v))
+}
+
+// AssistantIsNil applies the IsNil predicate on the "assistant" field.
+func AssistantIsNil() predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldIsNull(FieldAssistant))
+}
+
+// AssistantNotNil applies the NotNil predicate on the "assistant" field.
+func AssistantNotNil() predicate.WorkspaceMember {
+	return predicate.WorkspaceMember(sql.FieldNotNull(FieldAssistant))
 }
 
 // HasWorkspace applies the HasEdge predicate on the "workspace" edge.

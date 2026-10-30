@@ -56,6 +56,11 @@ operations and permissions.
   synced repositories keep their issues, comments and milestones in step both ways, and can open
   issues created in Ricrac on GitHub as their author. See
   [docs/github-app.md](docs/github-app.md).
+- **Ask Claude**, a panel in the web app where members ask Claude to find, sum up and change
+  things in the workspace. It runs the Claude Code CLI on the server with Ricrac's MCP tools as
+  the person asking: no shell, files or web, and no deleting. A document titled "Assistant" holds
+  the workspace's notes for it. Each question and the last 24 hours have a spending cap. It's off
+  until someone in `ASSISTANT_ADMINS` turns it on in a workspace and picks who may use it.
 
 ## Connecting agents
 
@@ -89,6 +94,11 @@ operations and permissions.
 | `GITHUB_API_URL`, `GITHUB_WEB_URL` | GitHub's API and web addresses, `https://api.github.com` and `https://github.com` by default (for GitHub Enterprise or tests). |
 | `MAX_UPLOAD_MB` | Largest uploaded file, 25 by default. |
 | `PORT` | 3000 by default. |
+| `ANTHROPIC_API_KEY` or `CLAUDE_CODE_OAUTH_TOKEN` | Turns on Ask Claude: an API key from the Claude Console, or a token from `claude setup-token`. The API key wins when both are set. |
+| `ASSISTANT_MODEL`, `ASSISTANT_MAX_TURNS` | The model (`sonnet` by default) and the most tool calls in one answer (30). |
+| `ASSISTANT_QUESTION_BUDGET_USD`, `ASSISTANT_DAILY_BUDGET_USD` | The most one question may cost (1) and what all questions of the last 24 hours may cost together (10), in dollars as Claude Code estimates them. |
+| `ASSISTANT_ADMINS` | Comma-separated emails of who may turn Ask Claude on, in workspaces where they're an owner or admin (Settings → Claude), and pick who uses it. Nobody else sees it. |
+| `ASSISTANT_CLAUDE_PATH` | The `claude` CLI, found on `PATH` by default; the Docker image has it. |
 
 ## Development
 

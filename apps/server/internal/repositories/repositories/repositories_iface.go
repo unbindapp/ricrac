@@ -8,6 +8,7 @@ import (
 	repository "ricrac/internal/repositories"
 	access_repo "ricrac/internal/repositories/access"
 	account_repo "ricrac/internal/repositories/account"
+	assistant_repo "ricrac/internal/repositories/assistant"
 	attachment_repo "ricrac/internal/repositories/attachment"
 	automation_repo "ricrac/internal/repositories/automation"
 	comment_repo "ricrac/internal/repositories/comment"
@@ -71,6 +72,7 @@ type RepositoriesInterface interface {
 	Customer() customer_repo.CustomerRepositoryInterface
 	Release() release_repo.ReleaseRepositoryInterface
 	Webhook() webhook_repo.WebhookRepositoryInterface
+	Assistant() assistant_repo.AssistantRepositoryInterface
 	Project() project_repo.ProjectRepositoryInterface
 	Milestone() milestone_repo.MilestoneRepositoryInterface
 	StatusUpdate() statusupdate_repo.StatusUpdateRepositoryInterface

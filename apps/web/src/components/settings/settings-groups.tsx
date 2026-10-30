@@ -16,6 +16,7 @@ import {
   RocketIcon,
   RulerIcon,
   SettingsIcon,
+  SparklesIcon,
   TagIcon,
   TagsIcon,
   TriangleAlertIcon,
@@ -25,10 +26,11 @@ import {
   WebhookIcon,
   WorkflowIcon,
 } from "@/components/icons";
+import { useManagesAssistant } from "@/components/assistant/use-assistant-available";
 import { type TSettingsTab, type TSettingsTabGroup } from "@/components/layout/settings-layout";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 
-type TWorkspaceTab = TSettingsTab & { isAdminOnly?: boolean };
+type TWorkspaceTab = TSettingsTab & { isAdminOnly?: boolean; isAssistantOnly?: boolean };
 
 function accountTabs(workspace: string): TSettingsTab[] {
   const params = { workspace };
@@ -79,6 +81,15 @@ function workspaceTabs(workspace: string): TWorkspaceTab[] {
       icon: UsersIcon,
       link: { to: "/$workspace/settings/members", params },
       isAdminOnly: true,
+    },
+    {
+      label: "Claude",
+      description: "Who can ask Claude here",
+      section: "workspace",
+      icon: SparklesIcon,
+      link: { to: "/$workspace/settings/claude", params },
+      isAdminOnly: true,
+      isAssistantOnly: true,
     },
     {
       label: "Workflow",
@@ -215,6 +226,7 @@ function workspaceTabs(workspace: string): TWorkspaceTab[] {
 /** The settings tabs the caller may open, in their groups. */
 export function useSettingsGroups() {
   const { workspace, canEdit, isAdmin } = useWorkspace();
+  const managesAssistant = useManagesAssistant();
   return useMemo(() => {
     const groups: TSettingsTabGroup[] = [
       { title: "Account", icon: UserIcon, tabs: accountTabs(workspace.urlKey) },
@@ -223,8 +235,10 @@ export function useSettingsGroups() {
     groups.push({
       title: "Workspace",
       icon: BuildingIcon,
-      tabs: workspaceTabs(workspace.urlKey).filter((tab) => isAdmin || !tab.isAdminOnly),
+      tabs: workspaceTabs(workspace.urlKey).filter(
+        (tab) => (isAdmin || !tab.isAdminOnly) && (managesAssistant || !tab.isAssistantOnly),
+      ),
     });
     return groups;
-  }, [workspace.urlKey, canEdit, isAdmin]);
+  }, [workspace.urlKey, canEdit, isAdmin, managesAssistant]);
 }

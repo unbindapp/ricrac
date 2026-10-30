@@ -9,6 +9,7 @@ import (
 	"ricrac/internal/api/server"
 	"ricrac/internal/models"
 	account_service "ricrac/internal/services/account"
+	assistant_service "ricrac/internal/services/assistant"
 	oauth_service "ricrac/internal/services/oauth"
 )
 
@@ -38,9 +39,10 @@ func TestWebTypes(t *testing.T) {
 func TestAccountWebTypes(t *testing.T) {
 	types, err := oapi.TypeScriptFor(
 		[]any{models.AppConfig{}, models.Me{}, models.APIKey{}, models.CreatedAPIKey{}, models.OAuthApp{}, models.OAuthAppSecret{},
-			models.ConnectedApp{}, models.OAuthClientInfo{}, models.OAuthRedirect{}},
+			models.ConnectedApp{}, models.OAuthClientInfo{}, models.OAuthRedirect{},
+			models.AssistantSettings{}, models.AssistantSession{}, models.AssistantText{}, models.AssistantTool{}, models.AssistantDone{}},
 		[]any{account_service.UpdateMe{}, account_service.CreateWorkspace{}, account_service.DeleteWorkspace{}, account_service.CreateAPIKey{},
-			account_service.SaveOAuthApp{}, oauth_service.OAuthDecision{}},
+			account_service.SaveOAuthApp{}, oauth_service.OAuthDecision{}, assistant_service.AskInput{}, assistant_service.AssistantSettingsInput{}},
 	)
 	if err != nil {
 		t.Fatal(err)

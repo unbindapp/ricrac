@@ -5,10 +5,12 @@ import (
 	"crypto/rsa"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 
 	"ricrac/config"
+	"ricrac/ent"
 	"ricrac/internal/api/oapi"
 	"ricrac/internal/api/router"
 	apiserver "ricrac/internal/api/server"
@@ -27,6 +29,7 @@ type backend struct {
 	router   http.Handler
 	registry *oapi.Registry
 	server   *apiserver.Server
+	client   *ent.Client
 }
 
 type mailMessage = mail.Message
@@ -48,7 +51,24 @@ func newBackend(t *testing.T, url string) *backend {
 		t.Fatalf("connect: %v", err)
 	}
 	t.Cleanup(func() { _ = client.Close() })
-	return &backend{t: t, server: apiserver.New(cfg, client, scheduler.NewWakeups())}
+	return &backend{t: t, server: apiserver.New(cfg, client, scheduler.NewWakeups()), client: client}
+}
+
+// ConfigureAssistant gives the server the assistant, running claude in place of the CLI, with
+// Ann as the one who may turn it on.
+func (b *backend) ConfigureAssistant(claude string, questionBudget, dailyBudget float64) {
+	cfg := b.server.Cfg
+	cfg.Assistant = &config.Assistant{
+		Claude: claude, Credential: "ANTHROPIC_API_KEY=test", Model: "sonnet", MaxTurns: 30,
+		QuestionBudgetUSD: questionBudget, DailyBudgetUSD: dailyBudget, Admins: []string{"ann@acme.test"},
+	}
+	b.server = apiserver.New(cfg, b.client, scheduler.NewWakeups())
+	b.router = nil
+}
+
+// AssistantToken is the token the assistant's CLI would call MCP with.
+func (b *backend) AssistantToken(user, workspace uuid.UUID, ttl time.Duration) string {
+	return b.server.Keys.AssistantToken(user, workspace, ttl)
 }
 
 func (b *backend) Router() http.Handler {

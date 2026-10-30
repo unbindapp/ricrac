@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"reflect"
 	"ricrac/ent/apikey"
+	"ricrac/ent/assistantrun"
 	"ricrac/ent/attachment"
 	"ricrac/ent/auditentry"
 	"ricrac/ent/comment"
@@ -143,6 +144,7 @@ func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			apikey.Table:               apikey.ValidColumn,
+			assistantrun.Table:         assistantrun.ValidColumn,
 			attachment.Table:           attachment.ValidColumn,
 			auditentry.Table:           auditentry.ValidColumn,
 			comment.Table:              comment.ValidColumn,

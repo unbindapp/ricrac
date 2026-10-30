@@ -135,6 +135,20 @@ func (_c *WorkspaceCreate) SetNillablePublic(v *bool) *WorkspaceCreate {
 	return _c
 }
 
+// SetAssistantEnabled sets the "assistant_enabled" field.
+func (_c *WorkspaceCreate) SetAssistantEnabled(v bool) *WorkspaceCreate {
+	_c.mutation.SetAssistantEnabled(v)
+	return _c
+}
+
+// SetNillableAssistantEnabled sets the "assistant_enabled" field if the given value is not nil.
+func (_c *WorkspaceCreate) SetNillableAssistantEnabled(v *bool) *WorkspaceCreate {
+	if v != nil {
+		_c.SetAssistantEnabled(*v)
+	}
+	return _c
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_c *WorkspaceCreate) SetCreatedAt(v time.Time) *WorkspaceCreate {
 	_c.mutation.SetCreatedAt(v)
@@ -829,6 +843,10 @@ func (_c *WorkspaceCreate) createSpec() (*Workspace, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Public(); ok {
 		_spec.SetField(workspace.FieldPublic, field.TypeBool, value)
 		_node.Public = value
+	}
+	if value, ok := _c.mutation.AssistantEnabled(); ok {
+		_spec.SetField(workspace.FieldAssistantEnabled, field.TypeBool, value)
+		_node.AssistantEnabled = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(workspace.FieldCreatedAt, field.TypeTime, value)
@@ -1580,6 +1598,24 @@ func (u *WorkspaceUpsert) ClearPublic() *WorkspaceUpsert {
 	return u
 }
 
+// SetAssistantEnabled sets the "assistant_enabled" field.
+func (u *WorkspaceUpsert) SetAssistantEnabled(v bool) *WorkspaceUpsert {
+	u.Set(workspace.FieldAssistantEnabled, v)
+	return u
+}
+
+// UpdateAssistantEnabled sets the "assistant_enabled" field to the value that was provided on create.
+func (u *WorkspaceUpsert) UpdateAssistantEnabled() *WorkspaceUpsert {
+	u.SetExcluded(workspace.FieldAssistantEnabled)
+	return u
+}
+
+// ClearAssistantEnabled clears the value of the "assistant_enabled" field.
+func (u *WorkspaceUpsert) ClearAssistantEnabled() *WorkspaceUpsert {
+	u.SetNull(workspace.FieldAssistantEnabled)
+	return u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (u *WorkspaceUpsert) SetCreatedAt(v time.Time) *WorkspaceUpsert {
 	u.Set(workspace.FieldCreatedAt, v)
@@ -1794,6 +1830,27 @@ func (u *WorkspaceUpsertOne) UpdatePublic() *WorkspaceUpsertOne {
 func (u *WorkspaceUpsertOne) ClearPublic() *WorkspaceUpsertOne {
 	return u.Update(func(s *WorkspaceUpsert) {
 		s.ClearPublic()
+	})
+}
+
+// SetAssistantEnabled sets the "assistant_enabled" field.
+func (u *WorkspaceUpsertOne) SetAssistantEnabled(v bool) *WorkspaceUpsertOne {
+	return u.Update(func(s *WorkspaceUpsert) {
+		s.SetAssistantEnabled(v)
+	})
+}
+
+// UpdateAssistantEnabled sets the "assistant_enabled" field to the value that was provided on create.
+func (u *WorkspaceUpsertOne) UpdateAssistantEnabled() *WorkspaceUpsertOne {
+	return u.Update(func(s *WorkspaceUpsert) {
+		s.UpdateAssistantEnabled()
+	})
+}
+
+// ClearAssistantEnabled clears the value of the "assistant_enabled" field.
+func (u *WorkspaceUpsertOne) ClearAssistantEnabled() *WorkspaceUpsertOne {
+	return u.Update(func(s *WorkspaceUpsert) {
+		s.ClearAssistantEnabled()
 	})
 }
 
@@ -2184,6 +2241,27 @@ func (u *WorkspaceUpsertBulk) UpdatePublic() *WorkspaceUpsertBulk {
 func (u *WorkspaceUpsertBulk) ClearPublic() *WorkspaceUpsertBulk {
 	return u.Update(func(s *WorkspaceUpsert) {
 		s.ClearPublic()
+	})
+}
+
+// SetAssistantEnabled sets the "assistant_enabled" field.
+func (u *WorkspaceUpsertBulk) SetAssistantEnabled(v bool) *WorkspaceUpsertBulk {
+	return u.Update(func(s *WorkspaceUpsert) {
+		s.SetAssistantEnabled(v)
+	})
+}
+
+// UpdateAssistantEnabled sets the "assistant_enabled" field to the value that was provided on create.
+func (u *WorkspaceUpsertBulk) UpdateAssistantEnabled() *WorkspaceUpsertBulk {
+	return u.Update(func(s *WorkspaceUpsert) {
+		s.UpdateAssistantEnabled()
+	})
+}
+
+// ClearAssistantEnabled clears the value of the "assistant_enabled" field.
+func (u *WorkspaceUpsertBulk) ClearAssistantEnabled() *WorkspaceUpsertBulk {
+	return u.Update(func(s *WorkspaceUpsert) {
+		s.ClearAssistantEnabled()
 	})
 }
 

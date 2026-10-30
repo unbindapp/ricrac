@@ -535,3 +535,21 @@ packages:
           filename: github_service_mock.go
           structname: GitHubServiceMock
           pkgname: mocks_services_github
+  ricrac/internal/repositories/assistant:
+    config:
+      dir: ./mocks/repository/assistant
+    interfaces:
+      AssistantRepositoryInterface:
+        config:
+          filename: assistant_repository_mock.go
+          structname: AssistantRepositoryMock
+          pkgname: mocks_repository_assistant
+  ricrac/internal/services/assistant:
+    config:
+      dir: ./mocks/services/assistant
+    interfaces:
+      AssistantServiceInterface:
+        config:
+          filename: assistant_service_mock.go
+          structname: AssistantServiceMock
+          pkgname: mocks_services_assistant

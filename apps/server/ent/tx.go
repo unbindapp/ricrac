@@ -16,6 +16,8 @@ type Tx struct {
 	config
 	// APIKey is the client for interacting with the APIKey builders.
 	APIKey *APIKeyClient
+	// AssistantRun is the client for interacting with the AssistantRun builders.
+	AssistantRun *AssistantRunClient
 	// Attachment is the client for interacting with the Attachment builders.
 	Attachment *AttachmentClient
 	// AuditEntry is the client for interacting with the AuditEntry builders.
@@ -286,6 +288,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.APIKey = NewAPIKeyClient(tx.config)
+	tx.AssistantRun = NewAssistantRunClient(tx.config)
 	tx.Attachment = NewAttachmentClient(tx.config)
 	tx.AuditEntry = NewAuditEntryClient(tx.config)
 	tx.Comment = NewCommentClient(tx.config)

@@ -12,6 +12,7 @@ import (
 	"ricrac/ent/migrate"
 
 	"ricrac/ent/apikey"
+	"ricrac/ent/assistantrun"
 	"ricrac/ent/attachment"
 	"ricrac/ent/auditentry"
 	"ricrac/ent/comment"
@@ -98,6 +99,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// APIKey is the client for interacting with the APIKey builders.
 	APIKey *APIKeyClient
+	// AssistantRun is the client for interacting with the AssistantRun builders.
+	AssistantRun *AssistantRunClient
 	// Attachment is the client for interacting with the Attachment builders.
 	Attachment *AttachmentClient
 	// AuditEntry is the client for interacting with the AuditEntry builders.
@@ -248,6 +251,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.APIKey = NewAPIKeyClient(c.config)
+	c.AssistantRun = NewAssistantRunClient(c.config)
 	c.Attachment = NewAttachmentClient(c.config)
 	c.AuditEntry = NewAuditEntryClient(c.config)
 	c.Comment = NewCommentClient(c.config)
@@ -410,6 +414,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:                  ctx,
 		config:               cfg,
 		APIKey:               NewAPIKeyClient(cfg),
+		AssistantRun:         NewAssistantRunClient(cfg),
 		Attachment:           NewAttachmentClient(cfg),
 		AuditEntry:           NewAuditEntryClient(cfg),
 		Comment:              NewCommentClient(cfg),
@@ -499,6 +504,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:                  ctx,
 		config:               cfg,
 		APIKey:               NewAPIKeyClient(cfg),
+		AssistantRun:         NewAssistantRunClient(cfg),
 		Attachment:           NewAttachmentClient(cfg),
 		AuditEntry:           NewAuditEntryClient(cfg),
 		Comment:              NewCommentClient(cfg),
@@ -597,10 +603,10 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.APIKey, c.Attachment, c.AuditEntry, c.Comment, c.CustomView, c.Customer,
-		c.CustomerNeed, c.CustomerStatus, c.CustomerTier, c.Cycle, c.Discussion,
-		c.DiscussionSubscriber, c.DiscussionThread, c.DiscussionVote, c.Document,
-		c.DocumentVersion, c.Email, c.EntityLink, c.Favorite, c.File,
+		c.APIKey, c.AssistantRun, c.Attachment, c.AuditEntry, c.Comment, c.CustomView,
+		c.Customer, c.CustomerNeed, c.CustomerStatus, c.CustomerTier, c.Cycle,
+		c.Discussion, c.DiscussionSubscriber, c.DiscussionThread, c.DiscussionVote,
+		c.Document, c.DocumentVersion, c.Email, c.EntityLink, c.Favorite, c.File,
 		c.GithubCommentLink, c.GithubInstallation, c.GithubIssueLink,
 		c.GithubMilestoneLink, c.GithubOutbox, c.GithubRepoSync, c.GithubUserToken,
 		c.Initiative, c.InitiativeProject, c.Invitation, c.Issue, c.IssueHistory,
@@ -621,10 +627,10 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.APIKey, c.Attachment, c.AuditEntry, c.Comment, c.CustomView, c.Customer,
-		c.CustomerNeed, c.CustomerStatus, c.CustomerTier, c.Cycle, c.Discussion,
-		c.DiscussionSubscriber, c.DiscussionThread, c.DiscussionVote, c.Document,
-		c.DocumentVersion, c.Email, c.EntityLink, c.Favorite, c.File,
+		c.APIKey, c.AssistantRun, c.Attachment, c.AuditEntry, c.Comment, c.CustomView,
+		c.Customer, c.CustomerNeed, c.CustomerStatus, c.CustomerTier, c.Cycle,
+		c.Discussion, c.DiscussionSubscriber, c.DiscussionThread, c.DiscussionVote,
+		c.Document, c.DocumentVersion, c.Email, c.EntityLink, c.Favorite, c.File,
 		c.GithubCommentLink, c.GithubInstallation, c.GithubIssueLink,
 		c.GithubMilestoneLink, c.GithubOutbox, c.GithubRepoSync, c.GithubUserToken,
 		c.Initiative, c.InitiativeProject, c.Invitation, c.Issue, c.IssueHistory,
@@ -646,6 +652,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *APIKeyMutation:
 		return c.APIKey.mutate(ctx, m)
+	case *AssistantRunMutation:
+		return c.AssistantRun.mutate(ctx, m)
 	case *AttachmentMutation:
 		return c.Attachment.mutate(ctx, m)
 	case *AuditEntryMutation:
@@ -935,6 +943,139 @@ func (c *APIKeyClient) mutate(ctx context.Context, m *APIKeyMutation) (Value, er
 		return (&APIKeyDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown APIKey mutation op: %q", m.Op())
+	}
+}
+
+// AssistantRunClient is a client for the AssistantRun schema.
+type AssistantRunClient struct {
+	config
+}
+
+// NewAssistantRunClient returns a client for the AssistantRun from the given config.
+func NewAssistantRunClient(c config) *AssistantRunClient {
+	return &AssistantRunClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `assistantrun.Hooks(f(g(h())))`.
+func (c *AssistantRunClient) Use(hooks ...Hook) {
+	c.hooks.AssistantRun = append(c.hooks.AssistantRun, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `assistantrun.Intercept(f(g(h())))`.
+func (c *AssistantRunClient) Intercept(interceptors ...Interceptor) {
+	c.inters.AssistantRun = append(c.inters.AssistantRun, interceptors...)
+}
+
+// Create returns a builder for creating a AssistantRun entity.
+func (c *AssistantRunClient) Create() *AssistantRunCreate {
+	mutation := newAssistantRunMutation(c.config, OpCreate)
+	return &AssistantRunCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AssistantRun entities.
+func (c *AssistantRunClient) CreateBulk(builders ...*AssistantRunCreate) *AssistantRunCreateBulk {
+	return &AssistantRunCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AssistantRunClient) MapCreateBulk(slice any, setFunc func(*AssistantRunCreate, int)) *AssistantRunCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AssistantRunCreateBulk{err: fmt.Errorf("calling to AssistantRunClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AssistantRunCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AssistantRunCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AssistantRun.
+func (c *AssistantRunClient) Update() *AssistantRunUpdate {
+	mutation := newAssistantRunMutation(c.config, OpUpdate)
+	return &AssistantRunUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AssistantRunClient) UpdateOne(_m *AssistantRun) *AssistantRunUpdateOne {
+	mutation := newAssistantRunMutation(c.config, OpUpdateOne, withAssistantRun(_m))
+	return &AssistantRunUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AssistantRunClient) UpdateOneID(id uuid.UUID) *AssistantRunUpdateOne {
+	mutation := newAssistantRunMutation(c.config, OpUpdateOne, withAssistantRunID(id))
+	return &AssistantRunUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AssistantRun.
+func (c *AssistantRunClient) Delete() *AssistantRunDelete {
+	mutation := newAssistantRunMutation(c.config, OpDelete)
+	return &AssistantRunDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AssistantRunClient) DeleteOne(_m *AssistantRun) *AssistantRunDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AssistantRunClient) DeleteOneID(id uuid.UUID) *AssistantRunDeleteOne {
+	builder := c.Delete().Where(assistantrun.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AssistantRunDeleteOne{builder}
+}
+
+// Query returns a query builder for AssistantRun.
+func (c *AssistantRunClient) Query() *AssistantRunQuery {
+	return &AssistantRunQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAssistantRun},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a AssistantRun entity by its id.
+func (c *AssistantRunClient) Get(ctx context.Context, id uuid.UUID) (*AssistantRun, error) {
+	return c.Query().Where(assistantrun.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AssistantRunClient) GetX(ctx context.Context, id uuid.UUID) *AssistantRun {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AssistantRunClient) Hooks() []Hook {
+	return c.hooks.AssistantRun
+}
+
+// Interceptors returns the client interceptors.
+func (c *AssistantRunClient) Interceptors() []Interceptor {
+	return c.inters.AssistantRun
+}
+
+func (c *AssistantRunClient) mutate(ctx context.Context, m *AssistantRunMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AssistantRunCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AssistantRunUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AssistantRunUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AssistantRunDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown AssistantRun mutation op: %q", m.Op())
 	}
 }
 
@@ -16072,34 +16213,36 @@ func (c *WorkspaceMemberClient) mutate(ctx context.Context, m *WorkspaceMemberMu
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		APIKey, Attachment, AuditEntry, Comment, CustomView, Customer, CustomerNeed,
-		CustomerStatus, CustomerTier, Cycle, Discussion, DiscussionSubscriber,
-		DiscussionThread, DiscussionVote, Document, DocumentVersion, Email, EntityLink,
-		Favorite, File, GithubCommentLink, GithubInstallation, GithubIssueLink,
-		GithubMilestoneLink, GithubOutbox, GithubRepoSync, GithubUserToken, Initiative,
-		InitiativeProject, Invitation, Issue, IssueHistory, IssueLabel, IssueLabelLink,
-		IssueRelation, IssueRelease, IssueShare, IssueSubscriber, MessageVersion,
-		Notification, OAuthClient, OAuthCode, OAuthGrant, OAuthToken, Project,
-		ProjectLabel, ProjectLabelLink, ProjectMember, ProjectMilestone,
-		ProjectRelation, ProjectStatus, ProjectSubscriber, ProjectTeam, Reaction,
-		Release, ReleaseNote, ReleasePipeline, ReleasePipelineTeam, ReleaseStage,
-		SignInLink, StatusUpdate, Team, TeamMember, Template, User, Webhook,
-		WebhookDelivery, WorkflowState, Workspace, WorkspaceMember []ent.Hook
+		APIKey, AssistantRun, Attachment, AuditEntry, Comment, CustomView, Customer,
+		CustomerNeed, CustomerStatus, CustomerTier, Cycle, Discussion,
+		DiscussionSubscriber, DiscussionThread, DiscussionVote, Document,
+		DocumentVersion, Email, EntityLink, Favorite, File, GithubCommentLink,
+		GithubInstallation, GithubIssueLink, GithubMilestoneLink, GithubOutbox,
+		GithubRepoSync, GithubUserToken, Initiative, InitiativeProject, Invitation,
+		Issue, IssueHistory, IssueLabel, IssueLabelLink, IssueRelation, IssueRelease,
+		IssueShare, IssueSubscriber, MessageVersion, Notification, OAuthClient,
+		OAuthCode, OAuthGrant, OAuthToken, Project, ProjectLabel, ProjectLabelLink,
+		ProjectMember, ProjectMilestone, ProjectRelation, ProjectStatus,
+		ProjectSubscriber, ProjectTeam, Reaction, Release, ReleaseNote,
+		ReleasePipeline, ReleasePipelineTeam, ReleaseStage, SignInLink, StatusUpdate,
+		Team, TeamMember, Template, User, Webhook, WebhookDelivery, WorkflowState,
+		Workspace, WorkspaceMember []ent.Hook
 	}
 	inters struct {
-		APIKey, Attachment, AuditEntry, Comment, CustomView, Customer, CustomerNeed,
-		CustomerStatus, CustomerTier, Cycle, Discussion, DiscussionSubscriber,
-		DiscussionThread, DiscussionVote, Document, DocumentVersion, Email, EntityLink,
-		Favorite, File, GithubCommentLink, GithubInstallation, GithubIssueLink,
-		GithubMilestoneLink, GithubOutbox, GithubRepoSync, GithubUserToken, Initiative,
-		InitiativeProject, Invitation, Issue, IssueHistory, IssueLabel, IssueLabelLink,
-		IssueRelation, IssueRelease, IssueShare, IssueSubscriber, MessageVersion,
-		Notification, OAuthClient, OAuthCode, OAuthGrant, OAuthToken, Project,
-		ProjectLabel, ProjectLabelLink, ProjectMember, ProjectMilestone,
-		ProjectRelation, ProjectStatus, ProjectSubscriber, ProjectTeam, Reaction,
-		Release, ReleaseNote, ReleasePipeline, ReleasePipelineTeam, ReleaseStage,
-		SignInLink, StatusUpdate, Team, TeamMember, Template, User, Webhook,
-		WebhookDelivery, WorkflowState, Workspace, WorkspaceMember []ent.Interceptor
+		APIKey, AssistantRun, Attachment, AuditEntry, Comment, CustomView, Customer,
+		CustomerNeed, CustomerStatus, CustomerTier, Cycle, Discussion,
+		DiscussionSubscriber, DiscussionThread, DiscussionVote, Document,
+		DocumentVersion, Email, EntityLink, Favorite, File, GithubCommentLink,
+		GithubInstallation, GithubIssueLink, GithubMilestoneLink, GithubOutbox,
+		GithubRepoSync, GithubUserToken, Initiative, InitiativeProject, Invitation,
+		Issue, IssueHistory, IssueLabel, IssueLabelLink, IssueRelation, IssueRelease,
+		IssueShare, IssueSubscriber, MessageVersion, Notification, OAuthClient,
+		OAuthCode, OAuthGrant, OAuthToken, Project, ProjectLabel, ProjectLabelLink,
+		ProjectMember, ProjectMilestone, ProjectRelation, ProjectStatus,
+		ProjectSubscriber, ProjectTeam, Reaction, Release, ReleaseNote,
+		ReleasePipeline, ReleasePipelineTeam, ReleaseStage, SignInLink, StatusUpdate,
+		Team, TeamMember, Template, User, Webhook, WebhookDelivery, WorkflowState,
+		Workspace, WorkspaceMember []ent.Interceptor
 	}
 )
 

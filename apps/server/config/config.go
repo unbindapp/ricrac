@@ -30,6 +30,8 @@ type Config struct {
 	Mail *mail.Config
 	// The GitHub App; nil when the GitHub integration is off.
 	GitHub *github.Config
+	// Nil when the assistant is off.
+	Assistant *Assistant
 }
 
 func FromEnv() (Config, error) {
@@ -76,6 +78,9 @@ func FromEnv() (Config, error) {
 		env("GITHUB_WEBHOOK_SECRET"), env("GITHUB_CLIENT_ID"), env("GITHUB_CLIENT_SECRET"), env("GITHUB_API_URL"), env("GITHUB_WEB_URL"))
 	if err != nil {
 		slog.Warn("GitHub is off: " + err.Error())
+	}
+	if config.Assistant, err = ParseAssistant(); err != nil {
+		slog.Warn("the assistant is off: " + err.Error())
 	}
 	switch env("SECURE_COOKIES") {
 	case "true", "1":

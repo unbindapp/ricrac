@@ -25,7 +25,7 @@ type AccessServiceInterface interface {
 	// Visitor is someone who isn't a member reading the public workspace named (URL key or id), nil
 	// when no such workspace is public.
 	Visitor(ctx context.Context, named string) (*auth.Actor, error)
-	// Authenticate is the caller of a bearer token (an API key or an OAuth access token), nil when
-	// it isn't a valid one.
+	// Authenticate is the caller of a bearer token (an API key, an assistant token or an OAuth
+	// access token), nil when it isn't a valid one.
 	Authenticate(ctx context.Context, token string) (*auth.Caller, error)
 }

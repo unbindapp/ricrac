@@ -112,11 +112,30 @@ func (self *AccountService) Me(ctx context.Context, id uuid.UUID) (*models.Me, e
 	if err != nil {
 		return nil, err
 	}
+	for i := range workspaces {
+		self.withAssistant(&workspaces[i], user.Email)
+	}
 	return &models.Me{
 		ID: id, Email: user.Email, Name: user.Name, DisplayName: user.DisplayName, AvatarURL: user.AvatarURL, GitHubLogin: user.GithubLogin,
 		GitHubAuthorized: authorized,
 		Workspaces:       models.NonNil(workspaces), Invitations: models.NonNil(invitations),
 	}, nil
+}
+
+// withAssistant says what they may do with Claude in the workspace.
+func (self *AccountService) withAssistant(summary *models.WorkspaceSummary, email string) {
+	summary.Assistant = summary.Assistant && self.cfg.Assistant != nil
+	summary.ManagesAssistant = self.cfg.Assistant.Manages(email) && (summary.Role == "owner" || summary.Role == "admin")
+}
+
+// withAssistantFor is withAssistant for the user with that id.
+func (self *AccountService) withAssistantFor(ctx context.Context, summary *models.WorkspaceSummary, user uuid.UUID) error {
+	found, err := self.repo.Account().User(ctx, user)
+	if err != nil || found == nil {
+		return err
+	}
+	self.withAssistant(summary, found.Email)
+	return nil
 }
 
 func validHandle(handle string) bool {
@@ -187,7 +206,10 @@ func (self *AccountService) CreateWorkspace(ctx context.Context, user uuid.UUID,
 		summary = models.WorkspaceSummary{ID: id, Name: name, URLKey: urlKey, Role: "owner", Theme: "default"}
 		return nil
 	})
-	return summary, err
+	if err != nil {
+		return summary, err
+	}
+	return summary, self.withAssistantFor(ctx, &summary, user)
 }
 
 // DeleteWorkspace deletes the workspace and everything in it. Owners only, confirmed by
@@ -252,7 +274,10 @@ func (self *AccountService) AcceptInvitation(ctx context.Context, user, id uuid.
 		}
 		return err
 	})
-	return summary, err
+	if err != nil {
+		return summary, err
+	}
+	return summary, self.withAssistantFor(ctx, &summary, user)
 }
 
 func (self *AccountService) DeclineInvitation(ctx context.Context, user, id uuid.UUID) error {
