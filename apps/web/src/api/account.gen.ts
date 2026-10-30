@@ -126,6 +126,7 @@ export type WorkspaceSummary = {
   id: string
   logoUrl: string | null
   name: string
+  ownTheme: "default" | "dank" | null
   role: string
   /** The look of the web app for everyone in the workspace. */
   theme: "default" | "dank"

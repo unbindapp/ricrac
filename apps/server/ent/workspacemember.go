@@ -28,6 +28,8 @@ type WorkspaceMember struct {
 	Active bool `json:"active,omitempty"`
 	// JoinedAt holds the value of the "joined_at" field.
 	JoinedAt time.Time `json:"joined_at,omitempty"`
+	// Theme holds the value of the "theme" field.
+	Theme *string `json:"theme,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WorkspaceMemberQuery when eager-loading is set.
 	Edges        WorkspaceMemberEdges `json:"edges"`
@@ -74,7 +76,7 @@ func (*WorkspaceMember) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case workspacemember.FieldActive:
 			values[i] = new(sql.NullBool)
-		case workspacemember.FieldRole:
+		case workspacemember.FieldRole, workspacemember.FieldTheme:
 			values[i] = new(sql.NullString)
 		case workspacemember.FieldJoinedAt:
 			values[i] = new(sql.NullTime)
@@ -124,6 +126,13 @@ func (_m *WorkspaceMember) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field joined_at", values[i])
 			} else if value.Valid {
 				_m.JoinedAt = value.Time
+			}
+		case workspacemember.FieldTheme:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field theme", values[i])
+			} else if value.Valid {
+				_m.Theme = new(string)
+				*_m.Theme = value.String
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -184,6 +193,11 @@ func (_m *WorkspaceMember) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("joined_at=")
 	builder.WriteString(_m.JoinedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	if v := _m.Theme; v != nil {
+		builder.WriteString("theme=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -2612,6 +2612,7 @@ var (
 		{Name: "role", Type: field.TypeString, Size: 2147483647},
 		{Name: "active", Type: field.TypeBool, Nullable: true},
 		{Name: "joined_at", Type: field.TypeTime, Nullable: true},
+		{Name: "theme", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "workspace_id", Type: field.TypeUUID},
 		{Name: "user_id", Type: field.TypeUUID},
 	}
@@ -2619,17 +2620,17 @@ var (
 	WorkspaceMembersTable = &schema.Table{
 		Name:       "workspace_members",
 		Columns:    WorkspaceMembersColumns,
-		PrimaryKey: []*schema.Column{WorkspaceMembersColumns[3], WorkspaceMembersColumns[4]},
+		PrimaryKey: []*schema.Column{WorkspaceMembersColumns[4], WorkspaceMembersColumns[5]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "workspace_members_workspaces_workspace",
-				Columns:    []*schema.Column{WorkspaceMembersColumns[3]},
+				Columns:    []*schema.Column{WorkspaceMembersColumns[4]},
 				RefColumns: []*schema.Column{WorkspacesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "workspace_members_users_user",
-				Columns:    []*schema.Column{WorkspaceMembersColumns[4]},
+				Columns:    []*schema.Column{WorkspaceMembersColumns[5]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

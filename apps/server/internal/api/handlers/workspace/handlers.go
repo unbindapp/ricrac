@@ -35,7 +35,7 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	}, workspaces.GetUser)
 	oapi.Register(reg, oapi.Operation{
 		Name: "update_user", Access: auth.Write, Routes: []string{"PATCH /users/{id}"},
-		Description: "Change a member. Anyone may change their own name, displayName and timezone. Changing a role (owner, admin, " +
+		Description: "Change a member. Anyone may change their own name, displayName, timezone, emailNotifications and theme. Changing a role (owner, admin, " +
 			"member, guest) needs an admin; only owners grant or take away owner, and the last owner stays one. Omitted " +
 			"fields stay as they are; null clears the timezone.",
 	}, workspaces.UpdateUser)

@@ -2,6 +2,7 @@ package workspace_service
 
 import (
 	"context"
+	"slices"
 	"strings"
 	"unicode"
 
@@ -120,6 +121,7 @@ type UpdateUserInput struct {
 	DisplayName        *string               `json:"displayName" doc:"Your short handle, used for @mentions."`
 	Timezone           args.Nullable[string] `json:"timezone" doc:"Your IANA timezone, like Europe/Berlin; null clears it."`
 	EmailNotifications *bool                 `json:"emailNotifications" doc:"Whether you get unread notifications by email."`
+	Theme              args.Nullable[string] `json:"theme" enum:"default,dank" doc:"Your look of the web app in this workspace, over the workspace's theme; null follows it."`
 }
 
 func (self *WorkspaceService) UpdateUser(ctx context.Context, actor *auth.Actor, input *UpdateUserInput) (models.WorkspaceUserDetail, error) {
@@ -127,9 +129,9 @@ func (self *WorkspaceService) UpdateUser(ctx context.Context, actor *auth.Actor,
 	if err != nil {
 		return models.WorkspaceUserDetail{}, err
 	}
-	profileChange := input.Name != nil || input.DisplayName != nil || input.Timezone.Set || input.EmailNotifications != nil
+	profileChange := input.Name != nil || input.DisplayName != nil || input.Timezone.Set || input.EmailNotifications != nil || input.Theme.Set
 	if profileChange && user != actor.User {
-		return models.WorkspaceUserDetail{}, errdefs.Forbidden("You can only change your own name, display name, timezone and email notifications")
+		return models.WorkspaceUserDetail{}, errdefs.Forbidden("You can only change your own name, display name, timezone, email notifications and theme")
 	}
 	var value models.WorkspaceUserDetail
 	err = self.repo.WithTx(ctx, func(tx repository.TxInterface) error {
@@ -172,6 +174,15 @@ func (self *WorkspaceService) UpdateUser(ctx context.Context, actor *auth.Actor,
 		}
 		if input.EmailNotifications != nil {
 			if err := self.repo.Workspace().SetEmailNotifications(ctx, tx, user, *input.EmailNotifications); err != nil {
+				return err
+			}
+		}
+		if input.Theme.Set {
+			theme := input.Theme.Ptr()
+			if theme != nil && !slices.Contains(themes, *theme) {
+				return errdefs.BadRequest("theme %q isn't one of %s", *theme, strings.Join(themes, ", "))
+			}
+			if err := self.repo.Workspace().SetMemberTheme(ctx, tx, actor.Workspace, user, theme); err != nil {
 				return err
 			}
 		}

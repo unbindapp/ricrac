@@ -114,6 +114,26 @@ func (_u *WorkspaceMemberUpdate) ClearJoinedAt() *WorkspaceMemberUpdate {
 	return _u
 }
 
+// SetTheme sets the "theme" field.
+func (_u *WorkspaceMemberUpdate) SetTheme(v string) *WorkspaceMemberUpdate {
+	_u.mutation.SetTheme(v)
+	return _u
+}
+
+// SetNillableTheme sets the "theme" field if the given value is not nil.
+func (_u *WorkspaceMemberUpdate) SetNillableTheme(v *string) *WorkspaceMemberUpdate {
+	if v != nil {
+		_u.SetTheme(*v)
+	}
+	return _u
+}
+
+// ClearTheme clears the value of the "theme" field.
+func (_u *WorkspaceMemberUpdate) ClearTheme() *WorkspaceMemberUpdate {
+	_u.mutation.ClearTheme()
+	return _u
+}
+
 // SetWorkspace sets the "workspace" edge to the Workspace entity.
 func (_u *WorkspaceMemberUpdate) SetWorkspace(v *Workspace) *WorkspaceMemberUpdate {
 	return _u.SetWorkspaceID(v.ID)
@@ -211,6 +231,12 @@ func (_u *WorkspaceMemberUpdate) sqlSave(ctx context.Context) (_node int, err er
 	}
 	if _u.mutation.JoinedAtCleared() {
 		_spec.ClearField(workspacemember.FieldJoinedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.Theme(); ok {
+		_spec.SetField(workspacemember.FieldTheme, field.TypeString, value)
+	}
+	if _u.mutation.ThemeCleared() {
+		_spec.ClearField(workspacemember.FieldTheme, field.TypeString)
 	}
 	if _u.mutation.WorkspaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -374,6 +400,26 @@ func (_u *WorkspaceMemberUpdateOne) ClearJoinedAt() *WorkspaceMemberUpdateOne {
 	return _u
 }
 
+// SetTheme sets the "theme" field.
+func (_u *WorkspaceMemberUpdateOne) SetTheme(v string) *WorkspaceMemberUpdateOne {
+	_u.mutation.SetTheme(v)
+	return _u
+}
+
+// SetNillableTheme sets the "theme" field if the given value is not nil.
+func (_u *WorkspaceMemberUpdateOne) SetNillableTheme(v *string) *WorkspaceMemberUpdateOne {
+	if v != nil {
+		_u.SetTheme(*v)
+	}
+	return _u
+}
+
+// ClearTheme clears the value of the "theme" field.
+func (_u *WorkspaceMemberUpdateOne) ClearTheme() *WorkspaceMemberUpdateOne {
+	_u.mutation.ClearTheme()
+	return _u
+}
+
 // SetWorkspace sets the "workspace" edge to the Workspace entity.
 func (_u *WorkspaceMemberUpdateOne) SetWorkspace(v *Workspace) *WorkspaceMemberUpdateOne {
 	return _u.SetWorkspaceID(v.ID)
@@ -503,6 +549,12 @@ func (_u *WorkspaceMemberUpdateOne) sqlSave(ctx context.Context) (_node *Workspa
 	}
 	if _u.mutation.JoinedAtCleared() {
 		_spec.ClearField(workspacemember.FieldJoinedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.Theme(); ok {
+		_spec.SetField(workspacemember.FieldTheme, field.TypeString, value)
+	}
+	if _u.mutation.ThemeCleared() {
+		_spec.ClearField(workspacemember.FieldTheme, field.TypeString)
 	}
 	if _u.mutation.WorkspaceCleared() {
 		edge := &sqlgraph.EdgeSpec{

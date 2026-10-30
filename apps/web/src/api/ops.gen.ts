@@ -1954,6 +1954,8 @@ export type WorkspaceUser = {
   role: "owner" | "admin" | "member" | "guest"
   /** Their teams that you can see. */
   teams: TeamRef[]
+  /** Your look of the web app in this workspace, over the workspace's theme; null follows it. Only shown for yourself. */
+  theme: "default" | "dank" | null
   timezone: string | null
 }
 
@@ -1974,6 +1976,8 @@ export type WorkspaceUserDetail = {
   role: "owner" | "admin" | "member" | "guest"
   /** Their teams that you can see. */
   teams: TeamRef[]
+  /** Your look of the web app in this workspace, over the workspace's theme; null follows it. Only shown for yourself. */
+  theme: "default" | "dank" | null
   timezone: string | null
 }
 
@@ -2022,6 +2026,8 @@ export type UpdateUserArgs = {
   name?: string | null
   /** owner, admin, member or guest. Needs an admin; owner changes need an owner. */
   role?: string | null
+  /** Your look of the web app in this workspace, over the workspace's theme; null follows it. */
+  theme?: "default" | "dank" | null
   /** Your IANA timezone, like Europe/Berlin; null clears it. */
   timezone?: string | null
 }

@@ -58,7 +58,7 @@ function ThemeSection() {
   return (
     <SettingsSection
       title="Theme"
-      description="How the app looks for everyone in this workspace. Light or dark stays each person's choice."
+      description="How the app looks in this workspace for everyone who hasn't picked their own in their account settings. Light or dark stays each person's choice."
     >
       <form.AppField
         name="theme"

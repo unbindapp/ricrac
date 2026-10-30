@@ -23,8 +23,8 @@ type EventsRepositoryInterface interface {
 	AddNotification(ctx context.Context, tx repository.TxInterface, n Notification) error
 	IssueSubscribers(ctx context.Context, tx repository.TxInterface, issue uuid.UUID) ([]uuid.UUID, error)
 	Subscribe(ctx context.Context, tx repository.TxInterface, issue uuid.UUID, users []uuid.UUID) error
-	// Mentioned is the active members whose display name, email or the part of their email before
-	// the @ is one of handles.
+	// Mentioned is the active members whose display name, email, the part of their email before the
+	// @ or linked GitHub login is one of handles.
 	Mentioned(ctx context.Context, workspace uuid.UUID, handles []string) ([]uuid.UUID, error)
 	// QueueIssueForGitHub queues the issue's changes for the GitHub issue it is linked to, saying
 	// whether there was one.
