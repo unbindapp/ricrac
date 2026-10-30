@@ -79,7 +79,7 @@ func MilestoneRefOf(m *ent.ProjectMilestone) *MilestoneRef {
 	if m == nil {
 		return nil
 	}
-	return &MilestoneRef{ID: ID(m.ID), Name: m.Name, TargetDate: DatePtr(m.TargetDate)}
+	return &MilestoneRef{ID: ID(m.ID), Name: m.Name, TargetDate: DatePtr(m.TargetDate), ProjectID: IDPtr(m.ProjectID)}
 }
 
 func CycleRefOf(c *ent.Cycle) *CycleRef {

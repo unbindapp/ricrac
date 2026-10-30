@@ -30,6 +30,7 @@ import (
 	"ricrac/ent/githubcommentlink"
 	"ricrac/ent/githubinstallation"
 	"ricrac/ent/githubissuelink"
+	"ricrac/ent/githubmilestonelink"
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/githubreposync"
 	"ricrac/ent/githubusertoken"
@@ -118,6 +119,7 @@ const (
 	TypeGithubCommentLink    = "GithubCommentLink"
 	TypeGithubInstallation   = "GithubInstallation"
 	TypeGithubIssueLink      = "GithubIssueLink"
+	TypeGithubMilestoneLink  = "GithubMilestoneLink"
 	TypeGithubOutbox         = "GithubOutbox"
 	TypeGithubRepoSync       = "GithubRepoSync"
 	TypeGithubUserToken      = "GithubUserToken"
@@ -26360,6 +26362,853 @@ func (m *GithubIssueLinkMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown GithubIssueLink edge %s", name)
 }
 
+// GithubMilestoneLinkMutation represents an operation that mutates the GithubMilestoneLink nodes in the graph.
+type GithubMilestoneLinkMutation struct {
+	config
+	op                Op
+	typ               string
+	id                *uuid.UUID
+	github_id         *int64
+	addgithub_id      *int64
+	github_number     *int
+	addgithub_number  *int
+	github_url        *string
+	github_updated_at *time.Time
+	created_at        *time.Time
+	clearedFields     map[string]struct{}
+	milestone         *uuid.UUID
+	clearedmilestone  bool
+	repo_sync         *uuid.UUID
+	clearedrepo_sync  bool
+	done              bool
+	oldValue          func(context.Context) (*GithubMilestoneLink, error)
+	predicates        []predicate.GithubMilestoneLink
+}
+
+var _ ent.Mutation = (*GithubMilestoneLinkMutation)(nil)
+
+// githubmilestonelinkOption allows management of the mutation configuration using functional options.
+type githubmilestonelinkOption func(*GithubMilestoneLinkMutation)
+
+// newGithubMilestoneLinkMutation creates new mutation for the GithubMilestoneLink entity.
+func newGithubMilestoneLinkMutation(c config, op Op, opts ...githubmilestonelinkOption) *GithubMilestoneLinkMutation {
+	m := &GithubMilestoneLinkMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeGithubMilestoneLink,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withGithubMilestoneLinkID sets the ID field of the mutation.
+func withGithubMilestoneLinkID(id uuid.UUID) githubmilestonelinkOption {
+	return func(m *GithubMilestoneLinkMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *GithubMilestoneLink
+		)
+		m.oldValue = func(ctx context.Context) (*GithubMilestoneLink, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().GithubMilestoneLink.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withGithubMilestoneLink sets the old GithubMilestoneLink of the mutation.
+func withGithubMilestoneLink(node *GithubMilestoneLink) githubmilestonelinkOption {
+	return func(m *GithubMilestoneLinkMutation) {
+		m.oldValue = func(context.Context) (*GithubMilestoneLink, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m GithubMilestoneLinkMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m GithubMilestoneLinkMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of GithubMilestoneLink entities.
+func (m *GithubMilestoneLinkMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *GithubMilestoneLinkMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *GithubMilestoneLinkMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().GithubMilestoneLink.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetMilestoneID sets the "milestone_id" field.
+func (m *GithubMilestoneLinkMutation) SetMilestoneID(u uuid.UUID) {
+	m.milestone = &u
+}
+
+// MilestoneID returns the value of the "milestone_id" field in the mutation.
+func (m *GithubMilestoneLinkMutation) MilestoneID() (r uuid.UUID, exists bool) {
+	v := m.milestone
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMilestoneID returns the old "milestone_id" field's value of the GithubMilestoneLink entity.
+// If the GithubMilestoneLink object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GithubMilestoneLinkMutation) OldMilestoneID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMilestoneID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMilestoneID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMilestoneID: %w", err)
+	}
+	return oldValue.MilestoneID, nil
+}
+
+// ResetMilestoneID resets all changes to the "milestone_id" field.
+func (m *GithubMilestoneLinkMutation) ResetMilestoneID() {
+	m.milestone = nil
+}
+
+// SetRepoSyncID sets the "repo_sync_id" field.
+func (m *GithubMilestoneLinkMutation) SetRepoSyncID(u uuid.UUID) {
+	m.repo_sync = &u
+}
+
+// RepoSyncID returns the value of the "repo_sync_id" field in the mutation.
+func (m *GithubMilestoneLinkMutation) RepoSyncID() (r uuid.UUID, exists bool) {
+	v := m.repo_sync
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRepoSyncID returns the old "repo_sync_id" field's value of the GithubMilestoneLink entity.
+// If the GithubMilestoneLink object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GithubMilestoneLinkMutation) OldRepoSyncID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRepoSyncID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRepoSyncID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRepoSyncID: %w", err)
+	}
+	return oldValue.RepoSyncID, nil
+}
+
+// ResetRepoSyncID resets all changes to the "repo_sync_id" field.
+func (m *GithubMilestoneLinkMutation) ResetRepoSyncID() {
+	m.repo_sync = nil
+}
+
+// SetGithubID sets the "github_id" field.
+func (m *GithubMilestoneLinkMutation) SetGithubID(i int64) {
+	m.github_id = &i
+	m.addgithub_id = nil
+}
+
+// GithubID returns the value of the "github_id" field in the mutation.
+func (m *GithubMilestoneLinkMutation) GithubID() (r int64, exists bool) {
+	v := m.github_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGithubID returns the old "github_id" field's value of the GithubMilestoneLink entity.
+// If the GithubMilestoneLink object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GithubMilestoneLinkMutation) OldGithubID(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGithubID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGithubID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGithubID: %w", err)
+	}
+	return oldValue.GithubID, nil
+}
+
+// AddGithubID adds i to the "github_id" field.
+func (m *GithubMilestoneLinkMutation) AddGithubID(i int64) {
+	if m.addgithub_id != nil {
+		*m.addgithub_id += i
+	} else {
+		m.addgithub_id = &i
+	}
+}
+
+// AddedGithubID returns the value that was added to the "github_id" field in this mutation.
+func (m *GithubMilestoneLinkMutation) AddedGithubID() (r int64, exists bool) {
+	v := m.addgithub_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetGithubID resets all changes to the "github_id" field.
+func (m *GithubMilestoneLinkMutation) ResetGithubID() {
+	m.github_id = nil
+	m.addgithub_id = nil
+}
+
+// SetGithubNumber sets the "github_number" field.
+func (m *GithubMilestoneLinkMutation) SetGithubNumber(i int) {
+	m.github_number = &i
+	m.addgithub_number = nil
+}
+
+// GithubNumber returns the value of the "github_number" field in the mutation.
+func (m *GithubMilestoneLinkMutation) GithubNumber() (r int, exists bool) {
+	v := m.github_number
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGithubNumber returns the old "github_number" field's value of the GithubMilestoneLink entity.
+// If the GithubMilestoneLink object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GithubMilestoneLinkMutation) OldGithubNumber(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGithubNumber is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGithubNumber requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGithubNumber: %w", err)
+	}
+	return oldValue.GithubNumber, nil
+}
+
+// AddGithubNumber adds i to the "github_number" field.
+func (m *GithubMilestoneLinkMutation) AddGithubNumber(i int) {
+	if m.addgithub_number != nil {
+		*m.addgithub_number += i
+	} else {
+		m.addgithub_number = &i
+	}
+}
+
+// AddedGithubNumber returns the value that was added to the "github_number" field in this mutation.
+func (m *GithubMilestoneLinkMutation) AddedGithubNumber() (r int, exists bool) {
+	v := m.addgithub_number
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetGithubNumber resets all changes to the "github_number" field.
+func (m *GithubMilestoneLinkMutation) ResetGithubNumber() {
+	m.github_number = nil
+	m.addgithub_number = nil
+}
+
+// SetGithubURL sets the "github_url" field.
+func (m *GithubMilestoneLinkMutation) SetGithubURL(s string) {
+	m.github_url = &s
+}
+
+// GithubURL returns the value of the "github_url" field in the mutation.
+func (m *GithubMilestoneLinkMutation) GithubURL() (r string, exists bool) {
+	v := m.github_url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGithubURL returns the old "github_url" field's value of the GithubMilestoneLink entity.
+// If the GithubMilestoneLink object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GithubMilestoneLinkMutation) OldGithubURL(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGithubURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGithubURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGithubURL: %w", err)
+	}
+	return oldValue.GithubURL, nil
+}
+
+// ResetGithubURL resets all changes to the "github_url" field.
+func (m *GithubMilestoneLinkMutation) ResetGithubURL() {
+	m.github_url = nil
+}
+
+// SetGithubUpdatedAt sets the "github_updated_at" field.
+func (m *GithubMilestoneLinkMutation) SetGithubUpdatedAt(t time.Time) {
+	m.github_updated_at = &t
+}
+
+// GithubUpdatedAt returns the value of the "github_updated_at" field in the mutation.
+func (m *GithubMilestoneLinkMutation) GithubUpdatedAt() (r time.Time, exists bool) {
+	v := m.github_updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGithubUpdatedAt returns the old "github_updated_at" field's value of the GithubMilestoneLink entity.
+// If the GithubMilestoneLink object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GithubMilestoneLinkMutation) OldGithubUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGithubUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGithubUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGithubUpdatedAt: %w", err)
+	}
+	return oldValue.GithubUpdatedAt, nil
+}
+
+// ResetGithubUpdatedAt resets all changes to the "github_updated_at" field.
+func (m *GithubMilestoneLinkMutation) ResetGithubUpdatedAt() {
+	m.github_updated_at = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *GithubMilestoneLinkMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *GithubMilestoneLinkMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the GithubMilestoneLink entity.
+// If the GithubMilestoneLink object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GithubMilestoneLinkMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ClearCreatedAt clears the value of the "created_at" field.
+func (m *GithubMilestoneLinkMutation) ClearCreatedAt() {
+	m.created_at = nil
+	m.clearedFields[githubmilestonelink.FieldCreatedAt] = struct{}{}
+}
+
+// CreatedAtCleared returns if the "created_at" field was cleared in this mutation.
+func (m *GithubMilestoneLinkMutation) CreatedAtCleared() bool {
+	_, ok := m.clearedFields[githubmilestonelink.FieldCreatedAt]
+	return ok
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *GithubMilestoneLinkMutation) ResetCreatedAt() {
+	m.created_at = nil
+	delete(m.clearedFields, githubmilestonelink.FieldCreatedAt)
+}
+
+// ClearMilestone clears the "milestone" edge to the ProjectMilestone entity.
+func (m *GithubMilestoneLinkMutation) ClearMilestone() {
+	m.clearedmilestone = true
+	m.clearedFields[githubmilestonelink.FieldMilestoneID] = struct{}{}
+}
+
+// MilestoneCleared reports if the "milestone" edge to the ProjectMilestone entity was cleared.
+func (m *GithubMilestoneLinkMutation) MilestoneCleared() bool {
+	return m.clearedmilestone
+}
+
+// MilestoneIDs returns the "milestone" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// MilestoneID instead. It exists only for internal usage by the builders.
+func (m *GithubMilestoneLinkMutation) MilestoneIDs() (ids []uuid.UUID) {
+	if id := m.milestone; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetMilestone resets all changes to the "milestone" edge.
+func (m *GithubMilestoneLinkMutation) ResetMilestone() {
+	m.milestone = nil
+	m.clearedmilestone = false
+}
+
+// ClearRepoSync clears the "repo_sync" edge to the GithubRepoSync entity.
+func (m *GithubMilestoneLinkMutation) ClearRepoSync() {
+	m.clearedrepo_sync = true
+	m.clearedFields[githubmilestonelink.FieldRepoSyncID] = struct{}{}
+}
+
+// RepoSyncCleared reports if the "repo_sync" edge to the GithubRepoSync entity was cleared.
+func (m *GithubMilestoneLinkMutation) RepoSyncCleared() bool {
+	return m.clearedrepo_sync
+}
+
+// RepoSyncIDs returns the "repo_sync" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// RepoSyncID instead. It exists only for internal usage by the builders.
+func (m *GithubMilestoneLinkMutation) RepoSyncIDs() (ids []uuid.UUID) {
+	if id := m.repo_sync; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetRepoSync resets all changes to the "repo_sync" edge.
+func (m *GithubMilestoneLinkMutation) ResetRepoSync() {
+	m.repo_sync = nil
+	m.clearedrepo_sync = false
+}
+
+// Where appends a list predicates to the GithubMilestoneLinkMutation builder.
+func (m *GithubMilestoneLinkMutation) Where(ps ...predicate.GithubMilestoneLink) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the GithubMilestoneLinkMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *GithubMilestoneLinkMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.GithubMilestoneLink, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *GithubMilestoneLinkMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *GithubMilestoneLinkMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (GithubMilestoneLink).
+func (m *GithubMilestoneLinkMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *GithubMilestoneLinkMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.milestone != nil {
+		fields = append(fields, githubmilestonelink.FieldMilestoneID)
+	}
+	if m.repo_sync != nil {
+		fields = append(fields, githubmilestonelink.FieldRepoSyncID)
+	}
+	if m.github_id != nil {
+		fields = append(fields, githubmilestonelink.FieldGithubID)
+	}
+	if m.github_number != nil {
+		fields = append(fields, githubmilestonelink.FieldGithubNumber)
+	}
+	if m.github_url != nil {
+		fields = append(fields, githubmilestonelink.FieldGithubURL)
+	}
+	if m.github_updated_at != nil {
+		fields = append(fields, githubmilestonelink.FieldGithubUpdatedAt)
+	}
+	if m.created_at != nil {
+		fields = append(fields, githubmilestonelink.FieldCreatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *GithubMilestoneLinkMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case githubmilestonelink.FieldMilestoneID:
+		return m.MilestoneID()
+	case githubmilestonelink.FieldRepoSyncID:
+		return m.RepoSyncID()
+	case githubmilestonelink.FieldGithubID:
+		return m.GithubID()
+	case githubmilestonelink.FieldGithubNumber:
+		return m.GithubNumber()
+	case githubmilestonelink.FieldGithubURL:
+		return m.GithubURL()
+	case githubmilestonelink.FieldGithubUpdatedAt:
+		return m.GithubUpdatedAt()
+	case githubmilestonelink.FieldCreatedAt:
+		return m.CreatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *GithubMilestoneLinkMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case githubmilestonelink.FieldMilestoneID:
+		return m.OldMilestoneID(ctx)
+	case githubmilestonelink.FieldRepoSyncID:
+		return m.OldRepoSyncID(ctx)
+	case githubmilestonelink.FieldGithubID:
+		return m.OldGithubID(ctx)
+	case githubmilestonelink.FieldGithubNumber:
+		return m.OldGithubNumber(ctx)
+	case githubmilestonelink.FieldGithubURL:
+		return m.OldGithubURL(ctx)
+	case githubmilestonelink.FieldGithubUpdatedAt:
+		return m.OldGithubUpdatedAt(ctx)
+	case githubmilestonelink.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown GithubMilestoneLink field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *GithubMilestoneLinkMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case githubmilestonelink.FieldMilestoneID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMilestoneID(v)
+		return nil
+	case githubmilestonelink.FieldRepoSyncID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRepoSyncID(v)
+		return nil
+	case githubmilestonelink.FieldGithubID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGithubID(v)
+		return nil
+	case githubmilestonelink.FieldGithubNumber:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGithubNumber(v)
+		return nil
+	case githubmilestonelink.FieldGithubURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGithubURL(v)
+		return nil
+	case githubmilestonelink.FieldGithubUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGithubUpdatedAt(v)
+		return nil
+	case githubmilestonelink.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown GithubMilestoneLink field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *GithubMilestoneLinkMutation) AddedFields() []string {
+	var fields []string
+	if m.addgithub_id != nil {
+		fields = append(fields, githubmilestonelink.FieldGithubID)
+	}
+	if m.addgithub_number != nil {
+		fields = append(fields, githubmilestonelink.FieldGithubNumber)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *GithubMilestoneLinkMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case githubmilestonelink.FieldGithubID:
+		return m.AddedGithubID()
+	case githubmilestonelink.FieldGithubNumber:
+		return m.AddedGithubNumber()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *GithubMilestoneLinkMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case githubmilestonelink.FieldGithubID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddGithubID(v)
+		return nil
+	case githubmilestonelink.FieldGithubNumber:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddGithubNumber(v)
+		return nil
+	}
+	return fmt.Errorf("unknown GithubMilestoneLink numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *GithubMilestoneLinkMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(githubmilestonelink.FieldCreatedAt) {
+		fields = append(fields, githubmilestonelink.FieldCreatedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *GithubMilestoneLinkMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *GithubMilestoneLinkMutation) ClearField(name string) error {
+	switch name {
+	case githubmilestonelink.FieldCreatedAt:
+		m.ClearCreatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown GithubMilestoneLink nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *GithubMilestoneLinkMutation) ResetField(name string) error {
+	switch name {
+	case githubmilestonelink.FieldMilestoneID:
+		m.ResetMilestoneID()
+		return nil
+	case githubmilestonelink.FieldRepoSyncID:
+		m.ResetRepoSyncID()
+		return nil
+	case githubmilestonelink.FieldGithubID:
+		m.ResetGithubID()
+		return nil
+	case githubmilestonelink.FieldGithubNumber:
+		m.ResetGithubNumber()
+		return nil
+	case githubmilestonelink.FieldGithubURL:
+		m.ResetGithubURL()
+		return nil
+	case githubmilestonelink.FieldGithubUpdatedAt:
+		m.ResetGithubUpdatedAt()
+		return nil
+	case githubmilestonelink.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown GithubMilestoneLink field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *GithubMilestoneLinkMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.milestone != nil {
+		edges = append(edges, githubmilestonelink.EdgeMilestone)
+	}
+	if m.repo_sync != nil {
+		edges = append(edges, githubmilestonelink.EdgeRepoSync)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *GithubMilestoneLinkMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case githubmilestonelink.EdgeMilestone:
+		if id := m.milestone; id != nil {
+			return []ent.Value{*id}
+		}
+	case githubmilestonelink.EdgeRepoSync:
+		if id := m.repo_sync; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *GithubMilestoneLinkMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *GithubMilestoneLinkMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *GithubMilestoneLinkMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedmilestone {
+		edges = append(edges, githubmilestonelink.EdgeMilestone)
+	}
+	if m.clearedrepo_sync {
+		edges = append(edges, githubmilestonelink.EdgeRepoSync)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *GithubMilestoneLinkMutation) EdgeCleared(name string) bool {
+	switch name {
+	case githubmilestonelink.EdgeMilestone:
+		return m.clearedmilestone
+	case githubmilestonelink.EdgeRepoSync:
+		return m.clearedrepo_sync
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *GithubMilestoneLinkMutation) ClearEdge(name string) error {
+	switch name {
+	case githubmilestonelink.EdgeMilestone:
+		m.ClearMilestone()
+		return nil
+	case githubmilestonelink.EdgeRepoSync:
+		m.ClearRepoSync()
+		return nil
+	}
+	return fmt.Errorf("unknown GithubMilestoneLink unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *GithubMilestoneLinkMutation) ResetEdge(name string) error {
+	switch name {
+	case githubmilestonelink.EdgeMilestone:
+		m.ResetMilestone()
+		return nil
+	case githubmilestonelink.EdgeRepoSync:
+		m.ResetRepoSync()
+		return nil
+	}
+	return fmt.Errorf("unknown GithubMilestoneLink edge %s", name)
+}
+
 // GithubOutboxMutation represents an operation that mutates the GithubOutbox nodes in the graph.
 type GithubOutboxMutation struct {
 	config
@@ -26385,6 +27234,8 @@ type GithubOutboxMutation struct {
 	clearedissue         bool
 	comment              *uuid.UUID
 	clearedcomment       bool
+	milestone            *uuid.UUID
+	clearedmilestone     bool
 	done                 bool
 	oldValue             func(context.Context) (*GithubOutbox, error)
 	predicates           []predicate.GithubOutbox
@@ -26752,6 +27603,55 @@ func (m *GithubOutboxMutation) ResetGithubCommentID() {
 	m.github_comment_id = nil
 	m.addgithub_comment_id = nil
 	delete(m.clearedFields, githuboutbox.FieldGithubCommentID)
+}
+
+// SetMilestoneID sets the "milestone_id" field.
+func (m *GithubOutboxMutation) SetMilestoneID(u uuid.UUID) {
+	m.milestone = &u
+}
+
+// MilestoneID returns the value of the "milestone_id" field in the mutation.
+func (m *GithubOutboxMutation) MilestoneID() (r uuid.UUID, exists bool) {
+	v := m.milestone
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMilestoneID returns the old "milestone_id" field's value of the GithubOutbox entity.
+// If the GithubOutbox object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GithubOutboxMutation) OldMilestoneID(ctx context.Context) (v *uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMilestoneID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMilestoneID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMilestoneID: %w", err)
+	}
+	return oldValue.MilestoneID, nil
+}
+
+// ClearMilestoneID clears the value of the "milestone_id" field.
+func (m *GithubOutboxMutation) ClearMilestoneID() {
+	m.milestone = nil
+	m.clearedFields[githuboutbox.FieldMilestoneID] = struct{}{}
+}
+
+// MilestoneIDCleared returns if the "milestone_id" field was cleared in this mutation.
+func (m *GithubOutboxMutation) MilestoneIDCleared() bool {
+	_, ok := m.clearedFields[githuboutbox.FieldMilestoneID]
+	return ok
+}
+
+// ResetMilestoneID resets all changes to the "milestone_id" field.
+func (m *GithubOutboxMutation) ResetMilestoneID() {
+	m.milestone = nil
+	delete(m.clearedFields, githuboutbox.FieldMilestoneID)
 }
 
 // SetKind sets the "kind" field.
@@ -27153,6 +28053,33 @@ func (m *GithubOutboxMutation) ResetComment() {
 	m.clearedcomment = false
 }
 
+// ClearMilestone clears the "milestone" edge to the ProjectMilestone entity.
+func (m *GithubOutboxMutation) ClearMilestone() {
+	m.clearedmilestone = true
+	m.clearedFields[githuboutbox.FieldMilestoneID] = struct{}{}
+}
+
+// MilestoneCleared reports if the "milestone" edge to the ProjectMilestone entity was cleared.
+func (m *GithubOutboxMutation) MilestoneCleared() bool {
+	return m.MilestoneIDCleared() || m.clearedmilestone
+}
+
+// MilestoneIDs returns the "milestone" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// MilestoneID instead. It exists only for internal usage by the builders.
+func (m *GithubOutboxMutation) MilestoneIDs() (ids []uuid.UUID) {
+	if id := m.milestone; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetMilestone resets all changes to the "milestone" edge.
+func (m *GithubOutboxMutation) ResetMilestone() {
+	m.milestone = nil
+	m.clearedmilestone = false
+}
+
 // Where appends a list predicates to the GithubOutboxMutation builder.
 func (m *GithubOutboxMutation) Where(ps ...predicate.GithubOutbox) {
 	m.predicates = append(m.predicates, ps...)
@@ -27187,7 +28114,7 @@ func (m *GithubOutboxMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *GithubOutboxMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 12)
 	if m.repo_sync != nil {
 		fields = append(fields, githuboutbox.FieldRepoSyncID)
 	}
@@ -27202,6 +28129,9 @@ func (m *GithubOutboxMutation) Fields() []string {
 	}
 	if m.github_comment_id != nil {
 		fields = append(fields, githuboutbox.FieldGithubCommentID)
+	}
+	if m.milestone != nil {
+		fields = append(fields, githuboutbox.FieldMilestoneID)
 	}
 	if m.kind != nil {
 		fields = append(fields, githuboutbox.FieldKind)
@@ -27239,6 +28169,8 @@ func (m *GithubOutboxMutation) Field(name string) (ent.Value, bool) {
 		return m.CommentID()
 	case githuboutbox.FieldGithubCommentID:
 		return m.GithubCommentID()
+	case githuboutbox.FieldMilestoneID:
+		return m.MilestoneID()
 	case githuboutbox.FieldKind:
 		return m.Kind()
 	case githuboutbox.FieldChanges:
@@ -27270,6 +28202,8 @@ func (m *GithubOutboxMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldCommentID(ctx)
 	case githuboutbox.FieldGithubCommentID:
 		return m.OldGithubCommentID(ctx)
+	case githuboutbox.FieldMilestoneID:
+		return m.OldMilestoneID(ctx)
 	case githuboutbox.FieldKind:
 		return m.OldKind(ctx)
 	case githuboutbox.FieldChanges:
@@ -27325,6 +28259,13 @@ func (m *GithubOutboxMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetGithubCommentID(v)
+		return nil
+	case githuboutbox.FieldMilestoneID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMilestoneID(v)
 		return nil
 	case githuboutbox.FieldKind:
 		v, ok := value.(string)
@@ -27446,6 +28387,9 @@ func (m *GithubOutboxMutation) ClearedFields() []string {
 	if m.FieldCleared(githuboutbox.FieldGithubCommentID) {
 		fields = append(fields, githuboutbox.FieldGithubCommentID)
 	}
+	if m.FieldCleared(githuboutbox.FieldMilestoneID) {
+		fields = append(fields, githuboutbox.FieldMilestoneID)
+	}
 	if m.FieldCleared(githuboutbox.FieldChanges) {
 		fields = append(fields, githuboutbox.FieldChanges)
 	}
@@ -27483,6 +28427,9 @@ func (m *GithubOutboxMutation) ClearField(name string) error {
 		return nil
 	case githuboutbox.FieldGithubCommentID:
 		m.ClearGithubCommentID()
+		return nil
+	case githuboutbox.FieldMilestoneID:
+		m.ClearMilestoneID()
 		return nil
 	case githuboutbox.FieldChanges:
 		m.ClearChanges()
@@ -27522,6 +28469,9 @@ func (m *GithubOutboxMutation) ResetField(name string) error {
 	case githuboutbox.FieldGithubCommentID:
 		m.ResetGithubCommentID()
 		return nil
+	case githuboutbox.FieldMilestoneID:
+		m.ResetMilestoneID()
+		return nil
 	case githuboutbox.FieldKind:
 		m.ResetKind()
 		return nil
@@ -27546,7 +28496,7 @@ func (m *GithubOutboxMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *GithubOutboxMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.repo_sync != nil {
 		edges = append(edges, githuboutbox.EdgeRepoSync)
 	}
@@ -27555,6 +28505,9 @@ func (m *GithubOutboxMutation) AddedEdges() []string {
 	}
 	if m.comment != nil {
 		edges = append(edges, githuboutbox.EdgeComment)
+	}
+	if m.milestone != nil {
+		edges = append(edges, githuboutbox.EdgeMilestone)
 	}
 	return edges
 }
@@ -27575,13 +28528,17 @@ func (m *GithubOutboxMutation) AddedIDs(name string) []ent.Value {
 		if id := m.comment; id != nil {
 			return []ent.Value{*id}
 		}
+	case githuboutbox.EdgeMilestone:
+		if id := m.milestone; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *GithubOutboxMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	return edges
 }
 
@@ -27593,7 +28550,7 @@ func (m *GithubOutboxMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *GithubOutboxMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.clearedrepo_sync {
 		edges = append(edges, githuboutbox.EdgeRepoSync)
 	}
@@ -27602,6 +28559,9 @@ func (m *GithubOutboxMutation) ClearedEdges() []string {
 	}
 	if m.clearedcomment {
 		edges = append(edges, githuboutbox.EdgeComment)
+	}
+	if m.clearedmilestone {
+		edges = append(edges, githuboutbox.EdgeMilestone)
 	}
 	return edges
 }
@@ -27616,6 +28576,8 @@ func (m *GithubOutboxMutation) EdgeCleared(name string) bool {
 		return m.clearedissue
 	case githuboutbox.EdgeComment:
 		return m.clearedcomment
+	case githuboutbox.EdgeMilestone:
+		return m.clearedmilestone
 	}
 	return false
 }
@@ -27632,6 +28594,9 @@ func (m *GithubOutboxMutation) ClearEdge(name string) error {
 		return nil
 	case githuboutbox.EdgeComment:
 		m.ClearComment()
+		return nil
+	case githuboutbox.EdgeMilestone:
+		m.ClearMilestone()
 		return nil
 	}
 	return fmt.Errorf("unknown GithubOutbox unique edge %s", name)
@@ -27650,6 +28615,9 @@ func (m *GithubOutboxMutation) ResetEdge(name string) error {
 	case githuboutbox.EdgeComment:
 		m.ResetComment()
 		return nil
+	case githuboutbox.EdgeMilestone:
+		m.ResetMilestone()
+		return nil
 	}
 	return fmt.Errorf("unknown GithubOutbox edge %s", name)
 }
@@ -27657,47 +28625,51 @@ func (m *GithubOutboxMutation) ResetEdge(name string) error {
 // GithubRepoSyncMutation represents an operation that mutates the GithubRepoSync nodes in the graph.
 type GithubRepoSyncMutation struct {
 	config
-	op                        Op
-	typ                       string
-	id                        *uuid.UUID
-	repo_id                   *int64
-	addrepo_id                *int64
-	full_name                 *string
-	link_back                 *bool
-	backfill_status           *string
-	backfill_closed           *bool
-	backfill_page             *int
-	addbackfill_page          *int
-	issues_created            *int
-	addissues_created         *int
-	issues_updated            *int
-	addissues_updated         *int
-	comments_created          *int
-	addcomments_created       *int
-	skipped                   *int
-	addskipped                *int
-	last_error                *string
-	last_synced_at            *time.Time
-	created_at                *time.Time
-	updated_at                *time.Time
-	clearedFields             map[string]struct{}
-	workspace                 *uuid.UUID
-	clearedworkspace          bool
-	installation              *int64
-	clearedinstallation       bool
-	team                      *uuid.UUID
-	clearedteam               bool
-	project                   *uuid.UUID
-	clearedproject            bool
-	github_issue_links        map[uuid.UUID]struct{}
-	removedgithub_issue_links map[uuid.UUID]struct{}
-	clearedgithub_issue_links bool
-	github_outbox             map[int64]struct{}
-	removedgithub_outbox      map[int64]struct{}
-	clearedgithub_outbox      bool
-	done                      bool
-	oldValue                  func(context.Context) (*GithubRepoSync, error)
-	predicates                []predicate.GithubRepoSync
+	op                            Op
+	typ                           string
+	id                            *uuid.UUID
+	repo_id                       *int64
+	addrepo_id                    *int64
+	full_name                     *string
+	link_back                     *bool
+	backfill_status               *string
+	backfill_closed               *bool
+	backfill_page                 *int
+	addbackfill_page              *int
+	issues_created                *int
+	addissues_created             *int
+	issues_updated                *int
+	addissues_updated             *int
+	comments_created              *int
+	addcomments_created           *int
+	skipped                       *int
+	addskipped                    *int
+	last_error                    *string
+	last_synced_at                *time.Time
+	milestones_synced_at          *time.Time
+	created_at                    *time.Time
+	updated_at                    *time.Time
+	clearedFields                 map[string]struct{}
+	workspace                     *uuid.UUID
+	clearedworkspace              bool
+	installation                  *int64
+	clearedinstallation           bool
+	team                          *uuid.UUID
+	clearedteam                   bool
+	project                       *uuid.UUID
+	clearedproject                bool
+	github_issue_links            map[uuid.UUID]struct{}
+	removedgithub_issue_links     map[uuid.UUID]struct{}
+	clearedgithub_issue_links     bool
+	github_outbox                 map[int64]struct{}
+	removedgithub_outbox          map[int64]struct{}
+	clearedgithub_outbox          bool
+	github_milestone_links        map[uuid.UUID]struct{}
+	removedgithub_milestone_links map[uuid.UUID]struct{}
+	clearedgithub_milestone_links bool
+	done                          bool
+	oldValue                      func(context.Context) (*GithubRepoSync, error)
+	predicates                    []predicate.GithubRepoSync
 }
 
 var _ ent.Mutation = (*GithubRepoSyncMutation)(nil)
@@ -28648,6 +29620,55 @@ func (m *GithubRepoSyncMutation) ResetLastSyncedAt() {
 	delete(m.clearedFields, githubreposync.FieldLastSyncedAt)
 }
 
+// SetMilestonesSyncedAt sets the "milestones_synced_at" field.
+func (m *GithubRepoSyncMutation) SetMilestonesSyncedAt(t time.Time) {
+	m.milestones_synced_at = &t
+}
+
+// MilestonesSyncedAt returns the value of the "milestones_synced_at" field in the mutation.
+func (m *GithubRepoSyncMutation) MilestonesSyncedAt() (r time.Time, exists bool) {
+	v := m.milestones_synced_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMilestonesSyncedAt returns the old "milestones_synced_at" field's value of the GithubRepoSync entity.
+// If the GithubRepoSync object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GithubRepoSyncMutation) OldMilestonesSyncedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMilestonesSyncedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMilestonesSyncedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMilestonesSyncedAt: %w", err)
+	}
+	return oldValue.MilestonesSyncedAt, nil
+}
+
+// ClearMilestonesSyncedAt clears the value of the "milestones_synced_at" field.
+func (m *GithubRepoSyncMutation) ClearMilestonesSyncedAt() {
+	m.milestones_synced_at = nil
+	m.clearedFields[githubreposync.FieldMilestonesSyncedAt] = struct{}{}
+}
+
+// MilestonesSyncedAtCleared returns if the "milestones_synced_at" field was cleared in this mutation.
+func (m *GithubRepoSyncMutation) MilestonesSyncedAtCleared() bool {
+	_, ok := m.clearedFields[githubreposync.FieldMilestonesSyncedAt]
+	return ok
+}
+
+// ResetMilestonesSyncedAt resets all changes to the "milestones_synced_at" field.
+func (m *GithubRepoSyncMutation) ResetMilestonesSyncedAt() {
+	m.milestones_synced_at = nil
+	delete(m.clearedFields, githubreposync.FieldMilestonesSyncedAt)
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *GithubRepoSyncMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -28962,6 +29983,60 @@ func (m *GithubRepoSyncMutation) ResetGithubOutbox() {
 	m.removedgithub_outbox = nil
 }
 
+// AddGithubMilestoneLinkIDs adds the "github_milestone_links" edge to the GithubMilestoneLink entity by ids.
+func (m *GithubRepoSyncMutation) AddGithubMilestoneLinkIDs(ids ...uuid.UUID) {
+	if m.github_milestone_links == nil {
+		m.github_milestone_links = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.github_milestone_links[ids[i]] = struct{}{}
+	}
+}
+
+// ClearGithubMilestoneLinks clears the "github_milestone_links" edge to the GithubMilestoneLink entity.
+func (m *GithubRepoSyncMutation) ClearGithubMilestoneLinks() {
+	m.clearedgithub_milestone_links = true
+}
+
+// GithubMilestoneLinksCleared reports if the "github_milestone_links" edge to the GithubMilestoneLink entity was cleared.
+func (m *GithubRepoSyncMutation) GithubMilestoneLinksCleared() bool {
+	return m.clearedgithub_milestone_links
+}
+
+// RemoveGithubMilestoneLinkIDs removes the "github_milestone_links" edge to the GithubMilestoneLink entity by IDs.
+func (m *GithubRepoSyncMutation) RemoveGithubMilestoneLinkIDs(ids ...uuid.UUID) {
+	if m.removedgithub_milestone_links == nil {
+		m.removedgithub_milestone_links = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.github_milestone_links, ids[i])
+		m.removedgithub_milestone_links[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedGithubMilestoneLinks returns the removed IDs of the "github_milestone_links" edge to the GithubMilestoneLink entity.
+func (m *GithubRepoSyncMutation) RemovedGithubMilestoneLinksIDs() (ids []uuid.UUID) {
+	for id := range m.removedgithub_milestone_links {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// GithubMilestoneLinksIDs returns the "github_milestone_links" edge IDs in the mutation.
+func (m *GithubRepoSyncMutation) GithubMilestoneLinksIDs() (ids []uuid.UUID) {
+	for id := range m.github_milestone_links {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetGithubMilestoneLinks resets all changes to the "github_milestone_links" edge.
+func (m *GithubRepoSyncMutation) ResetGithubMilestoneLinks() {
+	m.github_milestone_links = nil
+	m.clearedgithub_milestone_links = false
+	m.removedgithub_milestone_links = nil
+}
+
 // Where appends a list predicates to the GithubRepoSyncMutation builder.
 func (m *GithubRepoSyncMutation) Where(ps ...predicate.GithubRepoSync) {
 	m.predicates = append(m.predicates, ps...)
@@ -28996,7 +30071,7 @@ func (m *GithubRepoSyncMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *GithubRepoSyncMutation) Fields() []string {
-	fields := make([]string, 0, 18)
+	fields := make([]string, 0, 19)
 	if m.workspace != nil {
 		fields = append(fields, githubreposync.FieldWorkspaceID)
 	}
@@ -29045,6 +30120,9 @@ func (m *GithubRepoSyncMutation) Fields() []string {
 	if m.last_synced_at != nil {
 		fields = append(fields, githubreposync.FieldLastSyncedAt)
 	}
+	if m.milestones_synced_at != nil {
+		fields = append(fields, githubreposync.FieldMilestonesSyncedAt)
+	}
 	if m.created_at != nil {
 		fields = append(fields, githubreposync.FieldCreatedAt)
 	}
@@ -29091,6 +30169,8 @@ func (m *GithubRepoSyncMutation) Field(name string) (ent.Value, bool) {
 		return m.LastError()
 	case githubreposync.FieldLastSyncedAt:
 		return m.LastSyncedAt()
+	case githubreposync.FieldMilestonesSyncedAt:
+		return m.MilestonesSyncedAt()
 	case githubreposync.FieldCreatedAt:
 		return m.CreatedAt()
 	case githubreposync.FieldUpdatedAt:
@@ -29136,6 +30216,8 @@ func (m *GithubRepoSyncMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldLastError(ctx)
 	case githubreposync.FieldLastSyncedAt:
 		return m.OldLastSyncedAt(ctx)
+	case githubreposync.FieldMilestonesSyncedAt:
+		return m.OldMilestonesSyncedAt(ctx)
 	case githubreposync.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case githubreposync.FieldUpdatedAt:
@@ -29260,6 +30342,13 @@ func (m *GithubRepoSyncMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetLastSyncedAt(v)
+		return nil
+	case githubreposync.FieldMilestonesSyncedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMilestonesSyncedAt(v)
 		return nil
 	case githubreposync.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -29413,6 +30502,9 @@ func (m *GithubRepoSyncMutation) ClearedFields() []string {
 	if m.FieldCleared(githubreposync.FieldLastSyncedAt) {
 		fields = append(fields, githubreposync.FieldLastSyncedAt)
 	}
+	if m.FieldCleared(githubreposync.FieldMilestonesSyncedAt) {
+		fields = append(fields, githubreposync.FieldMilestonesSyncedAt)
+	}
 	if m.FieldCleared(githubreposync.FieldCreatedAt) {
 		fields = append(fields, githubreposync.FieldCreatedAt)
 	}
@@ -29465,6 +30557,9 @@ func (m *GithubRepoSyncMutation) ClearField(name string) error {
 		return nil
 	case githubreposync.FieldLastSyncedAt:
 		m.ClearLastSyncedAt()
+		return nil
+	case githubreposync.FieldMilestonesSyncedAt:
+		m.ClearMilestonesSyncedAt()
 		return nil
 	case githubreposync.FieldCreatedAt:
 		m.ClearCreatedAt()
@@ -29528,6 +30623,9 @@ func (m *GithubRepoSyncMutation) ResetField(name string) error {
 	case githubreposync.FieldLastSyncedAt:
 		m.ResetLastSyncedAt()
 		return nil
+	case githubreposync.FieldMilestonesSyncedAt:
+		m.ResetMilestonesSyncedAt()
+		return nil
 	case githubreposync.FieldCreatedAt:
 		m.ResetCreatedAt()
 		return nil
@@ -29540,7 +30638,7 @@ func (m *GithubRepoSyncMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *GithubRepoSyncMutation) AddedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.workspace != nil {
 		edges = append(edges, githubreposync.EdgeWorkspace)
 	}
@@ -29558,6 +30656,9 @@ func (m *GithubRepoSyncMutation) AddedEdges() []string {
 	}
 	if m.github_outbox != nil {
 		edges = append(edges, githubreposync.EdgeGithubOutbox)
+	}
+	if m.github_milestone_links != nil {
+		edges = append(edges, githubreposync.EdgeGithubMilestoneLinks)
 	}
 	return edges
 }
@@ -29594,18 +30695,27 @@ func (m *GithubRepoSyncMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case githubreposync.EdgeGithubMilestoneLinks:
+		ids := make([]ent.Value, 0, len(m.github_milestone_links))
+		for id := range m.github_milestone_links {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *GithubRepoSyncMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.removedgithub_issue_links != nil {
 		edges = append(edges, githubreposync.EdgeGithubIssueLinks)
 	}
 	if m.removedgithub_outbox != nil {
 		edges = append(edges, githubreposync.EdgeGithubOutbox)
+	}
+	if m.removedgithub_milestone_links != nil {
+		edges = append(edges, githubreposync.EdgeGithubMilestoneLinks)
 	}
 	return edges
 }
@@ -29626,13 +30736,19 @@ func (m *GithubRepoSyncMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case githubreposync.EdgeGithubMilestoneLinks:
+		ids := make([]ent.Value, 0, len(m.removedgithub_milestone_links))
+		for id := range m.removedgithub_milestone_links {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *GithubRepoSyncMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.clearedworkspace {
 		edges = append(edges, githubreposync.EdgeWorkspace)
 	}
@@ -29650,6 +30766,9 @@ func (m *GithubRepoSyncMutation) ClearedEdges() []string {
 	}
 	if m.clearedgithub_outbox {
 		edges = append(edges, githubreposync.EdgeGithubOutbox)
+	}
+	if m.clearedgithub_milestone_links {
+		edges = append(edges, githubreposync.EdgeGithubMilestoneLinks)
 	}
 	return edges
 }
@@ -29670,6 +30789,8 @@ func (m *GithubRepoSyncMutation) EdgeCleared(name string) bool {
 		return m.clearedgithub_issue_links
 	case githubreposync.EdgeGithubOutbox:
 		return m.clearedgithub_outbox
+	case githubreposync.EdgeGithubMilestoneLinks:
+		return m.clearedgithub_milestone_links
 	}
 	return false
 }
@@ -29715,6 +30836,9 @@ func (m *GithubRepoSyncMutation) ResetEdge(name string) error {
 		return nil
 	case githubreposync.EdgeGithubOutbox:
 		m.ResetGithubOutbox()
+		return nil
+	case githubreposync.EdgeGithubMilestoneLinks:
+		m.ResetGithubMilestoneLinks()
 		return nil
 	}
 	return fmt.Errorf("unknown GithubRepoSync edge %s", name)
@@ -55308,28 +56432,37 @@ func (m *ProjectMemberMutation) ResetEdge(name string) error {
 // ProjectMilestoneMutation represents an operation that mutates the ProjectMilestone nodes in the graph.
 type ProjectMilestoneMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *uuid.UUID
-	name            *string
-	description     *string
-	target_date     *time.Time
-	sort_order      *float64
-	addsort_order   *float64
-	created_at      *time.Time
-	updated_at      *time.Time
-	clearedFields   map[string]struct{}
-	project         *uuid.UUID
-	clearedproject  bool
-	issues          map[uuid.UUID]struct{}
-	removedissues   map[uuid.UUID]struct{}
-	clearedissues   bool
-	comments        map[uuid.UUID]struct{}
-	removedcomments map[uuid.UUID]struct{}
-	clearedcomments bool
-	done            bool
-	oldValue        func(context.Context) (*ProjectMilestone, error)
-	predicates      []predicate.ProjectMilestone
+	op                            Op
+	typ                           string
+	id                            *uuid.UUID
+	name                          *string
+	description                   *string
+	target_date                   *time.Time
+	sort_order                    *float64
+	addsort_order                 *float64
+	closed_at                     *time.Time
+	created_at                    *time.Time
+	updated_at                    *time.Time
+	clearedFields                 map[string]struct{}
+	workspace                     *uuid.UUID
+	clearedworkspace              bool
+	project                       *uuid.UUID
+	clearedproject                bool
+	issues                        map[uuid.UUID]struct{}
+	removedissues                 map[uuid.UUID]struct{}
+	clearedissues                 bool
+	comments                      map[uuid.UUID]struct{}
+	removedcomments               map[uuid.UUID]struct{}
+	clearedcomments               bool
+	github_milestone_links        map[uuid.UUID]struct{}
+	removedgithub_milestone_links map[uuid.UUID]struct{}
+	clearedgithub_milestone_links bool
+	github_outbox                 map[int64]struct{}
+	removedgithub_outbox          map[int64]struct{}
+	clearedgithub_outbox          bool
+	done                          bool
+	oldValue                      func(context.Context) (*ProjectMilestone, error)
+	predicates                    []predicate.ProjectMilestone
 }
 
 var _ ent.Mutation = (*ProjectMilestoneMutation)(nil)
@@ -55436,6 +56569,42 @@ func (m *ProjectMilestoneMutation) IDs(ctx context.Context) ([]uuid.UUID, error)
 	}
 }
 
+// SetWorkspaceID sets the "workspace_id" field.
+func (m *ProjectMilestoneMutation) SetWorkspaceID(u uuid.UUID) {
+	m.workspace = &u
+}
+
+// WorkspaceID returns the value of the "workspace_id" field in the mutation.
+func (m *ProjectMilestoneMutation) WorkspaceID() (r uuid.UUID, exists bool) {
+	v := m.workspace
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWorkspaceID returns the old "workspace_id" field's value of the ProjectMilestone entity.
+// If the ProjectMilestone object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProjectMilestoneMutation) OldWorkspaceID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWorkspaceID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWorkspaceID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWorkspaceID: %w", err)
+	}
+	return oldValue.WorkspaceID, nil
+}
+
+// ResetWorkspaceID resets all changes to the "workspace_id" field.
+func (m *ProjectMilestoneMutation) ResetWorkspaceID() {
+	m.workspace = nil
+}
+
 // SetProjectID sets the "project_id" field.
 func (m *ProjectMilestoneMutation) SetProjectID(u uuid.UUID) {
 	m.project = &u
@@ -55453,7 +56622,7 @@ func (m *ProjectMilestoneMutation) ProjectID() (r uuid.UUID, exists bool) {
 // OldProjectID returns the old "project_id" field's value of the ProjectMilestone entity.
 // If the ProjectMilestone object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProjectMilestoneMutation) OldProjectID(ctx context.Context) (v uuid.UUID, err error) {
+func (m *ProjectMilestoneMutation) OldProjectID(ctx context.Context) (v *uuid.UUID, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldProjectID is only allowed on UpdateOne operations")
 	}
@@ -55467,9 +56636,22 @@ func (m *ProjectMilestoneMutation) OldProjectID(ctx context.Context) (v uuid.UUI
 	return oldValue.ProjectID, nil
 }
 
+// ClearProjectID clears the value of the "project_id" field.
+func (m *ProjectMilestoneMutation) ClearProjectID() {
+	m.project = nil
+	m.clearedFields[projectmilestone.FieldProjectID] = struct{}{}
+}
+
+// ProjectIDCleared returns if the "project_id" field was cleared in this mutation.
+func (m *ProjectMilestoneMutation) ProjectIDCleared() bool {
+	_, ok := m.clearedFields[projectmilestone.FieldProjectID]
+	return ok
+}
+
 // ResetProjectID resets all changes to the "project_id" field.
 func (m *ProjectMilestoneMutation) ResetProjectID() {
 	m.project = nil
+	delete(m.clearedFields, projectmilestone.FieldProjectID)
 }
 
 // SetName sets the "name" field.
@@ -55676,6 +56858,55 @@ func (m *ProjectMilestoneMutation) ResetSortOrder() {
 	delete(m.clearedFields, projectmilestone.FieldSortOrder)
 }
 
+// SetClosedAt sets the "closed_at" field.
+func (m *ProjectMilestoneMutation) SetClosedAt(t time.Time) {
+	m.closed_at = &t
+}
+
+// ClosedAt returns the value of the "closed_at" field in the mutation.
+func (m *ProjectMilestoneMutation) ClosedAt() (r time.Time, exists bool) {
+	v := m.closed_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldClosedAt returns the old "closed_at" field's value of the ProjectMilestone entity.
+// If the ProjectMilestone object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProjectMilestoneMutation) OldClosedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldClosedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldClosedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldClosedAt: %w", err)
+	}
+	return oldValue.ClosedAt, nil
+}
+
+// ClearClosedAt clears the value of the "closed_at" field.
+func (m *ProjectMilestoneMutation) ClearClosedAt() {
+	m.closed_at = nil
+	m.clearedFields[projectmilestone.FieldClosedAt] = struct{}{}
+}
+
+// ClosedAtCleared returns if the "closed_at" field was cleared in this mutation.
+func (m *ProjectMilestoneMutation) ClosedAtCleared() bool {
+	_, ok := m.clearedFields[projectmilestone.FieldClosedAt]
+	return ok
+}
+
+// ResetClosedAt resets all changes to the "closed_at" field.
+func (m *ProjectMilestoneMutation) ResetClosedAt() {
+	m.closed_at = nil
+	delete(m.clearedFields, projectmilestone.FieldClosedAt)
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *ProjectMilestoneMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -55774,6 +57005,33 @@ func (m *ProjectMilestoneMutation) ResetUpdatedAt() {
 	delete(m.clearedFields, projectmilestone.FieldUpdatedAt)
 }
 
+// ClearWorkspace clears the "workspace" edge to the Workspace entity.
+func (m *ProjectMilestoneMutation) ClearWorkspace() {
+	m.clearedworkspace = true
+	m.clearedFields[projectmilestone.FieldWorkspaceID] = struct{}{}
+}
+
+// WorkspaceCleared reports if the "workspace" edge to the Workspace entity was cleared.
+func (m *ProjectMilestoneMutation) WorkspaceCleared() bool {
+	return m.clearedworkspace
+}
+
+// WorkspaceIDs returns the "workspace" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// WorkspaceID instead. It exists only for internal usage by the builders.
+func (m *ProjectMilestoneMutation) WorkspaceIDs() (ids []uuid.UUID) {
+	if id := m.workspace; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetWorkspace resets all changes to the "workspace" edge.
+func (m *ProjectMilestoneMutation) ResetWorkspace() {
+	m.workspace = nil
+	m.clearedworkspace = false
+}
+
 // ClearProject clears the "project" edge to the Project entity.
 func (m *ProjectMilestoneMutation) ClearProject() {
 	m.clearedproject = true
@@ -55782,7 +57040,7 @@ func (m *ProjectMilestoneMutation) ClearProject() {
 
 // ProjectCleared reports if the "project" edge to the Project entity was cleared.
 func (m *ProjectMilestoneMutation) ProjectCleared() bool {
-	return m.clearedproject
+	return m.ProjectIDCleared() || m.clearedproject
 }
 
 // ProjectIDs returns the "project" edge IDs in the mutation.
@@ -55909,6 +57167,114 @@ func (m *ProjectMilestoneMutation) ResetComments() {
 	m.removedcomments = nil
 }
 
+// AddGithubMilestoneLinkIDs adds the "github_milestone_links" edge to the GithubMilestoneLink entity by ids.
+func (m *ProjectMilestoneMutation) AddGithubMilestoneLinkIDs(ids ...uuid.UUID) {
+	if m.github_milestone_links == nil {
+		m.github_milestone_links = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.github_milestone_links[ids[i]] = struct{}{}
+	}
+}
+
+// ClearGithubMilestoneLinks clears the "github_milestone_links" edge to the GithubMilestoneLink entity.
+func (m *ProjectMilestoneMutation) ClearGithubMilestoneLinks() {
+	m.clearedgithub_milestone_links = true
+}
+
+// GithubMilestoneLinksCleared reports if the "github_milestone_links" edge to the GithubMilestoneLink entity was cleared.
+func (m *ProjectMilestoneMutation) GithubMilestoneLinksCleared() bool {
+	return m.clearedgithub_milestone_links
+}
+
+// RemoveGithubMilestoneLinkIDs removes the "github_milestone_links" edge to the GithubMilestoneLink entity by IDs.
+func (m *ProjectMilestoneMutation) RemoveGithubMilestoneLinkIDs(ids ...uuid.UUID) {
+	if m.removedgithub_milestone_links == nil {
+		m.removedgithub_milestone_links = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.github_milestone_links, ids[i])
+		m.removedgithub_milestone_links[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedGithubMilestoneLinks returns the removed IDs of the "github_milestone_links" edge to the GithubMilestoneLink entity.
+func (m *ProjectMilestoneMutation) RemovedGithubMilestoneLinksIDs() (ids []uuid.UUID) {
+	for id := range m.removedgithub_milestone_links {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// GithubMilestoneLinksIDs returns the "github_milestone_links" edge IDs in the mutation.
+func (m *ProjectMilestoneMutation) GithubMilestoneLinksIDs() (ids []uuid.UUID) {
+	for id := range m.github_milestone_links {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetGithubMilestoneLinks resets all changes to the "github_milestone_links" edge.
+func (m *ProjectMilestoneMutation) ResetGithubMilestoneLinks() {
+	m.github_milestone_links = nil
+	m.clearedgithub_milestone_links = false
+	m.removedgithub_milestone_links = nil
+}
+
+// AddGithubOutboxIDs adds the "github_outbox" edge to the GithubOutbox entity by ids.
+func (m *ProjectMilestoneMutation) AddGithubOutboxIDs(ids ...int64) {
+	if m.github_outbox == nil {
+		m.github_outbox = make(map[int64]struct{})
+	}
+	for i := range ids {
+		m.github_outbox[ids[i]] = struct{}{}
+	}
+}
+
+// ClearGithubOutbox clears the "github_outbox" edge to the GithubOutbox entity.
+func (m *ProjectMilestoneMutation) ClearGithubOutbox() {
+	m.clearedgithub_outbox = true
+}
+
+// GithubOutboxCleared reports if the "github_outbox" edge to the GithubOutbox entity was cleared.
+func (m *ProjectMilestoneMutation) GithubOutboxCleared() bool {
+	return m.clearedgithub_outbox
+}
+
+// RemoveGithubOutboxIDs removes the "github_outbox" edge to the GithubOutbox entity by IDs.
+func (m *ProjectMilestoneMutation) RemoveGithubOutboxIDs(ids ...int64) {
+	if m.removedgithub_outbox == nil {
+		m.removedgithub_outbox = make(map[int64]struct{})
+	}
+	for i := range ids {
+		delete(m.github_outbox, ids[i])
+		m.removedgithub_outbox[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedGithubOutbox returns the removed IDs of the "github_outbox" edge to the GithubOutbox entity.
+func (m *ProjectMilestoneMutation) RemovedGithubOutboxIDs() (ids []int64) {
+	for id := range m.removedgithub_outbox {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// GithubOutboxIDs returns the "github_outbox" edge IDs in the mutation.
+func (m *ProjectMilestoneMutation) GithubOutboxIDs() (ids []int64) {
+	for id := range m.github_outbox {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetGithubOutbox resets all changes to the "github_outbox" edge.
+func (m *ProjectMilestoneMutation) ResetGithubOutbox() {
+	m.github_outbox = nil
+	m.clearedgithub_outbox = false
+	m.removedgithub_outbox = nil
+}
+
 // Where appends a list predicates to the ProjectMilestoneMutation builder.
 func (m *ProjectMilestoneMutation) Where(ps ...predicate.ProjectMilestone) {
 	m.predicates = append(m.predicates, ps...)
@@ -55943,7 +57309,10 @@ func (m *ProjectMilestoneMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ProjectMilestoneMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 9)
+	if m.workspace != nil {
+		fields = append(fields, projectmilestone.FieldWorkspaceID)
+	}
 	if m.project != nil {
 		fields = append(fields, projectmilestone.FieldProjectID)
 	}
@@ -55959,6 +57328,9 @@ func (m *ProjectMilestoneMutation) Fields() []string {
 	if m.sort_order != nil {
 		fields = append(fields, projectmilestone.FieldSortOrder)
 	}
+	if m.closed_at != nil {
+		fields = append(fields, projectmilestone.FieldClosedAt)
+	}
 	if m.created_at != nil {
 		fields = append(fields, projectmilestone.FieldCreatedAt)
 	}
@@ -55973,6 +57345,8 @@ func (m *ProjectMilestoneMutation) Fields() []string {
 // schema.
 func (m *ProjectMilestoneMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case projectmilestone.FieldWorkspaceID:
+		return m.WorkspaceID()
 	case projectmilestone.FieldProjectID:
 		return m.ProjectID()
 	case projectmilestone.FieldName:
@@ -55983,6 +57357,8 @@ func (m *ProjectMilestoneMutation) Field(name string) (ent.Value, bool) {
 		return m.TargetDate()
 	case projectmilestone.FieldSortOrder:
 		return m.SortOrder()
+	case projectmilestone.FieldClosedAt:
+		return m.ClosedAt()
 	case projectmilestone.FieldCreatedAt:
 		return m.CreatedAt()
 	case projectmilestone.FieldUpdatedAt:
@@ -55996,6 +57372,8 @@ func (m *ProjectMilestoneMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *ProjectMilestoneMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case projectmilestone.FieldWorkspaceID:
+		return m.OldWorkspaceID(ctx)
 	case projectmilestone.FieldProjectID:
 		return m.OldProjectID(ctx)
 	case projectmilestone.FieldName:
@@ -56006,6 +57384,8 @@ func (m *ProjectMilestoneMutation) OldField(ctx context.Context, name string) (e
 		return m.OldTargetDate(ctx)
 	case projectmilestone.FieldSortOrder:
 		return m.OldSortOrder(ctx)
+	case projectmilestone.FieldClosedAt:
+		return m.OldClosedAt(ctx)
 	case projectmilestone.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case projectmilestone.FieldUpdatedAt:
@@ -56019,6 +57399,13 @@ func (m *ProjectMilestoneMutation) OldField(ctx context.Context, name string) (e
 // type.
 func (m *ProjectMilestoneMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case projectmilestone.FieldWorkspaceID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWorkspaceID(v)
+		return nil
 	case projectmilestone.FieldProjectID:
 		v, ok := value.(uuid.UUID)
 		if !ok {
@@ -56053,6 +57440,13 @@ func (m *ProjectMilestoneMutation) SetField(name string, value ent.Value) error 
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetSortOrder(v)
+		return nil
+	case projectmilestone.FieldClosedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetClosedAt(v)
 		return nil
 	case projectmilestone.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -56113,6 +57507,9 @@ func (m *ProjectMilestoneMutation) AddField(name string, value ent.Value) error 
 // mutation.
 func (m *ProjectMilestoneMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(projectmilestone.FieldProjectID) {
+		fields = append(fields, projectmilestone.FieldProjectID)
+	}
 	if m.FieldCleared(projectmilestone.FieldDescription) {
 		fields = append(fields, projectmilestone.FieldDescription)
 	}
@@ -56121,6 +57518,9 @@ func (m *ProjectMilestoneMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(projectmilestone.FieldSortOrder) {
 		fields = append(fields, projectmilestone.FieldSortOrder)
+	}
+	if m.FieldCleared(projectmilestone.FieldClosedAt) {
+		fields = append(fields, projectmilestone.FieldClosedAt)
 	}
 	if m.FieldCleared(projectmilestone.FieldCreatedAt) {
 		fields = append(fields, projectmilestone.FieldCreatedAt)
@@ -56142,6 +57542,9 @@ func (m *ProjectMilestoneMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *ProjectMilestoneMutation) ClearField(name string) error {
 	switch name {
+	case projectmilestone.FieldProjectID:
+		m.ClearProjectID()
+		return nil
 	case projectmilestone.FieldDescription:
 		m.ClearDescription()
 		return nil
@@ -56150,6 +57553,9 @@ func (m *ProjectMilestoneMutation) ClearField(name string) error {
 		return nil
 	case projectmilestone.FieldSortOrder:
 		m.ClearSortOrder()
+		return nil
+	case projectmilestone.FieldClosedAt:
+		m.ClearClosedAt()
 		return nil
 	case projectmilestone.FieldCreatedAt:
 		m.ClearCreatedAt()
@@ -56165,6 +57571,9 @@ func (m *ProjectMilestoneMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ProjectMilestoneMutation) ResetField(name string) error {
 	switch name {
+	case projectmilestone.FieldWorkspaceID:
+		m.ResetWorkspaceID()
+		return nil
 	case projectmilestone.FieldProjectID:
 		m.ResetProjectID()
 		return nil
@@ -56180,6 +57589,9 @@ func (m *ProjectMilestoneMutation) ResetField(name string) error {
 	case projectmilestone.FieldSortOrder:
 		m.ResetSortOrder()
 		return nil
+	case projectmilestone.FieldClosedAt:
+		m.ResetClosedAt()
+		return nil
 	case projectmilestone.FieldCreatedAt:
 		m.ResetCreatedAt()
 		return nil
@@ -56192,7 +57604,10 @@ func (m *ProjectMilestoneMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ProjectMilestoneMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 6)
+	if m.workspace != nil {
+		edges = append(edges, projectmilestone.EdgeWorkspace)
+	}
 	if m.project != nil {
 		edges = append(edges, projectmilestone.EdgeProject)
 	}
@@ -56202,6 +57617,12 @@ func (m *ProjectMilestoneMutation) AddedEdges() []string {
 	if m.comments != nil {
 		edges = append(edges, projectmilestone.EdgeComments)
 	}
+	if m.github_milestone_links != nil {
+		edges = append(edges, projectmilestone.EdgeGithubMilestoneLinks)
+	}
+	if m.github_outbox != nil {
+		edges = append(edges, projectmilestone.EdgeGithubOutbox)
+	}
 	return edges
 }
 
@@ -56209,6 +57630,10 @@ func (m *ProjectMilestoneMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *ProjectMilestoneMutation) AddedIDs(name string) []ent.Value {
 	switch name {
+	case projectmilestone.EdgeWorkspace:
+		if id := m.workspace; id != nil {
+			return []ent.Value{*id}
+		}
 	case projectmilestone.EdgeProject:
 		if id := m.project; id != nil {
 			return []ent.Value{*id}
@@ -56225,18 +57650,36 @@ func (m *ProjectMilestoneMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case projectmilestone.EdgeGithubMilestoneLinks:
+		ids := make([]ent.Value, 0, len(m.github_milestone_links))
+		for id := range m.github_milestone_links {
+			ids = append(ids, id)
+		}
+		return ids
+	case projectmilestone.EdgeGithubOutbox:
+		ids := make([]ent.Value, 0, len(m.github_outbox))
+		for id := range m.github_outbox {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ProjectMilestoneMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 6)
 	if m.removedissues != nil {
 		edges = append(edges, projectmilestone.EdgeIssues)
 	}
 	if m.removedcomments != nil {
 		edges = append(edges, projectmilestone.EdgeComments)
+	}
+	if m.removedgithub_milestone_links != nil {
+		edges = append(edges, projectmilestone.EdgeGithubMilestoneLinks)
+	}
+	if m.removedgithub_outbox != nil {
+		edges = append(edges, projectmilestone.EdgeGithubOutbox)
 	}
 	return edges
 }
@@ -56257,13 +57700,28 @@ func (m *ProjectMilestoneMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case projectmilestone.EdgeGithubMilestoneLinks:
+		ids := make([]ent.Value, 0, len(m.removedgithub_milestone_links))
+		for id := range m.removedgithub_milestone_links {
+			ids = append(ids, id)
+		}
+		return ids
+	case projectmilestone.EdgeGithubOutbox:
+		ids := make([]ent.Value, 0, len(m.removedgithub_outbox))
+		for id := range m.removedgithub_outbox {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ProjectMilestoneMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 6)
+	if m.clearedworkspace {
+		edges = append(edges, projectmilestone.EdgeWorkspace)
+	}
 	if m.clearedproject {
 		edges = append(edges, projectmilestone.EdgeProject)
 	}
@@ -56273,6 +57731,12 @@ func (m *ProjectMilestoneMutation) ClearedEdges() []string {
 	if m.clearedcomments {
 		edges = append(edges, projectmilestone.EdgeComments)
 	}
+	if m.clearedgithub_milestone_links {
+		edges = append(edges, projectmilestone.EdgeGithubMilestoneLinks)
+	}
+	if m.clearedgithub_outbox {
+		edges = append(edges, projectmilestone.EdgeGithubOutbox)
+	}
 	return edges
 }
 
@@ -56280,12 +57744,18 @@ func (m *ProjectMilestoneMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *ProjectMilestoneMutation) EdgeCleared(name string) bool {
 	switch name {
+	case projectmilestone.EdgeWorkspace:
+		return m.clearedworkspace
 	case projectmilestone.EdgeProject:
 		return m.clearedproject
 	case projectmilestone.EdgeIssues:
 		return m.clearedissues
 	case projectmilestone.EdgeComments:
 		return m.clearedcomments
+	case projectmilestone.EdgeGithubMilestoneLinks:
+		return m.clearedgithub_milestone_links
+	case projectmilestone.EdgeGithubOutbox:
+		return m.clearedgithub_outbox
 	}
 	return false
 }
@@ -56294,6 +57764,9 @@ func (m *ProjectMilestoneMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *ProjectMilestoneMutation) ClearEdge(name string) error {
 	switch name {
+	case projectmilestone.EdgeWorkspace:
+		m.ClearWorkspace()
+		return nil
 	case projectmilestone.EdgeProject:
 		m.ClearProject()
 		return nil
@@ -56305,6 +57778,9 @@ func (m *ProjectMilestoneMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *ProjectMilestoneMutation) ResetEdge(name string) error {
 	switch name {
+	case projectmilestone.EdgeWorkspace:
+		m.ResetWorkspace()
+		return nil
 	case projectmilestone.EdgeProject:
 		m.ResetProject()
 		return nil
@@ -56313,6 +57789,12 @@ func (m *ProjectMilestoneMutation) ResetEdge(name string) error {
 		return nil
 	case projectmilestone.EdgeComments:
 		m.ResetComments()
+		return nil
+	case projectmilestone.EdgeGithubMilestoneLinks:
+		m.ResetGithubMilestoneLinks()
+		return nil
+	case projectmilestone.EdgeGithubOutbox:
+		m.ResetGithubOutbox()
 		return nil
 	}
 	return fmt.Errorf("unknown ProjectMilestone edge %s", name)
@@ -66954,6 +68436,8 @@ type TeamMutation struct {
 	archived_at                      *time.Time
 	created_at                       *time.Time
 	updated_at                       *time.Time
+	github_open_issues               *bool
+	github_sync_fields               *bool
 	previous_keys                    *pgarray.Text
 	previous_names                   *pgarray.Text
 	merged_team_ids                  *pgarray.UUID
@@ -69332,6 +70816,104 @@ func (m *TeamMutation) ResetGithubPrMergedStateID() {
 	delete(m.clearedFields, team.FieldGithubPrMergedStateID)
 }
 
+// SetGithubOpenIssues sets the "github_open_issues" field.
+func (m *TeamMutation) SetGithubOpenIssues(b bool) {
+	m.github_open_issues = &b
+}
+
+// GithubOpenIssues returns the value of the "github_open_issues" field in the mutation.
+func (m *TeamMutation) GithubOpenIssues() (r bool, exists bool) {
+	v := m.github_open_issues
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGithubOpenIssues returns the old "github_open_issues" field's value of the Team entity.
+// If the Team object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TeamMutation) OldGithubOpenIssues(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGithubOpenIssues is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGithubOpenIssues requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGithubOpenIssues: %w", err)
+	}
+	return oldValue.GithubOpenIssues, nil
+}
+
+// ClearGithubOpenIssues clears the value of the "github_open_issues" field.
+func (m *TeamMutation) ClearGithubOpenIssues() {
+	m.github_open_issues = nil
+	m.clearedFields[team.FieldGithubOpenIssues] = struct{}{}
+}
+
+// GithubOpenIssuesCleared returns if the "github_open_issues" field was cleared in this mutation.
+func (m *TeamMutation) GithubOpenIssuesCleared() bool {
+	_, ok := m.clearedFields[team.FieldGithubOpenIssues]
+	return ok
+}
+
+// ResetGithubOpenIssues resets all changes to the "github_open_issues" field.
+func (m *TeamMutation) ResetGithubOpenIssues() {
+	m.github_open_issues = nil
+	delete(m.clearedFields, team.FieldGithubOpenIssues)
+}
+
+// SetGithubSyncFields sets the "github_sync_fields" field.
+func (m *TeamMutation) SetGithubSyncFields(b bool) {
+	m.github_sync_fields = &b
+}
+
+// GithubSyncFields returns the value of the "github_sync_fields" field in the mutation.
+func (m *TeamMutation) GithubSyncFields() (r bool, exists bool) {
+	v := m.github_sync_fields
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGithubSyncFields returns the old "github_sync_fields" field's value of the Team entity.
+// If the Team object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TeamMutation) OldGithubSyncFields(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGithubSyncFields is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGithubSyncFields requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGithubSyncFields: %w", err)
+	}
+	return oldValue.GithubSyncFields, nil
+}
+
+// ClearGithubSyncFields clears the value of the "github_sync_fields" field.
+func (m *TeamMutation) ClearGithubSyncFields() {
+	m.github_sync_fields = nil
+	m.clearedFields[team.FieldGithubSyncFields] = struct{}{}
+}
+
+// GithubSyncFieldsCleared returns if the "github_sync_fields" field was cleared in this mutation.
+func (m *TeamMutation) GithubSyncFieldsCleared() bool {
+	_, ok := m.clearedFields[team.FieldGithubSyncFields]
+	return ok
+}
+
+// ResetGithubSyncFields resets all changes to the "github_sync_fields" field.
+func (m *TeamMutation) ResetGithubSyncFields() {
+	m.github_sync_fields = nil
+	delete(m.clearedFields, team.FieldGithubSyncFields)
+}
+
 // SetPreviousKeys sets the "previous_keys" field.
 func (m *TeamMutation) SetPreviousKeys(pg pgarray.Text) {
 	m.previous_keys = &pg
@@ -70485,7 +72067,7 @@ func (m *TeamMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TeamMutation) Fields() []string {
-	fields := make([]string, 0, 45)
+	fields := make([]string, 0, 47)
 	if m.workspace != nil {
 		fields = append(fields, team.FieldWorkspaceID)
 	}
@@ -70612,6 +72194,12 @@ func (m *TeamMutation) Fields() []string {
 	if m.github_pr_merged_state != nil {
 		fields = append(fields, team.FieldGithubPrMergedStateID)
 	}
+	if m.github_open_issues != nil {
+		fields = append(fields, team.FieldGithubOpenIssues)
+	}
+	if m.github_sync_fields != nil {
+		fields = append(fields, team.FieldGithubSyncFields)
+	}
 	if m.previous_keys != nil {
 		fields = append(fields, team.FieldPreviousKeys)
 	}
@@ -70713,6 +72301,10 @@ func (m *TeamMutation) Field(name string) (ent.Value, bool) {
 		return m.GithubPrOpenedStateID()
 	case team.FieldGithubPrMergedStateID:
 		return m.GithubPrMergedStateID()
+	case team.FieldGithubOpenIssues:
+		return m.GithubOpenIssues()
+	case team.FieldGithubSyncFields:
+		return m.GithubSyncFields()
 	case team.FieldPreviousKeys:
 		return m.PreviousKeys()
 	case team.FieldPreviousNames:
@@ -70812,6 +72404,10 @@ func (m *TeamMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldGithubPrOpenedStateID(ctx)
 	case team.FieldGithubPrMergedStateID:
 		return m.OldGithubPrMergedStateID(ctx)
+	case team.FieldGithubOpenIssues:
+		return m.OldGithubOpenIssues(ctx)
+	case team.FieldGithubSyncFields:
+		return m.OldGithubSyncFields(ctx)
 	case team.FieldPreviousKeys:
 		return m.OldPreviousKeys(ctx)
 	case team.FieldPreviousNames:
@@ -71121,6 +72717,20 @@ func (m *TeamMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetGithubPrMergedStateID(v)
 		return nil
+	case team.FieldGithubOpenIssues:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGithubOpenIssues(v)
+		return nil
+	case team.FieldGithubSyncFields:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGithubSyncFields(v)
+		return nil
 	case team.FieldPreviousKeys:
 		v, ok := value.(pgarray.Text)
 		if !ok {
@@ -71400,6 +73010,12 @@ func (m *TeamMutation) ClearedFields() []string {
 	if m.FieldCleared(team.FieldGithubPrMergedStateID) {
 		fields = append(fields, team.FieldGithubPrMergedStateID)
 	}
+	if m.FieldCleared(team.FieldGithubOpenIssues) {
+		fields = append(fields, team.FieldGithubOpenIssues)
+	}
+	if m.FieldCleared(team.FieldGithubSyncFields) {
+		fields = append(fields, team.FieldGithubSyncFields)
+	}
 	if m.FieldCleared(team.FieldPreviousKeys) {
 		fields = append(fields, team.FieldPreviousKeys)
 	}
@@ -71539,6 +73155,12 @@ func (m *TeamMutation) ClearField(name string) error {
 		return nil
 	case team.FieldGithubPrMergedStateID:
 		m.ClearGithubPrMergedStateID()
+		return nil
+	case team.FieldGithubOpenIssues:
+		m.ClearGithubOpenIssues()
+		return nil
+	case team.FieldGithubSyncFields:
+		m.ClearGithubSyncFields()
 		return nil
 	case team.FieldPreviousKeys:
 		m.ClearPreviousKeys()
@@ -71682,6 +73304,12 @@ func (m *TeamMutation) ResetField(name string) error {
 		return nil
 	case team.FieldGithubPrMergedStateID:
 		m.ResetGithubPrMergedStateID()
+		return nil
+	case team.FieldGithubOpenIssues:
+		m.ResetGithubOpenIssues()
+		return nil
+	case team.FieldGithubSyncFields:
+		m.ResetGithubSyncFields()
 		return nil
 	case team.FieldPreviousKeys:
 		m.ResetPreviousKeys()
@@ -82731,6 +84359,9 @@ type WorkspaceMutation struct {
 	projects                    map[uuid.UUID]struct{}
 	removedprojects             map[uuid.UUID]struct{}
 	clearedprojects             bool
+	project_milestones          map[uuid.UUID]struct{}
+	removedproject_milestones   map[uuid.UUID]struct{}
+	clearedproject_milestones   bool
 	initiatives                 map[uuid.UUID]struct{}
 	removedinitiatives          map[uuid.UUID]struct{}
 	clearedinitiatives          bool
@@ -83731,6 +85362,60 @@ func (m *WorkspaceMutation) ResetProjects() {
 	m.projects = nil
 	m.clearedprojects = false
 	m.removedprojects = nil
+}
+
+// AddProjectMilestoneIDs adds the "project_milestones" edge to the ProjectMilestone entity by ids.
+func (m *WorkspaceMutation) AddProjectMilestoneIDs(ids ...uuid.UUID) {
+	if m.project_milestones == nil {
+		m.project_milestones = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.project_milestones[ids[i]] = struct{}{}
+	}
+}
+
+// ClearProjectMilestones clears the "project_milestones" edge to the ProjectMilestone entity.
+func (m *WorkspaceMutation) ClearProjectMilestones() {
+	m.clearedproject_milestones = true
+}
+
+// ProjectMilestonesCleared reports if the "project_milestones" edge to the ProjectMilestone entity was cleared.
+func (m *WorkspaceMutation) ProjectMilestonesCleared() bool {
+	return m.clearedproject_milestones
+}
+
+// RemoveProjectMilestoneIDs removes the "project_milestones" edge to the ProjectMilestone entity by IDs.
+func (m *WorkspaceMutation) RemoveProjectMilestoneIDs(ids ...uuid.UUID) {
+	if m.removedproject_milestones == nil {
+		m.removedproject_milestones = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.project_milestones, ids[i])
+		m.removedproject_milestones[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedProjectMilestones returns the removed IDs of the "project_milestones" edge to the ProjectMilestone entity.
+func (m *WorkspaceMutation) RemovedProjectMilestonesIDs() (ids []uuid.UUID) {
+	for id := range m.removedproject_milestones {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ProjectMilestonesIDs returns the "project_milestones" edge IDs in the mutation.
+func (m *WorkspaceMutation) ProjectMilestonesIDs() (ids []uuid.UUID) {
+	for id := range m.project_milestones {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetProjectMilestones resets all changes to the "project_milestones" edge.
+func (m *WorkspaceMutation) ResetProjectMilestones() {
+	m.project_milestones = nil
+	m.clearedproject_milestones = false
+	m.removedproject_milestones = nil
 }
 
 // AddInitiativeIDs adds the "initiatives" edge to the Initiative entity by ids.
@@ -85559,7 +87244,7 @@ func (m *WorkspaceMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *WorkspaceMutation) AddedEdges() []string {
-	edges := make([]string, 0, 35)
+	edges := make([]string, 0, 36)
 	if m.invitations != nil {
 		edges = append(edges, workspace.EdgeInvitations)
 	}
@@ -85580,6 +87265,9 @@ func (m *WorkspaceMutation) AddedEdges() []string {
 	}
 	if m.projects != nil {
 		edges = append(edges, workspace.EdgeProjects)
+	}
+	if m.project_milestones != nil {
+		edges = append(edges, workspace.EdgeProjectMilestones)
 	}
 	if m.initiatives != nil {
 		edges = append(edges, workspace.EdgeInitiatives)
@@ -85711,6 +87399,12 @@ func (m *WorkspaceMutation) AddedIDs(name string) []ent.Value {
 	case workspace.EdgeProjects:
 		ids := make([]ent.Value, 0, len(m.projects))
 		for id := range m.projects {
+			ids = append(ids, id)
+		}
+		return ids
+	case workspace.EdgeProjectMilestones:
+		ids := make([]ent.Value, 0, len(m.project_milestones))
+		for id := range m.project_milestones {
 			ids = append(ids, id)
 		}
 		return ids
@@ -85888,7 +87582,7 @@ func (m *WorkspaceMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *WorkspaceMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 35)
+	edges := make([]string, 0, 36)
 	if m.removedinvitations != nil {
 		edges = append(edges, workspace.EdgeInvitations)
 	}
@@ -85909,6 +87603,9 @@ func (m *WorkspaceMutation) RemovedEdges() []string {
 	}
 	if m.removedprojects != nil {
 		edges = append(edges, workspace.EdgeProjects)
+	}
+	if m.removedproject_milestones != nil {
+		edges = append(edges, workspace.EdgeProjectMilestones)
 	}
 	if m.removedinitiatives != nil {
 		edges = append(edges, workspace.EdgeInitiatives)
@@ -86040,6 +87737,12 @@ func (m *WorkspaceMutation) RemovedIDs(name string) []ent.Value {
 	case workspace.EdgeProjects:
 		ids := make([]ent.Value, 0, len(m.removedprojects))
 		for id := range m.removedprojects {
+			ids = append(ids, id)
+		}
+		return ids
+	case workspace.EdgeProjectMilestones:
+		ids := make([]ent.Value, 0, len(m.removedproject_milestones))
+		for id := range m.removedproject_milestones {
 			ids = append(ids, id)
 		}
 		return ids
@@ -86217,7 +87920,7 @@ func (m *WorkspaceMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *WorkspaceMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 35)
+	edges := make([]string, 0, 36)
 	if m.clearedinvitations {
 		edges = append(edges, workspace.EdgeInvitations)
 	}
@@ -86238,6 +87941,9 @@ func (m *WorkspaceMutation) ClearedEdges() []string {
 	}
 	if m.clearedprojects {
 		edges = append(edges, workspace.EdgeProjects)
+	}
+	if m.clearedproject_milestones {
+		edges = append(edges, workspace.EdgeProjectMilestones)
 	}
 	if m.clearedinitiatives {
 		edges = append(edges, workspace.EdgeInitiatives)
@@ -86344,6 +88050,8 @@ func (m *WorkspaceMutation) EdgeCleared(name string) bool {
 		return m.clearedproject_labels
 	case workspace.EdgeProjects:
 		return m.clearedprojects
+	case workspace.EdgeProjectMilestones:
+		return m.clearedproject_milestones
 	case workspace.EdgeInitiatives:
 		return m.clearedinitiatives
 	case workspace.EdgeStatusUpdates:
@@ -86436,6 +88144,9 @@ func (m *WorkspaceMutation) ResetEdge(name string) error {
 		return nil
 	case workspace.EdgeProjects:
 		m.ResetProjects()
+		return nil
+	case workspace.EdgeProjectMilestones:
+		m.ResetProjectMilestones()
 		return nil
 	case workspace.EdgeInitiatives:
 		m.ResetInitiatives()

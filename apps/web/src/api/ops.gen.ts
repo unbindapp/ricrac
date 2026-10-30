@@ -735,6 +735,19 @@ export type GitHubIssueRef = {
   url: string
 }
 
+export type GitHubMilestone = {
+  number: number
+  repository: string
+  url: string
+}
+
+export type GitHubPreview = {
+  /** The GitHub login it would be opened as; null when the Ricrac app opens it. */
+  openedAs: string | null
+  /** owner/name */
+  repository: string
+}
+
 export type GitHubRepoSync = {
   /** The import of the repository's existing issues; null when none was asked for. */
   backfill: GitHubBackfill | null
@@ -1001,6 +1014,8 @@ export type IssueDetail = {
   labels: LabelRef[]
   number: number
   parent: IssueRef | null
+  /** Only with preview: nothing was saved. */
+  preview?: IssuePreview | null
   previousIdentifiers: string[]
   /** 0 none, 1 urgent, 2 high, 3 medium, 4 low. */
   priority: number
@@ -1060,6 +1075,11 @@ export type IssueLabel = {
 export type IssueLabelParent = {
   id: string
   name: string
+}
+
+export type IssuePreview = {
+  /** Where the new issue would open on GitHub; null when it stays off GitHub. */
+  github: GitHubPreview | null
 }
 
 export type IssueReaction = {
@@ -1162,15 +1182,19 @@ export type MessageVersion = {
 
 export type Milestone = {
   canceledIssueCount: number
+  closedAt: string | null
   completedIssueCount: number
   createdAt: string
   description: string | null
+  /** The GitHub milestones it is synced with, one per repository. */
+  github: GitHubMilestone[]
   id: string
   issueCount: number
   name: string
   /** Completed issues / (all - canceled), from 0 to 1. */
   progress: number
-  project: ProjectRef
+  /** Null for the workspace's own milestones, like those synced with GitHub. */
+  project: ProjectRef | null
   sortOrder: number
   targetDate: string | null
   updatedAt: string
@@ -1178,16 +1202,20 @@ export type Milestone = {
 
 export type MilestoneDetail = {
   canceledIssueCount: number
+  closedAt: string | null
   completedIssueCount: number
   createdAt: string
   description: string | null
+  /** The GitHub milestones it is synced with, one per repository. */
+  github: GitHubMilestone[]
   id: string
   issueCount: number
   issues: IssueChild[]
   name: string
   /** Completed issues / (all - canceled), from 0 to 1. */
   progress: number
-  project: ProjectRef
+  /** Null for the workspace's own milestones, like those synced with GitHub. */
+  project: ProjectRef | null
   sortOrder: number
   targetDate: string | null
   updatedAt: string
@@ -1196,6 +1224,7 @@ export type MilestoneDetail = {
 export type MilestoneRef = {
   id: string
   name: string
+  projectId: string | null
   targetDate: string | null
 }
 
@@ -1676,10 +1705,14 @@ export type TeamDetail = {
   estimateAllowZero: boolean
   estimateExtended: boolean
   estimateType: "notUsed" | "exponential" | "fibonacci" | "linear" | "tShirt"
+  /** New issues open on GitHub too unless they say otherwise. */
+  githubOpenIssues: boolean
   /** Where merged pull requests that fix issues move them; null for the first completed status. */
   githubPrMergedState: StateRef | null
   /** Where GitHub pull requests and branches move issues; null for the first started status. */
   githubPrOpenedState: StateRef | null
+  /** Priority, estimate, due date and cycle sync with the GitHub organization's issue fields. */
+  githubSyncFields: boolean
   icon: string | null
   id: string
   isMember: boolean
@@ -2084,10 +2117,14 @@ export type SaveTeamArgs = {
   estimateExtended?: boolean | null
   /** notUsed, exponential, fibonacci, linear or tShirt. */
   estimateType?: string | null
+  /** New issues open on GitHub too, in one of the synced repositories (see save_issue's githubRepository), unless save_issue says githubRepository "none". Off (the default), only issues that name a githubRepository do. */
+  githubOpenIssues?: boolean | null
   /** The status issues move to when a pull request that fixes them merges (name or id); null for the first completed status. */
   githubPrMergedState?: string | null
   /** The status issues move to when a GitHub pull request or branch mentioning them opens (name or id); null for the first started status. */
   githubPrOpenedState?: string | null
+  /** Priority, estimate, due date and cycle of issues synced with GitHub sync both ways with the organization's issue fields named Priority (Urgent, High, Medium, Low), Estimate, Due date (or Target date) and Cycle, where it has them (default off). */
+  githubSyncFields?: boolean | null
   /** An emoji or icon name; null clears it. */
   icon?: string | null
   /** The workspace's team: its key, name or id. A workspace has one team, so omitting it (creating another) fails. */
@@ -2275,7 +2312,7 @@ export type ListIssuesArgs = {
   label?: string | null
   /** How many to return, 50 by default, at most 250. */
   limit?: number | null
-  /** Project milestone name or id (name needs project). */
+  /** Milestone name or id. */
   milestone?: string | null
   /** updatedAt (default), createdAt, priority, dueDate, manual (the team's board order) or identifier. */
   orderBy?: string | null
@@ -2329,6 +2366,8 @@ export type SaveIssueArgs = {
   duplicateOf?: string | null
   /** Estimate points on the team's scale; null clears it. T-shirt sizes are XS=1, S=2, M=3, L=5, XL=8, XXL=13, XXXL=21. */
   estimate?: number | null
+  /** Only on create: the synced repository (owner/name, or name) to open the issue in on GitHub too, or "none" to keep it off GitHub. Omitted, it opens on GitHub only when the team's githubOpenIssues is on, in the repository synced with the issue's project, else the one with the most synced issues. */
+  githubRepository?: string | null
   /** Only to update an issue: its identifier (ENG-123), id or link. Omit to create one. */
   id?: string | null
   /** Replace all labels with these (names or ids; Group/Child for a label in a group). */
@@ -2338,7 +2377,7 @@ export type SaveIssueArgs = {
     title: string
     url: string
   }[]
-  /** Project milestone name or id; null clears it. */
+  /** Milestone name or id: the project's, or one of the workspace's own; null clears it. */
   milestone?: string | null
   /** Parent issue (identifier or id), making this a sub-issue; null detaches it. */
   parentId?: string | null
@@ -2368,6 +2407,8 @@ export type SaveIssueArgs = {
     op: "replace_range"
     to: string
   })[]
+  /** true answers the issue as it would be saved, and where it would open on GitHub, without saving anything: to show it to the user before they confirm. */
+  preview?: boolean | null
   /** 1 urgent, 2 high, 3 medium, 4 low; 0 means no priority (not the highest). */
   priority?: number | null
   /** Project name, slug or id; null removes the issue from its project. */
@@ -2884,36 +2925,38 @@ export type ListMilestonesArgs = {
   cursor?: string | null
   /** How many to return, 50 by default, at most 250. */
   limit?: number | null
-  /** Project name, slug, link or id. */
-  project: string
+  /** Project name, slug, link or id; omit for the workspace's own milestones, those in no project. */
+  project?: string | null
 }
 
 export type GetMilestoneArgs = {
-  /** The milestone's id, or its name together with project. */
+  /** The milestone's id or name. */
   id: string
-  /** Project name, slug or id; needed when id is a name. */
+  /** Project name, slug or id, when id names one of its milestones. */
   project?: string | null
 }
 
 export type SaveMilestoneArgs = {
+  /** true closes the milestone, false opens it again. */
+  closed?: boolean | null
   /** Markdown; null clears it. */
   description?: string | null
-  /** Only to change a milestone: its id, or its name together with project. Omit to create one. */
+  /** Only to change a milestone: its id or name. Omit to create one. */
   id?: string | null
-  /** Required to create; unique within the project. */
+  /** Required to create; unique within the project, or among the workspace's own. */
   name?: string | null
-  /** Project name, slug or id. Required to create. */
+  /** Project name, slug or id. To create: the project it is in; omit for one of the workspace's own. */
   project?: string | null
-  /** Position among the project's milestones (lower comes first; ties go by target date). */
+  /** Position among its sibling milestones (lower comes first; ties go by target date). */
   sortOrder?: number | null
   /** YYYY-MM-DD; null clears it. */
   targetDate?: string | null
 }
 
 export type DeleteMilestoneArgs = {
-  /** The milestone's id, or its name together with project. */
+  /** The milestone's id or name. */
   id: string
-  /** Project name, slug or id; needed when id is a name. */
+  /** Project name, slug or id, when id names one of its milestones. */
   project?: string | null
 }
 

@@ -54,10 +54,11 @@ export function draftFromIssue(issue: Issue): TIssueDraft {
   };
 }
 
-/** A milestone belongs to its project, so changing the project drops it. */
+/** A project's milestone goes with its project; the workspace's own stay whatever the project. */
 export function applyPatch(draft: TIssueDraft, patch: TIssuePatch): TIssueDraft {
   const next = { ...draft, ...patch };
-  if ("project" in patch && patch.project?.id !== draft.project?.id) next.projectMilestone = null;
+  const milestoneProject = next.projectMilestone?.projectId;
+  if (milestoneProject && milestoneProject !== next.project?.id) next.projectMilestone = null;
   return next;
 }
 
@@ -65,7 +66,6 @@ export function patchToOptimistic(patch: TIssuePatch): Partial<Issue> {
   const { state, ...rest } = patch;
   const optimistic: Partial<Issue> = { ...rest };
   if (state) optimistic.state = state;
-  if ("project" in patch) optimistic.projectMilestone = patch.projectMilestone ?? null;
   return optimistic;
 }
 

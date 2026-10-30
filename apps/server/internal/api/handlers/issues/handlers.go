@@ -25,7 +25,9 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 		Description: "Create an issue (omit id; title is required unless a template provides it; team is optional) or update " +
 			"one (pass id). Omitted fields stay as they are; null clears a field. People are given as id, name, email or " +
 			"\"me\"; states as name, type or id; labels, projects, cycles and milestones as name or id. Use patch to edit " +
-			"part of the description without resending it. Earlier identifiers of an issue keep working. Returns the issue as get_issue does, with relations and sub-issues.",
+			"part of the description without resending it. Earlier identifiers of an issue keep working. Returns the issue as get_issue does, with relations and sub-issues. " +
+			"When the user wants to review an issue before it is saved, pass preview: true first: it answers the issue as it would be, " +
+			"and where and as whom it would open on GitHub, without saving anything; show it, then save again without preview once they confirm.",
 	}, issues.Save)
 	oapi.Register(reg, oapi.Operation{
 		Name: "update_issues", Access: auth.Write, Routes: []string{"PATCH /issues"},

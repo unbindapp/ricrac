@@ -108,8 +108,16 @@ func (self *IssueService) applyChanges(ctx context.Context, tx repository.TxInte
 			return err
 		}
 		if !samePtr(project, row.ProjectID) {
-			if err := update(issue_repo.SetProject(project)); err != nil {
+			milestone, err := self.repo.Issue().Milestone(ctx, tx, row.MilestoneID)
+			if err != nil {
 				return err
+			}
+			leavesMilestone := milestone != nil && milestone.ProjectID != nil
+			if err := update(issue_repo.SetProject(project, leavesMilestone)); err != nil {
+				return err
+			}
+			if leavesMilestone && !input.Milestone.Set {
+				changes["projectMilestone"] = M{"from": models.MilestoneRefOf(milestone), "to": nil}
 			}
 			if project != nil {
 				if err := self.repo.Issue().AddProjectTeam(ctx, tx, *project, row.TeamID); err != nil {
@@ -312,7 +320,7 @@ func (self *IssueService) applyMilestone(ctx context.Context, tx repository.TxIn
 		return err
 	}
 	if found != nil {
-		milestoneProject = &found.ProjectID
+		milestoneProject = found.ProjectID
 	}
 	if milestoneProject != nil && project != nil && *milestoneProject != *project {
 		return errdefs.BadRequest("That milestone belongs to another project than the issue's")

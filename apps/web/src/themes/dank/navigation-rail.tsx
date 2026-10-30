@@ -7,6 +7,7 @@ import {
   BoxIcon,
   BuildingIcon,
   CircleDotIcon,
+  DiamondIcon,
   EllipsisIcon,
   FileTextIcon,
   InboxIcon,
@@ -293,6 +294,7 @@ function MoreMenu({ isExpanded, onNavigate }: { isExpanded: boolean; onNavigate?
   const params = { workspace: workspace.urlKey };
   const pages: TDestination[] = [
     { label: "My issues", icon: UserCircleIcon, link: { to: "/$workspace/my-issues", params } },
+    { label: "Milestones", icon: DiamondIcon, link: { to: "/$workspace/milestones", params } },
     {
       label: "Initiatives",
       icon: TargetIcon,

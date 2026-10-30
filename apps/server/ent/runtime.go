@@ -19,6 +19,7 @@ import (
 	"ricrac/ent/entitylink"
 	"ricrac/ent/favorite"
 	"ricrac/ent/file"
+	"ricrac/ent/githubmilestonelink"
 	"ricrac/ent/githubreposync"
 	"ricrac/ent/initiative"
 	"ricrac/ent/invitation"
@@ -151,6 +152,12 @@ func init() {
 	fileDescID := fileFields[0].Descriptor()
 	// file.DefaultID holds the default value on creation for the id field.
 	file.DefaultID = fileDescID.Default.(func() uuid.UUID)
+	githubmilestonelinkFields := schema.GithubMilestoneLink{}.Fields()
+	_ = githubmilestonelinkFields
+	// githubmilestonelinkDescID is the schema descriptor for id field.
+	githubmilestonelinkDescID := githubmilestonelinkFields[0].Descriptor()
+	// githubmilestonelink.DefaultID holds the default value on creation for the id field.
+	githubmilestonelink.DefaultID = githubmilestonelinkDescID.Default.(func() uuid.UUID)
 	githubreposyncFields := schema.GithubRepoSync{}.Fields()
 	_ = githubreposyncFields
 	// githubreposyncDescID is the schema descriptor for id field.

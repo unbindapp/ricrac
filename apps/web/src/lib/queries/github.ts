@@ -11,6 +11,7 @@ export const queryKeyGithub = {
   all: (workspaceId: string) => [workspaceId, "github"] as const,
   integration: (workspaceId: string) => [workspaceId, "github", "integration"] as const,
   repositories: (workspaceId: string) => [workspaceId, "github", "repositories"] as const,
+  repoSyncs: (workspaceId: string) => [workspaceId, "github", "repo-syncs"] as const,
 };
 
 /** The connection, its installations and synced repositories; polls while an import runs. */
@@ -31,6 +32,13 @@ export const githubRepositoriesQuery = (workspaceId: string) =>
     queryKey: queryKeyGithub.repositories(workspaceId),
     queryFn: () => callAll(workspaceId, "list_github_repositories", {}),
     staleTime: 60 * 1000,
+  });
+
+/** The repositories synced with the workspace's team; members can read them. */
+export const githubRepoSyncsQuery = (workspaceId: string) =>
+  queryOptions({
+    queryKey: queryKeyGithub.repoSyncs(workspaceId),
+    queryFn: () => callAll(workspaceId, "list_github_repo_syncs", {}),
   });
 
 function useInvalidateGithub(workspaceId: string) {

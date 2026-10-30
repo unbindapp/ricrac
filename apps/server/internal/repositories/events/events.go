@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 
 	"ricrac/ent"
+	"ricrac/ent/githubreposync"
 	"ricrac/ent/issuesubscriber"
 	"ricrac/ent/user"
 	"ricrac/ent/webhook"
@@ -122,6 +123,48 @@ func (self *EventsRepository) QueueIssueForGitHub(ctx context.Context, tx reposi
 	}
 	rows, err := result.RowsAffected()
 	return rows > 0, err
+}
+
+// QueueMilestoneForGitHub queues a milestone's change or deletion for each GitHub milestone it is
+// linked to but the one of except, saying whether anything was queued.
+func (self *EventsRepository) QueueMilestoneForGitHub(ctx context.Context, tx repository.TxInterface, milestone uuid.UUID, kind string, except *uuid.UUID) (bool, error) {
+	result, err := self.base.Client(tx).ExecContext(ctx,
+		`INSERT INTO github_outbox (repo_sync_id, github_number, milestone_id, kind)
+		 SELECT repo_sync_id, github_number, milestone_id, $2 FROM github_milestone_links
+		 WHERE milestone_id = $1 AND repo_sync_id IS DISTINCT FROM $3`, milestone, kind, except)
+	if err != nil {
+		return false, err
+	}
+	rows, err := result.RowsAffected()
+	return rows > 0, err
+}
+
+// QueueNewIssueForGitHub queues a new issue for one of the team's synced repositories: the one
+// named, else (when the team opens new issues on GitHub) the one synced with the issue's project,
+// else the one with the most linked issues. It says whether there was one.
+func (self *EventsRepository) QueueNewIssueForGitHub(ctx context.Context, tx repository.TxInterface, issue, team uuid.UUID, named *string, actAs *uuid.UUID) (bool, error) {
+	result, err := self.base.Client(tx).ExecContext(ctx,
+		`INSERT INTO github_outbox (repo_sync_id, github_number, issue_id, kind, act_as)
+		 SELECT s.id, 0, i.id, 'issue_created', $4 FROM github_repo_syncs s
+		 JOIN issues i ON i.id = $1 JOIN teams t ON t.id = s.team_id
+		 WHERE s.team_id = $2
+		   AND ($3::text IS NULL AND t.github_open_issues
+		     OR lower(s.full_name) = lower($3) OR lower(split_part(s.full_name, '/', 2)) = lower($3))
+		 ORDER BY coalesce(s.project_id = i.project_id, false) DESC,
+		   (SELECT count(*) FROM github_issue_links l WHERE l.repo_sync_id = s.id) DESC, s.created_at
+		 LIMIT 1`, issue, team, named, actAs)
+	if err != nil {
+		return false, err
+	}
+	rows, err := result.RowsAffected()
+	return rows > 0, err
+}
+
+// TeamRepos is the names of the team's synced repositories.
+func (self *EventsRepository) TeamRepos(ctx context.Context, tx repository.TxInterface, team uuid.UUID) ([]string, error) {
+	return self.base.Client(tx).GithubRepoSync.Query().
+		Where(githubreposync.TeamID(team)).
+		Order(ent.Asc(githubreposync.FieldFullName)).Select(githubreposync.FieldFullName).Strings(ctx)
 }
 
 // QueueCommentForGitHub queues a new comment on a linked issue, or the edit or deletion of a

@@ -244,7 +244,7 @@ func (self *ProjectService) create(ctx context.Context, tx repository.TxInterfac
 		if err != nil {
 			return uuid.Nil, nil, err
 		}
-		milestone, err := self.repo.Milestone().CreateFull(ctx, tx, id, milestoneName, m.Description, target, float64(n))
+		milestone, err := self.repo.Milestone().CreateFull(ctx, tx, actor.Workspace, id, milestoneName, m.Description, target, float64(n))
 		if err != nil {
 			return uuid.Nil, nil, err
 		}

@@ -34,6 +34,7 @@ import (
 	"ricrac/ent/githubcommentlink"
 	"ricrac/ent/githubinstallation"
 	"ricrac/ent/githubissuelink"
+	"ricrac/ent/githubmilestonelink"
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/githubreposync"
 	"ricrac/ent/githubusertoken"
@@ -141,6 +142,8 @@ type Client struct {
 	GithubInstallation *GithubInstallationClient
 	// GithubIssueLink is the client for interacting with the GithubIssueLink builders.
 	GithubIssueLink *GithubIssueLinkClient
+	// GithubMilestoneLink is the client for interacting with the GithubMilestoneLink builders.
+	GithubMilestoneLink *GithubMilestoneLinkClient
 	// GithubOutbox is the client for interacting with the GithubOutbox builders.
 	GithubOutbox *GithubOutboxClient
 	// GithubRepoSync is the client for interacting with the GithubRepoSync builders.
@@ -267,6 +270,7 @@ func (c *Client) init() {
 	c.GithubCommentLink = NewGithubCommentLinkClient(c.config)
 	c.GithubInstallation = NewGithubInstallationClient(c.config)
 	c.GithubIssueLink = NewGithubIssueLinkClient(c.config)
+	c.GithubMilestoneLink = NewGithubMilestoneLinkClient(c.config)
 	c.GithubOutbox = NewGithubOutboxClient(c.config)
 	c.GithubRepoSync = NewGithubRepoSyncClient(c.config)
 	c.GithubUserToken = NewGithubUserTokenClient(c.config)
@@ -428,6 +432,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		GithubCommentLink:    NewGithubCommentLinkClient(cfg),
 		GithubInstallation:   NewGithubInstallationClient(cfg),
 		GithubIssueLink:      NewGithubIssueLinkClient(cfg),
+		GithubMilestoneLink:  NewGithubMilestoneLinkClient(cfg),
 		GithubOutbox:         NewGithubOutboxClient(cfg),
 		GithubRepoSync:       NewGithubRepoSyncClient(cfg),
 		GithubUserToken:      NewGithubUserTokenClient(cfg),
@@ -516,6 +521,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		GithubCommentLink:    NewGithubCommentLinkClient(cfg),
 		GithubInstallation:   NewGithubInstallationClient(cfg),
 		GithubIssueLink:      NewGithubIssueLinkClient(cfg),
+		GithubMilestoneLink:  NewGithubMilestoneLinkClient(cfg),
 		GithubOutbox:         NewGithubOutboxClient(cfg),
 		GithubRepoSync:       NewGithubRepoSyncClient(cfg),
 		GithubUserToken:      NewGithubUserTokenClient(cfg),
@@ -595,17 +601,17 @@ func (c *Client) Use(hooks ...Hook) {
 		c.CustomerNeed, c.CustomerStatus, c.CustomerTier, c.Cycle, c.Discussion,
 		c.DiscussionSubscriber, c.DiscussionThread, c.DiscussionVote, c.Document,
 		c.DocumentVersion, c.Email, c.EntityLink, c.Favorite, c.File,
-		c.GithubCommentLink, c.GithubInstallation, c.GithubIssueLink, c.GithubOutbox,
-		c.GithubRepoSync, c.GithubUserToken, c.Initiative, c.InitiativeProject,
-		c.Invitation, c.Issue, c.IssueHistory, c.IssueLabel, c.IssueLabelLink,
-		c.IssueRelation, c.IssueRelease, c.IssueShare, c.IssueSubscriber,
-		c.MessageVersion, c.Notification, c.OAuthClient, c.OAuthCode, c.OAuthGrant,
-		c.OAuthToken, c.Project, c.ProjectLabel, c.ProjectLabelLink, c.ProjectMember,
-		c.ProjectMilestone, c.ProjectRelation, c.ProjectStatus, c.ProjectSubscriber,
-		c.ProjectTeam, c.Reaction, c.Release, c.ReleaseNote, c.ReleasePipeline,
-		c.ReleasePipelineTeam, c.ReleaseStage, c.SignInLink, c.StatusUpdate, c.Team,
-		c.TeamMember, c.Template, c.User, c.Webhook, c.WebhookDelivery,
-		c.WorkflowState, c.Workspace, c.WorkspaceMember,
+		c.GithubCommentLink, c.GithubInstallation, c.GithubIssueLink,
+		c.GithubMilestoneLink, c.GithubOutbox, c.GithubRepoSync, c.GithubUserToken,
+		c.Initiative, c.InitiativeProject, c.Invitation, c.Issue, c.IssueHistory,
+		c.IssueLabel, c.IssueLabelLink, c.IssueRelation, c.IssueRelease, c.IssueShare,
+		c.IssueSubscriber, c.MessageVersion, c.Notification, c.OAuthClient,
+		c.OAuthCode, c.OAuthGrant, c.OAuthToken, c.Project, c.ProjectLabel,
+		c.ProjectLabelLink, c.ProjectMember, c.ProjectMilestone, c.ProjectRelation,
+		c.ProjectStatus, c.ProjectSubscriber, c.ProjectTeam, c.Reaction, c.Release,
+		c.ReleaseNote, c.ReleasePipeline, c.ReleasePipelineTeam, c.ReleaseStage,
+		c.SignInLink, c.StatusUpdate, c.Team, c.TeamMember, c.Template, c.User,
+		c.Webhook, c.WebhookDelivery, c.WorkflowState, c.Workspace, c.WorkspaceMember,
 	} {
 		n.Use(hooks...)
 	}
@@ -619,17 +625,17 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.CustomerNeed, c.CustomerStatus, c.CustomerTier, c.Cycle, c.Discussion,
 		c.DiscussionSubscriber, c.DiscussionThread, c.DiscussionVote, c.Document,
 		c.DocumentVersion, c.Email, c.EntityLink, c.Favorite, c.File,
-		c.GithubCommentLink, c.GithubInstallation, c.GithubIssueLink, c.GithubOutbox,
-		c.GithubRepoSync, c.GithubUserToken, c.Initiative, c.InitiativeProject,
-		c.Invitation, c.Issue, c.IssueHistory, c.IssueLabel, c.IssueLabelLink,
-		c.IssueRelation, c.IssueRelease, c.IssueShare, c.IssueSubscriber,
-		c.MessageVersion, c.Notification, c.OAuthClient, c.OAuthCode, c.OAuthGrant,
-		c.OAuthToken, c.Project, c.ProjectLabel, c.ProjectLabelLink, c.ProjectMember,
-		c.ProjectMilestone, c.ProjectRelation, c.ProjectStatus, c.ProjectSubscriber,
-		c.ProjectTeam, c.Reaction, c.Release, c.ReleaseNote, c.ReleasePipeline,
-		c.ReleasePipelineTeam, c.ReleaseStage, c.SignInLink, c.StatusUpdate, c.Team,
-		c.TeamMember, c.Template, c.User, c.Webhook, c.WebhookDelivery,
-		c.WorkflowState, c.Workspace, c.WorkspaceMember,
+		c.GithubCommentLink, c.GithubInstallation, c.GithubIssueLink,
+		c.GithubMilestoneLink, c.GithubOutbox, c.GithubRepoSync, c.GithubUserToken,
+		c.Initiative, c.InitiativeProject, c.Invitation, c.Issue, c.IssueHistory,
+		c.IssueLabel, c.IssueLabelLink, c.IssueRelation, c.IssueRelease, c.IssueShare,
+		c.IssueSubscriber, c.MessageVersion, c.Notification, c.OAuthClient,
+		c.OAuthCode, c.OAuthGrant, c.OAuthToken, c.Project, c.ProjectLabel,
+		c.ProjectLabelLink, c.ProjectMember, c.ProjectMilestone, c.ProjectRelation,
+		c.ProjectStatus, c.ProjectSubscriber, c.ProjectTeam, c.Reaction, c.Release,
+		c.ReleaseNote, c.ReleasePipeline, c.ReleasePipelineTeam, c.ReleaseStage,
+		c.SignInLink, c.StatusUpdate, c.Team, c.TeamMember, c.Template, c.User,
+		c.Webhook, c.WebhookDelivery, c.WorkflowState, c.Workspace, c.WorkspaceMember,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -684,6 +690,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.GithubInstallation.mutate(ctx, m)
 	case *GithubIssueLinkMutation:
 		return c.GithubIssueLink.mutate(ctx, m)
+	case *GithubMilestoneLinkMutation:
+		return c.GithubMilestoneLink.mutate(ctx, m)
 	case *GithubOutboxMutation:
 		return c.GithubOutbox.mutate(ctx, m)
 	case *GithubRepoSyncMutation:
@@ -5230,6 +5238,171 @@ func (c *GithubIssueLinkClient) mutate(ctx context.Context, m *GithubIssueLinkMu
 	}
 }
 
+// GithubMilestoneLinkClient is a client for the GithubMilestoneLink schema.
+type GithubMilestoneLinkClient struct {
+	config
+}
+
+// NewGithubMilestoneLinkClient returns a client for the GithubMilestoneLink from the given config.
+func NewGithubMilestoneLinkClient(c config) *GithubMilestoneLinkClient {
+	return &GithubMilestoneLinkClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `githubmilestonelink.Hooks(f(g(h())))`.
+func (c *GithubMilestoneLinkClient) Use(hooks ...Hook) {
+	c.hooks.GithubMilestoneLink = append(c.hooks.GithubMilestoneLink, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `githubmilestonelink.Intercept(f(g(h())))`.
+func (c *GithubMilestoneLinkClient) Intercept(interceptors ...Interceptor) {
+	c.inters.GithubMilestoneLink = append(c.inters.GithubMilestoneLink, interceptors...)
+}
+
+// Create returns a builder for creating a GithubMilestoneLink entity.
+func (c *GithubMilestoneLinkClient) Create() *GithubMilestoneLinkCreate {
+	mutation := newGithubMilestoneLinkMutation(c.config, OpCreate)
+	return &GithubMilestoneLinkCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of GithubMilestoneLink entities.
+func (c *GithubMilestoneLinkClient) CreateBulk(builders ...*GithubMilestoneLinkCreate) *GithubMilestoneLinkCreateBulk {
+	return &GithubMilestoneLinkCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *GithubMilestoneLinkClient) MapCreateBulk(slice any, setFunc func(*GithubMilestoneLinkCreate, int)) *GithubMilestoneLinkCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &GithubMilestoneLinkCreateBulk{err: fmt.Errorf("calling to GithubMilestoneLinkClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*GithubMilestoneLinkCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &GithubMilestoneLinkCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for GithubMilestoneLink.
+func (c *GithubMilestoneLinkClient) Update() *GithubMilestoneLinkUpdate {
+	mutation := newGithubMilestoneLinkMutation(c.config, OpUpdate)
+	return &GithubMilestoneLinkUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *GithubMilestoneLinkClient) UpdateOne(_m *GithubMilestoneLink) *GithubMilestoneLinkUpdateOne {
+	mutation := newGithubMilestoneLinkMutation(c.config, OpUpdateOne, withGithubMilestoneLink(_m))
+	return &GithubMilestoneLinkUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *GithubMilestoneLinkClient) UpdateOneID(id uuid.UUID) *GithubMilestoneLinkUpdateOne {
+	mutation := newGithubMilestoneLinkMutation(c.config, OpUpdateOne, withGithubMilestoneLinkID(id))
+	return &GithubMilestoneLinkUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for GithubMilestoneLink.
+func (c *GithubMilestoneLinkClient) Delete() *GithubMilestoneLinkDelete {
+	mutation := newGithubMilestoneLinkMutation(c.config, OpDelete)
+	return &GithubMilestoneLinkDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *GithubMilestoneLinkClient) DeleteOne(_m *GithubMilestoneLink) *GithubMilestoneLinkDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *GithubMilestoneLinkClient) DeleteOneID(id uuid.UUID) *GithubMilestoneLinkDeleteOne {
+	builder := c.Delete().Where(githubmilestonelink.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &GithubMilestoneLinkDeleteOne{builder}
+}
+
+// Query returns a query builder for GithubMilestoneLink.
+func (c *GithubMilestoneLinkClient) Query() *GithubMilestoneLinkQuery {
+	return &GithubMilestoneLinkQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeGithubMilestoneLink},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a GithubMilestoneLink entity by its id.
+func (c *GithubMilestoneLinkClient) Get(ctx context.Context, id uuid.UUID) (*GithubMilestoneLink, error) {
+	return c.Query().Where(githubmilestonelink.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *GithubMilestoneLinkClient) GetX(ctx context.Context, id uuid.UUID) *GithubMilestoneLink {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryMilestone queries the milestone edge of a GithubMilestoneLink.
+func (c *GithubMilestoneLinkClient) QueryMilestone(_m *GithubMilestoneLink) *ProjectMilestoneQuery {
+	query := (&ProjectMilestoneClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(githubmilestonelink.Table, githubmilestonelink.FieldID, id),
+			sqlgraph.To(projectmilestone.Table, projectmilestone.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, githubmilestonelink.MilestoneTable, githubmilestonelink.MilestoneColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRepoSync queries the repo_sync edge of a GithubMilestoneLink.
+func (c *GithubMilestoneLinkClient) QueryRepoSync(_m *GithubMilestoneLink) *GithubRepoSyncQuery {
+	query := (&GithubRepoSyncClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(githubmilestonelink.Table, githubmilestonelink.FieldID, id),
+			sqlgraph.To(githubreposync.Table, githubreposync.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, githubmilestonelink.RepoSyncTable, githubmilestonelink.RepoSyncColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *GithubMilestoneLinkClient) Hooks() []Hook {
+	return c.hooks.GithubMilestoneLink
+}
+
+// Interceptors returns the client interceptors.
+func (c *GithubMilestoneLinkClient) Interceptors() []Interceptor {
+	return c.inters.GithubMilestoneLink
+}
+
+func (c *GithubMilestoneLinkClient) mutate(ctx context.Context, m *GithubMilestoneLinkMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&GithubMilestoneLinkCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&GithubMilestoneLinkUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&GithubMilestoneLinkUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&GithubMilestoneLinkDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown GithubMilestoneLink mutation op: %q", m.Op())
+	}
+}
+
 // GithubOutboxClient is a client for the GithubOutbox schema.
 type GithubOutboxClient struct {
 	config
@@ -5379,6 +5552,22 @@ func (c *GithubOutboxClient) QueryComment(_m *GithubOutbox) *CommentQuery {
 			sqlgraph.From(githuboutbox.Table, githuboutbox.FieldID, id),
 			sqlgraph.To(comment.Table, comment.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, githuboutbox.CommentTable, githuboutbox.CommentColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryMilestone queries the milestone edge of a GithubOutbox.
+func (c *GithubOutboxClient) QueryMilestone(_m *GithubOutbox) *ProjectMilestoneQuery {
+	query := (&ProjectMilestoneClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(githuboutbox.Table, githuboutbox.FieldID, id),
+			sqlgraph.To(projectmilestone.Table, projectmilestone.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, githuboutbox.MilestoneTable, githuboutbox.MilestoneColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -5608,6 +5797,22 @@ func (c *GithubRepoSyncClient) QueryGithubOutbox(_m *GithubRepoSync) *GithubOutb
 			sqlgraph.From(githubreposync.Table, githubreposync.FieldID, id),
 			sqlgraph.To(githuboutbox.Table, githuboutbox.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, githubreposync.GithubOutboxTable, githubreposync.GithubOutboxColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryGithubMilestoneLinks queries the github_milestone_links edge of a GithubRepoSync.
+func (c *GithubRepoSyncClient) QueryGithubMilestoneLinks(_m *GithubRepoSync) *GithubMilestoneLinkQuery {
+	query := (&GithubMilestoneLinkClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(githubreposync.Table, githubreposync.FieldID, id),
+			sqlgraph.To(githubmilestonelink.Table, githubmilestonelink.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, githubreposync.GithubMilestoneLinksTable, githubreposync.GithubMilestoneLinksColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -10347,6 +10552,22 @@ func (c *ProjectMilestoneClient) GetX(ctx context.Context, id uuid.UUID) *Projec
 	return obj
 }
 
+// QueryWorkspace queries the workspace edge of a ProjectMilestone.
+func (c *ProjectMilestoneClient) QueryWorkspace(_m *ProjectMilestone) *WorkspaceQuery {
+	query := (&WorkspaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(projectmilestone.Table, projectmilestone.FieldID, id),
+			sqlgraph.To(workspace.Table, workspace.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, projectmilestone.WorkspaceTable, projectmilestone.WorkspaceColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryProject queries the project edge of a ProjectMilestone.
 func (c *ProjectMilestoneClient) QueryProject(_m *ProjectMilestone) *ProjectQuery {
 	query := (&ProjectClient{config: c.config}).Query()
@@ -10388,6 +10609,38 @@ func (c *ProjectMilestoneClient) QueryComments(_m *ProjectMilestone) *CommentQue
 			sqlgraph.From(projectmilestone.Table, projectmilestone.FieldID, id),
 			sqlgraph.To(comment.Table, comment.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, projectmilestone.CommentsTable, projectmilestone.CommentsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryGithubMilestoneLinks queries the github_milestone_links edge of a ProjectMilestone.
+func (c *ProjectMilestoneClient) QueryGithubMilestoneLinks(_m *ProjectMilestone) *GithubMilestoneLinkQuery {
+	query := (&GithubMilestoneLinkClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(projectmilestone.Table, projectmilestone.FieldID, id),
+			sqlgraph.To(githubmilestonelink.Table, githubmilestonelink.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, projectmilestone.GithubMilestoneLinksTable, projectmilestone.GithubMilestoneLinksColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryGithubOutbox queries the github_outbox edge of a ProjectMilestone.
+func (c *ProjectMilestoneClient) QueryGithubOutbox(_m *ProjectMilestone) *GithubOutboxQuery {
+	query := (&GithubOutboxClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(projectmilestone.Table, projectmilestone.FieldID, id),
+			sqlgraph.To(githuboutbox.Table, githuboutbox.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, projectmilestone.GithubOutboxTable, projectmilestone.GithubOutboxColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -15195,6 +15448,22 @@ func (c *WorkspaceClient) QueryProjects(_m *Workspace) *ProjectQuery {
 	return query
 }
 
+// QueryProjectMilestones queries the project_milestones edge of a Workspace.
+func (c *WorkspaceClient) QueryProjectMilestones(_m *Workspace) *ProjectMilestoneQuery {
+	query := (&ProjectMilestoneClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(workspace.Table, workspace.FieldID, id),
+			sqlgraph.To(projectmilestone.Table, projectmilestone.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, workspace.ProjectMilestonesTable, workspace.ProjectMilestonesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryInitiatives queries the initiatives edge of a Workspace.
 func (c *WorkspaceClient) QueryInitiatives(_m *Workspace) *InitiativeQuery {
 	query := (&InitiativeClient{config: c.config}).Query()
@@ -15807,30 +16076,30 @@ type (
 		CustomerStatus, CustomerTier, Cycle, Discussion, DiscussionSubscriber,
 		DiscussionThread, DiscussionVote, Document, DocumentVersion, Email, EntityLink,
 		Favorite, File, GithubCommentLink, GithubInstallation, GithubIssueLink,
-		GithubOutbox, GithubRepoSync, GithubUserToken, Initiative, InitiativeProject,
-		Invitation, Issue, IssueHistory, IssueLabel, IssueLabelLink, IssueRelation,
-		IssueRelease, IssueShare, IssueSubscriber, MessageVersion, Notification,
-		OAuthClient, OAuthCode, OAuthGrant, OAuthToken, Project, ProjectLabel,
-		ProjectLabelLink, ProjectMember, ProjectMilestone, ProjectRelation,
-		ProjectStatus, ProjectSubscriber, ProjectTeam, Reaction, Release, ReleaseNote,
-		ReleasePipeline, ReleasePipelineTeam, ReleaseStage, SignInLink, StatusUpdate,
-		Team, TeamMember, Template, User, Webhook, WebhookDelivery, WorkflowState,
-		Workspace, WorkspaceMember []ent.Hook
+		GithubMilestoneLink, GithubOutbox, GithubRepoSync, GithubUserToken, Initiative,
+		InitiativeProject, Invitation, Issue, IssueHistory, IssueLabel, IssueLabelLink,
+		IssueRelation, IssueRelease, IssueShare, IssueSubscriber, MessageVersion,
+		Notification, OAuthClient, OAuthCode, OAuthGrant, OAuthToken, Project,
+		ProjectLabel, ProjectLabelLink, ProjectMember, ProjectMilestone,
+		ProjectRelation, ProjectStatus, ProjectSubscriber, ProjectTeam, Reaction,
+		Release, ReleaseNote, ReleasePipeline, ReleasePipelineTeam, ReleaseStage,
+		SignInLink, StatusUpdate, Team, TeamMember, Template, User, Webhook,
+		WebhookDelivery, WorkflowState, Workspace, WorkspaceMember []ent.Hook
 	}
 	inters struct {
 		APIKey, Attachment, AuditEntry, Comment, CustomView, Customer, CustomerNeed,
 		CustomerStatus, CustomerTier, Cycle, Discussion, DiscussionSubscriber,
 		DiscussionThread, DiscussionVote, Document, DocumentVersion, Email, EntityLink,
 		Favorite, File, GithubCommentLink, GithubInstallation, GithubIssueLink,
-		GithubOutbox, GithubRepoSync, GithubUserToken, Initiative, InitiativeProject,
-		Invitation, Issue, IssueHistory, IssueLabel, IssueLabelLink, IssueRelation,
-		IssueRelease, IssueShare, IssueSubscriber, MessageVersion, Notification,
-		OAuthClient, OAuthCode, OAuthGrant, OAuthToken, Project, ProjectLabel,
-		ProjectLabelLink, ProjectMember, ProjectMilestone, ProjectRelation,
-		ProjectStatus, ProjectSubscriber, ProjectTeam, Reaction, Release, ReleaseNote,
-		ReleasePipeline, ReleasePipelineTeam, ReleaseStage, SignInLink, StatusUpdate,
-		Team, TeamMember, Template, User, Webhook, WebhookDelivery, WorkflowState,
-		Workspace, WorkspaceMember []ent.Interceptor
+		GithubMilestoneLink, GithubOutbox, GithubRepoSync, GithubUserToken, Initiative,
+		InitiativeProject, Invitation, Issue, IssueHistory, IssueLabel, IssueLabelLink,
+		IssueRelation, IssueRelease, IssueShare, IssueSubscriber, MessageVersion,
+		Notification, OAuthClient, OAuthCode, OAuthGrant, OAuthToken, Project,
+		ProjectLabel, ProjectLabelLink, ProjectMember, ProjectMilestone,
+		ProjectRelation, ProjectStatus, ProjectSubscriber, ProjectTeam, Reaction,
+		Release, ReleaseNote, ReleasePipeline, ReleasePipelineTeam, ReleaseStage,
+		SignInLink, StatusUpdate, Team, TeamMember, Template, User, Webhook,
+		WebhookDelivery, WorkflowState, Workspace, WorkspaceMember []ent.Interceptor
 	}
 )
 

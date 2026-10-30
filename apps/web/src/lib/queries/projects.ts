@@ -184,35 +184,6 @@ export function useProjectLabelActionMutation(workspaceId: string) {
   });
 }
 
-/** Milestones also show on issues, so issues refresh with them. */
-function useInvalidateMilestones(workspaceId: string) {
-  const queryClient = useQueryClient();
-  const invalidate = useInvalidateProjects(workspaceId);
-  return () =>
-    Promise.all([
-      invalidate(),
-      queryClient.invalidateQueries({ queryKey: [workspaceId, "issues"] }),
-    ]);
-}
-
-export function useSaveMilestoneMutation(workspaceId: string) {
-  const invalidate = useInvalidateMilestones(workspaceId);
-  return useMutation({
-    mutationFn: (args: OpArgs<"save_milestone">) => call(workspaceId, "save_milestone", args),
-    meta: { errorTitle: "Could not save milestone" },
-    onSuccess: invalidate,
-  });
-}
-
-export function useDeleteMilestoneMutation(workspaceId: string) {
-  const invalidate = useInvalidateMilestones(workspaceId);
-  return useMutation({
-    mutationFn: (id: string) => call(workspaceId, "delete_milestone", { id }),
-    meta: { errorTitle: "Could not delete milestone" },
-    onSuccess: invalidate,
-  });
-}
-
 /** Status updates set the health of their project or initiative, so both refresh. */
 export function useSaveStatusUpdateMutation(workspaceId: string) {
   const invalidate = useInvalidateProjects(workspaceId);

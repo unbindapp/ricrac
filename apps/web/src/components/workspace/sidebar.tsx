@@ -7,6 +7,7 @@ import {
   BoxIcon,
   BuildingIcon,
   CircleDotIcon,
+  DiamondIcon,
   FileTextIcon,
   InboxIcon,
   KeyboardIcon,
@@ -62,6 +63,7 @@ export function Sidebar({ onNavigate, hideButton }: TSidebarProps) {
       isHidden: !team?.cyclesEnabled,
     },
     { label: "Projects", icon: BoxIcon, link: { to: "/$workspace/projects", params } },
+    { label: "Milestones", icon: DiamondIcon, link: { to: "/$workspace/milestones", params } },
     { label: "Views", icon: LayersIcon, link: { to: "/$workspace/views", params } },
     {
       label: "Initiatives",

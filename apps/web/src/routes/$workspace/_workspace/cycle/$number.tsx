@@ -4,7 +4,6 @@ import { useState } from "react";
 
 import type { CycleDetail, Team } from "@/api/ops.gen";
 import { CycleDialog } from "@/components/cycles/cycle-dialog";
-import { CycleIssues } from "@/components/cycles/cycle-issues";
 import { CycleProgress } from "@/components/cycles/cycle-list";
 import { CycleMenu } from "@/components/cycles/cycle-menu";
 import {
@@ -14,7 +13,8 @@ import {
   daysLeft,
 } from "@/components/cycles/cycle-status";
 import { FavoriteButton } from "@/components/favorites/favorite-button";
-import { RefreshCwIcon } from "@/components/icons";
+import { CircleDotIcon, RefreshCwIcon } from "@/components/icons";
+import { IssuesByState } from "@/components/issues/issues-by-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
@@ -127,7 +127,15 @@ function CycleBody({ cycle }: { cycle: CycleDetail }) {
       </Card>
       <section className="flex w-full flex-col gap-2">
         <SectionTitle title="Issues" />
-        <CycleIssues issues={cycle.issues ?? []} />
+        <IssuesByState
+          issues={cycle.issues ?? []}
+          empty={{
+            icon: CircleDotIcon,
+            title: "No issues in this cycle yet",
+            description:
+              "Add issues to the cycle from an issue's properties, or let started issues join it on their own in cycle settings.",
+          }}
+        />
       </section>
     </>
   );

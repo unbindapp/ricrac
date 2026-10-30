@@ -97,6 +97,10 @@ const (
 	FieldGithubPrOpenedStateID = "github_pr_opened_state_id"
 	// FieldGithubPrMergedStateID holds the string denoting the github_pr_merged_state_id field in the database.
 	FieldGithubPrMergedStateID = "github_pr_merged_state_id"
+	// FieldGithubOpenIssues holds the string denoting the github_open_issues field in the database.
+	FieldGithubOpenIssues = "github_open_issues"
+	// FieldGithubSyncFields holds the string denoting the github_sync_fields field in the database.
+	FieldGithubSyncFields = "github_sync_fields"
 	// FieldPreviousKeys holds the string denoting the previous_keys field in the database.
 	FieldPreviousKeys = "previous_keys"
 	// FieldPreviousNames holds the string denoting the previous_names field in the database.
@@ -356,6 +360,8 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldGithubPrOpenedStateID,
 	FieldGithubPrMergedStateID,
+	FieldGithubOpenIssues,
+	FieldGithubSyncFields,
 	FieldPreviousKeys,
 	FieldPreviousNames,
 	FieldMergedTeamIds,
@@ -604,6 +610,16 @@ func ByGithubPrOpenedStateID(opts ...sql.OrderTermOption) OrderOption {
 // ByGithubPrMergedStateID orders the results by the github_pr_merged_state_id field.
 func ByGithubPrMergedStateID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldGithubPrMergedStateID, opts...).ToFunc()
+}
+
+// ByGithubOpenIssues orders the results by the github_open_issues field.
+func ByGithubOpenIssues(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldGithubOpenIssues, opts...).ToFunc()
+}
+
+// ByGithubSyncFields orders the results by the github_sync_fields field.
+func ByGithubSyncFields(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldGithubSyncFields, opts...).ToFunc()
 }
 
 // ByPreviousKeys orders the results by the previous_keys field.

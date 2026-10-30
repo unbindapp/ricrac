@@ -1,9 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { type ComponentProps, useState } from "react";
 
-import type { CycleIssue, StateRef } from "@/api/ops.gen";
+import type { IssueChild, StateRef } from "@/api/ops.gen";
 import { pointsText } from "@/components/cycles/cycle-status";
-import { ChevronRightIcon, CircleDotIcon } from "@/components/icons";
+import { ChevronRightIcon } from "@/components/icons";
 import { EmptyState } from "@/components/layout/empty-state";
 import { List } from "@/components/layout/list";
 import { Avatar } from "@/components/shared/avatar";
@@ -21,9 +21,10 @@ const TYPE_ORDER: TStateType[] = [
   "canceled",
 ];
 
-type TGroup = { state: StateRef; issues: CycleIssue[] };
+type TStateIssue = IssueChild & { estimate?: number | null };
+type TGroup = { state: StateRef; issues: TStateIssue[] };
 
-function groupByState(issues: CycleIssue[]): TGroup[] {
+function groupByState(issues: TStateIssue[]): TGroup[] {
   const groups = new Map<string, TGroup>();
   for (const issue of issues) {
     const group = groups.get(issue.state.id) ?? { state: issue.state, issues: [] };
@@ -35,17 +36,15 @@ function groupByState(issues: CycleIssue[]): TGroup[] {
   );
 }
 
-/** A cycle's issues by status; finished ones start collapsed. */
-export function CycleIssues({ issues }: { issues: CycleIssue[] }) {
-  if (issues.length === 0) {
-    return (
-      <EmptyState
-        icon={CircleDotIcon}
-        title="No issues in this cycle yet"
-        description="Add issues to the cycle from an issue's properties, or let started issues join it on their own in cycle settings."
-      />
-    );
-  }
+/** Issues by status, like a cycle's or a milestone's; finished ones start collapsed. */
+export function IssuesByState({
+  issues,
+  empty,
+}: {
+  issues: TStateIssue[];
+  empty: ComponentProps<typeof EmptyState>;
+}) {
+  if (issues.length === 0) return <EmptyState {...empty} />;
   return (
     <List>
       {groupByState(issues).map((group) => (
@@ -86,7 +85,7 @@ function StateGroup({ group }: { group: TGroup }) {
   );
 }
 
-function IssueRow({ issue }: { issue: CycleIssue }) {
+function IssueRow({ issue }: { issue: TStateIssue }) {
   const { workspace } = useWorkspace();
   return (
     <Link
@@ -101,7 +100,7 @@ function IssueRow({ issue }: { issue: CycleIssue }) {
       </span>
       <StateIcon type={issue.state.type} color={issue.state.color} name={issue.state.name} />
       <span className="min-w-0 flex-1 truncate">{issue.title}</span>
-      {issue.estimate !== null && (
+      {issue.estimate != null && (
         <span className="text-muted-foreground shrink-0 text-xs tabular-nums">
           {pointsText(issue.estimate)}
         </span>

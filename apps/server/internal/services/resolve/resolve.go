@@ -461,7 +461,8 @@ func (self *ResolveService) Projects(ctx context.Context, actor *auth.Actor, val
 	return all(ctx, actor, values, self.Project)
 }
 
-// Milestone is a milestone by id, or by name within the project.
+// Milestone is a milestone by id, or by name among the project's (when given) and then the
+// workspace's own.
 func (self *ResolveService) Milestone(ctx context.Context, actor *auth.Actor, project *uuid.UUID, value string) (uuid.UUID, error) {
 	value = strings.TrimSpace(value)
 	if id, ok := utils.AsUUID(value); ok {
@@ -469,20 +470,28 @@ func (self *ResolveService) Milestone(ctx context.Context, actor *auth.Actor, pr
 		if err != nil {
 			return uuid.Nil, err
 		}
-		if found {
+		if found && projectOf != nil {
 			if _, err := self.Project(ctx, actor, projectOf.String()); err != nil {
 				return uuid.Nil, err
 			}
+		}
+		if found {
 			return id, nil
 		}
 	}
-	if project == nil {
-		return uuid.Nil, errdefs.BadRequest("Name the project too, or pass the milestone's id")
+	var rows []resolve_repo.Named
+	if project != nil {
+		projectRows, err := self.lookups().Milestones(ctx, *project)
+		if err != nil {
+			return uuid.Nil, err
+		}
+		rows = projectRows
 	}
-	rows, err := self.lookups().Milestones(ctx, *project)
+	workspaceRows, err := self.lookups().WorkspaceMilestones(ctx, actor.Workspace)
 	if err != nil {
 		return uuid.Nil, err
 	}
+	rows = append(rows, workspaceRows...)
 	names := make([]string, len(rows))
 	for i, r := range rows {
 		if strings.EqualFold(r.Name, value) {
@@ -490,7 +499,7 @@ func (self *ResolveService) Milestone(ctx context.Context, actor *auth.Actor, pr
 		}
 		names[i] = r.Name
 	}
-	return uuid.Nil, errdefs.BadRequest("The project has no milestone %q. %s", value, utils.Options(names))
+	return uuid.Nil, errdefs.BadRequest("No milestone %q. %s", value, utils.Options(names))
 }
 
 var relativeCycles = map[string]string{

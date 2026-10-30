@@ -99,7 +99,7 @@ func (self *EventsService) History(ctx context.Context, tx repository.TxInterfac
 }
 
 // pushedFields are the issue fields GitHub has too.
-var pushedFields = []string{"title", "description", "state", "labels", "assignee"}
+var pushedFields = []string{"title", "description", "state", "labels", "assignee", "projectMilestone", "priority", "estimate", "dueDate", "cycle"}
 
 func mirrorsGitHub(actor *auth.Actor) bool {
 	return actor.Origin != nil && actor.Origin.FromGitHubIssue
@@ -134,6 +134,50 @@ func (self *EventsService) QueueCommentForGitHub(ctx context.Context, tx reposit
 		self.waker.WakeGitHub()
 	}
 	return nil
+}
+
+// QueueMilestoneForGitHub queues a milestone's change (kind milestone) or deletion
+// (milestone_deleted) for each GitHub milestone it is linked to.
+func (self *EventsService) QueueMilestoneForGitHub(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, milestone uuid.UUID, kind string) error {
+	if mirrorsGitHub(actor) {
+		return nil
+	}
+	queued, err := self.events().QueueMilestoneForGitHub(ctx, tx, milestone, kind, nil)
+	if err != nil {
+		return err
+	}
+	if queued {
+		self.waker.WakeGitHub()
+	}
+	return nil
+}
+
+// QueueNewIssueForGitHub queues an issue created in Ricrac for the synced repository it opens in
+// on GitHub: the one named, or by default when the team opens new issues on GitHub.
+func (self *EventsService) QueueNewIssueForGitHub(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, issue, team uuid.UUID, repository *string) error {
+	if mirrorsGitHub(actor) || repository != nil && utils.IsNoneWord(*repository) {
+		return nil
+	}
+	var actAs *uuid.UUID
+	if actor.User != uuid.Nil {
+		actAs = &actor.User
+	}
+	queued, err := self.events().QueueNewIssueForGitHub(ctx, tx, issue, team, repository, actAs)
+	if err != nil {
+		return err
+	}
+	if queued {
+		self.waker.WakeGitHub()
+		return nil
+	}
+	if repository == nil {
+		return nil
+	}
+	names, err := self.events().TeamRepos(ctx, tx, team)
+	if err != nil {
+		return err
+	}
+	return errdefs.BadRequest("No repository %q syncs with the team. %s", *repository, utils.Options(names))
 }
 
 func (self *EventsService) Audit(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, kind string, metadata any) error {

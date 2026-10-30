@@ -56,6 +56,11 @@ func IDLTE(id uuid.UUID) predicate.ProjectMilestone {
 	return predicate.ProjectMilestone(sql.FieldLTE(FieldID, id))
 }
 
+// WorkspaceID applies equality check predicate on the "workspace_id" field. It's identical to WorkspaceIDEQ.
+func WorkspaceID(v uuid.UUID) predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(sql.FieldEQ(FieldWorkspaceID, v))
+}
+
 // ProjectID applies equality check predicate on the "project_id" field. It's identical to ProjectIDEQ.
 func ProjectID(v uuid.UUID) predicate.ProjectMilestone {
 	return predicate.ProjectMilestone(sql.FieldEQ(FieldProjectID, v))
@@ -81,6 +86,11 @@ func SortOrder(v float64) predicate.ProjectMilestone {
 	return predicate.ProjectMilestone(sql.FieldEQ(FieldSortOrder, v))
 }
 
+// ClosedAt applies equality check predicate on the "closed_at" field. It's identical to ClosedAtEQ.
+func ClosedAt(v time.Time) predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(sql.FieldEQ(FieldClosedAt, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.ProjectMilestone {
 	return predicate.ProjectMilestone(sql.FieldEQ(FieldCreatedAt, v))
@@ -89,6 +99,26 @@ func CreatedAt(v time.Time) predicate.ProjectMilestone {
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.ProjectMilestone {
 	return predicate.ProjectMilestone(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// WorkspaceIDEQ applies the EQ predicate on the "workspace_id" field.
+func WorkspaceIDEQ(v uuid.UUID) predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(sql.FieldEQ(FieldWorkspaceID, v))
+}
+
+// WorkspaceIDNEQ applies the NEQ predicate on the "workspace_id" field.
+func WorkspaceIDNEQ(v uuid.UUID) predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(sql.FieldNEQ(FieldWorkspaceID, v))
+}
+
+// WorkspaceIDIn applies the In predicate on the "workspace_id" field.
+func WorkspaceIDIn(vs ...uuid.UUID) predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(sql.FieldIn(FieldWorkspaceID, vs...))
+}
+
+// WorkspaceIDNotIn applies the NotIn predicate on the "workspace_id" field.
+func WorkspaceIDNotIn(vs ...uuid.UUID) predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(sql.FieldNotIn(FieldWorkspaceID, vs...))
 }
 
 // ProjectIDEQ applies the EQ predicate on the "project_id" field.
@@ -109,6 +139,16 @@ func ProjectIDIn(vs ...uuid.UUID) predicate.ProjectMilestone {
 // ProjectIDNotIn applies the NotIn predicate on the "project_id" field.
 func ProjectIDNotIn(vs ...uuid.UUID) predicate.ProjectMilestone {
 	return predicate.ProjectMilestone(sql.FieldNotIn(FieldProjectID, vs...))
+}
+
+// ProjectIDIsNil applies the IsNil predicate on the "project_id" field.
+func ProjectIDIsNil() predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(sql.FieldIsNull(FieldProjectID))
+}
+
+// ProjectIDNotNil applies the NotNil predicate on the "project_id" field.
+func ProjectIDNotNil() predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(sql.FieldNotNull(FieldProjectID))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -351,6 +391,56 @@ func SortOrderNotNil() predicate.ProjectMilestone {
 	return predicate.ProjectMilestone(sql.FieldNotNull(FieldSortOrder))
 }
 
+// ClosedAtEQ applies the EQ predicate on the "closed_at" field.
+func ClosedAtEQ(v time.Time) predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(sql.FieldEQ(FieldClosedAt, v))
+}
+
+// ClosedAtNEQ applies the NEQ predicate on the "closed_at" field.
+func ClosedAtNEQ(v time.Time) predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(sql.FieldNEQ(FieldClosedAt, v))
+}
+
+// ClosedAtIn applies the In predicate on the "closed_at" field.
+func ClosedAtIn(vs ...time.Time) predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(sql.FieldIn(FieldClosedAt, vs...))
+}
+
+// ClosedAtNotIn applies the NotIn predicate on the "closed_at" field.
+func ClosedAtNotIn(vs ...time.Time) predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(sql.FieldNotIn(FieldClosedAt, vs...))
+}
+
+// ClosedAtGT applies the GT predicate on the "closed_at" field.
+func ClosedAtGT(v time.Time) predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(sql.FieldGT(FieldClosedAt, v))
+}
+
+// ClosedAtGTE applies the GTE predicate on the "closed_at" field.
+func ClosedAtGTE(v time.Time) predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(sql.FieldGTE(FieldClosedAt, v))
+}
+
+// ClosedAtLT applies the LT predicate on the "closed_at" field.
+func ClosedAtLT(v time.Time) predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(sql.FieldLT(FieldClosedAt, v))
+}
+
+// ClosedAtLTE applies the LTE predicate on the "closed_at" field.
+func ClosedAtLTE(v time.Time) predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(sql.FieldLTE(FieldClosedAt, v))
+}
+
+// ClosedAtIsNil applies the IsNil predicate on the "closed_at" field.
+func ClosedAtIsNil() predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(sql.FieldIsNull(FieldClosedAt))
+}
+
+// ClosedAtNotNil applies the NotNil predicate on the "closed_at" field.
+func ClosedAtNotNil() predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(sql.FieldNotNull(FieldClosedAt))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.ProjectMilestone {
 	return predicate.ProjectMilestone(sql.FieldEQ(FieldCreatedAt, v))
@@ -451,6 +541,29 @@ func UpdatedAtNotNil() predicate.ProjectMilestone {
 	return predicate.ProjectMilestone(sql.FieldNotNull(FieldUpdatedAt))
 }
 
+// HasWorkspace applies the HasEdge predicate on the "workspace" edge.
+func HasWorkspace() predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, WorkspaceTable, WorkspaceColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasWorkspaceWith applies the HasEdge predicate on the "workspace" edge with a given conditions (other predicates).
+func HasWorkspaceWith(preds ...predicate.Workspace) predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(func(s *sql.Selector) {
+		step := newWorkspaceStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasProject applies the HasEdge predicate on the "project" edge.
 func HasProject() predicate.ProjectMilestone {
 	return predicate.ProjectMilestone(func(s *sql.Selector) {
@@ -512,6 +625,52 @@ func HasComments() predicate.ProjectMilestone {
 func HasCommentsWith(preds ...predicate.Comment) predicate.ProjectMilestone {
 	return predicate.ProjectMilestone(func(s *sql.Selector) {
 		step := newCommentsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasGithubMilestoneLinks applies the HasEdge predicate on the "github_milestone_links" edge.
+func HasGithubMilestoneLinks() predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, GithubMilestoneLinksTable, GithubMilestoneLinksColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasGithubMilestoneLinksWith applies the HasEdge predicate on the "github_milestone_links" edge with a given conditions (other predicates).
+func HasGithubMilestoneLinksWith(preds ...predicate.GithubMilestoneLink) predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(func(s *sql.Selector) {
+		step := newGithubMilestoneLinksStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasGithubOutbox applies the HasEdge predicate on the "github_outbox" edge.
+func HasGithubOutbox() predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, GithubOutboxTable, GithubOutboxColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasGithubOutboxWith applies the HasEdge predicate on the "github_outbox" edge with a given conditions (other predicates).
+func HasGithubOutboxWith(preds ...predicate.GithubOutbox) predicate.ProjectMilestone {
+	return predicate.ProjectMilestone(func(s *sql.Selector) {
+		step := newGithubOutboxStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

@@ -16,7 +16,7 @@ import {
   TagIcon,
 } from "@/components/icons";
 import { applyPatch, type TIssueDraft, type TIssuePatch } from "@/components/issues/issue-draft";
-import { useCycles, useTeamDetail } from "@/components/issues/picker-sources";
+import { useCycles, useMilestones, useTeamDetail } from "@/components/issues/picker-sources";
 import {
   AssigneePicker,
   CyclePicker,
@@ -72,6 +72,8 @@ type TProps = {
   hideEmpty?: boolean;
   /** More rows at the end of the panel (sharing, SLA, snooze). */
   children?: ReactNode;
+  /** Inline, more chips after the properties, like where a new issue opens on GitHub. */
+  extraChips?: ReactNode;
 };
 
 const SHORTCUTS: { hotkey: string; property: TPropertyKey }[] = [
@@ -97,10 +99,12 @@ export function IssueProperties({
   omit = [],
   hideEmpty = false,
   children,
+  extraChips,
 }: TProps) {
   const [openProperty, setOpenProperty] = useState<TPropertyKey | null>(null);
   const team = useTeamDetail(teamId);
   const { enabled: cyclesEnabled } = useCycles(teamId);
+  const { workspaceMilestones } = useMilestones(undefined, draft.projectMilestone?.id);
   const estimatesEnabled = Boolean(team && team.estimateType !== "notUsed");
   useHotkeyScope(
     SHORTCUTS.map(({ hotkey, property }) => ({
@@ -192,10 +196,10 @@ export function IssueProperties({
       property: "milestone",
       label: "Milestone",
       icon: DiamondIcon,
-      hidden: !draft.project,
+      hidden: !draft.project && !draft.projectMilestone && workspaceMilestones.length === 0,
       node: (
         <MilestonePicker
-          projectId={draft.project?.id}
+          project={draft.project}
           milestone={draft.projectMilestone}
           onChange={(projectMilestone) => onChange({ projectMilestone })}
           {...control("milestone")}
@@ -272,6 +276,7 @@ export function IssueProperties({
                 {field.node}
               </span>
             ))}
+          {extraChips}
           {!disabled && unset.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger
@@ -353,7 +358,7 @@ function isSet(draft: TIssueDraft, property: TPropertyKey) {
   }
 }
 
-/** Changing the project drops a milestone of the old one. */
+/** Changing the project drops a milestone of the old one, so the patch says so. */
 function withMilestone(draft: TIssueDraft, patch: TIssuePatch): TIssuePatch {
   const next = applyPatch(draft, patch);
   if (next.projectMilestone === draft.projectMilestone) return patch;

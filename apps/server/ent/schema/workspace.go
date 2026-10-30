@@ -39,6 +39,7 @@ func (Workspace) Edges() []ent.Edge {
 		edge.To("project_statuses", ProjectStatus.Type),
 		edge.To("project_labels", ProjectLabel.Type),
 		edge.To("projects", Project.Type),
+		edge.To("project_milestones", ProjectMilestone.Type),
 		edge.To("initiatives", Initiative.Type),
 		edge.To("status_updates", StatusUpdate.Type),
 		edge.To("entity_links", EntityLink.Type),

@@ -311,17 +311,31 @@ func (self *ResolveRepository) ProjectBySlug(ctx context.Context, workspace uuid
 	return firstID(ctx, ids, err)
 }
 
-// MilestoneProject is the project of a milestone of the workspace.
-func (self *ResolveRepository) MilestoneProject(ctx context.Context, workspace, id uuid.UUID) (uuid.UUID, bool, error) {
+// MilestoneProject is the project of a milestone of the workspace, nil when it is in none.
+func (self *ResolveRepository) MilestoneProject(ctx context.Context, workspace, id uuid.UUID) (*uuid.UUID, bool, error) {
 	milestone, err := self.base.DB.ProjectMilestone.Query().
-		Where(projectmilestone.ID(id), projectmilestone.HasProjectWith(project.WorkspaceID(workspace))).Only(ctx)
+		Where(projectmilestone.ID(id), projectmilestone.WorkspaceID(workspace)).Only(ctx)
 	if ent.IsNotFound(err) {
-		return uuid.Nil, false, nil
+		return nil, false, nil
 	}
 	if err != nil {
-		return uuid.Nil, false, err
+		return nil, false, err
 	}
 	return milestone.ProjectID, true, nil
+}
+
+// WorkspaceMilestones is the workspace's milestones in no project.
+func (self *ResolveRepository) WorkspaceMilestones(ctx context.Context, workspace uuid.UUID) ([]Named, error) {
+	milestones, err := self.base.DB.ProjectMilestone.Query().
+		Where(projectmilestone.WorkspaceID(workspace), projectmilestone.ProjectIDIsNil()).Order(ent.Asc(projectmilestone.FieldName)).All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	rows := make([]Named, len(milestones))
+	for i, m := range milestones {
+		rows[i] = Named{ID: m.ID, Name: m.Name}
+	}
+	return rows, nil
 }
 
 // Milestones is the project's milestones in their order.

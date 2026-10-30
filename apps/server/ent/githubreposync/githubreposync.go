@@ -45,6 +45,8 @@ const (
 	FieldLastError = "last_error"
 	// FieldLastSyncedAt holds the string denoting the last_synced_at field in the database.
 	FieldLastSyncedAt = "last_synced_at"
+	// FieldMilestonesSyncedAt holds the string denoting the milestones_synced_at field in the database.
+	FieldMilestonesSyncedAt = "milestones_synced_at"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -61,6 +63,8 @@ const (
 	EdgeGithubIssueLinks = "github_issue_links"
 	// EdgeGithubOutbox holds the string denoting the github_outbox edge name in mutations.
 	EdgeGithubOutbox = "github_outbox"
+	// EdgeGithubMilestoneLinks holds the string denoting the github_milestone_links edge name in mutations.
+	EdgeGithubMilestoneLinks = "github_milestone_links"
 	// GithubIssueLinkFieldID holds the string denoting the ID field of the GithubIssueLink.
 	GithubIssueLinkFieldID = "issue_id"
 	// Table holds the table name of the githubreposync in the database.
@@ -107,6 +111,13 @@ const (
 	GithubOutboxInverseTable = "github_outbox"
 	// GithubOutboxColumn is the table column denoting the github_outbox relation/edge.
 	GithubOutboxColumn = "repo_sync_id"
+	// GithubMilestoneLinksTable is the table that holds the github_milestone_links relation/edge.
+	GithubMilestoneLinksTable = "github_milestone_links"
+	// GithubMilestoneLinksInverseTable is the table name for the GithubMilestoneLink entity.
+	// It exists in this package in order to avoid circular dependency with the "githubmilestonelink" package.
+	GithubMilestoneLinksInverseTable = "github_milestone_links"
+	// GithubMilestoneLinksColumn is the table column denoting the github_milestone_links relation/edge.
+	GithubMilestoneLinksColumn = "repo_sync_id"
 )
 
 // Columns holds all SQL columns for githubreposync fields.
@@ -128,6 +139,7 @@ var Columns = []string{
 	FieldSkipped,
 	FieldLastError,
 	FieldLastSyncedAt,
+	FieldMilestonesSyncedAt,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -235,6 +247,11 @@ func ByLastSyncedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLastSyncedAt, opts...).ToFunc()
 }
 
+// ByMilestonesSyncedAt orders the results by the milestones_synced_at field.
+func ByMilestonesSyncedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMilestonesSyncedAt, opts...).ToFunc()
+}
+
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
@@ -300,6 +317,20 @@ func ByGithubOutbox(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newGithubOutboxStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByGithubMilestoneLinksCount orders the results by github_milestone_links count.
+func ByGithubMilestoneLinksCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newGithubMilestoneLinksStep(), opts...)
+	}
+}
+
+// ByGithubMilestoneLinks orders the results by github_milestone_links terms.
+func ByGithubMilestoneLinks(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newGithubMilestoneLinksStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newWorkspaceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -340,5 +371,12 @@ func newGithubOutboxStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(GithubOutboxInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, GithubOutboxTable, GithubOutboxColumn),
+	)
+}
+func newGithubMilestoneLinksStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(GithubMilestoneLinksInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, GithubMilestoneLinksTable, GithubMilestoneLinksColumn),
 	)
 }

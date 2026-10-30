@@ -19,6 +19,7 @@ import (
 	"ricrac/ent/projectteam"
 	"ricrac/ent/user"
 	"ricrac/ent/workflowstate"
+	"ricrac/internal/models"
 	repository "ricrac/internal/repositories"
 )
 
@@ -113,10 +114,12 @@ func SetAssignee(assignee *uuid.UUID) Change {
 	}
 }
 
-// SetProject moves the issue to another project (or none), out of its milestone.
-func SetProject(project *uuid.UUID) Change {
+// SetProject moves the issue to another project (or none), out of its milestone when asked.
+func SetProject(project *uuid.UUID, leaveMilestone bool) Change {
 	return func(u *ent.IssueUpdateOne) {
-		u.ClearMilestoneID()
+		if leaveMilestone {
+			u.ClearMilestoneID()
+		}
 		if project == nil {
 			u.ClearProjectID()
 			return
@@ -433,4 +436,26 @@ func (self *IssueRepository) Share(ctx context.Context, tx repository.TxInterfac
 func (self *IssueRepository) Unshare(ctx context.Context, tx repository.TxInterface, id, with uuid.UUID) error {
 	_, err := self.base.Client(tx).IssueShare.Delete().Where(issueshare.IssueID(id), issueshare.UserID(with)).Exec(ctx)
 	return err
+}
+
+// PendingGitHub is where an issue queued to open on GitHub goes and the login it would be opened
+// as, nil when it isn't queued.
+func (self *IssueRepository) PendingGitHub(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*models.GitHubPreview, error) {
+	rows, err := self.base.Client(tx).QueryContext(ctx,
+		`SELECT s.full_name, u.github_login FROM github_outbox o
+		 JOIN github_repo_syncs s ON s.id = o.repo_sync_id
+		 LEFT JOIN users u ON u.id = o.act_as AND EXISTS (SELECT 1 FROM github_user_tokens t WHERE t.user_id = u.id)
+		 WHERE o.issue_id = $1 AND o.kind = 'issue_created' LIMIT 1`, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	if !rows.Next() {
+		return nil, rows.Err()
+	}
+	var preview models.GitHubPreview
+	if err := rows.Scan(&preview.Repository, &preview.OpenedAs); err != nil {
+		return nil, err
+	}
+	return &preview, rows.Close()
 }

@@ -341,6 +341,14 @@ func IssueFieldsPath(fullName string) string {
 	return "/orgs/" + url.PathEscape(owner) + "/issue-fields"
 }
 
+func MilestonesPath(fullName string) string {
+	return RepoPath(fullName) + "/milestones"
+}
+
+func MilestonePath(fullName string, number int) string {
+	return MilestonesPath(fullName) + "/" + strconv.Itoa(number)
+}
+
 func CommentPath(fullName string, comment int64) string {
 	return RepoPath(fullName) + "/issues/comments/" + strconv.FormatInt(comment, 10)
 }

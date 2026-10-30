@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"ricrac/ent"
+	"ricrac/internal/models"
 	repository "ricrac/internal/repositories"
 	"time"
 
@@ -128,6 +129,9 @@ type IssueRepositoryInterface interface {
 	// Share lets the user see the issue.
 	Share(ctx context.Context, tx repository.TxInterface, id, with, sharer uuid.UUID) error
 	Unshare(ctx context.Context, tx repository.TxInterface, id, with uuid.UUID) error
+	// PendingGitHub is where an issue queued to open on GitHub goes and the login it would be opened
+	// as, nil when it isn't queued.
+	PendingGitHub(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*models.GitHubPreview, error)
 	State(ctx context.Context, tx repository.TxInterface, id uuid.UUID) (*ent.WorkflowState, error)
 	// DefaultState is the state new issues of the team start in: its default, else the first
 	// backlog, unstarted, started, triage, completed or canceled state.

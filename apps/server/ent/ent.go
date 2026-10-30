@@ -30,6 +30,7 @@ import (
 	"ricrac/ent/githubcommentlink"
 	"ricrac/ent/githubinstallation"
 	"ricrac/ent/githubissuelink"
+	"ricrac/ent/githubmilestonelink"
 	"ricrac/ent/githuboutbox"
 	"ricrac/ent/githubreposync"
 	"ricrac/ent/githubusertoken"
@@ -164,6 +165,7 @@ func checkColumn(t, c string) error {
 			githubcommentlink.Table:    githubcommentlink.ValidColumn,
 			githubinstallation.Table:   githubinstallation.ValidColumn,
 			githubissuelink.Table:      githubissuelink.ValidColumn,
+			githubmilestonelink.Table:  githubmilestonelink.ValidColumn,
 			githuboutbox.Table:         githuboutbox.ValidColumn,
 			githubreposync.Table:       githubreposync.ValidColumn,
 			githubusertoken.Table:      githubusertoken.ValidColumn,

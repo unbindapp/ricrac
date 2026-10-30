@@ -54,6 +54,8 @@ type TeamDetail struct {
 	DefaultIssueState            *StateRef    `json:"defaultIssueState"`
 	GitHubPROpenedState          *StateRef    `json:"githubPrOpenedState" doc:"Where GitHub pull requests and branches move issues; null for the first started status."`
 	GitHubPRMergedState          *StateRef    `json:"githubPrMergedState" doc:"Where merged pull requests that fix issues move them; null for the first completed status."`
+	GitHubOpenIssues             bool         `json:"githubOpenIssues" doc:"New issues open on GitHub too unless they say otherwise."`
+	GitHubSyncFields             bool         `json:"githubSyncFields" doc:"Priority, estimate, due date and cycle sync with the GitHub organization's issue fields."`
 	States                       []TeamStatus `json:"states" doc:"Its active statuses in board order."`
 	Members                      []TeamMember `json:"members"`
 	LabelCount                   int          `json:"labelCount"`
@@ -150,6 +152,8 @@ func TeamDetailOf(t *ent.Team, publicURL string, stats TeamStats, labelCount int
 		DefaultIssueState:   StateRefOf(t.Edges.DefaultIssueState),
 		GitHubPROpenedState: StateRefOf(t.Edges.GithubPrOpenedState),
 		GitHubPRMergedState: StateRefOf(t.Edges.GithubPrMergedState),
+		GitHubOpenIssues:    t.GithubOpenIssues,
+		GitHubSyncFields:    t.GithubSyncFields,
 		States:              make([]TeamStatus, len(t.Edges.WorkflowStates)),
 		Members:             make([]TeamMember, len(t.Edges.TeamMembers)),
 		LabelCount:          labelCount,

@@ -28,6 +28,7 @@ type OutboxEntry struct {
 	Number        int
 	Issue         *uuid.UUID
 	Comment       *uuid.UUID
+	Milestone     *uuid.UUID
 	GitHubComment *int64
 	Kind          string
 	Changes       json.RawMessage
@@ -51,7 +52,7 @@ func (self *GitHubRepository) DueOutbox(ctx context.Context) ([]OutboxEntry, err
 	entries := make([]OutboxEntry, len(rows))
 	for i, row := range rows {
 		entries[i] = OutboxEntry{
-			ID: row.ID, RepoSync: row.RepoSyncID, Number: row.GithubNumber, Issue: row.IssueID, Comment: row.CommentID,
+			ID: row.ID, RepoSync: row.RepoSyncID, Number: row.GithubNumber, Issue: row.IssueID, Comment: row.CommentID, Milestone: row.MilestoneID,
 			GitHubComment: row.GithubCommentID, Kind: row.Kind, Changes: row.Changes, Attempts: row.Attempts,
 			Installation: row.Edges.RepoSync.InstallationID, FullName: row.Edges.RepoSync.FullName, ActAs: row.ActAs,
 		}

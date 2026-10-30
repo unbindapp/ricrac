@@ -74,6 +74,35 @@ type fakeGitHub struct {
 	lastComment int
 	// Runs when a comment is posted, before GitHub answers.
 	onComment func(id int)
+	// The repository's milestones, and the issues GitHub lists in each by number.
+	milestones      []M
+	milestoneIssues map[int][]M
+	lastIssue       int
+	// Runs when an issue is opened, before GitHub answers.
+	onIssue func(number int)
+	// The issue field values GitHub answers for an issue, by number.
+	fieldValues map[int][]M
+}
+
+var milestonePath = regexp.MustCompile(`^/repos/[^/]+/[^/]+/milestones/(\d+)$`)
+
+// milestone is a GitHub milestone as the API answers it.
+func milestone(id, number int, title string, extra M) M {
+	value := M{"id": id, "number": number, "title": title, "description": "", "state": "open", "due_on": nil,
+		"html_url": fmt.Sprintf("https://github.com/unbindapp/unbind/milestone/%d", number), "updated_at": "2026-10-01T10:00:00Z"}
+	for key, v := range extra {
+		value[key] = v
+	}
+	return value
+}
+
+func (f *fakeGitHub) milestoneNumbered(number int) M {
+	for _, m := range f.milestones {
+		if fmt.Sprint(m["number"]) == strconv.Itoa(number) {
+			return m
+		}
+	}
+	return nil
 }
 
 var issuePath = regexp.MustCompile(`^/repos/[^/]+/[^/]+/issues/(\d+)$`)
@@ -84,7 +113,7 @@ func newFakeGitHub(t *testing.T) *fakeGitHub {
 		installations: []M{{"id": installation, "account": M{"login": "acme-org", "type": "Organization"}}},
 		repositories: []M{{"id": repoID, "full_name": "unbindapp/unbind", "html_url": "https://github.com/unbindapp/unbind",
 			"private": true, "has_issues": true, "default_branch": "master"}},
-		comments: map[int][]M{},
+		comments: map[int][]M{}, milestoneIssues: map[int][]M{}, fieldValues: map[int][]M{},
 	}
 	f.server = httptest.NewServer(http.HandlerFunc(f.serve))
 	t.Cleanup(f.server.Close)
@@ -138,6 +167,52 @@ func (f *fakeGitHub) serve(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		answer(f.issueFields)
+	case r.Method == http.MethodGet && strings.HasSuffix(path, "/issue-field-values"):
+		number, _ := strconv.Atoi(strings.Split(path, "/")[5])
+		f.mu.Lock()
+		defer f.mu.Unlock()
+		answer(f.fieldValues[number])
+	case r.Method == http.MethodPost && strings.HasSuffix(path, "/issue-field-values"):
+		answer([]M{})
+	case r.Method == http.MethodGet && strings.HasSuffix(path, "/milestones"):
+		f.mu.Lock()
+		defer f.mu.Unlock()
+		answer(f.milestones)
+	case r.Method == http.MethodPost && strings.HasSuffix(path, "/milestones"):
+		f.mu.Lock()
+		defer f.mu.Unlock()
+		number := len(f.milestones) + 1
+		created := milestone(800+number, number, fmt.Sprint(body["title"]), M{"updated_at": time.Now().UTC()})
+		f.milestones = append(f.milestones, created)
+		answer(created)
+	case r.Method == http.MethodPatch && milestonePath.MatchString(path):
+		number, _ := strconv.Atoi(milestonePath.FindStringSubmatch(path)[1])
+		f.mu.Lock()
+		defer f.mu.Unlock()
+		found := f.milestoneNumbered(number)
+		if found == nil {
+			writeJSON(w, http.StatusNotFound, M{"message": "Not Found"})
+			return
+		}
+		for key, v := range body {
+			found[key] = v
+		}
+		found["updated_at"] = time.Now().UTC()
+		answer(found)
+	case r.Method == http.MethodGet && strings.HasSuffix(path, "/issues") && r.URL.Query().Has("milestone"):
+		number, _ := strconv.Atoi(r.URL.Query().Get("milestone"))
+		answer(f.milestoneIssues[number])
+	case r.Method == http.MethodPost && strings.HasSuffix(path, "/issues"):
+		f.mu.Lock()
+		f.lastIssue++
+		number := 2000 + f.lastIssue
+		onIssue := f.onIssue
+		f.mu.Unlock()
+		if onIssue != nil {
+			onIssue(number)
+		}
+		answer(M{"id": 4000000000 + number, "number": number, "node_id": fmt.Sprintf("I_%d", number), "title": body["title"],
+			"html_url": fmt.Sprintf("https://github.com/unbindapp/unbind/issues/%d", number), "updated_at": time.Now().UTC()})
 	case r.Method == http.MethodGet && strings.HasSuffix(path, "/comments"):
 		number, _ := strconv.Atoi(strings.Split(path, "/")[5])
 		answer(f.comments[number])

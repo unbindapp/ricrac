@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
-import { useSaveMilestoneMutation } from "@/lib/queries/projects";
+import { useSaveMilestoneMutation } from "@/lib/queries/milestones";
 
 const milestoneSchema = z.object({
   name: z.string().trim().min(1, "Name is required.").max(80, "Keep the name under 80 characters."),
@@ -22,23 +22,41 @@ const milestoneSchema = z.object({
   targetDate: z.string().regex(/^(\d{4}-\d{2}-\d{2})?$/, "Pick a date."),
 });
 
-type TProps = { trigger: ReactElement } & (
-  { projectId: string; milestone?: never } | { milestone: Milestone; projectId?: never }
-);
+type TProps = {
+  trigger?: ReactElement;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+} & ({ milestone: Milestone; projectId?: never } | { milestone?: never; projectId?: string });
 
+/** Edits a milestone, or adds one to the project, or to the workspace without a project. */
 export function MilestoneDialog(props: TProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = props.open ?? internalOpen;
+  const setOpen = (open: boolean) => {
+    setInternalOpen(open);
+    props.onOpenChange?.(open);
+  };
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger render={props.trigger} />
+    <Dialog open={isOpen} onOpenChange={setOpen}>
+      {props.trigger && <DialogTrigger render={props.trigger} />}
       <DialogContent className="w-md max-w-full">
         <DialogHeader>
-          <DialogTitle>{props.milestone ? "Edit milestone" : "Add milestone"}</DialogTitle>
+          <DialogTitle>{dialogTitle(props)}</DialogTitle>
         </DialogHeader>
-        {isOpen && <MilestoneForm {...props} onDone={() => setIsOpen(false)} />}
+        {isOpen && <MilestoneForm {...props} onDone={() => setOpen(false)} />}
       </DialogContent>
     </Dialog>
   );
+}
+
+function dialogTitle({ milestone, projectId }: TProps) {
+  if (milestone) return "Edit milestone";
+  return projectId ? "Add milestone" : "New milestone";
+}
+
+function submitLabel({ milestone, projectId }: TProps) {
+  if (milestone) return "Save";
+  return projectId ? "Add milestone" : "Create milestone";
 }
 
 function MilestoneForm(props: TProps & { onDone: () => void }) {
@@ -94,7 +112,7 @@ function MilestoneForm(props: TProps & { onDone: () => void }) {
           }
         />
         <form.AppForm>
-          <form.SubmitButton size="sm">{milestone ? "Save" : "Add milestone"}</form.SubmitButton>
+          <form.SubmitButton size="sm">{submitLabel(props)}</form.SubmitButton>
         </form.AppForm>
       </DialogFooter>
     </form>

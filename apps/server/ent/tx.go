@@ -60,6 +60,8 @@ type Tx struct {
 	GithubInstallation *GithubInstallationClient
 	// GithubIssueLink is the client for interacting with the GithubIssueLink builders.
 	GithubIssueLink *GithubIssueLinkClient
+	// GithubMilestoneLink is the client for interacting with the GithubMilestoneLink builders.
+	GithubMilestoneLink *GithubMilestoneLinkClient
 	// GithubOutbox is the client for interacting with the GithubOutbox builders.
 	GithubOutbox *GithubOutboxClient
 	// GithubRepoSync is the client for interacting with the GithubRepoSync builders.
@@ -306,6 +308,7 @@ func (tx *Tx) init() {
 	tx.GithubCommentLink = NewGithubCommentLinkClient(tx.config)
 	tx.GithubInstallation = NewGithubInstallationClient(tx.config)
 	tx.GithubIssueLink = NewGithubIssueLinkClient(tx.config)
+	tx.GithubMilestoneLink = NewGithubMilestoneLinkClient(tx.config)
 	tx.GithubOutbox = NewGithubOutboxClient(tx.config)
 	tx.GithubRepoSync = NewGithubRepoSyncClient(tx.config)
 	tx.GithubUserToken = NewGithubUserTokenClient(tx.config)

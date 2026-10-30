@@ -20,7 +20,10 @@ func (self *IssueService) Get(ctx context.Context, actor *auth.Actor, input *Get
 
 // Detail is the issue as get_issue answers it, read from the pool.
 func (self *IssueService) Detail(ctx context.Context, actor *auth.Actor, id uuid.UUID, withComments, withHistory bool) (models.IssueDetail, error) {
-	var tx repository.TxInterface
+	return self.detailIn(ctx, nil, actor, id, withComments, withHistory)
+}
+
+func (self *IssueService) detailIn(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, id uuid.UUID, withComments, withHistory bool) (models.IssueDetail, error) {
 	value, err := self.Value(ctx, tx, id)
 	if err != nil {
 		return models.IssueDetail{}, err

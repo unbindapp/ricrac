@@ -267,6 +267,16 @@ func GithubPrMergedStateID(v uuid.UUID) predicate.Team {
 	return predicate.Team(sql.FieldEQ(FieldGithubPrMergedStateID, v))
 }
 
+// GithubOpenIssues applies equality check predicate on the "github_open_issues" field. It's identical to GithubOpenIssuesEQ.
+func GithubOpenIssues(v bool) predicate.Team {
+	return predicate.Team(sql.FieldEQ(FieldGithubOpenIssues, v))
+}
+
+// GithubSyncFields applies equality check predicate on the "github_sync_fields" field. It's identical to GithubSyncFieldsEQ.
+func GithubSyncFields(v bool) predicate.Team {
+	return predicate.Team(sql.FieldEQ(FieldGithubSyncFields, v))
+}
+
 // PreviousKeys applies equality check predicate on the "previous_keys" field. It's identical to PreviousKeysEQ.
 func PreviousKeys(v pgarray.Text) predicate.Team {
 	return predicate.Team(sql.FieldEQ(FieldPreviousKeys, v))
@@ -2100,6 +2110,46 @@ func GithubPrMergedStateIDIsNil() predicate.Team {
 // GithubPrMergedStateIDNotNil applies the NotNil predicate on the "github_pr_merged_state_id" field.
 func GithubPrMergedStateIDNotNil() predicate.Team {
 	return predicate.Team(sql.FieldNotNull(FieldGithubPrMergedStateID))
+}
+
+// GithubOpenIssuesEQ applies the EQ predicate on the "github_open_issues" field.
+func GithubOpenIssuesEQ(v bool) predicate.Team {
+	return predicate.Team(sql.FieldEQ(FieldGithubOpenIssues, v))
+}
+
+// GithubOpenIssuesNEQ applies the NEQ predicate on the "github_open_issues" field.
+func GithubOpenIssuesNEQ(v bool) predicate.Team {
+	return predicate.Team(sql.FieldNEQ(FieldGithubOpenIssues, v))
+}
+
+// GithubOpenIssuesIsNil applies the IsNil predicate on the "github_open_issues" field.
+func GithubOpenIssuesIsNil() predicate.Team {
+	return predicate.Team(sql.FieldIsNull(FieldGithubOpenIssues))
+}
+
+// GithubOpenIssuesNotNil applies the NotNil predicate on the "github_open_issues" field.
+func GithubOpenIssuesNotNil() predicate.Team {
+	return predicate.Team(sql.FieldNotNull(FieldGithubOpenIssues))
+}
+
+// GithubSyncFieldsEQ applies the EQ predicate on the "github_sync_fields" field.
+func GithubSyncFieldsEQ(v bool) predicate.Team {
+	return predicate.Team(sql.FieldEQ(FieldGithubSyncFields, v))
+}
+
+// GithubSyncFieldsNEQ applies the NEQ predicate on the "github_sync_fields" field.
+func GithubSyncFieldsNEQ(v bool) predicate.Team {
+	return predicate.Team(sql.FieldNEQ(FieldGithubSyncFields, v))
+}
+
+// GithubSyncFieldsIsNil applies the IsNil predicate on the "github_sync_fields" field.
+func GithubSyncFieldsIsNil() predicate.Team {
+	return predicate.Team(sql.FieldIsNull(FieldGithubSyncFields))
+}
+
+// GithubSyncFieldsNotNil applies the NotNil predicate on the "github_sync_fields" field.
+func GithubSyncFieldsNotNil() predicate.Team {
+	return predicate.Team(sql.FieldNotNull(FieldGithubSyncFields))
 }
 
 // PreviousKeysEQ applies the EQ predicate on the "previous_keys" field.

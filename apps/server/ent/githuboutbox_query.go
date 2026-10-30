@@ -11,6 +11,7 @@ import (
 	"ricrac/ent/githubreposync"
 	"ricrac/ent/issue"
 	"ricrac/ent/predicate"
+	"ricrac/ent/projectmilestone"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -23,14 +24,15 @@ import (
 // GithubOutboxQuery is the builder for querying GithubOutbox entities.
 type GithubOutboxQuery struct {
 	config
-	ctx          *QueryContext
-	order        []githuboutbox.OrderOption
-	inters       []Interceptor
-	predicates   []predicate.GithubOutbox
-	withRepoSync *GithubRepoSyncQuery
-	withIssue    *IssueQuery
-	withComment  *CommentQuery
-	modifiers    []func(*sql.Selector)
+	ctx           *QueryContext
+	order         []githuboutbox.OrderOption
+	inters        []Interceptor
+	predicates    []predicate.GithubOutbox
+	withRepoSync  *GithubRepoSyncQuery
+	withIssue     *IssueQuery
+	withComment   *CommentQuery
+	withMilestone *ProjectMilestoneQuery
+	modifiers     []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -126,6 +128,28 @@ func (_q *GithubOutboxQuery) QueryComment() *CommentQuery {
 			sqlgraph.From(githuboutbox.Table, githuboutbox.FieldID, selector),
 			sqlgraph.To(comment.Table, comment.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, githuboutbox.CommentTable, githuboutbox.CommentColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryMilestone chains the current query on the "milestone" edge.
+func (_q *GithubOutboxQuery) QueryMilestone() *ProjectMilestoneQuery {
+	query := (&ProjectMilestoneClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(githuboutbox.Table, githuboutbox.FieldID, selector),
+			sqlgraph.To(projectmilestone.Table, projectmilestone.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, githuboutbox.MilestoneTable, githuboutbox.MilestoneColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -320,14 +344,15 @@ func (_q *GithubOutboxQuery) Clone() *GithubOutboxQuery {
 		return nil
 	}
 	return &GithubOutboxQuery{
-		config:       _q.config,
-		ctx:          _q.ctx.Clone(),
-		order:        append([]githuboutbox.OrderOption{}, _q.order...),
-		inters:       append([]Interceptor{}, _q.inters...),
-		predicates:   append([]predicate.GithubOutbox{}, _q.predicates...),
-		withRepoSync: _q.withRepoSync.Clone(),
-		withIssue:    _q.withIssue.Clone(),
-		withComment:  _q.withComment.Clone(),
+		config:        _q.config,
+		ctx:           _q.ctx.Clone(),
+		order:         append([]githuboutbox.OrderOption{}, _q.order...),
+		inters:        append([]Interceptor{}, _q.inters...),
+		predicates:    append([]predicate.GithubOutbox{}, _q.predicates...),
+		withRepoSync:  _q.withRepoSync.Clone(),
+		withIssue:     _q.withIssue.Clone(),
+		withComment:   _q.withComment.Clone(),
+		withMilestone: _q.withMilestone.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
 		path:      _q.path,
@@ -365,6 +390,17 @@ func (_q *GithubOutboxQuery) WithComment(opts ...func(*CommentQuery)) *GithubOut
 		opt(query)
 	}
 	_q.withComment = query
+	return _q
+}
+
+// WithMilestone tells the query-builder to eager-load the nodes that are connected to
+// the "milestone" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *GithubOutboxQuery) WithMilestone(opts ...func(*ProjectMilestoneQuery)) *GithubOutboxQuery {
+	query := (&ProjectMilestoneClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withMilestone = query
 	return _q
 }
 
@@ -446,10 +482,11 @@ func (_q *GithubOutboxQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	var (
 		nodes       = []*GithubOutbox{}
 		_spec       = _q.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			_q.withRepoSync != nil,
 			_q.withIssue != nil,
 			_q.withComment != nil,
+			_q.withMilestone != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -488,6 +525,12 @@ func (_q *GithubOutboxQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if query := _q.withComment; query != nil {
 		if err := _q.loadComment(ctx, query, nodes, nil,
 			func(n *GithubOutbox, e *Comment) { n.Edges.Comment = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withMilestone; query != nil {
+		if err := _q.loadMilestone(ctx, query, nodes, nil,
+			func(n *GithubOutbox, e *ProjectMilestone) { n.Edges.Milestone = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -587,6 +630,38 @@ func (_q *GithubOutboxQuery) loadComment(ctx context.Context, query *CommentQuer
 	}
 	return nil
 }
+func (_q *GithubOutboxQuery) loadMilestone(ctx context.Context, query *ProjectMilestoneQuery, nodes []*GithubOutbox, init func(*GithubOutbox), assign func(*GithubOutbox, *ProjectMilestone)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*GithubOutbox)
+	for i := range nodes {
+		if nodes[i].MilestoneID == nil {
+			continue
+		}
+		fk := *nodes[i].MilestoneID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(projectmilestone.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "milestone_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 
 func (_q *GithubOutboxQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := _q.querySpec()
@@ -624,6 +699,9 @@ func (_q *GithubOutboxQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if _q.withComment != nil {
 			_spec.Node.AddColumnOnce(githuboutbox.FieldCommentID)
+		}
+		if _q.withMilestone != nil {
+			_spec.Node.AddColumnOnce(githuboutbox.FieldMilestoneID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {

@@ -45,6 +45,8 @@ const (
 	EdgeProjectLabels = "project_labels"
 	// EdgeProjects holds the string denoting the projects edge name in mutations.
 	EdgeProjects = "projects"
+	// EdgeProjectMilestones holds the string denoting the project_milestones edge name in mutations.
+	EdgeProjectMilestones = "project_milestones"
 	// EdgeInitiatives holds the string denoting the initiatives edge name in mutations.
 	EdgeInitiatives = "initiatives"
 	// EdgeStatusUpdates holds the string denoting the status_updates edge name in mutations.
@@ -154,6 +156,13 @@ const (
 	ProjectsInverseTable = "projects"
 	// ProjectsColumn is the table column denoting the projects relation/edge.
 	ProjectsColumn = "workspace_id"
+	// ProjectMilestonesTable is the table that holds the project_milestones relation/edge.
+	ProjectMilestonesTable = "project_milestones"
+	// ProjectMilestonesInverseTable is the table name for the ProjectMilestone entity.
+	// It exists in this package in order to avoid circular dependency with the "projectmilestone" package.
+	ProjectMilestonesInverseTable = "project_milestones"
+	// ProjectMilestonesColumn is the table column denoting the project_milestones relation/edge.
+	ProjectMilestonesColumn = "workspace_id"
 	// InitiativesTable is the table that holds the initiatives relation/edge.
 	InitiativesTable = "initiatives"
 	// InitiativesInverseTable is the table name for the Initiative entity.
@@ -535,6 +544,20 @@ func ByProjectsCount(opts ...sql.OrderTermOption) OrderOption {
 func ByProjects(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newProjectsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByProjectMilestonesCount orders the results by project_milestones count.
+func ByProjectMilestonesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newProjectMilestonesStep(), opts...)
+	}
+}
+
+// ByProjectMilestones orders the results by project_milestones terms.
+func ByProjectMilestones(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newProjectMilestonesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -990,6 +1013,13 @@ func newProjectsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ProjectsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, ProjectsTable, ProjectsColumn),
+	)
+}
+func newProjectMilestonesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ProjectMilestonesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ProjectMilestonesTable, ProjectMilestonesColumn),
 	)
 }
 func newInitiativesStep() *sqlgraph.Step {

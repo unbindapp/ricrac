@@ -40,14 +40,36 @@ type GitHubRepositoryInterface interface {
 	// RepoTaken says whether some workspace syncs the repository already.
 	RepoTaken(ctx context.Context, repoID int64) (bool, error)
 	CreateRepoSync(ctx context.Context, input NewRepoSync) (uuid.UUID, error)
-	// ChangeRepoSync moves a sync to team when given and, when setProject, to project.
-	ChangeRepoSync(ctx context.Context, id uuid.UUID, team *uuid.UUID, setProject bool, project *uuid.UUID, linkBack *bool) error
+	ChangeRepoSync(ctx context.Context, id uuid.UUID, change RepoSyncChange) error
 	// RequestBackfill sets the sync's import of existing issues to start over.
 	RequestBackfill(ctx context.Context, id uuid.UUID, includeClosed *bool) error
 	DeleteRepoSync(ctx context.Context, id uuid.UUID) error
 	// SaveInstallation stores an installation for the workspace, or brings it back up to date;
 	// false when another workspace has it.
 	SaveInstallation(ctx context.Context, id int64, workspace uuid.UUID, login, kind string, installer uuid.UUID) (bool, error)
+	// MilestoneLink is the link of a GitHub milestone of the sync, nil when it has none.
+	MilestoneLink(ctx context.Context, repoSync uuid.UUID, githubID int64) (*ent.GithubMilestoneLink, error)
+	// MilestoneLinkIn is the link of a Ricrac milestone to the sync's repository, nil when it has none.
+	MilestoneLinkIn(ctx context.Context, milestone, repoSync uuid.UUID) (*ent.GithubMilestoneLink, error)
+	// MilestoneLinks is the links of the sync's repository.
+	MilestoneLinks(ctx context.Context, repoSync uuid.UUID) ([]*ent.GithubMilestoneLink, error)
+	// OtherMilestoneLinks says whether the milestone is linked to a GitHub milestone but this one.
+	OtherMilestoneLinks(ctx context.Context, milestone, link uuid.UUID) (bool, error)
+	AddMilestoneLink(ctx context.Context, milestone, repoSync uuid.UUID, githubID int64, number int, url string, updatedAt time.Time) error
+	// TouchMilestoneLink notes the GitHub milestone's last change, if it is later than the one known.
+	TouchMilestoneLink(ctx context.Context, id uuid.UUID, updatedAt time.Time) error
+	DeleteMilestoneLink(ctx context.Context, id uuid.UUID) error
+	// MilestoneSyncsDue is up to limit syncs whose milestones weren't read from GitHub in the last ten
+	// minutes, of installations that aren't suspended, the longest waiting first.
+	MilestoneSyncsDue(ctx context.Context, limit int) ([]*ent.GithubRepoSync, error)
+	MarkMilestonesSynced(ctx context.Context, id uuid.UUID) error
+	// TeamSyncsFields says whether the team syncs priority, estimate, due date and cycle with GitHub's
+	// issue fields.
+	TeamSyncsFields(ctx context.Context, team uuid.UUID) (bool, error)
+	// LockNewIssues waits for the sync's issues being opened on GitHub to be linked, until tx ends.
+	LockNewIssues(ctx context.Context, tx repository.TxInterface, repoSync uuid.UUID) error
+	// IssueLinked says whether the issue is linked to a GitHub issue.
+	IssueLinked(ctx context.Context, tx repository.TxInterface, issue uuid.UUID) (bool, error)
 	// DueOutbox is up to 50 queued changes due now, of installations that aren't suspended, oldest
 	// first.
 	DueOutbox(ctx context.Context) ([]OutboxEntry, error)

@@ -8,6 +8,8 @@ import (
 	"slices"
 	"time"
 
+	"github.com/google/uuid"
+
 	"ricrac/ent"
 	"ricrac/internal/integrations/github"
 	"ricrac/internal/models"
@@ -26,7 +28,11 @@ func (self *GitHubService) GitHubJobs(ctx context.Context) (bool, error) {
 		return false, err
 	}
 	more, err := self.runBackfills(ctx)
-	return more || pushed > 0, err
+	if err != nil {
+		return false, err
+	}
+	moreMilestones, err := self.syncMilestones(ctx)
+	return more || moreMilestones || pushed > 0, err
 }
 
 // pushChanges sends the queued changes that are due, answering how many it tried.
@@ -70,6 +76,12 @@ func (self *GitHubService) pushEntry(ctx context.Context, entry github_repo.Outb
 		return self.pushCommentEdit(ctx, token, entry)
 	case "comment_deleted":
 		return self.pushCommentDeletion(ctx, token, entry)
+	case "milestone":
+		return self.pushMilestone(ctx, token, entry)
+	case "milestone_deleted":
+		return self.pushMilestoneDeletion(ctx, token, entry)
+	case "issue_created":
+		return self.pushNewIssue(ctx, token, entry)
 	}
 	return nil
 }
@@ -95,11 +107,7 @@ func (self *GitHubService) pushLinkBack(ctx context.Context, token string, entry
 // fillRicracField puts the link in the organization's Ricrac issue field, false when it has none
 // or the app can't use it.
 func (self *GitHubService) fillRicracField(ctx context.Context, token string, entry github_repo.OutboxEntry, link string) (bool, error) {
-	var fields []github.IssueField
-	_, err := self.app.Do(ctx, token, http.MethodGet, github.IssueFieldsPath(entry.FullName), nil, &fields)
-	if github.IsUnavailable(err) {
-		return false, nil
-	}
+	fields, err := self.orgFields(ctx, token, entry.FullName)
 	if err != nil {
 		return false, err
 	}
@@ -108,7 +116,7 @@ func (self *GitHubService) fillRicracField(ctx context.Context, token string, en
 		return false, nil
 	}
 	values := M{"issue_field_values": []M{{"field_id": field.ID, "value": link}}}
-	_, err = self.app.Do(ctx, token, http.MethodPost, github.IssuePath(entry.FullName, entry.Number)+"/issue-field-values", values, nil)
+	_, err = self.app.Do(ctx, token, http.MethodPost, github.IssueFieldValuesPath(entry.FullName, entry.Number), values, nil)
 	if github.IsUnavailable(err) {
 		return false, nil
 	}
@@ -199,6 +207,16 @@ func (self *GitHubService) pushCommentDeletion(ctx context.Context, token string
 		return nil
 	}
 	return err
+}
+
+// milestoneNumber is the number of the GitHub milestone of a Ricrac milestone id in the entry's
+// repository, nil for none.
+func (self *GitHubService) milestoneNumber(ctx context.Context, token string, entry github_repo.OutboxEntry, id string) (*int, error) {
+	milestone, err := uuid.Parse(id)
+	if err != nil {
+		return nil, nil
+	}
+	return self.gitHubMilestone(ctx, token, entry, milestone)
 }
 
 // gitHubState is how a status type reads on GitHub: open, or closed as completed or not planned.
@@ -301,7 +319,15 @@ func (self *GitHubService) pushIssue(ctx context.Context, token string, entry gi
 		}
 	}
 	path := github.IssuePath(entry.FullName, entry.Number)
-	if patch := issuePatch(changes, issue.Title, issue.Description, duplicateOf); len(patch) > 0 {
+	patch := issuePatch(changes, issue.Title, issue.Description, duplicateOf)
+	if _, to, ok := change(changes, "projectMilestone"); ok {
+		number, err := self.milestoneNumber(ctx, token, entry, refField(to, "id"))
+		if err != nil {
+			return err
+		}
+		patch["milestone"] = number
+	}
+	if len(patch) > 0 {
 		var updated github.Issue
 		if _, err := self.app.Do(ctx, token, http.MethodPatch, path, patch, &updated); err != nil {
 			return err
@@ -323,6 +349,9 @@ func (self *GitHubService) pushIssue(ctx context.Context, token string, entry gi
 				return err
 			}
 		}
+	}
+	if err := self.pushIssueFields(ctx, token, entry, changes); err != nil {
+		return err
 	}
 	if from, to, ok := change(changes, "assignee"); ok {
 		for _, step := range []struct {

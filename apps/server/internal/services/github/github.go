@@ -1,7 +1,7 @@
 // Package github_service is GitHub, as a GitHub App: admins install it on their GitHub account or
 // organization and pick repositories. Pull requests, branches and commits that mention
 // identifiers link to issues and move them (webhook.go); repositories bound to a team sync their
-// issues and comments both ways (sync.go, push.go).
+// issues, comments and milestones both ways (sync.go, push.go, milestones.go).
 package github_service
 
 import (
@@ -19,6 +19,7 @@ import (
 	comment_service "ricrac/internal/services/comment"
 	events_service "ricrac/internal/services/events"
 	issue_service "ricrac/internal/services/issue"
+	milestone_service "ricrac/internal/services/milestone"
 	resolve_service "ricrac/internal/services/resolve"
 )
 
@@ -36,16 +37,18 @@ type GitHubService struct {
 	issues      issue_service.IssueServiceInterface
 	comments    comment_service.CommentServiceInterface
 	attachments attachment_service.AttachmentServiceInterface
+	milestones  milestone_service.MilestoneServiceInterface
 	waker       events_service.Waker
 }
 
 // NewGitHubService acts as the GitHub App of cfg, none when cfg has none.
 func NewGitHubService(cfg config.Config, keys auth.Keys, repo repositories.RepositoriesInterface, access access_service.AccessServiceInterface,
 	resolve resolve_service.ResolveServiceInterface, events events_service.EventsServiceInterface, issues issue_service.IssueServiceInterface,
-	comments comment_service.CommentServiceInterface, attachments attachment_service.AttachmentServiceInterface, waker events_service.Waker) *GitHubService {
+	comments comment_service.CommentServiceInterface, attachments attachment_service.AttachmentServiceInterface,
+	milestones milestone_service.MilestoneServiceInterface, waker events_service.Waker) *GitHubService {
 	service := &GitHubService{
 		cfg: cfg, keys: keys, repo: repo, access: access, resolve: resolve, events: events, issues: issues, comments: comments,
-		attachments: attachments, waker: waker,
+		attachments: attachments, milestones: milestones, waker: waker,
 	}
 	if cfg.GitHub != nil {
 		service.app = github.NewApp(*cfg.GitHub, &http.Client{Timeout: 30 * time.Second})

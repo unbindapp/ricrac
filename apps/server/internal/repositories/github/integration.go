@@ -120,13 +120,21 @@ func (self *GitHubRepository) CreateRepoSync(ctx context.Context, input NewRepoS
 	return created.ID, nil
 }
 
-// ChangeRepoSync moves a sync to team when given and, when setProject, to project.
-func (self *GitHubRepository) ChangeRepoSync(ctx context.Context, id uuid.UUID, team *uuid.UUID, setProject bool, project *uuid.UUID, linkBack *bool) error {
-	update := self.base.DB.GithubRepoSync.Update().Where(githubreposync.ID(id)).SetNillableTeamID(team).SetNillableLinkBack(linkBack).
+// RepoSyncChange is what changes on a sync; nil fields stay, the project only when SetProject.
+type RepoSyncChange struct {
+	Team       *uuid.UUID
+	SetProject bool
+	Project    *uuid.UUID
+	LinkBack   *bool
+}
+
+func (self *GitHubRepository) ChangeRepoSync(ctx context.Context, id uuid.UUID, change RepoSyncChange) error {
+	update := self.base.DB.GithubRepoSync.Update().Where(githubreposync.ID(id)).SetNillableTeamID(change.Team).
+		SetNillableLinkBack(change.LinkBack).
 		Modify(func(u *entsql.UpdateBuilder) { u.Set(githubreposync.FieldUpdatedAt, now()) })
-	if setProject {
-		update.SetNillableProjectID(project)
-		if project == nil {
+	if change.SetProject {
+		update.SetNillableProjectID(change.Project)
+		if change.Project == nil {
 			update.ClearProjectID()
 		}
 	}

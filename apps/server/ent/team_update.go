@@ -922,6 +922,46 @@ func (_u *TeamUpdate) ClearGithubPrMergedStateID() *TeamUpdate {
 	return _u
 }
 
+// SetGithubOpenIssues sets the "github_open_issues" field.
+func (_u *TeamUpdate) SetGithubOpenIssues(v bool) *TeamUpdate {
+	_u.mutation.SetGithubOpenIssues(v)
+	return _u
+}
+
+// SetNillableGithubOpenIssues sets the "github_open_issues" field if the given value is not nil.
+func (_u *TeamUpdate) SetNillableGithubOpenIssues(v *bool) *TeamUpdate {
+	if v != nil {
+		_u.SetGithubOpenIssues(*v)
+	}
+	return _u
+}
+
+// ClearGithubOpenIssues clears the value of the "github_open_issues" field.
+func (_u *TeamUpdate) ClearGithubOpenIssues() *TeamUpdate {
+	_u.mutation.ClearGithubOpenIssues()
+	return _u
+}
+
+// SetGithubSyncFields sets the "github_sync_fields" field.
+func (_u *TeamUpdate) SetGithubSyncFields(v bool) *TeamUpdate {
+	_u.mutation.SetGithubSyncFields(v)
+	return _u
+}
+
+// SetNillableGithubSyncFields sets the "github_sync_fields" field if the given value is not nil.
+func (_u *TeamUpdate) SetNillableGithubSyncFields(v *bool) *TeamUpdate {
+	if v != nil {
+		_u.SetGithubSyncFields(*v)
+	}
+	return _u
+}
+
+// ClearGithubSyncFields clears the value of the "github_sync_fields" field.
+func (_u *TeamUpdate) ClearGithubSyncFields() *TeamUpdate {
+	_u.mutation.ClearGithubSyncFields()
+	return _u
+}
+
 // SetPreviousKeys sets the "previous_keys" field.
 func (_u *TeamUpdate) SetPreviousKeys(v pgarray.Text) *TeamUpdate {
 	_u.mutation.SetPreviousKeys(v)
@@ -1858,6 +1898,18 @@ func (_u *TeamUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(team.FieldUpdatedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.GithubOpenIssues(); ok {
+		_spec.SetField(team.FieldGithubOpenIssues, field.TypeBool, value)
+	}
+	if _u.mutation.GithubOpenIssuesCleared() {
+		_spec.ClearField(team.FieldGithubOpenIssues, field.TypeBool)
+	}
+	if value, ok := _u.mutation.GithubSyncFields(); ok {
+		_spec.SetField(team.FieldGithubSyncFields, field.TypeBool, value)
+	}
+	if _u.mutation.GithubSyncFieldsCleared() {
+		_spec.ClearField(team.FieldGithubSyncFields, field.TypeBool)
 	}
 	if value, ok := _u.mutation.PreviousKeys(); ok {
 		_spec.SetField(team.FieldPreviousKeys, field.TypeOther, value)
@@ -3625,6 +3677,46 @@ func (_u *TeamUpdateOne) ClearGithubPrMergedStateID() *TeamUpdateOne {
 	return _u
 }
 
+// SetGithubOpenIssues sets the "github_open_issues" field.
+func (_u *TeamUpdateOne) SetGithubOpenIssues(v bool) *TeamUpdateOne {
+	_u.mutation.SetGithubOpenIssues(v)
+	return _u
+}
+
+// SetNillableGithubOpenIssues sets the "github_open_issues" field if the given value is not nil.
+func (_u *TeamUpdateOne) SetNillableGithubOpenIssues(v *bool) *TeamUpdateOne {
+	if v != nil {
+		_u.SetGithubOpenIssues(*v)
+	}
+	return _u
+}
+
+// ClearGithubOpenIssues clears the value of the "github_open_issues" field.
+func (_u *TeamUpdateOne) ClearGithubOpenIssues() *TeamUpdateOne {
+	_u.mutation.ClearGithubOpenIssues()
+	return _u
+}
+
+// SetGithubSyncFields sets the "github_sync_fields" field.
+func (_u *TeamUpdateOne) SetGithubSyncFields(v bool) *TeamUpdateOne {
+	_u.mutation.SetGithubSyncFields(v)
+	return _u
+}
+
+// SetNillableGithubSyncFields sets the "github_sync_fields" field if the given value is not nil.
+func (_u *TeamUpdateOne) SetNillableGithubSyncFields(v *bool) *TeamUpdateOne {
+	if v != nil {
+		_u.SetGithubSyncFields(*v)
+	}
+	return _u
+}
+
+// ClearGithubSyncFields clears the value of the "github_sync_fields" field.
+func (_u *TeamUpdateOne) ClearGithubSyncFields() *TeamUpdateOne {
+	_u.mutation.ClearGithubSyncFields()
+	return _u
+}
+
 // SetPreviousKeys sets the "previous_keys" field.
 func (_u *TeamUpdateOne) SetPreviousKeys(v pgarray.Text) *TeamUpdateOne {
 	_u.mutation.SetPreviousKeys(v)
@@ -4591,6 +4683,18 @@ func (_u *TeamUpdateOne) sqlSave(ctx context.Context) (_node *Team, err error) {
 	}
 	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(team.FieldUpdatedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.GithubOpenIssues(); ok {
+		_spec.SetField(team.FieldGithubOpenIssues, field.TypeBool, value)
+	}
+	if _u.mutation.GithubOpenIssuesCleared() {
+		_spec.ClearField(team.FieldGithubOpenIssues, field.TypeBool)
+	}
+	if value, ok := _u.mutation.GithubSyncFields(); ok {
+		_spec.SetField(team.FieldGithubSyncFields, field.TypeBool, value)
+	}
+	if _u.mutation.GithubSyncFieldsCleared() {
+		_spec.ClearField(team.FieldGithubSyncFields, field.TypeBool)
 	}
 	if value, ok := _u.mutation.PreviousKeys(); ok {
 		_spec.SetField(team.FieldPreviousKeys, field.TypeOther, value)

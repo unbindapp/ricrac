@@ -8,10 +8,13 @@ import (
 	"fmt"
 	"math"
 	"ricrac/ent/comment"
+	"ricrac/ent/githubmilestonelink"
+	"ricrac/ent/githuboutbox"
 	"ricrac/ent/issue"
 	"ricrac/ent/predicate"
 	"ricrac/ent/project"
 	"ricrac/ent/projectmilestone"
+	"ricrac/ent/workspace"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -24,14 +27,17 @@ import (
 // ProjectMilestoneQuery is the builder for querying ProjectMilestone entities.
 type ProjectMilestoneQuery struct {
 	config
-	ctx          *QueryContext
-	order        []projectmilestone.OrderOption
-	inters       []Interceptor
-	predicates   []predicate.ProjectMilestone
-	withProject  *ProjectQuery
-	withIssues   *IssueQuery
-	withComments *CommentQuery
-	modifiers    []func(*sql.Selector)
+	ctx                      *QueryContext
+	order                    []projectmilestone.OrderOption
+	inters                   []Interceptor
+	predicates               []predicate.ProjectMilestone
+	withWorkspace            *WorkspaceQuery
+	withProject              *ProjectQuery
+	withIssues               *IssueQuery
+	withComments             *CommentQuery
+	withGithubMilestoneLinks *GithubMilestoneLinkQuery
+	withGithubOutbox         *GithubOutboxQuery
+	modifiers                []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -66,6 +72,28 @@ func (_q *ProjectMilestoneQuery) Unique(unique bool) *ProjectMilestoneQuery {
 func (_q *ProjectMilestoneQuery) Order(o ...projectmilestone.OrderOption) *ProjectMilestoneQuery {
 	_q.order = append(_q.order, o...)
 	return _q
+}
+
+// QueryWorkspace chains the current query on the "workspace" edge.
+func (_q *ProjectMilestoneQuery) QueryWorkspace() *WorkspaceQuery {
+	query := (&WorkspaceClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(projectmilestone.Table, projectmilestone.FieldID, selector),
+			sqlgraph.To(workspace.Table, workspace.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, projectmilestone.WorkspaceTable, projectmilestone.WorkspaceColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // QueryProject chains the current query on the "project" edge.
@@ -127,6 +155,50 @@ func (_q *ProjectMilestoneQuery) QueryComments() *CommentQuery {
 			sqlgraph.From(projectmilestone.Table, projectmilestone.FieldID, selector),
 			sqlgraph.To(comment.Table, comment.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, projectmilestone.CommentsTable, projectmilestone.CommentsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryGithubMilestoneLinks chains the current query on the "github_milestone_links" edge.
+func (_q *ProjectMilestoneQuery) QueryGithubMilestoneLinks() *GithubMilestoneLinkQuery {
+	query := (&GithubMilestoneLinkClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(projectmilestone.Table, projectmilestone.FieldID, selector),
+			sqlgraph.To(githubmilestonelink.Table, githubmilestonelink.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, projectmilestone.GithubMilestoneLinksTable, projectmilestone.GithubMilestoneLinksColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryGithubOutbox chains the current query on the "github_outbox" edge.
+func (_q *ProjectMilestoneQuery) QueryGithubOutbox() *GithubOutboxQuery {
+	query := (&GithubOutboxClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(projectmilestone.Table, projectmilestone.FieldID, selector),
+			sqlgraph.To(githuboutbox.Table, githuboutbox.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, projectmilestone.GithubOutboxTable, projectmilestone.GithubOutboxColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -321,19 +393,33 @@ func (_q *ProjectMilestoneQuery) Clone() *ProjectMilestoneQuery {
 		return nil
 	}
 	return &ProjectMilestoneQuery{
-		config:       _q.config,
-		ctx:          _q.ctx.Clone(),
-		order:        append([]projectmilestone.OrderOption{}, _q.order...),
-		inters:       append([]Interceptor{}, _q.inters...),
-		predicates:   append([]predicate.ProjectMilestone{}, _q.predicates...),
-		withProject:  _q.withProject.Clone(),
-		withIssues:   _q.withIssues.Clone(),
-		withComments: _q.withComments.Clone(),
+		config:                   _q.config,
+		ctx:                      _q.ctx.Clone(),
+		order:                    append([]projectmilestone.OrderOption{}, _q.order...),
+		inters:                   append([]Interceptor{}, _q.inters...),
+		predicates:               append([]predicate.ProjectMilestone{}, _q.predicates...),
+		withWorkspace:            _q.withWorkspace.Clone(),
+		withProject:              _q.withProject.Clone(),
+		withIssues:               _q.withIssues.Clone(),
+		withComments:             _q.withComments.Clone(),
+		withGithubMilestoneLinks: _q.withGithubMilestoneLinks.Clone(),
+		withGithubOutbox:         _q.withGithubOutbox.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
 		path:      _q.path,
 		modifiers: append([]func(*sql.Selector){}, _q.modifiers...),
 	}
+}
+
+// WithWorkspace tells the query-builder to eager-load the nodes that are connected to
+// the "workspace" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ProjectMilestoneQuery) WithWorkspace(opts ...func(*WorkspaceQuery)) *ProjectMilestoneQuery {
+	query := (&WorkspaceClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withWorkspace = query
+	return _q
 }
 
 // WithProject tells the query-builder to eager-load the nodes that are connected to
@@ -369,18 +455,40 @@ func (_q *ProjectMilestoneQuery) WithComments(opts ...func(*CommentQuery)) *Proj
 	return _q
 }
 
+// WithGithubMilestoneLinks tells the query-builder to eager-load the nodes that are connected to
+// the "github_milestone_links" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ProjectMilestoneQuery) WithGithubMilestoneLinks(opts ...func(*GithubMilestoneLinkQuery)) *ProjectMilestoneQuery {
+	query := (&GithubMilestoneLinkClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withGithubMilestoneLinks = query
+	return _q
+}
+
+// WithGithubOutbox tells the query-builder to eager-load the nodes that are connected to
+// the "github_outbox" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ProjectMilestoneQuery) WithGithubOutbox(opts ...func(*GithubOutboxQuery)) *ProjectMilestoneQuery {
+	query := (&GithubOutboxClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withGithubOutbox = query
+	return _q
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
 // Example:
 //
 //	var v []struct {
-//		ProjectID uuid.UUID `json:"project_id,omitempty"`
+//		WorkspaceID uuid.UUID `json:"workspace_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ProjectMilestone.Query().
-//		GroupBy(projectmilestone.FieldProjectID).
+//		GroupBy(projectmilestone.FieldWorkspaceID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *ProjectMilestoneQuery) GroupBy(field string, fields ...string) *ProjectMilestoneGroupBy {
@@ -398,11 +506,11 @@ func (_q *ProjectMilestoneQuery) GroupBy(field string, fields ...string) *Projec
 // Example:
 //
 //	var v []struct {
-//		ProjectID uuid.UUID `json:"project_id,omitempty"`
+//		WorkspaceID uuid.UUID `json:"workspace_id,omitempty"`
 //	}
 //
 //	client.ProjectMilestone.Query().
-//		Select(projectmilestone.FieldProjectID).
+//		Select(projectmilestone.FieldWorkspaceID).
 //		Scan(ctx, &v)
 func (_q *ProjectMilestoneQuery) Select(fields ...string) *ProjectMilestoneSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
@@ -447,10 +555,13 @@ func (_q *ProjectMilestoneQuery) sqlAll(ctx context.Context, hooks ...queryHook)
 	var (
 		nodes       = []*ProjectMilestone{}
 		_spec       = _q.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [6]bool{
+			_q.withWorkspace != nil,
 			_q.withProject != nil,
 			_q.withIssues != nil,
 			_q.withComments != nil,
+			_q.withGithubMilestoneLinks != nil,
+			_q.withGithubOutbox != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -474,6 +585,12 @@ func (_q *ProjectMilestoneQuery) sqlAll(ctx context.Context, hooks ...queryHook)
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := _q.withWorkspace; query != nil {
+		if err := _q.loadWorkspace(ctx, query, nodes, nil,
+			func(n *ProjectMilestone, e *Workspace) { n.Edges.Workspace = e }); err != nil {
+			return nil, err
+		}
+	}
 	if query := _q.withProject; query != nil {
 		if err := _q.loadProject(ctx, query, nodes, nil,
 			func(n *ProjectMilestone, e *Project) { n.Edges.Project = e }); err != nil {
@@ -494,14 +611,62 @@ func (_q *ProjectMilestoneQuery) sqlAll(ctx context.Context, hooks ...queryHook)
 			return nil, err
 		}
 	}
+	if query := _q.withGithubMilestoneLinks; query != nil {
+		if err := _q.loadGithubMilestoneLinks(ctx, query, nodes,
+			func(n *ProjectMilestone) { n.Edges.GithubMilestoneLinks = []*GithubMilestoneLink{} },
+			func(n *ProjectMilestone, e *GithubMilestoneLink) {
+				n.Edges.GithubMilestoneLinks = append(n.Edges.GithubMilestoneLinks, e)
+			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withGithubOutbox; query != nil {
+		if err := _q.loadGithubOutbox(ctx, query, nodes,
+			func(n *ProjectMilestone) { n.Edges.GithubOutbox = []*GithubOutbox{} },
+			func(n *ProjectMilestone, e *GithubOutbox) { n.Edges.GithubOutbox = append(n.Edges.GithubOutbox, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
+func (_q *ProjectMilestoneQuery) loadWorkspace(ctx context.Context, query *WorkspaceQuery, nodes []*ProjectMilestone, init func(*ProjectMilestone), assign func(*ProjectMilestone, *Workspace)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*ProjectMilestone)
+	for i := range nodes {
+		fk := nodes[i].WorkspaceID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(workspace.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "workspace_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 func (_q *ProjectMilestoneQuery) loadProject(ctx context.Context, query *ProjectQuery, nodes []*ProjectMilestone, init func(*ProjectMilestone), assign func(*ProjectMilestone, *Project)) error {
 	ids := make([]uuid.UUID, 0, len(nodes))
 	nodeids := make(map[uuid.UUID][]*ProjectMilestone)
 	for i := range nodes {
-		fk := nodes[i].ProjectID
+		if nodes[i].ProjectID == nil {
+			continue
+		}
+		fk := *nodes[i].ProjectID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -592,6 +757,69 @@ func (_q *ProjectMilestoneQuery) loadComments(ctx context.Context, query *Commen
 	}
 	return nil
 }
+func (_q *ProjectMilestoneQuery) loadGithubMilestoneLinks(ctx context.Context, query *GithubMilestoneLinkQuery, nodes []*ProjectMilestone, init func(*ProjectMilestone), assign func(*ProjectMilestone, *GithubMilestoneLink)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*ProjectMilestone)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(githubmilestonelink.FieldMilestoneID)
+	}
+	query.Where(predicate.GithubMilestoneLink(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(projectmilestone.GithubMilestoneLinksColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.MilestoneID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "milestone_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *ProjectMilestoneQuery) loadGithubOutbox(ctx context.Context, query *GithubOutboxQuery, nodes []*ProjectMilestone, init func(*ProjectMilestone), assign func(*ProjectMilestone, *GithubOutbox)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*ProjectMilestone)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(githuboutbox.FieldMilestoneID)
+	}
+	query.Where(predicate.GithubOutbox(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(projectmilestone.GithubOutboxColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.MilestoneID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "milestone_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "milestone_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
 
 func (_q *ProjectMilestoneQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := _q.querySpec()
@@ -620,6 +848,9 @@ func (_q *ProjectMilestoneQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != projectmilestone.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if _q.withWorkspace != nil {
+			_spec.Node.AddColumnOnce(projectmilestone.FieldWorkspaceID)
 		}
 		if _q.withProject != nil {
 			_spec.Node.AddColumnOnce(projectmilestone.FieldProjectID)

@@ -408,6 +408,9 @@ func (self *CommentService) about(ctx context.Context, tx repository.TxInterface
 			return about{}, err
 		}
 		project := milestone.Edges.Project
+		if project == nil {
+			return about{projectKinds, milestone.Name, events_service.Notice{}, nil}, nil
+		}
 		return about{projectKinds, milestone.Name + " (" + project.Name + ")", events_service.Notice{Project: &project.ID}, nil}, nil
 	case "initiative_id":
 		name, err := self.repo.Comment().InitiativeName(ctx, tx, id)

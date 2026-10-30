@@ -105,6 +105,10 @@ type Team struct {
 	GithubPrOpenedStateID *uuid.UUID `json:"github_pr_opened_state_id,omitempty"`
 	// GithubPrMergedStateID holds the value of the "github_pr_merged_state_id" field.
 	GithubPrMergedStateID *uuid.UUID `json:"github_pr_merged_state_id,omitempty"`
+	// GithubOpenIssues holds the value of the "github_open_issues" field.
+	GithubOpenIssues bool `json:"github_open_issues,omitempty"`
+	// GithubSyncFields holds the value of the "github_sync_fields" field.
+	GithubSyncFields bool `json:"github_sync_fields,omitempty"`
 	// PreviousKeys holds the value of the "previous_keys" field.
 	PreviousKeys pgarray.Text `json:"previous_keys,omitempty"`
 	// PreviousNames holds the value of the "previous_names" field.
@@ -411,7 +415,7 @@ func (*Team) scanValues(columns []string) ([]any, error) {
 			values[i] = new(pgarray.Text)
 		case team.FieldTriageResponsibleIds, team.FieldMergedTeamIds:
 			values[i] = new(pgarray.UUID)
-		case team.FieldPrivate, team.FieldEstimateAllowZero, team.FieldEstimateExtended, team.FieldCyclesEnabled, team.FieldCycleAutoAddStarted, team.FieldCycleAutoAddCompleted, team.FieldCycleRollover, team.FieldTriageEnabled, team.FieldRequirePriorityToLeaveTriage, team.FieldAutoCloseParentIssues, team.FieldAutoCloseChildIssues:
+		case team.FieldPrivate, team.FieldEstimateAllowZero, team.FieldEstimateExtended, team.FieldCyclesEnabled, team.FieldCycleAutoAddStarted, team.FieldCycleAutoAddCompleted, team.FieldCycleRollover, team.FieldTriageEnabled, team.FieldRequirePriorityToLeaveTriage, team.FieldAutoCloseParentIssues, team.FieldAutoCloseChildIssues, team.FieldGithubOpenIssues, team.FieldGithubSyncFields:
 			values[i] = new(sql.NullBool)
 		case team.FieldDefaultEstimate:
 			values[i] = new(sql.NullFloat64)
@@ -712,6 +716,18 @@ func (_m *Team) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.GithubPrMergedStateID = new(uuid.UUID)
 				*_m.GithubPrMergedStateID = *value.S.(*uuid.UUID)
+			}
+		case team.FieldGithubOpenIssues:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field github_open_issues", values[i])
+			} else if value.Valid {
+				_m.GithubOpenIssues = value.Bool
+			}
+		case team.FieldGithubSyncFields:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field github_sync_fields", values[i])
+			} else if value.Valid {
+				_m.GithubSyncFields = value.Bool
 			}
 		case team.FieldPreviousKeys:
 			if value, ok := values[i].(*pgarray.Text); !ok {
@@ -1046,6 +1062,12 @@ func (_m *Team) String() string {
 		builder.WriteString("github_pr_merged_state_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
+	builder.WriteString(", ")
+	builder.WriteString("github_open_issues=")
+	builder.WriteString(fmt.Sprintf("%v", _m.GithubOpenIssues))
+	builder.WriteString(", ")
+	builder.WriteString("github_sync_fields=")
+	builder.WriteString(fmt.Sprintf("%v", _m.GithubSyncFields))
 	builder.WriteString(", ")
 	builder.WriteString("previous_keys=")
 	builder.WriteString(fmt.Sprintf("%v", _m.PreviousKeys))
