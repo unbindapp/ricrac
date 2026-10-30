@@ -1,5 +1,6 @@
 import type * as Account from "@/api/account.gen";
 import type { OpName, Ops, PageInfo } from "@/api/ops.gen";
+import { parseAssistantEvents, type TAssistantEvent } from "@/lib/server/assistant-events";
 
 export class ApiError extends Error {
   status: number;
@@ -11,6 +12,16 @@ export class ApiError extends Error {
 }
 
 type Method = "GET" | "POST" | "PATCH" | "DELETE";
+
+const UNREACHABLE = "Couldn't reach Ricrac. Try again in a moment.";
+
+async function responseError(response: Response) {
+  const data = await response.json().catch(() => undefined);
+  return new ApiError(
+    response.status,
+    typeof data?.error === "string" ? data.error : response.statusText,
+  );
+}
 
 type Options = {
   body?: unknown;
@@ -38,14 +49,48 @@ export async function request<T>(
       credentials: "same-origin",
     });
   } catch {
-    throw new ApiError(0, "Couldn't reach Ricrac. Try again in a moment.");
+    throw new ApiError(0, UNREACHABLE);
   }
-  const data = await response.json().catch(() => undefined);
-  if (response.ok) return data as T;
-  throw new ApiError(
-    response.status,
-    typeof data?.error === "string" ? data.error : response.statusText,
-  );
+  if (!response.ok) throw await responseError(response);
+  return (await response.json().catch(() => undefined)) as T;
+}
+
+/** Asks Claude in a workspace, calling onEvent with each event of the answer as it streams in. */
+async function askAssistant(
+  workspace: string,
+  body: Account.AskInput,
+  onEvent: (event: TAssistantEvent) => void,
+  signal: AbortSignal,
+) {
+  let response: Response;
+  try {
+    response = await fetch("/api/assistant", {
+      method: "POST",
+      headers: {
+        accept: "text/event-stream",
+        "content-type": "application/json",
+        "x-ricrac": "1",
+        "x-ricrac-workspace": workspace,
+      },
+      body: JSON.stringify(body),
+      credentials: "same-origin",
+      signal,
+    });
+  } catch (error) {
+    if (signal.aborted) throw error;
+    throw new ApiError(0, UNREACHABLE);
+  }
+  if (!response.ok || !response.body) throw await responseError(response);
+
+  const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+  let rest = "";
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) return;
+    const parsed = parseAssistantEvents(rest + value);
+    rest = parsed.rest;
+    parsed.events.forEach(onEvent);
+  }
 }
 
 export type OpArgs<N extends OpName> = Ops[N]["args"];
@@ -126,4 +171,9 @@ export const account = {
     request<Account.OAuthClientInfo>("GET", `/api/oauth/client?${query}`),
   oauthDecide: (body: Account.OAuthDecision) =>
     request<Account.OAuthRedirect>("POST", "/api/oauth/decide", { body }),
+  askAssistant,
+  assistantSettings: (workspace: string) =>
+    request<Account.AssistantSettings>("GET", "/api/assistant/settings", { workspace }),
+  saveAssistantSettings: (workspace: string, body: Account.AssistantSettingsInput) =>
+    request<Account.AssistantSettings>("PATCH", "/api/assistant/settings", { body, workspace }),
 };

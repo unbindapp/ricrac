@@ -3,6 +3,7 @@ import { type LinkProps, useNavigate } from "@tanstack/react-router";
 import { useTheme } from "next-themes";
 import { ReactNode, useState } from "react";
 
+import { useIsAssistantAvailable } from "@/components/assistant/use-assistant-available";
 import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
 import { ShortcutKeys } from "@/components/command-panel/shortcut-keys";
 import { ShortcutsDialog } from "@/components/command-panel/shortcuts-dialog";
@@ -22,6 +23,7 @@ import {
   MoonIcon,
   RefreshCwIcon,
   SettingsIcon,
+  SparklesIcon,
   SquarePenIcon,
   SunIcon,
   TargetIcon,
@@ -53,6 +55,7 @@ import { GO_TO_KEYS } from "@/lib/hotkeys/shortcuts";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 import { useHotkeySequenceScope } from "@/lib/hotkeys/use-hotkey-sequences";
 import { meQuery, signOut } from "@/lib/queries/me";
+import { useAssistantStore } from "@/lib/stores/assistant";
 
 type TShortcutDestination = keyof typeof GO_TO_KEYS;
 type TDestination = TShortcutDestination | "cycles" | "milestones";
@@ -197,6 +200,8 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
   const openNewProject = useNewProjectStore((state) => state.open);
   const openInvite = useInviteStore((state) => state.setOpen);
   const setShortcutsOpen = useCommandPanelStore((state) => state.setShortcutsOpen);
+  const isAssistantAvailable = useIsAssistantAvailable();
+  const openAssistant = useAssistantStore((state) => state.setOpen);
   const destinations = useDestinations();
   const search = useSearch(query);
 
@@ -232,6 +237,18 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
           icon: <UserPlusIcon />,
           keywords: ["member", "teammate", "add", "email"],
           run: run(() => openInvite(true)),
+        },
+      ]
+    : [];
+
+  const assistant: TAction[] = isAssistantAvailable
+    ? [
+        {
+          id: "ask-claude",
+          label: "Ask Claude",
+          icon: <SparklesIcon />,
+          keywords: ["assistant", "ai", "chat", "question"],
+          run: run(() => openAssistant(true)),
         },
       ]
     : [];
@@ -313,6 +330,7 @@ function CommandPanelContent({ onDone }: { onDone: () => void }) {
           )}
           <SearchHitGroups hits={search.hits} query={query} onOpen={go} />
           <ActionGroup heading="Create" actions={create} />
+          <ActionGroup heading="Claude" actions={assistant} />
           <ActionGroup heading="Go to" actions={goTo} />
           <ActionGroup heading="Workspaces" actions={workspaces} />
           <ActionGroup heading="Preferences" actions={preferences} />

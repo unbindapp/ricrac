@@ -8,6 +8,7 @@ import (
 	"ricrac/internal/repositories/repositories"
 	access_service "ricrac/internal/services/access"
 	account_service "ricrac/internal/services/account"
+	assistant_service "ricrac/internal/services/assistant"
 	attachment_service "ricrac/internal/services/attachment"
 	automation_service "ricrac/internal/services/automation"
 	comment_service "ricrac/internal/services/comment"
@@ -43,12 +44,13 @@ import (
 // New wires the services on the database. waker wakes the background senders.
 func New(cfg config.Config, db *ent.Client, waker events_service.Waker) *Server {
 	repo := repositories.NewRepositories(db)
+	keys := auth.NewKeys(cfg)
 	srv := &Server{
 		Cfg:            cfg,
-		Keys:           auth.NewKeys(cfg),
+		Keys:           keys,
 		Repository:     repo,
 		Ops:            &opcall.Late{},
-		AccessService:  access_service.NewAccessService(cfg, repo),
+		AccessService:  access_service.NewAccessService(cfg, keys, repo),
 		ResolveService: resolve_service.NewResolveService(repo),
 		EventsService:  events_service.NewEventsService(repo, waker),
 	}
@@ -70,6 +72,7 @@ func New(cfg config.Config, db *ent.Client, waker events_service.Waker) *Server 
 	srv.CycleService = cycle_service.NewCycleService(cfg, repo, srv.ResolveService, srv.EventsService)
 	srv.DocumentService = document_service.NewDocumentService(cfg, repo, srv.ResolveService, srv.EventsService)
 	srv.DiscussionService = discussion_service.NewDiscussionService(cfg, repo, srv.ResolveService, srv.EventsService)
+	srv.AssistantService = assistant_service.NewAssistantService(cfg, keys, repo, srv.WorkspaceService, srv.DocumentService, srv.EventsService)
 	srv.FavoriteService = favorite_service.NewFavoriteService(repo, srv.ResolveService)
 	srv.TemplateService = template_service.NewTemplateService(repo, srv.ResolveService, srv.EventsService, srv.AccessService, srv.Ops)
 	srv.CustomerService = customer_service.NewCustomerService(repo, srv.ResolveService, srv.EventsService)

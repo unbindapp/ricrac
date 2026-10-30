@@ -16,11 +16,12 @@ import (
 //go:generate go run -mod=mod github.com/vburenin/ifacemaker -f "*.go" -i AccessServiceInterface -p access_service -s AccessService -o access_service_iface.go
 type AccessService struct {
 	cfg  config.Config
+	keys auth.Keys
 	repo repositories.RepositoriesInterface
 }
 
-func NewAccessService(cfg config.Config, repo repositories.RepositoriesInterface) *AccessService {
-	return &AccessService{cfg: cfg, repo: repo}
+func NewAccessService(cfg config.Config, keys auth.Keys, repo repositories.RepositoriesInterface) *AccessService {
+	return &AccessService{cfg: cfg, keys: keys, repo: repo}
 }
 
 // Reachable is the workspaces the caller's token reaches that the user is still an active
@@ -101,14 +102,18 @@ func (self *AccessService) visibleTeams(ctx context.Context, actor *auth.Actor) 
 	return self.repo.Access().VisibleTeams(ctx, actor.Workspace, actor.User, guest, actor.Origin != nil)
 }
 
-// Authenticate is the caller of a bearer token (an API key or an OAuth access token), nil when
-// it isn't a valid one.
+// Authenticate is the caller of a bearer token (an API key, an assistant token or an OAuth
+// access token), nil when it isn't a valid one.
 func (self *AccessService) Authenticate(ctx context.Context, token string) (*auth.Caller, error) {
 	if token == "" {
 		return nil, nil
 	}
 	if strings.HasPrefix(token, auth.APIKeyPrefix) {
 		return self.repo.Access().APIKeyCaller(ctx, auth.SecretHash(token))
+	}
+	if strings.HasPrefix(token, auth.AssistantTokenPrefix) {
+		caller, _ := self.keys.AssistantCaller(token)
+		return caller, nil
 	}
 	return self.repo.Access().AccessTokenCaller(ctx, auth.SecretHash(token))
 }

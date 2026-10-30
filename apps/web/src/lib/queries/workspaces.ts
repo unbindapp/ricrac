@@ -57,7 +57,17 @@ export async function fetchPublicWorkspace(
     const workspace = await call(urlKey, "get_workspace", {});
     queryClient.setQueryData(queryKeyWorkspace.detail(workspace.id), workspace);
     const { id, name, logoUrl, theme } = workspace;
-    return { id, name, urlKey: workspace.urlKey, logoUrl, theme, ownTheme: null, role: "guest" };
+    return {
+      id,
+      name,
+      urlKey: workspace.urlKey,
+      logoUrl,
+      theme,
+      ownTheme: null,
+      role: "guest",
+      assistant: false,
+      managesAssistant: false,
+    };
   } catch (error) {
     if (isApiError(error) && error.status < 500) return null;
     throw error;

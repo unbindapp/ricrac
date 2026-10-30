@@ -27,6 +27,8 @@ const (
 	FieldTheme = "theme"
 	// FieldPublic holds the string denoting the public field in the database.
 	FieldPublic = "public"
+	// FieldAssistantEnabled holds the string denoting the assistant_enabled field in the database.
+	FieldAssistantEnabled = "assistant_enabled"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -376,6 +378,7 @@ var Columns = []string{
 	FieldProjectUpdateReminderDay,
 	FieldTheme,
 	FieldPublic,
+	FieldAssistantEnabled,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -437,6 +440,11 @@ func ByTheme(opts ...sql.OrderTermOption) OrderOption {
 // ByPublic orders the results by the public field.
 func ByPublic(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPublic, opts...).ToFunc()
+}
+
+// ByAssistantEnabled orders the results by the assistant_enabled field.
+func ByAssistantEnabled(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAssistantEnabled, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

@@ -60,7 +60,12 @@ services call repositories, repositories use Ent.
 - `internal/services/resolve` turns what agents pass (names, keys, identifiers like ENG-123,
   "me", links) into ids and checks the caller may see the thing; errors list the valid options.
   `internal/services/events` writes issue history, notifications, webhook deliveries, the audit
-  log and changes for GitHub inside the change's transaction. `internal/services/seed` is what new
+  log and changes for GitHub inside the change's transaction. `internal/services/assistant` is
+  Ask Claude: `POST /api/assistant` runs the Claude Code CLI with Ricrac's MCP (an `rr_as_` token
+  for the asker in one workspace) and streams its answer as server-sent events; `assistant_runs`
+  holds each question's cost for the daily budget. People in `ASSISTANT_ADMINS` turn it on per
+  workspace and pick its users (`/api/assistant/settings`, `workspaces.assistant_enabled`,
+  `workspace_members.assistant`). `internal/services/seed` is what new
   workspaces and teams start with. The issue filter language is `internal/services/issue/filter.go`.
 - `internal/models` is what operations answer, built in Go from Ent entities (`XOf` functions,
   short forms in `refs.go`). Times are written as Postgres wrote them (`models.Time`), since the

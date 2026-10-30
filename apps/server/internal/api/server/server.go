@@ -8,6 +8,7 @@ import (
 	"ricrac/internal/repositories/repositories"
 	access_service "ricrac/internal/services/access"
 	account_service "ricrac/internal/services/account"
+	assistant_service "ricrac/internal/services/assistant"
 	attachment_service "ricrac/internal/services/attachment"
 	automation_service "ricrac/internal/services/automation"
 	comment_service "ricrac/internal/services/comment"
@@ -48,6 +49,7 @@ type Server struct {
 	Ops *opcall.Late
 
 	AccessService       *access_service.AccessService
+	AssistantService    *assistant_service.AssistantService
 	ResolveService      *resolve_service.ResolveService
 	EventsService       *events_service.EventsService
 	SeedService         *seed_service.SeedService

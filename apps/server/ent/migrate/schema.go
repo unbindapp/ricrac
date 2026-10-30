@@ -35,6 +35,23 @@ var (
 			},
 		},
 	}
+	// AssistantRunsColumns holds the columns for the "assistant_runs" table.
+	AssistantRunsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "workspace_id", Type: field.TypeUUID},
+		{Name: "user_id", Type: field.TypeUUID},
+		{Name: "session_id", Type: field.TypeUUID},
+		{Name: "cost_usd", Type: field.TypeFloat64},
+		{Name: "turns", Type: field.TypeInt},
+		{Name: "outcome", Type: field.TypeString, Size: 2147483647},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true},
+	}
+	// AssistantRunsTable holds the schema information for the "assistant_runs" table.
+	AssistantRunsTable = &schema.Table{
+		Name:       "assistant_runs",
+		Columns:    AssistantRunsColumns,
+		PrimaryKey: []*schema.Column{AssistantRunsColumns[0]},
+	}
 	// AttachmentsColumns holds the columns for the "attachments" table.
 	AttachmentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
@@ -2598,6 +2615,7 @@ var (
 		{Name: "project_update_reminder_day", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "theme", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "public", Type: field.TypeBool, Nullable: true},
+		{Name: "assistant_enabled", Type: field.TypeBool, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 	}
@@ -2613,6 +2631,7 @@ var (
 		{Name: "active", Type: field.TypeBool, Nullable: true},
 		{Name: "joined_at", Type: field.TypeTime, Nullable: true},
 		{Name: "theme", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "assistant", Type: field.TypeBool, Nullable: true},
 		{Name: "workspace_id", Type: field.TypeUUID},
 		{Name: "user_id", Type: field.TypeUUID},
 	}
@@ -2620,17 +2639,17 @@ var (
 	WorkspaceMembersTable = &schema.Table{
 		Name:       "workspace_members",
 		Columns:    WorkspaceMembersColumns,
-		PrimaryKey: []*schema.Column{WorkspaceMembersColumns[4], WorkspaceMembersColumns[5]},
+		PrimaryKey: []*schema.Column{WorkspaceMembersColumns[5], WorkspaceMembersColumns[6]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "workspace_members_workspaces_workspace",
-				Columns:    []*schema.Column{WorkspaceMembersColumns[4]},
+				Columns:    []*schema.Column{WorkspaceMembersColumns[5]},
 				RefColumns: []*schema.Column{WorkspacesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "workspace_members_users_user",
-				Columns:    []*schema.Column{WorkspaceMembersColumns[5]},
+				Columns:    []*schema.Column{WorkspaceMembersColumns[6]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -2639,6 +2658,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		APIKeysTable,
+		AssistantRunsTable,
 		AttachmentsTable,
 		AuditEntriesTable,
 		CommentsTable,
@@ -2715,6 +2735,9 @@ func init() {
 	APIKeysTable.ForeignKeys[0].RefTable = UsersTable
 	APIKeysTable.Annotation = &entsql.Annotation{
 		Table: "api_keys",
+	}
+	AssistantRunsTable.Annotation = &entsql.Annotation{
+		Table: "assistant_runs",
 	}
 	AttachmentsTable.ForeignKeys[0].RefTable = IssuesTable
 	AttachmentsTable.ForeignKeys[1].RefTable = UsersTable

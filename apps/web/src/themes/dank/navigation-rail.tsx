@@ -1,6 +1,7 @@
 import { Link, type LinkProps, useNavigate, useRouterState } from "@tanstack/react-router";
 import { type ComponentProps, type ComponentType } from "react";
 
+import { useIsAssistantAvailable } from "@/components/assistant/use-assistant-available";
 import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
 import { SidebarFavorites } from "@/components/favorites/sidebar-favorites";
 import {
@@ -19,6 +20,7 @@ import {
   RefreshCwIcon,
   RocketIcon,
   SettingsIcon,
+  SparklesIcon,
   TargetIcon,
   type LucideIcon,
   TriangleIcon,
@@ -41,6 +43,7 @@ import { useWorkspaceTeam } from "@/components/workspace/teams-provider";
 import { WorkspaceIcon } from "@/components/workspace/workspace-icon";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { WorkspaceMenu } from "@/components/workspace/workspace-switcher";
+import { useAssistantStore } from "@/lib/stores/assistant";
 
 type TDestination = {
   label: string;
@@ -139,6 +142,7 @@ export function NavigationRail({
               onNavigate={onNavigate}
             />
           ))}
+        <AskClaudeButton isExpanded={isExpanded} onNavigate={onNavigate} />
         <MoreMenu isExpanded={isExpanded} onNavigate={onNavigate} />
         <RailLink
           label="Settings"
@@ -284,6 +288,31 @@ function CurrentWorkspaceIcon({ className }: { className?: string }) {
     <span className={cn(className, "flex items-center justify-center")}>
       <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} />
     </span>
+  );
+}
+
+function AskClaudeButton({
+  isExpanded,
+  onNavigate,
+}: {
+  isExpanded: boolean;
+  onNavigate?: () => void;
+}) {
+  const isAvailable = useIsAssistantAvailable();
+  const toggle = useAssistantStore((state) => state.toggle);
+  if (!isAvailable) return null;
+  return (
+    <SimpleTooltip content={isExpanded ? undefined : "Ask Claude"} side="right">
+      <RailButton
+        label="Ask Claude"
+        icon={SparklesIcon}
+        isExpanded={isExpanded}
+        onClick={() => {
+          onNavigate?.();
+          toggle();
+        }}
+      />
+    </SimpleTooltip>
   );
 }
 

@@ -85,6 +85,20 @@ func (_c *WorkspaceMemberCreate) SetNillableTheme(v *string) *WorkspaceMemberCre
 	return _c
 }
 
+// SetAssistant sets the "assistant" field.
+func (_c *WorkspaceMemberCreate) SetAssistant(v bool) *WorkspaceMemberCreate {
+	_c.mutation.SetAssistant(v)
+	return _c
+}
+
+// SetNillableAssistant sets the "assistant" field if the given value is not nil.
+func (_c *WorkspaceMemberCreate) SetNillableAssistant(v *bool) *WorkspaceMemberCreate {
+	if v != nil {
+		_c.SetAssistant(*v)
+	}
+	return _c
+}
+
 // SetWorkspace sets the "workspace" edge to the Workspace entity.
 func (_c *WorkspaceMemberCreate) SetWorkspace(v *Workspace) *WorkspaceMemberCreate {
 	return _c.SetWorkspaceID(v.ID)
@@ -182,6 +196,10 @@ func (_c *WorkspaceMemberCreate) createSpec() (*WorkspaceMember, *sqlgraph.Creat
 	if value, ok := _c.mutation.Theme(); ok {
 		_spec.SetField(workspacemember.FieldTheme, field.TypeString, value)
 		_node.Theme = &value
+	}
+	if value, ok := _c.mutation.Assistant(); ok {
+		_spec.SetField(workspacemember.FieldAssistant, field.TypeBool, value)
+		_node.Assistant = value
 	}
 	if nodes := _c.mutation.WorkspaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -359,6 +377,24 @@ func (u *WorkspaceMemberUpsert) ClearTheme() *WorkspaceMemberUpsert {
 	return u
 }
 
+// SetAssistant sets the "assistant" field.
+func (u *WorkspaceMemberUpsert) SetAssistant(v bool) *WorkspaceMemberUpsert {
+	u.Set(workspacemember.FieldAssistant, v)
+	return u
+}
+
+// UpdateAssistant sets the "assistant" field to the value that was provided on create.
+func (u *WorkspaceMemberUpsert) UpdateAssistant() *WorkspaceMemberUpsert {
+	u.SetExcluded(workspacemember.FieldAssistant)
+	return u
+}
+
+// ClearAssistant clears the value of the "assistant" field.
+func (u *WorkspaceMemberUpsert) ClearAssistant() *WorkspaceMemberUpsert {
+	u.SetNull(workspacemember.FieldAssistant)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -501,6 +537,27 @@ func (u *WorkspaceMemberUpsertOne) UpdateTheme() *WorkspaceMemberUpsertOne {
 func (u *WorkspaceMemberUpsertOne) ClearTheme() *WorkspaceMemberUpsertOne {
 	return u.Update(func(s *WorkspaceMemberUpsert) {
 		s.ClearTheme()
+	})
+}
+
+// SetAssistant sets the "assistant" field.
+func (u *WorkspaceMemberUpsertOne) SetAssistant(v bool) *WorkspaceMemberUpsertOne {
+	return u.Update(func(s *WorkspaceMemberUpsert) {
+		s.SetAssistant(v)
+	})
+}
+
+// UpdateAssistant sets the "assistant" field to the value that was provided on create.
+func (u *WorkspaceMemberUpsertOne) UpdateAssistant() *WorkspaceMemberUpsertOne {
+	return u.Update(func(s *WorkspaceMemberUpsert) {
+		s.UpdateAssistant()
+	})
+}
+
+// ClearAssistant clears the value of the "assistant" field.
+func (u *WorkspaceMemberUpsertOne) ClearAssistant() *WorkspaceMemberUpsertOne {
+	return u.Update(func(s *WorkspaceMemberUpsert) {
+		s.ClearAssistant()
 	})
 }
 
@@ -786,6 +843,27 @@ func (u *WorkspaceMemberUpsertBulk) UpdateTheme() *WorkspaceMemberUpsertBulk {
 func (u *WorkspaceMemberUpsertBulk) ClearTheme() *WorkspaceMemberUpsertBulk {
 	return u.Update(func(s *WorkspaceMemberUpsert) {
 		s.ClearTheme()
+	})
+}
+
+// SetAssistant sets the "assistant" field.
+func (u *WorkspaceMemberUpsertBulk) SetAssistant(v bool) *WorkspaceMemberUpsertBulk {
+	return u.Update(func(s *WorkspaceMemberUpsert) {
+		s.SetAssistant(v)
+	})
+}
+
+// UpdateAssistant sets the "assistant" field to the value that was provided on create.
+func (u *WorkspaceMemberUpsertBulk) UpdateAssistant() *WorkspaceMemberUpsertBulk {
+	return u.Update(func(s *WorkspaceMemberUpsert) {
+		s.UpdateAssistant()
+	})
+}
+
+// ClearAssistant clears the value of the "assistant" field.
+func (u *WorkspaceMemberUpsertBulk) ClearAssistant() *WorkspaceMemberUpsertBulk {
+	return u.Update(func(s *WorkspaceMemberUpsert) {
+		s.ClearAssistant()
 	})
 }
 

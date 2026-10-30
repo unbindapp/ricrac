@@ -1,6 +1,7 @@
 import type { LinkProps } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
+import { useIsAssistantAvailable } from "@/components/assistant/use-assistant-available";
 import { useCommandPanelStore } from "@/components/command-panel/command-panel-store";
 import { SidebarFavorites } from "@/components/favorites/sidebar-favorites";
 import {
@@ -18,6 +19,7 @@ import {
   RocketIcon,
   SearchIcon,
   SettingsIcon,
+  SparklesIcon,
   SquarePenIcon,
   TargetIcon,
   TriangleIcon,
@@ -27,10 +29,15 @@ import { InboxUnreadBadge } from "@/components/inbox/inbox-unread-badge";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
 import { Button, LinkButton } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { SidebarNavItem, SidebarSection } from "@/components/workspace/sidebar-nav";
+import {
+  SidebarNavItem,
+  SidebarSection,
+  sidebarItemClassName,
+} from "@/components/workspace/sidebar-nav";
 import { useWorkspaceTeam } from "@/components/workspace/teams-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
+import { useAssistantStore } from "@/lib/stores/assistant";
 
 type TProps = {
   onNavigate?: () => void;
@@ -130,6 +137,7 @@ export function Sidebar({ onNavigate, hideButton }: TSidebarProps) {
               link={{ to: "/$workspace/my-issues", params }}
               onNavigate={onNavigate}
             />
+            <AskClaudeItem onNavigate={onNavigate} />
           </div>
           <SidebarSection title="Workspace">
             <NavItems items={destinations} onNavigate={onNavigate} />
@@ -154,6 +162,27 @@ function NavItems({ items, onNavigate }: { items: TNavDestination[] } & TProps) 
         onNavigate={onNavigate}
       />
     ));
+}
+
+function AskClaudeItem({ onNavigate }: TProps) {
+  const isAvailable = useIsAssistantAvailable();
+  const toggle = useAssistantStore((state) => state.toggle);
+  if (!isAvailable) return null;
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      forceMinSize={false}
+      className={sidebarItemClassName}
+      onClick={() => {
+        onNavigate?.();
+        toggle();
+      }}
+    >
+      <SparklesIcon className="size-4" />
+      <span className="min-w-0 flex-1 truncate text-left">Ask Claude</span>
+    </Button>
+  );
 }
 
 function SidebarFooter({ onNavigate }: TProps) {

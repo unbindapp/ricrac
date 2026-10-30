@@ -157,6 +157,20 @@ func (g *gzipWriter) finish() {
 	}
 }
 
+// Flush sends what's written so far, uncompressed when it hasn't decided yet, for streams.
+func (g *gzipWriter) Flush() {
+	if g.status == 0 {
+		g.status = http.StatusOK
+	}
+	if !g.decided {
+		g.decide(false)
+	}
+	if g.gz != nil {
+		_ = g.gz.Flush()
+	}
+	_ = http.NewResponseController(g.ResponseWriter).Flush()
+}
+
 func (g *gzipWriter) Unwrap() http.ResponseWriter {
 	return g.ResponseWriter
 }

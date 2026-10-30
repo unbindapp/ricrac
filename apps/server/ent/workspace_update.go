@@ -194,6 +194,26 @@ func (_u *WorkspaceUpdate) ClearPublic() *WorkspaceUpdate {
 	return _u
 }
 
+// SetAssistantEnabled sets the "assistant_enabled" field.
+func (_u *WorkspaceUpdate) SetAssistantEnabled(v bool) *WorkspaceUpdate {
+	_u.mutation.SetAssistantEnabled(v)
+	return _u
+}
+
+// SetNillableAssistantEnabled sets the "assistant_enabled" field if the given value is not nil.
+func (_u *WorkspaceUpdate) SetNillableAssistantEnabled(v *bool) *WorkspaceUpdate {
+	if v != nil {
+		_u.SetAssistantEnabled(*v)
+	}
+	return _u
+}
+
+// ClearAssistantEnabled clears the value of the "assistant_enabled" field.
+func (_u *WorkspaceUpdate) ClearAssistantEnabled() *WorkspaceUpdate {
+	_u.mutation.ClearAssistantEnabled()
+	return _u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_u *WorkspaceUpdate) SetCreatedAt(v time.Time) *WorkspaceUpdate {
 	_u.mutation.SetCreatedAt(v)
@@ -1617,6 +1637,12 @@ func (_u *WorkspaceUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.PublicCleared() {
 		_spec.ClearField(workspace.FieldPublic, field.TypeBool)
+	}
+	if value, ok := _u.mutation.AssistantEnabled(); ok {
+		_spec.SetField(workspace.FieldAssistantEnabled, field.TypeBool, value)
+	}
+	if _u.mutation.AssistantEnabledCleared() {
+		_spec.ClearField(workspace.FieldAssistantEnabled, field.TypeBool)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(workspace.FieldCreatedAt, field.TypeTime, value)
@@ -3398,6 +3424,26 @@ func (_u *WorkspaceUpdateOne) ClearPublic() *WorkspaceUpdateOne {
 	return _u
 }
 
+// SetAssistantEnabled sets the "assistant_enabled" field.
+func (_u *WorkspaceUpdateOne) SetAssistantEnabled(v bool) *WorkspaceUpdateOne {
+	_u.mutation.SetAssistantEnabled(v)
+	return _u
+}
+
+// SetNillableAssistantEnabled sets the "assistant_enabled" field if the given value is not nil.
+func (_u *WorkspaceUpdateOne) SetNillableAssistantEnabled(v *bool) *WorkspaceUpdateOne {
+	if v != nil {
+		_u.SetAssistantEnabled(*v)
+	}
+	return _u
+}
+
+// ClearAssistantEnabled clears the value of the "assistant_enabled" field.
+func (_u *WorkspaceUpdateOne) ClearAssistantEnabled() *WorkspaceUpdateOne {
+	_u.mutation.ClearAssistantEnabled()
+	return _u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_u *WorkspaceUpdateOne) SetCreatedAt(v time.Time) *WorkspaceUpdateOne {
 	_u.mutation.SetCreatedAt(v)
@@ -4851,6 +4897,12 @@ func (_u *WorkspaceUpdateOne) sqlSave(ctx context.Context) (_node *Workspace, er
 	}
 	if _u.mutation.PublicCleared() {
 		_spec.ClearField(workspace.FieldPublic, field.TypeBool)
+	}
+	if value, ok := _u.mutation.AssistantEnabled(); ok {
+		_spec.SetField(workspace.FieldAssistantEnabled, field.TypeBool, value)
+	}
+	if _u.mutation.AssistantEnabledCleared() {
+		_spec.ClearField(workspace.FieldAssistantEnabled, field.TypeBool)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(workspace.FieldCreatedAt, field.TypeTime, value)

@@ -21,6 +21,7 @@ func (WorkspaceMember) Fields() []ent.Field {
 		field.Bool("active").Optional(),
 		field.Time("joined_at").Optional(),
 		field.Text("theme").Optional().Nillable(),
+		field.Bool("assistant").Optional(),
 	}
 }
 

@@ -8,6 +8,7 @@ import (
 	repository "ricrac/internal/repositories"
 	access_repo "ricrac/internal/repositories/access"
 	account_repo "ricrac/internal/repositories/account"
+	assistant_repo "ricrac/internal/repositories/assistant"
 	attachment_repo "ricrac/internal/repositories/attachment"
 	automation_repo "ricrac/internal/repositories/automation"
 	comment_repo "ricrac/internal/repositories/comment"
@@ -68,6 +69,7 @@ type Repositories struct {
 	customer     customer_repo.CustomerRepositoryInterface
 	release      release_repo.ReleaseRepositoryInterface
 	webhook      webhook_repo.WebhookRepositoryInterface
+	assistant    assistant_repo.AssistantRepositoryInterface
 	project      project_repo.ProjectRepositoryInterface
 	milestone    milestone_repo.MilestoneRepositoryInterface
 	statusUpdate statusupdate_repo.StatusUpdateRepositoryInterface
@@ -105,6 +107,7 @@ func NewRepositories(db *ent.Client) *Repositories {
 		customer:     customer_repo.NewCustomerRepository(db),
 		release:      release_repo.NewReleaseRepository(db),
 		webhook:      webhook_repo.NewWebhookRepository(db),
+		assistant:    assistant_repo.NewAssistantRepository(db),
 		project:      project_repo.NewProjectRepository(db),
 		milestone:    milestone_repo.NewMilestoneRepository(db),
 		statusUpdate: statusupdate_repo.NewStatusUpdateRepository(db),
@@ -225,6 +228,10 @@ func (r *Repositories) Release() release_repo.ReleaseRepositoryInterface {
 
 func (r *Repositories) Webhook() webhook_repo.WebhookRepositoryInterface {
 	return r.webhook
+}
+
+func (r *Repositories) Assistant() assistant_repo.AssistantRepositoryInterface {
+	return r.assistant
 }
 
 func (r *Repositories) Project() project_repo.ProjectRepositoryInterface {

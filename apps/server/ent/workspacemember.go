@@ -30,6 +30,8 @@ type WorkspaceMember struct {
 	JoinedAt time.Time `json:"joined_at,omitempty"`
 	// Theme holds the value of the "theme" field.
 	Theme *string `json:"theme,omitempty"`
+	// Assistant holds the value of the "assistant" field.
+	Assistant bool `json:"assistant,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WorkspaceMemberQuery when eager-loading is set.
 	Edges        WorkspaceMemberEdges `json:"edges"`
@@ -74,7 +76,7 @@ func (*WorkspaceMember) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case workspacemember.FieldActive:
+		case workspacemember.FieldActive, workspacemember.FieldAssistant:
 			values[i] = new(sql.NullBool)
 		case workspacemember.FieldRole, workspacemember.FieldTheme:
 			values[i] = new(sql.NullString)
@@ -133,6 +135,12 @@ func (_m *WorkspaceMember) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Theme = new(string)
 				*_m.Theme = value.String
+			}
+		case workspacemember.FieldAssistant:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field assistant", values[i])
+			} else if value.Valid {
+				_m.Assistant = value.Bool
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -198,6 +206,9 @@ func (_m *WorkspaceMember) String() string {
 		builder.WriteString("theme=")
 		builder.WriteString(*v)
 	}
+	builder.WriteString(", ")
+	builder.WriteString("assistant=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Assistant))
 	builder.WriteByte(')')
 	return builder.String()
 }

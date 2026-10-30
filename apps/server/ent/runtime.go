@@ -4,6 +4,7 @@ package ent
 
 import (
 	"ricrac/ent/apikey"
+	"ricrac/ent/assistantrun"
 	"ricrac/ent/attachment"
 	"ricrac/ent/comment"
 	"ricrac/ent/customer"
@@ -62,6 +63,12 @@ func init() {
 	apikeyDescID := apikeyFields[0].Descriptor()
 	// apikey.DefaultID holds the default value on creation for the id field.
 	apikey.DefaultID = apikeyDescID.Default.(func() uuid.UUID)
+	assistantrunFields := schema.AssistantRun{}.Fields()
+	_ = assistantrunFields
+	// assistantrunDescID is the schema descriptor for id field.
+	assistantrunDescID := assistantrunFields[0].Descriptor()
+	// assistantrun.DefaultID holds the default value on creation for the id field.
+	assistantrun.DefaultID = assistantrunDescID.Default.(func() uuid.UUID)
 	attachmentFields := schema.Attachment{}.Fields()
 	_ = attachmentFields
 	// attachmentDescID is the schema descriptor for id field.

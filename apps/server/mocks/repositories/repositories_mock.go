@@ -10,6 +10,7 @@ import (
 	"ricrac/internal/repositories"
 	"ricrac/internal/repositories/access"
 	"ricrac/internal/repositories/account"
+	"ricrac/internal/repositories/assistant"
 	"ricrac/internal/repositories/attachment"
 	"ricrac/internal/repositories/automation"
 	"ricrac/internal/repositories/comment"
@@ -168,6 +169,52 @@ func (_c *RepositoriesMock_Account_Call) Return(accountRepositoryInterface accou
 }
 
 func (_c *RepositoriesMock_Account_Call) RunAndReturn(run func() account_repo.AccountRepositoryInterface) *RepositoriesMock_Account_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Assistant provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Assistant() assistant_repo.AssistantRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Assistant")
+	}
+
+	var r0 assistant_repo.AssistantRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() assistant_repo.AssistantRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(assistant_repo.AssistantRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Assistant_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Assistant'
+type RepositoriesMock_Assistant_Call struct {
+	*mock.Call
+}
+
+// Assistant is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Assistant() *RepositoriesMock_Assistant_Call {
+	return &RepositoriesMock_Assistant_Call{Call: _e.mock.On("Assistant")}
+}
+
+func (_c *RepositoriesMock_Assistant_Call) Run(run func()) *RepositoriesMock_Assistant_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Assistant_Call) Return(assistantRepositoryInterface assistant_repo.AssistantRepositoryInterface) *RepositoriesMock_Assistant_Call {
+	_c.Call.Return(assistantRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Assistant_Call) RunAndReturn(run func() assistant_repo.AssistantRepositoryInterface) *RepositoriesMock_Assistant_Call {
 	_c.Call.Return(run)
 	return _c
 }

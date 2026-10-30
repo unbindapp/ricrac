@@ -177,6 +177,7 @@ import {
   SparklesIcon as LucideSparklesIcon,
   SplitIcon as LucideSplitIcon,
   SquareCheckBigIcon as LucideSquareCheckBigIcon,
+  SquareIcon as LucideSquareIcon,
   SquarePenIcon as LucideSquarePenIcon,
   StarIcon as LucideStarIcon,
   StrikethroughIcon as LucideStrikethroughIcon,
@@ -496,6 +497,7 @@ export const SquareCheckBigIcon = /* @__PURE__ */ themedIcon(
   LucideSquareCheckBigIcon,
   "SquareCheckBigIcon",
 );
+export const SquareIcon = /* @__PURE__ */ themedIcon(LucideSquareIcon, "SquareIcon");
 export const SquarePenIcon = /* @__PURE__ */ themedIcon(LucideSquarePenIcon, "SquarePenIcon");
 export const StarIcon = /* @__PURE__ */ themedIcon(LucideStarIcon, "StarIcon");
 export const StrikethroughIcon = /* @__PURE__ */ themedIcon(

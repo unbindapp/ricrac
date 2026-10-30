@@ -34,6 +34,8 @@ type Workspace struct {
 	Theme string `json:"theme,omitempty"`
 	// Public holds the value of the "public" field.
 	Public bool `json:"public,omitempty"`
+	// AssistantEnabled holds the value of the "assistant_enabled" field.
+	AssistantEnabled bool `json:"assistant_enabled,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -465,7 +467,7 @@ func (*Workspace) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case workspace.FieldDefaultTeamSettings:
 			values[i] = new([]byte)
-		case workspace.FieldPublic:
+		case workspace.FieldPublic, workspace.FieldAssistantEnabled:
 			values[i] = new(sql.NullBool)
 		case workspace.FieldName, workspace.FieldURLKey, workspace.FieldLogoURL, workspace.FieldProjectUpdateReminderDay, workspace.FieldTheme:
 			values[i] = new(sql.NullString)
@@ -539,6 +541,12 @@ func (_m *Workspace) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field public", values[i])
 			} else if value.Valid {
 				_m.Public = value.Bool
+			}
+		case workspace.FieldAssistantEnabled:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field assistant_enabled", values[i])
+			} else if value.Valid {
+				_m.AssistantEnabled = value.Bool
 			}
 		case workspace.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -797,6 +805,9 @@ func (_m *Workspace) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("public=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Public))
+	builder.WriteString(", ")
+	builder.WriteString("assistant_enabled=")
+	builder.WriteString(fmt.Sprintf("%v", _m.AssistantEnabled))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

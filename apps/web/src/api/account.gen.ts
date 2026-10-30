@@ -18,6 +18,49 @@ export type AppConfig = {
   publicUrl: string
 }
 
+export type AskInput = {
+  /** The path of the page open in the web app, like /acme/issue/ENG-12. */
+  page?: string | null
+  prompt: string
+  /** The conversation to continue; leave out to start one. */
+  sessionId?: string | null
+}
+
+export type AssistantDone = {
+  /** What the question cost, as Claude Code estimates it. */
+  costUsd: number
+  /** Why it stopped early: turns, budget or error; null when it finished. */
+  stopped: string | null
+  turns: number
+}
+
+export type AssistantSession = {
+  /** Pass it with the next question to continue the conversation. */
+  sessionId: string
+}
+
+export type AssistantSettings = {
+  enabled: boolean
+  /** Who may ask Claude. */
+  userIds: string[]
+}
+
+export type AssistantSettingsInput = {
+  enabled?: boolean | null
+  /** Everyone who may ask Claude, members but not guests; leave out to keep them. */
+  userIds?: string[]
+}
+
+export type AssistantText = {
+  /** The next piece of the answer's Markdown. */
+  text: string
+}
+
+export type AssistantTool = {
+  /** The operation the assistant runs, like list_issues. */
+  name: string
+}
+
 export type ConnectedApp = {
   allWorkspaces: boolean
   createdAt: string
@@ -123,8 +166,10 @@ export type UpdateMe = {
 }
 
 export type WorkspaceSummary = {
+  assistant: boolean
   id: string
   logoUrl: string | null
+  managesAssistant: boolean
   name: string
   ownTheme: "default" | "dank" | null
   role: string

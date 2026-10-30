@@ -68,6 +68,7 @@ import { Route as WorkspaceWorkspaceTeamKeyIssuesRouteImport } from './routes/$w
 import { Route as WorkspaceWorkspaceTeamKeyLabelsRouteImport } from './routes/$workspace/_workspace/team/$key/labels'
 import { Route as WorkspaceWorkspaceTeamKeyProjectsRouteImport } from './routes/$workspace/_workspace/team/$key/projects'
 import { Route as WorkspaceWorkspaceTeamKeyTriageRouteImport } from './routes/$workspace/_workspace/team/$key/triage'
+import { Route as WorkspaceWorkspaceSettingsWorkspaceSettingsAdminClaudeRouteImport } from './routes/$workspace/_workspace/settings/_workspace-settings/_admin/claude'
 import { Route as WorkspaceWorkspaceSettingsWorkspaceSettingsAdminCustomersRouteImport } from './routes/$workspace/_workspace/settings/_workspace-settings/_admin/customers'
 import { Route as WorkspaceWorkspaceSettingsWorkspaceSettingsAdminDangerRouteImport } from './routes/$workspace/_workspace/settings/_workspace-settings/_admin/danger'
 import { Route as WorkspaceWorkspaceSettingsWorkspaceSettingsAdminImportRouteImport } from './routes/$workspace/_workspace/settings/_workspace-settings/_admin/import'
@@ -420,6 +421,13 @@ const WorkspaceWorkspaceTeamKeyTriageRoute =
     path: '/team/$key/triage',
     getParentRoute: () => WorkspaceWorkspaceRouteRoute,
   } as any)
+const WorkspaceWorkspaceSettingsWorkspaceSettingsAdminClaudeRoute =
+  WorkspaceWorkspaceSettingsWorkspaceSettingsAdminClaudeRouteImport.update({
+    id: '/claude',
+    path: '/claude',
+    getParentRoute: () =>
+      WorkspaceWorkspaceSettingsWorkspaceSettingsAdminRouteRoute,
+  } as any)
 const WorkspaceWorkspaceSettingsWorkspaceSettingsAdminCustomersRoute =
   WorkspaceWorkspaceSettingsWorkspaceSettingsAdminCustomersRouteImport.update({
     id: '/customers',
@@ -561,6 +569,7 @@ export interface FileRoutesByFullPath {
   '/$workspace/settings/': typeof WorkspaceWorkspaceSettingsWorkspaceSettingsIndexRoute
   '/$workspace/settings/account/': typeof WorkspaceWorkspaceSettingsAccountIndexRoute
   '/$workspace/team/$key/': typeof WorkspaceWorkspaceTeamKeyIndexRoute
+  '/$workspace/settings/claude': typeof WorkspaceWorkspaceSettingsWorkspaceSettingsAdminClaudeRoute
   '/$workspace/settings/customers': typeof WorkspaceWorkspaceSettingsWorkspaceSettingsAdminCustomersRoute
   '/$workspace/settings/danger': typeof WorkspaceWorkspaceSettingsWorkspaceSettingsAdminDangerRoute
   '/$workspace/settings/import': typeof WorkspaceWorkspaceSettingsWorkspaceSettingsAdminImportRoute
@@ -629,6 +638,7 @@ export interface FileRoutesByTo {
   '/$workspace/project/$slug': typeof WorkspaceWorkspaceProjectSlugIndexRoute
   '/$workspace/settings/account': typeof WorkspaceWorkspaceSettingsAccountIndexRoute
   '/$workspace/team/$key': typeof WorkspaceWorkspaceTeamKeyIndexRoute
+  '/$workspace/settings/claude': typeof WorkspaceWorkspaceSettingsWorkspaceSettingsAdminClaudeRoute
   '/$workspace/settings/customers': typeof WorkspaceWorkspaceSettingsWorkspaceSettingsAdminCustomersRoute
   '/$workspace/settings/danger': typeof WorkspaceWorkspaceSettingsWorkspaceSettingsAdminDangerRoute
   '/$workspace/settings/import': typeof WorkspaceWorkspaceSettingsWorkspaceSettingsAdminImportRoute
@@ -702,6 +712,7 @@ export interface FileRoutesById {
   '/$workspace/_workspace/settings/_workspace-settings/': typeof WorkspaceWorkspaceSettingsWorkspaceSettingsIndexRoute
   '/$workspace/_workspace/settings/account/': typeof WorkspaceWorkspaceSettingsAccountIndexRoute
   '/$workspace/_workspace/team/$key/': typeof WorkspaceWorkspaceTeamKeyIndexRoute
+  '/$workspace/_workspace/settings/_workspace-settings/_admin/claude': typeof WorkspaceWorkspaceSettingsWorkspaceSettingsAdminClaudeRoute
   '/$workspace/_workspace/settings/_workspace-settings/_admin/customers': typeof WorkspaceWorkspaceSettingsWorkspaceSettingsAdminCustomersRoute
   '/$workspace/_workspace/settings/_workspace-settings/_admin/danger': typeof WorkspaceWorkspaceSettingsWorkspaceSettingsAdminDangerRoute
   '/$workspace/_workspace/settings/_workspace-settings/_admin/import': typeof WorkspaceWorkspaceSettingsWorkspaceSettingsAdminImportRoute
@@ -774,6 +785,7 @@ export interface FileRouteTypes {
     | '/$workspace/settings/'
     | '/$workspace/settings/account/'
     | '/$workspace/team/$key/'
+    | '/$workspace/settings/claude'
     | '/$workspace/settings/customers'
     | '/$workspace/settings/danger'
     | '/$workspace/settings/import'
@@ -842,6 +854,7 @@ export interface FileRouteTypes {
     | '/$workspace/project/$slug'
     | '/$workspace/settings/account'
     | '/$workspace/team/$key'
+    | '/$workspace/settings/claude'
     | '/$workspace/settings/customers'
     | '/$workspace/settings/danger'
     | '/$workspace/settings/import'
@@ -914,6 +927,7 @@ export interface FileRouteTypes {
     | '/$workspace/_workspace/settings/_workspace-settings/'
     | '/$workspace/_workspace/settings/account/'
     | '/$workspace/_workspace/team/$key/'
+    | '/$workspace/_workspace/settings/_workspace-settings/_admin/claude'
     | '/$workspace/_workspace/settings/_workspace-settings/_admin/customers'
     | '/$workspace/_workspace/settings/_workspace-settings/_admin/danger'
     | '/$workspace/_workspace/settings/_workspace-settings/_admin/import'
@@ -1353,6 +1367,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceWorkspaceTeamKeyTriageRouteImport
       parentRoute: typeof WorkspaceWorkspaceRouteRoute
     }
+    '/$workspace/_workspace/settings/_workspace-settings/_admin/claude': {
+      id: '/$workspace/_workspace/settings/_workspace-settings/_admin/claude'
+      path: '/claude'
+      fullPath: '/$workspace/settings/claude'
+      preLoaderRoute: typeof WorkspaceWorkspaceSettingsWorkspaceSettingsAdminClaudeRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSettingsWorkspaceSettingsAdminRouteRoute
+    }
     '/$workspace/_workspace/settings/_workspace-settings/_admin/customers': {
       id: '/$workspace/_workspace/settings/_workspace-settings/_admin/customers'
       path: '/customers'
@@ -1434,6 +1455,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface WorkspaceWorkspaceSettingsWorkspaceSettingsAdminRouteRouteChildren {
+  WorkspaceWorkspaceSettingsWorkspaceSettingsAdminClaudeRoute: typeof WorkspaceWorkspaceSettingsWorkspaceSettingsAdminClaudeRoute
   WorkspaceWorkspaceSettingsWorkspaceSettingsAdminCustomersRoute: typeof WorkspaceWorkspaceSettingsWorkspaceSettingsAdminCustomersRoute
   WorkspaceWorkspaceSettingsWorkspaceSettingsAdminDangerRoute: typeof WorkspaceWorkspaceSettingsWorkspaceSettingsAdminDangerRoute
   WorkspaceWorkspaceSettingsWorkspaceSettingsAdminImportRoute: typeof WorkspaceWorkspaceSettingsWorkspaceSettingsAdminImportRoute
@@ -1448,6 +1470,8 @@ interface WorkspaceWorkspaceSettingsWorkspaceSettingsAdminRouteRouteChildren {
 
 const WorkspaceWorkspaceSettingsWorkspaceSettingsAdminRouteRouteChildren: WorkspaceWorkspaceSettingsWorkspaceSettingsAdminRouteRouteChildren =
   {
+    WorkspaceWorkspaceSettingsWorkspaceSettingsAdminClaudeRoute:
+      WorkspaceWorkspaceSettingsWorkspaceSettingsAdminClaudeRoute,
     WorkspaceWorkspaceSettingsWorkspaceSettingsAdminCustomersRoute:
       WorkspaceWorkspaceSettingsWorkspaceSettingsAdminCustomersRoute,
     WorkspaceWorkspaceSettingsWorkspaceSettingsAdminDangerRoute:

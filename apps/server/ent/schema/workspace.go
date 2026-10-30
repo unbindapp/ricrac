@@ -25,6 +25,7 @@ func (Workspace) Fields() []ent.Field {
 		field.Text("project_update_reminder_day").Optional().Nillable(),
 		field.Text("theme").Optional(),
 		field.Bool("public").Optional(),
+		field.Bool("assistant_enabled").Optional(),
 		field.Time("created_at").Optional(),
 		field.Time("updated_at").Optional(),
 	}

@@ -154,3 +154,37 @@ func SecretHash(secret string) string {
 
 // APIKeyPrefix starts every API key.
 const APIKeyPrefix = "rr_key_"
+
+// AssistantTokenPrefix starts the tokens the assistant's CLI calls MCP with.
+const AssistantTokenPrefix = "rr_as_"
+
+// AssistantToken lets the assistant act as user in one workspace, with read and write, for ttl.
+func (k Keys) AssistantToken(user, workspace uuid.UUID, ttl time.Duration) string {
+	return AssistantTokenPrefix + k.Sign(fmt.Sprintf("assistant:%d:%s:%s", time.Now().Add(ttl).Unix(), user, workspace))
+}
+
+// AssistantCaller is the caller of an assistant token, false when it isn't a valid one.
+func (k Keys) AssistantCaller(token string) (*Caller, bool) {
+	signed, ok := strings.CutPrefix(token, AssistantTokenPrefix)
+	if !ok {
+		return nil, false
+	}
+	payload, ok := k.Verify(signed)
+	if !ok {
+		return nil, false
+	}
+	parts := strings.Split(payload, ":")
+	if len(parts) != 4 || parts[0] != "assistant" {
+		return nil, false
+	}
+	expires, err := strconv.ParseInt(parts[1], 10, 64)
+	if err != nil || expires <= time.Now().Unix() {
+		return nil, false
+	}
+	user, userErr := uuid.Parse(parts[2])
+	workspace, workspaceErr := uuid.Parse(parts[3])
+	if userErr != nil || workspaceErr != nil {
+		return nil, false
+	}
+	return &Caller{User: user, Scopes: []Access{Read, Write}, Workspaces: []uuid.UUID{workspace}}, true
+}

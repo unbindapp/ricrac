@@ -86,6 +86,11 @@ func Public(v bool) predicate.Workspace {
 	return predicate.Workspace(sql.FieldEQ(FieldPublic, v))
 }
 
+// AssistantEnabled applies equality check predicate on the "assistant_enabled" field. It's identical to AssistantEnabledEQ.
+func AssistantEnabled(v bool) predicate.Workspace {
+	return predicate.Workspace(sql.FieldEQ(FieldAssistantEnabled, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Workspace {
 	return predicate.Workspace(sql.FieldEQ(FieldCreatedAt, v))
@@ -479,6 +484,26 @@ func PublicIsNil() predicate.Workspace {
 // PublicNotNil applies the NotNil predicate on the "public" field.
 func PublicNotNil() predicate.Workspace {
 	return predicate.Workspace(sql.FieldNotNull(FieldPublic))
+}
+
+// AssistantEnabledEQ applies the EQ predicate on the "assistant_enabled" field.
+func AssistantEnabledEQ(v bool) predicate.Workspace {
+	return predicate.Workspace(sql.FieldEQ(FieldAssistantEnabled, v))
+}
+
+// AssistantEnabledNEQ applies the NEQ predicate on the "assistant_enabled" field.
+func AssistantEnabledNEQ(v bool) predicate.Workspace {
+	return predicate.Workspace(sql.FieldNEQ(FieldAssistantEnabled, v))
+}
+
+// AssistantEnabledIsNil applies the IsNil predicate on the "assistant_enabled" field.
+func AssistantEnabledIsNil() predicate.Workspace {
+	return predicate.Workspace(sql.FieldIsNull(FieldAssistantEnabled))
+}
+
+// AssistantEnabledNotNil applies the NotNil predicate on the "assistant_enabled" field.
+func AssistantEnabledNotNil() predicate.Workspace {
+	return predicate.Workspace(sql.FieldNotNull(FieldAssistantEnabled))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
