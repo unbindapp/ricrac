@@ -27,7 +27,7 @@ type ListInput struct {
 
 type SaveInput struct {
 	ID   *string `json:"id" doc:"Only to edit one of your comments: its id. Omit to create a comment."`
-	Body *string `json:"body" doc:"Markdown. Mention people with @displayName or @email; they are notified."`
+	Body *string `json:"body" doc:"Markdown. Mention people with @displayName, @email or their linked GitHub login; they are notified."`
 	targetInput
 	ParentID      *string `json:"parentId" doc:"The comment to reply to; the reply joins its thread."`
 	QuotedText    *string `json:"quotedText" doc:"The passage of the document or description the comment is about."`

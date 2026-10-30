@@ -281,10 +281,14 @@ func SplitGroup(value string) (group *string, name string) {
 	return &g, strings.TrimSpace(n)
 }
 
-// MentionHandles is the @handles in Markdown, lowercased, without repeats.
-func MentionHandles(text string) []string {
-	var handles []string
-	chars := []rune(text)
+// mention is an @handle in text: the runes of the handle, after the @, from start to end.
+type mention struct {
+	start, end int
+	handle     string
+}
+
+func mentionsIn(chars []rune) []mention {
+	var found []mention
 	for i, c := range chars {
 		startsWord := i == 0 || !(unicode.IsLetter(chars[i-1]) || unicode.IsDigit(chars[i-1]) || chars[i-1] == '@')
 		if c != '@' || !startsWord {
@@ -297,12 +301,41 @@ func MentionHandles(text string) []string {
 			}
 			handle = append(handle, h)
 		}
-		name := strings.ToLower(strings.TrimRight(string(handle), ".-"))
-		if name != "" && !slices.Contains(handles, name) {
-			handles = append(handles, name)
+		name := strings.TrimRight(string(handle), ".-")
+		if name == "" {
+			continue
+		}
+		found = append(found, mention{start: i + 1, end: i + 1 + len([]rune(name)), handle: strings.ToLower(name)})
+	}
+	return found
+}
+
+// MentionHandles is the @handles in Markdown, lowercased, without repeats.
+func MentionHandles(text string) []string {
+	var handles []string
+	for _, m := range mentionsIn([]rune(text)) {
+		if !slices.Contains(handles, m.handle) {
+			handles = append(handles, m.handle)
 		}
 	}
 	return handles
+}
+
+// ReplaceMentions puts the handle replacements gives (by lowercased handle) in place of the
+// @handles of text.
+func ReplaceMentions(text string, replacements map[string]string) string {
+	chars := []rune(text)
+	var out []rune
+	last := 0
+	for _, m := range mentionsIn(chars) {
+		replacement, ok := replacements[m.handle]
+		if !ok {
+			continue
+		}
+		out = append(append(out, chars[last:m.start]...), []rune(replacement)...)
+		last = m.end
+	}
+	return string(append(out, chars[last:]...))
 }
 
 // LikePattern is an ILIKE pattern finding the query anywhere, or nil for an empty one.

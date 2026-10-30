@@ -44,7 +44,7 @@ type SaveInput struct {
 	ID                *string                `json:"id" doc:"Only to update an issue: its identifier (ENG-123), id or link. Omit to create one."`
 	Team              *string                `json:"team" doc:"Optional: the workspace's team by default (or the parent's, or the template's). Its key, name or id."`
 	Title             *string                `json:"title"`
-	Description       *string                `json:"description" doc:"Markdown. Mention people with @displayName or @email; they are notified and subscribed."`
+	Description       *string                `json:"description" doc:"Markdown. Mention people with @displayName, @email or their linked GitHub login; they are notified and subscribed."`
 	Patch             []args.TextEdit        `json:"patch" doc:"Edits to the current description instead of the whole text, applied in order, all or none."`
 	State             *string                `json:"state" doc:"Status name, type (backlog, unstarted, started, completed, canceled, triage) or id."`
 	Priority          *int                   `json:"priority" doc:"1 urgent, 2 high, 3 medium, 4 low; 0 means no priority (not the highest)."`

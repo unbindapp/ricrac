@@ -97,9 +97,9 @@ func (self *GitHubRepository) LinkPostedComment(ctx context.Context, tx reposito
 	return err
 }
 
-// Issue is an issue, nil when there's none.
+// Issue is an issue's workspace, title, description and when it went to the trash, nil when it's gone.
 func (self *GitHubRepository) Issue(ctx context.Context, id uuid.UUID) (*ent.Issue, error) {
-	found, err := self.base.DB.Issue.Query().Where(issue.ID(id)).Select(issue.FieldTitle, issue.FieldDescription).Only(ctx)
+	found, err := self.base.DB.Issue.Query().Where(issue.ID(id)).Select(issue.FieldWorkspaceID, issue.FieldTitle, issue.FieldDescription, issue.FieldTrashedAt).Only(ctx)
 	if ent.IsNotFound(err) {
 		return nil, nil
 	}

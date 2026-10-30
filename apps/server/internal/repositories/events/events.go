@@ -99,15 +99,15 @@ func (self *EventsRepository) Subscribe(ctx context.Context, tx repository.TxInt
 	return self.base.Client(tx).IssueSubscriber.CreateBulk(creates...).OnConflict().DoNothing().Exec(ctx)
 }
 
-// Mentioned is the active members whose display name, email or the part of their email before
-// the @ is one of handles.
+// Mentioned is the active members whose display name, email, the part of their email before the
+// @ or linked GitHub login is one of handles.
 func (self *EventsRepository) Mentioned(ctx context.Context, workspace uuid.UUID, handles []string) ([]uuid.UUID, error) {
 	return self.base.DB.User.Query().Modify(func(s *entsql.Selector) {
 		members := entsql.Table(workspacemember.Table)
 		s.Join(members).On(s.C(user.FieldID), members.C(workspacemember.FieldUserID)).
 			Where(entsql.And(entsql.EQ(members.C(workspacemember.FieldWorkspaceID), workspace), entsql.EQ(members.C(workspacemember.FieldActive), true)))
-		s.Where(repository.Raw("lower("+s.C(user.FieldDisplayName)+") = ANY(?) OR lower("+s.C(user.FieldEmail)+") = ANY(?) OR lower(split_part("+s.C(user.FieldEmail)+", '@', 1)) = ANY(?)",
-			handles, handles, handles))
+		s.Where(repository.Raw("lower("+s.C(user.FieldDisplayName)+") = ANY(?) OR lower("+s.C(user.FieldEmail)+") = ANY(?) OR lower(split_part("+s.C(user.FieldEmail)+", '@', 1)) = ANY(?) OR lower("+s.C(user.FieldGithubLogin)+") = ANY(?)",
+			handles, handles, handles, handles))
 		s.Select(s.C(user.FieldID))
 	}).IDs(ctx)
 }

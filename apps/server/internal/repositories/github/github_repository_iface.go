@@ -66,6 +66,9 @@ type GitHubRepositoryInterface interface {
 	// TeamSyncsFields says whether the team syncs priority, estimate, due date and cycle with GitHub's
 	// issue fields.
 	TeamSyncsFields(ctx context.Context, team uuid.UUID) (bool, error)
+	// MentionLogins is the GitHub login of each of handles naming an active member who linked GitHub:
+	// by display name, email or the part of their email before the @.
+	MentionLogins(ctx context.Context, workspace uuid.UUID, handles []string) (map[string]string, error)
 	// LockNewIssues waits for the sync's issues being opened on GitHub to be linked, until tx ends.
 	LockNewIssues(ctx context.Context, tx repository.TxInterface, repoSync uuid.UUID) error
 	// IssueLinked says whether the issue is linked to a GitHub issue.
@@ -83,7 +86,7 @@ type GitHubRepositoryInterface interface {
 	// LinkPostedComment links a comment the app posted on the linked GitHub issue, as postedAs or
 	// as itself when nil.
 	LinkPostedComment(ctx context.Context, tx repository.TxInterface, commentID uuid.UUID, issueID *uuid.UUID, githubID int64, postedAs *uuid.UUID) error
-	// Issue is an issue, nil when there's none.
+	// Issue is an issue's workspace, title, description and when it went to the trash, nil when it's gone.
 	Issue(ctx context.Context, id uuid.UUID) (*ent.Issue, error)
 	// IssueAddress is an issue's identifier and its workspace's URL key, empty when it's gone.
 	IssueAddress(ctx context.Context, id uuid.UUID) (string, string, error)
