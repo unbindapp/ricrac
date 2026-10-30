@@ -2,6 +2,8 @@ package github_repo
 
 import (
 	"context"
+	"slices"
+	"strings"
 	"time"
 
 	entsql "entgo.io/ent/dialect/sql"
@@ -13,6 +15,8 @@ import (
 	"ricrac/ent/githubmilestonelink"
 	"ricrac/ent/githubreposync"
 	team_ent "ricrac/ent/team"
+	"ricrac/ent/user"
+	"ricrac/ent/workspacemember"
 	repository "ricrac/internal/repositories"
 )
 
@@ -87,6 +91,28 @@ func (self *GitHubRepository) MarkMilestonesSynced(ctx context.Context, id uuid.
 // issue fields.
 func (self *GitHubRepository) TeamSyncsFields(ctx context.Context, team uuid.UUID) (bool, error) {
 	return self.base.DB.Team.Query().Where(team_ent.ID(team), team_ent.GithubSyncFields(true)).Exist(ctx)
+}
+
+// MentionLogins is the GitHub login of each of handles naming an active member who linked GitHub:
+// by display name, email or the part of their email before the @.
+func (self *GitHubRepository) MentionLogins(ctx context.Context, workspace uuid.UUID, handles []string) (map[string]string, error) {
+	members, err := self.base.DB.User.Query().
+		Where(user.GithubLoginNotNil(), user.HasWorkspaceMembersWith(workspacemember.WorkspaceID(workspace), workspacemember.Active(true))).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	logins := map[string]string{}
+	for _, member := range members {
+		email := strings.ToLower(member.Email)
+		local, _, _ := strings.Cut(email, "@")
+		for _, name := range []string{strings.ToLower(member.DisplayName), email, local} {
+			if slices.Contains(handles, name) {
+				logins[name] = *member.GithubLogin
+			}
+		}
+	}
+	return logins, nil
 }
 
 // LockNewIssues waits for the sync's issues being opened on GitHub to be linked, until tx ends.

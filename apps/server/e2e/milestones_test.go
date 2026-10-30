@@ -185,6 +185,10 @@ func TestRicracIssuesOpenOnGitHubAsTheirAuthor(t *testing.T) {
 	eq(t, string(marshal(g.fake.sent("POST", path+"/assignees")[0].Body)), `{"assignees":["ann-gh"]}`)
 	contains(t, g.fake.sent("POST", path+"/comments")[0].Body["body"].(string), "Tracked in Ricrac as [ENG-2]")
 
+	trashed := call(t, g.Ann, "save_issue", M{"title": "Never mind"})
+	call(t, g.Ann, "delete_issue", M{"id": trashed.At("identifier").Str()})
+	g.runJobs(t)
+	eq(t, len(g.fake.opened()), 1, "trashed before it went out, it stays here")
 	call(t, g.Ann, "save_issue", M{"title": "Kept here", "githubRepository": "none"})
 	contains(t, fails(t, g.Ann, "save_issue", M{"title": "Elsewhere", "githubRepository": "unbindapp/other"}), "unbindapp/unbind")
 	bob := g.member("bob@acme.test", "Bob", "member")
@@ -264,4 +268,21 @@ func TestPreviewingAnIssueSavesNothing(t *testing.T) {
 	edited := call(t, g.Ann, "save_issue", M{"id": "ENG-1", "title": "Dark theme", "preview": true})
 	eq(t, edited.At("title").Str(), "Dark theme")
 	eq(t, call(t, g.Ann, "get_issue", M{"id": "ENG-1"}).At("title").Str(), "Dark mode")
+}
+
+func TestMentionsReachTheSamePeopleOnGitHub(t *testing.T) {
+	g := withGitHub(t)
+	g.syncRepo(t, "ENG")
+	call(t, g.Ann, "save_team", M{"id": "ENG", "githubOpenIssues": true})
+	bob := g.member("bob@acme.test", "Bob", "member")
+	g.exec("UPDATE users SET github_login = 'bob-gh' WHERE id = $1", bob.User)
+
+	call(t, g.Ann, "save_issue", M{"title": "Clock tab", "description": "@bob-gh has a start on this, cc @Bob and @octocat."})
+	eq(t, call(t, bob, "get_notifications", nil).At("nodes").Len(), 1, "a GitHub login mentions its member here")
+	g.runJobs(t)
+	eq(t, g.fake.opened()[0].Body["body"], any("**Ann Smith on Ricrac**\n\n@bob-gh has a start on this, cc @bob-gh and @octocat."))
+
+	call(t, g.Ann, "save_comment", M{"issueId": "ENG-1", "body": "@Bob does this still work?"})
+	g.runJobs(t)
+	contains(t, g.fake.sent("POST", "/issues/2001/comments")[0].Body["body"].(string), "@bob-gh does this still work?")
 }

@@ -2358,7 +2358,7 @@ export type SaveIssueArgs = {
   blocks?: string[]
   /** Cycle number, name or id, or "current" / "next"; null removes it from its cycle. */
   cycle?: string | null
-  /** Markdown. Mention people with @displayName or @email; they are notified and subscribed. */
+  /** Markdown. Mention people with @displayName, @email or their linked GitHub login; they are notified and subscribed. */
   description?: string | null
   /** YYYY-MM-DD; null clears it. */
   dueDate?: string | null
@@ -2585,7 +2585,7 @@ export type ListCommentsArgs = {
 }
 
 export type SaveCommentArgs = {
-  /** Markdown. Mention people with @displayName or @email; they are notified. */
+  /** Markdown. Mention people with @displayName, @email or their linked GitHub login; they are notified. */
   body?: string | null
   /** Discussion id, slug, link or title. */
   discussionId?: string | null

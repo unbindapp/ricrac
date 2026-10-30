@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 
 	"ricrac/ent"
+	"ricrac/internal/common/utils"
 	"ricrac/internal/integrations/github"
 	"ricrac/internal/models"
 	repository "ricrac/internal/repositories"
@@ -123,6 +124,20 @@ func (self *GitHubService) fillRicracField(ctx context.Context, token string, en
 	return err == nil, err
 }
 
+// forGitHub is Markdown with its @mentions of members who linked GitHub written as their GitHub
+// logins, so they reach the same people there.
+func (self *GitHubService) forGitHub(ctx context.Context, workspace uuid.UUID, text string) (string, error) {
+	handles := utils.MentionHandles(text)
+	if len(handles) == 0 {
+		return text, nil
+	}
+	logins, err := self.github().MentionLogins(ctx, workspace, handles)
+	if err != nil {
+		return "", err
+	}
+	return utils.ReplaceMentions(text, logins), nil
+}
+
 // bodyForApp is a comment's body as the app posts it as itself, with its author's name.
 func bodyForApp(comment *ent.Comment) string {
 	author := "Someone"
@@ -140,6 +155,9 @@ func (self *GitHubService) pushNewComment(ctx context.Context, token string, ent
 	}
 	found, err := self.github().CommentWithAuthor(ctx, *entry.Comment)
 	if err != nil || found == nil {
+		return err
+	}
+	if found.Body, err = self.forGitHub(ctx, found.WorkspaceID, found.Body); err != nil {
 		return err
 	}
 	path := github.IssuePath(entry.FullName, entry.Number) + "/comments"
@@ -174,6 +192,9 @@ func (self *GitHubService) pushCommentEdit(ctx context.Context, token string, en
 	}
 	found, err := self.github().CommentWithAuthor(ctx, *entry.Comment)
 	if err != nil || found == nil {
+		return err
+	}
+	if found.Body, err = self.forGitHub(ctx, found.WorkspaceID, found.Body); err != nil {
 		return err
 	}
 	body := found.Body
@@ -318,8 +339,12 @@ func (self *GitHubService) pushIssue(ctx context.Context, token string, entry gi
 			duplicateOf = &target.GithubID
 		}
 	}
+	description, err := self.forGitHub(ctx, issue.WorkspaceID, issue.Description)
+	if err != nil {
+		return err
+	}
 	path := github.IssuePath(entry.FullName, entry.Number)
-	patch := issuePatch(changes, issue.Title, issue.Description, duplicateOf)
+	patch := issuePatch(changes, issue.Title, description, duplicateOf)
 	if _, to, ok := change(changes, "projectMilestone"); ok {
 		number, err := self.milestoneNumber(ctx, token, entry, refField(to, "id"))
 		if err != nil {

@@ -40,7 +40,11 @@ func (self *GitHubService) pushNewIssue(ctx context.Context, token string, entry
 		if err != nil {
 			return err
 		}
-		created, err := self.openIssue(ctx, token, entry, row.Title, row.Description, value.Creator)
+		description, err := self.forGitHub(ctx, row.WorkspaceID, row.Description)
+		if err != nil {
+			return err
+		}
+		created, err := self.openIssue(ctx, token, entry, row.Title, description, value.Creator)
 		if err != nil {
 			return err
 		}
