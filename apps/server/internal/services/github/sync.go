@@ -56,7 +56,7 @@ func (h *hook) issuesEvent(event *github.IssuesEvent) error {
 		return nil
 	}
 	if link == nil {
-		_, err := h.importIssue(h.ctx, sync, &event.Issue, event.Action == "opened")
+		_, err := h.importIssue(h.ctx, sync, &event.Issue, true)
 		return h.recordSync(h.ctx, sync.ID, err)
 	}
 	return h.recordSync(h.ctx, sync.ID, h.applyIssueEvent(h.ctx, sync, link, event))
@@ -142,8 +142,8 @@ func samePtr[T comparable](a, b *T) bool {
 var errLinkedAlready = errors.New("the GitHub issue is linked already")
 
 // importIssue creates the Ricrac issue of a GitHub issue, linked to it; false when another
-// delivery linked it first. A newly opened one gets a comment linking back when the sync wants it.
-func (self *GitHubService) importIssue(ctx context.Context, sync *ent.GithubRepoSync, issue *github.Issue, opened bool) (bool, error) {
+// delivery linked it first. With linkBack, GitHub gets the link when the sync wants it.
+func (self *GitHubService) importIssue(ctx context.Context, sync *ent.GithubRepoSync, issue *github.Issue, linkBack bool) (bool, error) {
 	member := self.memberByLogin(ctx, sync.WorkspaceID, &issue.User)
 	label := byLine("Synced from GitHub #"+strconv.Itoa(issue.Number), member, issue.User.Login)
 	actor := self.access.System(sync.WorkspaceID, member, auth.Origin{Label: label, URL: issue.HTMLURL, FromGitHubIssue: true})
@@ -189,7 +189,7 @@ func (self *GitHubService) importIssue(ctx context.Context, sync *ent.GithubRepo
 		if err := self.github().AddIssueLink(ctx, tx, id, sync.ID, issue.ID, issue.Number, issue.NodeID, issue.HTMLURL, issue.UpdatedAt); err != nil {
 			return err
 		}
-		if !opened || !sync.LinkBack {
+		if !linkBack || !sync.LinkBack {
 			return nil
 		}
 		return self.github().QueueLinkBack(ctx, tx, id)
@@ -200,7 +200,7 @@ func (self *GitHubService) importIssue(ctx context.Context, sync *ent.GithubRepo
 	if err != nil {
 		return false, err
 	}
-	if opened && sync.LinkBack {
+	if linkBack && sync.LinkBack {
 		self.waker.WakeGitHub()
 	}
 	return true, nil
@@ -445,7 +445,7 @@ func (h *hook) issueComment(event *github.IssueCommentEvent) error {
 		return nil
 	}
 	if link == nil {
-		if _, err := h.importIssue(h.ctx, sync, &event.Issue, false); err != nil {
+		if _, err := h.importIssue(h.ctx, sync, &event.Issue, true); err != nil {
 			return h.recordSync(h.ctx, sync.ID, err)
 		}
 		if link, err = h.github().IssueLink(h.ctx, sync.ID, event.Issue.ID); link == nil || err != nil {
