@@ -626,21 +626,21 @@ func TestPullRequestsLinkSyncedGitHubIssues(t *testing.T) {
 	eq(t, call(t, g.Ann, "get_issue", M{"id": "ENG-2"}).At("state", "name").Str(), before)
 }
 
-func TestIssuesOpenedOnGitHubLinkBackWhenTheSyncAsks(t *testing.T) {
+func TestIssuesFromGitHubLinkBackWhenTheSyncAsks(t *testing.T) {
 	g := withGitHub(t)
 	sync := g.syncRepo(t, "ENG")
 	check(t, !sync.At("linkBack").Bool())
 	eq(t, call(t, g.Ann, "save_github_repo_sync", M{"id": "unbindapp/unbind", "linkBack": true}).At("linkBack").Bool(), true)
 
-	g.deliver(t, "issues", "issues_edited_stale.json", func(p M) { p["issue"].(M)["number"], p["issue"].(M)["id"] = 1300, 1300 })
+	// GitHub sends labeled with opened for an issue opened with labels, in either order.
+	g.deliver(t, "issues", "issues_labeled.json", nil)
 	for range 2 {
 		g.deliver(t, "issues", "issues_opened.json", nil)
 	}
 	g.runJobs(t)
-	eq(t, len(g.fake.sent("POST", "/issues/1300/comments")), 0, "only issues opened while synced link back")
 	posted := g.fake.sent("POST", "/issues/1347/comments")
-	eq(t, len(posted), 1, "once per issue")
-	identifier := "ENG-2"
+	eq(t, len(posted), 1, "once per issue, whichever delivery imports it")
+	identifier := "ENG-1"
 	body := posted[0].Body["body"].(string)
 	contains(t, body, "Tracked in Ricrac as ["+identifier+"](", "/acme/issue/"+identifier+").")
 
@@ -658,7 +658,7 @@ func TestIssuesOpenedOnGitHubLinkBackWhenTheSyncAsks(t *testing.T) {
 	eq(t, len(filled), 1)
 	value := filled[0].Body["issue_field_values"].([]any)[0].(M)
 	eq(t, value["field_id"], any(8.0))
-	contains(t, value["value"].(string), "/acme/issue/ENG-3")
+	contains(t, value["value"].(string), "/acme/issue/ENG-2")
 }
 
 func TestRicracChangesGoToGitHubButNotBack(t *testing.T) {
