@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { type CSSProperties, type RefObject, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 import type { Discussion } from "@/api/ops.gen";
@@ -12,29 +12,24 @@ import {
   TrashedDiscussionRow,
 } from "@/components/forum/forum-views";
 import { NewDiscussionDialog } from "@/components/forum/new-discussion-dialog";
-import { ImageIcon, MessageSquareIcon, PlusIcon } from "@/components/icons";
+import { ImageIcon, PencilIcon, PlusIcon } from "@/components/icons";
+import { commentExcerpt } from "@/components/inbox/notifications";
 import { CreateButton } from "@/components/layout/create-button";
 import { List } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { PageSlotsContext } from "@/components/layout/page-container";
-import { useDeviceSize } from "@/components/providers/device-size-provider";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { entitySlug } from "@/lib/helpers/entity-slug";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 import { DiscussionPanel } from "@/themes/dank/discussion-panel";
-import { ForumControls, type TForumLayout } from "@/themes/dank/forum-controls";
+import { ForumToolbar, type TForumLayout } from "@/themes/dank/forum-controls";
 import { UpvoteChip } from "@/themes/dank/upvote-chip";
-import type { TForumPanesProps } from "@/themes/types";
+import type { TForumPanelProps } from "@/themes/types";
 
-const MIN_LIST_WIDTH = 280;
-const MIN_DETAIL_WIDTH = 360;
-const RESIZER_WIDTH = 12;
-const RESIZE_STEP = 16;
-
-/** The forum's list in a pane, and the open discussion in a panel beside it on wide screens. */
-export function DankForumPanes({
+/** The forum in the page's panel: its discussions as cards, or the open one in their place. */
+export function DankForumPanel({
   filters,
   discussion,
   chat,
@@ -42,14 +37,10 @@ export function DankForumPanes({
   isThreadOpen = false,
   onBackToChat,
   fallback,
-}: TForumPanesProps) {
+}: TForumPanelProps) {
   const { workspace } = useWorkspace();
   const navigate = useNavigate();
-  const { size } = useDeviceSize();
-  const panesRef = useRef<HTMLDivElement>(null);
-  const [listWidth, setListWidth] = useLocalStorage<number | null>("forum-list-width", null);
   const isOpen = Boolean(discussion || fallback);
-  const isWide = size === "lg" || size === "xl";
   const close = () =>
     void navigate({
       to: "/$workspace/forum",
@@ -58,7 +49,8 @@ export function DankForumPanes({
     });
   useHotkeyScope([{ hotkey: "Escape", callback: close }], { enabled: isOpen && !isThreadOpen });
 
-  const detail = isOpen && (
+  if (!isOpen) return <ForumList filters={filters} />;
+  return (
     <div data-slot="forum-detail">
       {discussion ? (
         <DiscussionPanel
@@ -73,28 +65,9 @@ export function DankForumPanes({
       )}
     </div>
   );
-  if (detail && !isWide) return detail;
-  return (
-    <div
-      ref={panesRef}
-      data-slot="forum-panes"
-      data-open={isOpen || undefined}
-      style={listWidth ? ({ "--list-w": `${listWidth}px` } as CSSProperties) : undefined}
-    >
-      <ForumListPane filters={filters} openId={discussion?.id} />
-      {detail && (
-        <PaneResizer
-          panesRef={panesRef}
-          onResize={setListWidth}
-          onReset={() => setListWidth(null)}
-        />
-      )}
-      {detail}
-    </div>
-  );
 }
 
-function ForumListPane({ filters, openId }: { filters: TForumFilters; openId?: string }) {
+function ForumList({ filters }: { filters: TForumFilters }) {
   const { workspace, canEdit } = useWorkspace();
   const navigate = useNavigate();
   const [layout, setLayout] = useLocalStorage<TForumLayout>("forum-layout", "grid");
@@ -103,7 +76,12 @@ function ForumListPane({ filters, openId }: { filters: TForumFilters; openId?: s
   const isTrash = status === "trash";
   const isGrid = layout === "grid" && !isTrash;
   const list = useInfiniteQuery(
-    forumDiscussionsQuery(workspace.id, { status, tag: filters.tag, sort: filters.sort }),
+    forumDiscussionsQuery(workspace.id, {
+      status,
+      tag: filters.tag,
+      sort: filters.sort,
+      order: filters.order,
+    }),
   );
   const discussions = list.data?.pages.flatMap((page) => page.nodes) ?? [];
   const filter = (next: TForumFilters) =>
@@ -117,9 +95,7 @@ function ForumListPane({ filters, openId }: { filters: TForumFilters; openId?: s
   return (
     <PageSlotsContext value={{ bar: null, fab }}>
       <section aria-label="Forum" data-slot="forum-list">
-        <div data-slot="forum-list-tools">
-          <ForumControls filters={filters} layout={layout} onFilter={filter} onLayout={setLayout} />
-        </div>
+        <ForumToolbar filters={filters} layout={layout} onFilter={filter} onLayout={setLayout} />
         <ListStates
           isPending={list.isPending}
           error={list.error}
@@ -147,14 +123,9 @@ function ForumListPane({ filters, openId }: { filters: TForumFilters; openId?: s
               ))}
             </List>
           ) : (
-            <div role="list" data-slot="forum-items" data-layout={isGrid ? "cards" : "list"}>
+            <div role="list" data-slot="forum-cards" data-layout={isGrid ? "grid" : "list"}>
               {discussions.map((discussion) => (
-                <ForumItem
-                  key={discussion.id}
-                  discussion={discussion}
-                  filters={filters}
-                  isOpen={discussion.id === openId}
-                />
+                <ForumCard key={discussion.id} discussion={discussion} filters={filters} />
               ))}
             </div>
           )}
@@ -171,79 +142,55 @@ function ForumListPane({ filters, openId }: { filters: TForumFilters; openId?: s
           )}
         </ListStates>
         {canEdit && !isTrash && (
-          <NewDiscussionDialog trigger={<CreateButton label="New discussion" />} />
+          <NewDiscussionDialog
+            trigger={<CreateButton label="New discussion" icon={PencilIcon} isLarge />}
+          />
         )}
-        <div
-          ref={setFab}
-          className="pointer-events-none sticky bottom-0 z-20 mt-auto flex justify-end pt-3 *:pointer-events-auto empty:hidden"
-        />
+        <div ref={setFab} data-slot="forum-fab" />
       </section>
     </PageSlotsContext>
   );
 }
 
-function ForumItem({
-  discussion,
-  filters,
-  isOpen,
-}: {
-  discussion: Discussion;
-  filters: TForumFilters;
-  isOpen: boolean;
-}) {
+function ForumCard({ discussion, filters }: { discussion: Discussion; filters: TForumFilters }) {
   const { workspace } = useWorkspace();
-  const content = (
-    <>
+  const excerpt = commentExcerpt(discussion.body ?? "");
+  const replies = discussion.commentCount;
+  return (
+    <DiscussionContextMenu
+      discussion={discussion}
+      trigger={
+        <Link
+          role="listitem"
+          data-slot="forum-card"
+          data-closed={discussion.closedAt ? true : undefined}
+          to="/$workspace/discussion/$slug"
+          params={{ workspace: workspace.urlKey, slug: entitySlug(discussion) }}
+          search={filters}
+        />
+      }
+    >
       <ForumThumb discussion={discussion} />
-      <span data-slot="forum-item-text">
-        <span className="truncate">{discussion.title}</span>
-        <span data-slot="forum-item-supporting">
-          <RelativeTime value={discussion.lastActivityAt} />
-          <span
-            data-slot="count-chip"
-            aria-label={`${discussion.commentCount} ${discussion.commentCount === 1 ? "message" : "messages"}`}
-          >
-            <MessageSquareIcon />
-            {discussion.commentCount}
+      <span data-slot="forum-card-text">
+        <span data-slot="forum-card-title">{discussion.title}</span>
+        {excerpt && <span data-slot="forum-card-excerpt">{excerpt}</span>}
+        <span data-slot="forum-card-meta">
+          <span>
+            {replies} {replies === 1 ? "reply" : "replies"}
+            {discussion.closedAt && " · Closed"}
+            {" · "}
+            <RelativeTime value={discussion.lastActivityAt} />
           </span>
           <UpvoteChip discussion={discussion} />
         </span>
         {discussion.tags.length > 0 && <FittingTags tags={discussion.tags} />}
       </span>
-    </>
-  );
-  return (
-    <DiscussionContextMenu
-      discussion={discussion}
-      trigger={
-        isOpen ? (
-          <Link
-            role="listitem"
-            data-slot="forum-item"
-            data-selected
-            aria-current="page"
-            to="/$workspace/forum"
-            params={{ workspace: workspace.urlKey }}
-            search={filters}
-          />
-        ) : (
-          <Link
-            role="listitem"
-            data-slot="forum-item"
-            to="/$workspace/discussion/$slug"
-            params={{ workspace: workspace.urlKey, slug: entitySlug(discussion) }}
-            search={filters}
-          />
-        )
-      }
-    >
-      {content}
     </DiscussionContextMenu>
   );
 }
 
 const MORE_CHIP_WIDTH = 36;
-const TAG_GAP = 4;
+const TAG_GAP = 6;
 
 /** The tags on one line, with a +n chip for those that don't fit. */
 function FittingTags({ tags }: { tags: string[] }) {
@@ -274,13 +221,10 @@ function FittingTags({ tags }: { tags: string[] }) {
   }, [tags]);
   const hidden = tags.length - shown;
   return (
-    <span ref={rowRef} data-slot="forum-item-tags">
+    <span ref={rowRef} data-slot="forum-card-tags">
       {tags.map((tag, index) => (
         <span key={tag} data-tag data-overflow={index >= shown || undefined}>
-          <span aria-hidden data-slot="tag-hash">
-            #
-          </span>
-          {tag}
+          #{tag}
         </span>
       ))}
       {hidden > 0 && (
@@ -300,58 +244,5 @@ function ForumThumb({ discussion }: { discussion: Discussion }) {
       {cover?.kind === "video" && <video src={cover.url} muted preload="metadata" />}
       {!cover && <ImageIcon />}
     </span>
-  );
-}
-
-/** The divider between the list and the open discussion: drag or use the arrow keys to resize the list. */
-function PaneResizer({
-  panesRef,
-  onResize,
-  onReset,
-}: {
-  panesRef: RefObject<HTMLDivElement | null>;
-  onResize: (width: number) => void;
-  onReset: () => void;
-}) {
-  const resize = (width: number) => {
-    const panes = panesRef.current;
-    if (!panes) return;
-    const max = panes.getBoundingClientRect().width - RESIZER_WIDTH - MIN_DETAIL_WIDTH;
-    onResize(Math.round(Math.max(MIN_LIST_WIDTH, Math.min(width, max))));
-  };
-  const listWidth = () =>
-    panesRef.current?.querySelector("[data-slot=forum-list]")?.getBoundingClientRect().width ?? 0;
-
-  return (
-    <div
-      role="separator"
-      aria-orientation="vertical"
-      aria-label="Resize panels"
-      tabIndex={0}
-      data-slot="pane-resizer"
-      data-focus-indicator="child"
-      onPointerDown={(event) => {
-        const handle = event.currentTarget;
-        handle.setPointerCapture(event.pointerId);
-        document.body.dataset.resizing = "";
-        const left = panesRef.current?.getBoundingClientRect().left ?? 0;
-        const move = (moved: PointerEvent) => resize(moved.clientX - left - RESIZER_WIDTH / 2);
-        const end = () => {
-          delete document.body.dataset.resizing;
-          handle.removeEventListener("pointermove", move);
-          handle.removeEventListener("pointerup", end);
-          handle.removeEventListener("pointercancel", end);
-        };
-        handle.addEventListener("pointermove", move);
-        handle.addEventListener("pointerup", end);
-        handle.addEventListener("pointercancel", end);
-      }}
-      onKeyDown={(event) => {
-        if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-        event.preventDefault();
-        resize(listWidth() + (event.key === "ArrowRight" ? RESIZE_STEP : -RESIZE_STEP));
-      }}
-      onDoubleClick={onReset}
-    />
   );
 }

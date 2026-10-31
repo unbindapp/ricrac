@@ -65,7 +65,7 @@ type TRailProps = {
   isModal?: boolean;
 };
 
-/** The navigation rail: icons in pills, with their labels beside them while expanded. */
+/** The navigation rail: icons in round pills under the menu button, with their labels beside them while expanded. */
 export function NavigationRail({
   isExpanded,
   menuLabel,
@@ -111,27 +111,28 @@ export function NavigationRail({
       data-slot="navigation-rail"
       data-expanded={isExpanded || undefined}
       className={cn(
-        "group/rail-root grid h-full shrink-0 grid-rows-[1fr_auto_1fr] overflow-x-hidden overflow-y-auto px-4 py-3",
+        "group/rail flex h-full shrink-0 flex-col gap-1 overflow-x-hidden overflow-y-auto px-5 py-3",
         isModal
           ? "bg-m3-surface-container w-full"
-          : "w-22 transition-[width] duration-250 ease-[ease] data-expanded:w-70",
+          : "duration-(--spring-default-spatial-duration) ease-spring-default-spatial w-24 transition-[width] data-expanded:w-70",
       )}
     >
-      <div className="flex flex-col items-start">
+      <div className="flex h-14 shrink-0 items-center">
         <SidebarToggleTooltip label={menuLabel} side="right">
           <Button
             variant="ghost"
             size="icon"
             forceMinSize={false}
             aria-label={menuLabel}
-            className="text-m3-on-surface has-hover:hover:bg-m3-surface-variant size-14 rounded-full after:hidden active:rounded-full"
+            data-slot="rail-item"
+            className="size-14 rounded-full after:hidden active:rounded-full"
             onClick={onMenu}
           >
             <MenuToggleIcon />
           </Button>
         </SidebarToggleTooltip>
       </div>
-      <div className="row-start-2 flex flex-col gap-2">
+      <div className="mt-2 flex flex-col gap-2">
         {destinations
           .filter((destination) => !destination.isHidden)
           .map((destination) => (
@@ -144,41 +145,41 @@ export function NavigationRail({
           ))}
         <AskClaudeButton isExpanded={isExpanded} onNavigate={onNavigate} />
         <MoreMenu isExpanded={isExpanded} onNavigate={onNavigate} />
-        <RailLink
-          label="Settings"
-          icon={SettingsIcon}
-          isExpanded={isExpanded}
-          onNavigate={onNavigate}
-          link={{ to: isAdmin ? "/$workspace/settings" : "/$workspace/settings/account", params }}
-        />
-      </div>
-      <div className="flex min-w-0 flex-col justify-between gap-2 pt-3">
-        {isExpanded && (
-          <div className="animate-in fade-in-0 flex flex-col">
-            <SidebarFavorites onNavigate={onNavigate} />
-          </div>
-        )}
         {isModal && (
-          <WorkspaceMenu
+          <RailLink
+            label="Settings"
+            icon={SettingsIcon}
+            isExpanded={isExpanded}
             onNavigate={onNavigate}
-            trigger={
-              <RailButton
-                label={workspace.name}
-                icon={CurrentWorkspaceIcon}
-                isExpanded
-                aria-label="Switch workspace"
-                className="mt-auto"
-              />
-            }
+            link={{ to: isAdmin ? "/$workspace/settings" : "/$workspace/settings/account", params }}
           />
         )}
       </div>
+      {isExpanded && (
+        <div className="animate-in fade-in-0 flex min-w-0 flex-col pt-3">
+          <SidebarFavorites onNavigate={onNavigate} />
+        </div>
+      )}
+      {isModal && (
+        <WorkspaceMenu
+          onNavigate={onNavigate}
+          trigger={
+            <RailButton
+              label={workspace.name}
+              icon={CurrentWorkspaceIcon}
+              isExpanded
+              aria-label="Switch workspace"
+              className="mt-auto"
+            />
+          }
+        />
+      )}
     </nav>
   );
 }
 
 const railItemClassName =
-  "relative flex h-14 w-full shrink-0 items-center justify-start gap-3 rounded-full px-4 text-left text-[15px] leading-5 font-medium whitespace-nowrap transition-colors select-none";
+  "type-label-large relative flex h-14 w-14 shrink-0 items-center justify-start gap-3 rounded-full px-4 text-left whitespace-nowrap transition-colors select-none group-data-expanded/rail:w-full";
 
 type TRailIcon = ComponentType<{ className?: string }>;
 

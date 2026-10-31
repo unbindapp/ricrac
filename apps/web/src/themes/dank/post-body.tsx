@@ -49,7 +49,7 @@ export function PostBody({ discussion }: { discussion: DiscussionDetail }) {
           role="toolbar"
           aria-label="Post actions"
           data-slot="message-tools"
-          className="touch:hidden absolute -top-4.5 right-2 z-10 flex gap-0.5 rounded-full p-0.75 opacity-0 group-hover/message:opacity-100 focus-within:opacity-100 has-data-popup-open:opacity-100"
+          className="touch:hidden absolute top-0 right-0 z-10 flex gap-0.5 rounded-full p-1 opacity-0 group-hover/message:opacity-100 focus-within:opacity-100 has-data-popup-open:opacity-100"
         >
           {canRewrite && (
             <SimpleTooltip content="Edit post">

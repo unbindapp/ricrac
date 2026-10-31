@@ -27,6 +27,8 @@ export type TForumFilters = {
   status?: Exclude<TForumView, "open">;
   tag?: string;
   sort?: Exclude<TForumSort, "activity">;
+  /** The sort turned round. */
+  order?: "asc";
 };
 
 export const forumSortOptions: { value: TForumSort; label: string }[] = [
@@ -55,7 +57,8 @@ export function forumDiscussionsQuery(
     tag,
     query,
     sort,
-  }: { status?: TForumView; tag?: string; query?: string; sort?: TForumSort },
+    order,
+  }: { status?: TForumView; tag?: string; query?: string; sort?: TForumSort; order?: "asc" },
 ) {
   const isTrash = status === "trash";
   return discussionsQuery(workspaceId, {
@@ -65,6 +68,7 @@ export function forumDiscussionsQuery(
     query: query || undefined,
     includeBody: !isTrash || undefined,
     sort: isTrash ? undefined : sort,
+    order: isTrash ? undefined : order,
   });
 }
 

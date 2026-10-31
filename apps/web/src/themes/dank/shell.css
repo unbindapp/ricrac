@@ -1,4 +1,4 @@
-/* Panes on the shell, rounded as in the Ricrac layout mockup. */
+/* Panes on the shell, rounded as in the Ricrac workspace mockup. */
 :root[data-ui-theme="dank"]
   :is(
     main,
@@ -8,7 +8,7 @@
     [data-slot="chat-layout"] > div,
     [data-slot="panel-bar"]
   ) {
-  border-radius: 24px;
+  border-radius: 28px;
 }
 
 /* Rail items: the active one keeps its indicator when hovered, under a state layer. */
@@ -18,7 +18,7 @@
 
   @media (hover: hover) {
     &:hover {
-      background-color: var(--m3-surface-variant);
+      background-color: color-mix(in srgb, var(--m3-on-surface-variant) 8%, transparent);
     }
   }
 
@@ -36,4 +36,9 @@
       }
     }
   }
+}
+
+/* The search bar rests low over the shell and lifts to level 3 while it lists what matches. */
+:root[data-ui-theme="dank"] [data-slot="global-search"]:not([data-open]) {
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
 }

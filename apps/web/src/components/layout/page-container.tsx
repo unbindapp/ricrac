@@ -34,14 +34,14 @@ export function PageContainer({ width = "full", children }: TProps) {
       <div
         className={cn(
           "dank:animate-in dank:fade-in-0 dank:slide-in-from-bottom-2 dank:ease-spring-default-spatial dank:duration-(--spring-default-spatial-duration) dank:motion-reduce:animate-none mx-auto flex w-full flex-1 flex-col gap-4 px-4 pt-4 pb-8",
-          width === "narrow" ? "max-w-3xl sm:px-6 sm:pt-10" : "max-w-none",
+          width === "narrow" ? "max-w-3xl sm:px-6 sm:pt-10" : "dank:md:px-10 dank:md:pt-8 max-w-none",
         )}
       >
         {children}
         {createButton === "fab" && (
           <div
             ref={setFab}
-            className="pointer-events-none sticky bottom-4 z-20 mt-auto -mb-4 flex justify-end *:pointer-events-auto empty:hidden"
+            className="dank:md:bottom-6 dank:md:-mr-4 dank:md:-mb-2 pointer-events-none sticky bottom-4 z-20 mt-auto -mb-4 flex justify-end *:pointer-events-auto empty:hidden"
           />
         )}
       </div>

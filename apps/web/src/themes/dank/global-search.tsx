@@ -1,5 +1,5 @@
 import { type LinkProps, useNavigate } from "@tanstack/react-router";
-import { type ReactNode, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import { TriangleAlertIcon, XIcon } from "@/components/icons";
 import { SearchHitGroups } from "@/components/search/search-hit-groups";
@@ -9,8 +9,8 @@ import { Command, CommandEmpty, CommandInput, CommandList } from "@/components/u
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 
-/** Searches the whole workspace from a bar that widens while you type, listing what matches under it. */
-export function GlobalSearch({ trailing }: { trailing?: ReactNode }) {
+/** Searches the whole workspace from a bar that docks what matches under it while you type. */
+export function GlobalSearch() {
   const { workspace } = useWorkspace();
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -33,18 +33,16 @@ export function GlobalSearch({ trailing }: { trailing?: ReactNode }) {
     <Command
       shouldFilter={false}
       loop
+      variant="searchView"
       wrapper="none"
+      data-slot="global-search"
       data-open={isListShown || undefined}
-      data-typing={query ? true : undefined}
-      className="group/search relative w-140 max-w-full overflow-visible rounded-[1.75rem] bg-transparent transition-[width] duration-250 ease-[ease] data-typing:w-160"
+      className="h-auto"
       onKeyDown={(event) => {
         if (event.key === "Escape") close();
       }}
     >
-      <div
-        data-slot="search-bar"
-        className="bg-m3-surface-container-lowest flex h-14 items-center rounded-[1.75rem] px-1 group-data-open/search:rounded-b-none"
-      >
+      <div data-slot="search-bar" className="flex h-14 shrink-0 items-center pr-1">
         <CommandInput
           ref={inputRef}
           value={query}
@@ -57,10 +55,10 @@ export function GlobalSearch({ trailing }: { trailing?: ReactNode }) {
           showSpinner={search.isPending}
           aria-label="Search"
           placeholder={`Search ${workspace.name}`}
-          classNameWrapper="min-w-0 flex-1 border-0 [&>div]:left-3 [&>div]:size-6 [&>div]:text-m3-on-surface-variant [&_svg]:text-m3-on-surface-variant"
+          classNameWrapper="min-w-0 flex-1 border-0 [&>div]:left-5 [&>div]:size-6 [&>div]:text-m3-on-surface-variant [&_svg]:text-m3-on-surface-variant"
           className="text-m3-on-surface placeholder:text-m3-on-surface-variant h-14 pr-2 pl-14 text-base leading-6"
         />
-        {query ? (
+        {query && (
           <Button
             variant="ghost"
             size="icon"
@@ -75,13 +73,11 @@ export function GlobalSearch({ trailing }: { trailing?: ReactNode }) {
           >
             <XIcon />
           </Button>
-        ) : (
-          trailing
         )}
       </div>
       {isListShown && (
         <div
-          className="bg-m3-surface-container-lowest text-m3-on-surface absolute inset-x-0 top-full z-50 flex max-h-120 min-h-60 flex-col overflow-hidden rounded-b-[1.75rem]"
+          className="border-m3-outline flex max-h-120 min-h-60 flex-col border-t"
           onMouseDown={(event) => event.preventDefault()}
         >
           <ScrollArea className="min-h-0">

@@ -27,6 +27,7 @@ type ListInput struct {
 	Status         *string `json:"status" enum:"open,closed,all" doc:"open (default), closed or all."`
 	Query          *string `json:"query" doc:"Words to find in the title or body."`
 	Sort           *string `json:"sort" enum:"activity,newest,top" doc:"activity (default): pinned first, then the most recent activity; newest: pinned first, then the newest; top: pinned first, then the most upvoted, ties by recent activity."`
+	Order          *string `json:"order" enum:"desc,asc" doc:"desc (default) lists as sort says; asc turns it round: the least recent activity, the oldest or the least upvoted first. Pinned ones stay first."`
 	IncludeTrashed bool    `json:"includeTrashed,omitempty"`
 	OnlyTrashed    bool    `json:"onlyTrashed,omitempty" doc:"Only discussions in the trash, the most recently trashed first."`
 	IncludeBody    bool    `json:"includeBody,omitempty" doc:"Include each discussion's body."`
@@ -50,6 +51,7 @@ type SaveInput struct {
 var (
 	statuses = []string{"open", "closed", "all"}
 	sorts    = []string{"activity", "newest", "top"}
+	orders   = []string{"desc", "asc"}
 )
 
 func (self *DiscussionService) List(ctx context.Context, actor *auth.Actor, input *ListInput) (args.PageOf[models.Discussion], error) {
@@ -67,12 +69,20 @@ func (self *DiscussionService) List(ctx context.Context, actor *auth.Actor, inpu
 	if !slices.Contains(sorts, sort) {
 		return args.PageOf[models.Discussion]{}, errdefs.BadRequest("sort %q isn't activity, newest or top", sort)
 	}
+	order := "desc"
+	if input.Order != nil {
+		order = strings.TrimSpace(*input.Order)
+	}
+	if !slices.Contains(orders, order) {
+		return args.PageOf[models.Discussion]{}, errdefs.BadRequest("order %q isn't desc or asc", order)
+	}
 	teams, err := actor.TeamIDs(ctx)
 	if err != nil {
 		return args.PageOf[models.Discussion]{}, err
 	}
 	filter := discussion_repo.ListFilter{
-		Workspace: actor.Workspace, Teams: teams, Status: status, Sort: sort, IncludeTrashed: input.IncludeTrashed, OnlyTrashed: input.OnlyTrashed,
+		Workspace: actor.Workspace, Teams: teams, Status: status, Sort: sort, Ascending: order == "asc",
+		IncludeTrashed: input.IncludeTrashed, OnlyTrashed: input.OnlyTrashed,
 	}
 	if filter.Team, err = self.resolve.OptionalTeam(ctx, actor, input.Team); err != nil {
 		return args.PageOf[models.Discussion]{}, err

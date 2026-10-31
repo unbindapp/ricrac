@@ -3274,6 +3274,8 @@ export type ListDiscussionsArgs = {
   limit?: number | null
   /** Only discussions in the trash, the most recently trashed first. */
   onlyTrashed?: boolean
+  /** desc (default) lists as sort says; asc turns it round: the least recent activity, the oldest or the least upvoted first. Pinned ones stay first. */
+  order?: "desc" | "asc" | null
   /** Words to find in the title or body. */
   query?: string | null
   /** activity (default): pinned first, then the most recent activity; newest: pinned first, then the newest; top: pinned first, then the most upvoted, ties by recent activity. */

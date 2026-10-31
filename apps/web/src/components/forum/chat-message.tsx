@@ -242,8 +242,8 @@ export function ChatMessage({
       aria-label="Message actions"
       data-slot="message-tools"
       className={cn(
-        "touch:hidden absolute -top-4.5 z-10 flex gap-0.5 rounded-full p-0.75 opacity-0 group-hover/message:opacity-100 group-data-popup-open/message:opacity-100 focus-within:opacity-100 has-data-popup-open:opacity-100",
-        isMine ? "left-2" : "right-2",
+        "touch:hidden absolute top-1/2 z-10 flex -translate-y-1/2 gap-0.5 rounded-full p-1 opacity-0 group-hover/message:opacity-100 group-data-popup-open/message:opacity-100 focus-within:opacity-100 has-data-popup-open:opacity-100",
+        isMine ? "right-full mr-2" : "left-full ml-2",
       )}
     >
       {canEdit && <AddReactionButton reactions={reactions} onToggle={react} />}
@@ -317,11 +317,9 @@ export function ChatMessage({
         >
           {!isContinuation && (
             <header className="flex max-w-full min-w-0 items-baseline gap-2 px-1 pb-0.5">
-              {!isMine && (
-                <span data-slot="message-name" className="truncate">
-                  {authorName}
-                </span>
-              )}
+              <span data-slot="message-name" className="truncate">
+                {isMine ? "You" : authorName}
+              </span>
               <MessageTime value={message.createdAt} />
             </header>
           )}
@@ -330,7 +328,7 @@ export function ChatMessage({
           ) : (
             <div
               className={cn(
-                "flex max-w-full min-w-0 flex-col gap-1",
+                "relative flex max-w-full min-w-0 flex-col gap-1",
                 isMine ? "items-end" : "items-start",
               )}
               onContextMenu={keepNativeMenu}
@@ -348,6 +346,7 @@ export function ChatMessage({
               )}
               <MessageAttachments attachments={attachments} />
               {!text && edited}
+              {!isDeleted && (canEdit || canDelete) && bubbleTools}
             </div>
           )}
           {reactions.length > 0 && (
@@ -362,7 +361,6 @@ export function ChatMessage({
           )}
         </div>
       </div>
-      {!isEditing && !isDeleted && (canEdit || canDelete) && bubbleTools}
     </>
   );
 

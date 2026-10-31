@@ -1,43 +1,41 @@
-/* Chats, measured from the Ricrac chat mockup. */
+/* Chats, measured from the Ricrac workspace mockup. */
 :root[data-ui-theme="dank"] {
-  & article[data-side] {
-    @media (hover: hover) {
-      &:hover {
-        background-color: color-mix(in srgb, var(--m3-on-surface) 5%, transparent);
-      }
-    }
-
-    &[data-popup-open] {
-      background-color: color-mix(in srgb, var(--m3-on-surface) 5%, transparent);
-    }
-  }
-
-  & [data-slot="message-avatar"] [data-slot="avatar"] {
-    width: 36px;
-    height: 36px;
-    font-size: 15px;
+  & [data-slot="message-avatar"] {
+    display: none;
   }
 
   & [data-slot="message-body"]:not([data-editing]) {
-    max-width: min(75%, 560px);
+    max-width: min(70%, 520px);
+  }
+
+  & article[data-side] header {
+    gap: 8px;
+    padding: 0 4px 4px;
+
+    & time {
+      color: var(--m3-on-surface-variant);
+      font-size: 11px;
+      opacity: 0.7;
+    }
   }
 
   & [data-slot="message-name"] {
     color: var(--m3-on-surface);
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
   }
 
   & [data-slot="message-bubble"] {
-    padding: 8px 14px;
-    border-radius: 18px;
-    background-color: var(--m3-surface-container-low);
-    color: var(--m3-on-surface);
+    padding: 10px 14px;
+    border-radius: 20px;
+    background-color: var(--m3-secondary-container);
+    color: var(--m3-on-secondary-container);
     overflow-wrap: anywhere;
 
     & .rr-prose {
       font-size: 15px;
-      line-height: 1.4;
+      line-height: 21px;
     }
 
     & [data-slot="message-edited"] {
@@ -71,7 +69,7 @@
   }
 
   & [data-slot="message-reactions"] {
-    padding-top: 2px;
+    padding: 2px 4px 0;
 
     & [data-slot="reaction-bar"] {
       gap: 4px;
@@ -80,18 +78,19 @@
     & [data-m3-chip] {
       height: 26px;
       min-height: 26px;
-      gap: 6px;
+      gap: 4px;
       padding-inline: 8px;
-      border: 1px solid transparent;
-      border-radius: 8px;
-      background-color: var(--m3-surface-container-low);
-      color: var(--m3-on-surface-variant);
+      border: 0;
+      border-radius: 13px;
+      background-color: var(--m3-surface-container-high);
+      box-shadow: inset 0 0 0 1px var(--m3-surface-variant);
+      color: var(--m3-on-surface);
       font-size: 13px;
 
       &[aria-pressed="true"] {
-        border-color: var(--m3-primary);
-        background-color: var(--m3-secondary-container);
-        color: var(--m3-on-secondary-container);
+        background-color: var(--m3-primary-container);
+        box-shadow: inset 0 0 0 1px var(--m3-primary);
+        color: var(--m3-on-primary-container);
       }
 
       & > span:first-child {
@@ -107,13 +106,27 @@
 
   & [data-slot="message-tools"] {
     background-color: var(--m3-surface-container-high);
-    box-shadow: 0 2px 8px rgb(0 0 0 / 0.2);
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.3),
+      0 2px 6px 2px rgb(0 0 0 / 0.12);
+    color: var(--m3-on-surface-variant);
 
     & button {
-      width: 36px;
-      height: 30px;
-      border-radius: 15px;
-      color: var(--m3-on-surface-variant);
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      color: inherit;
+
+      &::after {
+        display: none;
+      }
+
+      @media (hover: hover) {
+        &:hover {
+          background-color: color-mix(in srgb, var(--m3-on-surface-variant) 14%, transparent);
+          color: var(--m3-on-surface);
+        }
+      }
     }
 
     & button svg {
@@ -123,7 +136,7 @@
     }
   }
 
-  /* The line from a reply's glimpse down to its avatar, or to its bubble on your side. */
+  /* The line from a reply's glimpse down to the message it opens. */
   & [data-slot="reply-glimpse"] {
     position: relative;
     display: flex;
@@ -133,13 +146,15 @@
     gap: 6px;
     width: auto;
     max-width: 100%;
-    height: 20px;
-    margin-bottom: 6px;
-    padding: 0 0 0 46px;
+    height: auto;
+    min-height: 18px;
+    margin: 0 4px 2px;
+    padding: 0 0 0 22px;
     border-radius: 0;
     color: var(--m3-on-surface-variant);
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 400;
+    line-height: 16px;
 
     &::after {
       display: none;
@@ -149,28 +164,26 @@
       content: "";
       position: absolute;
       top: 50%;
-      left: 17px;
-      width: 22px;
-      height: calc(50% + 6px);
-      border: 0 solid color-mix(in srgb, var(--m3-on-surface-variant) 55%, transparent);
+      left: 8px;
+      width: 14px;
+      height: 10px;
+      border: 0 solid var(--m3-outline);
       border-top-width: 2px;
       border-left-width: 2px;
       border-top-left-radius: 8px;
     }
 
     & [data-slot="avatar"] {
-      width: 16px;
-      height: 16px;
-      font-size: 10px;
+      display: none;
     }
   }
 
   & article[data-side="me"] [data-slot="reply-glimpse"] {
     align-self: flex-end;
-    padding: 0 46px 0 0;
+    padding: 0 22px 0 0;
 
     &::before {
-      right: 17px;
+      right: 8px;
       left: auto;
       border-left-width: 0;
       border-right-width: 2px;
@@ -181,6 +194,7 @@
 
   & [data-slot="reply-glimpse-name"] {
     flex: none;
+    color: var(--m3-on-surface);
     font-weight: 500;
   }
 
@@ -192,11 +206,13 @@
   }
 
   & [data-slot="reply-bar"] {
-    padding: 6px 6px 6px 16px;
-    border-radius: 16px;
-    background-color: var(--m3-surface-container-low);
+    gap: 8px;
+    margin-top: 8px;
+    padding: 8px 8px 8px 20px;
+    border-radius: 20px;
+    background-color: var(--m3-surface-container);
     color: var(--m3-on-surface-variant);
-    font-size: 14px;
+    font-size: 13px;
 
     & > svg {
       width: 20px;
@@ -230,8 +246,8 @@
 
   & [data-slot="composer-tool"],
   & [data-slot="composer-send"] {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
 
     & svg {
@@ -242,7 +258,7 @@
 
   & [data-slot="composer-tool"] {
     background-color: var(--m3-surface-container-high);
-    color: var(--m3-on-surface);
+    color: var(--m3-on-surface-variant);
   }
 
   & [data-slot="composer-send"] {
@@ -252,10 +268,10 @@
 
   & [data-slot="composer-field"] {
     align-self: auto;
-    min-height: 48px;
-    padding: 12px 16px;
-    border-radius: 24px;
-    background-color: var(--m3-surface-container-low);
+    min-height: 56px;
+    padding: 14px 20px;
+    border-radius: 28px;
+    background-color: var(--m3-surface-container-high);
     color: var(--m3-on-surface);
 
     & .ProseMirror {
@@ -273,8 +289,8 @@
     }
 
     &:focus-within {
-      outline: 2px solid var(--m3-primary);
-      outline-offset: -2px;
+      outline: 3px solid var(--m3-secondary);
+      outline-offset: 2px;
     }
   }
 

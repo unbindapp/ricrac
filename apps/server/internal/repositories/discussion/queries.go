@@ -85,9 +85,11 @@ type ListFilter struct {
 	Query *string
 	// After the pinned ones: activity (the latest activity first), newest or top (the most
 	// upvoted first). Only trashed ones keep their own order.
-	Sort   string
-	Limit  int64
-	Offset int64
+	Sort string
+	// The sort turned round: the least recent activity, the oldest or the least upvoted first.
+	Ascending bool
+	Limit     int64
+	Offset    int64
 }
 
 // List is the discussions that match, pinned ones first, then in the filter's sort (after the most
@@ -129,16 +131,20 @@ func (self *DiscussionRepository) List(ctx context.Context, filter ListFilter) (
 	query = query.Order(func(s *entsql.Selector) {
 		s.OrderExpr(repository.RawExpr(s.C(discussion.FieldPinnedAt) + " IS NULL"))
 	})
+	by, direction := ent.Desc, " DESC"
+	if filter.Ascending {
+		by, direction = ent.Asc, " ASC"
+	}
 	switch {
 	case filter.OnlyTrashed:
 	case filter.Sort == "newest":
-		query = query.Order(ent.Desc(discussion.FieldCreatedAt))
+		query = query.Order(by(discussion.FieldCreatedAt))
 	case filter.Sort == "top":
 		query = query.Order(func(s *entsql.Selector) {
-			s.OrderExpr(repository.RawExpr("(SELECT count(*) FROM discussion_votes v WHERE v.discussion_id = " + s.C(discussion.FieldID) + ") DESC"))
+			s.OrderExpr(repository.RawExpr("(SELECT count(*) FROM discussion_votes v WHERE v.discussion_id = " + s.C(discussion.FieldID) + ")" + direction))
 		})
 	}
-	return query.Order(ent.Desc(discussion.FieldLastActivityAt), ent.Asc(discussion.FieldID)).
+	return query.Order(by(discussion.FieldLastActivityAt), ent.Asc(discussion.FieldID)).
 		Limit(int(filter.Limit)).Offset(int(filter.Offset)).IDs(ctx)
 }
 
