@@ -8,12 +8,14 @@ import {
   AppWindowIcon as LucideAppWindowIcon,
   ArchiveIcon as LucideArchiveIcon,
   ArchiveRestoreIcon as LucideArchiveRestoreIcon,
+  ArrowDownIcon as LucideArrowDownIcon,
   ArrowDownNarrowWideIcon as LucideArrowDownNarrowWideIcon,
   ArrowDownToLineIcon as LucideArrowDownToLineIcon,
   ArrowLeftIcon as LucideArrowLeftIcon,
   ArrowLeftToLineIcon as LucideArrowLeftToLineIcon,
   ArrowRightLeftIcon as LucideArrowRightLeftIcon,
   ArrowRightToLineIcon as LucideArrowRightToLineIcon,
+  ArrowUpIcon as LucideArrowUpIcon,
   ArrowUpNarrowWideIcon as LucideArrowUpNarrowWideIcon,
   ArrowUpRightIcon as LucideArrowUpRightIcon,
   ArrowUpToLineIcon as LucideArrowUpToLineIcon,
@@ -108,6 +110,7 @@ import {
   KeyboardIcon as LucideKeyboardIcon,
   LayersIcon as LucideLayersIcon,
   LayoutGridIcon as LucideLayoutGridIcon,
+  LayoutListIcon as LucideLayoutListIcon,
   LightbulbIcon as LucideLightbulbIcon,
   LinkIcon as LucideLinkIcon,
   ListChecksIcon as LucideListChecksIcon,
@@ -182,6 +185,7 @@ import {
   StarIcon as LucideStarIcon,
   StrikethroughIcon as LucideStrikethroughIcon,
   SunIcon as LucideSunIcon,
+  SunMoonIcon as LucideSunMoonIcon,
   TableColumnsSplitIcon as LucideTableColumnsSplitIcon,
   TableIcon as LucideTableIcon,
   TableRowsSplitIcon as LucideTableRowsSplitIcon,
@@ -190,6 +194,7 @@ import {
   TargetIcon as LucideTargetIcon,
   TextQuoteIcon as LucideTextQuoteIcon,
   Trash2Icon as LucideTrash2Icon,
+  TrendingUpIcon as LucideTrendingUpIcon,
   TriangleAlertIcon as LucideTriangleAlertIcon,
   TriangleIcon as LucideTriangleIcon,
   TrophyIcon as LucideTrophyIcon,
@@ -226,6 +231,7 @@ export const ArchiveRestoreIcon = /* @__PURE__ */ themedIcon(
   LucideArchiveRestoreIcon,
   "ArchiveRestoreIcon",
 );
+export const ArrowDownIcon = /* @__PURE__ */ themedIcon(LucideArrowDownIcon, "ArrowDownIcon");
 export const ArrowDownNarrowWideIcon = /* @__PURE__ */ themedIcon(
   LucideArrowDownNarrowWideIcon,
   "ArrowDownNarrowWideIcon",
@@ -247,6 +253,7 @@ export const ArrowRightToLineIcon = /* @__PURE__ */ themedIcon(
   LucideArrowRightToLineIcon,
   "ArrowRightToLineIcon",
 );
+export const ArrowUpIcon = /* @__PURE__ */ themedIcon(LucideArrowUpIcon, "ArrowUpIcon");
 export const ArrowUpNarrowWideIcon = /* @__PURE__ */ themedIcon(
   LucideArrowUpNarrowWideIcon,
   "ArrowUpNarrowWideIcon",
@@ -389,6 +396,7 @@ export const KeySquareIcon = /* @__PURE__ */ themedIcon(LucideKeySquareIcon, "Ke
 export const KeyboardIcon = /* @__PURE__ */ themedIcon(LucideKeyboardIcon, "KeyboardIcon");
 export const LayersIcon = /* @__PURE__ */ themedIcon(LucideLayersIcon, "LayersIcon");
 export const LayoutGridIcon = /* @__PURE__ */ themedIcon(LucideLayoutGridIcon, "LayoutGridIcon");
+export const LayoutListIcon = /* @__PURE__ */ themedIcon(LucideLayoutListIcon, "LayoutListIcon");
 export const LightbulbIcon = /* @__PURE__ */ themedIcon(LucideLightbulbIcon, "LightbulbIcon");
 export const LinkIcon = /* @__PURE__ */ themedIcon(LucideLinkIcon, "LinkIcon");
 export const ListChecksIcon = /* @__PURE__ */ themedIcon(LucideListChecksIcon, "ListChecksIcon");
@@ -505,6 +513,7 @@ export const StrikethroughIcon = /* @__PURE__ */ themedIcon(
   "StrikethroughIcon",
 );
 export const SunIcon = /* @__PURE__ */ themedIcon(LucideSunIcon, "SunIcon");
+export const SunMoonIcon = /* @__PURE__ */ themedIcon(LucideSunMoonIcon, "SunMoonIcon");
 export const TableColumnsSplitIcon = /* @__PURE__ */ themedIcon(
   LucideTableColumnsSplitIcon,
   "TableColumnsSplitIcon",
@@ -519,6 +528,7 @@ export const TagsIcon = /* @__PURE__ */ themedIcon(LucideTagsIcon, "TagsIcon");
 export const TargetIcon = /* @__PURE__ */ themedIcon(LucideTargetIcon, "TargetIcon");
 export const TextQuoteIcon = /* @__PURE__ */ themedIcon(LucideTextQuoteIcon, "TextQuoteIcon");
 export const Trash2Icon = /* @__PURE__ */ themedIcon(LucideTrash2Icon, "Trash2Icon");
+export const TrendingUpIcon = /* @__PURE__ */ themedIcon(LucideTrendingUpIcon, "TrendingUpIcon");
 export const TriangleAlertIcon = /* @__PURE__ */ themedIcon(
   LucideTriangleAlertIcon,
   "TriangleAlertIcon",

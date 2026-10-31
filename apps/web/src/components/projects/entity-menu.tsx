@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from "react";
+import { type ReactElement, type ReactNode, useState } from "react";
 
 import {
   ArchiveIcon,
@@ -30,6 +30,8 @@ type TProps = {
   onShowHistory?: () => void;
   /** Items of the page's own, first. */
   children?: ReactNode;
+  /** What opens the menu, in place of the ⋯ button. */
+  trigger?: ReactElement;
 };
 
 /** Trashed things can't be opened, so their page is left with a toast that brings them back. */
@@ -99,6 +101,7 @@ export function EntityMenu({
   onTrash,
   onShowHistory,
   children,
+  trigger,
 }: TProps) {
   const [isTrashing, setIsTrashing] = useState(false);
   return (
@@ -106,9 +109,11 @@ export function EntityMenu({
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
-            <Button variant="ghost" size="icon" aria-label={`More ${noun} actions`}>
-              <EllipsisIcon className="size-4" />
-            </Button>
+            trigger ?? (
+              <Button variant="ghost" size="icon" aria-label={`More ${noun} actions`}>
+                <EllipsisIcon className="size-4" />
+              </Button>
+            )
           }
         />
         <DropdownMenuContent align="end" className="w-52">

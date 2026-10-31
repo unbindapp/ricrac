@@ -51,6 +51,9 @@ func TestDiscussionUpvotes(t *testing.T) {
 	call(t, w.Ann, "save_comment", M{"discussionId": "Launch", "body": "Soon"})
 	eqList(t, call(t, bob, "list_discussions", M{}).At("nodes").Strings("title"), []string{"Launch", "Offsite", "Lunch"})
 	eqList(t, call(t, bob, "list_discussions", M{"sort": "newest"}).At("nodes").Strings("title"), []string{"Offsite", "Launch", "Lunch"})
+	eqList(t, call(t, bob, "list_discussions", M{"order": "asc"}).At("nodes").Strings("title"), []string{"Lunch", "Offsite", "Launch"})
+	eqList(t, call(t, bob, "list_discussions", M{"sort": "newest", "order": "asc"}).At("nodes").Strings("title"), []string{"Lunch", "Launch", "Offsite"})
+	eqList(t, call(t, bob, "list_discussions", M{"sort": "top", "order": "asc"}).At("nodes").Strings("title"), []string{"Offsite", "Launch", "Lunch"})
 
 	takenBack := call(t, bob, "vote_discussion", M{"id": "Lunch", "upvote": false})
 	eq(t, takenBack.At("upvoteCount").Num(), 1)
@@ -60,7 +63,9 @@ func TestDiscussionUpvotes(t *testing.T) {
 
 	call(t, w.Ann, "save_discussion", M{"title": "Pinned", "pinned": true})
 	eq(t, call(t, bob, "list_discussions", M{"sort": "top"}).At("nodes", 0, "title").Str(), "Pinned", "pinned first")
+	eq(t, call(t, bob, "list_discussions", M{"sort": "top", "order": "asc"}).At("nodes", 0, "title").Str(), "Pinned", "pinned first either way")
 	contains(t, fails(t, bob, "list_discussions", M{"sort": "best"}), "sort")
+	contains(t, fails(t, bob, "list_discussions", M{"order": "up"}), "order")
 }
 
 func TestOnlyTheStarterClosesADiscussion(t *testing.T) {

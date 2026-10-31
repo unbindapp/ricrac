@@ -30,6 +30,7 @@ const searchSchema = z.object({
   /** The forum's filters, when the discussion opens beside its list. */
   status: z.enum(["closed", "all", "trash"]).optional(),
   sort: z.enum(["newest", "top"]).optional(),
+  order: z.enum(["asc"]).optional(),
   tag: z.string().optional(),
 });
 
@@ -40,11 +41,11 @@ export const Route = createFileRoute("/$workspace/_workspace/discussion/$slug")(
 
 function DiscussionSlugPage() {
   const { slug } = Route.useParams();
-  const { thread, message, status, tag, sort } = Route.useSearch();
+  const { thread, message, status, tag, sort, order } = Route.useSearch();
   const navigate = Route.useNavigate();
   const { workspace } = useWorkspace();
   const { size } = useDeviceSize();
-  const { threadsInChat, ForumPanes } = useUiTheme();
+  const { threadsInChat, ForumPanel } = useUiTheme();
   const [isChatShown, setIsChatShown] = useLocalStorage("discussion-chat-shown", true);
   const { data, isPending, error, refetch } = useQuery(discussionQuery(workspace.id, slug));
   const hasPanel = size === "lg" || size === "xl";
@@ -65,10 +66,10 @@ function DiscussionSlugPage() {
       replace: true,
     });
 
-  const filters = { status, tag, sort };
+  const filters = { status, tag, sort, order };
   const placeholder = (content: ReactNode) =>
-    ForumPanes ? (
-      <ForumPanes filters={filters} fallback={content} />
+    ForumPanel ? (
+      <ForumPanel filters={filters} fallback={content} />
     ) : (
       <PageContainer width="narrow">{content}</PageContainer>
     );
@@ -125,9 +126,9 @@ function DiscussionSlugPage() {
     />
   );
 
-  if (ForumPanes) {
+  if (ForumPanel) {
     return (
-      <ForumPanes
+      <ForumPanel
         filters={filters}
         discussion={data}
         chat={message ? threadPanel : mainChat}

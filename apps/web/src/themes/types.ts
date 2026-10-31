@@ -35,8 +35,8 @@ export type TUiTheme = {
   chatBubbles: boolean;
   /** Threads start from the chat's composer, show in its timeline and switch from its header, instead of as branches beside the topic. */
   threadsInChat: boolean;
-  /** Lists the forum in a pane beside the open discussion, whose topic and chat share a panel. */
-  ForumPanes?: ComponentType<TForumPanesProps>;
+  /** Shows the forum in one panel: its discussions, or the open one with its chat in their place. */
+  ForumPanel?: ComponentType<TForumPanelProps>;
   /** Editors show toolbars for formatting text and laying out images, which resize from their edges. */
   editorToolbars: boolean;
   /** Top-level pages show their title in a bar; without it their actions join the toolbar. */
@@ -55,7 +55,7 @@ export type TUiTheme = {
   load?: () => Promise<void>;
 };
 
-export type TForumPanesProps = {
+export type TForumPanelProps = {
   filters: TForumFilters;
   discussion?: DiscussionDetail;
   /** The discussion's main chat, or the thread open in its place. */

@@ -11,7 +11,9 @@ import { useCanClose, useCanRewrite } from "@/components/forum/use-can-rewrite";
 import {
   BellIcon,
   BellOffIcon,
+  ChevronDownIcon,
   ImageIcon,
+  LinkIcon,
   LockIcon,
   LockOpenIcon,
   MessagesSquareIcon,
@@ -26,12 +28,7 @@ import { SectionTitle } from "@/components/layout/section-title";
 import { EntityMenu, toastTrashed } from "@/components/projects/entity-menu";
 import { AvatarStack } from "@/components/projects/people";
 import { AutosaveMarkdown } from "@/components/shared/autosave-markdown";
-import {
-  ConfirmDeleteAction,
-  CopyLinkAction,
-  HeaderAction,
-  HeaderActions,
-} from "@/components/shared/detail-actions";
+import { CopyLinkAction, HeaderAction, HeaderActions } from "@/components/shared/detail-actions";
 import { InlineText } from "@/components/shared/inline-text";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +43,7 @@ import {
   useDiscussionLifecycleMutation,
   useSaveDiscussionMutation,
 } from "@/lib/queries/discussions";
+import { useCopyToClipboard } from "@/lib/hooks/use-copy";
 import { meQuery } from "@/lib/queries/me";
 import { useUiTheme } from "@/themes/ui-theme-provider";
 
@@ -141,7 +139,7 @@ export function DiscussionActions({
   children,
 }: {
   discussion: TDiscussionDetail;
-  /** Only copying and deleting are buttons of their own; the rest wait in the ⋯ menu. */
+  /** Only copying the link is a button of its own; the rest wait in the menu beside it. */
   grouped?: boolean;
   children?: ReactNode;
 }) {
@@ -153,6 +151,7 @@ export function DiscussionActions({
   const { mutateAsync: changeLifecycle } = useDiscussionLifecycleMutation(workspace.id);
   const navigate = useNavigate();
   const [isEditingThumbnail, setIsEditingThumbnail] = useState(false);
+  const { copyToClipboard } = useCopyToClipboard();
   const isPinned = Boolean(discussion.pinnedAt);
   const isClosed = Boolean(discussion.closedAt);
   const isSubscribed = discussion.subscribers.some((user) => user.id === me?.id);
@@ -202,8 +201,27 @@ export function DiscussionActions({
     return (
       <>
         {children}
+        <Button
+          variant="ghost"
+          forceMinSize={false}
+          onClick={() => {
+            copyToClipboard(discussion.url);
+            toast.add({ type: "success", title: "Link copied" });
+          }}
+        >
+          <LinkIcon />
+          Copy link
+        </Button>
         {(canEdit || canRewrite) && (
-          <EntityMenu noun="discussion">
+          <EntityMenu
+            noun="discussion"
+            onTrash={canRewrite ? trash : undefined}
+            trigger={
+              <Button variant="ghost" forceMinSize={false} aria-label="More discussion actions">
+                <ChevronDownIcon />
+              </Button>
+            }
+          >
             {canEdit && (
               <>
                 <DropdownMenuItem onClick={subscribe}>
@@ -233,8 +251,6 @@ export function DiscussionActions({
             {canRewrite && thumbnailItem}
           </EntityMenu>
         )}
-        <CopyLinkAction url={discussion.url} label="Copy link to discussion" />
-        {canRewrite && <ConfirmDeleteAction label="Delete discussion" onDelete={trash} />}
         {thumbnailDialog}
       </>
     );

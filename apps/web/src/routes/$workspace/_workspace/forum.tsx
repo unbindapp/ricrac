@@ -39,6 +39,7 @@ type TLayout = "grid" | "list";
 const searchSchema = z.object({
   status: z.enum(["closed", "all", "trash"]).optional(),
   sort: z.enum(["newest", "top"]).optional(),
+  order: z.enum(["asc"]).optional(),
   team: z.string().optional(),
   tag: z.string().optional(),
 });
@@ -49,9 +50,9 @@ export const Route = createFileRoute("/$workspace/_workspace/forum")({
 });
 
 function ForumPage() {
-  const { ForumPanes } = useUiTheme();
-  const { status, tag, sort } = Route.useSearch();
-  if (ForumPanes) return <ForumPanes filters={{ status, tag, sort }} />;
+  const { ForumPanel } = useUiTheme();
+  const { status, tag, sort, order } = Route.useSearch();
+  if (ForumPanel) return <ForumPanel filters={{ status, tag, sort, order }} />;
   return <ForumList />;
 }
 
