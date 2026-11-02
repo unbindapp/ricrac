@@ -5,6 +5,8 @@ import { BoardMenu } from "@/components/boards/board-menu";
 import { KanbanIcon, PlusIcon } from "@/components/icons";
 import { List } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
+import { EntityIcon } from "@/components/shared/entity-icon";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { boardParam, boardsQuery, type TBoard } from "@/lib/queries/boards";
@@ -51,7 +53,9 @@ function BoardRow({ board }: { board: TBoard }) {
       data-interactive
       className="has-hover:hover:bg-accent/50 flex h-11 w-full items-center gap-2 border-b px-3 text-sm last:border-b-0"
     >
-      <KanbanIcon className="text-muted-foreground size-4 shrink-0" />
+      <span className="dank:*:size-6 flex shrink-0">
+        <EntityIcon icon={null} color={null} fallback={KanbanIcon} />
+      </span>
       <Link
         to="/$workspace/board/$board_id"
         params={{ workspace: workspace.urlKey, board_id: boardParam(board) }}
@@ -65,9 +69,9 @@ function BoardRow({ board }: { board: TBoard }) {
           {board.description ?? board.columns.map((column) => column.name).join(" · ")}
         </span>
       </Link>
-      <span className="text-muted-foreground text-xs">
+      <Badge variant="muted">
         {cards} {cards === 1 ? "issue" : "issues"}
-      </span>
+      </Badge>
       <BoardMenu board={board} />
     </div>
   );
