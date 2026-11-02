@@ -52,14 +52,35 @@ func (self *IssueService) save(ctx context.Context, tx repository.TxInterface, a
 	if input.ID == nil {
 		return self.Create(ctx, tx, actor, *input)
 	}
-	if input.GitHubRepository != nil {
-		return uuid.Nil, errdefs.BadRequest("githubRepository only applies when creating an issue")
-	}
 	id, err := self.resolve.Issue(ctx, actor, *input.ID)
 	if err != nil {
 		return uuid.Nil, err
 	}
-	return id, self.Update(ctx, tx, actor, id, *input)
+	if err := self.Update(ctx, tx, actor, id, *input); err != nil {
+		return uuid.Nil, err
+	}
+	if input.GitHubRepository == nil {
+		return id, nil
+	}
+	return id, self.openOnGitHub(ctx, tx, actor, id, *input.GitHubRepository)
+}
+
+func (self *IssueService) openOnGitHub(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, id uuid.UUID, named string) error {
+	if utils.IsNoneWord(named) {
+		return errdefs.BadRequest("githubRepository \"none\" only applies when creating an issue")
+	}
+	linked, err := self.repo.GitHub().IssueLinked(ctx, tx, id)
+	if err != nil {
+		return err
+	}
+	if linked {
+		return errdefs.BadRequest("The issue is already on GitHub")
+	}
+	row, err := self.repo.Issue().Get(ctx, tx, id)
+	if err != nil {
+		return err
+	}
+	return self.events.QueueNewIssueForGitHub(ctx, tx, actor, id, row.TeamID, &named)
 }
 
 // preview is the issue as tx saved it, with where it would open on GitHub.

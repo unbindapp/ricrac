@@ -22,6 +22,12 @@ type Tx struct {
 	Attachment *AttachmentClient
 	// AuditEntry is the client for interacting with the AuditEntry builders.
 	AuditEntry *AuditEntryClient
+	// Board is the client for interacting with the Board builders.
+	Board *BoardClient
+	// BoardColumn is the client for interacting with the BoardColumn builders.
+	BoardColumn *BoardColumnClient
+	// BoardIssue is the client for interacting with the BoardIssue builders.
+	BoardIssue *BoardIssueClient
 	// Comment is the client for interacting with the Comment builders.
 	Comment *CommentClient
 	// CustomView is the client for interacting with the CustomView builders.
@@ -291,6 +297,9 @@ func (tx *Tx) init() {
 	tx.AssistantRun = NewAssistantRunClient(tx.config)
 	tx.Attachment = NewAttachmentClient(tx.config)
 	tx.AuditEntry = NewAuditEntryClient(tx.config)
+	tx.Board = NewBoardClient(tx.config)
+	tx.BoardColumn = NewBoardColumnClient(tx.config)
+	tx.BoardIssue = NewBoardIssueClient(tx.config)
 	tx.Comment = NewCommentClient(tx.config)
 	tx.CustomView = NewCustomViewClient(tx.config)
 	tx.Customer = NewCustomerClient(tx.config)

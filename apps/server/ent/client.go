@@ -15,6 +15,9 @@ import (
 	"ricrac/ent/assistantrun"
 	"ricrac/ent/attachment"
 	"ricrac/ent/auditentry"
+	"ricrac/ent/board"
+	"ricrac/ent/boardcolumn"
+	"ricrac/ent/boardissue"
 	"ricrac/ent/comment"
 	"ricrac/ent/customer"
 	"ricrac/ent/customerneed"
@@ -105,6 +108,12 @@ type Client struct {
 	Attachment *AttachmentClient
 	// AuditEntry is the client for interacting with the AuditEntry builders.
 	AuditEntry *AuditEntryClient
+	// Board is the client for interacting with the Board builders.
+	Board *BoardClient
+	// BoardColumn is the client for interacting with the BoardColumn builders.
+	BoardColumn *BoardColumnClient
+	// BoardIssue is the client for interacting with the BoardIssue builders.
+	BoardIssue *BoardIssueClient
 	// Comment is the client for interacting with the Comment builders.
 	Comment *CommentClient
 	// CustomView is the client for interacting with the CustomView builders.
@@ -254,6 +263,9 @@ func (c *Client) init() {
 	c.AssistantRun = NewAssistantRunClient(c.config)
 	c.Attachment = NewAttachmentClient(c.config)
 	c.AuditEntry = NewAuditEntryClient(c.config)
+	c.Board = NewBoardClient(c.config)
+	c.BoardColumn = NewBoardColumnClient(c.config)
+	c.BoardIssue = NewBoardIssueClient(c.config)
 	c.Comment = NewCommentClient(c.config)
 	c.CustomView = NewCustomViewClient(c.config)
 	c.Customer = NewCustomerClient(c.config)
@@ -417,6 +429,9 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		AssistantRun:         NewAssistantRunClient(cfg),
 		Attachment:           NewAttachmentClient(cfg),
 		AuditEntry:           NewAuditEntryClient(cfg),
+		Board:                NewBoardClient(cfg),
+		BoardColumn:          NewBoardColumnClient(cfg),
+		BoardIssue:           NewBoardIssueClient(cfg),
 		Comment:              NewCommentClient(cfg),
 		CustomView:           NewCustomViewClient(cfg),
 		Customer:             NewCustomerClient(cfg),
@@ -507,6 +522,9 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		AssistantRun:         NewAssistantRunClient(cfg),
 		Attachment:           NewAttachmentClient(cfg),
 		AuditEntry:           NewAuditEntryClient(cfg),
+		Board:                NewBoardClient(cfg),
+		BoardColumn:          NewBoardColumnClient(cfg),
+		BoardIssue:           NewBoardIssueClient(cfg),
 		Comment:              NewCommentClient(cfg),
 		CustomView:           NewCustomViewClient(cfg),
 		Customer:             NewCustomerClient(cfg),
@@ -603,10 +621,11 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.APIKey, c.AssistantRun, c.Attachment, c.AuditEntry, c.Comment, c.CustomView,
-		c.Customer, c.CustomerNeed, c.CustomerStatus, c.CustomerTier, c.Cycle,
-		c.Discussion, c.DiscussionSubscriber, c.DiscussionThread, c.DiscussionVote,
-		c.Document, c.DocumentVersion, c.Email, c.EntityLink, c.Favorite, c.File,
+		c.APIKey, c.AssistantRun, c.Attachment, c.AuditEntry, c.Board, c.BoardColumn,
+		c.BoardIssue, c.Comment, c.CustomView, c.Customer, c.CustomerNeed,
+		c.CustomerStatus, c.CustomerTier, c.Cycle, c.Discussion,
+		c.DiscussionSubscriber, c.DiscussionThread, c.DiscussionVote, c.Document,
+		c.DocumentVersion, c.Email, c.EntityLink, c.Favorite, c.File,
 		c.GithubCommentLink, c.GithubInstallation, c.GithubIssueLink,
 		c.GithubMilestoneLink, c.GithubOutbox, c.GithubRepoSync, c.GithubUserToken,
 		c.Initiative, c.InitiativeProject, c.Invitation, c.Issue, c.IssueHistory,
@@ -627,10 +646,11 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.APIKey, c.AssistantRun, c.Attachment, c.AuditEntry, c.Comment, c.CustomView,
-		c.Customer, c.CustomerNeed, c.CustomerStatus, c.CustomerTier, c.Cycle,
-		c.Discussion, c.DiscussionSubscriber, c.DiscussionThread, c.DiscussionVote,
-		c.Document, c.DocumentVersion, c.Email, c.EntityLink, c.Favorite, c.File,
+		c.APIKey, c.AssistantRun, c.Attachment, c.AuditEntry, c.Board, c.BoardColumn,
+		c.BoardIssue, c.Comment, c.CustomView, c.Customer, c.CustomerNeed,
+		c.CustomerStatus, c.CustomerTier, c.Cycle, c.Discussion,
+		c.DiscussionSubscriber, c.DiscussionThread, c.DiscussionVote, c.Document,
+		c.DocumentVersion, c.Email, c.EntityLink, c.Favorite, c.File,
 		c.GithubCommentLink, c.GithubInstallation, c.GithubIssueLink,
 		c.GithubMilestoneLink, c.GithubOutbox, c.GithubRepoSync, c.GithubUserToken,
 		c.Initiative, c.InitiativeProject, c.Invitation, c.Issue, c.IssueHistory,
@@ -658,6 +678,12 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Attachment.mutate(ctx, m)
 	case *AuditEntryMutation:
 		return c.AuditEntry.mutate(ctx, m)
+	case *BoardMutation:
+		return c.Board.mutate(ctx, m)
+	case *BoardColumnMutation:
+		return c.BoardColumn.mutate(ctx, m)
+	case *BoardIssueMutation:
+		return c.BoardIssue.mutate(ctx, m)
 	case *CommentMutation:
 		return c.Comment.mutate(ctx, m)
 	case *CustomViewMutation:
@@ -1422,6 +1448,549 @@ func (c *AuditEntryClient) mutate(ctx context.Context, m *AuditEntryMutation) (V
 		return (&AuditEntryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown AuditEntry mutation op: %q", m.Op())
+	}
+}
+
+// BoardClient is a client for the Board schema.
+type BoardClient struct {
+	config
+}
+
+// NewBoardClient returns a client for the Board from the given config.
+func NewBoardClient(c config) *BoardClient {
+	return &BoardClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `board.Hooks(f(g(h())))`.
+func (c *BoardClient) Use(hooks ...Hook) {
+	c.hooks.Board = append(c.hooks.Board, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `board.Intercept(f(g(h())))`.
+func (c *BoardClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Board = append(c.inters.Board, interceptors...)
+}
+
+// Create returns a builder for creating a Board entity.
+func (c *BoardClient) Create() *BoardCreate {
+	mutation := newBoardMutation(c.config, OpCreate)
+	return &BoardCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Board entities.
+func (c *BoardClient) CreateBulk(builders ...*BoardCreate) *BoardCreateBulk {
+	return &BoardCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *BoardClient) MapCreateBulk(slice any, setFunc func(*BoardCreate, int)) *BoardCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &BoardCreateBulk{err: fmt.Errorf("calling to BoardClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*BoardCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &BoardCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Board.
+func (c *BoardClient) Update() *BoardUpdate {
+	mutation := newBoardMutation(c.config, OpUpdate)
+	return &BoardUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BoardClient) UpdateOne(_m *Board) *BoardUpdateOne {
+	mutation := newBoardMutation(c.config, OpUpdateOne, withBoard(_m))
+	return &BoardUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BoardClient) UpdateOneID(id uuid.UUID) *BoardUpdateOne {
+	mutation := newBoardMutation(c.config, OpUpdateOne, withBoardID(id))
+	return &BoardUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Board.
+func (c *BoardClient) Delete() *BoardDelete {
+	mutation := newBoardMutation(c.config, OpDelete)
+	return &BoardDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *BoardClient) DeleteOne(_m *Board) *BoardDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *BoardClient) DeleteOneID(id uuid.UUID) *BoardDeleteOne {
+	builder := c.Delete().Where(board.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BoardDeleteOne{builder}
+}
+
+// Query returns a query builder for Board.
+func (c *BoardClient) Query() *BoardQuery {
+	return &BoardQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeBoard},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Board entity by its id.
+func (c *BoardClient) Get(ctx context.Context, id uuid.UUID) (*Board, error) {
+	return c.Query().Where(board.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BoardClient) GetX(ctx context.Context, id uuid.UUID) *Board {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryWorkspace queries the workspace edge of a Board.
+func (c *BoardClient) QueryWorkspace(_m *Board) *WorkspaceQuery {
+	query := (&WorkspaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(board.Table, board.FieldID, id),
+			sqlgraph.To(workspace.Table, workspace.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, board.WorkspaceTable, board.WorkspaceColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCreator queries the creator edge of a Board.
+func (c *BoardClient) QueryCreator(_m *Board) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(board.Table, board.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, board.CreatorTable, board.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryColumns queries the columns edge of a Board.
+func (c *BoardClient) QueryColumns(_m *Board) *BoardColumnQuery {
+	query := (&BoardColumnClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(board.Table, board.FieldID, id),
+			sqlgraph.To(boardcolumn.Table, boardcolumn.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, board.ColumnsTable, board.ColumnsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryBoardIssues queries the board_issues edge of a Board.
+func (c *BoardClient) QueryBoardIssues(_m *Board) *BoardIssueQuery {
+	query := (&BoardIssueClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(board.Table, board.FieldID, id),
+			sqlgraph.To(boardissue.Table, boardissue.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, board.BoardIssuesTable, board.BoardIssuesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *BoardClient) Hooks() []Hook {
+	return c.hooks.Board
+}
+
+// Interceptors returns the client interceptors.
+func (c *BoardClient) Interceptors() []Interceptor {
+	return c.inters.Board
+}
+
+func (c *BoardClient) mutate(ctx context.Context, m *BoardMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&BoardCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&BoardUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&BoardUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&BoardDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Board mutation op: %q", m.Op())
+	}
+}
+
+// BoardColumnClient is a client for the BoardColumn schema.
+type BoardColumnClient struct {
+	config
+}
+
+// NewBoardColumnClient returns a client for the BoardColumn from the given config.
+func NewBoardColumnClient(c config) *BoardColumnClient {
+	return &BoardColumnClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `boardcolumn.Hooks(f(g(h())))`.
+func (c *BoardColumnClient) Use(hooks ...Hook) {
+	c.hooks.BoardColumn = append(c.hooks.BoardColumn, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `boardcolumn.Intercept(f(g(h())))`.
+func (c *BoardColumnClient) Intercept(interceptors ...Interceptor) {
+	c.inters.BoardColumn = append(c.inters.BoardColumn, interceptors...)
+}
+
+// Create returns a builder for creating a BoardColumn entity.
+func (c *BoardColumnClient) Create() *BoardColumnCreate {
+	mutation := newBoardColumnMutation(c.config, OpCreate)
+	return &BoardColumnCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of BoardColumn entities.
+func (c *BoardColumnClient) CreateBulk(builders ...*BoardColumnCreate) *BoardColumnCreateBulk {
+	return &BoardColumnCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *BoardColumnClient) MapCreateBulk(slice any, setFunc func(*BoardColumnCreate, int)) *BoardColumnCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &BoardColumnCreateBulk{err: fmt.Errorf("calling to BoardColumnClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*BoardColumnCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &BoardColumnCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for BoardColumn.
+func (c *BoardColumnClient) Update() *BoardColumnUpdate {
+	mutation := newBoardColumnMutation(c.config, OpUpdate)
+	return &BoardColumnUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BoardColumnClient) UpdateOne(_m *BoardColumn) *BoardColumnUpdateOne {
+	mutation := newBoardColumnMutation(c.config, OpUpdateOne, withBoardColumn(_m))
+	return &BoardColumnUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BoardColumnClient) UpdateOneID(id uuid.UUID) *BoardColumnUpdateOne {
+	mutation := newBoardColumnMutation(c.config, OpUpdateOne, withBoardColumnID(id))
+	return &BoardColumnUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for BoardColumn.
+func (c *BoardColumnClient) Delete() *BoardColumnDelete {
+	mutation := newBoardColumnMutation(c.config, OpDelete)
+	return &BoardColumnDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *BoardColumnClient) DeleteOne(_m *BoardColumn) *BoardColumnDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *BoardColumnClient) DeleteOneID(id uuid.UUID) *BoardColumnDeleteOne {
+	builder := c.Delete().Where(boardcolumn.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BoardColumnDeleteOne{builder}
+}
+
+// Query returns a query builder for BoardColumn.
+func (c *BoardColumnClient) Query() *BoardColumnQuery {
+	return &BoardColumnQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeBoardColumn},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a BoardColumn entity by its id.
+func (c *BoardColumnClient) Get(ctx context.Context, id uuid.UUID) (*BoardColumn, error) {
+	return c.Query().Where(boardcolumn.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BoardColumnClient) GetX(ctx context.Context, id uuid.UUID) *BoardColumn {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryBoard queries the board edge of a BoardColumn.
+func (c *BoardColumnClient) QueryBoard(_m *BoardColumn) *BoardQuery {
+	query := (&BoardClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(boardcolumn.Table, boardcolumn.FieldID, id),
+			sqlgraph.To(board.Table, board.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, boardcolumn.BoardTable, boardcolumn.BoardColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryBoardIssues queries the board_issues edge of a BoardColumn.
+func (c *BoardColumnClient) QueryBoardIssues(_m *BoardColumn) *BoardIssueQuery {
+	query := (&BoardIssueClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(boardcolumn.Table, boardcolumn.FieldID, id),
+			sqlgraph.To(boardissue.Table, boardissue.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, boardcolumn.BoardIssuesTable, boardcolumn.BoardIssuesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *BoardColumnClient) Hooks() []Hook {
+	return c.hooks.BoardColumn
+}
+
+// Interceptors returns the client interceptors.
+func (c *BoardColumnClient) Interceptors() []Interceptor {
+	return c.inters.BoardColumn
+}
+
+func (c *BoardColumnClient) mutate(ctx context.Context, m *BoardColumnMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&BoardColumnCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&BoardColumnUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&BoardColumnUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&BoardColumnDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown BoardColumn mutation op: %q", m.Op())
+	}
+}
+
+// BoardIssueClient is a client for the BoardIssue schema.
+type BoardIssueClient struct {
+	config
+}
+
+// NewBoardIssueClient returns a client for the BoardIssue from the given config.
+func NewBoardIssueClient(c config) *BoardIssueClient {
+	return &BoardIssueClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `boardissue.Hooks(f(g(h())))`.
+func (c *BoardIssueClient) Use(hooks ...Hook) {
+	c.hooks.BoardIssue = append(c.hooks.BoardIssue, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `boardissue.Intercept(f(g(h())))`.
+func (c *BoardIssueClient) Intercept(interceptors ...Interceptor) {
+	c.inters.BoardIssue = append(c.inters.BoardIssue, interceptors...)
+}
+
+// Create returns a builder for creating a BoardIssue entity.
+func (c *BoardIssueClient) Create() *BoardIssueCreate {
+	mutation := newBoardIssueMutation(c.config, OpCreate)
+	return &BoardIssueCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of BoardIssue entities.
+func (c *BoardIssueClient) CreateBulk(builders ...*BoardIssueCreate) *BoardIssueCreateBulk {
+	return &BoardIssueCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *BoardIssueClient) MapCreateBulk(slice any, setFunc func(*BoardIssueCreate, int)) *BoardIssueCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &BoardIssueCreateBulk{err: fmt.Errorf("calling to BoardIssueClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*BoardIssueCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &BoardIssueCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for BoardIssue.
+func (c *BoardIssueClient) Update() *BoardIssueUpdate {
+	mutation := newBoardIssueMutation(c.config, OpUpdate)
+	return &BoardIssueUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BoardIssueClient) UpdateOne(_m *BoardIssue) *BoardIssueUpdateOne {
+	mutation := newBoardIssueMutation(c.config, OpUpdateOne, withBoardIssue(_m))
+	return &BoardIssueUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BoardIssueClient) UpdateOneID(id uuid.UUID) *BoardIssueUpdateOne {
+	mutation := newBoardIssueMutation(c.config, OpUpdateOne, withBoardIssueID(id))
+	return &BoardIssueUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for BoardIssue.
+func (c *BoardIssueClient) Delete() *BoardIssueDelete {
+	mutation := newBoardIssueMutation(c.config, OpDelete)
+	return &BoardIssueDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *BoardIssueClient) DeleteOne(_m *BoardIssue) *BoardIssueDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *BoardIssueClient) DeleteOneID(id uuid.UUID) *BoardIssueDeleteOne {
+	builder := c.Delete().Where(boardissue.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BoardIssueDeleteOne{builder}
+}
+
+// Query returns a query builder for BoardIssue.
+func (c *BoardIssueClient) Query() *BoardIssueQuery {
+	return &BoardIssueQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeBoardIssue},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a BoardIssue entity by its id.
+func (c *BoardIssueClient) Get(ctx context.Context, id uuid.UUID) (*BoardIssue, error) {
+	return c.Query().Where(boardissue.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BoardIssueClient) GetX(ctx context.Context, id uuid.UUID) *BoardIssue {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryBoard queries the board edge of a BoardIssue.
+func (c *BoardIssueClient) QueryBoard(_m *BoardIssue) *BoardQuery {
+	query := (&BoardClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(boardissue.Table, boardissue.FieldID, id),
+			sqlgraph.To(board.Table, board.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, boardissue.BoardTable, boardissue.BoardColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryColumn queries the column edge of a BoardIssue.
+func (c *BoardIssueClient) QueryColumn(_m *BoardIssue) *BoardColumnQuery {
+	query := (&BoardColumnClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(boardissue.Table, boardissue.FieldID, id),
+			sqlgraph.To(boardcolumn.Table, boardcolumn.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, boardissue.ColumnTable, boardissue.ColumnColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryIssue queries the issue edge of a BoardIssue.
+func (c *BoardIssueClient) QueryIssue(_m *BoardIssue) *IssueQuery {
+	query := (&IssueClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(boardissue.Table, boardissue.FieldID, id),
+			sqlgraph.To(issue.Table, issue.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, boardissue.IssueTable, boardissue.IssueColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *BoardIssueClient) Hooks() []Hook {
+	return c.hooks.BoardIssue
+}
+
+// Interceptors returns the client interceptors.
+func (c *BoardIssueClient) Interceptors() []Interceptor {
+	return c.inters.BoardIssue
+}
+
+func (c *BoardIssueClient) mutate(ctx context.Context, m *BoardIssueMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&BoardIssueCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&BoardIssueUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&BoardIssueUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&BoardIssueDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown BoardIssue mutation op: %q", m.Op())
 	}
 }
 
@@ -7066,6 +7635,22 @@ func (c *IssueClient) QueryAttachments(_m *Issue) *AttachmentQuery {
 			sqlgraph.From(issue.Table, issue.FieldID, id),
 			sqlgraph.To(attachment.Table, attachment.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, issue.AttachmentsTable, issue.AttachmentsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryBoardIssues queries the board_issues edge of a Issue.
+func (c *IssueClient) QueryBoardIssues(_m *Issue) *BoardIssueQuery {
+	query := (&BoardIssueClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(issue.Table, issue.FieldID, id),
+			sqlgraph.To(boardissue.Table, boardissue.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, issue.BoardIssuesTable, issue.BoardIssuesColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -14401,6 +14986,22 @@ func (c *UserClient) QueryCustomViews(_m *User) *CustomViewQuery {
 	return query
 }
 
+// QueryBoards queries the boards edge of a User.
+func (c *UserClient) QueryBoards(_m *User) *BoardQuery {
+	query := (&BoardClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(board.Table, board.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.BoardsTable, user.BoardsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryFavorites queries the favorites edge of a User.
 func (c *UserClient) QueryFavorites(_m *User) *FavoriteQuery {
 	query := (&FavoriteClient{config: c.config}).Query()
@@ -15925,6 +16526,22 @@ func (c *WorkspaceClient) QueryCustomViews(_m *Workspace) *CustomViewQuery {
 	return query
 }
 
+// QueryBoards queries the boards edge of a Workspace.
+func (c *WorkspaceClient) QueryBoards(_m *Workspace) *BoardQuery {
+	query := (&BoardClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(workspace.Table, workspace.FieldID, id),
+			sqlgraph.To(board.Table, board.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, workspace.BoardsTable, workspace.BoardsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryFavorites queries the favorites edge of a Workspace.
 func (c *WorkspaceClient) QueryFavorites(_m *Workspace) *FavoriteQuery {
 	query := (&FavoriteClient{config: c.config}).Query()
@@ -16213,33 +16830,33 @@ func (c *WorkspaceMemberClient) mutate(ctx context.Context, m *WorkspaceMemberMu
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		APIKey, AssistantRun, Attachment, AuditEntry, Comment, CustomView, Customer,
-		CustomerNeed, CustomerStatus, CustomerTier, Cycle, Discussion,
-		DiscussionSubscriber, DiscussionThread, DiscussionVote, Document,
-		DocumentVersion, Email, EntityLink, Favorite, File, GithubCommentLink,
-		GithubInstallation, GithubIssueLink, GithubMilestoneLink, GithubOutbox,
-		GithubRepoSync, GithubUserToken, Initiative, InitiativeProject, Invitation,
-		Issue, IssueHistory, IssueLabel, IssueLabelLink, IssueRelation, IssueRelease,
-		IssueShare, IssueSubscriber, MessageVersion, Notification, OAuthClient,
-		OAuthCode, OAuthGrant, OAuthToken, Project, ProjectLabel, ProjectLabelLink,
-		ProjectMember, ProjectMilestone, ProjectRelation, ProjectStatus,
-		ProjectSubscriber, ProjectTeam, Reaction, Release, ReleaseNote,
+		APIKey, AssistantRun, Attachment, AuditEntry, Board, BoardColumn, BoardIssue,
+		Comment, CustomView, Customer, CustomerNeed, CustomerStatus, CustomerTier,
+		Cycle, Discussion, DiscussionSubscriber, DiscussionThread, DiscussionVote,
+		Document, DocumentVersion, Email, EntityLink, Favorite, File,
+		GithubCommentLink, GithubInstallation, GithubIssueLink, GithubMilestoneLink,
+		GithubOutbox, GithubRepoSync, GithubUserToken, Initiative, InitiativeProject,
+		Invitation, Issue, IssueHistory, IssueLabel, IssueLabelLink, IssueRelation,
+		IssueRelease, IssueShare, IssueSubscriber, MessageVersion, Notification,
+		OAuthClient, OAuthCode, OAuthGrant, OAuthToken, Project, ProjectLabel,
+		ProjectLabelLink, ProjectMember, ProjectMilestone, ProjectRelation,
+		ProjectStatus, ProjectSubscriber, ProjectTeam, Reaction, Release, ReleaseNote,
 		ReleasePipeline, ReleasePipelineTeam, ReleaseStage, SignInLink, StatusUpdate,
 		Team, TeamMember, Template, User, Webhook, WebhookDelivery, WorkflowState,
 		Workspace, WorkspaceMember []ent.Hook
 	}
 	inters struct {
-		APIKey, AssistantRun, Attachment, AuditEntry, Comment, CustomView, Customer,
-		CustomerNeed, CustomerStatus, CustomerTier, Cycle, Discussion,
-		DiscussionSubscriber, DiscussionThread, DiscussionVote, Document,
-		DocumentVersion, Email, EntityLink, Favorite, File, GithubCommentLink,
-		GithubInstallation, GithubIssueLink, GithubMilestoneLink, GithubOutbox,
-		GithubRepoSync, GithubUserToken, Initiative, InitiativeProject, Invitation,
-		Issue, IssueHistory, IssueLabel, IssueLabelLink, IssueRelation, IssueRelease,
-		IssueShare, IssueSubscriber, MessageVersion, Notification, OAuthClient,
-		OAuthCode, OAuthGrant, OAuthToken, Project, ProjectLabel, ProjectLabelLink,
-		ProjectMember, ProjectMilestone, ProjectRelation, ProjectStatus,
-		ProjectSubscriber, ProjectTeam, Reaction, Release, ReleaseNote,
+		APIKey, AssistantRun, Attachment, AuditEntry, Board, BoardColumn, BoardIssue,
+		Comment, CustomView, Customer, CustomerNeed, CustomerStatus, CustomerTier,
+		Cycle, Discussion, DiscussionSubscriber, DiscussionThread, DiscussionVote,
+		Document, DocumentVersion, Email, EntityLink, Favorite, File,
+		GithubCommentLink, GithubInstallation, GithubIssueLink, GithubMilestoneLink,
+		GithubOutbox, GithubRepoSync, GithubUserToken, Initiative, InitiativeProject,
+		Invitation, Issue, IssueHistory, IssueLabel, IssueLabelLink, IssueRelation,
+		IssueRelease, IssueShare, IssueSubscriber, MessageVersion, Notification,
+		OAuthClient, OAuthCode, OAuthGrant, OAuthToken, Project, ProjectLabel,
+		ProjectLabelLink, ProjectMember, ProjectMilestone, ProjectRelation,
+		ProjectStatus, ProjectSubscriber, ProjectTeam, Reaction, Release, ReleaseNote,
 		ReleasePipeline, ReleasePipelineTeam, ReleaseStage, SignInLink, StatusUpdate,
 		Team, TeamMember, Template, User, Webhook, WebhookDelivery, WorkflowState,
 		Workspace, WorkspaceMember []ent.Interceptor

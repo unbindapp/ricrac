@@ -44,8 +44,10 @@ import { useNow } from "@/components/providers/now-provider";
 import { AutosaveMarkdown } from "@/components/shared/autosave-markdown";
 import { InlineText } from "@/components/shared/inline-text";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/toast";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { formatDateTime } from "@/lib/helpers/dates";
+import { issueRepositories } from "@/lib/helpers/github-sync";
 import {
   ISSUE_TITLE_MAX_LENGTH,
   issueQuery,
@@ -56,6 +58,7 @@ import {
   useUpdateIssueMutation,
 } from "@/lib/queries/issues";
 import { customerNeedsQuery } from "@/lib/queries/customers";
+import { githubRepoSyncsQuery } from "@/lib/queries/github";
 import { meQuery } from "@/lib/queries/me";
 import { isApiError } from "@/lib/server/errors";
 
@@ -366,7 +369,7 @@ function TriageBanner({ issue }: { issue: TIssueDetail }) {
 
 /** Guests see only their teams' issues and those shared with them. */
 function GitHubIssueRow({ issue }: { issue: TIssueDetail }) {
-  if (!issue.github) return null;
+  if (!issue.github) return <OpenOnGitHubRow issue={issue} />;
   return (
     <PropertyRow label="GitHub">
       <a
@@ -379,6 +382,49 @@ function GitHubIssueRow({ issue }: { issue: TIssueDetail }) {
         <span className="shrink-0">#{issue.github.number}</span>
         <span className="text-muted-foreground truncate text-xs">{issue.github.repository}</span>
       </a>
+    </PropertyRow>
+  );
+}
+
+function OpenOnGitHubRow({ issue }: { issue: TIssueDetail }) {
+  const { workspace, canEdit } = useWorkspace();
+  const { data } = useQuery(githubRepoSyncsQuery(workspace.id));
+  const { mutate: updateIssue, isPending } = useUpdateIssueMutation(workspace.id);
+  const repositories = issueRepositories(
+    (data ?? []).filter((repoSync) => repoSync.team.id === issue.team.id),
+    issue.project?.id,
+  );
+  if (!canEdit || repositories.length === 0) return null;
+  return (
+    <PropertyRow label="GitHub">
+      <PropertyPicker
+        label="Open on GitHub in"
+        disabled={isPending}
+        options={repositories.map(({ repository }) => ({
+          value: repository.fullName,
+          label: repository.fullName,
+          icon: <GithubIcon className="text-muted-foreground" />,
+        }))}
+        value={[]}
+        onChange={([repository]) => {
+          if (!repository) return;
+          updateIssue(
+            { id: issue.id, changes: { githubRepository: repository } },
+            {
+              onSuccess: () =>
+                toast.add({ type: "success", title: `Opening on GitHub in ${repository}` }),
+            },
+          );
+        }}
+        trigger={
+          <PickerTrigger
+            label="Open on GitHub"
+            icon={<GithubIcon className="text-muted-foreground" />}
+            text="Not on GitHub"
+            muted
+          />
+        }
+      />
     </PropertyRow>
   );
 }

@@ -1250,6 +1250,29 @@ func HasCustomViewsWith(preds ...predicate.CustomView) predicate.Workspace {
 	})
 }
 
+// HasBoards applies the HasEdge predicate on the "boards" edge.
+func HasBoards() predicate.Workspace {
+	return predicate.Workspace(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, BoardsTable, BoardsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasBoardsWith applies the HasEdge predicate on the "boards" edge with a given conditions (other predicates).
+func HasBoardsWith(preds ...predicate.Board) predicate.Workspace {
+	return predicate.Workspace(func(s *sql.Selector) {
+		step := newBoardsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasFavorites applies the HasEdge predicate on the "favorites" edge.
 func HasFavorites() predicate.Workspace {
 	return predicate.Workspace(func(s *sql.Selector) {

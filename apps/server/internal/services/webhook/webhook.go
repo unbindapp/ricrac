@@ -48,6 +48,8 @@ var resourceTypes = []string{
 	"Release",
 	"ReleasePipeline",
 	"ReleaseNote",
+	"Board",
+	"BoardCard",
 }
 
 //go:generate go run -mod=mod github.com/vburenin/ifacemaker -f "*.go" -i WebhookServiceInterface -p webhook_service -s WebhookService -o webhook_service_iface.go
@@ -79,7 +81,7 @@ type SaveInput struct {
 	ID            *string               `json:"id" doc:"Only to update a webhook: its id. Omit to create one."`
 	URL           *string               `json:"url" doc:"Where to POST: https, or http only for localhost / 127.0.0.1. Required to create."`
 	Label         args.Nullable[string] `json:"label" doc:"A name to recognize it by; null clears it."`
-	ResourceTypes []string              `json:"resourceTypes" doc:"What to receive: Issue, Comment, Reaction, Attachment, IssueLabel, IssueRelation, Project, ProjectLabel, ProjectMilestone, ProjectUpdate, Initiative, InitiativeUpdate, Cycle, Document, Team, WorkflowState, Customer, CustomerNeed, Release, ReleasePipeline, ReleaseNote. Issue and Comment by default."`
+	ResourceTypes []string              `json:"resourceTypes" doc:"What to receive: Issue, Comment, Reaction, Attachment, IssueLabel, IssueRelation, Project, ProjectLabel, ProjectMilestone, ProjectUpdate, Initiative, InitiativeUpdate, Cycle, Document, Team, WorkflowState, Customer, CustomerNeed, Release, ReleasePipeline, ReleaseNote, Board, BoardCard. Issue and Comment by default."`
 	Team          args.Nullable[string] `json:"team" doc:"Only changes in this team (key, name or id); null for every team."`
 	Enabled       *bool                 `json:"enabled" doc:"Disabled webhooks receive nothing; queued deliveries are given up."`
 }

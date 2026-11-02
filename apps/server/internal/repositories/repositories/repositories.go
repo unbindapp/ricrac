@@ -11,6 +11,7 @@ import (
 	assistant_repo "ricrac/internal/repositories/assistant"
 	attachment_repo "ricrac/internal/repositories/attachment"
 	automation_repo "ricrac/internal/repositories/automation"
+	board_repo "ricrac/internal/repositories/board"
 	comment_repo "ricrac/internal/repositories/comment"
 	customer_repo "ricrac/internal/repositories/customer"
 	cycle_repo "ricrac/internal/repositories/cycle"
@@ -75,6 +76,7 @@ type Repositories struct {
 	statusUpdate statusupdate_repo.StatusUpdateRepositoryInterface
 	initiative   initiative_repo.InitiativeRepositoryInterface
 	view         view_repo.ViewRepositoryInterface
+	board        board_repo.BoardRepositoryInterface
 	github       github_repo.GitHubRepositoryInterface
 }
 
@@ -113,6 +115,7 @@ func NewRepositories(db *ent.Client) *Repositories {
 		statusUpdate: statusupdate_repo.NewStatusUpdateRepository(db),
 		initiative:   initiative_repo.NewInitiativeRepository(db),
 		view:         view_repo.NewViewRepository(db),
+		board:        board_repo.NewBoardRepository(db),
 		github:       github_repo.NewGitHubRepository(db),
 	}
 }
@@ -252,6 +255,10 @@ func (r *Repositories) Initiative() initiative_repo.InitiativeRepositoryInterfac
 
 func (r *Repositories) View() view_repo.ViewRepositoryInterface {
 	return r.view
+}
+
+func (r *Repositories) Board() board_repo.BoardRepositoryInterface {
+	return r.board
 }
 
 func (r *Repositories) GitHub() github_repo.GitHubRepositoryInterface {

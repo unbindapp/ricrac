@@ -11,6 +11,7 @@ import {
   DiamondIcon,
   FileTextIcon,
   InboxIcon,
+  KanbanIcon,
   KeyboardIcon,
   LayersIcon,
   type LucideIcon,
@@ -72,6 +73,7 @@ export function Sidebar({ onNavigate, hideButton }: TSidebarProps) {
     { label: "Projects", icon: BoxIcon, link: { to: "/$workspace/projects", params } },
     { label: "Milestones", icon: DiamondIcon, link: { to: "/$workspace/milestones", params } },
     { label: "Views", icon: LayersIcon, link: { to: "/$workspace/views", params } },
+    { label: "Boards", icon: KanbanIcon, link: { to: "/$workspace/boards", params } },
     {
       label: "Initiatives",
       icon: TargetIcon,

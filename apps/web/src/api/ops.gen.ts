@@ -23,6 +23,45 @@ export type AuditEntry = {
   type: string
 }
 
+export type Board = {
+  /** In board order. */
+  columns: BoardColumn[]
+  createdAt: string
+  creator: UserRef | null
+  description: string | null
+  id: string
+  name: string
+  slugId: string
+  updatedAt: string
+  url: string
+}
+
+export type BoardCard = {
+  board: BoardRef
+  column: BoardColumnRef
+  issue: Issue
+  /** Order in the column, lowest first. */
+  sortOrder: number
+}
+
+export type BoardColumn = {
+  color: string | null
+  id: string
+  issueCount: number
+  name: string
+}
+
+export type BoardColumnRef = {
+  id: string
+  name: string
+}
+
+export type BoardRef = {
+  id: string
+  name: string
+  slugId: string
+}
+
 export type Comment = {
   body: string
   createdAt: string
@@ -323,6 +362,12 @@ export type CycleSnapshot = {
 
 export type Deleted = {
   deleted: string
+}
+
+export type DeletedBoard = {
+  deleted: boolean
+  id: string
+  name: string
 }
 
 export type DeletedComment = {
@@ -1594,6 +1639,13 @@ export type RemovedFavorite = {
   removed: boolean
 }
 
+export type RemovedFromBoard = {
+  board: BoardRef
+  issue: IssueRef
+  /** false when the issue wasn't on the board. */
+  removed: boolean
+}
+
 export type RemovedReaction = {
   removed: string
 }
@@ -2372,7 +2424,7 @@ export type SaveIssueArgs = {
   duplicateOf?: string | null
   /** Estimate points on the team's scale; null clears it. T-shirt sizes are XS=1, S=2, M=3, L=5, XL=8, XXL=13, XXXL=21. */
   estimate?: number | null
-  /** Only on create: the synced repository (owner/name, or name) to open the issue in on GitHub too, or "none" to keep it off GitHub. Omitted, it opens on GitHub only when the team's githubOpenIssues is on, in the repository synced with the issue's project, else the one with the most synced issues. */
+  /** The synced repository (owner/name, or name) to open the issue in on GitHub too. On create, "none" keeps it off GitHub; omitted, it opens on GitHub only when the team's githubOpenIssues is on, in the repository synced with the issue's project, else the one with the most synced issues. On update, it opens an issue that isn't on GitHub yet in that repository. */
   githubRepository?: string | null
   /** Only to update an issue: its identifier (ENG-123), id or link. Omit to create one. */
   id?: string | null
@@ -3459,6 +3511,70 @@ export type DeleteCustomViewArgs = {
   id: string
 }
 
+export type ListBoardsArgs = {
+  /** The endCursor of the previous page, to continue after it. */
+  cursor?: string | null
+  /** How many to return, 50 by default, at most 250. */
+  limit?: number | null
+  /** Words in the name or description. */
+  query?: string | null
+}
+
+export type GetBoardArgs = {
+  /** The board's id, slug, link or name. */
+  id: string
+}
+
+export type SaveBoardArgs = {
+  /** All the board's columns, in order. Columns left out are removed and their issues taken off the board (the issues stay). New boards start with Ideas, Backlog, Doing and Done. */
+  columns?: ({
+    /** Hex color like #5e6ad2. */
+    color?: string | null
+    /** Only to keep or rename a column: its id. Without it, a column of the same name is kept, else a new one is added. */
+    id?: string | null
+    name: string
+  })[]
+  description?: string | null
+  /** Only to update a board: its id, slug, link or name. Omit to create one. */
+  id?: string | null
+  /** Required to create. */
+  name?: string | null
+}
+
+export type DeleteBoardArgs = {
+  /** The board's id, slug, link or name. */
+  id: string
+}
+
+export type ListBoardIssuesArgs = {
+  /** The board's id, slug, link or name. */
+  board: string
+  /** Only this column (name or id). */
+  column?: string | null
+  /** The endCursor of the previous page, to continue after it. */
+  cursor?: string | null
+  /** How many to return, 50 by default, at most 250. */
+  limit?: number | null
+}
+
+export type PlaceOnBoardArgs = {
+  /** The board's id, slug, link or name. */
+  board: string
+  /** The column (name or id) to put it in. */
+  column: string
+  /** The issue: identifier like ENG-123, id or link. */
+  issue: string
+  /** Order in the column, lowest first. By default it keeps its place when already in the column, else goes last. */
+  sortOrder?: number | null
+}
+
+export type RemoveFromBoardArgs = {
+  /** The board's id, slug, link or name. */
+  board: string
+  /** The issue: identifier like ENG-123, id or link. */
+  issue: string
+}
+
 export type ListFavoritesArgs = {
   /** The endCursor of the previous page, to continue after it. */
   cursor?: string | null
@@ -3904,7 +4020,7 @@ export type SaveWebhookArgs = {
   id?: string | null
   /** A name to recognize it by; null clears it. */
   label?: string | null
-  /** What to receive: Issue, Comment, Reaction, Attachment, IssueLabel, IssueRelation, Project, ProjectLabel, ProjectMilestone, ProjectUpdate, Initiative, InitiativeUpdate, Cycle, Document, Team, WorkflowState, Customer, CustomerNeed, Release, ReleasePipeline, ReleaseNote. Issue and Comment by default. */
+  /** What to receive: Issue, Comment, Reaction, Attachment, IssueLabel, IssueRelation, Project, ProjectLabel, ProjectMilestone, ProjectUpdate, Initiative, InitiativeUpdate, Cycle, Document, Team, WorkflowState, Customer, CustomerNeed, Release, ReleasePipeline, ReleaseNote, Board, BoardCard. Issue and Comment by default. */
   resourceTypes?: string[]
   /** Only changes in this team (key, name or id); null for every team. */
   team?: string | null
@@ -4152,6 +4268,19 @@ export interface Ops {
   get_custom_view: { args: GetCustomViewArgs; result: CustomView }
   save_custom_view: { args: SaveCustomViewArgs; result: CustomView }
   delete_custom_view: { args: DeleteCustomViewArgs; result: DeletedCustomView }
+  list_boards: { args: ListBoardsArgs; result: {
+  nodes: Board[]
+  pageInfo: PageInfo
+} }
+  get_board: { args: GetBoardArgs; result: Board }
+  save_board: { args: SaveBoardArgs; result: Board }
+  delete_board: { args: DeleteBoardArgs; result: DeletedBoard }
+  list_board_issues: { args: ListBoardIssuesArgs; result: {
+  nodes: BoardCard[]
+  pageInfo: PageInfo
+} }
+  place_on_board: { args: PlaceOnBoardArgs; result: BoardCard }
+  remove_from_board: { args: RemoveFromBoardArgs; result: RemovedFromBoard }
   list_favorites: { args: ListFavoritesArgs; result: {
   nodes: Favorite[]
   pageInfo: PageInfo

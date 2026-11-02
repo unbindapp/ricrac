@@ -11,6 +11,7 @@ import (
 	assistant_service "ricrac/internal/services/assistant"
 	attachment_service "ricrac/internal/services/attachment"
 	automation_service "ricrac/internal/services/automation"
+	board_service "ricrac/internal/services/board"
 	comment_service "ricrac/internal/services/comment"
 	customer_service "ricrac/internal/services/customer"
 	cycle_service "ricrac/internal/services/cycle"
@@ -80,5 +81,6 @@ type Server struct {
 	StatusUpdateService *statusupdate_service.StatusUpdateService
 	InitiativeService   *initiative_service.InitiativeService
 	ViewService         *view_service.ViewService
+	BoardService        *board_service.BoardService
 	GitHubService       *github_service.GitHubService
 }

@@ -731,6 +731,10 @@ func (self *ResolveService) Customer(ctx context.Context, actor *auth.Actor, val
 	return self.named(ctx, actor, "customers", "name", "", "customer", value)
 }
 
+func (self *ResolveService) Board(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error) {
+	return self.named(ctx, actor, "boards", "name", "", "board", value)
+}
+
 func (self *ResolveService) CustomView(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error) {
 	return self.named(ctx, actor, "custom_views", "name", resolve_repo.CustomViewsVisibleTo(actor.User), "view", value)
 }

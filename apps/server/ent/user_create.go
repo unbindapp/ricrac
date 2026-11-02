@@ -9,6 +9,7 @@ import (
 	"ricrac/ent/apikey"
 	"ricrac/ent/attachment"
 	"ricrac/ent/auditentry"
+	"ricrac/ent/board"
 	"ricrac/ent/comment"
 	"ricrac/ent/customer"
 	"ricrac/ent/customerneed"
@@ -713,6 +714,21 @@ func (_c *UserCreate) AddCustomViews(v ...*CustomView) *UserCreate {
 		ids[i] = v[i].ID
 	}
 	return _c.AddCustomViewIDs(ids...)
+}
+
+// AddBoardIDs adds the "boards" edge to the Board entity by IDs.
+func (_c *UserCreate) AddBoardIDs(ids ...uuid.UUID) *UserCreate {
+	_c.mutation.AddBoardIDs(ids...)
+	return _c
+}
+
+// AddBoards adds the "boards" edges to the Board entity.
+func (_c *UserCreate) AddBoards(v ...*Board) *UserCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddBoardIDs(ids...)
 }
 
 // AddFavoriteIDs adds the "favorites" edge to the Favorite entity by IDs.
@@ -1621,6 +1637,22 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(customview.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.BoardsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.BoardsTable,
+			Columns: []string{user.BoardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

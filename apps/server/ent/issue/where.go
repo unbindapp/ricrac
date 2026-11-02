@@ -2097,6 +2097,29 @@ func HasAttachmentsWith(preds ...predicate.Attachment) predicate.Issue {
 	})
 }
 
+// HasBoardIssues applies the HasEdge predicate on the "board_issues" edge.
+func HasBoardIssues() predicate.Issue {
+	return predicate.Issue(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, BoardIssuesTable, BoardIssuesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasBoardIssuesWith applies the HasEdge predicate on the "board_issues" edge with a given conditions (other predicates).
+func HasBoardIssuesWith(preds ...predicate.BoardIssue) predicate.Issue {
+	return predicate.Issue(func(s *sql.Selector) {
+		step := newBoardIssuesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasDocuments applies the HasEdge predicate on the "documents" edge.
 func HasDocuments() predicate.Issue {
 	return predicate.Issue(func(s *sql.Selector) {

@@ -11,6 +11,7 @@ import (
 	assistant_repo "ricrac/internal/repositories/assistant"
 	attachment_repo "ricrac/internal/repositories/attachment"
 	automation_repo "ricrac/internal/repositories/automation"
+	board_repo "ricrac/internal/repositories/board"
 	comment_repo "ricrac/internal/repositories/comment"
 	customer_repo "ricrac/internal/repositories/customer"
 	cycle_repo "ricrac/internal/repositories/cycle"
@@ -78,5 +79,6 @@ type RepositoriesInterface interface {
 	StatusUpdate() statusupdate_repo.StatusUpdateRepositoryInterface
 	Initiative() initiative_repo.InitiativeRepositoryInterface
 	View() view_repo.ViewRepositoryInterface
+	Board() board_repo.BoardRepositoryInterface
 	GitHub() github_repo.GitHubRepositoryInterface
 }

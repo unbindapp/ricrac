@@ -36,15 +36,19 @@ var viewSeparators = regexp.MustCompile(`[^a-z0-9]+`)
 // ViewURL is the view's page in the web app: its name as a slug (60 characters at most) and its
 // slug id.
 func ViewURL(publicURL, workspaceKey, name, slugID string) string {
+	return sluggedURL(publicURL, workspaceKey, "view", name, slugID)
+}
+
+func sluggedURL(publicURL, workspaceKey, page, name, slugID string) string {
 	slug := strings.Trim(viewSeparators.ReplaceAllString(strings.ToLower(name), "-"), "-")
 	if len(slug) > 60 {
 		slug = slug[:60]
 	}
 	slug = strings.Trim(slug, "-")
 	if slug == "" {
-		return publicURL + "/" + workspaceKey + "/view/" + slugID
+		return publicURL + "/" + workspaceKey + "/" + page + "/" + slugID
 	}
-	return publicURL + "/" + workspaceKey + "/view/" + slug + "-" + slugID
+	return publicURL + "/" + workspaceKey + "/" + page + "/" + slug + "-" + slugID
 }
 
 // CustomViewOf needs the view's workspace, team and owner loaded.

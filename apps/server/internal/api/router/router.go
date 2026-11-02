@@ -16,6 +16,7 @@ import (
 
 	account_handler "ricrac/internal/api/handlers/account"
 	attachments_handler "ricrac/internal/api/handlers/attachments"
+	boards_handler "ricrac/internal/api/handlers/boards"
 	comments_handler "ricrac/internal/api/handlers/comments"
 	customers_handler "ricrac/internal/api/handlers/customers"
 	cycles_handler "ricrac/internal/api/handlers/cycles"
@@ -173,6 +174,7 @@ func RegisterHandlers(srv *server.Server, reg *oapi.Registry) {
 	documents_handler.RegisterHandlers(srv, reg)
 	discussions_handler.RegisterHandlers(srv, reg)
 	views_handler.RegisterHandlers(srv, reg)
+	boards_handler.RegisterHandlers(srv, reg)
 	favorites_handler.RegisterHandlers(srv, reg)
 	templates_handler.RegisterHandlers(srv, reg)
 	notifications_handler.RegisterHandlers(srv, reg)

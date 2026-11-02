@@ -132,6 +132,8 @@ type IssueEdges struct {
 	IssueHistory []*IssueHistory `json:"issue_history,omitempty"`
 	// Attachments holds the value of the attachments edge.
 	Attachments []*Attachment `json:"attachments,omitempty"`
+	// BoardIssues holds the value of the board_issues edge.
+	BoardIssues []*BoardIssue `json:"board_issues,omitempty"`
 	// Documents holds the value of the documents edge.
 	Documents []*Document `json:"documents,omitempty"`
 	// Comments holds the value of the comments edge.
@@ -164,7 +166,7 @@ type IssueEdges struct {
 	IssueSubscribers []*IssueSubscriber `json:"issue_subscribers,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [30]bool
+	loadedTypes [31]bool
 }
 
 // WorkspaceOrErr returns the Workspace value or an error if the edge
@@ -322,10 +324,19 @@ func (e IssueEdges) AttachmentsOrErr() ([]*Attachment, error) {
 	return nil, &NotLoadedError{edge: "attachments"}
 }
 
+// BoardIssuesOrErr returns the BoardIssues value or an error if the edge
+// was not loaded in eager-loading.
+func (e IssueEdges) BoardIssuesOrErr() ([]*BoardIssue, error) {
+	if e.loadedTypes[15] {
+		return e.BoardIssues, nil
+	}
+	return nil, &NotLoadedError{edge: "board_issues"}
+}
+
 // DocumentsOrErr returns the Documents value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) DocumentsOrErr() ([]*Document, error) {
-	if e.loadedTypes[15] {
+	if e.loadedTypes[16] {
 		return e.Documents, nil
 	}
 	return nil, &NotLoadedError{edge: "documents"}
@@ -334,7 +345,7 @@ func (e IssueEdges) DocumentsOrErr() ([]*Document, error) {
 // CommentsOrErr returns the Comments value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) CommentsOrErr() ([]*Comment, error) {
-	if e.loadedTypes[16] {
+	if e.loadedTypes[17] {
 		return e.Comments, nil
 	}
 	return nil, &NotLoadedError{edge: "comments"}
@@ -343,7 +354,7 @@ func (e IssueEdges) CommentsOrErr() ([]*Comment, error) {
 // DiscussionThreadsOrErr returns the DiscussionThreads value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) DiscussionThreadsOrErr() ([]*DiscussionThread, error) {
-	if e.loadedTypes[17] {
+	if e.loadedTypes[18] {
 		return e.DiscussionThreads, nil
 	}
 	return nil, &NotLoadedError{edge: "discussion_threads"}
@@ -352,7 +363,7 @@ func (e IssueEdges) DiscussionThreadsOrErr() ([]*DiscussionThread, error) {
 // ReactionsOrErr returns the Reactions value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) ReactionsOrErr() ([]*Reaction, error) {
-	if e.loadedTypes[18] {
+	if e.loadedTypes[19] {
 		return e.Reactions, nil
 	}
 	return nil, &NotLoadedError{edge: "reactions"}
@@ -361,7 +372,7 @@ func (e IssueEdges) ReactionsOrErr() ([]*Reaction, error) {
 // CustomerNeedsOrErr returns the CustomerNeeds value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) CustomerNeedsOrErr() ([]*CustomerNeed, error) {
-	if e.loadedTypes[19] {
+	if e.loadedTypes[20] {
 		return e.CustomerNeeds, nil
 	}
 	return nil, &NotLoadedError{edge: "customer_needs"}
@@ -370,7 +381,7 @@ func (e IssueEdges) CustomerNeedsOrErr() ([]*CustomerNeed, error) {
 // NotificationsOrErr returns the Notifications value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) NotificationsOrErr() ([]*Notification, error) {
-	if e.loadedTypes[20] {
+	if e.loadedTypes[21] {
 		return e.Notifications, nil
 	}
 	return nil, &NotLoadedError{edge: "notifications"}
@@ -379,7 +390,7 @@ func (e IssueEdges) NotificationsOrErr() ([]*Notification, error) {
 // GithubOutboxOrErr returns the GithubOutbox value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) GithubOutboxOrErr() ([]*GithubOutbox, error) {
-	if e.loadedTypes[21] {
+	if e.loadedTypes[22] {
 		return e.GithubOutbox, nil
 	}
 	return nil, &NotLoadedError{edge: "github_outbox"}
@@ -388,7 +399,7 @@ func (e IssueEdges) GithubOutboxOrErr() ([]*GithubOutbox, error) {
 // LabelsOrErr returns the Labels value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) LabelsOrErr() ([]*IssueLabel, error) {
-	if e.loadedTypes[22] {
+	if e.loadedTypes[23] {
 		return e.Labels, nil
 	}
 	return nil, &NotLoadedError{edge: "labels"}
@@ -397,7 +408,7 @@ func (e IssueEdges) LabelsOrErr() ([]*IssueLabel, error) {
 // ReleasesOrErr returns the Releases value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) ReleasesOrErr() ([]*Release, error) {
-	if e.loadedTypes[23] {
+	if e.loadedTypes[24] {
 		return e.Releases, nil
 	}
 	return nil, &NotLoadedError{edge: "releases"}
@@ -406,7 +417,7 @@ func (e IssueEdges) ReleasesOrErr() ([]*Release, error) {
 // SharedWithOrErr returns the SharedWith value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) SharedWithOrErr() ([]*User, error) {
-	if e.loadedTypes[24] {
+	if e.loadedTypes[25] {
 		return e.SharedWith, nil
 	}
 	return nil, &NotLoadedError{edge: "shared_with"}
@@ -415,7 +426,7 @@ func (e IssueEdges) SharedWithOrErr() ([]*User, error) {
 // SubscribersOrErr returns the Subscribers value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) SubscribersOrErr() ([]*User, error) {
-	if e.loadedTypes[25] {
+	if e.loadedTypes[26] {
 		return e.Subscribers, nil
 	}
 	return nil, &NotLoadedError{edge: "subscribers"}
@@ -424,7 +435,7 @@ func (e IssueEdges) SubscribersOrErr() ([]*User, error) {
 // IssueLabelLinksOrErr returns the IssueLabelLinks value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) IssueLabelLinksOrErr() ([]*IssueLabelLink, error) {
-	if e.loadedTypes[26] {
+	if e.loadedTypes[27] {
 		return e.IssueLabelLinks, nil
 	}
 	return nil, &NotLoadedError{edge: "issue_label_links"}
@@ -433,7 +444,7 @@ func (e IssueEdges) IssueLabelLinksOrErr() ([]*IssueLabelLink, error) {
 // IssueReleasesOrErr returns the IssueReleases value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) IssueReleasesOrErr() ([]*IssueRelease, error) {
-	if e.loadedTypes[27] {
+	if e.loadedTypes[28] {
 		return e.IssueReleases, nil
 	}
 	return nil, &NotLoadedError{edge: "issue_releases"}
@@ -442,7 +453,7 @@ func (e IssueEdges) IssueReleasesOrErr() ([]*IssueRelease, error) {
 // IssueSharesOrErr returns the IssueShares value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) IssueSharesOrErr() ([]*IssueShare, error) {
-	if e.loadedTypes[28] {
+	if e.loadedTypes[29] {
 		return e.IssueShares, nil
 	}
 	return nil, &NotLoadedError{edge: "issue_shares"}
@@ -451,7 +462,7 @@ func (e IssueEdges) IssueSharesOrErr() ([]*IssueShare, error) {
 // IssueSubscribersOrErr returns the IssueSubscribers value or an error if the edge
 // was not loaded in eager-loading.
 func (e IssueEdges) IssueSubscribersOrErr() ([]*IssueSubscriber, error) {
-	if e.loadedTypes[29] {
+	if e.loadedTypes[30] {
 		return e.IssueSubscribers, nil
 	}
 	return nil, &NotLoadedError{edge: "issue_subscribers"}
@@ -810,6 +821,11 @@ func (_m *Issue) QueryIssueHistory() *IssueHistoryQuery {
 // QueryAttachments queries the "attachments" edge of the Issue entity.
 func (_m *Issue) QueryAttachments() *AttachmentQuery {
 	return NewIssueClient(_m.config).QueryAttachments(_m)
+}
+
+// QueryBoardIssues queries the "board_issues" edge of the Issue entity.
+func (_m *Issue) QueryBoardIssues() *BoardIssueQuery {
+	return NewIssueClient(_m.config).QueryBoardIssues(_m)
 }
 
 // QueryDocuments queries the "documents" edge of the Issue entity.

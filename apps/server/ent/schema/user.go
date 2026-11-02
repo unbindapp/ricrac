@@ -66,6 +66,7 @@ func (User) Edges() []ent.Edge {
 		edge.To("customers", Customer.Type),
 		edge.To("customer_needs", CustomerNeed.Type),
 		edge.To("custom_views", CustomView.Type),
+		edge.To("boards", Board.Type),
 		edge.To("favorites", Favorite.Type),
 		edge.To("templates", Template.Type),
 		edge.To("notifications_by_user", Notification.Type),

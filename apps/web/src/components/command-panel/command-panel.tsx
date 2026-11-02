@@ -14,6 +14,7 @@ import {
   DiamondIcon,
   FileTextIcon,
   InboxIcon,
+  KanbanIcon,
   KeyboardIcon,
   LayersIcon,
   ListTodoIcon,
@@ -58,7 +59,7 @@ import { meQuery, signOut } from "@/lib/queries/me";
 import { useAssistantStore } from "@/lib/stores/assistant";
 
 type TShortcutDestination = keyof typeof GO_TO_KEYS;
-type TDestination = TShortcutDestination | "cycles" | "milestones";
+type TDestination = TShortcutDestination | "cycles" | "milestones" | "boards";
 
 const shortcutDestinations = Object.keys(GO_TO_KEYS) as TShortcutDestination[];
 
@@ -114,6 +115,7 @@ function useDestinations(): Record<
       link: { to: "/$workspace/milestones", params },
     },
     views: { label: "Views", icon: <LayersIcon />, link: { to: "/$workspace/views", params } },
+    boards: { label: "Boards", icon: <KanbanIcon />, link: { to: "/$workspace/boards", params } },
     initiatives: {
       label: "Initiatives",
       icon: <TargetIcon />,

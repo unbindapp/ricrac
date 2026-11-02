@@ -6,6 +6,9 @@ import (
 	"ricrac/ent/apikey"
 	"ricrac/ent/assistantrun"
 	"ricrac/ent/attachment"
+	"ricrac/ent/board"
+	"ricrac/ent/boardcolumn"
+	"ricrac/ent/boardissue"
 	"ricrac/ent/comment"
 	"ricrac/ent/customer"
 	"ricrac/ent/customerneed"
@@ -75,6 +78,24 @@ func init() {
 	attachmentDescID := attachmentFields[0].Descriptor()
 	// attachment.DefaultID holds the default value on creation for the id field.
 	attachment.DefaultID = attachmentDescID.Default.(func() uuid.UUID)
+	boardFields := schema.Board{}.Fields()
+	_ = boardFields
+	// boardDescID is the schema descriptor for id field.
+	boardDescID := boardFields[0].Descriptor()
+	// board.DefaultID holds the default value on creation for the id field.
+	board.DefaultID = boardDescID.Default.(func() uuid.UUID)
+	boardcolumnFields := schema.BoardColumn{}.Fields()
+	_ = boardcolumnFields
+	// boardcolumnDescID is the schema descriptor for id field.
+	boardcolumnDescID := boardcolumnFields[0].Descriptor()
+	// boardcolumn.DefaultID holds the default value on creation for the id field.
+	boardcolumn.DefaultID = boardcolumnDescID.Default.(func() uuid.UUID)
+	boardissueFields := schema.BoardIssue{}.Fields()
+	_ = boardissueFields
+	// boardissueDescID is the schema descriptor for id field.
+	boardissueDescID := boardissueFields[0].Descriptor()
+	// boardissue.DefaultID holds the default value on creation for the id field.
+	boardissue.DefaultID = boardissueDescID.Default.(func() uuid.UUID)
 	commentFields := schema.Comment{}.Fields()
 	_ = commentFields
 	// commentDescID is the schema descriptor for id field.
