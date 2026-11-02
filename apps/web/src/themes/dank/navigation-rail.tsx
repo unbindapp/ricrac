@@ -12,6 +12,7 @@ import {
   EllipsisIcon,
   FileTextIcon,
   InboxIcon,
+  KanbanIcon,
   KeyboardIcon,
   LayersIcon,
   ListIndentDecreaseIcon,
@@ -96,6 +97,7 @@ export function NavigationRail({
     },
     { label: "Projects", icon: BoxIcon, link: { to: "/$workspace/projects", params } },
     { label: "Views", icon: LayersIcon, link: { to: "/$workspace/views", params } },
+    { label: "Boards", icon: KanbanIcon, link: { to: "/$workspace/boards", params } },
     { label: "Docs", icon: FileTextIcon, link: { to: "/$workspace/documents", params } },
     {
       label: "Forum",
