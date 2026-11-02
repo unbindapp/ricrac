@@ -517,6 +517,24 @@ packages:
           filename: view_service_mock.go
           structname: ViewServiceMock
           pkgname: mocks_services_view
+  ricrac/internal/repositories/board:
+    config:
+      dir: ./mocks/repository/board
+    interfaces:
+      BoardRepositoryInterface:
+        config:
+          filename: board_repository_mock.go
+          structname: BoardRepositoryMock
+          pkgname: mocks_repository_board
+  ricrac/internal/services/board:
+    config:
+      dir: ./mocks/services/board
+    interfaces:
+      BoardServiceInterface:
+        config:
+          filename: board_service_mock.go
+          structname: BoardServiceMock
+          pkgname: mocks_services_board
   ricrac/internal/repositories/github:
     config:
       dir: ./mocks/repository/github

@@ -56,6 +56,42 @@ func (f AuditEntryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AuditEntryMutation", m)
 }
 
+// The BoardFunc type is an adapter to allow the use of ordinary
+// function as Board mutator.
+type BoardFunc func(context.Context, *ent.BoardMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BoardFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.BoardMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BoardMutation", m)
+}
+
+// The BoardColumnFunc type is an adapter to allow the use of ordinary
+// function as BoardColumn mutator.
+type BoardColumnFunc func(context.Context, *ent.BoardColumnMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BoardColumnFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.BoardColumnMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BoardColumnMutation", m)
+}
+
+// The BoardIssueFunc type is an adapter to allow the use of ordinary
+// function as BoardIssue mutator.
+type BoardIssueFunc func(context.Context, *ent.BoardIssueMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BoardIssueFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.BoardIssueMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BoardIssueMutation", m)
+}
+
 // The CommentFunc type is an adapter to allow the use of ordinary
 // function as Comment mutator.
 type CommentFunc func(context.Context, *ent.CommentMutation) (ent.Value, error)

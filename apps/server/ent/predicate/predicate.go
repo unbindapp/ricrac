@@ -18,6 +18,15 @@ type Attachment func(*sql.Selector)
 // AuditEntry is the predicate function for auditentry builders.
 type AuditEntry func(*sql.Selector)
 
+// Board is the predicate function for board builders.
+type Board func(*sql.Selector)
+
+// BoardColumn is the predicate function for boardcolumn builders.
+type BoardColumn func(*sql.Selector)
+
+// BoardIssue is the predicate function for boardissue builders.
+type BoardIssue func(*sql.Selector)
+
 // Comment is the predicate function for comment builders.
 type Comment func(*sql.Selector)
 

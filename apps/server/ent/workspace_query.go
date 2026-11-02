@@ -9,6 +9,7 @@ import (
 	"math"
 	"ricrac/ent/attachment"
 	"ricrac/ent/auditentry"
+	"ricrac/ent/board"
 	"ricrac/ent/comment"
 	"ricrac/ent/customer"
 	"ricrac/ent/customerneed"
@@ -90,6 +91,7 @@ type WorkspaceQuery struct {
 	withCustomers           *CustomerQuery
 	withCustomerNeeds       *CustomerNeedQuery
 	withCustomViews         *CustomViewQuery
+	withBoards              *BoardQuery
 	withFavorites           *FavoriteQuery
 	withTemplates           *TemplateQuery
 	withNotifications       *NotificationQuery
@@ -752,6 +754,28 @@ func (_q *WorkspaceQuery) QueryCustomViews() *CustomViewQuery {
 	return query
 }
 
+// QueryBoards chains the current query on the "boards" edge.
+func (_q *WorkspaceQuery) QueryBoards() *BoardQuery {
+	query := (&BoardClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(workspace.Table, workspace.FieldID, selector),
+			sqlgraph.To(board.Table, board.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, workspace.BoardsTable, workspace.BoardsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryFavorites chains the current query on the "favorites" edge.
 func (_q *WorkspaceQuery) QueryFavorites() *FavoriteQuery {
 	query := (&FavoriteClient{config: _q.config}).Query()
@@ -1170,6 +1194,7 @@ func (_q *WorkspaceQuery) Clone() *WorkspaceQuery {
 		withCustomers:           _q.withCustomers.Clone(),
 		withCustomerNeeds:       _q.withCustomerNeeds.Clone(),
 		withCustomViews:         _q.withCustomViews.Clone(),
+		withBoards:              _q.withBoards.Clone(),
 		withFavorites:           _q.withFavorites.Clone(),
 		withTemplates:           _q.withTemplates.Clone(),
 		withNotifications:       _q.withNotifications.Clone(),
@@ -1494,6 +1519,17 @@ func (_q *WorkspaceQuery) WithCustomViews(opts ...func(*CustomViewQuery)) *Works
 	return _q
 }
 
+// WithBoards tells the query-builder to eager-load the nodes that are connected to
+// the "boards" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *WorkspaceQuery) WithBoards(opts ...func(*BoardQuery)) *WorkspaceQuery {
+	query := (&BoardClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withBoards = query
+	return _q
+}
+
 // WithFavorites tells the query-builder to eager-load the nodes that are connected to
 // the "favorites" edge. The optional arguments are used to configure the query builder of the edge.
 func (_q *WorkspaceQuery) WithFavorites(opts ...func(*FavoriteQuery)) *WorkspaceQuery {
@@ -1671,7 +1707,7 @@ func (_q *WorkspaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Wo
 	var (
 		nodes       = []*Workspace{}
 		_spec       = _q.querySpec()
-		loadedTypes = [37]bool{
+		loadedTypes = [38]bool{
 			_q.withInvitations != nil,
 			_q.withOauthClients != nil,
 			_q.withTeams != nil,
@@ -1700,6 +1736,7 @@ func (_q *WorkspaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Wo
 			_q.withCustomers != nil,
 			_q.withCustomerNeeds != nil,
 			_q.withCustomViews != nil,
+			_q.withBoards != nil,
 			_q.withFavorites != nil,
 			_q.withTemplates != nil,
 			_q.withNotifications != nil,
@@ -1929,6 +1966,13 @@ func (_q *WorkspaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Wo
 		if err := _q.loadCustomViews(ctx, query, nodes,
 			func(n *Workspace) { n.Edges.CustomViews = []*CustomView{} },
 			func(n *Workspace, e *CustomView) { n.Edges.CustomViews = append(n.Edges.CustomViews, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withBoards; query != nil {
+		if err := _q.loadBoards(ctx, query, nodes,
+			func(n *Workspace) { n.Edges.Boards = []*Board{} },
+			func(n *Workspace, e *Board) { n.Edges.Boards = append(n.Edges.Boards, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -2828,6 +2872,36 @@ func (_q *WorkspaceQuery) loadCustomViews(ctx context.Context, query *CustomView
 	}
 	query.Where(predicate.CustomView(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(workspace.CustomViewsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.WorkspaceID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "workspace_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *WorkspaceQuery) loadBoards(ctx context.Context, query *BoardQuery, nodes []*Workspace, init func(*Workspace), assign func(*Workspace, *Board)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Workspace)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(board.FieldWorkspaceID)
+	}
+	query.Where(predicate.Board(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(workspace.BoardsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

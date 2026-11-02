@@ -71,6 +71,7 @@ func (Issue) Edges() []ent.Edge {
 		edge.To("issue_relations_by_related_issue", IssueRelation.Type),
 		edge.To("issue_history", IssueHistory.Type),
 		edge.To("attachments", Attachment.Type),
+		edge.To("board_issues", BoardIssue.Type),
 		edge.To("documents", Document.Type),
 		edge.To("comments", Comment.Type),
 		edge.To("discussion_threads", DiscussionThread.Type),

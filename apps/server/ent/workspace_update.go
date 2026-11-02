@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"ricrac/ent/attachment"
 	"ricrac/ent/auditentry"
+	"ricrac/ent/board"
 	"ricrac/ent/comment"
 	"ricrac/ent/customer"
 	"ricrac/ent/customerneed"
@@ -672,6 +673,21 @@ func (_u *WorkspaceUpdate) AddCustomViews(v ...*CustomView) *WorkspaceUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.AddCustomViewIDs(ids...)
+}
+
+// AddBoardIDs adds the "boards" edge to the Board entity by IDs.
+func (_u *WorkspaceUpdate) AddBoardIDs(ids ...uuid.UUID) *WorkspaceUpdate {
+	_u.mutation.AddBoardIDs(ids...)
+	return _u
+}
+
+// AddBoards adds the "boards" edges to the Board entity.
+func (_u *WorkspaceUpdate) AddBoards(v ...*Board) *WorkspaceUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddBoardIDs(ids...)
 }
 
 // AddFavoriteIDs adds the "favorites" edge to the Favorite entity by IDs.
@@ -1385,6 +1401,27 @@ func (_u *WorkspaceUpdate) RemoveCustomViews(v ...*CustomView) *WorkspaceUpdate 
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveCustomViewIDs(ids...)
+}
+
+// ClearBoards clears all "boards" edges to the Board entity.
+func (_u *WorkspaceUpdate) ClearBoards() *WorkspaceUpdate {
+	_u.mutation.ClearBoards()
+	return _u
+}
+
+// RemoveBoardIDs removes the "boards" edge to Board entities by IDs.
+func (_u *WorkspaceUpdate) RemoveBoardIDs(ids ...uuid.UUID) *WorkspaceUpdate {
+	_u.mutation.RemoveBoardIDs(ids...)
+	return _u
+}
+
+// RemoveBoards removes "boards" edges to Board entities.
+func (_u *WorkspaceUpdate) RemoveBoards(v ...*Board) *WorkspaceUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveBoardIDs(ids...)
 }
 
 // ClearFavorites clears all "favorites" edges to the Favorite entity.
@@ -2916,6 +2953,51 @@ func (_u *WorkspaceUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.BoardsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.BoardsTable,
+			Columns: []string{workspace.BoardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedBoardsIDs(); len(nodes) > 0 && !_u.mutation.BoardsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.BoardsTable,
+			Columns: []string{workspace.BoardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.BoardsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.BoardsTable,
+			Columns: []string{workspace.BoardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _u.mutation.FavoritesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -3904,6 +3986,21 @@ func (_u *WorkspaceUpdateOne) AddCustomViews(v ...*CustomView) *WorkspaceUpdateO
 	return _u.AddCustomViewIDs(ids...)
 }
 
+// AddBoardIDs adds the "boards" edge to the Board entity by IDs.
+func (_u *WorkspaceUpdateOne) AddBoardIDs(ids ...uuid.UUID) *WorkspaceUpdateOne {
+	_u.mutation.AddBoardIDs(ids...)
+	return _u
+}
+
+// AddBoards adds the "boards" edges to the Board entity.
+func (_u *WorkspaceUpdateOne) AddBoards(v ...*Board) *WorkspaceUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddBoardIDs(ids...)
+}
+
 // AddFavoriteIDs adds the "favorites" edge to the Favorite entity by IDs.
 func (_u *WorkspaceUpdateOne) AddFavoriteIDs(ids ...uuid.UUID) *WorkspaceUpdateOne {
 	_u.mutation.AddFavoriteIDs(ids...)
@@ -4615,6 +4712,27 @@ func (_u *WorkspaceUpdateOne) RemoveCustomViews(v ...*CustomView) *WorkspaceUpda
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveCustomViewIDs(ids...)
+}
+
+// ClearBoards clears all "boards" edges to the Board entity.
+func (_u *WorkspaceUpdateOne) ClearBoards() *WorkspaceUpdateOne {
+	_u.mutation.ClearBoards()
+	return _u
+}
+
+// RemoveBoardIDs removes the "boards" edge to Board entities by IDs.
+func (_u *WorkspaceUpdateOne) RemoveBoardIDs(ids ...uuid.UUID) *WorkspaceUpdateOne {
+	_u.mutation.RemoveBoardIDs(ids...)
+	return _u
+}
+
+// RemoveBoards removes "boards" edges to Board entities.
+func (_u *WorkspaceUpdateOne) RemoveBoards(v ...*Board) *WorkspaceUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveBoardIDs(ids...)
 }
 
 // ClearFavorites clears all "favorites" edges to the Favorite entity.
@@ -6169,6 +6287,51 @@ func (_u *WorkspaceUpdateOne) sqlSave(ctx context.Context) (_node *Workspace, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(customview.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.BoardsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.BoardsTable,
+			Columns: []string{workspace.BoardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedBoardsIDs(); len(nodes) > 0 && !_u.mutation.BoardsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.BoardsTable,
+			Columns: []string{workspace.BoardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.BoardsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workspace.BoardsTable,
+			Columns: []string{workspace.BoardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

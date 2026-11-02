@@ -65,6 +65,7 @@ type ResolveServiceInterface interface {
 	Releases(ctx context.Context, actor *auth.Actor, values []string) ([]uuid.UUID, error)
 	Pipeline(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error)
 	Customer(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error)
+	Board(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error)
 	CustomView(ctx context.Context, actor *auth.Actor, value string) (uuid.UUID, error)
 	// Template is a template by id or name, of the given type (issue, project or document).
 	Template(ctx context.Context, actor *auth.Actor, kind, value string) (uuid.UUID, error)

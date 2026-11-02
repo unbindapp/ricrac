@@ -11,6 +11,7 @@ import (
 	assistant_service "ricrac/internal/services/assistant"
 	attachment_service "ricrac/internal/services/attachment"
 	automation_service "ricrac/internal/services/automation"
+	board_service "ricrac/internal/services/board"
 	comment_service "ricrac/internal/services/comment"
 	customer_service "ricrac/internal/services/customer"
 	cycle_service "ricrac/internal/services/cycle"
@@ -84,6 +85,7 @@ func New(cfg config.Config, db *ent.Client, waker events_service.Waker) *Server 
 	srv.InitiativeService = initiative_service.NewInitiativeService(cfg, repo, srv.ResolveService, srv.EventsService, srv.ProjectService, srv.StatusUpdateService)
 	srv.IssueService.Uses(srv.AttachmentService, srv.CommentService)
 	srv.ViewService = view_service.NewViewService(cfg, repo, srv.ResolveService, srv.EventsService, srv.IssueService)
+	srv.BoardService = board_service.NewBoardService(cfg, repo, srv.ResolveService, srv.EventsService, srv.IssueService)
 	srv.GitHubService = github_service.NewGitHubService(cfg, srv.Keys, repo, srv.AccessService, srv.ResolveService, srv.EventsService,
 		srv.IssueService, srv.CommentService, srv.AttachmentService, srv.MilestoneService, waker)
 	return srv

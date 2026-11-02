@@ -89,6 +89,8 @@ const (
 	EdgeCustomerNeeds = "customer_needs"
 	// EdgeCustomViews holds the string denoting the custom_views edge name in mutations.
 	EdgeCustomViews = "custom_views"
+	// EdgeBoards holds the string denoting the boards edge name in mutations.
+	EdgeBoards = "boards"
 	// EdgeFavorites holds the string denoting the favorites edge name in mutations.
 	EdgeFavorites = "favorites"
 	// EdgeTemplates holds the string denoting the templates edge name in mutations.
@@ -305,6 +307,13 @@ const (
 	CustomViewsInverseTable = "custom_views"
 	// CustomViewsColumn is the table column denoting the custom_views relation/edge.
 	CustomViewsColumn = "workspace_id"
+	// BoardsTable is the table that holds the boards relation/edge.
+	BoardsTable = "boards"
+	// BoardsInverseTable is the table name for the Board entity.
+	// It exists in this package in order to avoid circular dependency with the "board" package.
+	BoardsInverseTable = "boards"
+	// BoardsColumn is the table column denoting the boards relation/edge.
+	BoardsColumn = "workspace_id"
 	// FavoritesTable is the table that holds the favorites relation/edge.
 	FavoritesTable = "favorites"
 	// FavoritesInverseTable is the table name for the Favorite entity.
@@ -849,6 +858,20 @@ func ByCustomViews(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByBoardsCount orders the results by boards count.
+func ByBoardsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newBoardsStep(), opts...)
+	}
+}
+
+// ByBoards orders the results by boards terms.
+func ByBoards(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newBoardsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByFavoritesCount orders the results by favorites count.
 func ByFavoritesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -1168,6 +1191,13 @@ func newCustomViewsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CustomViewsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, CustomViewsTable, CustomViewsColumn),
+	)
+}
+func newBoardsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(BoardsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, BoardsTable, BoardsColumn),
 	)
 }
 func newFavoritesStep() *sqlgraph.Step {

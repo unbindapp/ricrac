@@ -122,6 +122,95 @@ var (
 			},
 		},
 	}
+	// BoardsColumns holds the columns for the "boards" table.
+	BoardsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "slug_id", Type: field.TypeString, Size: 2147483647},
+		{Name: "name", Type: field.TypeString, Size: 2147483647},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "creator_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "workspace_id", Type: field.TypeUUID},
+	}
+	// BoardsTable holds the schema information for the "boards" table.
+	BoardsTable = &schema.Table{
+		Name:       "boards",
+		Columns:    BoardsColumns,
+		PrimaryKey: []*schema.Column{BoardsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "boards_users_boards",
+				Columns:    []*schema.Column{BoardsColumns[6]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "boards_workspaces_boards",
+				Columns:    []*schema.Column{BoardsColumns[7]},
+				RefColumns: []*schema.Column{WorkspacesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// BoardColumnsColumns holds the columns for the "board_columns" table.
+	BoardColumnsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "name", Type: field.TypeString, Size: 2147483647},
+		{Name: "color", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "position", Type: field.TypeFloat64},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true},
+		{Name: "board_id", Type: field.TypeUUID},
+	}
+	// BoardColumnsTable holds the schema information for the "board_columns" table.
+	BoardColumnsTable = &schema.Table{
+		Name:       "board_columns",
+		Columns:    BoardColumnsColumns,
+		PrimaryKey: []*schema.Column{BoardColumnsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "board_columns_boards_columns",
+				Columns:    []*schema.Column{BoardColumnsColumns[5]},
+				RefColumns: []*schema.Column{BoardsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// BoardIssuesColumns holds the columns for the "board_issues" table.
+	BoardIssuesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "sort_order", Type: field.TypeFloat64},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true},
+		{Name: "board_id", Type: field.TypeUUID},
+		{Name: "column_id", Type: field.TypeUUID},
+		{Name: "issue_id", Type: field.TypeUUID},
+	}
+	// BoardIssuesTable holds the schema information for the "board_issues" table.
+	BoardIssuesTable = &schema.Table{
+		Name:       "board_issues",
+		Columns:    BoardIssuesColumns,
+		PrimaryKey: []*schema.Column{BoardIssuesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "board_issues_boards_board_issues",
+				Columns:    []*schema.Column{BoardIssuesColumns[3]},
+				RefColumns: []*schema.Column{BoardsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "board_issues_board_columns_board_issues",
+				Columns:    []*schema.Column{BoardIssuesColumns[4]},
+				RefColumns: []*schema.Column{BoardColumnsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "board_issues_issues_board_issues",
+				Columns:    []*schema.Column{BoardIssuesColumns[5]},
+				RefColumns: []*schema.Column{IssuesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// CommentsColumns holds the columns for the "comments" table.
 	CommentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
@@ -2661,6 +2750,9 @@ var (
 		AssistantRunsTable,
 		AttachmentsTable,
 		AuditEntriesTable,
+		BoardsTable,
+		BoardColumnsTable,
+		BoardIssuesTable,
 		CommentsTable,
 		CustomViewsTable,
 		CustomersTable,
@@ -2749,6 +2841,21 @@ func init() {
 	AuditEntriesTable.ForeignKeys[1].RefTable = WorkspacesTable
 	AuditEntriesTable.Annotation = &entsql.Annotation{
 		Table: "audit_entries",
+	}
+	BoardsTable.ForeignKeys[0].RefTable = UsersTable
+	BoardsTable.ForeignKeys[1].RefTable = WorkspacesTable
+	BoardsTable.Annotation = &entsql.Annotation{
+		Table: "boards",
+	}
+	BoardColumnsTable.ForeignKeys[0].RefTable = BoardsTable
+	BoardColumnsTable.Annotation = &entsql.Annotation{
+		Table: "board_columns",
+	}
+	BoardIssuesTable.ForeignKeys[0].RefTable = BoardsTable
+	BoardIssuesTable.ForeignKeys[1].RefTable = BoardColumnsTable
+	BoardIssuesTable.ForeignKeys[2].RefTable = IssuesTable
+	BoardIssuesTable.Annotation = &entsql.Annotation{
+		Table: "board_issues",
 	}
 	CommentsTable.ForeignKeys[0].RefTable = CommentsTable
 	CommentsTable.ForeignKeys[1].RefTable = DiscussionsTable

@@ -17,6 +17,7 @@ import { Route as SignInIndexRouteImport } from './routes/sign-in/index'
 import { Route as SignInEmailRouteImport } from './routes/sign-in/email'
 import { Route as TermsIndexRouteImport } from './routes/terms/index'
 import { Route as WorkspaceWorkspaceIndexRouteImport } from './routes/$workspace/_workspace/index'
+import { Route as WorkspaceWorkspaceBoardsRouteImport } from './routes/$workspace/_workspace/boards'
 import { Route as WorkspaceWorkspaceCustomersRouteImport } from './routes/$workspace/_workspace/customers'
 import { Route as WorkspaceWorkspaceCyclesRouteImport } from './routes/$workspace/_workspace/cycles'
 import { Route as WorkspaceWorkspaceDocumentsRouteImport } from './routes/$workspace/_workspace/documents'
@@ -32,6 +33,7 @@ import { Route as WorkspaceWorkspaceSettingsRouteRouteImport } from './routes/$w
 import { Route as WorkspaceWorkspaceTriageRouteImport } from './routes/$workspace/_workspace/triage'
 import { Route as WorkspaceWorkspaceViewsRouteImport } from './routes/$workspace/_workspace/views'
 import { Route as OauthAuthorizeIndexRouteImport } from './routes/oauth/authorize/index'
+import { Route as WorkspaceWorkspaceBoardBoard_idRouteImport } from './routes/$workspace/_workspace/board/$board_id'
 import { Route as WorkspaceWorkspaceCustomerSlugRouteImport } from './routes/$workspace/_workspace/customer/$slug'
 import { Route as WorkspaceWorkspaceCycleNumberRouteImport } from './routes/$workspace/_workspace/cycle/$number'
 import { Route as WorkspaceWorkspaceDiscussionSlugRouteImport } from './routes/$workspace/_workspace/discussion/$slug'
@@ -121,6 +123,12 @@ const WorkspaceWorkspaceIndexRoute = WorkspaceWorkspaceIndexRouteImport.update({
   path: '/',
   getParentRoute: () => WorkspaceWorkspaceRouteRoute,
 } as any)
+const WorkspaceWorkspaceBoardsRoute =
+  WorkspaceWorkspaceBoardsRouteImport.update({
+    id: '/boards',
+    path: '/boards',
+    getParentRoute: () => WorkspaceWorkspaceRouteRoute,
+  } as any)
 const WorkspaceWorkspaceCustomersRoute =
   WorkspaceWorkspaceCustomersRouteImport.update({
     id: '/customers',
@@ -207,6 +215,12 @@ const OauthAuthorizeIndexRoute = OauthAuthorizeIndexRouteImport.update({
   path: '/oauth/authorize/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkspaceWorkspaceBoardBoard_idRoute =
+  WorkspaceWorkspaceBoardBoard_idRouteImport.update({
+    id: '/board/$board_id',
+    path: '/board/$board_id',
+    getParentRoute: () => WorkspaceWorkspaceRouteRoute,
+  } as any)
 const WorkspaceWorkspaceCustomerSlugRoute =
   WorkspaceWorkspaceCustomerSlugRouteImport.update({
     id: '/customer/$slug',
@@ -520,6 +534,7 @@ export interface FileRoutesByFullPath {
   '/sign-in/': typeof SignInIndexRoute
   '/terms/': typeof TermsIndexRoute
   '/$workspace/settings': typeof WorkspaceWorkspaceSettingsRouteRouteWithChildren
+  '/$workspace/boards': typeof WorkspaceWorkspaceBoardsRoute
   '/$workspace/customers': typeof WorkspaceWorkspaceCustomersRoute
   '/$workspace/cycles': typeof WorkspaceWorkspaceCyclesRoute
   '/$workspace/documents': typeof WorkspaceWorkspaceDocumentsRoute
@@ -535,6 +550,7 @@ export interface FileRoutesByFullPath {
   '/$workspace/views': typeof WorkspaceWorkspaceViewsRoute
   '/$workspace/': typeof WorkspaceWorkspaceIndexRoute
   '/oauth/authorize/': typeof OauthAuthorizeIndexRoute
+  '/$workspace/board/$board_id': typeof WorkspaceWorkspaceBoardBoard_idRoute
   '/$workspace/customer/$slug': typeof WorkspaceWorkspaceCustomerSlugRoute
   '/$workspace/cycle/$number': typeof WorkspaceWorkspaceCycleNumberRoute
   '/$workspace/discussion/$slug': typeof WorkspaceWorkspaceDiscussionSlugRoute
@@ -590,6 +606,7 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInIndexRoute
   '/terms': typeof TermsIndexRoute
   '/$workspace/settings': typeof WorkspaceWorkspaceSettingsWorkspaceSettingsIndexRoute
+  '/$workspace/boards': typeof WorkspaceWorkspaceBoardsRoute
   '/$workspace/customers': typeof WorkspaceWorkspaceCustomersRoute
   '/$workspace/cycles': typeof WorkspaceWorkspaceCyclesRoute
   '/$workspace/documents': typeof WorkspaceWorkspaceDocumentsRoute
@@ -605,6 +622,7 @@ export interface FileRoutesByTo {
   '/$workspace/views': typeof WorkspaceWorkspaceViewsRoute
   '/$workspace': typeof WorkspaceWorkspaceIndexRoute
   '/oauth/authorize': typeof OauthAuthorizeIndexRoute
+  '/$workspace/board/$board_id': typeof WorkspaceWorkspaceBoardBoard_idRoute
   '/$workspace/customer/$slug': typeof WorkspaceWorkspaceCustomerSlugRoute
   '/$workspace/cycle/$number': typeof WorkspaceWorkspaceCycleNumberRoute
   '/$workspace/discussion/$slug': typeof WorkspaceWorkspaceDiscussionSlugRoute
@@ -661,6 +679,7 @@ export interface FileRoutesById {
   '/sign-in/': typeof SignInIndexRoute
   '/terms/': typeof TermsIndexRoute
   '/$workspace/_workspace/settings': typeof WorkspaceWorkspaceSettingsRouteRouteWithChildren
+  '/$workspace/_workspace/boards': typeof WorkspaceWorkspaceBoardsRoute
   '/$workspace/_workspace/customers': typeof WorkspaceWorkspaceCustomersRoute
   '/$workspace/_workspace/cycles': typeof WorkspaceWorkspaceCyclesRoute
   '/$workspace/_workspace/documents': typeof WorkspaceWorkspaceDocumentsRoute
@@ -677,6 +696,7 @@ export interface FileRoutesById {
   '/$workspace/_workspace/': typeof WorkspaceWorkspaceIndexRoute
   '/oauth/authorize/': typeof OauthAuthorizeIndexRoute
   '/$workspace/_workspace/settings/_workspace-settings': typeof WorkspaceWorkspaceSettingsWorkspaceSettingsRouteRouteWithChildren
+  '/$workspace/_workspace/board/$board_id': typeof WorkspaceWorkspaceBoardBoard_idRoute
   '/$workspace/_workspace/customer/$slug': typeof WorkspaceWorkspaceCustomerSlugRoute
   '/$workspace/_workspace/cycle/$number': typeof WorkspaceWorkspaceCycleNumberRoute
   '/$workspace/_workspace/discussion/$slug': typeof WorkspaceWorkspaceDiscussionSlugRoute
@@ -736,6 +756,7 @@ export interface FileRouteTypes {
     | '/sign-in/'
     | '/terms/'
     | '/$workspace/settings'
+    | '/$workspace/boards'
     | '/$workspace/customers'
     | '/$workspace/cycles'
     | '/$workspace/documents'
@@ -751,6 +772,7 @@ export interface FileRouteTypes {
     | '/$workspace/views'
     | '/$workspace/'
     | '/oauth/authorize/'
+    | '/$workspace/board/$board_id'
     | '/$workspace/customer/$slug'
     | '/$workspace/cycle/$number'
     | '/$workspace/discussion/$slug'
@@ -806,6 +828,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/terms'
     | '/$workspace/settings'
+    | '/$workspace/boards'
     | '/$workspace/customers'
     | '/$workspace/cycles'
     | '/$workspace/documents'
@@ -821,6 +844,7 @@ export interface FileRouteTypes {
     | '/$workspace/views'
     | '/$workspace'
     | '/oauth/authorize'
+    | '/$workspace/board/$board_id'
     | '/$workspace/customer/$slug'
     | '/$workspace/cycle/$number'
     | '/$workspace/discussion/$slug'
@@ -876,6 +900,7 @@ export interface FileRouteTypes {
     | '/sign-in/'
     | '/terms/'
     | '/$workspace/_workspace/settings'
+    | '/$workspace/_workspace/boards'
     | '/$workspace/_workspace/customers'
     | '/$workspace/_workspace/cycles'
     | '/$workspace/_workspace/documents'
@@ -892,6 +917,7 @@ export interface FileRouteTypes {
     | '/$workspace/_workspace/'
     | '/oauth/authorize/'
     | '/$workspace/_workspace/settings/_workspace-settings'
+    | '/$workspace/_workspace/board/$board_id'
     | '/$workspace/_workspace/customer/$slug'
     | '/$workspace/_workspace/cycle/$number'
     | '/$workspace/_workspace/discussion/$slug'
@@ -1010,6 +1036,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceWorkspaceIndexRouteImport
       parentRoute: typeof WorkspaceWorkspaceRouteRoute
     }
+    '/$workspace/_workspace/boards': {
+      id: '/$workspace/_workspace/boards'
+      path: '/boards'
+      fullPath: '/$workspace/boards'
+      preLoaderRoute: typeof WorkspaceWorkspaceBoardsRouteImport
+      parentRoute: typeof WorkspaceWorkspaceRouteRoute
+    }
     '/$workspace/_workspace/customers': {
       id: '/$workspace/_workspace/customers'
       path: '/customers'
@@ -1114,6 +1147,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/oauth/authorize/'
       preLoaderRoute: typeof OauthAuthorizeIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/$workspace/_workspace/board/$board_id': {
+      id: '/$workspace/_workspace/board/$board_id'
+      path: '/board/$board_id'
+      fullPath: '/$workspace/board/$board_id'
+      preLoaderRoute: typeof WorkspaceWorkspaceBoardBoard_idRouteImport
+      parentRoute: typeof WorkspaceWorkspaceRouteRoute
     }
     '/$workspace/_workspace/customer/$slug': {
       id: '/$workspace/_workspace/customer/$slug'
@@ -1570,6 +1610,7 @@ const WorkspaceWorkspaceSettingsRouteRouteWithChildren =
 
 interface WorkspaceWorkspaceRouteRouteChildren {
   WorkspaceWorkspaceSettingsRouteRoute: typeof WorkspaceWorkspaceSettingsRouteRouteWithChildren
+  WorkspaceWorkspaceBoardsRoute: typeof WorkspaceWorkspaceBoardsRoute
   WorkspaceWorkspaceCustomersRoute: typeof WorkspaceWorkspaceCustomersRoute
   WorkspaceWorkspaceCyclesRoute: typeof WorkspaceWorkspaceCyclesRoute
   WorkspaceWorkspaceDocumentsRoute: typeof WorkspaceWorkspaceDocumentsRoute
@@ -1584,6 +1625,7 @@ interface WorkspaceWorkspaceRouteRouteChildren {
   WorkspaceWorkspaceTriageRoute: typeof WorkspaceWorkspaceTriageRoute
   WorkspaceWorkspaceViewsRoute: typeof WorkspaceWorkspaceViewsRoute
   WorkspaceWorkspaceIndexRoute: typeof WorkspaceWorkspaceIndexRoute
+  WorkspaceWorkspaceBoardBoard_idRoute: typeof WorkspaceWorkspaceBoardBoard_idRoute
   WorkspaceWorkspaceCustomerSlugRoute: typeof WorkspaceWorkspaceCustomerSlugRoute
   WorkspaceWorkspaceCycleNumberRoute: typeof WorkspaceWorkspaceCycleNumberRoute
   WorkspaceWorkspaceDiscussionSlugRoute: typeof WorkspaceWorkspaceDiscussionSlugRoute
@@ -1612,6 +1654,7 @@ const WorkspaceWorkspaceRouteRouteChildren: WorkspaceWorkspaceRouteRouteChildren
   {
     WorkspaceWorkspaceSettingsRouteRoute:
       WorkspaceWorkspaceSettingsRouteRouteWithChildren,
+    WorkspaceWorkspaceBoardsRoute: WorkspaceWorkspaceBoardsRoute,
     WorkspaceWorkspaceCustomersRoute: WorkspaceWorkspaceCustomersRoute,
     WorkspaceWorkspaceCyclesRoute: WorkspaceWorkspaceCyclesRoute,
     WorkspaceWorkspaceDocumentsRoute: WorkspaceWorkspaceDocumentsRoute,
@@ -1626,6 +1669,7 @@ const WorkspaceWorkspaceRouteRouteChildren: WorkspaceWorkspaceRouteRouteChildren
     WorkspaceWorkspaceTriageRoute: WorkspaceWorkspaceTriageRoute,
     WorkspaceWorkspaceViewsRoute: WorkspaceWorkspaceViewsRoute,
     WorkspaceWorkspaceIndexRoute: WorkspaceWorkspaceIndexRoute,
+    WorkspaceWorkspaceBoardBoard_idRoute: WorkspaceWorkspaceBoardBoard_idRoute,
     WorkspaceWorkspaceCustomerSlugRoute: WorkspaceWorkspaceCustomerSlugRoute,
     WorkspaceWorkspaceCycleNumberRoute: WorkspaceWorkspaceCycleNumberRoute,
     WorkspaceWorkspaceDiscussionSlugRoute:

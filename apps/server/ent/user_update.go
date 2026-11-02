@@ -9,6 +9,7 @@ import (
 	"ricrac/ent/apikey"
 	"ricrac/ent/attachment"
 	"ricrac/ent/auditentry"
+	"ricrac/ent/board"
 	"ricrac/ent/comment"
 	"ricrac/ent/customer"
 	"ricrac/ent/customerneed"
@@ -771,6 +772,21 @@ func (_u *UserUpdate) AddCustomViews(v ...*CustomView) *UserUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.AddCustomViewIDs(ids...)
+}
+
+// AddBoardIDs adds the "boards" edge to the Board entity by IDs.
+func (_u *UserUpdate) AddBoardIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.AddBoardIDs(ids...)
+	return _u
+}
+
+// AddBoards adds the "boards" edges to the Board entity.
+func (_u *UserUpdate) AddBoards(v ...*Board) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddBoardIDs(ids...)
 }
 
 // AddFavoriteIDs adds the "favorites" edge to the Favorite entity by IDs.
@@ -1736,6 +1752,27 @@ func (_u *UserUpdate) RemoveCustomViews(v ...*CustomView) *UserUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveCustomViewIDs(ids...)
+}
+
+// ClearBoards clears all "boards" edges to the Board entity.
+func (_u *UserUpdate) ClearBoards() *UserUpdate {
+	_u.mutation.ClearBoards()
+	return _u
+}
+
+// RemoveBoardIDs removes the "boards" edge to Board entities by IDs.
+func (_u *UserUpdate) RemoveBoardIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.RemoveBoardIDs(ids...)
+	return _u
+}
+
+// RemoveBoards removes "boards" edges to Board entities.
+func (_u *UserUpdate) RemoveBoards(v ...*Board) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveBoardIDs(ids...)
 }
 
 // ClearFavorites clears all "favorites" edges to the Favorite entity.
@@ -3721,6 +3758,51 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.BoardsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.BoardsTable,
+			Columns: []string{user.BoardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedBoardsIDs(); len(nodes) > 0 && !_u.mutation.BoardsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.BoardsTable,
+			Columns: []string{user.BoardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.BoardsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.BoardsTable,
+			Columns: []string{user.BoardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _u.mutation.FavoritesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -5125,6 +5207,21 @@ func (_u *UserUpdateOne) AddCustomViews(v ...*CustomView) *UserUpdateOne {
 	return _u.AddCustomViewIDs(ids...)
 }
 
+// AddBoardIDs adds the "boards" edge to the Board entity by IDs.
+func (_u *UserUpdateOne) AddBoardIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.AddBoardIDs(ids...)
+	return _u
+}
+
+// AddBoards adds the "boards" edges to the Board entity.
+func (_u *UserUpdateOne) AddBoards(v ...*Board) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddBoardIDs(ids...)
+}
+
 // AddFavoriteIDs adds the "favorites" edge to the Favorite entity by IDs.
 func (_u *UserUpdateOne) AddFavoriteIDs(ids ...uuid.UUID) *UserUpdateOne {
 	_u.mutation.AddFavoriteIDs(ids...)
@@ -6088,6 +6185,27 @@ func (_u *UserUpdateOne) RemoveCustomViews(v ...*CustomView) *UserUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveCustomViewIDs(ids...)
+}
+
+// ClearBoards clears all "boards" edges to the Board entity.
+func (_u *UserUpdateOne) ClearBoards() *UserUpdateOne {
+	_u.mutation.ClearBoards()
+	return _u
+}
+
+// RemoveBoardIDs removes the "boards" edge to Board entities by IDs.
+func (_u *UserUpdateOne) RemoveBoardIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.RemoveBoardIDs(ids...)
+	return _u
+}
+
+// RemoveBoards removes "boards" edges to Board entities.
+func (_u *UserUpdateOne) RemoveBoards(v ...*Board) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveBoardIDs(ids...)
 }
 
 // ClearFavorites clears all "favorites" edges to the Favorite entity.
@@ -8096,6 +8214,51 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(customview.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.BoardsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.BoardsTable,
+			Columns: []string{user.BoardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedBoardsIDs(); len(nodes) > 0 && !_u.mutation.BoardsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.BoardsTable,
+			Columns: []string{user.BoardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.BoardsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.BoardsTable,
+			Columns: []string{user.BoardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

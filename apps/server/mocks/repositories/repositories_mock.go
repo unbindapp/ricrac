@@ -13,6 +13,7 @@ import (
 	"ricrac/internal/repositories/assistant"
 	"ricrac/internal/repositories/attachment"
 	"ricrac/internal/repositories/automation"
+	"ricrac/internal/repositories/board"
 	"ricrac/internal/repositories/comment"
 	"ricrac/internal/repositories/customer"
 	"ricrac/internal/repositories/cycle"
@@ -307,6 +308,52 @@ func (_c *RepositoriesMock_Automation_Call) Return(automationRepositoryInterface
 }
 
 func (_c *RepositoriesMock_Automation_Call) RunAndReturn(run func() automation_repo.AutomationRepositoryInterface) *RepositoriesMock_Automation_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Board provides a mock function for the type RepositoriesMock
+func (_mock *RepositoriesMock) Board() board_repo.BoardRepositoryInterface {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Board")
+	}
+
+	var r0 board_repo.BoardRepositoryInterface
+	if returnFunc, ok := ret.Get(0).(func() board_repo.BoardRepositoryInterface); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(board_repo.BoardRepositoryInterface)
+		}
+	}
+	return r0
+}
+
+// RepositoriesMock_Board_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Board'
+type RepositoriesMock_Board_Call struct {
+	*mock.Call
+}
+
+// Board is a helper method to define mock.On call
+func (_e *RepositoriesMock_Expecter) Board() *RepositoriesMock_Board_Call {
+	return &RepositoriesMock_Board_Call{Call: _e.mock.On("Board")}
+}
+
+func (_c *RepositoriesMock_Board_Call) Run(run func()) *RepositoriesMock_Board_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *RepositoriesMock_Board_Call) Return(boardRepositoryInterface board_repo.BoardRepositoryInterface) *RepositoriesMock_Board_Call {
+	_c.Call.Return(boardRepositoryInterface)
+	return _c
+}
+
+func (_c *RepositoriesMock_Board_Call) RunAndReturn(run func() board_repo.BoardRepositoryInterface) *RepositoriesMock_Board_Call {
 	_c.Call.Return(run)
 	return _c
 }

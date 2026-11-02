@@ -11,6 +11,9 @@ import (
 	"ricrac/ent/assistantrun"
 	"ricrac/ent/attachment"
 	"ricrac/ent/auditentry"
+	"ricrac/ent/board"
+	"ricrac/ent/boardcolumn"
+	"ricrac/ent/boardissue"
 	"ricrac/ent/comment"
 	"ricrac/ent/customer"
 	"ricrac/ent/customerneed"
@@ -147,6 +150,9 @@ func checkColumn(t, c string) error {
 			assistantrun.Table:         assistantrun.ValidColumn,
 			attachment.Table:           attachment.ValidColumn,
 			auditentry.Table:           auditentry.ValidColumn,
+			board.Table:                board.ValidColumn,
+			boardcolumn.Table:          boardcolumn.ValidColumn,
+			boardissue.Table:           boardissue.ValidColumn,
 			comment.Table:              comment.ValidColumn,
 			customview.Table:           customview.ValidColumn,
 			customer.Table:             customer.ValidColumn,

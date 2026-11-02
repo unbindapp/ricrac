@@ -111,6 +111,8 @@ const (
 	EdgeIssueHistory = "issue_history"
 	// EdgeAttachments holds the string denoting the attachments edge name in mutations.
 	EdgeAttachments = "attachments"
+	// EdgeBoardIssues holds the string denoting the board_issues edge name in mutations.
+	EdgeBoardIssues = "board_issues"
 	// EdgeDocuments holds the string denoting the documents edge name in mutations.
 	EdgeDocuments = "documents"
 	// EdgeComments holds the string denoting the comments edge name in mutations.
@@ -242,6 +244,13 @@ const (
 	AttachmentsInverseTable = "attachments"
 	// AttachmentsColumn is the table column denoting the attachments relation/edge.
 	AttachmentsColumn = "issue_id"
+	// BoardIssuesTable is the table that holds the board_issues relation/edge.
+	BoardIssuesTable = "board_issues"
+	// BoardIssuesInverseTable is the table name for the BoardIssue entity.
+	// It exists in this package in order to avoid circular dependency with the "boardissue" package.
+	BoardIssuesInverseTable = "board_issues"
+	// BoardIssuesColumn is the table column denoting the board_issues relation/edge.
+	BoardIssuesColumn = "issue_id"
 	// DocumentsTable is the table that holds the documents relation/edge.
 	DocumentsTable = "documents"
 	// DocumentsInverseTable is the table name for the Document entity.
@@ -728,6 +737,20 @@ func ByAttachments(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByBoardIssuesCount orders the results by board_issues count.
+func ByBoardIssuesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newBoardIssuesStep(), opts...)
+	}
+}
+
+// ByBoardIssues orders the results by board_issues terms.
+func ByBoardIssues(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newBoardIssuesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByDocumentsCount orders the results by documents count.
 func ByDocumentsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -1040,6 +1063,13 @@ func newAttachmentsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AttachmentsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, AttachmentsTable, AttachmentsColumn),
+	)
+}
+func newBoardIssuesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(BoardIssuesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, BoardIssuesTable, BoardIssuesColumn),
 	)
 }
 func newDocumentsStep() *sqlgraph.Step {

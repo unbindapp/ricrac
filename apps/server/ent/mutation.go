@@ -11,6 +11,9 @@ import (
 	"ricrac/ent/assistantrun"
 	"ricrac/ent/attachment"
 	"ricrac/ent/auditentry"
+	"ricrac/ent/board"
+	"ricrac/ent/boardcolumn"
+	"ricrac/ent/boardissue"
 	"ricrac/ent/comment"
 	"ricrac/ent/customer"
 	"ricrac/ent/customerneed"
@@ -101,6 +104,9 @@ const (
 	TypeAssistantRun         = "AssistantRun"
 	TypeAttachment           = "Attachment"
 	TypeAuditEntry           = "AuditEntry"
+	TypeBoard                = "Board"
+	TypeBoardColumn          = "BoardColumn"
+	TypeBoardIssue           = "BoardIssue"
 	TypeComment              = "Comment"
 	TypeCustomView           = "CustomView"
 	TypeCustomer             = "Customer"
@@ -3635,6 +3641,2525 @@ func (m *AuditEntryMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown AuditEntry edge %s", name)
+}
+
+// BoardMutation represents an operation that mutates the Board nodes in the graph.
+type BoardMutation struct {
+	config
+	op                  Op
+	typ                 string
+	id                  *uuid.UUID
+	slug_id             *string
+	name                *string
+	description         *string
+	created_at          *time.Time
+	updated_at          *time.Time
+	clearedFields       map[string]struct{}
+	workspace           *uuid.UUID
+	clearedworkspace    bool
+	creator             *uuid.UUID
+	clearedcreator      bool
+	columns             map[uuid.UUID]struct{}
+	removedcolumns      map[uuid.UUID]struct{}
+	clearedcolumns      bool
+	board_issues        map[uuid.UUID]struct{}
+	removedboard_issues map[uuid.UUID]struct{}
+	clearedboard_issues bool
+	done                bool
+	oldValue            func(context.Context) (*Board, error)
+	predicates          []predicate.Board
+}
+
+var _ ent.Mutation = (*BoardMutation)(nil)
+
+// boardOption allows management of the mutation configuration using functional options.
+type boardOption func(*BoardMutation)
+
+// newBoardMutation creates new mutation for the Board entity.
+func newBoardMutation(c config, op Op, opts ...boardOption) *BoardMutation {
+	m := &BoardMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeBoard,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withBoardID sets the ID field of the mutation.
+func withBoardID(id uuid.UUID) boardOption {
+	return func(m *BoardMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Board
+		)
+		m.oldValue = func(ctx context.Context) (*Board, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Board.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withBoard sets the old Board of the mutation.
+func withBoard(node *Board) boardOption {
+	return func(m *BoardMutation) {
+		m.oldValue = func(context.Context) (*Board, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m BoardMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m BoardMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Board entities.
+func (m *BoardMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *BoardMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *BoardMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Board.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetWorkspaceID sets the "workspace_id" field.
+func (m *BoardMutation) SetWorkspaceID(u uuid.UUID) {
+	m.workspace = &u
+}
+
+// WorkspaceID returns the value of the "workspace_id" field in the mutation.
+func (m *BoardMutation) WorkspaceID() (r uuid.UUID, exists bool) {
+	v := m.workspace
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWorkspaceID returns the old "workspace_id" field's value of the Board entity.
+// If the Board object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BoardMutation) OldWorkspaceID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWorkspaceID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWorkspaceID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWorkspaceID: %w", err)
+	}
+	return oldValue.WorkspaceID, nil
+}
+
+// ResetWorkspaceID resets all changes to the "workspace_id" field.
+func (m *BoardMutation) ResetWorkspaceID() {
+	m.workspace = nil
+}
+
+// SetSlugID sets the "slug_id" field.
+func (m *BoardMutation) SetSlugID(s string) {
+	m.slug_id = &s
+}
+
+// SlugID returns the value of the "slug_id" field in the mutation.
+func (m *BoardMutation) SlugID() (r string, exists bool) {
+	v := m.slug_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSlugID returns the old "slug_id" field's value of the Board entity.
+// If the Board object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BoardMutation) OldSlugID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSlugID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSlugID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSlugID: %w", err)
+	}
+	return oldValue.SlugID, nil
+}
+
+// ResetSlugID resets all changes to the "slug_id" field.
+func (m *BoardMutation) ResetSlugID() {
+	m.slug_id = nil
+}
+
+// SetName sets the "name" field.
+func (m *BoardMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *BoardMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Board entity.
+// If the Board object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BoardMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *BoardMutation) ResetName() {
+	m.name = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *BoardMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *BoardMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the Board entity.
+// If the Board object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BoardMutation) OldDescription(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *BoardMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[board.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *BoardMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[board.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *BoardMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, board.FieldDescription)
+}
+
+// SetCreatorID sets the "creator_id" field.
+func (m *BoardMutation) SetCreatorID(u uuid.UUID) {
+	m.creator = &u
+}
+
+// CreatorID returns the value of the "creator_id" field in the mutation.
+func (m *BoardMutation) CreatorID() (r uuid.UUID, exists bool) {
+	v := m.creator
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatorID returns the old "creator_id" field's value of the Board entity.
+// If the Board object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BoardMutation) OldCreatorID(ctx context.Context) (v *uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatorID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatorID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatorID: %w", err)
+	}
+	return oldValue.CreatorID, nil
+}
+
+// ClearCreatorID clears the value of the "creator_id" field.
+func (m *BoardMutation) ClearCreatorID() {
+	m.creator = nil
+	m.clearedFields[board.FieldCreatorID] = struct{}{}
+}
+
+// CreatorIDCleared returns if the "creator_id" field was cleared in this mutation.
+func (m *BoardMutation) CreatorIDCleared() bool {
+	_, ok := m.clearedFields[board.FieldCreatorID]
+	return ok
+}
+
+// ResetCreatorID resets all changes to the "creator_id" field.
+func (m *BoardMutation) ResetCreatorID() {
+	m.creator = nil
+	delete(m.clearedFields, board.FieldCreatorID)
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *BoardMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *BoardMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Board entity.
+// If the Board object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BoardMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ClearCreatedAt clears the value of the "created_at" field.
+func (m *BoardMutation) ClearCreatedAt() {
+	m.created_at = nil
+	m.clearedFields[board.FieldCreatedAt] = struct{}{}
+}
+
+// CreatedAtCleared returns if the "created_at" field was cleared in this mutation.
+func (m *BoardMutation) CreatedAtCleared() bool {
+	_, ok := m.clearedFields[board.FieldCreatedAt]
+	return ok
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *BoardMutation) ResetCreatedAt() {
+	m.created_at = nil
+	delete(m.clearedFields, board.FieldCreatedAt)
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *BoardMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *BoardMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Board entity.
+// If the Board object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BoardMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (m *BoardMutation) ClearUpdatedAt() {
+	m.updated_at = nil
+	m.clearedFields[board.FieldUpdatedAt] = struct{}{}
+}
+
+// UpdatedAtCleared returns if the "updated_at" field was cleared in this mutation.
+func (m *BoardMutation) UpdatedAtCleared() bool {
+	_, ok := m.clearedFields[board.FieldUpdatedAt]
+	return ok
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *BoardMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	delete(m.clearedFields, board.FieldUpdatedAt)
+}
+
+// ClearWorkspace clears the "workspace" edge to the Workspace entity.
+func (m *BoardMutation) ClearWorkspace() {
+	m.clearedworkspace = true
+	m.clearedFields[board.FieldWorkspaceID] = struct{}{}
+}
+
+// WorkspaceCleared reports if the "workspace" edge to the Workspace entity was cleared.
+func (m *BoardMutation) WorkspaceCleared() bool {
+	return m.clearedworkspace
+}
+
+// WorkspaceIDs returns the "workspace" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// WorkspaceID instead. It exists only for internal usage by the builders.
+func (m *BoardMutation) WorkspaceIDs() (ids []uuid.UUID) {
+	if id := m.workspace; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetWorkspace resets all changes to the "workspace" edge.
+func (m *BoardMutation) ResetWorkspace() {
+	m.workspace = nil
+	m.clearedworkspace = false
+}
+
+// ClearCreator clears the "creator" edge to the User entity.
+func (m *BoardMutation) ClearCreator() {
+	m.clearedcreator = true
+	m.clearedFields[board.FieldCreatorID] = struct{}{}
+}
+
+// CreatorCleared reports if the "creator" edge to the User entity was cleared.
+func (m *BoardMutation) CreatorCleared() bool {
+	return m.CreatorIDCleared() || m.clearedcreator
+}
+
+// CreatorIDs returns the "creator" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CreatorID instead. It exists only for internal usage by the builders.
+func (m *BoardMutation) CreatorIDs() (ids []uuid.UUID) {
+	if id := m.creator; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCreator resets all changes to the "creator" edge.
+func (m *BoardMutation) ResetCreator() {
+	m.creator = nil
+	m.clearedcreator = false
+}
+
+// AddColumnIDs adds the "columns" edge to the BoardColumn entity by ids.
+func (m *BoardMutation) AddColumnIDs(ids ...uuid.UUID) {
+	if m.columns == nil {
+		m.columns = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.columns[ids[i]] = struct{}{}
+	}
+}
+
+// ClearColumns clears the "columns" edge to the BoardColumn entity.
+func (m *BoardMutation) ClearColumns() {
+	m.clearedcolumns = true
+}
+
+// ColumnsCleared reports if the "columns" edge to the BoardColumn entity was cleared.
+func (m *BoardMutation) ColumnsCleared() bool {
+	return m.clearedcolumns
+}
+
+// RemoveColumnIDs removes the "columns" edge to the BoardColumn entity by IDs.
+func (m *BoardMutation) RemoveColumnIDs(ids ...uuid.UUID) {
+	if m.removedcolumns == nil {
+		m.removedcolumns = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.columns, ids[i])
+		m.removedcolumns[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedColumns returns the removed IDs of the "columns" edge to the BoardColumn entity.
+func (m *BoardMutation) RemovedColumnsIDs() (ids []uuid.UUID) {
+	for id := range m.removedcolumns {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ColumnsIDs returns the "columns" edge IDs in the mutation.
+func (m *BoardMutation) ColumnsIDs() (ids []uuid.UUID) {
+	for id := range m.columns {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetColumns resets all changes to the "columns" edge.
+func (m *BoardMutation) ResetColumns() {
+	m.columns = nil
+	m.clearedcolumns = false
+	m.removedcolumns = nil
+}
+
+// AddBoardIssueIDs adds the "board_issues" edge to the BoardIssue entity by ids.
+func (m *BoardMutation) AddBoardIssueIDs(ids ...uuid.UUID) {
+	if m.board_issues == nil {
+		m.board_issues = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.board_issues[ids[i]] = struct{}{}
+	}
+}
+
+// ClearBoardIssues clears the "board_issues" edge to the BoardIssue entity.
+func (m *BoardMutation) ClearBoardIssues() {
+	m.clearedboard_issues = true
+}
+
+// BoardIssuesCleared reports if the "board_issues" edge to the BoardIssue entity was cleared.
+func (m *BoardMutation) BoardIssuesCleared() bool {
+	return m.clearedboard_issues
+}
+
+// RemoveBoardIssueIDs removes the "board_issues" edge to the BoardIssue entity by IDs.
+func (m *BoardMutation) RemoveBoardIssueIDs(ids ...uuid.UUID) {
+	if m.removedboard_issues == nil {
+		m.removedboard_issues = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.board_issues, ids[i])
+		m.removedboard_issues[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedBoardIssues returns the removed IDs of the "board_issues" edge to the BoardIssue entity.
+func (m *BoardMutation) RemovedBoardIssuesIDs() (ids []uuid.UUID) {
+	for id := range m.removedboard_issues {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// BoardIssuesIDs returns the "board_issues" edge IDs in the mutation.
+func (m *BoardMutation) BoardIssuesIDs() (ids []uuid.UUID) {
+	for id := range m.board_issues {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetBoardIssues resets all changes to the "board_issues" edge.
+func (m *BoardMutation) ResetBoardIssues() {
+	m.board_issues = nil
+	m.clearedboard_issues = false
+	m.removedboard_issues = nil
+}
+
+// Where appends a list predicates to the BoardMutation builder.
+func (m *BoardMutation) Where(ps ...predicate.Board) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the BoardMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *BoardMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Board, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *BoardMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *BoardMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Board).
+func (m *BoardMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *BoardMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.workspace != nil {
+		fields = append(fields, board.FieldWorkspaceID)
+	}
+	if m.slug_id != nil {
+		fields = append(fields, board.FieldSlugID)
+	}
+	if m.name != nil {
+		fields = append(fields, board.FieldName)
+	}
+	if m.description != nil {
+		fields = append(fields, board.FieldDescription)
+	}
+	if m.creator != nil {
+		fields = append(fields, board.FieldCreatorID)
+	}
+	if m.created_at != nil {
+		fields = append(fields, board.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, board.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *BoardMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case board.FieldWorkspaceID:
+		return m.WorkspaceID()
+	case board.FieldSlugID:
+		return m.SlugID()
+	case board.FieldName:
+		return m.Name()
+	case board.FieldDescription:
+		return m.Description()
+	case board.FieldCreatorID:
+		return m.CreatorID()
+	case board.FieldCreatedAt:
+		return m.CreatedAt()
+	case board.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *BoardMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case board.FieldWorkspaceID:
+		return m.OldWorkspaceID(ctx)
+	case board.FieldSlugID:
+		return m.OldSlugID(ctx)
+	case board.FieldName:
+		return m.OldName(ctx)
+	case board.FieldDescription:
+		return m.OldDescription(ctx)
+	case board.FieldCreatorID:
+		return m.OldCreatorID(ctx)
+	case board.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case board.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown Board field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *BoardMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case board.FieldWorkspaceID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWorkspaceID(v)
+		return nil
+	case board.FieldSlugID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSlugID(v)
+		return nil
+	case board.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case board.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case board.FieldCreatorID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatorID(v)
+		return nil
+	case board.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case board.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Board field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *BoardMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *BoardMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *BoardMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Board numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *BoardMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(board.FieldDescription) {
+		fields = append(fields, board.FieldDescription)
+	}
+	if m.FieldCleared(board.FieldCreatorID) {
+		fields = append(fields, board.FieldCreatorID)
+	}
+	if m.FieldCleared(board.FieldCreatedAt) {
+		fields = append(fields, board.FieldCreatedAt)
+	}
+	if m.FieldCleared(board.FieldUpdatedAt) {
+		fields = append(fields, board.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *BoardMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *BoardMutation) ClearField(name string) error {
+	switch name {
+	case board.FieldDescription:
+		m.ClearDescription()
+		return nil
+	case board.FieldCreatorID:
+		m.ClearCreatorID()
+		return nil
+	case board.FieldCreatedAt:
+		m.ClearCreatedAt()
+		return nil
+	case board.FieldUpdatedAt:
+		m.ClearUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Board nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *BoardMutation) ResetField(name string) error {
+	switch name {
+	case board.FieldWorkspaceID:
+		m.ResetWorkspaceID()
+		return nil
+	case board.FieldSlugID:
+		m.ResetSlugID()
+		return nil
+	case board.FieldName:
+		m.ResetName()
+		return nil
+	case board.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case board.FieldCreatorID:
+		m.ResetCreatorID()
+		return nil
+	case board.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case board.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Board field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *BoardMutation) AddedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.workspace != nil {
+		edges = append(edges, board.EdgeWorkspace)
+	}
+	if m.creator != nil {
+		edges = append(edges, board.EdgeCreator)
+	}
+	if m.columns != nil {
+		edges = append(edges, board.EdgeColumns)
+	}
+	if m.board_issues != nil {
+		edges = append(edges, board.EdgeBoardIssues)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *BoardMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case board.EdgeWorkspace:
+		if id := m.workspace; id != nil {
+			return []ent.Value{*id}
+		}
+	case board.EdgeCreator:
+		if id := m.creator; id != nil {
+			return []ent.Value{*id}
+		}
+	case board.EdgeColumns:
+		ids := make([]ent.Value, 0, len(m.columns))
+		for id := range m.columns {
+			ids = append(ids, id)
+		}
+		return ids
+	case board.EdgeBoardIssues:
+		ids := make([]ent.Value, 0, len(m.board_issues))
+		for id := range m.board_issues {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *BoardMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.removedcolumns != nil {
+		edges = append(edges, board.EdgeColumns)
+	}
+	if m.removedboard_issues != nil {
+		edges = append(edges, board.EdgeBoardIssues)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *BoardMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case board.EdgeColumns:
+		ids := make([]ent.Value, 0, len(m.removedcolumns))
+		for id := range m.removedcolumns {
+			ids = append(ids, id)
+		}
+		return ids
+	case board.EdgeBoardIssues:
+		ids := make([]ent.Value, 0, len(m.removedboard_issues))
+		for id := range m.removedboard_issues {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *BoardMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.clearedworkspace {
+		edges = append(edges, board.EdgeWorkspace)
+	}
+	if m.clearedcreator {
+		edges = append(edges, board.EdgeCreator)
+	}
+	if m.clearedcolumns {
+		edges = append(edges, board.EdgeColumns)
+	}
+	if m.clearedboard_issues {
+		edges = append(edges, board.EdgeBoardIssues)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *BoardMutation) EdgeCleared(name string) bool {
+	switch name {
+	case board.EdgeWorkspace:
+		return m.clearedworkspace
+	case board.EdgeCreator:
+		return m.clearedcreator
+	case board.EdgeColumns:
+		return m.clearedcolumns
+	case board.EdgeBoardIssues:
+		return m.clearedboard_issues
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *BoardMutation) ClearEdge(name string) error {
+	switch name {
+	case board.EdgeWorkspace:
+		m.ClearWorkspace()
+		return nil
+	case board.EdgeCreator:
+		m.ClearCreator()
+		return nil
+	}
+	return fmt.Errorf("unknown Board unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *BoardMutation) ResetEdge(name string) error {
+	switch name {
+	case board.EdgeWorkspace:
+		m.ResetWorkspace()
+		return nil
+	case board.EdgeCreator:
+		m.ResetCreator()
+		return nil
+	case board.EdgeColumns:
+		m.ResetColumns()
+		return nil
+	case board.EdgeBoardIssues:
+		m.ResetBoardIssues()
+		return nil
+	}
+	return fmt.Errorf("unknown Board edge %s", name)
+}
+
+// BoardColumnMutation represents an operation that mutates the BoardColumn nodes in the graph.
+type BoardColumnMutation struct {
+	config
+	op                  Op
+	typ                 string
+	id                  *uuid.UUID
+	name                *string
+	color               *string
+	position            *float64
+	addposition         *float64
+	created_at          *time.Time
+	clearedFields       map[string]struct{}
+	board               *uuid.UUID
+	clearedboard        bool
+	board_issues        map[uuid.UUID]struct{}
+	removedboard_issues map[uuid.UUID]struct{}
+	clearedboard_issues bool
+	done                bool
+	oldValue            func(context.Context) (*BoardColumn, error)
+	predicates          []predicate.BoardColumn
+}
+
+var _ ent.Mutation = (*BoardColumnMutation)(nil)
+
+// boardcolumnOption allows management of the mutation configuration using functional options.
+type boardcolumnOption func(*BoardColumnMutation)
+
+// newBoardColumnMutation creates new mutation for the BoardColumn entity.
+func newBoardColumnMutation(c config, op Op, opts ...boardcolumnOption) *BoardColumnMutation {
+	m := &BoardColumnMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeBoardColumn,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withBoardColumnID sets the ID field of the mutation.
+func withBoardColumnID(id uuid.UUID) boardcolumnOption {
+	return func(m *BoardColumnMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *BoardColumn
+		)
+		m.oldValue = func(ctx context.Context) (*BoardColumn, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().BoardColumn.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withBoardColumn sets the old BoardColumn of the mutation.
+func withBoardColumn(node *BoardColumn) boardcolumnOption {
+	return func(m *BoardColumnMutation) {
+		m.oldValue = func(context.Context) (*BoardColumn, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m BoardColumnMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m BoardColumnMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of BoardColumn entities.
+func (m *BoardColumnMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *BoardColumnMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *BoardColumnMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().BoardColumn.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetBoardID sets the "board_id" field.
+func (m *BoardColumnMutation) SetBoardID(u uuid.UUID) {
+	m.board = &u
+}
+
+// BoardID returns the value of the "board_id" field in the mutation.
+func (m *BoardColumnMutation) BoardID() (r uuid.UUID, exists bool) {
+	v := m.board
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBoardID returns the old "board_id" field's value of the BoardColumn entity.
+// If the BoardColumn object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BoardColumnMutation) OldBoardID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBoardID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBoardID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBoardID: %w", err)
+	}
+	return oldValue.BoardID, nil
+}
+
+// ResetBoardID resets all changes to the "board_id" field.
+func (m *BoardColumnMutation) ResetBoardID() {
+	m.board = nil
+}
+
+// SetName sets the "name" field.
+func (m *BoardColumnMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *BoardColumnMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the BoardColumn entity.
+// If the BoardColumn object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BoardColumnMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *BoardColumnMutation) ResetName() {
+	m.name = nil
+}
+
+// SetColor sets the "color" field.
+func (m *BoardColumnMutation) SetColor(s string) {
+	m.color = &s
+}
+
+// Color returns the value of the "color" field in the mutation.
+func (m *BoardColumnMutation) Color() (r string, exists bool) {
+	v := m.color
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldColor returns the old "color" field's value of the BoardColumn entity.
+// If the BoardColumn object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BoardColumnMutation) OldColor(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldColor is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldColor requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldColor: %w", err)
+	}
+	return oldValue.Color, nil
+}
+
+// ClearColor clears the value of the "color" field.
+func (m *BoardColumnMutation) ClearColor() {
+	m.color = nil
+	m.clearedFields[boardcolumn.FieldColor] = struct{}{}
+}
+
+// ColorCleared returns if the "color" field was cleared in this mutation.
+func (m *BoardColumnMutation) ColorCleared() bool {
+	_, ok := m.clearedFields[boardcolumn.FieldColor]
+	return ok
+}
+
+// ResetColor resets all changes to the "color" field.
+func (m *BoardColumnMutation) ResetColor() {
+	m.color = nil
+	delete(m.clearedFields, boardcolumn.FieldColor)
+}
+
+// SetPosition sets the "position" field.
+func (m *BoardColumnMutation) SetPosition(f float64) {
+	m.position = &f
+	m.addposition = nil
+}
+
+// Position returns the value of the "position" field in the mutation.
+func (m *BoardColumnMutation) Position() (r float64, exists bool) {
+	v := m.position
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPosition returns the old "position" field's value of the BoardColumn entity.
+// If the BoardColumn object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BoardColumnMutation) OldPosition(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPosition is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPosition requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPosition: %w", err)
+	}
+	return oldValue.Position, nil
+}
+
+// AddPosition adds f to the "position" field.
+func (m *BoardColumnMutation) AddPosition(f float64) {
+	if m.addposition != nil {
+		*m.addposition += f
+	} else {
+		m.addposition = &f
+	}
+}
+
+// AddedPosition returns the value that was added to the "position" field in this mutation.
+func (m *BoardColumnMutation) AddedPosition() (r float64, exists bool) {
+	v := m.addposition
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPosition resets all changes to the "position" field.
+func (m *BoardColumnMutation) ResetPosition() {
+	m.position = nil
+	m.addposition = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *BoardColumnMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *BoardColumnMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the BoardColumn entity.
+// If the BoardColumn object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BoardColumnMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ClearCreatedAt clears the value of the "created_at" field.
+func (m *BoardColumnMutation) ClearCreatedAt() {
+	m.created_at = nil
+	m.clearedFields[boardcolumn.FieldCreatedAt] = struct{}{}
+}
+
+// CreatedAtCleared returns if the "created_at" field was cleared in this mutation.
+func (m *BoardColumnMutation) CreatedAtCleared() bool {
+	_, ok := m.clearedFields[boardcolumn.FieldCreatedAt]
+	return ok
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *BoardColumnMutation) ResetCreatedAt() {
+	m.created_at = nil
+	delete(m.clearedFields, boardcolumn.FieldCreatedAt)
+}
+
+// ClearBoard clears the "board" edge to the Board entity.
+func (m *BoardColumnMutation) ClearBoard() {
+	m.clearedboard = true
+	m.clearedFields[boardcolumn.FieldBoardID] = struct{}{}
+}
+
+// BoardCleared reports if the "board" edge to the Board entity was cleared.
+func (m *BoardColumnMutation) BoardCleared() bool {
+	return m.clearedboard
+}
+
+// BoardIDs returns the "board" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// BoardID instead. It exists only for internal usage by the builders.
+func (m *BoardColumnMutation) BoardIDs() (ids []uuid.UUID) {
+	if id := m.board; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetBoard resets all changes to the "board" edge.
+func (m *BoardColumnMutation) ResetBoard() {
+	m.board = nil
+	m.clearedboard = false
+}
+
+// AddBoardIssueIDs adds the "board_issues" edge to the BoardIssue entity by ids.
+func (m *BoardColumnMutation) AddBoardIssueIDs(ids ...uuid.UUID) {
+	if m.board_issues == nil {
+		m.board_issues = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.board_issues[ids[i]] = struct{}{}
+	}
+}
+
+// ClearBoardIssues clears the "board_issues" edge to the BoardIssue entity.
+func (m *BoardColumnMutation) ClearBoardIssues() {
+	m.clearedboard_issues = true
+}
+
+// BoardIssuesCleared reports if the "board_issues" edge to the BoardIssue entity was cleared.
+func (m *BoardColumnMutation) BoardIssuesCleared() bool {
+	return m.clearedboard_issues
+}
+
+// RemoveBoardIssueIDs removes the "board_issues" edge to the BoardIssue entity by IDs.
+func (m *BoardColumnMutation) RemoveBoardIssueIDs(ids ...uuid.UUID) {
+	if m.removedboard_issues == nil {
+		m.removedboard_issues = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.board_issues, ids[i])
+		m.removedboard_issues[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedBoardIssues returns the removed IDs of the "board_issues" edge to the BoardIssue entity.
+func (m *BoardColumnMutation) RemovedBoardIssuesIDs() (ids []uuid.UUID) {
+	for id := range m.removedboard_issues {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// BoardIssuesIDs returns the "board_issues" edge IDs in the mutation.
+func (m *BoardColumnMutation) BoardIssuesIDs() (ids []uuid.UUID) {
+	for id := range m.board_issues {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetBoardIssues resets all changes to the "board_issues" edge.
+func (m *BoardColumnMutation) ResetBoardIssues() {
+	m.board_issues = nil
+	m.clearedboard_issues = false
+	m.removedboard_issues = nil
+}
+
+// Where appends a list predicates to the BoardColumnMutation builder.
+func (m *BoardColumnMutation) Where(ps ...predicate.BoardColumn) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the BoardColumnMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *BoardColumnMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.BoardColumn, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *BoardColumnMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *BoardColumnMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (BoardColumn).
+func (m *BoardColumnMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *BoardColumnMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.board != nil {
+		fields = append(fields, boardcolumn.FieldBoardID)
+	}
+	if m.name != nil {
+		fields = append(fields, boardcolumn.FieldName)
+	}
+	if m.color != nil {
+		fields = append(fields, boardcolumn.FieldColor)
+	}
+	if m.position != nil {
+		fields = append(fields, boardcolumn.FieldPosition)
+	}
+	if m.created_at != nil {
+		fields = append(fields, boardcolumn.FieldCreatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *BoardColumnMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case boardcolumn.FieldBoardID:
+		return m.BoardID()
+	case boardcolumn.FieldName:
+		return m.Name()
+	case boardcolumn.FieldColor:
+		return m.Color()
+	case boardcolumn.FieldPosition:
+		return m.Position()
+	case boardcolumn.FieldCreatedAt:
+		return m.CreatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *BoardColumnMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case boardcolumn.FieldBoardID:
+		return m.OldBoardID(ctx)
+	case boardcolumn.FieldName:
+		return m.OldName(ctx)
+	case boardcolumn.FieldColor:
+		return m.OldColor(ctx)
+	case boardcolumn.FieldPosition:
+		return m.OldPosition(ctx)
+	case boardcolumn.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown BoardColumn field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *BoardColumnMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case boardcolumn.FieldBoardID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBoardID(v)
+		return nil
+	case boardcolumn.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case boardcolumn.FieldColor:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetColor(v)
+		return nil
+	case boardcolumn.FieldPosition:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPosition(v)
+		return nil
+	case boardcolumn.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown BoardColumn field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *BoardColumnMutation) AddedFields() []string {
+	var fields []string
+	if m.addposition != nil {
+		fields = append(fields, boardcolumn.FieldPosition)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *BoardColumnMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case boardcolumn.FieldPosition:
+		return m.AddedPosition()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *BoardColumnMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case boardcolumn.FieldPosition:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPosition(v)
+		return nil
+	}
+	return fmt.Errorf("unknown BoardColumn numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *BoardColumnMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(boardcolumn.FieldColor) {
+		fields = append(fields, boardcolumn.FieldColor)
+	}
+	if m.FieldCleared(boardcolumn.FieldCreatedAt) {
+		fields = append(fields, boardcolumn.FieldCreatedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *BoardColumnMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *BoardColumnMutation) ClearField(name string) error {
+	switch name {
+	case boardcolumn.FieldColor:
+		m.ClearColor()
+		return nil
+	case boardcolumn.FieldCreatedAt:
+		m.ClearCreatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown BoardColumn nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *BoardColumnMutation) ResetField(name string) error {
+	switch name {
+	case boardcolumn.FieldBoardID:
+		m.ResetBoardID()
+		return nil
+	case boardcolumn.FieldName:
+		m.ResetName()
+		return nil
+	case boardcolumn.FieldColor:
+		m.ResetColor()
+		return nil
+	case boardcolumn.FieldPosition:
+		m.ResetPosition()
+		return nil
+	case boardcolumn.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown BoardColumn field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *BoardColumnMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.board != nil {
+		edges = append(edges, boardcolumn.EdgeBoard)
+	}
+	if m.board_issues != nil {
+		edges = append(edges, boardcolumn.EdgeBoardIssues)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *BoardColumnMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case boardcolumn.EdgeBoard:
+		if id := m.board; id != nil {
+			return []ent.Value{*id}
+		}
+	case boardcolumn.EdgeBoardIssues:
+		ids := make([]ent.Value, 0, len(m.board_issues))
+		for id := range m.board_issues {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *BoardColumnMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.removedboard_issues != nil {
+		edges = append(edges, boardcolumn.EdgeBoardIssues)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *BoardColumnMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case boardcolumn.EdgeBoardIssues:
+		ids := make([]ent.Value, 0, len(m.removedboard_issues))
+		for id := range m.removedboard_issues {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *BoardColumnMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedboard {
+		edges = append(edges, boardcolumn.EdgeBoard)
+	}
+	if m.clearedboard_issues {
+		edges = append(edges, boardcolumn.EdgeBoardIssues)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *BoardColumnMutation) EdgeCleared(name string) bool {
+	switch name {
+	case boardcolumn.EdgeBoard:
+		return m.clearedboard
+	case boardcolumn.EdgeBoardIssues:
+		return m.clearedboard_issues
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *BoardColumnMutation) ClearEdge(name string) error {
+	switch name {
+	case boardcolumn.EdgeBoard:
+		m.ClearBoard()
+		return nil
+	}
+	return fmt.Errorf("unknown BoardColumn unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *BoardColumnMutation) ResetEdge(name string) error {
+	switch name {
+	case boardcolumn.EdgeBoard:
+		m.ResetBoard()
+		return nil
+	case boardcolumn.EdgeBoardIssues:
+		m.ResetBoardIssues()
+		return nil
+	}
+	return fmt.Errorf("unknown BoardColumn edge %s", name)
+}
+
+// BoardIssueMutation represents an operation that mutates the BoardIssue nodes in the graph.
+type BoardIssueMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *uuid.UUID
+	sort_order    *float64
+	addsort_order *float64
+	created_at    *time.Time
+	clearedFields map[string]struct{}
+	board         *uuid.UUID
+	clearedboard  bool
+	column        *uuid.UUID
+	clearedcolumn bool
+	issue         *uuid.UUID
+	clearedissue  bool
+	done          bool
+	oldValue      func(context.Context) (*BoardIssue, error)
+	predicates    []predicate.BoardIssue
+}
+
+var _ ent.Mutation = (*BoardIssueMutation)(nil)
+
+// boardissueOption allows management of the mutation configuration using functional options.
+type boardissueOption func(*BoardIssueMutation)
+
+// newBoardIssueMutation creates new mutation for the BoardIssue entity.
+func newBoardIssueMutation(c config, op Op, opts ...boardissueOption) *BoardIssueMutation {
+	m := &BoardIssueMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeBoardIssue,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withBoardIssueID sets the ID field of the mutation.
+func withBoardIssueID(id uuid.UUID) boardissueOption {
+	return func(m *BoardIssueMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *BoardIssue
+		)
+		m.oldValue = func(ctx context.Context) (*BoardIssue, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().BoardIssue.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withBoardIssue sets the old BoardIssue of the mutation.
+func withBoardIssue(node *BoardIssue) boardissueOption {
+	return func(m *BoardIssueMutation) {
+		m.oldValue = func(context.Context) (*BoardIssue, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m BoardIssueMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m BoardIssueMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of BoardIssue entities.
+func (m *BoardIssueMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *BoardIssueMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *BoardIssueMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().BoardIssue.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetBoardID sets the "board_id" field.
+func (m *BoardIssueMutation) SetBoardID(u uuid.UUID) {
+	m.board = &u
+}
+
+// BoardID returns the value of the "board_id" field in the mutation.
+func (m *BoardIssueMutation) BoardID() (r uuid.UUID, exists bool) {
+	v := m.board
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBoardID returns the old "board_id" field's value of the BoardIssue entity.
+// If the BoardIssue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BoardIssueMutation) OldBoardID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBoardID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBoardID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBoardID: %w", err)
+	}
+	return oldValue.BoardID, nil
+}
+
+// ResetBoardID resets all changes to the "board_id" field.
+func (m *BoardIssueMutation) ResetBoardID() {
+	m.board = nil
+}
+
+// SetColumnID sets the "column_id" field.
+func (m *BoardIssueMutation) SetColumnID(u uuid.UUID) {
+	m.column = &u
+}
+
+// ColumnID returns the value of the "column_id" field in the mutation.
+func (m *BoardIssueMutation) ColumnID() (r uuid.UUID, exists bool) {
+	v := m.column
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldColumnID returns the old "column_id" field's value of the BoardIssue entity.
+// If the BoardIssue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BoardIssueMutation) OldColumnID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldColumnID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldColumnID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldColumnID: %w", err)
+	}
+	return oldValue.ColumnID, nil
+}
+
+// ResetColumnID resets all changes to the "column_id" field.
+func (m *BoardIssueMutation) ResetColumnID() {
+	m.column = nil
+}
+
+// SetIssueID sets the "issue_id" field.
+func (m *BoardIssueMutation) SetIssueID(u uuid.UUID) {
+	m.issue = &u
+}
+
+// IssueID returns the value of the "issue_id" field in the mutation.
+func (m *BoardIssueMutation) IssueID() (r uuid.UUID, exists bool) {
+	v := m.issue
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIssueID returns the old "issue_id" field's value of the BoardIssue entity.
+// If the BoardIssue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BoardIssueMutation) OldIssueID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIssueID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIssueID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIssueID: %w", err)
+	}
+	return oldValue.IssueID, nil
+}
+
+// ResetIssueID resets all changes to the "issue_id" field.
+func (m *BoardIssueMutation) ResetIssueID() {
+	m.issue = nil
+}
+
+// SetSortOrder sets the "sort_order" field.
+func (m *BoardIssueMutation) SetSortOrder(f float64) {
+	m.sort_order = &f
+	m.addsort_order = nil
+}
+
+// SortOrder returns the value of the "sort_order" field in the mutation.
+func (m *BoardIssueMutation) SortOrder() (r float64, exists bool) {
+	v := m.sort_order
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSortOrder returns the old "sort_order" field's value of the BoardIssue entity.
+// If the BoardIssue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BoardIssueMutation) OldSortOrder(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSortOrder is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSortOrder requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSortOrder: %w", err)
+	}
+	return oldValue.SortOrder, nil
+}
+
+// AddSortOrder adds f to the "sort_order" field.
+func (m *BoardIssueMutation) AddSortOrder(f float64) {
+	if m.addsort_order != nil {
+		*m.addsort_order += f
+	} else {
+		m.addsort_order = &f
+	}
+}
+
+// AddedSortOrder returns the value that was added to the "sort_order" field in this mutation.
+func (m *BoardIssueMutation) AddedSortOrder() (r float64, exists bool) {
+	v := m.addsort_order
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSortOrder resets all changes to the "sort_order" field.
+func (m *BoardIssueMutation) ResetSortOrder() {
+	m.sort_order = nil
+	m.addsort_order = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *BoardIssueMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *BoardIssueMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the BoardIssue entity.
+// If the BoardIssue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BoardIssueMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ClearCreatedAt clears the value of the "created_at" field.
+func (m *BoardIssueMutation) ClearCreatedAt() {
+	m.created_at = nil
+	m.clearedFields[boardissue.FieldCreatedAt] = struct{}{}
+}
+
+// CreatedAtCleared returns if the "created_at" field was cleared in this mutation.
+func (m *BoardIssueMutation) CreatedAtCleared() bool {
+	_, ok := m.clearedFields[boardissue.FieldCreatedAt]
+	return ok
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *BoardIssueMutation) ResetCreatedAt() {
+	m.created_at = nil
+	delete(m.clearedFields, boardissue.FieldCreatedAt)
+}
+
+// ClearBoard clears the "board" edge to the Board entity.
+func (m *BoardIssueMutation) ClearBoard() {
+	m.clearedboard = true
+	m.clearedFields[boardissue.FieldBoardID] = struct{}{}
+}
+
+// BoardCleared reports if the "board" edge to the Board entity was cleared.
+func (m *BoardIssueMutation) BoardCleared() bool {
+	return m.clearedboard
+}
+
+// BoardIDs returns the "board" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// BoardID instead. It exists only for internal usage by the builders.
+func (m *BoardIssueMutation) BoardIDs() (ids []uuid.UUID) {
+	if id := m.board; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetBoard resets all changes to the "board" edge.
+func (m *BoardIssueMutation) ResetBoard() {
+	m.board = nil
+	m.clearedboard = false
+}
+
+// ClearColumn clears the "column" edge to the BoardColumn entity.
+func (m *BoardIssueMutation) ClearColumn() {
+	m.clearedcolumn = true
+	m.clearedFields[boardissue.FieldColumnID] = struct{}{}
+}
+
+// ColumnCleared reports if the "column" edge to the BoardColumn entity was cleared.
+func (m *BoardIssueMutation) ColumnCleared() bool {
+	return m.clearedcolumn
+}
+
+// ColumnIDs returns the "column" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ColumnID instead. It exists only for internal usage by the builders.
+func (m *BoardIssueMutation) ColumnIDs() (ids []uuid.UUID) {
+	if id := m.column; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetColumn resets all changes to the "column" edge.
+func (m *BoardIssueMutation) ResetColumn() {
+	m.column = nil
+	m.clearedcolumn = false
+}
+
+// ClearIssue clears the "issue" edge to the Issue entity.
+func (m *BoardIssueMutation) ClearIssue() {
+	m.clearedissue = true
+	m.clearedFields[boardissue.FieldIssueID] = struct{}{}
+}
+
+// IssueCleared reports if the "issue" edge to the Issue entity was cleared.
+func (m *BoardIssueMutation) IssueCleared() bool {
+	return m.clearedissue
+}
+
+// IssueIDs returns the "issue" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// IssueID instead. It exists only for internal usage by the builders.
+func (m *BoardIssueMutation) IssueIDs() (ids []uuid.UUID) {
+	if id := m.issue; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetIssue resets all changes to the "issue" edge.
+func (m *BoardIssueMutation) ResetIssue() {
+	m.issue = nil
+	m.clearedissue = false
+}
+
+// Where appends a list predicates to the BoardIssueMutation builder.
+func (m *BoardIssueMutation) Where(ps ...predicate.BoardIssue) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the BoardIssueMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *BoardIssueMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.BoardIssue, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *BoardIssueMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *BoardIssueMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (BoardIssue).
+func (m *BoardIssueMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *BoardIssueMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.board != nil {
+		fields = append(fields, boardissue.FieldBoardID)
+	}
+	if m.column != nil {
+		fields = append(fields, boardissue.FieldColumnID)
+	}
+	if m.issue != nil {
+		fields = append(fields, boardissue.FieldIssueID)
+	}
+	if m.sort_order != nil {
+		fields = append(fields, boardissue.FieldSortOrder)
+	}
+	if m.created_at != nil {
+		fields = append(fields, boardissue.FieldCreatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *BoardIssueMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case boardissue.FieldBoardID:
+		return m.BoardID()
+	case boardissue.FieldColumnID:
+		return m.ColumnID()
+	case boardissue.FieldIssueID:
+		return m.IssueID()
+	case boardissue.FieldSortOrder:
+		return m.SortOrder()
+	case boardissue.FieldCreatedAt:
+		return m.CreatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *BoardIssueMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case boardissue.FieldBoardID:
+		return m.OldBoardID(ctx)
+	case boardissue.FieldColumnID:
+		return m.OldColumnID(ctx)
+	case boardissue.FieldIssueID:
+		return m.OldIssueID(ctx)
+	case boardissue.FieldSortOrder:
+		return m.OldSortOrder(ctx)
+	case boardissue.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown BoardIssue field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *BoardIssueMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case boardissue.FieldBoardID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBoardID(v)
+		return nil
+	case boardissue.FieldColumnID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetColumnID(v)
+		return nil
+	case boardissue.FieldIssueID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIssueID(v)
+		return nil
+	case boardissue.FieldSortOrder:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSortOrder(v)
+		return nil
+	case boardissue.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown BoardIssue field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *BoardIssueMutation) AddedFields() []string {
+	var fields []string
+	if m.addsort_order != nil {
+		fields = append(fields, boardissue.FieldSortOrder)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *BoardIssueMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case boardissue.FieldSortOrder:
+		return m.AddedSortOrder()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *BoardIssueMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case boardissue.FieldSortOrder:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSortOrder(v)
+		return nil
+	}
+	return fmt.Errorf("unknown BoardIssue numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *BoardIssueMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(boardissue.FieldCreatedAt) {
+		fields = append(fields, boardissue.FieldCreatedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *BoardIssueMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *BoardIssueMutation) ClearField(name string) error {
+	switch name {
+	case boardissue.FieldCreatedAt:
+		m.ClearCreatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown BoardIssue nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *BoardIssueMutation) ResetField(name string) error {
+	switch name {
+	case boardissue.FieldBoardID:
+		m.ResetBoardID()
+		return nil
+	case boardissue.FieldColumnID:
+		m.ResetColumnID()
+		return nil
+	case boardissue.FieldIssueID:
+		m.ResetIssueID()
+		return nil
+	case boardissue.FieldSortOrder:
+		m.ResetSortOrder()
+		return nil
+	case boardissue.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown BoardIssue field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *BoardIssueMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.board != nil {
+		edges = append(edges, boardissue.EdgeBoard)
+	}
+	if m.column != nil {
+		edges = append(edges, boardissue.EdgeColumn)
+	}
+	if m.issue != nil {
+		edges = append(edges, boardissue.EdgeIssue)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *BoardIssueMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case boardissue.EdgeBoard:
+		if id := m.board; id != nil {
+			return []ent.Value{*id}
+		}
+	case boardissue.EdgeColumn:
+		if id := m.column; id != nil {
+			return []ent.Value{*id}
+		}
+	case boardissue.EdgeIssue:
+		if id := m.issue; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *BoardIssueMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *BoardIssueMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *BoardIssueMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedboard {
+		edges = append(edges, boardissue.EdgeBoard)
+	}
+	if m.clearedcolumn {
+		edges = append(edges, boardissue.EdgeColumn)
+	}
+	if m.clearedissue {
+		edges = append(edges, boardissue.EdgeIssue)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *BoardIssueMutation) EdgeCleared(name string) bool {
+	switch name {
+	case boardissue.EdgeBoard:
+		return m.clearedboard
+	case boardissue.EdgeColumn:
+		return m.clearedcolumn
+	case boardissue.EdgeIssue:
+		return m.clearedissue
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *BoardIssueMutation) ClearEdge(name string) error {
+	switch name {
+	case boardissue.EdgeBoard:
+		m.ClearBoard()
+		return nil
+	case boardissue.EdgeColumn:
+		m.ClearColumn()
+		return nil
+	case boardissue.EdgeIssue:
+		m.ClearIssue()
+		return nil
+	}
+	return fmt.Errorf("unknown BoardIssue unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *BoardIssueMutation) ResetEdge(name string) error {
+	switch name {
+	case boardissue.EdgeBoard:
+		m.ResetBoard()
+		return nil
+	case boardissue.EdgeColumn:
+		m.ResetColumn()
+		return nil
+	case boardissue.EdgeIssue:
+		m.ResetIssue()
+		return nil
+	}
+	return fmt.Errorf("unknown BoardIssue edge %s", name)
 }
 
 // CommentMutation represents an operation that mutates the Comment nodes in the graph.
@@ -36076,6 +38601,9 @@ type IssueMutation struct {
 	attachments                             map[uuid.UUID]struct{}
 	removedattachments                      map[uuid.UUID]struct{}
 	clearedattachments                      bool
+	board_issues                            map[uuid.UUID]struct{}
+	removedboard_issues                     map[uuid.UUID]struct{}
+	clearedboard_issues                     bool
 	documents                               map[uuid.UUID]struct{}
 	removeddocuments                        map[uuid.UUID]struct{}
 	cleareddocuments                        bool
@@ -38463,6 +40991,60 @@ func (m *IssueMutation) ResetAttachments() {
 	m.removedattachments = nil
 }
 
+// AddBoardIssueIDs adds the "board_issues" edge to the BoardIssue entity by ids.
+func (m *IssueMutation) AddBoardIssueIDs(ids ...uuid.UUID) {
+	if m.board_issues == nil {
+		m.board_issues = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.board_issues[ids[i]] = struct{}{}
+	}
+}
+
+// ClearBoardIssues clears the "board_issues" edge to the BoardIssue entity.
+func (m *IssueMutation) ClearBoardIssues() {
+	m.clearedboard_issues = true
+}
+
+// BoardIssuesCleared reports if the "board_issues" edge to the BoardIssue entity was cleared.
+func (m *IssueMutation) BoardIssuesCleared() bool {
+	return m.clearedboard_issues
+}
+
+// RemoveBoardIssueIDs removes the "board_issues" edge to the BoardIssue entity by IDs.
+func (m *IssueMutation) RemoveBoardIssueIDs(ids ...uuid.UUID) {
+	if m.removedboard_issues == nil {
+		m.removedboard_issues = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.board_issues, ids[i])
+		m.removedboard_issues[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedBoardIssues returns the removed IDs of the "board_issues" edge to the BoardIssue entity.
+func (m *IssueMutation) RemovedBoardIssuesIDs() (ids []uuid.UUID) {
+	for id := range m.removedboard_issues {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// BoardIssuesIDs returns the "board_issues" edge IDs in the mutation.
+func (m *IssueMutation) BoardIssuesIDs() (ids []uuid.UUID) {
+	for id := range m.board_issues {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetBoardIssues resets all changes to the "board_issues" edge.
+func (m *IssueMutation) ResetBoardIssues() {
+	m.board_issues = nil
+	m.clearedboard_issues = false
+	m.removedboard_issues = nil
+}
+
 // AddDocumentIDs adds the "documents" edge to the Document entity by ids.
 func (m *IssueMutation) AddDocumentIDs(ids ...uuid.UUID) {
 	if m.documents == nil {
@@ -39991,7 +42573,7 @@ func (m *IssueMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *IssueMutation) AddedEdges() []string {
-	edges := make([]string, 0, 26)
+	edges := make([]string, 0, 27)
 	if m.workspace != nil {
 		edges = append(edges, issue.EdgeWorkspace)
 	}
@@ -40036,6 +42618,9 @@ func (m *IssueMutation) AddedEdges() []string {
 	}
 	if m.attachments != nil {
 		edges = append(edges, issue.EdgeAttachments)
+	}
+	if m.board_issues != nil {
+		edges = append(edges, issue.EdgeBoardIssues)
 	}
 	if m.documents != nil {
 		edges = append(edges, issue.EdgeDocuments)
@@ -40147,6 +42732,12 @@ func (m *IssueMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case issue.EdgeBoardIssues:
+		ids := make([]ent.Value, 0, len(m.board_issues))
+		for id := range m.board_issues {
+			ids = append(ids, id)
+		}
+		return ids
 	case issue.EdgeDocuments:
 		ids := make([]ent.Value, 0, len(m.documents))
 		for id := range m.documents {
@@ -40219,7 +42810,7 @@ func (m *IssueMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *IssueMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 26)
+	edges := make([]string, 0, 27)
 	if m.removedchildren != nil {
 		edges = append(edges, issue.EdgeChildren)
 	}
@@ -40234,6 +42825,9 @@ func (m *IssueMutation) RemovedEdges() []string {
 	}
 	if m.removedattachments != nil {
 		edges = append(edges, issue.EdgeAttachments)
+	}
+	if m.removedboard_issues != nil {
+		edges = append(edges, issue.EdgeBoardIssues)
 	}
 	if m.removeddocuments != nil {
 		edges = append(edges, issue.EdgeDocuments)
@@ -40302,6 +42896,12 @@ func (m *IssueMutation) RemovedIDs(name string) []ent.Value {
 	case issue.EdgeAttachments:
 		ids := make([]ent.Value, 0, len(m.removedattachments))
 		for id := range m.removedattachments {
+			ids = append(ids, id)
+		}
+		return ids
+	case issue.EdgeBoardIssues:
+		ids := make([]ent.Value, 0, len(m.removedboard_issues))
+		for id := range m.removedboard_issues {
 			ids = append(ids, id)
 		}
 		return ids
@@ -40377,7 +42977,7 @@ func (m *IssueMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *IssueMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 26)
+	edges := make([]string, 0, 27)
 	if m.clearedworkspace {
 		edges = append(edges, issue.EdgeWorkspace)
 	}
@@ -40422,6 +43022,9 @@ func (m *IssueMutation) ClearedEdges() []string {
 	}
 	if m.clearedattachments {
 		edges = append(edges, issue.EdgeAttachments)
+	}
+	if m.clearedboard_issues {
+		edges = append(edges, issue.EdgeBoardIssues)
 	}
 	if m.cleareddocuments {
 		edges = append(edges, issue.EdgeDocuments)
@@ -40493,6 +43096,8 @@ func (m *IssueMutation) EdgeCleared(name string) bool {
 		return m.clearedissue_history
 	case issue.EdgeAttachments:
 		return m.clearedattachments
+	case issue.EdgeBoardIssues:
+		return m.clearedboard_issues
 	case issue.EdgeDocuments:
 		return m.cleareddocuments
 	case issue.EdgeComments:
@@ -40605,6 +43210,9 @@ func (m *IssueMutation) ResetEdge(name string) error {
 		return nil
 	case issue.EdgeAttachments:
 		m.ResetAttachments()
+		return nil
+	case issue.EdgeBoardIssues:
+		m.ResetBoardIssues()
 		return nil
 	case issue.EdgeDocuments:
 		m.ResetDocuments()
@@ -76448,6 +79056,9 @@ type UserMutation struct {
 	custom_views                                map[uuid.UUID]struct{}
 	removedcustom_views                         map[uuid.UUID]struct{}
 	clearedcustom_views                         bool
+	boards                                      map[uuid.UUID]struct{}
+	removedboards                               map[uuid.UUID]struct{}
+	clearedboards                               bool
 	favorites                                   map[uuid.UUID]struct{}
 	removedfavorites                            map[uuid.UUID]struct{}
 	clearedfavorites                            bool
@@ -78943,6 +81554,60 @@ func (m *UserMutation) ResetCustomViews() {
 	m.removedcustom_views = nil
 }
 
+// AddBoardIDs adds the "boards" edge to the Board entity by ids.
+func (m *UserMutation) AddBoardIDs(ids ...uuid.UUID) {
+	if m.boards == nil {
+		m.boards = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.boards[ids[i]] = struct{}{}
+	}
+}
+
+// ClearBoards clears the "boards" edge to the Board entity.
+func (m *UserMutation) ClearBoards() {
+	m.clearedboards = true
+}
+
+// BoardsCleared reports if the "boards" edge to the Board entity was cleared.
+func (m *UserMutation) BoardsCleared() bool {
+	return m.clearedboards
+}
+
+// RemoveBoardIDs removes the "boards" edge to the Board entity by IDs.
+func (m *UserMutation) RemoveBoardIDs(ids ...uuid.UUID) {
+	if m.removedboards == nil {
+		m.removedboards = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.boards, ids[i])
+		m.removedboards[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedBoards returns the removed IDs of the "boards" edge to the Board entity.
+func (m *UserMutation) RemovedBoardsIDs() (ids []uuid.UUID) {
+	for id := range m.removedboards {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// BoardsIDs returns the "boards" edge IDs in the mutation.
+func (m *UserMutation) BoardsIDs() (ids []uuid.UUID) {
+	for id := range m.boards {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetBoards resets all changes to the "boards" edge.
+func (m *UserMutation) ResetBoards() {
+	m.boards = nil
+	m.clearedboards = false
+	m.removedboards = nil
+}
+
 // AddFavoriteIDs adds the "favorites" edge to the Favorite entity by ids.
 func (m *UserMutation) AddFavoriteIDs(ids ...uuid.UUID) {
 	if m.favorites == nil {
@@ -80084,7 +82749,7 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 50)
+	edges := make([]string, 0, 51)
 	if m.invitations != nil {
 		edges = append(edges, user.EdgeInvitations)
 	}
@@ -80189,6 +82854,9 @@ func (m *UserMutation) AddedEdges() []string {
 	}
 	if m.custom_views != nil {
 		edges = append(edges, user.EdgeCustomViews)
+	}
+	if m.boards != nil {
+		edges = append(edges, user.EdgeBoards)
 	}
 	if m.favorites != nil {
 		edges = append(edges, user.EdgeFavorites)
@@ -80452,6 +83120,12 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeBoards:
+		ids := make([]ent.Value, 0, len(m.boards))
+		for id := range m.boards {
+			ids = append(ids, id)
+		}
+		return ids
 	case user.EdgeFavorites:
 		ids := make([]ent.Value, 0, len(m.favorites))
 		for id := range m.favorites {
@@ -80548,7 +83222,7 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 50)
+	edges := make([]string, 0, 51)
 	if m.removedinvitations != nil {
 		edges = append(edges, user.EdgeInvitations)
 	}
@@ -80653,6 +83327,9 @@ func (m *UserMutation) RemovedEdges() []string {
 	}
 	if m.removedcustom_views != nil {
 		edges = append(edges, user.EdgeCustomViews)
+	}
+	if m.removedboards != nil {
+		edges = append(edges, user.EdgeBoards)
 	}
 	if m.removedfavorites != nil {
 		edges = append(edges, user.EdgeFavorites)
@@ -80916,6 +83593,12 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeBoards:
+		ids := make([]ent.Value, 0, len(m.removedboards))
+		for id := range m.removedboards {
+			ids = append(ids, id)
+		}
+		return ids
 	case user.EdgeFavorites:
 		ids := make([]ent.Value, 0, len(m.removedfavorites))
 		for id := range m.removedfavorites {
@@ -81012,7 +83695,7 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 50)
+	edges := make([]string, 0, 51)
 	if m.clearedinvitations {
 		edges = append(edges, user.EdgeInvitations)
 	}
@@ -81117,6 +83800,9 @@ func (m *UserMutation) ClearedEdges() []string {
 	}
 	if m.clearedcustom_views {
 		edges = append(edges, user.EdgeCustomViews)
+	}
+	if m.clearedboards {
+		edges = append(edges, user.EdgeBoards)
 	}
 	if m.clearedfavorites {
 		edges = append(edges, user.EdgeFavorites)
@@ -81240,6 +83926,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 		return m.clearedcustomer_needs
 	case user.EdgeCustomViews:
 		return m.clearedcustom_views
+	case user.EdgeBoards:
+		return m.clearedboards
 	case user.EdgeFavorites:
 		return m.clearedfavorites
 	case user.EdgeTemplates:
@@ -81390,6 +84078,9 @@ func (m *UserMutation) ResetEdge(name string) error {
 		return nil
 	case user.EdgeCustomViews:
 		m.ResetCustomViews()
+		return nil
+	case user.EdgeBoards:
+		m.ResetBoards()
 		return nil
 	case user.EdgeFavorites:
 		m.ResetFavorites()
@@ -85172,6 +87863,9 @@ type WorkspaceMutation struct {
 	custom_views                map[uuid.UUID]struct{}
 	removedcustom_views         map[uuid.UUID]struct{}
 	clearedcustom_views         bool
+	boards                      map[uuid.UUID]struct{}
+	removedboards               map[uuid.UUID]struct{}
+	clearedboards               bool
 	favorites                   map[uuid.UUID]struct{}
 	removedfavorites            map[uuid.UUID]struct{}
 	clearedfavorites            bool
@@ -87297,6 +89991,60 @@ func (m *WorkspaceMutation) ResetCustomViews() {
 	m.removedcustom_views = nil
 }
 
+// AddBoardIDs adds the "boards" edge to the Board entity by ids.
+func (m *WorkspaceMutation) AddBoardIDs(ids ...uuid.UUID) {
+	if m.boards == nil {
+		m.boards = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.boards[ids[i]] = struct{}{}
+	}
+}
+
+// ClearBoards clears the "boards" edge to the Board entity.
+func (m *WorkspaceMutation) ClearBoards() {
+	m.clearedboards = true
+}
+
+// BoardsCleared reports if the "boards" edge to the Board entity was cleared.
+func (m *WorkspaceMutation) BoardsCleared() bool {
+	return m.clearedboards
+}
+
+// RemoveBoardIDs removes the "boards" edge to the Board entity by IDs.
+func (m *WorkspaceMutation) RemoveBoardIDs(ids ...uuid.UUID) {
+	if m.removedboards == nil {
+		m.removedboards = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.boards, ids[i])
+		m.removedboards[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedBoards returns the removed IDs of the "boards" edge to the Board entity.
+func (m *WorkspaceMutation) RemovedBoardsIDs() (ids []uuid.UUID) {
+	for id := range m.removedboards {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// BoardsIDs returns the "boards" edge IDs in the mutation.
+func (m *WorkspaceMutation) BoardsIDs() (ids []uuid.UUID) {
+	for id := range m.boards {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetBoards resets all changes to the "boards" edge.
+func (m *WorkspaceMutation) ResetBoards() {
+	m.boards = nil
+	m.clearedboards = false
+	m.removedboards = nil
+}
+
 // AddFavoriteIDs adds the "favorites" edge to the Favorite entity by ids.
 func (m *WorkspaceMutation) AddFavoriteIDs(ids ...uuid.UUID) {
 	if m.favorites == nil {
@@ -88066,7 +90814,7 @@ func (m *WorkspaceMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *WorkspaceMutation) AddedEdges() []string {
-	edges := make([]string, 0, 36)
+	edges := make([]string, 0, 37)
 	if m.invitations != nil {
 		edges = append(edges, workspace.EdgeInvitations)
 	}
@@ -88150,6 +90898,9 @@ func (m *WorkspaceMutation) AddedEdges() []string {
 	}
 	if m.custom_views != nil {
 		edges = append(edges, workspace.EdgeCustomViews)
+	}
+	if m.boards != nil {
+		edges = append(edges, workspace.EdgeBoards)
 	}
 	if m.favorites != nil {
 		edges = append(edges, workspace.EdgeFavorites)
@@ -88350,6 +91101,12 @@ func (m *WorkspaceMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case workspace.EdgeBoards:
+		ids := make([]ent.Value, 0, len(m.boards))
+		for id := range m.boards {
+			ids = append(ids, id)
+		}
+		return ids
 	case workspace.EdgeFavorites:
 		ids := make([]ent.Value, 0, len(m.favorites))
 		for id := range m.favorites {
@@ -88404,7 +91161,7 @@ func (m *WorkspaceMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *WorkspaceMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 36)
+	edges := make([]string, 0, 37)
 	if m.removedinvitations != nil {
 		edges = append(edges, workspace.EdgeInvitations)
 	}
@@ -88488,6 +91245,9 @@ func (m *WorkspaceMutation) RemovedEdges() []string {
 	}
 	if m.removedcustom_views != nil {
 		edges = append(edges, workspace.EdgeCustomViews)
+	}
+	if m.removedboards != nil {
+		edges = append(edges, workspace.EdgeBoards)
 	}
 	if m.removedfavorites != nil {
 		edges = append(edges, workspace.EdgeFavorites)
@@ -88688,6 +91448,12 @@ func (m *WorkspaceMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case workspace.EdgeBoards:
+		ids := make([]ent.Value, 0, len(m.removedboards))
+		for id := range m.removedboards {
+			ids = append(ids, id)
+		}
+		return ids
 	case workspace.EdgeFavorites:
 		ids := make([]ent.Value, 0, len(m.removedfavorites))
 		for id := range m.removedfavorites {
@@ -88742,7 +91508,7 @@ func (m *WorkspaceMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *WorkspaceMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 36)
+	edges := make([]string, 0, 37)
 	if m.clearedinvitations {
 		edges = append(edges, workspace.EdgeInvitations)
 	}
@@ -88826,6 +91592,9 @@ func (m *WorkspaceMutation) ClearedEdges() []string {
 	}
 	if m.clearedcustom_views {
 		edges = append(edges, workspace.EdgeCustomViews)
+	}
+	if m.clearedboards {
+		edges = append(edges, workspace.EdgeBoards)
 	}
 	if m.clearedfavorites {
 		edges = append(edges, workspace.EdgeFavorites)
@@ -88914,6 +91683,8 @@ func (m *WorkspaceMutation) EdgeCleared(name string) bool {
 		return m.clearedcustomer_needs
 	case workspace.EdgeCustomViews:
 		return m.clearedcustom_views
+	case workspace.EdgeBoards:
+		return m.clearedboards
 	case workspace.EdgeFavorites:
 		return m.clearedfavorites
 	case workspace.EdgeTemplates:
@@ -89029,6 +91800,9 @@ func (m *WorkspaceMutation) ResetEdge(name string) error {
 		return nil
 	case workspace.EdgeCustomViews:
 		m.ResetCustomViews()
+		return nil
+	case workspace.EdgeBoards:
+		m.ResetBoards()
 		return nil
 	case workspace.EdgeFavorites:
 		m.ResetFavorites()

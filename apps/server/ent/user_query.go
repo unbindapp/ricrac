@@ -10,6 +10,7 @@ import (
 	"ricrac/ent/apikey"
 	"ricrac/ent/attachment"
 	"ricrac/ent/auditentry"
+	"ricrac/ent/board"
 	"ricrac/ent/comment"
 	"ricrac/ent/customer"
 	"ricrac/ent/customerneed"
@@ -104,6 +105,7 @@ type UserQuery struct {
 	withCustomers                        *CustomerQuery
 	withCustomerNeeds                    *CustomerNeedQuery
 	withCustomViews                      *CustomViewQuery
+	withBoards                           *BoardQuery
 	withFavorites                        *FavoriteQuery
 	withTemplates                        *TemplateQuery
 	withNotificationsByUser              *NotificationQuery
@@ -934,6 +936,28 @@ func (_q *UserQuery) QueryCustomViews() *CustomViewQuery {
 	return query
 }
 
+// QueryBoards chains the current query on the "boards" edge.
+func (_q *UserQuery) QueryBoards() *BoardQuery {
+	query := (&BoardClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(board.Table, board.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.BoardsTable, user.BoardsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryFavorites chains the current query on the "favorites" edge.
 func (_q *UserQuery) QueryFavorites() *FavoriteQuery {
 	query := (&FavoriteClient{config: _q.config}).Query()
@@ -1667,6 +1691,7 @@ func (_q *UserQuery) Clone() *UserQuery {
 		withCustomers:                        _q.withCustomers.Clone(),
 		withCustomerNeeds:                    _q.withCustomerNeeds.Clone(),
 		withCustomViews:                      _q.withCustomViews.Clone(),
+		withBoards:                           _q.withBoards.Clone(),
 		withFavorites:                        _q.withFavorites.Clone(),
 		withTemplates:                        _q.withTemplates.Clone(),
 		withNotificationsByUser:              _q.withNotificationsByUser.Clone(),
@@ -2082,6 +2107,17 @@ func (_q *UserQuery) WithCustomViews(opts ...func(*CustomViewQuery)) *UserQuery 
 	return _q
 }
 
+// WithBoards tells the query-builder to eager-load the nodes that are connected to
+// the "boards" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithBoards(opts ...func(*BoardQuery)) *UserQuery {
+	query := (&BoardClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withBoards = query
+	return _q
+}
+
 // WithFavorites tells the query-builder to eager-load the nodes that are connected to
 // the "favorites" edge. The optional arguments are used to configure the query builder of the edge.
 func (_q *UserQuery) WithFavorites(opts ...func(*FavoriteQuery)) *UserQuery {
@@ -2413,7 +2449,7 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = _q.querySpec()
-		loadedTypes = [58]bool{
+		loadedTypes = [59]bool{
 			_q.withInvitations != nil,
 			_q.withAPIKeys != nil,
 			_q.withOauthClients != nil,
@@ -2449,6 +2485,7 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			_q.withCustomers != nil,
 			_q.withCustomerNeeds != nil,
 			_q.withCustomViews != nil,
+			_q.withBoards != nil,
 			_q.withFavorites != nil,
 			_q.withTemplates != nil,
 			_q.withNotificationsByUser != nil,
@@ -2743,6 +2780,13 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := _q.loadCustomViews(ctx, query, nodes,
 			func(n *User) { n.Edges.CustomViews = []*CustomView{} },
 			func(n *User, e *CustomView) { n.Edges.CustomViews = append(n.Edges.CustomViews, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withBoards; query != nil {
+		if err := _q.loadBoards(ctx, query, nodes,
+			func(n *User) { n.Edges.Boards = []*Board{} },
+			func(n *User, e *Board) { n.Edges.Boards = append(n.Edges.Boards, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -4054,6 +4098,39 @@ func (_q *UserQuery) loadCustomViews(ctx context.Context, query *CustomViewQuery
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "owner_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *UserQuery) loadBoards(ctx context.Context, query *BoardQuery, nodes []*User, init func(*User), assign func(*User, *Board)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(board.FieldCreatorID)
+	}
+	query.Where(predicate.Board(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.BoardsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.CreatorID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "creator_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "creator_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

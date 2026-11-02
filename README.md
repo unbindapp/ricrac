@@ -46,6 +46,8 @@ operations and permissions.
   thumbnail, each a live chat whose messages take replies in their own thread, and with smaller
   threads for a bug, a design check, a question, an idea or a task, which link to issues and get
   resolved. Subscribers hear about new threads and comments.
+- **Boards**: kanban boards with columns of their own (Ideas, Design, Ready), apart from the
+  workflow statuses. Cards are issues; quick ones written on a board stay off GitHub.
 - **Custom views**, **favorites**, **templates** (issue templates with sub-issues, recurring
   issues on a schedule, project templates with milestones and issues, document templates), an **inbox** of notifications
   (read, archive, snooze), **customers** and customer requests, **releases** with pipelines,
@@ -54,7 +56,7 @@ operations and permissions.
   commits that mention ENG-123 are attached to the issue and move it (opened, then done when a
   pull request that fixes it merges or a fixing commit lands on the default branch), and
   synced repositories keep their issues, comments and milestones in step both ways, and can open
-  issues created in Ricrac on GitHub as their author. See
+  issues created in Ricrac on GitHub as their author, when they're created or later. See
   [docs/github-app.md](docs/github-app.md).
 - **Ask Claude**, a panel in the web app where members ask Claude to find, sum up and change
   things in the workspace. It runs the Claude Code CLI on the server with Ricrac's MCP tools as
