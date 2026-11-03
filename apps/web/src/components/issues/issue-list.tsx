@@ -21,11 +21,9 @@ import {
 } from "@/components/issues/use-issue-collection";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
-import { List } from "@/components/layout/list";
+import { isHeaderItem, List, type TVirtualListHandle, VirtualList } from "@/components/layout/list";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/components/ui/utils";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { useListVirtualizer } from "@/lib/hooks/use-list-virtualizer";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 import { LIST_MAX_ISSUES } from "@/lib/queries/issues";
 import { useIssueSelectionStore } from "@/lib/stores/issue-selection";
@@ -42,7 +40,6 @@ export type TIssueListProps = {
 
 const ROW_HEIGHT = 44;
 const HEADER_HEIGHT = 36;
-const OVERSCAN = 12;
 
 type TListItem =
   | { kind: "header"; key: string; group: TIssueGroup }
@@ -51,11 +48,6 @@ type TListItem =
 function segmentOf(index: number, count: number) {
   const edges = [index === 0 && "first", index === count - 1 && "last"].filter(Boolean);
   return edges.length > 0 ? edges.join(" ") : undefined;
-}
-
-function dankSpacingOf(item: TListItem, index: number) {
-  if (item.kind === "header") return index > 0 ? "dank:pt-2" : undefined;
-  return item.segment?.includes("last") ? undefined : "dank:pb-0.5";
 }
 
 const PLACEHOLDER_ROWS = 12;
@@ -140,7 +132,7 @@ function VirtualIssueList({
   properties,
   rowActions,
 }: TVirtualProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<TVirtualListHandle>(null);
   const [collapsed, setCollapsed] = useState<string[]>([]);
   const { canEdit } = useWorkspace();
   const openNewIssue = useNewIssueStore((state) => state.open);
@@ -190,19 +182,6 @@ function VirtualIssueList({
     [clear, setFocused],
   );
 
-  const headerIndexes = useMemo(
-    () => items.flatMap((item, index) => (item.kind === "header" ? [index] : [])),
-    [items],
-  );
-  const { virtualizer, scrollMargin, stickyTop, activeSticky } = useListVirtualizer(containerRef, {
-    count: items.length,
-    stickyIndexes: headerIndexes,
-    estimateSize: (index) => (items[index].kind === "header" ? HEADER_HEIGHT : ROW_HEIGHT),
-    getItemKey: (index) => items[index].key,
-    overscan: OVERSCAN,
-  });
-  const virtualItems = virtualizer.getVirtualItems();
-
   const open = (issue: Issue) => {
     if (peek && isPeekable) {
       peek.openPeek(issue.identifier);
@@ -217,7 +196,7 @@ function VirtualIssueList({
     const next = orderedIds[Math.max(0, Math.min(orderedIds.length - 1, current + step))];
     setFocused(next);
     const index = items.findIndex((item) => item.kind === "row" && item.issue.id === next);
-    virtualizer.scrollToIndex(index, { align: "auto" });
+    listRef.current?.scrollToIndex(index);
     requestAnimationFrame(() =>
       document.querySelector<HTMLElement>(`[data-issue-row="${next}"]`)?.focus(),
     );
@@ -260,7 +239,6 @@ function VirtualIssueList({
   };
 
   const selectedIssues = issues.filter((issue) => selectedIds.includes(issue.id));
-  const stickyItem = activeSticky === undefined ? undefined : items[activeSticky];
 
   const renderItem = (item: TListItem) =>
     item.kind === "header" ? (
@@ -294,39 +272,15 @@ function VirtualIssueList({
 
   return (
     <>
-      <div ref={containerRef}>
-        <List flush>
-          <div
-            data-list-track
-            className="relative w-full"
-            style={{ height: virtualizer.getTotalSize() }}
-          >
-            {stickyItem && (
-              <div data-list-cell className="bg-background sticky z-5" style={{ top: stickyTop }}>
-                {renderItem(stickyItem)}
-              </div>
-            )}
-            {virtualItems
-              .filter((virtualItem) => virtualItem.index !== activeSticky)
-              .map((virtualItem) => (
-                <div
-                  key={virtualItem.key}
-                  ref={virtualizer.measureElement}
-                  data-index={virtualItem.index}
-                  data-list-cell
-                  className={cn(
-                    "absolute inset-x-0 top-0",
-                    items[virtualItem.index].kind === "header" && "bg-background z-6",
-                    dankSpacingOf(items[virtualItem.index], virtualItem.index),
-                  )}
-                  style={{ transform: `translateY(${virtualItem.start - scrollMargin}px)` }}
-                >
-                  {renderItem(items[virtualItem.index])}
-                </div>
-              ))}
-          </div>
-        </List>
-      </div>
+      <VirtualList
+        flush
+        handle={listRef}
+        items={items}
+        getKey={(item) => item.key}
+        estimateSize={(item) => (item.kind === "header" ? HEADER_HEIGHT : ROW_HEIGHT)}
+        isSticky={isHeaderItem}
+        renderItem={renderItem}
+      />
       <BulkActionBar issues={selectedIssues} onClear={clear} />
     </>
   );

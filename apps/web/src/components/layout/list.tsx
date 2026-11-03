@@ -5,6 +5,7 @@ import {
   type ReactNode,
   type Ref,
   useEffect,
+  useImperativeHandle,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -56,7 +57,10 @@ type TVirtualListProps<T> = Omit<TListProps, "children" | "ref" | "style"> & {
   isSticky?: (item: T) => boolean;
   /** Called while the rendered rows reach the last few, to load the next page. */
   onEndReached?: () => void;
+  handle?: Ref<TVirtualListHandle>;
 };
+
+export type TVirtualListHandle = { scrollToIndex: (index: number) => void };
 
 /** Pins the group headers of a list of `{ kind: "header" | "row" }` items. */
 export const isHeaderItem = (item: { kind: string }) => item.kind === "header";
@@ -69,6 +73,7 @@ export function VirtualList<T>({
   estimateSize,
   isSticky,
   onEndReached,
+  handle,
   ...listProps
 }: TVirtualListProps<T>) {
   const listRef = useRef<HTMLDivElement>(null);
@@ -82,11 +87,20 @@ export function VirtualList<T>({
     getItemKey: (index) => getKey(items[index]),
     stickyIndexes,
   });
-  const virtualItems = virtualizer.getVirtualItems().filter((item) => item.index !== activeSticky);
+  const rendered = virtualizer.getVirtualItems();
+  const isStuckApart =
+    activeSticky !== undefined &&
+    rendered[0]?.index === activeSticky &&
+    rendered[1] !== undefined &&
+    rendered[1].index !== activeSticky + 1;
+  const virtualItems = isStuckApart ? rendered.slice(1) : rendered;
+  const stuck = isStuckApart ? rendered[0] : undefined;
   const first = virtualItems[0];
   const last = virtualItems.at(-1);
-  const stuck =
-    activeSticky === undefined ? undefined : virtualizer.measurementsCache[activeSticky];
+
+  useImperativeHandle(handle, () => ({
+    scrollToIndex: (index) => virtualizer.scrollToIndex(index, { align: "auto" }),
+  }));
 
   useLayoutEffect(() => {
     const list = listRef.current;
@@ -111,22 +125,21 @@ export function VirtualList<T>({
     <List
       {...listProps}
       ref={listRef}
-      style={{
-        paddingTop,
-        paddingBottom: last
-          ? Math.max(0, virtualizer.getTotalSize() - (last.end - scrollMargin))
-          : 0,
-      }}
+      style={
+        {
+          "--sticky-top": `${stickyTop}px`,
+          paddingTop,
+          paddingBottom: last
+            ? Math.max(0, virtualizer.getTotalSize() - (last.end - scrollMargin))
+            : 0,
+        } as CSSProperties
+      }
     >
       {stuck && (
         <div
           data-list-cell
-          className="bg-background sticky z-5"
-          style={{
-            top: stickyTop,
-            marginTop: -paddingTop,
-            marginBottom: paddingTop - stuck.size - gap,
-          }}
+          className="bg-background sticky top-(--sticky-top) z-5"
+          style={{ marginBottom: -(stuck.size + gap) }}
         >
           {renderItem(items[stuck.index])}
         </div>

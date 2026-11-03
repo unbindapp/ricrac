@@ -567,9 +567,10 @@
   border-top: 2px solid var(--color-primary);
 }
 
-/* A group header slides over the pinned one above it as its group reaches the top. */
-[data-slot="list"] > [data-sticky-header] {
-  position: relative;
+/* Group headers pin below the page's bars, each sliding over the one before it. */
+:root [data-slot="list"] > [data-sticky-header][data-index] {
+  position: sticky;
+  top: var(--sticky-top, 0px);
   z-index: 6;
 }
 
@@ -581,7 +582,7 @@
    is a transparent border the background isn't painted under, so it still belongs to a row.
    Unlayered so it beats the rows' own border utilities. */
 :root[data-ui-theme="default"] [data-slot="list"][data-flush] {
-  & > :not([data-list-track], [data-list-cell]),
+  & > :not([data-list-cell]),
   & [data-list-cell] > * {
     border-block: 1px solid transparent;
     border-inline: 0;
