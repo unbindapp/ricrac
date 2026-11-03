@@ -2,6 +2,7 @@ import { ChevronRightIcon, PlusIcon } from "@/components/icons";
 import { GroupIcon } from "@/components/issues/group-icon";
 import type { TIssueGroup } from "@/components/issues/grouping";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type TProps = {
   group: TIssueGroup;
@@ -58,6 +59,20 @@ export function IssueGroupHeader({ group, isCollapsed, onToggle, onCreate }: TPr
           <PlusIcon className="size-4" />
         </Button>
       )}
+    </div>
+  );
+}
+
+/** A group header while the list loads. */
+export function IssueGroupHeaderPlaceholder() {
+  return (
+    <div
+      aria-hidden
+      className="bg-muted dank:h-12 dank:bg-transparent flex h-9 w-full items-center gap-2 px-3 text-sm"
+    >
+      <Skeleton className="size-3.5" />
+      <Skeleton className="size-3.5 rounded-full" />
+      <Skeleton className="h-3.5 w-24" />
     </div>
   );
 }

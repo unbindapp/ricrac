@@ -40,7 +40,7 @@ export function ViewIssues({ filter }: TProps) {
   const { workspace } = useWorkspace();
   const query = useInfiniteQuery(viewIssuesQuery(workspace.id, filter));
   const loadMore = useLoadMore(query);
-  if (query.isPending) return <ListSkeleton />;
+  if (query.isPending) return <ListSkeleton flush />;
   if (query.error) {
     return <ErrorCard message={query.error.message} onRetry={() => void query.refetch()} />;
   }
@@ -144,7 +144,7 @@ export function ViewProjects({ filter }: TProps) {
   const { workspace } = useWorkspace();
   const query = useInfiniteQuery(viewProjectsQuery(workspace.id, filter));
   const loadMore = useLoadMore(query);
-  if (query.isPending) return <ListSkeleton />;
+  if (query.isPending) return <ListSkeleton flush />;
   if (query.error) {
     return <ErrorCard message={query.error.message} onRetry={() => void query.refetch()} />;
   }

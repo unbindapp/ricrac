@@ -20,7 +20,7 @@ import { PageBar } from "@/components/layout/page-header";
 import { SplitView } from "@/components/layout/split-view";
 import { Breadcrumb, type TBreadcrumbItem } from "@/components/layout/breadcrumb";
 import { ErrorCard } from "@/components/layout/error-card";
-import { ListSkeleton } from "@/components/layout/list-skeleton";
+import { DetailPlaceholder } from "@/components/layout/detail-placeholder";
 import { EntityNotFound } from "@/components/navigation/not-found-template";
 import { EntityMenu, toastTrashed } from "@/components/projects/entity-menu";
 import { useDeviceSize } from "@/components/providers/device-size-provider";
@@ -48,22 +48,38 @@ export function DocumentDetail({ slug }: { slug: string }) {
   const { data, isPending, error, refetch } = useQuery(documentQuery(workspace.id, slug));
   if (isPending) {
     return (
+      <SplitView
+        main={
+          <PageContainer width="narrow">
+            <div className="flex w-full flex-col gap-6">
+              <DetailPlaceholder
+                breadcrumb={[
+                  {
+                    label: "Documents",
+                    link: { to: "/$workspace/documents", params: { workspace: workspace.urlKey } },
+                  },
+                ]}
+              />
+            </div>
+          </PageContainer>
+        }
+      />
+    );
+  }
+  if (isMissing(error)) {
+    return (
       <PageContainer width="narrow">
-        <ListSkeleton rows={4} />
+        <EntityNotFound
+          Icon={FileTextIcon}
+          description="Document not found. It was deleted, or you cannot see it."
+        />
       </PageContainer>
     );
   }
-  if (error) {
+  if (error && !data) {
     return (
       <PageContainer width="narrow">
-        {isMissing(error) ? (
-          <EntityNotFound
-            Icon={FileTextIcon}
-            description="Document not found. It was deleted, or you cannot see it."
-          />
-        ) : (
-          <ErrorCard message={error.message} onRetry={() => void refetch()} />
-        )}
+        <ErrorCard message={error.message} onRetry={() => void refetch()} />
       </PageContainer>
     );
   }

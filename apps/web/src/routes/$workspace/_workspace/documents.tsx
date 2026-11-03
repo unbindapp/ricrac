@@ -95,7 +95,7 @@ function DocumentsPage() {
           </PageToolbar>
         }
       />
-      {isPending && <ListSkeleton />}
+      {isPending && <ListSkeleton flush />}
       {error && <ErrorCard message={error.message} onRetry={() => void refetch()} />}
       {!isPending && !error && documents.length === 0 && (
         <DocumentsEmpty

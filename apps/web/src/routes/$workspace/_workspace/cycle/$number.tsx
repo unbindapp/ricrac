@@ -44,7 +44,6 @@ function Cycle({ team }: { team: Team }) {
   const isValidNumber = Number.isInteger(cycleNumber) && cycleNumber > 0;
   const {
     data: cycle,
-    isPending,
     error,
     refetch,
   } = useQuery({
@@ -55,6 +54,7 @@ function Cycle({ team }: { team: Team }) {
   const title = cycle ? cycleName(cycle) : `Cycle ${number}`;
 
   const body = () => {
+    if (cycle) return <CycleBody cycle={cycle} />;
     const isMissing = isApiError(error) && error.status >= 400 && error.status < 500;
     if (error && !isMissing) {
       return <ErrorCard message={error.message} onRetry={() => void refetch()} />;
@@ -62,8 +62,7 @@ function Cycle({ team }: { team: Team }) {
     if (!isValidNumber || error) {
       return <EntityNotFound Icon={RefreshCwIcon} description={`There is no cycle ${number}.`} />;
     }
-    if (isPending) return <ListSkeleton />;
-    return <CycleBody cycle={cycle} />;
+    return <ListSkeleton />;
   };
 
   return (

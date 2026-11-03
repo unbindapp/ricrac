@@ -26,14 +26,17 @@ declare module "@tanstack/react-query" {
 
 const MAX_QUERY_RETRIES = 3;
 
+/** Network failures (status 0) and server errors are worth another try; other answers stand. */
+const isRetryable = (error: unknown) =>
+  !isApiError(error) || error.status === 0 || error.status >= 500;
+
 reloadOnStaleBuild();
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: DEFAULT_STALE_TIME_MS,
-      retry: (failureCount, error) =>
-        !(isApiError(error) && error.status < 500) && failureCount < MAX_QUERY_RETRIES,
+      retry: (failureCount, error) => isRetryable(error) && failureCount < MAX_QUERY_RETRIES,
     },
   },
   mutationCache: new MutationCache({

@@ -53,6 +53,21 @@ export const issuesListQuery = (workspaceId: string, args: ListIssuesArgs) =>
   });
 
 /** An issue by identifier (ENG-123) or id; open ones follow others' changes. */
+/** An issue already in a loaded list, to show while its page loads. */
+export function findListedIssue(queryClient: QueryClient, workspaceId: string, identifier: string) {
+  const wanted = identifier.toUpperCase();
+  const lists = queryClient.getQueriesData<InfiniteData<TIssuePage>>({
+    queryKey: queryKeyIssues.lists(workspaceId),
+  });
+  for (const [, data] of lists) {
+    const issue = data?.pages
+      .flatMap((page) => page.nodes)
+      .find((node) => node.identifier === wanted);
+    if (issue) return issue;
+  }
+  return undefined;
+}
+
 export const issueQuery = (workspaceId: string, identifier: string) =>
   queryOptions({
     queryKey: queryKeyIssues.detail(workspaceId, identifier),

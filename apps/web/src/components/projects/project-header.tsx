@@ -59,10 +59,12 @@ function ProjectActions({ project }: { project: ProjectDetail }) {
   );
 }
 
-function ProjectTabs({ project, tab }: { project: ProjectDetail; tab: TProjectTab }) {
+type TProjectTabsProps = { slug: string; issueCount?: number; tab: TProjectTab };
+
+export function ProjectTabs({ slug, issueCount = 0, tab }: TProjectTabsProps) {
   const { workspace } = useWorkspace();
   const navigate = useNavigate();
-  const params = { workspace: workspace.urlKey, slug: entitySlug(project) };
+  const params = { workspace: workspace.urlKey, slug };
   return (
     <Tabs
       value={tab}
@@ -78,9 +80,9 @@ function ProjectTabs({ project, tab }: { project: ProjectDetail; tab: TProjectTa
         <TabsTab value="overview">Overview</TabsTab>
         <TabsTab value="issues">
           Issues
-          {project.issueCount > 0 && (
+          {issueCount > 0 && (
             <span className="text-muted-foreground text-xs font-normal tabular-nums">
-              {project.issueCount}
+              {issueCount}
             </span>
           )}
         </TabsTab>
@@ -115,7 +117,7 @@ export function ProjectHeaderBar({ project, tab }: { project: ProjectDetail; tab
         </div>
         <ProjectActions project={project} />
       </PageBar>
-      <ProjectTabs project={project} tab={tab} />
+      <ProjectTabs slug={entitySlug(project)} issueCount={project.issueCount} tab={tab} />
     </div>
   );
 }

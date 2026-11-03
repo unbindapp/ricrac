@@ -11,7 +11,7 @@ export const Route = createFileRoute("/$workspace/_workspace/project/$slug/")({
 function ProjectSlugPage() {
   const { slug } = Route.useParams();
   return (
-    <ProjectLoader slug={slug}>
+    <ProjectLoader slug={slug} tab="overview">
       {(project) => (
         <PageContainer>
           <ProjectOverview project={project} />

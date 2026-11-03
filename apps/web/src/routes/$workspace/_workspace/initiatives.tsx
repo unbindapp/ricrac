@@ -14,6 +14,7 @@ import {
 import { nestInitiatives } from "@/components/initiatives/initiative-tree";
 import { NewInitiativeDialog } from "@/components/initiatives/new-initiative-dialog";
 import { VirtualList, isHeaderItem } from "@/components/layout/list";
+import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { ListStates } from "@/components/layout/list-states";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -69,6 +70,7 @@ function InitiativesPage() {
         <ScopeEmpty scope={scope} noun="initiative" />
       ) : (
         <ListStates
+          skeleton={<ListSkeleton flush />}
           isPending={isPending}
           error={error}
           onRetry={() => void refetch()}

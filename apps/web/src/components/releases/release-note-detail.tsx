@@ -6,8 +6,8 @@ import { FileTextIcon, PlusIcon, RocketIcon, Trash2Icon } from "@/components/ico
 import { PropertyPicker } from "@/components/issues/property-picker";
 import { PageBar } from "@/components/layout/page-header";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { DetailPlaceholder } from "@/components/layout/detail-placeholder";
 import { ErrorCard } from "@/components/layout/error-card";
-import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { EntityNotFound } from "@/components/navigation/not-found-template";
 import { ReleaseStageIcon } from "@/components/releases/release-stage-icon";
@@ -33,7 +33,15 @@ export function ReleaseNoteDetail({ slug }: { slug: string }) {
   if (isPending) {
     return (
       <PageContainer width="narrow">
-        <ListSkeleton />
+        <DetailPlaceholder
+          breadcrumb={[
+            {
+              label: "Releases",
+              icon: <RocketIcon className="size-4" />,
+              link: { to: "/$workspace/releases", params: { workspace: workspace.urlKey } },
+            },
+          ]}
+        />
       </PageContainer>
     );
   }
@@ -47,7 +55,7 @@ export function ReleaseNoteDetail({ slug }: { slug: string }) {
       </PageContainer>
     );
   }
-  if (error) {
+  if (error && !data) {
     return (
       <PageContainer width="narrow">
         <ErrorCard message={error.message} onRetry={() => void refetch()} />

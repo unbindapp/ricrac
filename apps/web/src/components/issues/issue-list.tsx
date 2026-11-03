@@ -6,9 +6,12 @@ import { BulkActionBar } from "@/components/issues/bulk-action-bar";
 import type { DisplaySettings } from "@/components/issues/display";
 import type { ListIssuesFilters } from "@/components/issues/filters";
 import type { TIssueGroup } from "@/components/issues/grouping";
-import { IssueGroupHeader } from "@/components/issues/issue-group-header";
+import {
+  IssueGroupHeader,
+  IssueGroupHeaderPlaceholder,
+} from "@/components/issues/issue-group-header";
 import { useIsPeekable, useIssuePeek } from "@/components/issues/issue-peek";
-import { IssueRow } from "@/components/issues/issue-row";
+import { IssueRow, IssueRowPlaceholder } from "@/components/issues/issue-row";
 import { nestSubIssues } from "@/components/issues/nesting";
 import { useNewIssueStore } from "@/components/issues/new-issue-store";
 import { useOpenIssuePage } from "@/components/issues/use-issue-actions";
@@ -19,7 +22,6 @@ import {
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
 import { List } from "@/components/layout/list";
-import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/ui/utils";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
@@ -56,13 +58,30 @@ function dankSpacingOf(item: TListItem, index: number) {
   return item.segment?.includes("last") ? undefined : "dank:pb-0.5";
 }
 
+const PLACEHOLDER_ROWS = 12;
+
+function IssueListPlaceholder({ showHeader }: { showHeader: boolean }) {
+  return (
+    <div aria-busy aria-label="Loading issues" className="flex w-full flex-col gap-2">
+      <List flush>
+        {showHeader && <IssueGroupHeaderPlaceholder />}
+        {Array.from({ length: PLACEHOLDER_ROWS }, (_, index) => (
+          <IssueRowPlaceholder key={index} index={index} />
+        ))}
+      </List>
+    </div>
+  );
+}
+
 export function IssueList(props: TIssueListProps) {
   const { query, issues, groups, display, isLoadingMore, isCapped } = useIssueCollection(props);
   const { canEdit } = useWorkspace();
   const openNewIssue = useNewIssueStore((state) => state.open);
 
-  if (query.isPending) return <ListSkeleton rows={8} />;
-  if (query.error) {
+  if (query.isPending) {
+    return <IssueListPlaceholder showHeader={display.group_by !== "none"} />;
+  }
+  if (query.error && issues.length === 0) {
     return <ErrorCard message={query.error.message} onRetry={() => void query.refetch()} />;
   }
   if (issues.length === 0 && !isLoadingMore) {
@@ -297,6 +316,7 @@ function VirtualIssueList({
                   data-list-cell
                   className={cn(
                     "absolute inset-x-0 top-0",
+                    items[virtualItem.index].kind === "header" && "bg-background z-6",
                     dankSpacingOf(items[virtualItem.index], virtualItem.index),
                   )}
                   style={{ transform: `translateY(${virtualItem.start - scrollMargin}px)` }}

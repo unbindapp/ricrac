@@ -5,6 +5,8 @@ import { ChevronRightIcon } from "@/components/icons";
 
 export type TBreadcrumbItem = {
   label: string;
+  /** Still loading: the label keeps its size as a pulsing block. */
+  isPlaceholder?: boolean;
   icon?: ReactNode;
   link?: LinkProps;
 };
@@ -43,7 +45,12 @@ function BreadcrumbEntry({ item, isLast }: { item: TBreadcrumbItem; isLast: bool
   const content = (
     <>
       {item.icon}
-      <span className="truncate">{item.label}</span>
+      <span
+        data-placeholder={item.isPlaceholder || undefined}
+        className="data-placeholder:animate-skeleton data-placeholder:bg-foreground truncate data-placeholder:rounded-sm data-placeholder:text-transparent"
+      >
+        {item.label}
+      </span>
     </>
   );
   if (!item.link || isLast) {

@@ -81,7 +81,7 @@ export function ProjectList({
   );
   const [toggled, setToggled] = useState<string[]>([]);
 
-  if (isPending) return <ListSkeleton />;
+  if (isPending) return <ListSkeleton flush />;
   if (error) return <ErrorCard message={error.message} onRetry={refetch} />;
   if (total === 0) return empty;
   if (projects.length === 0) return noMatches;

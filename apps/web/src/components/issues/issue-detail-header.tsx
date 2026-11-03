@@ -228,6 +228,43 @@ export function IssueDetailHeader({ issue, variant, onClose, onSetSla }: TProps)
   );
 }
 
+/** The header while the issue loads: the same bar and breadcrumb, the actions to come. */
+export function IssueDetailHeaderPlaceholder({
+  identifier,
+  variant,
+  onClose,
+}: {
+  identifier: string;
+  variant: "page" | "peek";
+  onClose?: () => void;
+}) {
+  const { workspace } = useWorkspace();
+  const Bar = variant === "page" ? PageBar : PeekBar;
+  return (
+    <Bar>
+      <div className="flex min-w-0 flex-1 items-center gap-2">
+        <Breadcrumb
+          items={[
+            ...(variant === "page" ? [{ label: workspace.name }] : []),
+            {
+              label: "Issues",
+              link: { to: "/$workspace/issues", params: { workspace: workspace.urlKey } },
+            },
+            { label: identifier.toUpperCase() },
+          ]}
+        />
+      </div>
+      {onClose && (
+        <HeaderActions>
+          <HeaderAction label="Close" onClick={onClose}>
+            <XIcon className="size-4" />
+          </HeaderAction>
+        </HeaderActions>
+      )}
+    </Bar>
+  );
+}
+
 function PeekBar({ children }: { children: ReactNode }) {
   return <div className="flex min-h-9 w-full min-w-0 items-center gap-2">{children}</div>;
 }

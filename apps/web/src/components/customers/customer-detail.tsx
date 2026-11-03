@@ -22,9 +22,9 @@ import {
 } from "@/components/icons";
 import { PageBar } from "@/components/layout/page-header";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { DetailPlaceholder } from "@/components/layout/detail-placeholder";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
-import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { PropertyRow } from "@/components/layout/property-row";
 import { SectionTitle } from "@/components/layout/section-title";
@@ -56,7 +56,15 @@ export function CustomerDetail({ slug }: { slug: string }) {
   if (isPending) {
     return (
       <PageContainer>
-        <ListSkeleton />
+        <DetailPlaceholder
+          breadcrumb={[
+            {
+              label: "Customers",
+              icon: <BuildingIcon className="size-4" />,
+              link: { to: "/$workspace/customers", params: { workspace: workspace.urlKey } },
+            },
+          ]}
+        />
       </PageContainer>
     );
   }
@@ -70,7 +78,7 @@ export function CustomerDetail({ slug }: { slug: string }) {
       </PageContainer>
     );
   }
-  if (error) {
+  if (error && !data) {
     return (
       <PageContainer>
         <ErrorCard message={error.message} onRetry={() => void refetch()} />

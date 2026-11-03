@@ -32,7 +32,7 @@ export function ListStates({
   children,
 }: TProps) {
   if (isPending) return skeleton ?? <ListSkeleton rows={skeletonRows} />;
+  if (!isEmpty) return children;
   if (error) return <ErrorCard message={error.message} onRetry={onRetry} />;
-  if (isEmpty) return empty && <EmptyState {...empty} />;
-  return children;
+  return empty && <EmptyState {...empty} />;
 }

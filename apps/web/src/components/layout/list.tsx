@@ -96,6 +96,7 @@ export function VirtualList<T>({
       const row = rows[position];
       if (!row) return;
       row.setAttribute("data-index", String(item.index));
+      row.toggleAttribute("data-sticky-header", stickyIndexes?.includes(item.index) ?? false);
       virtualizer.measureElement(row);
     });
   });

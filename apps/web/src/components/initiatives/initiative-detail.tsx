@@ -11,8 +11,8 @@ import { InitiativeProperties } from "@/components/initiatives/initiative-proper
 import { InitiativeIcon } from "@/components/initiatives/initiative-status";
 import { PageBar } from "@/components/layout/page-header";
 import { Breadcrumb, type TBreadcrumbItem } from "@/components/layout/breadcrumb";
+import { DetailPlaceholder } from "@/components/layout/detail-placeholder";
 import { ErrorCard } from "@/components/layout/error-card";
-import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { EntityNotFound } from "@/components/navigation/not-found-template";
 import { ArchivedBanner } from "@/components/projects/archived-banner";
 import { EntityMenu, toastTrashed } from "@/components/projects/entity-menu";
@@ -61,18 +61,29 @@ function useInitiativeLifecycle(id: string) {
 export function InitiativeDetail({ slug }: { slug: string }) {
   const { workspace } = useWorkspace();
   const { data, isPending, error, refetch } = useQuery(initiativeQuery(workspace.id, slug));
-  if (isPending) return <ListSkeleton rows={4} />;
-  if (error) {
-    if (isMissing(error)) {
-      return (
-        <EntityNotFound
-          Icon={TargetIcon}
-          description="Initiative not found. It was deleted, or you cannot see it."
+  if (isPending) {
+    return (
+      <div className="flex w-full flex-col gap-6">
+        <DetailPlaceholder
+          breadcrumb={[
+            {
+              label: "Initiatives",
+              link: { to: "/$workspace/initiatives", params: { workspace: workspace.urlKey } },
+            },
+          ]}
         />
-      );
-    }
-    return <ErrorCard message={error.message} onRetry={() => void refetch()} />;
+      </div>
+    );
   }
+  if (isMissing(error)) {
+    return (
+      <EntityNotFound
+        Icon={TargetIcon}
+        description="Initiative not found. It was deleted, or you cannot see it."
+      />
+    );
+  }
+  if (error && !data) return <ErrorCard message={error.message} onRetry={() => void refetch()} />;
   return <InitiativeDetailContent key={data.id} initiative={data} />;
 }
 

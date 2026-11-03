@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { type ReactNode, useEffect, useState } from "react";
 
@@ -19,7 +19,10 @@ import {
 import { GithubIcon } from "@/components/icons/github";
 import { IssueActivity } from "@/components/issues/issue-activity";
 import { AttachMenu, IssueAttachments } from "@/components/issues/issue-attachments";
-import { IssueDetailHeader } from "@/components/issues/issue-detail-header";
+import {
+  IssueDetailHeader,
+  IssueDetailHeaderPlaceholder,
+} from "@/components/issues/issue-detail-header";
 import { draftFromIssue } from "@/components/issues/issue-draft";
 import { IssueProperties, type TPropertyKey } from "@/components/issues/issue-properties";
 import {
@@ -34,9 +37,9 @@ import { AddReactionButton, groupReactions, ReactionBar } from "@/components/iss
 import { AddSubIssueMenu, SubIssues } from "@/components/issues/sub-issues";
 import { useTriage } from "@/components/issues/triage-actions";
 import { useIssueLifecycle, useIssuePatch } from "@/components/issues/use-issue-actions";
+import { PlaceholderTitle } from "@/components/layout/detail-placeholder";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
-import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PropertyRow } from "@/components/layout/property-row";
 import { EntityNotFound } from "@/components/navigation/not-found-template";
 import { useDeviceSize } from "@/components/providers/device-size-provider";
@@ -44,7 +47,9 @@ import { useNow } from "@/components/providers/now-provider";
 import { AutosaveMarkdown } from "@/components/shared/autosave-markdown";
 import { InlineText } from "@/components/shared/inline-text";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/toast";
+import { cn } from "@/components/ui/utils";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { formatDateTime } from "@/lib/helpers/dates";
 import { issueRepositories } from "@/lib/helpers/github-sync";
@@ -55,6 +60,7 @@ import {
   useIssueSubscriptionMutation,
   useSaveDescriptionMutation,
   useShareIssueMutation,
+  findListedIssue,
   useUpdateIssueMutation,
 } from "@/lib/queries/issues";
 import { customerNeedsQuery } from "@/lib/queries/customers";
@@ -86,11 +92,7 @@ export function IssueDetail({ identifier, variant = "page", onClose, shortcuts =
     });
   }, [variant, canonical, identifier, navigate, workspace.urlKey]);
   if (isPending) {
-    return (
-      <div className="flex w-full flex-col gap-6 p-4">
-        <ListSkeleton rows={4} />
-      </div>
-    );
+    return <IssueDetailPlaceholder identifier={identifier} variant={variant} onClose={onClose} />;
   }
   if (error) {
     const description = `There is no issue ${identifier.toUpperCase()}, or you cannot see it.`;
@@ -257,7 +259,7 @@ function IssueDetailContent({
   return (
     <>
       <IssueDetailHeader issue={issue} variant="page" onSetSla={() => setIsSettingSla(true)} />
-      <div className="-mx-4 -mt-4 -mb-8 flex flex-1">
+      <div className="page-bleed -mb-8 flex flex-1">
         <div className="flex min-w-0 flex-1 justify-center px-4 py-6 sm:px-10 sm:py-8">
           <div className="flex w-full max-w-3xl">{main}</div>
         </div>
@@ -275,6 +277,82 @@ function IssueDetailContent({
       </div>
     </>
   );
+}
+
+const DESCRIPTION_LINES = ["w-full", "w-11/12", "w-4/5", "w-2/3"];
+const PROPERTY_LINES = ["w-24", "w-28", "w-20", "w-32", "w-24", "w-28", "w-20", "w-24"];
+
+/** The issue page while it loads, laid out as it will be, with the title when a list has it. */
+function IssueDetailPlaceholder({
+  identifier,
+  variant,
+  onClose,
+}: {
+  identifier: string;
+  variant: "page" | "peek";
+  onClose?: () => void;
+}) {
+  const { workspace } = useWorkspace();
+  const queryClient = useQueryClient();
+  const { size } = useDeviceSize();
+  const title = findListedIssue(queryClient, workspace.id, identifier)?.title;
+  const hasPropertiesAside = variant === "page" && (size === "lg" || size === "xl");
+
+  const main = (
+    <div aria-busy aria-label="Loading issue" className="flex min-w-0 flex-1 flex-col gap-8">
+      <div className="flex flex-col gap-2">
+        <PlaceholderTitle title={title} />
+        <div className="flex flex-col gap-2.5 py-1.5">
+          {DESCRIPTION_LINES.map((width) => (
+            <Skeleton key={width} className={cn("h-3.5", width)} />
+          ))}
+        </div>
+      </div>
+      {variant === "page" && !hasPropertiesAside && (
+        <div className="dank:border-0 dank:p-0 rounded-lg border p-3">
+          <PropertyLinesPlaceholder />
+        </div>
+      )}
+    </div>
+  );
+
+  if (variant === "peek") {
+    return (
+      <div className="flex w-full flex-col gap-4 p-4">
+        <IssueDetailHeaderPlaceholder identifier={identifier} variant="peek" onClose={onClose} />
+        {main}
+      </div>
+    );
+  }
+  return (
+    <>
+      <IssueDetailHeaderPlaceholder identifier={identifier} variant="page" />
+      <div className="page-bleed -mb-8 flex flex-1">
+        <div className="flex min-w-0 flex-1 justify-center px-4 py-6 sm:px-10 sm:py-8">
+          <div className="flex w-full max-w-3xl">{main}</div>
+        </div>
+        {hasPropertiesAside && (
+          <aside aria-hidden className="flex w-80 shrink-0 flex-col gap-2 border-l px-5 py-4">
+            <h2 className="text-muted-foreground dank:type-title-small flex h-7 items-center text-xs font-medium">
+              Properties
+            </h2>
+            <PropertyLinesPlaceholder />
+          </aside>
+        )}
+      </div>
+    </>
+  );
+}
+
+function PropertyLinesPlaceholder() {
+  return PROPERTY_LINES.map((width, index) => (
+    <div key={index} className="flex h-8.5 items-center gap-2">
+      <span className="w-24 shrink-0">
+        <Skeleton className="h-3 w-16" />
+      </span>
+      <Skeleton className={cn("h-3.5", width)} />
+    </div>
+  ));
 }
 
 /** One small row of "add" actions for the sections an issue doesn't have yet. */

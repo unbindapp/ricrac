@@ -21,6 +21,7 @@ import {
 } from "@/components/forum/forum-views";
 import { LayoutGridIcon, ListIcon, MessagesSquareIcon, PlusIcon } from "@/components/icons";
 import { VirtualList } from "@/components/layout/list";
+import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { ListStates } from "@/components/layout/list-states";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -142,7 +143,7 @@ function ForumList() {
       />
       <ListStates
         isPending={list.isPending}
-        skeleton={isGrid ? <DiscussionGridSkeleton /> : undefined}
+        skeleton={isGrid ? <DiscussionGridSkeleton /> : <ListSkeleton flush />}
         error={list.error}
         onRetry={() => void list.refetch()}
         isEmpty={discussions.length === 0}

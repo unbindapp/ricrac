@@ -35,7 +35,7 @@ export function PageHeader({ title, icon, description, breadcrumb, actions, tool
     <header
       data-slot="page-header"
       data-sticky-bar
-      className="bg-background sticky top-2 z-10 -mx-2 -mb-4 flex flex-col gap-2 px-2 pb-2 group-data-[width=narrow]/page:static group-data-[width=narrow]/page:m-0 group-data-[width=narrow]/page:gap-3 group-data-[width=narrow]/page:p-0 *:data-[slot=page-bar]:static"
+      className="bg-background sticky top-(--page-pt) z-10 -mx-(--page-px) -mb-4 flex flex-col gap-2 px-(--page-px) pb-2 group-data-[width=narrow]/page:static group-data-[width=narrow]/page:m-0 group-data-[width=narrow]/page:gap-3 group-data-[width=narrow]/page:p-0 *:data-[slot=page-bar]:static"
     >
       <PageBar>
         <div className="min-w-0 flex-1">
@@ -70,7 +70,7 @@ export function PageBar({ children }: { children: ReactNode }) {
       data-slot="page-bar"
       data-mobile-bar
       className={cn(
-        "bg-background dank:pr-1 dank:pl-4 sticky top-0 z-10 -mx-2 -mt-2 flex h-11 shrink-0 items-center gap-2 border-b px-2 text-sm font-medium group-data-[width=narrow]/page:static group-data-[width=narrow]/page:m-0 group-data-[width=narrow]/page:h-auto group-data-[width=narrow]/page:min-h-8 group-data-[width=narrow]/page:border-0 group-data-[width=narrow]/page:p-0 group-data-[width=full]/page:md:pl-4",
+        "bg-background dank:pr-1 dank:pl-4 sticky top-0 z-10 -mx-(--page-px) -mt-(--page-pt) flex h-11 shrink-0 items-center gap-2 border-b px-4 text-sm font-medium group-data-[width=narrow]/page:static group-data-[width=narrow]/page:m-0 group-data-[width=narrow]/page:h-auto group-data-[width=narrow]/page:min-h-8 group-data-[width=narrow]/page:border-0 group-data-[width=narrow]/page:p-0 group-data-[width=full]/page:md:pr-(--page-px)",
         slot && "static m-0 h-12 border-0",
         "dank:h-16",
       )}

@@ -6,6 +6,7 @@ import type { Milestone } from "@/api/ops.gen";
 import { CircleCheckIcon, DiamondIcon, PlusIcon } from "@/components/icons";
 import { CreateButton } from "@/components/layout/create-button";
 import { VirtualList, isHeaderItem } from "@/components/layout/list";
+import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { ListStates } from "@/components/layout/list-states";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -46,6 +47,7 @@ function MilestonesPage() {
         actions={canEdit && newButton("header")}
       />
       <ListStates
+        skeleton={<ListSkeleton flush />}
         isPending={isPending}
         error={error}
         onRetry={() => void refetch()}

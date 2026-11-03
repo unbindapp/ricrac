@@ -35,15 +35,15 @@ export const Route = createFileRoute("/$workspace/_workspace/milestone/$id")({
 function MilestonePage() {
   const { id } = Route.useParams();
   const { workspace, canEdit } = useWorkspace();
-  const { data: milestone, isPending, error, refetch } = useQuery(milestoneQuery(workspace.id, id));
+  const { data: milestone, error, refetch } = useQuery(milestoneQuery(workspace.id, id));
 
   const body = () => {
+    if (milestone) return <MilestoneBody milestone={milestone} />;
     if (isNotFoundError(error)) {
       return <EntityNotFound Icon={DiamondIcon} description="There is no such milestone." />;
     }
     if (error) return <ErrorCard message={error.message} onRetry={() => void refetch()} />;
-    if (isPending) return <ListSkeleton />;
-    return <MilestoneBody milestone={milestone} />;
+    return <ListSkeleton />;
   };
 
   return (

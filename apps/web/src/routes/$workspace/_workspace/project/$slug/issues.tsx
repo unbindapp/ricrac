@@ -19,7 +19,7 @@ function ProjectSlugIssuesPage() {
   const { milestone } = Route.useSearch();
   const navigate = Route.useNavigate();
   return (
-    <ProjectLoader slug={slug}>
+    <ProjectLoader slug={slug} tab="issues">
       {(project) => (
         <PageContainer>
           <div className="flex w-full flex-col gap-4">

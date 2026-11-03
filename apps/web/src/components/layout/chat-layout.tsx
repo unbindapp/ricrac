@@ -102,7 +102,7 @@ export function ChatLayout({
               {separatesBars ? (
                 <PageBar>{bar}</PageBar>
               ) : (
-                <div className="shrink-0 px-2 pt-2">
+                <div className="shrink-0 px-(--page-px) pt-(--page-pt) [--page-pt:--spacing(4)] [--page-px:--spacing(4)]">
                   <PageBar>{bar}</PageBar>
                 </div>
               )}

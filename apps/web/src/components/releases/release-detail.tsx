@@ -13,8 +13,8 @@ import {
 } from "@/components/icons";
 import { PageBar } from "@/components/layout/page-header";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { DetailPlaceholder } from "@/components/layout/detail-placeholder";
 import { ErrorCard } from "@/components/layout/error-card";
-import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { PropertyRow } from "@/components/layout/property-row";
 import { SectionTitle } from "@/components/layout/section-title";
@@ -53,7 +53,15 @@ export function ReleaseDetail({ slug }: { slug: string }) {
   if (release.isPending || pipelines.isPending) {
     return (
       <PageContainer>
-        <ListSkeleton />
+        <DetailPlaceholder
+          breadcrumb={[
+            {
+              label: "Releases",
+              icon: <RocketIcon className="size-4" />,
+              link: { to: "/$workspace/releases", params: { workspace: workspace.urlKey } },
+            },
+          ]}
+        />
       </PageContainer>
     );
   }
@@ -67,20 +75,18 @@ export function ReleaseDetail({ slug }: { slug: string }) {
       </PageContainer>
     );
   }
-  const error = release.error ?? pipelines.error;
-  if (error) {
-    return (
-      <PageContainer>
-        <ErrorCard
-          message={error.message}
-          onRetry={() => void Promise.all([release.refetch(), pipelines.refetch()])}
-        />
-      </PageContainer>
-    );
-  }
   const pipeline = pipelines.data?.find((item) => item.id === release.data?.pipeline.id);
-  if (!release.data || !pipeline) return null;
-  return <ReleasePage release={release.data} pipeline={pipeline} />;
+  if (release.data && pipeline) return <ReleasePage release={release.data} pipeline={pipeline} />;
+  const error = release.error ?? pipelines.error;
+  if (!error) return null;
+  return (
+    <PageContainer>
+      <ErrorCard
+        message={error.message}
+        onRetry={() => void Promise.all([release.refetch(), pipelines.refetch()])}
+      />
+    </PageContainer>
+  );
 }
 
 function ReleasePage({

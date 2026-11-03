@@ -60,6 +60,12 @@
   }
 }
 
+/* Cancels the page's padding, for content that runs to the edges of the page. */
+@utility page-bleed {
+  margin-inline: calc(var(--page-px, 0px) * -1);
+  margin-top: calc(var(--page-pt, 0px) * -1);
+}
+
 @utility line-icon {
   display: flex;
   height: 1lh;
@@ -559,6 +565,16 @@
   top: 0.1875rem;
   width: 100%;
   border-top: 2px solid var(--color-primary);
+}
+
+/* A group header slides over the pinned one above it as its group reaches the top. */
+[data-slot="list"] > [data-sticky-header] {
+  position: relative;
+  z-index: 6;
+}
+
+:root[data-ui-theme="dank"] [data-slot="list"] > [data-sticky-header] {
+  background-color: var(--color-background);
 }
 
 /* Edge-to-edge lists, after Linear: rounded rows. The gap between them
