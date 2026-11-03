@@ -64,7 +64,7 @@ export function ProjectsView({ title, breadcrumb, storageKey, filters }: TProps)
   const isBoard = layout === "board" && scope === "active";
 
   return (
-    <PageContainer>
+    <PageContainer scroll={isBoard ? "pane" : "window"}>
       <PageHeader
         title={title}
         icon={<BoxIcon />}

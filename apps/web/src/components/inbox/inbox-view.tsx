@@ -18,6 +18,7 @@ import {
   notificationLink,
   type TNotificationGroup,
 } from "@/components/inbox/notifications";
+import { VirtualList } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -35,6 +36,7 @@ import {
 import { toast } from "@/components/ui/toast";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { FilterMenu } from "@/components/shared/filter-menu";
+import { useLoadMore } from "@/lib/hooks/use-load-more";
 import { formatDateTime } from "@/lib/helpers/dates";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 import {
@@ -78,6 +80,8 @@ const emptyStates = {
     description: "Archive one with E once you're done with it.",
   },
 } satisfies Record<TInboxFilter, unknown>;
+
+const NOTIFICATION_ROW_HEIGHT = 64;
 
 /** Enter on a focused button or link presses it instead of opening the row. */
 function isOnControl(target: EventTarget | null) {
@@ -198,6 +202,8 @@ export function InboxView({ filter, selectedKey, onFilterChange, onSelect }: TPr
     toast.add({ type: "success", title: `Archived ${read.length} read` });
   };
 
+  const loadOlder = useLoadMore(list);
+
   const move = (step: number) => {
     if (groups.length === 0) return;
     const next = Math.min(
@@ -205,9 +211,7 @@ export function InboxView({ filter, selectedKey, onFilterChange, onSelect }: TPr
       groups.length - 1,
     );
     onSelect(groups[next].key);
-    if (next >= groups.length - 3 && list.hasNextPage && !list.isFetchingNextPage) {
-      void list.fetchNextPage();
-    }
+    if (next >= groups.length - 3) loadOlder();
   };
 
   useHotkeyScope(
@@ -237,7 +241,7 @@ export function InboxView({ filter, selectedKey, onFilterChange, onSelect }: TPr
   );
 
   const main = (
-    <PageContainer>
+    <PageContainer scroll="window">
       <PageHeader
         title="Inbox"
         icon={<InboxIcon />}
@@ -293,33 +297,25 @@ export function InboxView({ filter, selectedKey, onFilterChange, onSelect }: TPr
         empty={emptyStates[filter]}
       >
         <div className="flex w-full flex-col gap-2">
-          <div
+          <VirtualList
             role="listbox"
-            aria-label="Notifications"
-            data-slot="list"
-            className="bg-card flex w-full flex-col overflow-hidden rounded-lg border"
-          >
-            {groups.map((group) => (
+            label="Notifications"
+            items={groups}
+            getKey={(group) => group.key}
+            estimateSize={() => NOTIFICATION_ROW_HEIGHT}
+            onEndReached={loadOlder}
+            renderItem={(group) => (
               <NotificationRow
-                key={group.key}
                 group={group}
                 isSelected={group.key === selectedKey}
                 isArchived={isArchivedFilter}
                 onSelect={select}
                 onToggleArchive={toggleArchive}
               />
-            ))}
-          </div>
-          {list.hasNextPage && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="self-center"
-              isPending={list.isFetchingNextPage}
-              onClick={() => void list.fetchNextPage()}
-            >
-              Load older
-            </Button>
+            )}
+          />
+          {list.isFetchingNextPage && (
+            <p className="text-muted-foreground text-xs">Loading older notifications…</p>
           )}
         </div>
       </ListStates>

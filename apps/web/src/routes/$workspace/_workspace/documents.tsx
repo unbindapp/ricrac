@@ -10,7 +10,7 @@ import { NewDocumentDialog } from "@/components/documents/new-document-dialog";
 import { FileTextIcon, PlusIcon, SearchIcon, Trash2Icon } from "@/components/icons";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
-import { List } from "@/components/layout/list";
+import { VirtualList } from "@/components/layout/list";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -62,7 +62,7 @@ function DocumentsPage() {
   );
 
   return (
-    <PageContainer>
+    <PageContainer scroll="window">
       <PageHeader
         title="Documents"
         icon={<FileTextIcon />}
@@ -105,15 +105,18 @@ function DocumentsPage() {
         />
       )}
       {documents.length > 0 && (
-        <List flush>
-          {documents.map((document) =>
+        <VirtualList
+          flush
+          items={documents}
+          getKey={(document) => document.id}
+          renderItem={(document) =>
             isTrash ? (
-              <TrashedDocumentRow key={document.id} document={document} />
+              <TrashedDocumentRow document={document} />
             ) : (
-              <DocumentRow key={document.id} document={document} />
-            ),
-          )}
-        </List>
+              <DocumentRow document={document} />
+            )
+          }
+        />
       )}
     </PageContainer>
   );

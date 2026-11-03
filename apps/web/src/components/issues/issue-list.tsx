@@ -1,15 +1,4 @@
-import { useElementScrollRestoration } from "@tanstack/react-router";
-import { useVirtualizer, useWindowVirtualizer } from "@tanstack/react-virtual";
-import {
-  type MouseEvent,
-  type ReactNode,
-  type RefObject,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { type MouseEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
 import type { Issue } from "@/api/ops.gen";
 import { ListTodoIcon, PlusIcon } from "@/components/icons";
@@ -33,8 +22,8 @@ import { List } from "@/components/layout/list";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/ui/utils";
-import { useDeviceSize } from "@/components/providers/device-size-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { useListVirtualizer } from "@/lib/hooks/use-list-virtualizer";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 import { LIST_MAX_ISSUES } from "@/lib/queries/issues";
 import { useIssueSelectionStore } from "@/lib/stores/issue-selection";
@@ -65,63 +54,6 @@ function segmentOf(index: number, count: number) {
 function dankSpacingOf(item: TListItem, index: number) {
   if (item.kind === "header") return index > 0 ? "dank:pt-2" : undefined;
   return item.segment?.includes("last") ? undefined : "dank:pb-0.5";
-}
-
-function findScrollParent(element: HTMLElement | null): HTMLElement | null {
-  let current = element?.parentElement ?? null;
-  while (current) {
-    const overflowY = getComputedStyle(current).overflowY;
-    if (overflowY === "auto" || overflowY === "scroll") return current;
-    current = current.parentElement;
-  }
-  return null;
-}
-
-/** Phones scroll the window, so their browser bars can tuck away; wider screens scroll the page's pane. */
-function useListVirtualizer(containerRef: RefObject<HTMLDivElement | null>, items: TListItem[]) {
-  const { size } = useDeviceSize();
-  const followsWindow = size === "xs" || size === "sm";
-  const [pane, setPane] = useState<HTMLElement | null>(null);
-  const [scrollMargin, setScrollMargin] = useState(0);
-
-  useLayoutEffect(() => {
-    const container = containerRef.current;
-    const scroller = followsWindow ? null : findScrollParent(container);
-    setPane(scroller);
-    if (!container) return;
-    const measure = () =>
-      setScrollMargin(
-        scroller
-          ? container.getBoundingClientRect().top -
-              scroller.getBoundingClientRect().top +
-              scroller.scrollTop
-          : container.getBoundingClientRect().top + window.scrollY,
-      );
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(scroller ?? document.body);
-    return () => observer.disconnect();
-  }, [containerRef, followsWindow]);
-
-  const options = {
-    count: items.length,
-    estimateSize: (index: number) => (items[index].kind === "header" ? HEADER_HEIGHT : ROW_HEIGHT),
-    overscan: OVERSCAN,
-    scrollMargin,
-    getItemKey: (index: number) => items[index].key,
-  };
-  const windowEntry = useElementScrollRestoration({ getElement: () => window });
-  const windowVirtualizer = useWindowVirtualizer({
-    ...options,
-    enabled: followsWindow,
-    initialOffset: windowEntry?.scrollY,
-  });
-  const paneVirtualizer = useVirtualizer({
-    ...options,
-    enabled: !followsWindow,
-    getScrollElement: () => pane,
-  });
-  return { virtualizer: followsWindow ? windowVirtualizer : paneVirtualizer, scrollMargin };
 }
 
 export function IssueList(props: TIssueListProps) {
@@ -239,7 +171,12 @@ function VirtualIssueList({
     [clear, setFocused],
   );
 
-  const { virtualizer, scrollMargin } = useListVirtualizer(containerRef, items);
+  const { virtualizer, scrollMargin } = useListVirtualizer(containerRef, {
+    count: items.length,
+    estimateSize: (index) => (items[index].kind === "header" ? HEADER_HEIGHT : ROW_HEIGHT),
+    getItemKey: (index) => items[index].key,
+    overscan: OVERSCAN,
+  });
   const virtualItems = virtualizer.getVirtualItems();
 
   const open = (issue: Issue) => {

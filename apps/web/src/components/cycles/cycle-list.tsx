@@ -14,7 +14,7 @@ import {
   type TCycleStatus,
 } from "@/components/cycles/cycle-status";
 import { RefreshCwIcon } from "@/components/icons";
-import { List } from "@/components/layout/list";
+import { VirtualList } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { SectionTitle } from "@/components/layout/section-title";
 import { CycleIcon } from "@/components/shared/cycle-icon";
@@ -23,6 +23,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { cycleName, cyclesQuery } from "@/lib/queries/cycles";
+
+const CYCLE_ROW_HEIGHT = 36;
 
 /** "9 issues", or "21 of 30 points" once issues are estimated. */
 export function scopeText(cycle: Cycle) {
@@ -191,11 +193,13 @@ function CycleSection({
   return (
     <section className="flex w-full flex-col gap-2">
       <SectionTitle title={title} actions={actions} />
-      <List>
-        {cycles.map((cycle) => (
-          <CycleRow key={cycle.id} cycle={cycle} />
-        ))}
-      </List>
+      <VirtualList
+        label={title}
+        items={cycles}
+        getKey={(cycle) => cycle.id}
+        estimateSize={() => CYCLE_ROW_HEIGHT}
+        renderItem={(cycle) => <CycleRow cycle={cycle} />}
+      />
     </section>
   );
 }

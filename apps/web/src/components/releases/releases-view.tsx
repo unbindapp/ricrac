@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 
-import type { Release, ReleaseNote, ReleasePipeline } from "@/api/ops.gen";
+import type { Release, ReleaseNote, ReleasePipeline, ReleaseStage } from "@/api/ops.gen";
 import {
   ChevronDownIcon,
   CircleDotIcon,
@@ -14,6 +14,7 @@ import {
 import { PropertyPicker } from "@/components/issues/property-picker";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
+import { VirtualList } from "@/components/layout/list";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -38,6 +39,12 @@ import {
 
 export type TReleasesTab = "releases" | "notes";
 
+const HEADER_HEIGHT = 36;
+const ROW_HEIGHT = 36;
+
+type TStageGroup = { stage: ReleaseStage | null; releases: Release[] };
+type TReleaseItem = { kind: "header"; group: TStageGroup } | { kind: "row"; release: Release };
+
 type TProps = {
   pipeline: string | undefined;
   tab: TReleasesTab;
@@ -58,7 +65,7 @@ export function ReleasesView({ pipeline: pipelineSlug, tab, onChange }: TProps) 
     pipelines[0];
 
   return (
-    <PageContainer>
+    <PageContainer scroll="window">
       <PageHeader
         title="Releases"
         icon={<RocketIcon />}
@@ -240,26 +247,38 @@ function PipelineReleases({ pipeline }: { pipeline: ReleasePipeline }) {
       />
     );
   }
-  const groups = groupByStage(pipeline.stages ?? [], releases);
+  const items: TReleaseItem[] = groupByStage(pipeline.stages ?? [], releases).flatMap((group) => [
+    { kind: "header" as const, group },
+    ...group.releases.map((release) => ({ kind: "row" as const, release })),
+  ]);
   return (
-    <div className="dank:overflow-visible dank:rounded-none dank:border-0 flex w-full flex-col overflow-hidden rounded-lg border">
-      {groups.map((group) => (
-        <section key={group.stage?.id ?? "none"} aria-label={group.stage?.name ?? "No stage"}>
-          <h2 className="bg-muted dank:h-12 dank:border-0 dank:bg-transparent dank:px-4 dank:type-title-small flex h-9 items-center gap-2 border-b px-3 text-sm font-medium">
-            {group.stage && <ReleaseStageIcon type={group.stage.type} color={group.stage.color} />}
-            <span>{group.stage?.name ?? "No stage"}</span>
-            <span className="text-muted-foreground dank:type-label-large text-xs font-normal">
-              {group.releases.length}
-            </span>
-          </h2>
-          <div role="list" data-slot="list">
-            {group.releases.map((release) => (
-              <ReleaseRow key={release.id} release={release} />
-            ))}
-          </div>
-        </section>
-      ))}
-    </div>
+    <VirtualList
+      label="Releases"
+      items={items}
+      getKey={(item) =>
+        item.kind === "header" ? `stage-${item.group.stage?.id ?? "none"}` : item.release.id
+      }
+      estimateSize={(item) => (item.kind === "header" ? HEADER_HEIGHT : ROW_HEIGHT)}
+      renderItem={(item) =>
+        item.kind === "header" ? (
+          <StageHeader group={item.group} />
+        ) : (
+          <ReleaseRow release={item.release} />
+        )
+      }
+    />
+  );
+}
+
+function StageHeader({ group }: { group: TStageGroup }) {
+  return (
+    <h2 className="bg-muted dank:h-12 dank:border-0 dank:bg-transparent dank:px-4 dank:type-title-small flex h-9 items-center gap-2 border-b px-3 text-sm font-medium">
+      {group.stage && <ReleaseStageIcon type={group.stage.type} color={group.stage.color} />}
+      <span>{group.stage?.name ?? "No stage"}</span>
+      <span className="text-muted-foreground dank:type-label-large text-xs font-normal">
+        {group.releases.length}
+      </span>
+    </h2>
   );
 }
 
@@ -333,15 +352,13 @@ function PipelineNotes({ pipeline }: { pipeline: ReleasePipeline }) {
     );
   }
   return (
-    <div
-      role="list"
-      data-slot="list"
-      className="flex w-full flex-col overflow-hidden rounded-lg border"
-    >
-      {notes.map((note) => (
-        <NoteRow key={note.id} note={note} />
-      ))}
-    </div>
+    <VirtualList
+      label="Release notes"
+      items={notes}
+      getKey={(note) => note.id}
+      estimateSize={() => ROW_HEIGHT}
+      renderItem={(note) => <NoteRow note={note} />}
+    />
   );
 }
 

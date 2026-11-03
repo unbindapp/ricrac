@@ -15,6 +15,7 @@ import {
   SplitIcon,
 } from "@/components/icons";
 import { commentExcerpt } from "@/components/inbox/notifications";
+import { VirtualGrid } from "@/components/layout/list";
 import { PersonAvatar } from "@/components/projects/people";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Badge } from "@/components/ui/badge";
@@ -32,11 +33,25 @@ import { useSaveDiscussionMutation } from "@/lib/queries/discussions";
 
 const SKELETON_CARDS = 6;
 
-export function DiscussionGrid({ children }: { children: ReactNode }) {
+const CARD_ROW_HEIGHT = 320;
+
+export function DiscussionGrid({
+  discussions,
+  onEndReached,
+}: {
+  discussions: Discussion[];
+  onEndReached?: () => void;
+}) {
   return (
-    <div role="list" className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      {children}
-    </div>
+    <VirtualGrid
+      label="Discussions"
+      items={discussions}
+      getKey={(discussion) => discussion.id}
+      renderItem={(discussion) => <DiscussionCard discussion={discussion} />}
+      rowProps={{ className: "grid w-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3" }}
+      estimateRowHeight={CARD_ROW_HEIGHT}
+      onEndReached={onEndReached}
+    />
   );
 }
 

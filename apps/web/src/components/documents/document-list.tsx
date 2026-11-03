@@ -8,12 +8,14 @@ import {
 } from "@/components/documents/use-create-document";
 import { PlusIcon } from "@/components/icons";
 import { ErrorCard } from "@/components/layout/error-card";
-import { List } from "@/components/layout/list";
+import { VirtualList } from "@/components/layout/list";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { SectionTitle } from "@/components/layout/section-title";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { documentsQuery, type TDocumentListArgs } from "@/lib/queries/documents";
+
+const ROW_HEIGHT = 36;
 
 type TProps = {
   args: TDocumentListArgs;
@@ -30,11 +32,12 @@ export function DocumentList({ args, showParent, empty, skeletonRows }: TProps) 
   if (error) return <ErrorCard message={error.message} onRetry={() => void refetch()} />;
   if (data.length === 0) return empty;
   return (
-    <List>
-      {data.map((document) => (
-        <DocumentRow key={document.id} document={document} showParent={showParent} />
-      ))}
-    </List>
+    <VirtualList
+      items={data}
+      getKey={(document) => document.id}
+      estimateSize={() => ROW_HEIGHT}
+      renderItem={(document) => <DocumentRow document={document} showParent={showParent} />}
+    />
   );
 }
 

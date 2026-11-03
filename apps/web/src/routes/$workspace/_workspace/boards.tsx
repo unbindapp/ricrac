@@ -21,7 +21,7 @@ function BoardsPage() {
   const create = canEdit ? () => setIsCreating(true) : undefined;
 
   return (
-    <PageContainer>
+    <PageContainer scroll="window">
       <PageHeader
         title="Boards"
         icon={<KanbanIcon />}

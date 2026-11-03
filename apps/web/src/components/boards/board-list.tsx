@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 
 import { BoardMenu } from "@/components/boards/board-menu";
 import { KanbanIcon, PlusIcon } from "@/components/icons";
-import { List } from "@/components/layout/list";
+import { VirtualList } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { EntityIcon } from "@/components/shared/entity-icon";
 import { Badge } from "@/components/ui/badge";
@@ -35,11 +35,11 @@ export function BoardList({ onCreate }: { onCreate?: () => void }) {
         ),
       }}
     >
-      <List>
-        {boards.map((board) => (
-          <BoardRow key={board.id} board={board} />
-        ))}
-      </List>
+      <VirtualList
+        items={boards}
+        getKey={(board) => board.id}
+        renderItem={(board) => <BoardRow board={board} />}
+      />
     </ListStates>
   );
 }

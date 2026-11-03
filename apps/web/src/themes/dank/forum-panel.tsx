@@ -15,18 +15,22 @@ import { NewDiscussionDialog } from "@/components/forum/new-discussion-dialog";
 import { ImageIcon, PencilIcon, PlusIcon } from "@/components/icons";
 import { commentExcerpt } from "@/components/inbox/notifications";
 import { CreateButton } from "@/components/layout/create-button";
-import { List } from "@/components/layout/list";
+import { VirtualGrid, VirtualList } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { PageSlotsContext } from "@/components/layout/page-container";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { useLoadMore } from "@/lib/hooks/use-load-more";
 import { entitySlug } from "@/lib/helpers/entity-slug";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 import { DiscussionPanel } from "@/themes/dank/discussion-panel";
 import { ForumToolbar, type TForumLayout } from "@/themes/dank/forum-controls";
 import { UpvoteChip } from "@/themes/dank/upvote-chip";
 import type { TForumPanelProps } from "@/themes/types";
+
+const GRID_CARD_HEIGHT = 340;
+const LIST_CARD_HEIGHT = 120;
 
 /** The forum in the page's panel: its discussions as cards, or the open one in their place. */
 export function DankForumPanel({
@@ -84,6 +88,7 @@ function ForumList({ filters }: { filters: TForumFilters }) {
     }),
   );
   const discussions = list.data?.pages.flatMap((page) => page.nodes) ?? [];
+  const loadMore = useLoadMore(list);
   const filter = (next: TForumFilters) =>
     void navigate({
       to: "/$workspace/forum",
@@ -94,7 +99,7 @@ function ForumList({ filters }: { filters: TForumFilters }) {
 
   return (
     <PageSlotsContext value={{ bar: null, fab }}>
-      <section aria-label="Forum" data-slot="forum-list">
+      <section aria-label="Forum" data-slot="forum-list" data-scroll="window">
         <ForumToolbar filters={filters} layout={layout} onFilter={filter} onLayout={setLayout} />
         <ListStates
           isPending={list.isPending}
@@ -117,17 +122,24 @@ function ForumList({ filters }: { filters: TForumFilters }) {
           })}
         >
           {isTrash ? (
-            <List flush>
-              {discussions.map((discussion) => (
-                <TrashedDiscussionRow key={discussion.id} discussion={discussion} />
-              ))}
-            </List>
+            <VirtualList
+              flush
+              label="Trashed discussions"
+              items={discussions}
+              getKey={(discussion) => discussion.id}
+              onEndReached={loadMore}
+              renderItem={(discussion) => <TrashedDiscussionRow discussion={discussion} />}
+            />
           ) : (
-            <div role="list" data-slot="forum-cards" data-layout={isGrid ? "grid" : "list"}>
-              {discussions.map((discussion) => (
-                <ForumCard key={discussion.id} discussion={discussion} filters={filters} />
-              ))}
-            </div>
+            <VirtualGrid
+              label="Discussions"
+              items={discussions}
+              getKey={(discussion) => discussion.id}
+              renderItem={(discussion) => <ForumCard discussion={discussion} filters={filters} />}
+              rowProps={{ "data-slot": "forum-cards", "data-layout": isGrid ? "grid" : "list" }}
+              estimateRowHeight={isGrid ? GRID_CARD_HEIGHT : LIST_CARD_HEIGHT}
+              onEndReached={loadMore}
+            />
           )}
           {list.hasNextPage && (
             <Button

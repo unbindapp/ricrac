@@ -21,7 +21,7 @@ function ViewsPage() {
   const create = canEdit ? () => setIsCreating(true) : undefined;
 
   return (
-    <PageContainer>
+    <PageContainer scroll="window">
       <PageHeader
         title="Views"
         icon={<LayersIcon />}

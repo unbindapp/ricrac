@@ -13,7 +13,7 @@ import {
 } from "@/components/initiatives/initiative-status";
 import { nestInitiatives } from "@/components/initiatives/initiative-tree";
 import { NewInitiativeDialog } from "@/components/initiatives/new-initiative-dialog";
-import { List } from "@/components/layout/list";
+import { VirtualList } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -58,7 +58,7 @@ function InitiativesPage() {
     />
   );
   return (
-    <PageContainer>
+    <PageContainer scroll="window">
       <PageHeader
         title="Initiatives"
         icon={<TargetIcon />}
@@ -84,17 +84,7 @@ function InitiativesPage() {
           {scope === "trash" ? (
             <TrashedInitiatives initiatives={initiatives} />
           ) : (
-            <List flush>
-              <InitiativeListHeader />
-              {INITIATIVE_STATUSES.map((status) => (
-                <StatusGroup
-                  key={`${scope}:${status}`}
-                  status={status}
-                  initiatives={initiatives.filter((initiative) => initiative.status === status)}
-                  collapsedByDefault={scope === "active" && status === "completed"}
-                />
-              ))}
-            </List>
+            <InitiativeList key={scope} initiatives={initiatives} scope={scope} />
           )}
         </ListStates>
       )}
@@ -106,10 +96,12 @@ function TrashedInitiatives({ initiatives }: { initiatives: Initiative[] }) {
   const { workspace, canEdit } = useWorkspace();
   const { mutate: change, isPending, variables } = useInitiativeLifecycleMutation(workspace.id);
   return (
-    <List flush>
-      {initiatives.map((initiative) => (
+    <VirtualList
+      flush
+      items={initiatives}
+      getKey={(initiative) => initiative.id}
+      renderItem={(initiative) => (
         <TrashedRow
-          key={initiative.id}
           icon={<InitiativeIcon initiative={initiative} />}
           name={initiative.name}
           trashedAt={initiative.trashedAt}
@@ -126,43 +118,85 @@ function TrashedInitiatives({ initiatives }: { initiatives: Initiative[] }) {
               : undefined
           }
         />
-      ))}
-    </List>
+      )}
+    />
   );
 }
 
-function StatusGroup({
-  status,
+type TInitiativeListItem =
+  | { kind: "columns" }
+  | { kind: "header"; status: TInitiativeStatus; count: number; isCollapsed: boolean }
+  | { kind: "row"; initiative: Initiative; depth: number; showParent: boolean };
+
+function InitiativeList({
   initiatives,
-  collapsedByDefault,
+  scope,
 }: {
-  status: TInitiativeStatus;
   initiatives: Initiative[];
-  collapsedByDefault: boolean;
+  scope: TProjectScope;
 }) {
-  const [isCollapsed, setIsCollapsed] = useState(collapsedByDefault);
-  if (initiatives.length === 0) return null;
-  const ids = new Set(initiatives.map((initiative) => initiative.id));
+  const [toggled, setToggled] = useState<TInitiativeStatus[]>([]);
+  const toggle = (status: TInitiativeStatus) =>
+    setToggled((current) =>
+      current.includes(status) ? current.filter((value) => value !== status) : [...current, status],
+    );
+
+  const items: TInitiativeListItem[] = [{ kind: "columns" }];
+  for (const status of INITIATIVE_STATUSES) {
+    const group = initiatives.filter((initiative) => initiative.status === status);
+    if (group.length === 0) continue;
+    const collapsedByDefault = scope === "active" && status === "completed";
+    const isCollapsed = collapsedByDefault !== toggled.includes(status);
+    items.push({ kind: "header", status, count: group.length, isCollapsed });
+    if (isCollapsed) continue;
+    const ids = new Set(group.map((initiative) => initiative.id));
+    for (const { item, depth } of nestInitiatives(group)) {
+      const showParent = Boolean(item.parent && !ids.has(item.parent.id));
+      items.push({ kind: "row", initiative: item, depth, showParent });
+    }
+  }
+
   return (
-    <div role="presentation" data-slot="list-group" className="contents">
-      <div className="bg-muted dank:h-12 dank:gap-1 dank:bg-transparent dank:px-0 flex h-9 items-center px-1.5 group-data-flush/list:px-4">
-        <GroupToggle
-          icon={<InitiativeStatusIcon status={status} />}
-          label={initiativeStatusLabels[status]}
-          count={initiatives.length}
-          isCollapsed={isCollapsed}
-          onToggle={() => setIsCollapsed((value) => !value)}
-        />
-      </div>
-      {!isCollapsed &&
-        nestInitiatives(initiatives).map(({ item, depth }) => (
-          <InitiativeRow
-            key={item.id}
-            initiative={item}
-            depth={depth}
-            showParent={Boolean(item.parent && !ids.has(item.parent.id))}
-          />
-        ))}
-    </div>
+    <VirtualList
+      flush
+      items={items}
+      getKey={initiativeListKey}
+      estimateSize={initiativeListItemSize}
+      renderItem={(item) => {
+        if (item.kind === "columns") return <InitiativeListHeader />;
+        if (item.kind === "row") {
+          return (
+            <InitiativeRow
+              initiative={item.initiative}
+              depth={item.depth}
+              showParent={item.showParent}
+            />
+          );
+        }
+        return (
+          <div className="bg-muted dank:h-12 dank:gap-1 dank:bg-transparent dank:px-0 flex h-9 items-center px-1.5 group-data-flush/list:px-4">
+            <GroupToggle
+              icon={<InitiativeStatusIcon status={item.status} />}
+              label={initiativeStatusLabels[item.status]}
+              count={item.count}
+              isCollapsed={item.isCollapsed}
+              onToggle={() => toggle(item.status)}
+            />
+          </div>
+        );
+      }}
+    />
   );
+}
+
+function initiativeListKey(item: TInitiativeListItem) {
+  if (item.kind === "columns") return "columns";
+  if (item.kind === "header") return `header:${item.status}`;
+  return item.initiative.id;
+}
+
+function initiativeListItemSize(item: TInitiativeListItem) {
+  if (item.kind === "columns") return 32;
+  if (item.kind === "header") return 36;
+  return 44;
 }

@@ -126,7 +126,7 @@ function SavedView({ view, breadcrumb }: { view: TView; breadcrumb: TBreadcrumbI
   );
 
   return (
-    <PageContainer>
+    <PageContainer scroll="window">
       <PageHeader
         title={view.name}
         icon={

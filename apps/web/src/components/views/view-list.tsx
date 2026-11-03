@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 
 import { FavoriteButton } from "@/components/favorites/favorite-button";
 import { BoxIcon, LayersIcon, PlusIcon } from "@/components/icons";
-import { List } from "@/components/layout/list";
+import { VirtualList } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { SectionTitle } from "@/components/layout/section-title";
 import { Avatar } from "@/components/shared/avatar";
@@ -45,11 +45,11 @@ export function ViewList({ onCreate }: { onCreate?: () => void }) {
         {sections.map((section) => (
           <section key={section.title} className="flex w-full flex-col gap-2">
             <SectionTitle title={section.title} />
-            <List>
-              {section.views.map((view) => (
-                <ViewRow key={view.id} view={view} />
-              ))}
-            </List>
+            <VirtualList
+              items={section.views}
+              getKey={(view) => view.id}
+              renderItem={(view) => <ViewRow view={view} />}
+            />
           </section>
         ))}
       </div>

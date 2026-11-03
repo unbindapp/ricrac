@@ -134,11 +134,7 @@ export function ProjectGroupHeader({
     </>
   );
   return (
-    <div
-      role="listitem"
-      aria-label={`${status.name}, ${count} projects`}
-      className="bg-muted dank:h-12 dank:bg-transparent dank:px-0 dank:group-data-flush/list:px-0 flex h-9 w-full items-center gap-2 px-1.5 text-sm group-data-flush/list:px-4"
-    >
+    <div className="bg-muted dank:h-12 dank:bg-transparent dank:px-0 dank:group-data-flush/list:px-0 flex h-9 w-full items-center gap-2 px-1.5 text-sm group-data-flush/list:px-4">
       <Button
         variant="ghost"
         size="sm"

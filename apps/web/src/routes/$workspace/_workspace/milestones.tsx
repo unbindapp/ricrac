@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { type ReactNode, useState } from "react";
+import { useState } from "react";
 
 import type { Milestone } from "@/api/ops.gen";
 import { CircleCheckIcon, DiamondIcon, PlusIcon } from "@/components/icons";
 import { CreateButton } from "@/components/layout/create-button";
-import { List } from "@/components/layout/list";
+import { VirtualList } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -39,7 +39,7 @@ function MilestonesPage() {
     />
   );
   return (
-    <PageContainer>
+    <PageContainer scroll="window">
       <PageHeader
         title="Milestones"
         icon={<DiamondIcon />}
@@ -58,51 +58,77 @@ function MilestonesPage() {
           action: canEdit && newButton("empty"),
         }}
       >
-        <List flush>
-          <MilestoneListHeader />
-          <MilestoneGroup
-            label="Open"
-            icon={<DiamondIcon className="text-muted-foreground size-4" />}
-            milestones={milestones.filter((milestone) => !milestone.closedAt)}
-          />
-          <MilestoneGroup
-            label="Closed"
-            icon={<CircleCheckIcon className="text-muted-foreground size-4" />}
-            milestones={milestones.filter((milestone) => milestone.closedAt)}
-            collapsedByDefault
-          />
-        </List>
+        <MilestoneList milestones={milestones} />
       </ListStates>
     </PageContainer>
   );
 }
 
-function MilestoneGroup({
-  label,
-  icon,
-  milestones,
-  collapsedByDefault = false,
-}: {
-  label: string;
-  icon: ReactNode;
-  milestones: Milestone[];
-  collapsedByDefault?: boolean;
-}) {
-  const [isCollapsed, setIsCollapsed] = useState(collapsedByDefault);
-  if (milestones.length === 0) return null;
+type TMilestoneGroup = "open" | "closed";
+
+type TMilestoneListItem =
+  | { kind: "columns" }
+  | { kind: "header"; group: TMilestoneGroup; count: number; isCollapsed: boolean }
+  | { kind: "row"; milestone: Milestone };
+
+const milestoneGroups = {
+  open: { label: "Open", icon: DiamondIcon, collapsedByDefault: false },
+  closed: { label: "Closed", icon: CircleCheckIcon, collapsedByDefault: true },
+} satisfies Record<TMilestoneGroup, unknown>;
+
+function MilestoneList({ milestones }: { milestones: Milestone[] }) {
+  const [toggled, setToggled] = useState<TMilestoneGroup[]>([]);
+  const toggle = (group: TMilestoneGroup) =>
+    setToggled((current) =>
+      current.includes(group) ? current.filter((value) => value !== group) : [...current, group],
+    );
+
+  const items: TMilestoneListItem[] = [{ kind: "columns" }];
+  for (const group of ["open", "closed"] as const) {
+    const members = milestones.filter(
+      (milestone) => Boolean(milestone.closedAt) === (group === "closed"),
+    );
+    if (members.length === 0) continue;
+    const isCollapsed = milestoneGroups[group].collapsedByDefault !== toggled.includes(group);
+    items.push({ kind: "header", group, count: members.length, isCollapsed });
+    if (isCollapsed) continue;
+    for (const milestone of members) items.push({ kind: "row", milestone });
+  }
+
   return (
-    <div role="presentation" data-slot="list-group" className="contents">
-      <div className="bg-muted dank:h-12 dank:gap-1 dank:bg-transparent dank:px-0 flex h-9 items-center px-1.5 group-data-flush/list:px-4">
-        <GroupToggle
-          icon={icon}
-          label={label}
-          count={milestones.length}
-          isCollapsed={isCollapsed}
-          onToggle={() => setIsCollapsed((value) => !value)}
-        />
-      </div>
-      {!isCollapsed &&
-        milestones.map((milestone) => <MilestoneRow key={milestone.id} milestone={milestone} />)}
-    </div>
+    <VirtualList
+      flush
+      items={items}
+      getKey={milestoneListKey}
+      estimateSize={milestoneListItemSize}
+      renderItem={(item) => {
+        if (item.kind === "columns") return <MilestoneListHeader />;
+        if (item.kind === "row") return <MilestoneRow milestone={item.milestone} />;
+        const { label, icon: Icon } = milestoneGroups[item.group];
+        return (
+          <div className="bg-muted dank:h-12 dank:gap-1 dank:bg-transparent dank:px-0 flex h-9 items-center px-1.5 group-data-flush/list:px-4">
+            <GroupToggle
+              icon={<Icon className="text-muted-foreground size-4" />}
+              label={label}
+              count={item.count}
+              isCollapsed={item.isCollapsed}
+              onToggle={() => toggle(item.group)}
+            />
+          </div>
+        );
+      }}
+    />
   );
+}
+
+function milestoneListKey(item: TMilestoneListItem) {
+  if (item.kind === "columns") return "columns";
+  if (item.kind === "header") return `header:${item.group}`;
+  return item.milestone.id;
+}
+
+function milestoneListItemSize(item: TMilestoneListItem) {
+  if (item.kind === "columns") return 32;
+  if (item.kind === "header") return 36;
+  return 44;
 }

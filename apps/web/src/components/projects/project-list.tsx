@@ -4,7 +4,7 @@ import { type ReactNode, useState } from "react";
 import type { Project } from "@/api/ops.gen";
 
 import { ErrorCard } from "@/components/layout/error-card";
-import { List } from "@/components/layout/list";
+import { VirtualList } from "@/components/layout/list";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { useNewProjectStore } from "@/components/projects/new-project-store";
 import {
@@ -12,6 +12,7 @@ import {
   inScope,
   matchesQuery,
   scopeArgs,
+  type TProjectGroup,
   type TProjectScope,
 } from "@/components/projects/project-groups";
 import { useProjectStatuses } from "@/components/projects/project-pickers";
@@ -91,39 +92,59 @@ export function ProjectList({
       current.includes(statusId) ? current.filter((id) => id !== statusId) : [...current, statusId],
     );
 
+  const items: TProjectListItem[] = [{ kind: "columns" }];
+  for (const group of groups) {
+    if (group.projects.length === 0) continue;
+    const closedByDefault = scope === "active" && !isOpenStatus(group.status);
+    const isCollapsed = closedByDefault !== toggled.includes(group.status.id);
+    items.push({ kind: "header", group, isCollapsed });
+    if (isCollapsed) continue;
+    for (const project of group.projects) items.push({ kind: "row", project });
+  }
+
   return (
-    <List flush>
-      <ProjectListHeader />
-      {groups
-        .filter((group) => group.projects.length > 0)
-        .map((group) => {
-          const closedByDefault = scope === "active" && !isOpenStatus(group.status);
-          const isCollapsed = closedByDefault !== toggled.includes(group.status.id);
-          return (
-            <div key={group.status.id} role="presentation" className="contents">
-              <ProjectGroupHeader
-                status={group.status}
-                count={group.projects.length}
-                isCollapsed={isCollapsed}
-                onToggle={() => toggle(group.status.id)}
-                onCreate={
-                  canEdit && scope === "active"
-                    ? () => openNewProject({ ...createDefaults, statusId: group.status.id })
-                    : undefined
-                }
-              />
-              {!isCollapsed && (
-                <div role="presentation" data-slot="list-group" className="contents">
-                  {group.projects.map((project) => (
-                    <ProjectRow key={project.id} project={project} />
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
-    </List>
+    <VirtualList
+      flush
+      items={items}
+      getKey={projectListKey}
+      estimateSize={projectListItemSize}
+      renderItem={(item) => {
+        if (item.kind === "columns") return <ProjectListHeader />;
+        if (item.kind === "row") return <ProjectRow project={item.project} />;
+        const { status, projects: groupProjects } = item.group;
+        return (
+          <ProjectGroupHeader
+            status={status}
+            count={groupProjects.length}
+            isCollapsed={item.isCollapsed}
+            onToggle={() => toggle(status.id)}
+            onCreate={
+              canEdit && scope === "active"
+                ? () => openNewProject({ ...createDefaults, statusId: status.id })
+                : undefined
+            }
+          />
+        );
+      }}
+    />
   );
+}
+
+type TProjectListItem =
+  | { kind: "columns" }
+  | { kind: "header"; group: TProjectGroup; isCollapsed: boolean }
+  | { kind: "row"; project: Project };
+
+function projectListKey(item: TProjectListItem) {
+  if (item.kind === "columns") return "columns";
+  if (item.kind === "header") return `header:${item.group.status.id}`;
+  return item.project.id;
+}
+
+function projectListItemSize(item: TProjectListItem) {
+  if (item.kind === "columns") return 32;
+  if (item.kind === "header") return 36;
+  return 44;
 }
 
 function TrashedProjects({ projects }: { projects: Project[] }) {
@@ -133,10 +154,12 @@ function TrashedProjects({ projects }: { projects: Project[] }) {
     (b.trashedAt ?? "").localeCompare(a.trashedAt ?? ""),
   );
   return (
-    <List flush>
-      {newestFirst.map((project) => (
+    <VirtualList
+      flush
+      items={newestFirst}
+      getKey={(project) => project.id}
+      renderItem={(project) => (
         <TrashedRow
-          key={project.id}
           icon={<ProjectIcon icon={project.icon} color={project.color} />}
           name={project.name}
           trashedAt={project.trashedAt}
@@ -151,7 +174,7 @@ function TrashedProjects({ projects }: { projects: Project[] }) {
               : undefined
           }
         />
-      ))}
-    </List>
+      )}
+    />
   );
 }

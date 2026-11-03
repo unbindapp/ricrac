@@ -20,6 +20,11 @@
     overflow: auto;
     padding: var(--panel-padding-y) var(--panel-padding-x);
     container-type: inline-size;
+
+    /* Phones scroll the window, so the browser bars can tuck away. */
+    @media (width < 48rem) {
+      overflow: visible;
+    }
   }
 
   & [data-slot="forum-toolbar"] {

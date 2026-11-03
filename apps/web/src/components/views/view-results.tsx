@@ -5,7 +5,7 @@ import type { Issue, Project } from "@/api/ops.gen";
 import { BoxIcon, CircleDotIcon } from "@/components/icons";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
-import { List } from "@/components/layout/list";
+import { VirtualList } from "@/components/layout/list";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { Avatar } from "@/components/shared/avatar";
 import { EntityIcon } from "@/components/shared/entity-icon";
@@ -13,8 +13,8 @@ import { LabelChip } from "@/components/shared/label-chip";
 import { PriorityIcon } from "@/components/shared/priority-icon";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { StateIcon, stateTypeLabels, type TStateType } from "@/components/shared/state-icon";
-import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
+import { useLoadMore } from "@/lib/hooks/use-load-more";
 import { formatDate } from "@/lib/helpers/dates";
 import { type TFilter, viewIssuesQuery, viewProjectsQuery } from "@/lib/queries/views";
 
@@ -27,12 +27,19 @@ const TYPE_ORDER: TStateType[] = [
   "canceled",
 ];
 
+const HEADER_HEIGHT = 36;
+const ROW_HEIGHT = 44;
+
 type TProps = { filter: TFilter };
+
+type TIssueItem =
+  { kind: "header"; type: TStateType; count: number } | { kind: "row"; issue: Issue };
 
 /** The issues a view's filter matches, by status type. */
 export function ViewIssues({ filter }: TProps) {
   const { workspace } = useWorkspace();
   const query = useInfiniteQuery(viewIssuesQuery(workspace.id, filter));
+  const loadMore = useLoadMore(query);
   if (query.isPending) return <ListSkeleton />;
   if (query.error) {
     return <ErrorCard message={query.error.message} onRetry={() => void query.refetch()} />;
@@ -47,50 +54,50 @@ export function ViewIssues({ filter }: TProps) {
       />
     );
   }
-  const groups = TYPE_ORDER.map((type) => ({
-    type,
-    issues: issues.filter((issue) => issue.state.type === type),
-  })).filter((group) => group.issues.length > 0);
+  const items = TYPE_ORDER.flatMap((type): TIssueItem[] => {
+    const matching = issues.filter((issue) => issue.state.type === type);
+    if (matching.length === 0) return [];
+    return [
+      { kind: "header", type, count: matching.length },
+      ...matching.map((issue) => ({ kind: "row" as const, issue })),
+    ];
+  });
 
   return (
     <div className="flex w-full flex-col gap-2">
-      <List flush>
-        {groups.map((group) => (
-          <div
-            key={group.type}
-            role="group"
-            aria-label={stateTypeLabels[group.type]}
-            data-slot="list-group"
-            className="dank:border-0 border-b last:border-b-0"
-          >
-            <div className="bg-muted dank:h-12 dank:bg-transparent dank:px-0 dank:group-data-flush/list:px-0 flex h-9 items-center gap-2 px-3 group-data-flush/list:px-6">
-              <StateIcon type={group.type} />
-              <span className="dank:type-title-small text-sm font-medium">
-                {stateTypeLabels[group.type]}
-              </span>
-              <span className="text-muted-foreground dank:type-label-large text-xs tabular-nums">
-                {group.issues.length}
-              </span>
-            </div>
-            {group.issues.map((issue) => (
-              <IssueRow key={issue.id} issue={issue} />
-            ))}
-          </div>
-        ))}
-      </List>
-      {query.hasNextPage && (
-        <Button
-          variant="ghost"
-          size="sm"
-          isPending={query.isFetchingNextPage}
-          onClick={() => void query.fetchNextPage()}
-          className="self-center"
-        >
-          Show more
-        </Button>
-      )}
+      <VirtualList
+        flush
+        items={items}
+        getKey={(item) => (item.kind === "header" ? `type:${item.type}` : item.issue.id)}
+        estimateSize={(item) => (item.kind === "header" ? HEADER_HEIGHT : ROW_HEIGHT)}
+        onEndReached={loadMore}
+        renderItem={(item) =>
+          item.kind === "header" ? (
+            <StatusTypeHeader type={item.type} count={item.count} />
+          ) : (
+            <IssueRow issue={item.issue} />
+          )
+        }
+      />
+      {query.isFetchingNextPage && <LoadingMore />}
     </div>
   );
+}
+
+function StatusTypeHeader({ type, count }: { type: TStateType; count: number }) {
+  return (
+    <div className="bg-muted dank:h-12 dank:bg-transparent dank:px-0 dank:group-data-flush/list:px-0 flex h-9 items-center gap-2 px-3 group-data-flush/list:px-6">
+      <StateIcon type={type} />
+      <span className="dank:type-title-small text-sm font-medium">{stateTypeLabels[type]}</span>
+      <span className="text-muted-foreground dank:type-label-large text-xs tabular-nums">
+        {count}
+      </span>
+    </div>
+  );
+}
+
+function LoadingMore() {
+  return <p className="text-muted-foreground text-xs">Loading more…</p>;
 }
 
 function IssueRow({ issue }: { issue: Issue }) {
@@ -135,6 +142,7 @@ function IssueRow({ issue }: { issue: Issue }) {
 export function ViewProjects({ filter }: TProps) {
   const { workspace } = useWorkspace();
   const query = useInfiniteQuery(viewProjectsQuery(workspace.id, filter));
+  const loadMore = useLoadMore(query);
   if (query.isPending) return <ListSkeleton />;
   if (query.error) {
     return <ErrorCard message={query.error.message} onRetry={() => void query.refetch()} />;
@@ -151,22 +159,14 @@ export function ViewProjects({ filter }: TProps) {
   }
   return (
     <div className="flex w-full flex-col gap-2">
-      <List flush>
-        {projects.map((project) => (
-          <ProjectRow key={project.id} project={project} />
-        ))}
-      </List>
-      {query.hasNextPage && (
-        <Button
-          variant="ghost"
-          size="sm"
-          isPending={query.isFetchingNextPage}
-          onClick={() => void query.fetchNextPage()}
-          className="self-center"
-        >
-          Show more
-        </Button>
-      )}
+      <VirtualList
+        flush
+        items={projects}
+        getKey={(project) => project.id}
+        onEndReached={loadMore}
+        renderItem={(project) => <ProjectRow project={project} />}
+      />
+      {query.isFetchingNextPage && <LoadingMore />}
     </div>
   );
 }

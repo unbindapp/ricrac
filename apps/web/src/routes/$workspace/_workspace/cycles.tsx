@@ -48,7 +48,7 @@ function Cycles({ team }: { team: Team }) {
   };
 
   return (
-    <PageContainer>
+    <PageContainer scroll="window">
       <PageHeader
         title="Cycles"
         icon={<RefreshCwIcon />}

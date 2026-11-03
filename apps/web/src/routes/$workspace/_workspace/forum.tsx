@@ -6,7 +6,6 @@ import { useDebounceValue, useLocalStorage } from "usehooks-ts";
 import { z } from "zod";
 
 import {
-  DiscussionCard,
   DiscussionGrid,
   DiscussionGridSkeleton,
   DiscussionRow,
@@ -21,7 +20,7 @@ import {
   TrashedDiscussionRow,
 } from "@/components/forum/forum-views";
 import { LayoutGridIcon, ListIcon, MessagesSquareIcon, PlusIcon } from "@/components/icons";
-import { List } from "@/components/layout/list";
+import { VirtualList } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -32,6 +31,7 @@ import { SearchField } from "@/components/ui/search-field";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { FilterMenu } from "@/components/shared/filter-menu";
 import { LayoutToggle } from "@/components/shared/layout-toggle";
+import { useLoadMore } from "@/lib/hooks/use-load-more";
 import { useUiTheme } from "@/themes/ui-theme-provider";
 
 type TLayout = "grid" | "list";
@@ -69,6 +69,7 @@ function ForumList() {
     forumDiscussionsQuery(workspace.id, { status, tag, query: debouncedQuery }),
   );
   const discussions = list.data?.pages.flatMap((page) => page.nodes) ?? [];
+  const loadMore = useLoadMore(list);
   const newButton = (placement: "header" | "empty") => (
     <NewDiscussionDialog
       trigger={
@@ -85,7 +86,7 @@ function ForumList() {
   );
 
   return (
-    <PageContainer>
+    <PageContainer scroll="window">
       <PageHeader
         title="Forum"
         icon={<MessagesSquareIcon />}
@@ -153,25 +154,25 @@ function ForumList() {
       >
         <div className="flex w-full flex-col gap-3">
           {isTrash && (
-            <List flush>
-              {discussions.map((discussion) => (
-                <TrashedDiscussionRow key={discussion.id} discussion={discussion} />
-              ))}
-            </List>
+            <VirtualList
+              flush
+              label="Trashed discussions"
+              items={discussions}
+              getKey={(discussion) => discussion.id}
+              onEndReached={loadMore}
+              renderItem={(discussion) => <TrashedDiscussionRow discussion={discussion} />}
+            />
           )}
-          {isGrid && (
-            <DiscussionGrid>
-              {discussions.map((discussion) => (
-                <DiscussionCard key={discussion.id} discussion={discussion} />
-              ))}
-            </DiscussionGrid>
-          )}
+          {isGrid && <DiscussionGrid discussions={discussions} onEndReached={loadMore} />}
           {!isTrash && !isGrid && (
-            <List flush>
-              {discussions.map((discussion) => (
-                <DiscussionRow key={discussion.id} discussion={discussion} />
-              ))}
-            </List>
+            <VirtualList
+              flush
+              label="Discussions"
+              items={discussions}
+              getKey={(discussion) => discussion.id}
+              onEndReached={loadMore}
+              renderItem={(discussion) => <DiscussionRow discussion={discussion} />}
+            />
           )}
           {list.hasNextPage && (
             <Button

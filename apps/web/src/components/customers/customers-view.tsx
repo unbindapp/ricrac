@@ -11,6 +11,7 @@ import { PropertyPicker } from "@/components/issues/property-picker";
 import { CreateButton } from "@/components/layout/create-button";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
+import { VirtualList } from "@/components/layout/list";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -26,6 +27,9 @@ import { customersQuery, customerStatusesQuery, customerTiersQuery } from "@/lib
 
 const ALL = "all";
 const SEARCH_DEBOUNCE_MS = 250;
+const TABLE_ROW_HEIGHT = 36;
+
+type TCustomerItem = { kind: "header" } | { kind: "row"; customer: Customer; segment?: string };
 
 export function CustomersView() {
   const { workspace, canEdit } = useWorkspace();
@@ -63,7 +67,7 @@ export function CustomersView() {
     );
 
   return (
-    <PageContainer>
+    <PageContainer scroll="window">
       <PageHeader
         title="Customers"
         icon={<BuildingIcon />}
@@ -105,45 +109,59 @@ export function CustomersView() {
 }
 
 function CustomerTable({ customers }: { customers: Customer[] }) {
+  const items: TCustomerItem[] = [
+    { kind: "header" },
+    ...customers.map((customer, index) => ({
+      kind: "row" as const,
+      customer,
+      segment: segmentOf(index, customers.length),
+    })),
+  ];
+  return (
+    <VirtualList
+      role="table"
+      label="Customers"
+      items={items}
+      getKey={(item) => (item.kind === "header" ? "header" : item.customer.id)}
+      estimateSize={() => TABLE_ROW_HEIGHT}
+      renderItem={(item) =>
+        item.kind === "header" ? (
+          <CustomerTableHeader />
+        ) : (
+          <CustomerRow customer={item.customer} segment={item.segment} />
+        )
+      }
+    />
+  );
+}
+
+function CustomerTableHeader() {
   return (
     <div
-      role="table"
-      aria-label="Customers"
-      className="dank:gap-0.5 dank:overflow-visible dank:rounded-none dank:border-0 flex w-full flex-col overflow-hidden rounded-lg border"
+      role="row"
+      className="bg-card text-muted-foreground dank:type-label-medium dank:border-0 dank:bg-transparent dank:px-4 flex h-9 items-center gap-3 border-b px-3 text-xs font-medium"
     >
-      <div
-        role="row"
-        className="bg-card text-muted-foreground dank:type-label-medium dank:border-0 dank:bg-transparent dank:px-4 flex h-9 items-center gap-3 border-b px-3 text-xs font-medium"
-      >
-        <span role="columnheader" className="min-w-0 flex-1">
-          Name
-        </span>
-        <span role="columnheader" className="hidden w-32 md:block">
-          Status
-        </span>
-        <span role="columnheader" className="hidden w-28 lg:block">
-          Tier
-        </span>
-        <span role="columnheader" className="hidden w-36 lg:block">
-          Owner
-        </span>
-        <span role="columnheader" className="hidden w-20 text-right sm:block">
-          Revenue
-        </span>
-        <span role="columnheader" className="hidden w-20 text-right md:block">
-          Employees
-        </span>
-        <span role="columnheader" className="w-20 text-right">
-          Requests
-        </span>
-      </div>
-      {customers.map((customer, index) => (
-        <CustomerRow
-          key={customer.id}
-          customer={customer}
-          segment={segmentOf(index, customers.length)}
-        />
-      ))}
+      <span role="columnheader" className="min-w-0 flex-1">
+        Name
+      </span>
+      <span role="columnheader" className="hidden w-32 md:block">
+        Status
+      </span>
+      <span role="columnheader" className="hidden w-28 lg:block">
+        Tier
+      </span>
+      <span role="columnheader" className="hidden w-36 lg:block">
+        Owner
+      </span>
+      <span role="columnheader" className="hidden w-20 text-right sm:block">
+        Revenue
+      </span>
+      <span role="columnheader" className="hidden w-20 text-right md:block">
+        Employees
+      </span>
+      <span role="columnheader" className="w-20 text-right">
+        Requests
+      </span>
     </div>
   );
 }
