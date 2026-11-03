@@ -5,6 +5,8 @@ import { useUiTheme } from "@/themes/ui-theme-provider";
 
 type TProps = {
   width?: "full" | "narrow";
+  /** "window" lets phones scroll the whole document, for lists virtualized against the window. */
+  scroll?: "pane" | "window";
   children: ReactNode;
 };
 
@@ -15,7 +17,7 @@ export const PageSlotsContext = createContext<TPageSlots>({ bar: null, fab: null
 
 export const usePageSlots = () => useContext(PageSlotsContext);
 
-export function PageContainer({ width = "full", children }: TProps) {
+export function PageContainer({ width = "full", scroll = "pane", children }: TProps) {
   const { separatesBars, createButton } = useUiTheme();
   const [bar, setBar] = useState<HTMLElement | null>(null);
   const [fab, setFab] = useState<HTMLElement | null>(null);
@@ -25,9 +27,11 @@ export function PageContainer({ width = "full", children }: TProps) {
     <div
       data-slot="page-container"
       data-width={width}
+      data-scroll={scroll}
       data-bar={isBarApart ? "apart" : undefined}
       className={cn(
-        "group/page flex min-h-0 w-full flex-1 flex-col overflow-y-auto",
+        "group/page flex min-h-0 w-full flex-1 flex-col",
+        scroll === "window" ? "md:overflow-y-auto" : "overflow-y-auto",
         isBarApart && "bg-background rounded-lg",
       )}
     >
@@ -55,7 +59,7 @@ export function PageContainer({ width = "full", children }: TProps) {
           <div
             ref={setBar}
             data-slot="page-bar-slot"
-            className="bg-background shrink-0 overflow-hidden rounded-lg empty:hidden"
+            className="bg-background shrink-0 overflow-hidden rounded-lg empty:hidden max-md:sticky max-md:top-0 max-md:z-10"
           />
           {page}
         </div>

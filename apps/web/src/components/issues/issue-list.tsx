@@ -1,7 +1,9 @@
-import { useVirtualizer } from "@tanstack/react-virtual";
+import { useElementScrollRestoration } from "@tanstack/react-router";
+import { useVirtualizer, useWindowVirtualizer } from "@tanstack/react-virtual";
 import {
   type MouseEvent,
   type ReactNode,
+  type RefObject,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -31,6 +33,7 @@ import { List } from "@/components/layout/list";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/ui/utils";
+import { useDeviceSize } from "@/components/providers/device-size-provider";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 import { LIST_MAX_ISSUES } from "@/lib/queries/issues";
@@ -72,6 +75,53 @@ function findScrollParent(element: HTMLElement | null): HTMLElement | null {
     current = current.parentElement;
   }
   return null;
+}
+
+/** Phones scroll the window, so their browser bars can tuck away; wider screens scroll the page's pane. */
+function useListVirtualizer(containerRef: RefObject<HTMLDivElement | null>, items: TListItem[]) {
+  const { size } = useDeviceSize();
+  const followsWindow = size === "xs" || size === "sm";
+  const [pane, setPane] = useState<HTMLElement | null>(null);
+  const [scrollMargin, setScrollMargin] = useState(0);
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    const scroller = followsWindow ? null : findScrollParent(container);
+    setPane(scroller);
+    if (!container) return;
+    const measure = () =>
+      setScrollMargin(
+        scroller
+          ? container.getBoundingClientRect().top -
+              scroller.getBoundingClientRect().top +
+              scroller.scrollTop
+          : container.getBoundingClientRect().top + window.scrollY,
+      );
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(scroller ?? document.body);
+    return () => observer.disconnect();
+  }, [containerRef, followsWindow]);
+
+  const options = {
+    count: items.length,
+    estimateSize: (index: number) => (items[index].kind === "header" ? HEADER_HEIGHT : ROW_HEIGHT),
+    overscan: OVERSCAN,
+    scrollMargin,
+    getItemKey: (index: number) => items[index].key,
+  };
+  const windowEntry = useElementScrollRestoration({ getElement: () => window });
+  const windowVirtualizer = useWindowVirtualizer({
+    ...options,
+    enabled: followsWindow,
+    initialOffset: windowEntry?.scrollY,
+  });
+  const paneVirtualizer = useVirtualizer({
+    ...options,
+    enabled: !followsWindow,
+    getScrollElement: () => pane,
+  });
+  return { virtualizer: followsWindow ? windowVirtualizer : paneVirtualizer, scrollMargin };
 }
 
 export function IssueList(props: TIssueListProps) {
@@ -140,8 +190,6 @@ function VirtualIssueList({
   rowActions,
 }: TVirtualProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [scrollElement, setScrollElement] = useState<HTMLElement | null>(null);
-  const [scrollMargin, setScrollMargin] = useState(0);
   const [collapsed, setCollapsed] = useState<string[]>([]);
   const { canEdit } = useWorkspace();
   const openNewIssue = useNewIssueStore((state) => state.open);
@@ -183,23 +231,6 @@ function VirtualIssueList({
     [items],
   );
 
-  useLayoutEffect(() => {
-    const container = containerRef.current;
-    const parent = findScrollParent(container);
-    setScrollElement(parent);
-    if (!container || !parent) return;
-    const measure = () =>
-      setScrollMargin(
-        container.getBoundingClientRect().top -
-          parent.getBoundingClientRect().top +
-          parent.scrollTop,
-      );
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(parent);
-    return () => observer.disconnect();
-  }, []);
-
   useEffect(
     () => () => {
       clear();
@@ -208,14 +239,7 @@ function VirtualIssueList({
     [clear, setFocused],
   );
 
-  const virtualizer = useVirtualizer({
-    count: items.length,
-    getScrollElement: () => scrollElement,
-    estimateSize: (index) => (items[index].kind === "header" ? HEADER_HEIGHT : ROW_HEIGHT),
-    overscan: OVERSCAN,
-    scrollMargin,
-    getItemKey: (index) => items[index].key,
-  });
+  const { virtualizer, scrollMargin } = useListVirtualizer(containerRef, items);
   const virtualItems = virtualizer.getVirtualItems();
 
   const open = (issue: Issue) => {

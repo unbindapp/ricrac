@@ -114,7 +114,7 @@ export function IssuesView({
 
   return (
     <IssuePeekHost>
-      <PageContainer>
+      <PageContainer scroll="window">
         {header ? (
           <div className="flex w-full flex-col gap-2">
             {header}

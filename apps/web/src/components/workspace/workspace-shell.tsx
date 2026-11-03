@@ -28,14 +28,14 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
   return (
     <div
       data-sidebar-collapsed={isNavigationHidden || undefined}
-      className="group/shell bg-sidebar flex h-svh w-full overflow-hidden"
+      className="group/shell bg-sidebar flex h-svh w-full overflow-clip max-md:has-data-[scroll=window]:h-auto max-md:has-data-[scroll=window]:min-h-svh"
     >
       <Navigation />
       <div className="dank:md:gap-0 dank:md:pt-0 dank:md:pr-3 dank:md:pb-3 flex min-w-0 flex-1 flex-col md:gap-2 md:py-2 md:pr-2 md:group-data-sidebar-collapsed/shell:pl-2">
         <FallbackMobileBar />
         {TopBar && <TopBar />}
         <div className="dank:gap-3 flex min-h-0 flex-1 gap-2">
-          <main className="bg-background dank:border-0 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden has-data-[slot=split-view]:border-0 has-data-[slot=split-view]:bg-transparent md:rounded-lg md:border">
+          <main className="bg-background dank:border-0 flex min-h-0 min-w-0 flex-1 flex-col overflow-clip has-data-[slot=split-view]:border-0 has-data-[slot=split-view]:bg-transparent md:rounded-lg md:border">
             {children}
           </main>
           <AssistantPanel />
@@ -69,7 +69,7 @@ function FallbackMobileBar() {
   const { workspace } = useWorkspace();
   const openCommandPanel = useCommandPanelStore((state) => state.setOpen);
   return (
-    <div className="dank:h-16 dank:border-0 dank:px-1 flex h-11 shrink-0 items-center gap-2 border-b px-4 group-has-data-mobile-bar/shell:hidden md:hidden">
+    <div className="dank:h-16 dank:border-0 dank:px-1 bg-sidebar sticky top-0 z-10 flex h-11 shrink-0 items-center gap-2 border-b px-4 group-has-data-mobile-bar/shell:hidden md:hidden">
       <SidebarButton />
       <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} />
       <span className="min-w-0 flex-1 truncate text-sm font-medium">{workspace.name}</span>

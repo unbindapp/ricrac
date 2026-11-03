@@ -52,6 +52,7 @@ const router = createRouter({
   routeTree,
   context: { queryClient },
   defaultPreload: "intent",
+  scrollRestoration: true,
   defaultPreloadStaleTime: DEFAULT_STALE_TIME_MS,
   defaultPreloadDelay: DEFAULT_INTENT_DELAY_MS,
   defaultPendingComponent: PendingScreen,

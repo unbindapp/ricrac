@@ -17,7 +17,7 @@ export function VisitorShell({ children }: { children: ReactNode }) {
   return (
     <div
       data-visitor
-      className="group/shell bg-sidebar dank:md:gap-3 dank:md:p-3 flex h-svh w-full flex-col overflow-hidden md:gap-2 md:p-2"
+      className="group/shell bg-sidebar dank:md:gap-3 dank:md:p-3 flex h-svh w-full flex-col overflow-clip max-md:has-data-[scroll=window]:h-auto max-md:has-data-[scroll=window]:min-h-svh md:gap-2 md:p-2"
     >
       <header className="flex h-11 shrink-0 items-center gap-2 px-4 md:px-2">
         <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} />
@@ -38,7 +38,7 @@ export function VisitorShell({ children }: { children: ReactNode }) {
           </LinkButton>
         )}
       </header>
-      <main className="bg-background dank:border-0 flex min-h-0 flex-1 flex-col overflow-hidden md:rounded-lg md:border">
+      <main className="bg-background dank:border-0 flex min-h-0 flex-1 flex-col overflow-clip md:rounded-lg md:border">
         {children}
       </main>
     </div>
