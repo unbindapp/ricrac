@@ -7,8 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"ricrac/ent/board"
+	"ricrac/ent/boardcard"
 	"ricrac/ent/boardcolumn"
-	"ricrac/ent/boardissue"
+	"ricrac/ent/discussion"
 	"ricrac/ent/issue"
 	"ricrac/ent/predicate"
 	"time"
@@ -19,28 +20,28 @@ import (
 	"github.com/google/uuid"
 )
 
-// BoardIssueUpdate is the builder for updating BoardIssue entities.
-type BoardIssueUpdate struct {
+// BoardCardUpdate is the builder for updating BoardCard entities.
+type BoardCardUpdate struct {
 	config
 	hooks     []Hook
-	mutation  *BoardIssueMutation
+	mutation  *BoardCardMutation
 	modifiers []func(*sql.UpdateBuilder)
 }
 
-// Where appends a list predicates to the BoardIssueUpdate builder.
-func (_u *BoardIssueUpdate) Where(ps ...predicate.BoardIssue) *BoardIssueUpdate {
+// Where appends a list predicates to the BoardCardUpdate builder.
+func (_u *BoardCardUpdate) Where(ps ...predicate.BoardCard) *BoardCardUpdate {
 	_u.mutation.Where(ps...)
 	return _u
 }
 
 // SetBoardID sets the "board_id" field.
-func (_u *BoardIssueUpdate) SetBoardID(v uuid.UUID) *BoardIssueUpdate {
+func (_u *BoardCardUpdate) SetBoardID(v uuid.UUID) *BoardCardUpdate {
 	_u.mutation.SetBoardID(v)
 	return _u
 }
 
 // SetNillableBoardID sets the "board_id" field if the given value is not nil.
-func (_u *BoardIssueUpdate) SetNillableBoardID(v *uuid.UUID) *BoardIssueUpdate {
+func (_u *BoardCardUpdate) SetNillableBoardID(v *uuid.UUID) *BoardCardUpdate {
 	if v != nil {
 		_u.SetBoardID(*v)
 	}
@@ -48,13 +49,13 @@ func (_u *BoardIssueUpdate) SetNillableBoardID(v *uuid.UUID) *BoardIssueUpdate {
 }
 
 // SetColumnID sets the "column_id" field.
-func (_u *BoardIssueUpdate) SetColumnID(v uuid.UUID) *BoardIssueUpdate {
+func (_u *BoardCardUpdate) SetColumnID(v uuid.UUID) *BoardCardUpdate {
 	_u.mutation.SetColumnID(v)
 	return _u
 }
 
 // SetNillableColumnID sets the "column_id" field if the given value is not nil.
-func (_u *BoardIssueUpdate) SetNillableColumnID(v *uuid.UUID) *BoardIssueUpdate {
+func (_u *BoardCardUpdate) SetNillableColumnID(v *uuid.UUID) *BoardCardUpdate {
 	if v != nil {
 		_u.SetColumnID(*v)
 	}
@@ -62,28 +63,54 @@ func (_u *BoardIssueUpdate) SetNillableColumnID(v *uuid.UUID) *BoardIssueUpdate 
 }
 
 // SetIssueID sets the "issue_id" field.
-func (_u *BoardIssueUpdate) SetIssueID(v uuid.UUID) *BoardIssueUpdate {
+func (_u *BoardCardUpdate) SetIssueID(v uuid.UUID) *BoardCardUpdate {
 	_u.mutation.SetIssueID(v)
 	return _u
 }
 
 // SetNillableIssueID sets the "issue_id" field if the given value is not nil.
-func (_u *BoardIssueUpdate) SetNillableIssueID(v *uuid.UUID) *BoardIssueUpdate {
+func (_u *BoardCardUpdate) SetNillableIssueID(v *uuid.UUID) *BoardCardUpdate {
 	if v != nil {
 		_u.SetIssueID(*v)
 	}
 	return _u
 }
 
+// ClearIssueID clears the value of the "issue_id" field.
+func (_u *BoardCardUpdate) ClearIssueID() *BoardCardUpdate {
+	_u.mutation.ClearIssueID()
+	return _u
+}
+
+// SetDiscussionID sets the "discussion_id" field.
+func (_u *BoardCardUpdate) SetDiscussionID(v uuid.UUID) *BoardCardUpdate {
+	_u.mutation.SetDiscussionID(v)
+	return _u
+}
+
+// SetNillableDiscussionID sets the "discussion_id" field if the given value is not nil.
+func (_u *BoardCardUpdate) SetNillableDiscussionID(v *uuid.UUID) *BoardCardUpdate {
+	if v != nil {
+		_u.SetDiscussionID(*v)
+	}
+	return _u
+}
+
+// ClearDiscussionID clears the value of the "discussion_id" field.
+func (_u *BoardCardUpdate) ClearDiscussionID() *BoardCardUpdate {
+	_u.mutation.ClearDiscussionID()
+	return _u
+}
+
 // SetSortOrder sets the "sort_order" field.
-func (_u *BoardIssueUpdate) SetSortOrder(v float64) *BoardIssueUpdate {
+func (_u *BoardCardUpdate) SetSortOrder(v float64) *BoardCardUpdate {
 	_u.mutation.ResetSortOrder()
 	_u.mutation.SetSortOrder(v)
 	return _u
 }
 
 // SetNillableSortOrder sets the "sort_order" field if the given value is not nil.
-func (_u *BoardIssueUpdate) SetNillableSortOrder(v *float64) *BoardIssueUpdate {
+func (_u *BoardCardUpdate) SetNillableSortOrder(v *float64) *BoardCardUpdate {
 	if v != nil {
 		_u.SetSortOrder(*v)
 	}
@@ -91,19 +118,19 @@ func (_u *BoardIssueUpdate) SetNillableSortOrder(v *float64) *BoardIssueUpdate {
 }
 
 // AddSortOrder adds value to the "sort_order" field.
-func (_u *BoardIssueUpdate) AddSortOrder(v float64) *BoardIssueUpdate {
+func (_u *BoardCardUpdate) AddSortOrder(v float64) *BoardCardUpdate {
 	_u.mutation.AddSortOrder(v)
 	return _u
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (_u *BoardIssueUpdate) SetCreatedAt(v time.Time) *BoardIssueUpdate {
+func (_u *BoardCardUpdate) SetCreatedAt(v time.Time) *BoardCardUpdate {
 	_u.mutation.SetCreatedAt(v)
 	return _u
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (_u *BoardIssueUpdate) SetNillableCreatedAt(v *time.Time) *BoardIssueUpdate {
+func (_u *BoardCardUpdate) SetNillableCreatedAt(v *time.Time) *BoardCardUpdate {
 	if v != nil {
 		_u.SetCreatedAt(*v)
 	}
@@ -111,56 +138,67 @@ func (_u *BoardIssueUpdate) SetNillableCreatedAt(v *time.Time) *BoardIssueUpdate
 }
 
 // ClearCreatedAt clears the value of the "created_at" field.
-func (_u *BoardIssueUpdate) ClearCreatedAt() *BoardIssueUpdate {
+func (_u *BoardCardUpdate) ClearCreatedAt() *BoardCardUpdate {
 	_u.mutation.ClearCreatedAt()
 	return _u
 }
 
 // SetBoard sets the "board" edge to the Board entity.
-func (_u *BoardIssueUpdate) SetBoard(v *Board) *BoardIssueUpdate {
+func (_u *BoardCardUpdate) SetBoard(v *Board) *BoardCardUpdate {
 	return _u.SetBoardID(v.ID)
 }
 
 // SetColumn sets the "column" edge to the BoardColumn entity.
-func (_u *BoardIssueUpdate) SetColumn(v *BoardColumn) *BoardIssueUpdate {
+func (_u *BoardCardUpdate) SetColumn(v *BoardColumn) *BoardCardUpdate {
 	return _u.SetColumnID(v.ID)
 }
 
 // SetIssue sets the "issue" edge to the Issue entity.
-func (_u *BoardIssueUpdate) SetIssue(v *Issue) *BoardIssueUpdate {
+func (_u *BoardCardUpdate) SetIssue(v *Issue) *BoardCardUpdate {
 	return _u.SetIssueID(v.ID)
 }
 
-// Mutation returns the BoardIssueMutation object of the builder.
-func (_u *BoardIssueUpdate) Mutation() *BoardIssueMutation {
+// SetDiscussion sets the "discussion" edge to the Discussion entity.
+func (_u *BoardCardUpdate) SetDiscussion(v *Discussion) *BoardCardUpdate {
+	return _u.SetDiscussionID(v.ID)
+}
+
+// Mutation returns the BoardCardMutation object of the builder.
+func (_u *BoardCardUpdate) Mutation() *BoardCardMutation {
 	return _u.mutation
 }
 
 // ClearBoard clears the "board" edge to the Board entity.
-func (_u *BoardIssueUpdate) ClearBoard() *BoardIssueUpdate {
+func (_u *BoardCardUpdate) ClearBoard() *BoardCardUpdate {
 	_u.mutation.ClearBoard()
 	return _u
 }
 
 // ClearColumn clears the "column" edge to the BoardColumn entity.
-func (_u *BoardIssueUpdate) ClearColumn() *BoardIssueUpdate {
+func (_u *BoardCardUpdate) ClearColumn() *BoardCardUpdate {
 	_u.mutation.ClearColumn()
 	return _u
 }
 
 // ClearIssue clears the "issue" edge to the Issue entity.
-func (_u *BoardIssueUpdate) ClearIssue() *BoardIssueUpdate {
+func (_u *BoardCardUpdate) ClearIssue() *BoardCardUpdate {
 	_u.mutation.ClearIssue()
 	return _u
 }
 
+// ClearDiscussion clears the "discussion" edge to the Discussion entity.
+func (_u *BoardCardUpdate) ClearDiscussion() *BoardCardUpdate {
+	_u.mutation.ClearDiscussion()
+	return _u
+}
+
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (_u *BoardIssueUpdate) Save(ctx context.Context) (int, error) {
+func (_u *BoardCardUpdate) Save(ctx context.Context) (int, error) {
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (_u *BoardIssueUpdate) SaveX(ctx context.Context) int {
+func (_u *BoardCardUpdate) SaveX(ctx context.Context) int {
 	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -169,43 +207,40 @@ func (_u *BoardIssueUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (_u *BoardIssueUpdate) Exec(ctx context.Context) error {
+func (_u *BoardCardUpdate) Exec(ctx context.Context) error {
 	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_u *BoardIssueUpdate) ExecX(ctx context.Context) {
+func (_u *BoardCardUpdate) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (_u *BoardIssueUpdate) check() error {
+func (_u *BoardCardUpdate) check() error {
 	if _u.mutation.BoardCleared() && len(_u.mutation.BoardIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "BoardIssue.board"`)
+		return errors.New(`ent: clearing a required unique edge "BoardCard.board"`)
 	}
 	if _u.mutation.ColumnCleared() && len(_u.mutation.ColumnIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "BoardIssue.column"`)
-	}
-	if _u.mutation.IssueCleared() && len(_u.mutation.IssueIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "BoardIssue.issue"`)
+		return errors.New(`ent: clearing a required unique edge "BoardCard.column"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (_u *BoardIssueUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *BoardIssueUpdate {
+func (_u *BoardCardUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *BoardCardUpdate {
 	_u.modifiers = append(_u.modifiers, modifiers...)
 	return _u
 }
 
-func (_u *BoardIssueUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+func (_u *BoardCardUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(boardissue.Table, boardissue.Columns, sqlgraph.NewFieldSpec(boardissue.FieldID, field.TypeUUID))
+	_spec := sqlgraph.NewUpdateSpec(boardcard.Table, boardcard.Columns, sqlgraph.NewFieldSpec(boardcard.FieldID, field.TypeUUID))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -214,23 +249,23 @@ func (_u *BoardIssueUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 		}
 	}
 	if value, ok := _u.mutation.SortOrder(); ok {
-		_spec.SetField(boardissue.FieldSortOrder, field.TypeFloat64, value)
+		_spec.SetField(boardcard.FieldSortOrder, field.TypeFloat64, value)
 	}
 	if value, ok := _u.mutation.AddedSortOrder(); ok {
-		_spec.AddField(boardissue.FieldSortOrder, field.TypeFloat64, value)
+		_spec.AddField(boardcard.FieldSortOrder, field.TypeFloat64, value)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
-		_spec.SetField(boardissue.FieldCreatedAt, field.TypeTime, value)
+		_spec.SetField(boardcard.FieldCreatedAt, field.TypeTime, value)
 	}
 	if _u.mutation.CreatedAtCleared() {
-		_spec.ClearField(boardissue.FieldCreatedAt, field.TypeTime)
+		_spec.ClearField(boardcard.FieldCreatedAt, field.TypeTime)
 	}
 	if _u.mutation.BoardCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   boardissue.BoardTable,
-			Columns: []string{boardissue.BoardColumn},
+			Table:   boardcard.BoardTable,
+			Columns: []string{boardcard.BoardColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeUUID),
@@ -242,8 +277,8 @@ func (_u *BoardIssueUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   boardissue.BoardTable,
-			Columns: []string{boardissue.BoardColumn},
+			Table:   boardcard.BoardTable,
+			Columns: []string{boardcard.BoardColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeUUID),
@@ -258,8 +293,8 @@ func (_u *BoardIssueUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   boardissue.ColumnTable,
-			Columns: []string{boardissue.ColumnColumn},
+			Table:   boardcard.ColumnTable,
+			Columns: []string{boardcard.ColumnColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(boardcolumn.FieldID, field.TypeUUID),
@@ -271,8 +306,8 @@ func (_u *BoardIssueUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   boardissue.ColumnTable,
-			Columns: []string{boardissue.ColumnColumn},
+			Table:   boardcard.ColumnTable,
+			Columns: []string{boardcard.ColumnColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(boardcolumn.FieldID, field.TypeUUID),
@@ -287,8 +322,8 @@ func (_u *BoardIssueUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   boardissue.IssueTable,
-			Columns: []string{boardissue.IssueColumn},
+			Table:   boardcard.IssueTable,
+			Columns: []string{boardcard.IssueColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(issue.FieldID, field.TypeUUID),
@@ -300,8 +335,8 @@ func (_u *BoardIssueUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   boardissue.IssueTable,
-			Columns: []string{boardissue.IssueColumn},
+			Table:   boardcard.IssueTable,
+			Columns: []string{boardcard.IssueColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(issue.FieldID, field.TypeUUID),
@@ -312,10 +347,39 @@ func (_u *BoardIssueUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.DiscussionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   boardcard.DiscussionTable,
+			Columns: []string{boardcard.DiscussionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   boardcard.DiscussionTable,
+			Columns: []string{boardcard.DiscussionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
-			err = &NotFoundError{boardissue.Label}
+			err = &NotFoundError{boardcard.Label}
 		} else if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -325,23 +389,23 @@ func (_u *BoardIssueUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 	return _node, nil
 }
 
-// BoardIssueUpdateOne is the builder for updating a single BoardIssue entity.
-type BoardIssueUpdateOne struct {
+// BoardCardUpdateOne is the builder for updating a single BoardCard entity.
+type BoardCardUpdateOne struct {
 	config
 	fields    []string
 	hooks     []Hook
-	mutation  *BoardIssueMutation
+	mutation  *BoardCardMutation
 	modifiers []func(*sql.UpdateBuilder)
 }
 
 // SetBoardID sets the "board_id" field.
-func (_u *BoardIssueUpdateOne) SetBoardID(v uuid.UUID) *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) SetBoardID(v uuid.UUID) *BoardCardUpdateOne {
 	_u.mutation.SetBoardID(v)
 	return _u
 }
 
 // SetNillableBoardID sets the "board_id" field if the given value is not nil.
-func (_u *BoardIssueUpdateOne) SetNillableBoardID(v *uuid.UUID) *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) SetNillableBoardID(v *uuid.UUID) *BoardCardUpdateOne {
 	if v != nil {
 		_u.SetBoardID(*v)
 	}
@@ -349,13 +413,13 @@ func (_u *BoardIssueUpdateOne) SetNillableBoardID(v *uuid.UUID) *BoardIssueUpdat
 }
 
 // SetColumnID sets the "column_id" field.
-func (_u *BoardIssueUpdateOne) SetColumnID(v uuid.UUID) *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) SetColumnID(v uuid.UUID) *BoardCardUpdateOne {
 	_u.mutation.SetColumnID(v)
 	return _u
 }
 
 // SetNillableColumnID sets the "column_id" field if the given value is not nil.
-func (_u *BoardIssueUpdateOne) SetNillableColumnID(v *uuid.UUID) *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) SetNillableColumnID(v *uuid.UUID) *BoardCardUpdateOne {
 	if v != nil {
 		_u.SetColumnID(*v)
 	}
@@ -363,28 +427,54 @@ func (_u *BoardIssueUpdateOne) SetNillableColumnID(v *uuid.UUID) *BoardIssueUpda
 }
 
 // SetIssueID sets the "issue_id" field.
-func (_u *BoardIssueUpdateOne) SetIssueID(v uuid.UUID) *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) SetIssueID(v uuid.UUID) *BoardCardUpdateOne {
 	_u.mutation.SetIssueID(v)
 	return _u
 }
 
 // SetNillableIssueID sets the "issue_id" field if the given value is not nil.
-func (_u *BoardIssueUpdateOne) SetNillableIssueID(v *uuid.UUID) *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) SetNillableIssueID(v *uuid.UUID) *BoardCardUpdateOne {
 	if v != nil {
 		_u.SetIssueID(*v)
 	}
 	return _u
 }
 
+// ClearIssueID clears the value of the "issue_id" field.
+func (_u *BoardCardUpdateOne) ClearIssueID() *BoardCardUpdateOne {
+	_u.mutation.ClearIssueID()
+	return _u
+}
+
+// SetDiscussionID sets the "discussion_id" field.
+func (_u *BoardCardUpdateOne) SetDiscussionID(v uuid.UUID) *BoardCardUpdateOne {
+	_u.mutation.SetDiscussionID(v)
+	return _u
+}
+
+// SetNillableDiscussionID sets the "discussion_id" field if the given value is not nil.
+func (_u *BoardCardUpdateOne) SetNillableDiscussionID(v *uuid.UUID) *BoardCardUpdateOne {
+	if v != nil {
+		_u.SetDiscussionID(*v)
+	}
+	return _u
+}
+
+// ClearDiscussionID clears the value of the "discussion_id" field.
+func (_u *BoardCardUpdateOne) ClearDiscussionID() *BoardCardUpdateOne {
+	_u.mutation.ClearDiscussionID()
+	return _u
+}
+
 // SetSortOrder sets the "sort_order" field.
-func (_u *BoardIssueUpdateOne) SetSortOrder(v float64) *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) SetSortOrder(v float64) *BoardCardUpdateOne {
 	_u.mutation.ResetSortOrder()
 	_u.mutation.SetSortOrder(v)
 	return _u
 }
 
 // SetNillableSortOrder sets the "sort_order" field if the given value is not nil.
-func (_u *BoardIssueUpdateOne) SetNillableSortOrder(v *float64) *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) SetNillableSortOrder(v *float64) *BoardCardUpdateOne {
 	if v != nil {
 		_u.SetSortOrder(*v)
 	}
@@ -392,19 +482,19 @@ func (_u *BoardIssueUpdateOne) SetNillableSortOrder(v *float64) *BoardIssueUpdat
 }
 
 // AddSortOrder adds value to the "sort_order" field.
-func (_u *BoardIssueUpdateOne) AddSortOrder(v float64) *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) AddSortOrder(v float64) *BoardCardUpdateOne {
 	_u.mutation.AddSortOrder(v)
 	return _u
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (_u *BoardIssueUpdateOne) SetCreatedAt(v time.Time) *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) SetCreatedAt(v time.Time) *BoardCardUpdateOne {
 	_u.mutation.SetCreatedAt(v)
 	return _u
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (_u *BoardIssueUpdateOne) SetNillableCreatedAt(v *time.Time) *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) SetNillableCreatedAt(v *time.Time) *BoardCardUpdateOne {
 	if v != nil {
 		_u.SetCreatedAt(*v)
 	}
@@ -412,69 +502,80 @@ func (_u *BoardIssueUpdateOne) SetNillableCreatedAt(v *time.Time) *BoardIssueUpd
 }
 
 // ClearCreatedAt clears the value of the "created_at" field.
-func (_u *BoardIssueUpdateOne) ClearCreatedAt() *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) ClearCreatedAt() *BoardCardUpdateOne {
 	_u.mutation.ClearCreatedAt()
 	return _u
 }
 
 // SetBoard sets the "board" edge to the Board entity.
-func (_u *BoardIssueUpdateOne) SetBoard(v *Board) *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) SetBoard(v *Board) *BoardCardUpdateOne {
 	return _u.SetBoardID(v.ID)
 }
 
 // SetColumn sets the "column" edge to the BoardColumn entity.
-func (_u *BoardIssueUpdateOne) SetColumn(v *BoardColumn) *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) SetColumn(v *BoardColumn) *BoardCardUpdateOne {
 	return _u.SetColumnID(v.ID)
 }
 
 // SetIssue sets the "issue" edge to the Issue entity.
-func (_u *BoardIssueUpdateOne) SetIssue(v *Issue) *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) SetIssue(v *Issue) *BoardCardUpdateOne {
 	return _u.SetIssueID(v.ID)
 }
 
-// Mutation returns the BoardIssueMutation object of the builder.
-func (_u *BoardIssueUpdateOne) Mutation() *BoardIssueMutation {
+// SetDiscussion sets the "discussion" edge to the Discussion entity.
+func (_u *BoardCardUpdateOne) SetDiscussion(v *Discussion) *BoardCardUpdateOne {
+	return _u.SetDiscussionID(v.ID)
+}
+
+// Mutation returns the BoardCardMutation object of the builder.
+func (_u *BoardCardUpdateOne) Mutation() *BoardCardMutation {
 	return _u.mutation
 }
 
 // ClearBoard clears the "board" edge to the Board entity.
-func (_u *BoardIssueUpdateOne) ClearBoard() *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) ClearBoard() *BoardCardUpdateOne {
 	_u.mutation.ClearBoard()
 	return _u
 }
 
 // ClearColumn clears the "column" edge to the BoardColumn entity.
-func (_u *BoardIssueUpdateOne) ClearColumn() *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) ClearColumn() *BoardCardUpdateOne {
 	_u.mutation.ClearColumn()
 	return _u
 }
 
 // ClearIssue clears the "issue" edge to the Issue entity.
-func (_u *BoardIssueUpdateOne) ClearIssue() *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) ClearIssue() *BoardCardUpdateOne {
 	_u.mutation.ClearIssue()
 	return _u
 }
 
-// Where appends a list predicates to the BoardIssueUpdate builder.
-func (_u *BoardIssueUpdateOne) Where(ps ...predicate.BoardIssue) *BoardIssueUpdateOne {
+// ClearDiscussion clears the "discussion" edge to the Discussion entity.
+func (_u *BoardCardUpdateOne) ClearDiscussion() *BoardCardUpdateOne {
+	_u.mutation.ClearDiscussion()
+	return _u
+}
+
+// Where appends a list predicates to the BoardCardUpdate builder.
+func (_u *BoardCardUpdateOne) Where(ps ...predicate.BoardCard) *BoardCardUpdateOne {
 	_u.mutation.Where(ps...)
 	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (_u *BoardIssueUpdateOne) Select(field string, fields ...string) *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) Select(field string, fields ...string) *BoardCardUpdateOne {
 	_u.fields = append([]string{field}, fields...)
 	return _u
 }
 
-// Save executes the query and returns the updated BoardIssue entity.
-func (_u *BoardIssueUpdateOne) Save(ctx context.Context) (*BoardIssue, error) {
+// Save executes the query and returns the updated BoardCard entity.
+func (_u *BoardCardUpdateOne) Save(ctx context.Context) (*BoardCard, error) {
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (_u *BoardIssueUpdateOne) SaveX(ctx context.Context) *BoardIssue {
+func (_u *BoardCardUpdateOne) SaveX(ctx context.Context) *BoardCard {
 	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -483,56 +584,53 @@ func (_u *BoardIssueUpdateOne) SaveX(ctx context.Context) *BoardIssue {
 }
 
 // Exec executes the query on the entity.
-func (_u *BoardIssueUpdateOne) Exec(ctx context.Context) error {
+func (_u *BoardCardUpdateOne) Exec(ctx context.Context) error {
 	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_u *BoardIssueUpdateOne) ExecX(ctx context.Context) {
+func (_u *BoardCardUpdateOne) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (_u *BoardIssueUpdateOne) check() error {
+func (_u *BoardCardUpdateOne) check() error {
 	if _u.mutation.BoardCleared() && len(_u.mutation.BoardIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "BoardIssue.board"`)
+		return errors.New(`ent: clearing a required unique edge "BoardCard.board"`)
 	}
 	if _u.mutation.ColumnCleared() && len(_u.mutation.ColumnIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "BoardIssue.column"`)
-	}
-	if _u.mutation.IssueCleared() && len(_u.mutation.IssueIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "BoardIssue.issue"`)
+		return errors.New(`ent: clearing a required unique edge "BoardCard.column"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (_u *BoardIssueUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *BoardIssueUpdateOne {
+func (_u *BoardCardUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *BoardCardUpdateOne {
 	_u.modifiers = append(_u.modifiers, modifiers...)
 	return _u
 }
 
-func (_u *BoardIssueUpdateOne) sqlSave(ctx context.Context) (_node *BoardIssue, err error) {
+func (_u *BoardCardUpdateOne) sqlSave(ctx context.Context) (_node *BoardCard, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(boardissue.Table, boardissue.Columns, sqlgraph.NewFieldSpec(boardissue.FieldID, field.TypeUUID))
+	_spec := sqlgraph.NewUpdateSpec(boardcard.Table, boardcard.Columns, sqlgraph.NewFieldSpec(boardcard.FieldID, field.TypeUUID))
 	id, ok := _u.mutation.ID()
 	if !ok {
-		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "BoardIssue.id" for update`)}
+		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "BoardCard.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
 	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, boardissue.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, boardcard.FieldID)
 		for _, f := range fields {
-			if !boardissue.ValidColumn(f) {
+			if !boardcard.ValidColumn(f) {
 				return nil, &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 			}
-			if f != boardissue.FieldID {
+			if f != boardcard.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, f)
 			}
 		}
@@ -545,23 +643,23 @@ func (_u *BoardIssueUpdateOne) sqlSave(ctx context.Context) (_node *BoardIssue, 
 		}
 	}
 	if value, ok := _u.mutation.SortOrder(); ok {
-		_spec.SetField(boardissue.FieldSortOrder, field.TypeFloat64, value)
+		_spec.SetField(boardcard.FieldSortOrder, field.TypeFloat64, value)
 	}
 	if value, ok := _u.mutation.AddedSortOrder(); ok {
-		_spec.AddField(boardissue.FieldSortOrder, field.TypeFloat64, value)
+		_spec.AddField(boardcard.FieldSortOrder, field.TypeFloat64, value)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
-		_spec.SetField(boardissue.FieldCreatedAt, field.TypeTime, value)
+		_spec.SetField(boardcard.FieldCreatedAt, field.TypeTime, value)
 	}
 	if _u.mutation.CreatedAtCleared() {
-		_spec.ClearField(boardissue.FieldCreatedAt, field.TypeTime)
+		_spec.ClearField(boardcard.FieldCreatedAt, field.TypeTime)
 	}
 	if _u.mutation.BoardCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   boardissue.BoardTable,
-			Columns: []string{boardissue.BoardColumn},
+			Table:   boardcard.BoardTable,
+			Columns: []string{boardcard.BoardColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeUUID),
@@ -573,8 +671,8 @@ func (_u *BoardIssueUpdateOne) sqlSave(ctx context.Context) (_node *BoardIssue, 
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   boardissue.BoardTable,
-			Columns: []string{boardissue.BoardColumn},
+			Table:   boardcard.BoardTable,
+			Columns: []string{boardcard.BoardColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeUUID),
@@ -589,8 +687,8 @@ func (_u *BoardIssueUpdateOne) sqlSave(ctx context.Context) (_node *BoardIssue, 
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   boardissue.ColumnTable,
-			Columns: []string{boardissue.ColumnColumn},
+			Table:   boardcard.ColumnTable,
+			Columns: []string{boardcard.ColumnColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(boardcolumn.FieldID, field.TypeUUID),
@@ -602,8 +700,8 @@ func (_u *BoardIssueUpdateOne) sqlSave(ctx context.Context) (_node *BoardIssue, 
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   boardissue.ColumnTable,
-			Columns: []string{boardissue.ColumnColumn},
+			Table:   boardcard.ColumnTable,
+			Columns: []string{boardcard.ColumnColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(boardcolumn.FieldID, field.TypeUUID),
@@ -618,8 +716,8 @@ func (_u *BoardIssueUpdateOne) sqlSave(ctx context.Context) (_node *BoardIssue, 
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   boardissue.IssueTable,
-			Columns: []string{boardissue.IssueColumn},
+			Table:   boardcard.IssueTable,
+			Columns: []string{boardcard.IssueColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(issue.FieldID, field.TypeUUID),
@@ -631,8 +729,8 @@ func (_u *BoardIssueUpdateOne) sqlSave(ctx context.Context) (_node *BoardIssue, 
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   boardissue.IssueTable,
-			Columns: []string{boardissue.IssueColumn},
+			Table:   boardcard.IssueTable,
+			Columns: []string{boardcard.IssueColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(issue.FieldID, field.TypeUUID),
@@ -643,13 +741,42 @@ func (_u *BoardIssueUpdateOne) sqlSave(ctx context.Context) (_node *BoardIssue, 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.DiscussionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   boardcard.DiscussionTable,
+			Columns: []string{boardcard.DiscussionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DiscussionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   boardcard.DiscussionTable,
+			Columns: []string{boardcard.DiscussionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(discussion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(_u.modifiers...)
-	_node = &BoardIssue{config: _u.config}
+	_node = &BoardCard{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
 	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
-			err = &NotFoundError{boardissue.Label}
+			err = &NotFoundError{boardcard.Label}
 		} else if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}

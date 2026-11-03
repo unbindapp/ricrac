@@ -5,6 +5,7 @@ package board_repo
 import (
 	"context"
 	"ricrac/ent"
+	"ricrac/internal/models"
 	repository "ricrac/internal/repositories"
 
 	"github.com/google/uuid"
@@ -24,18 +25,18 @@ type BoardRepositoryInterface interface {
 	Columns(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID) ([]*ent.BoardColumn, error)
 	CreateColumn(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, name string, color *string, position float64) error
 	UpdateColumn(ctx context.Context, tx repository.TxInterface, id uuid.UUID, name string, color *string, position float64) error
-	// DeleteColumns deletes the columns, taking their issues off the board.
+	// DeleteColumns deletes the columns, taking their cards off the board.
 	DeleteColumns(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) error
-	// Counts is how many visible issues each column of the boards holds.
-	Counts(ctx context.Context, boards []uuid.UUID, visible Visible) (map[uuid.UUID]int, error)
-	// Cards is the board's visible issues, column by column in their order.
-	Cards(ctx context.Context, filter CardFilter) ([]*ent.BoardIssue, error)
-	// Card is where the issue sits on the board, if it does.
-	Card(ctx context.Context, tx repository.TxInterface, boardID, issueID uuid.UUID) (*ent.BoardIssue, error)
+	// Counts is how many visible issues and discussions each column of the boards holds.
+	Counts(ctx context.Context, boards []uuid.UUID, visible Visible) (map[uuid.UUID]models.BoardColumnCounts, error)
+	// Cards is the board's visible issues or discussions, column by column in their order.
+	Cards(ctx context.Context, filter CardFilter) ([]*ent.BoardCard, error)
+	// Card is where the subject sits on the board, if it does.
+	Card(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, subject Subject) (*ent.BoardCard, error)
 	// LastSortOrder is the highest sort order in the column, 0 when it is empty.
 	LastSortOrder(ctx context.Context, tx repository.TxInterface, column uuid.UUID) (float64, error)
-	// Place puts the issue in the column at sortOrder, moving it there when it is already on the board.
-	Place(ctx context.Context, tx repository.TxInterface, boardID, column, issueID uuid.UUID, sortOrder float64) error
-	// Remove takes the issue off the board, saying whether it was on it.
-	Remove(ctx context.Context, tx repository.TxInterface, boardID, issueID uuid.UUID) (bool, error)
+	// Place puts the subject in the column at sortOrder, moving it there when it is already on the board.
+	Place(ctx context.Context, tx repository.TxInterface, boardID, column uuid.UUID, subject Subject, sortOrder float64) error
+	// Remove takes the subject off the board, saying whether it was on it.
+	Remove(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, subject Subject) (bool, error)
 }

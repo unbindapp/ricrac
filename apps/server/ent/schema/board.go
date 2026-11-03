@@ -31,7 +31,7 @@ func (Board) Edges() []ent.Edge {
 		edge.From("workspace", Workspace.Type).Ref("boards").Field("workspace_id").Unique().Required(),
 		edge.From("creator", User.Type).Ref("boards").Field("creator_id").Unique(),
 		edge.To("columns", BoardColumn.Type),
-		edge.To("board_issues", BoardIssue.Type),
+		edge.To("board_cards", BoardCard.Type),
 	}
 }
 

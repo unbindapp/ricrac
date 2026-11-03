@@ -47,6 +47,7 @@ func (Discussion) Edges() []ent.Edge {
 		edge.To("subscribers", User.Type).Through("discussion_subscribers", DiscussionSubscriber.Type),
 		edge.To("voters", User.Type).Through("discussion_votes", DiscussionVote.Type),
 		edge.To("versions", MessageVersion.Type),
+		edge.To("board_cards", BoardCard.Type),
 	}
 }
 

@@ -9,8 +9,10 @@ import (
 	"ricrac/internal/auth"
 	"ricrac/internal/common/args"
 	"ricrac/internal/models"
+	"ricrac/internal/repositories"
 	"ricrac/internal/services/discussion"
 
+	"github.com/google/uuid"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -766,6 +768,92 @@ func (_c *DiscussionServiceMock_Tags_Call) Return(pageOf args.PageOf[models.Disc
 }
 
 func (_c *DiscussionServiceMock_Tags_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *discussion_service.TagsInput) (args.PageOf[models.DiscussionTag], error)) *DiscussionServiceMock_Tags_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Values provides a mock function for the type DiscussionServiceMock
+func (_mock *DiscussionServiceMock) Values(ctx context.Context, tx repository.TxInterface, viewer uuid.UUID, ids []uuid.UUID, withBody bool) ([]models.Discussion, error) {
+	ret := _mock.Called(ctx, tx, viewer, ids, withBody)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Values")
+	}
+
+	var r0 []models.Discussion
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, []uuid.UUID, bool) ([]models.Discussion, error)); ok {
+		return returnFunc(ctx, tx, viewer, ids, withBody)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, []uuid.UUID, bool) []models.Discussion); ok {
+		r0 = returnFunc(ctx, tx, viewer, ids, withBody)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]models.Discussion)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, []uuid.UUID, bool) error); ok {
+		r1 = returnFunc(ctx, tx, viewer, ids, withBody)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// DiscussionServiceMock_Values_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Values'
+type DiscussionServiceMock_Values_Call struct {
+	*mock.Call
+}
+
+// Values is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx repository.TxInterface
+//   - viewer uuid.UUID
+//   - ids []uuid.UUID
+//   - withBody bool
+func (_e *DiscussionServiceMock_Expecter) Values(ctx any, tx any, viewer any, ids any, withBody any) *DiscussionServiceMock_Values_Call {
+	return &DiscussionServiceMock_Values_Call{Call: _e.mock.On("Values", ctx, tx, viewer, ids, withBody)}
+}
+
+func (_c *DiscussionServiceMock_Values_Call) Run(run func(ctx context.Context, tx repository.TxInterface, viewer uuid.UUID, ids []uuid.UUID, withBody bool)) *DiscussionServiceMock_Values_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 repository.TxInterface
+		if args[1] != nil {
+			arg1 = args[1].(repository.TxInterface)
+		}
+		var arg2 uuid.UUID
+		if args[2] != nil {
+			arg2 = args[2].(uuid.UUID)
+		}
+		var arg3 []uuid.UUID
+		if args[3] != nil {
+			arg3 = args[3].([]uuid.UUID)
+		}
+		var arg4 bool
+		if args[4] != nil {
+			arg4 = args[4].(bool)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+		)
+	})
+	return _c
+}
+
+func (_c *DiscussionServiceMock_Values_Call) Return(discussions []models.Discussion, err error) *DiscussionServiceMock_Values_Call {
+	_c.Call.Return(discussions, err)
+	return _c
+}
+
+func (_c *DiscussionServiceMock_Values_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, viewer uuid.UUID, ids []uuid.UUID, withBody bool) ([]models.Discussion, error)) *DiscussionServiceMock_Values_Call {
 	_c.Call.Return(run)
 	return _c
 }

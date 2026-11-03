@@ -50,6 +50,7 @@ var resourceTypes = []string{
 	"ReleaseNote",
 	"Board",
 	"BoardCard",
+	"BoardDiscussionCard",
 }
 
 //go:generate go run -mod=mod github.com/vburenin/ifacemaker -f "*.go" -i WebhookServiceInterface -p webhook_service -s WebhookService -o webhook_service_iface.go

@@ -5,8 +5,9 @@ package ent
 import (
 	"fmt"
 	"ricrac/ent/board"
+	"ricrac/ent/boardcard"
 	"ricrac/ent/boardcolumn"
-	"ricrac/ent/boardissue"
+	"ricrac/ent/discussion"
 	"ricrac/ent/issue"
 	"strings"
 	"time"
@@ -16,8 +17,8 @@ import (
 	"github.com/google/uuid"
 )
 
-// BoardIssue is the model entity for the BoardIssue schema.
-type BoardIssue struct {
+// BoardCard is the model entity for the BoardCard schema.
+type BoardCard struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
@@ -26,33 +27,37 @@ type BoardIssue struct {
 	// ColumnID holds the value of the "column_id" field.
 	ColumnID uuid.UUID `json:"column_id,omitempty"`
 	// IssueID holds the value of the "issue_id" field.
-	IssueID uuid.UUID `json:"issue_id,omitempty"`
+	IssueID *uuid.UUID `json:"issue_id,omitempty"`
+	// DiscussionID holds the value of the "discussion_id" field.
+	DiscussionID *uuid.UUID `json:"discussion_id,omitempty"`
 	// SortOrder holds the value of the "sort_order" field.
 	SortOrder float64 `json:"sort_order,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the BoardIssueQuery when eager-loading is set.
-	Edges        BoardIssueEdges `json:"edges"`
+	// The values are being populated by the BoardCardQuery when eager-loading is set.
+	Edges        BoardCardEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
-// BoardIssueEdges holds the relations/edges for other nodes in the graph.
-type BoardIssueEdges struct {
+// BoardCardEdges holds the relations/edges for other nodes in the graph.
+type BoardCardEdges struct {
 	// Board holds the value of the board edge.
 	Board *Board `json:"board,omitempty"`
 	// Column holds the value of the column edge.
 	Column *BoardColumn `json:"column,omitempty"`
 	// Issue holds the value of the issue edge.
 	Issue *Issue `json:"issue,omitempty"`
+	// Discussion holds the value of the discussion edge.
+	Discussion *Discussion `json:"discussion,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // BoardOrErr returns the Board value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e BoardIssueEdges) BoardOrErr() (*Board, error) {
+func (e BoardCardEdges) BoardOrErr() (*Board, error) {
 	if e.Board != nil {
 		return e.Board, nil
 	} else if e.loadedTypes[0] {
@@ -63,7 +68,7 @@ func (e BoardIssueEdges) BoardOrErr() (*Board, error) {
 
 // ColumnOrErr returns the Column value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e BoardIssueEdges) ColumnOrErr() (*BoardColumn, error) {
+func (e BoardCardEdges) ColumnOrErr() (*BoardColumn, error) {
 	if e.Column != nil {
 		return e.Column, nil
 	} else if e.loadedTypes[1] {
@@ -74,7 +79,7 @@ func (e BoardIssueEdges) ColumnOrErr() (*BoardColumn, error) {
 
 // IssueOrErr returns the Issue value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e BoardIssueEdges) IssueOrErr() (*Issue, error) {
+func (e BoardCardEdges) IssueOrErr() (*Issue, error) {
 	if e.Issue != nil {
 		return e.Issue, nil
 	} else if e.loadedTypes[2] {
@@ -83,16 +88,29 @@ func (e BoardIssueEdges) IssueOrErr() (*Issue, error) {
 	return nil, &NotLoadedError{edge: "issue"}
 }
 
+// DiscussionOrErr returns the Discussion value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e BoardCardEdges) DiscussionOrErr() (*Discussion, error) {
+	if e.Discussion != nil {
+		return e.Discussion, nil
+	} else if e.loadedTypes[3] {
+		return nil, &NotFoundError{label: discussion.Label}
+	}
+	return nil, &NotLoadedError{edge: "discussion"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
-func (*BoardIssue) scanValues(columns []string) ([]any, error) {
+func (*BoardCard) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case boardissue.FieldSortOrder:
+		case boardcard.FieldIssueID, boardcard.FieldDiscussionID:
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case boardcard.FieldSortOrder:
 			values[i] = new(sql.NullFloat64)
-		case boardissue.FieldCreatedAt:
+		case boardcard.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
-		case boardissue.FieldID, boardissue.FieldBoardID, boardissue.FieldColumnID, boardissue.FieldIssueID:
+		case boardcard.FieldID, boardcard.FieldBoardID, boardcard.FieldColumnID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -102,44 +120,52 @@ func (*BoardIssue) scanValues(columns []string) ([]any, error) {
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the BoardIssue fields.
-func (_m *BoardIssue) assignValues(columns []string, values []any) error {
+// to the BoardCard fields.
+func (_m *BoardCard) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case boardissue.FieldID:
+		case boardcard.FieldID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				_m.ID = *value
 			}
-		case boardissue.FieldBoardID:
+		case boardcard.FieldBoardID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field board_id", values[i])
 			} else if value != nil {
 				_m.BoardID = *value
 			}
-		case boardissue.FieldColumnID:
+		case boardcard.FieldColumnID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field column_id", values[i])
 			} else if value != nil {
 				_m.ColumnID = *value
 			}
-		case boardissue.FieldIssueID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+		case boardcard.FieldIssueID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field issue_id", values[i])
-			} else if value != nil {
-				_m.IssueID = *value
+			} else if value.Valid {
+				_m.IssueID = new(uuid.UUID)
+				*_m.IssueID = *value.S.(*uuid.UUID)
 			}
-		case boardissue.FieldSortOrder:
+		case boardcard.FieldDiscussionID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field discussion_id", values[i])
+			} else if value.Valid {
+				_m.DiscussionID = new(uuid.UUID)
+				*_m.DiscussionID = *value.S.(*uuid.UUID)
+			}
+		case boardcard.FieldSortOrder:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field sort_order", values[i])
 			} else if value.Valid {
 				_m.SortOrder = value.Float64
 			}
-		case boardissue.FieldCreatedAt:
+		case boardcard.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
@@ -152,49 +178,54 @@ func (_m *BoardIssue) assignValues(columns []string, values []any) error {
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the BoardIssue.
+// Value returns the ent.Value that was dynamically selected and assigned to the BoardCard.
 // This includes values selected through modifiers, order, etc.
-func (_m *BoardIssue) Value(name string) (ent.Value, error) {
+func (_m *BoardCard) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
 }
 
-// QueryBoard queries the "board" edge of the BoardIssue entity.
-func (_m *BoardIssue) QueryBoard() *BoardQuery {
-	return NewBoardIssueClient(_m.config).QueryBoard(_m)
+// QueryBoard queries the "board" edge of the BoardCard entity.
+func (_m *BoardCard) QueryBoard() *BoardQuery {
+	return NewBoardCardClient(_m.config).QueryBoard(_m)
 }
 
-// QueryColumn queries the "column" edge of the BoardIssue entity.
-func (_m *BoardIssue) QueryColumn() *BoardColumnQuery {
-	return NewBoardIssueClient(_m.config).QueryColumn(_m)
+// QueryColumn queries the "column" edge of the BoardCard entity.
+func (_m *BoardCard) QueryColumn() *BoardColumnQuery {
+	return NewBoardCardClient(_m.config).QueryColumn(_m)
 }
 
-// QueryIssue queries the "issue" edge of the BoardIssue entity.
-func (_m *BoardIssue) QueryIssue() *IssueQuery {
-	return NewBoardIssueClient(_m.config).QueryIssue(_m)
+// QueryIssue queries the "issue" edge of the BoardCard entity.
+func (_m *BoardCard) QueryIssue() *IssueQuery {
+	return NewBoardCardClient(_m.config).QueryIssue(_m)
 }
 
-// Update returns a builder for updating this BoardIssue.
-// Note that you need to call BoardIssue.Unwrap() before calling this method if this BoardIssue
+// QueryDiscussion queries the "discussion" edge of the BoardCard entity.
+func (_m *BoardCard) QueryDiscussion() *DiscussionQuery {
+	return NewBoardCardClient(_m.config).QueryDiscussion(_m)
+}
+
+// Update returns a builder for updating this BoardCard.
+// Note that you need to call BoardCard.Unwrap() before calling this method if this BoardCard
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (_m *BoardIssue) Update() *BoardIssueUpdateOne {
-	return NewBoardIssueClient(_m.config).UpdateOne(_m)
+func (_m *BoardCard) Update() *BoardCardUpdateOne {
+	return NewBoardCardClient(_m.config).UpdateOne(_m)
 }
 
-// Unwrap unwraps the BoardIssue entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the BoardCard entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (_m *BoardIssue) Unwrap() *BoardIssue {
+func (_m *BoardCard) Unwrap() *BoardCard {
 	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: BoardIssue is not a transactional entity")
+		panic("ent: BoardCard is not a transactional entity")
 	}
 	_m.config.driver = _tx.drv
 	return _m
 }
 
 // String implements the fmt.Stringer.
-func (_m *BoardIssue) String() string {
+func (_m *BoardCard) String() string {
 	var builder strings.Builder
-	builder.WriteString("BoardIssue(")
+	builder.WriteString("BoardCard(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("board_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.BoardID))
@@ -202,8 +233,15 @@ func (_m *BoardIssue) String() string {
 	builder.WriteString("column_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.ColumnID))
 	builder.WriteString(", ")
-	builder.WriteString("issue_id=")
-	builder.WriteString(fmt.Sprintf("%v", _m.IssueID))
+	if v := _m.IssueID; v != nil {
+		builder.WriteString("issue_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.DiscussionID; v != nil {
+		builder.WriteString("discussion_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("sort_order=")
 	builder.WriteString(fmt.Sprintf("%v", _m.SortOrder))
@@ -214,5 +252,5 @@ func (_m *BoardIssue) String() string {
 	return builder.String()
 }
 
-// BoardIssues is a parsable slice of BoardIssue.
-type BoardIssues []*BoardIssue
+// BoardCards is a parsable slice of BoardCard.
+type BoardCards []*BoardCard

@@ -9,11 +9,13 @@ import (
 
 	"ricrac/ent"
 	"ricrac/ent/board"
+	"ricrac/ent/boardcard"
 	"ricrac/ent/boardcolumn"
-	"ricrac/ent/boardissue"
+	"ricrac/ent/discussion"
 	"ricrac/ent/issue"
 	"ricrac/ent/issueshare"
 	"ricrac/ent/predicate"
+	"ricrac/internal/models"
 	repository "ricrac/internal/repositories"
 )
 
@@ -142,7 +144,7 @@ func (self *BoardRepository) UpdateColumn(ctx context.Context, tx repository.TxI
 	return update.Exec(ctx)
 }
 
-// DeleteColumns deletes the columns, taking their issues off the board.
+// DeleteColumns deletes the columns, taking their cards off the board.
 func (self *BoardRepository) DeleteColumns(ctx context.Context, tx repository.TxInterface, ids []uuid.UUID) error {
 	if len(ids) == 0 {
 		return nil
@@ -151,63 +153,99 @@ func (self *BoardRepository) DeleteColumns(ctx context.Context, tx repository.Tx
 	return err
 }
 
-// Visible narrows board issues to live issues of these teams, and those shared with viewer.
+// Visible narrows cards to live issues of these teams and those shared with viewer, and to live
+// discussions of the workspace or of these teams.
 type Visible struct {
 	Teams  []uuid.UUID
 	Viewer uuid.UUID
 }
 
-func (v Visible) issues() predicate.Issue {
-	return issue.And(issue.TrashedAtIsNil(), issue.ArchivedAtIsNil(),
+func (v Visible) cards() predicate.BoardCard {
+	issues := issue.And(issue.TrashedAtIsNil(), issue.ArchivedAtIsNil(),
 		issue.Or(issue.TeamIDIn(v.Teams...), issue.HasIssueSharesWith(issueshare.UserID(v.Viewer))))
+	discussions := discussion.And(discussion.TrashedAtIsNil(),
+		discussion.Or(discussion.TeamIDIsNil(), discussion.TeamIDIn(v.Teams...)))
+	return boardcard.Or(boardcard.HasIssueWith(issues), boardcard.HasDiscussionWith(discussions))
 }
 
-// Counts is how many visible issues each column of the boards holds.
-func (self *BoardRepository) Counts(ctx context.Context, boards []uuid.UUID, visible Visible) (map[uuid.UUID]int, error) {
+// Subject is what a card holds: an issue or a discussion.
+type Subject struct {
+	Issue, Discussion *uuid.UUID
+}
+
+func IssueSubject(id uuid.UUID) Subject { return Subject{Issue: &id} }
+
+func DiscussionSubject(id uuid.UUID) Subject { return Subject{Discussion: &id} }
+
+func (s Subject) is() predicate.BoardCard {
+	if s.Issue != nil {
+		return boardcard.IssueID(*s.Issue)
+	}
+	return boardcard.DiscussionID(*s.Discussion)
+}
+
+func (s Subject) column() string {
+	if s.Issue != nil {
+		return boardcard.FieldIssueID
+	}
+	return boardcard.FieldDiscussionID
+}
+
+// Counts is how many visible issues and discussions each column of the boards holds.
+func (self *BoardRepository) Counts(ctx context.Context, boards []uuid.UUID, visible Visible) (map[uuid.UUID]models.BoardColumnCounts, error) {
 	var rows []struct {
 		ColumnID uuid.UUID `json:"column_id"`
+		Issues   int       `json:"issues"`
 		Count    int       `json:"count"`
 	}
-	err := self.base.DB.BoardIssue.Query().
-		Where(boardissue.BoardIDIn(boards...), boardissue.HasIssueWith(visible.issues())).
-		GroupBy(boardissue.FieldColumnID).Aggregate(ent.Count()).Scan(ctx, &rows)
+	err := self.base.DB.BoardCard.Query().
+		Where(boardcard.BoardIDIn(boards...), visible.cards()).
+		GroupBy(boardcard.FieldColumnID).
+		Aggregate(ent.Count(), func(s *entsql.Selector) string {
+			return entsql.As("count("+s.C(boardcard.FieldIssueID)+")", "issues")
+		}).Scan(ctx, &rows)
 	if err != nil {
 		return nil, err
 	}
-	counts := make(map[uuid.UUID]int, len(rows))
+	counts := make(map[uuid.UUID]models.BoardColumnCounts, len(rows))
 	for _, row := range rows {
-		counts[row.ColumnID] = row.Count
+		counts[row.ColumnID] = models.BoardColumnCounts{Issues: row.Issues, Discussions: row.Count - row.Issues}
 	}
 	return counts, nil
 }
 
 type CardFilter struct {
-	Board   uuid.UUID
-	Column  *uuid.UUID
-	Visible Visible
-	Limit   int64
-	Offset  int64
+	Board  uuid.UUID
+	Column *uuid.UUID
+	// Discussions lists the discussion cards instead of the issue cards.
+	Discussions bool
+	Visible     Visible
+	Limit       int64
+	Offset      int64
 }
 
-// Cards is the board's visible issues, column by column in their order.
-func (self *BoardRepository) Cards(ctx context.Context, filter CardFilter) ([]*ent.BoardIssue, error) {
-	query := self.base.DB.BoardIssue.Query().
-		Where(boardissue.BoardID(filter.Board), boardissue.HasIssueWith(filter.Visible.issues()))
+// Cards is the board's visible issues or discussions, column by column in their order.
+func (self *BoardRepository) Cards(ctx context.Context, filter CardFilter) ([]*ent.BoardCard, error) {
+	kind := boardcard.IssueIDNotNil()
+	if filter.Discussions {
+		kind = boardcard.DiscussionIDNotNil()
+	}
+	query := self.base.DB.BoardCard.Query().Where(boardcard.BoardID(filter.Board), kind, filter.Visible.cards())
 	if filter.Column != nil {
-		query = query.Where(boardissue.ColumnID(*filter.Column))
+		query = query.Where(boardcard.ColumnID(*filter.Column))
 	}
 	return query.WithColumn().Modify(func(s *entsql.Selector) {
 		columns := entsql.Table(boardcolumn.Table).As("c")
-		s.Join(columns).On(s.C(boardissue.FieldColumnID), columns.C(boardcolumn.FieldID))
-		s.OrderBy(columns.C(boardcolumn.FieldPosition), s.C(boardissue.FieldSortOrder), s.C(boardissue.FieldCreatedAt))
+		s.Join(columns).On(s.C(boardcard.FieldColumnID), columns.C(boardcolumn.FieldID))
+		s.OrderBy(columns.C(boardcolumn.FieldPosition), s.C(boardcard.FieldSortOrder), s.C(boardcard.FieldCreatedAt))
 		s.Limit(int(filter.Limit)).Offset(int(filter.Offset))
 	}).All(ctx)
 }
 
-// Card is where the issue sits on the board, if it does.
-func (self *BoardRepository) Card(ctx context.Context, tx repository.TxInterface, boardID, issueID uuid.UUID) (*ent.BoardIssue, error) {
-	found, err := self.base.Client(tx).BoardIssue.Query().
-		Where(boardissue.BoardID(boardID), boardissue.IssueID(issueID)).WithColumn().Only(ctx)
+// Card is where the subject sits on the board, if it does.
+func (self *BoardRepository) Card(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, subject Subject) (*ent.BoardCard, error) {
+	found, err := self.base.Client(tx).BoardCard.Query().
+		Where(boardcard.BoardID(boardID), subject.is()).WithColumn().Only(ctx)
 	if ent.IsNotFound(err) {
 		return nil, nil
 	}
@@ -219,26 +257,27 @@ func (self *BoardRepository) LastSortOrder(ctx context.Context, tx repository.Tx
 	var rows []struct {
 		Max *float64 `json:"max"`
 	}
-	err := self.base.Client(tx).BoardIssue.Query().Where(boardissue.ColumnID(column)).
-		Aggregate(ent.Max(boardissue.FieldSortOrder)).Scan(ctx, &rows)
+	err := self.base.Client(tx).BoardCard.Query().Where(boardcard.ColumnID(column)).
+		Aggregate(ent.Max(boardcard.FieldSortOrder)).Scan(ctx, &rows)
 	if err != nil || len(rows) == 0 || rows[0].Max == nil {
 		return 0, err
 	}
 	return *rows[0].Max, nil
 }
 
-// Place puts the issue in the column at sortOrder, moving it there when it is already on the board.
-func (self *BoardRepository) Place(ctx context.Context, tx repository.TxInterface, boardID, column, issueID uuid.UUID, sortOrder float64) error {
-	return self.base.Client(tx).BoardIssue.Create().
-		SetBoardID(boardID).SetColumnID(column).SetIssueID(issueID).SetSortOrder(sortOrder).
-		OnConflictColumns(boardissue.FieldBoardID, boardissue.FieldIssueID).
-		Update(func(u *ent.BoardIssueUpsert) { u.UpdateColumnID().UpdateSortOrder() }).
+// Place puts the subject in the column at sortOrder, moving it there when it is already on the board.
+func (self *BoardRepository) Place(ctx context.Context, tx repository.TxInterface, boardID, column uuid.UUID, subject Subject, sortOrder float64) error {
+	return self.base.Client(tx).BoardCard.Create().
+		SetBoardID(boardID).SetColumnID(column).SetNillableIssueID(subject.Issue).SetNillableDiscussionID(subject.Discussion).
+		SetSortOrder(sortOrder).
+		OnConflictColumns(boardcard.FieldBoardID, subject.column()).
+		Update(func(u *ent.BoardCardUpsert) { u.UpdateColumnID().UpdateSortOrder() }).
 		Exec(ctx)
 }
 
-// Remove takes the issue off the board, saying whether it was on it.
-func (self *BoardRepository) Remove(ctx context.Context, tx repository.TxInterface, boardID, issueID uuid.UUID) (bool, error) {
-	removed, err := self.base.Client(tx).BoardIssue.Delete().
-		Where(boardissue.BoardID(boardID), boardissue.IssueID(issueID)).Exec(ctx)
+// Remove takes the subject off the board, saying whether it was on it.
+func (self *BoardRepository) Remove(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, subject Subject) (bool, error) {
+	removed, err := self.base.Client(tx).BoardCard.Delete().
+		Where(boardcard.BoardID(boardID), subject.is()).Exec(ctx)
 	return removed > 0, err
 }

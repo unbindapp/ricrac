@@ -109,7 +109,7 @@ func (self *DiscussionService) List(ctx context.Context, actor *auth.Actor, inpu
 	if err != nil {
 		return args.PageOf[models.Discussion]{}, err
 	}
-	discussions, err := self.values(ctx, nil, actor.User, ids, input.IncludeBody)
+	discussions, err := self.Values(ctx, nil, actor.User, ids, input.IncludeBody)
 	if err != nil {
 		return args.PageOf[models.Discussion]{}, err
 	}

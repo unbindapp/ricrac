@@ -1099,6 +1099,29 @@ func HasVersionsWith(preds ...predicate.MessageVersion) predicate.Discussion {
 	})
 }
 
+// HasBoardCards applies the HasEdge predicate on the "board_cards" edge.
+func HasBoardCards() predicate.Discussion {
+	return predicate.Discussion(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, BoardCardsTable, BoardCardsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasBoardCardsWith applies the HasEdge predicate on the "board_cards" edge with a given conditions (other predicates).
+func HasBoardCardsWith(preds ...predicate.BoardCard) predicate.Discussion {
+	return predicate.Discussion(func(s *sql.Selector) {
+		step := newBoardCardsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasDiscussionSubscribers applies the HasEdge predicate on the "discussion_subscribers" edge.
 func HasDiscussionSubscribers() predicate.Discussion {
 	return predicate.Discussion(func(s *sql.Selector) {

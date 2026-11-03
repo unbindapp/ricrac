@@ -7,10 +7,14 @@ import (
 	"ricrac/internal/auth"
 	"ricrac/internal/common/args"
 	"ricrac/internal/models"
+	repository "ricrac/internal/repositories"
+
+	"github.com/google/uuid"
 )
 
 // DiscussionServiceInterface ...
 type DiscussionServiceInterface interface {
+	Values(ctx context.Context, tx repository.TxInterface, viewer uuid.UUID, ids []uuid.UUID, withBody bool) ([]models.Discussion, error)
 	List(ctx context.Context, actor *auth.Actor, input *ListInput) (args.PageOf[models.Discussion], error)
 	Get(ctx context.Context, actor *auth.Actor, input *IDInput) (models.DiscussionDetail, error)
 	Save(ctx context.Context, actor *auth.Actor, input *SaveInput) (models.DiscussionDetail, error)

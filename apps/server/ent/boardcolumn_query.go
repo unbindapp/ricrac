@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"math"
 	"ricrac/ent/board"
+	"ricrac/ent/boardcard"
 	"ricrac/ent/boardcolumn"
-	"ricrac/ent/boardissue"
 	"ricrac/ent/predicate"
 
 	"entgo.io/ent"
@@ -23,13 +23,13 @@ import (
 // BoardColumnQuery is the builder for querying BoardColumn entities.
 type BoardColumnQuery struct {
 	config
-	ctx             *QueryContext
-	order           []boardcolumn.OrderOption
-	inters          []Interceptor
-	predicates      []predicate.BoardColumn
-	withBoard       *BoardQuery
-	withBoardIssues *BoardIssueQuery
-	modifiers       []func(*sql.Selector)
+	ctx            *QueryContext
+	order          []boardcolumn.OrderOption
+	inters         []Interceptor
+	predicates     []predicate.BoardColumn
+	withBoard      *BoardQuery
+	withBoardCards *BoardCardQuery
+	modifiers      []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -88,9 +88,9 @@ func (_q *BoardColumnQuery) QueryBoard() *BoardQuery {
 	return query
 }
 
-// QueryBoardIssues chains the current query on the "board_issues" edge.
-func (_q *BoardColumnQuery) QueryBoardIssues() *BoardIssueQuery {
-	query := (&BoardIssueClient{config: _q.config}).Query()
+// QueryBoardCards chains the current query on the "board_cards" edge.
+func (_q *BoardColumnQuery) QueryBoardCards() *BoardCardQuery {
+	query := (&BoardCardClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -101,8 +101,8 @@ func (_q *BoardColumnQuery) QueryBoardIssues() *BoardIssueQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(boardcolumn.Table, boardcolumn.FieldID, selector),
-			sqlgraph.To(boardissue.Table, boardissue.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, boardcolumn.BoardIssuesTable, boardcolumn.BoardIssuesColumn),
+			sqlgraph.To(boardcard.Table, boardcard.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, boardcolumn.BoardCardsTable, boardcolumn.BoardCardsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -297,13 +297,13 @@ func (_q *BoardColumnQuery) Clone() *BoardColumnQuery {
 		return nil
 	}
 	return &BoardColumnQuery{
-		config:          _q.config,
-		ctx:             _q.ctx.Clone(),
-		order:           append([]boardcolumn.OrderOption{}, _q.order...),
-		inters:          append([]Interceptor{}, _q.inters...),
-		predicates:      append([]predicate.BoardColumn{}, _q.predicates...),
-		withBoard:       _q.withBoard.Clone(),
-		withBoardIssues: _q.withBoardIssues.Clone(),
+		config:         _q.config,
+		ctx:            _q.ctx.Clone(),
+		order:          append([]boardcolumn.OrderOption{}, _q.order...),
+		inters:         append([]Interceptor{}, _q.inters...),
+		predicates:     append([]predicate.BoardColumn{}, _q.predicates...),
+		withBoard:      _q.withBoard.Clone(),
+		withBoardCards: _q.withBoardCards.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
 		path:      _q.path,
@@ -322,14 +322,14 @@ func (_q *BoardColumnQuery) WithBoard(opts ...func(*BoardQuery)) *BoardColumnQue
 	return _q
 }
 
-// WithBoardIssues tells the query-builder to eager-load the nodes that are connected to
-// the "board_issues" edge. The optional arguments are used to configure the query builder of the edge.
-func (_q *BoardColumnQuery) WithBoardIssues(opts ...func(*BoardIssueQuery)) *BoardColumnQuery {
-	query := (&BoardIssueClient{config: _q.config}).Query()
+// WithBoardCards tells the query-builder to eager-load the nodes that are connected to
+// the "board_cards" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *BoardColumnQuery) WithBoardCards(opts ...func(*BoardCardQuery)) *BoardColumnQuery {
+	query := (&BoardCardClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	_q.withBoardIssues = query
+	_q.withBoardCards = query
 	return _q
 }
 
@@ -413,7 +413,7 @@ func (_q *BoardColumnQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 		_spec       = _q.querySpec()
 		loadedTypes = [2]bool{
 			_q.withBoard != nil,
-			_q.withBoardIssues != nil,
+			_q.withBoardCards != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -443,10 +443,10 @@ func (_q *BoardColumnQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 			return nil, err
 		}
 	}
-	if query := _q.withBoardIssues; query != nil {
-		if err := _q.loadBoardIssues(ctx, query, nodes,
-			func(n *BoardColumn) { n.Edges.BoardIssues = []*BoardIssue{} },
-			func(n *BoardColumn, e *BoardIssue) { n.Edges.BoardIssues = append(n.Edges.BoardIssues, e) }); err != nil {
+	if query := _q.withBoardCards; query != nil {
+		if err := _q.loadBoardCards(ctx, query, nodes,
+			func(n *BoardColumn) { n.Edges.BoardCards = []*BoardCard{} },
+			func(n *BoardColumn, e *BoardCard) { n.Edges.BoardCards = append(n.Edges.BoardCards, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -482,7 +482,7 @@ func (_q *BoardColumnQuery) loadBoard(ctx context.Context, query *BoardQuery, no
 	}
 	return nil
 }
-func (_q *BoardColumnQuery) loadBoardIssues(ctx context.Context, query *BoardIssueQuery, nodes []*BoardColumn, init func(*BoardColumn), assign func(*BoardColumn, *BoardIssue)) error {
+func (_q *BoardColumnQuery) loadBoardCards(ctx context.Context, query *BoardCardQuery, nodes []*BoardColumn, init func(*BoardColumn), assign func(*BoardColumn, *BoardCard)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[uuid.UUID]*BoardColumn)
 	for i := range nodes {
@@ -493,10 +493,10 @@ func (_q *BoardColumnQuery) loadBoardIssues(ctx context.Context, query *BoardIss
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(boardissue.FieldColumnID)
+		query.ctx.AppendFieldOnce(boardcard.FieldColumnID)
 	}
-	query.Where(predicate.BoardIssue(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(boardcolumn.BoardIssuesColumn), fks...))
+	query.Where(predicate.BoardCard(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(boardcolumn.BoardCardsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

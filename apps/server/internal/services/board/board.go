@@ -1,5 +1,5 @@
-// Package board_service is boards: columns of one's own choosing that issues are placed in,
-// apart from their workflow status.
+// Package board_service is boards: columns of one's own choosing that issues and discussions are
+// placed in, apart from their workflow status.
 package board_service
 
 import (
@@ -18,6 +18,7 @@ import (
 	repository "ricrac/internal/repositories"
 	board_repo "ricrac/internal/repositories/board"
 	"ricrac/internal/repositories/repositories"
+	discussion_service "ricrac/internal/services/discussion"
 	events_service "ricrac/internal/services/events"
 	issue_service "ricrac/internal/services/issue"
 	resolve_service "ricrac/internal/services/resolve"
@@ -27,15 +28,16 @@ var defaultColumns = []string{"Ideas", "Backlog", "Doing", "Done"}
 
 //go:generate go run -mod=mod github.com/vburenin/ifacemaker -f "*.go" -i BoardServiceInterface -p board_service -s BoardService -o board_service_iface.go
 type BoardService struct {
-	cfg     config.Config
-	repo    repositories.RepositoriesInterface
-	resolve resolve_service.ResolveServiceInterface
-	events  events_service.EventsServiceInterface
-	issues  issue_service.IssueServiceInterface
+	cfg         config.Config
+	repo        repositories.RepositoriesInterface
+	resolve     resolve_service.ResolveServiceInterface
+	events      events_service.EventsServiceInterface
+	issues      issue_service.IssueServiceInterface
+	discussions discussion_service.DiscussionServiceInterface
 }
 
-func NewBoardService(cfg config.Config, repo repositories.RepositoriesInterface, resolve resolve_service.ResolveServiceInterface, events events_service.EventsServiceInterface, issues issue_service.IssueServiceInterface) *BoardService {
-	return &BoardService{cfg: cfg, repo: repo, resolve: resolve, events: events, issues: issues}
+func NewBoardService(cfg config.Config, repo repositories.RepositoriesInterface, resolve resolve_service.ResolveServiceInterface, events events_service.EventsServiceInterface, issues issue_service.IssueServiceInterface, discussions discussion_service.DiscussionServiceInterface) *BoardService {
+	return &BoardService{cfg: cfg, repo: repo, resolve: resolve, events: events, issues: issues, discussions: discussions}
 }
 
 type ListInput struct {
@@ -57,7 +59,7 @@ type SaveInput struct {
 	ID          *string               `json:"id" doc:"Only to update a board: its id, slug, link or name. Omit to create one."`
 	Name        *string               `json:"name" doc:"Required to create."`
 	Description args.Nullable[string] `json:"description"`
-	Columns     []ColumnInput         `json:"columns" doc:"All the board's columns, in order. Columns left out are removed and their issues taken off the board (the issues stay). New boards start with Ideas, Backlog, Doing and Done."`
+	Columns     []ColumnInput         `json:"columns" doc:"All the board's columns, in order. Columns left out are removed and their cards taken off the board (the issues and discussions stay). New boards start with Ideas, Backlog, Doing and Done."`
 }
 
 type ListIssuesInput struct {
@@ -76,6 +78,25 @@ type PlaceInput struct {
 type RemoveInput struct {
 	Board string `json:"board" doc:"The board's id, slug, link or name."`
 	Issue string `json:"issue" doc:"The issue: identifier like ENG-123, id or link."`
+}
+
+type ListDiscussionsInput struct {
+	Board       string  `json:"board" doc:"The board's id, slug, link or name."`
+	Column      *string `json:"column" doc:"Only this column (name or id)."`
+	IncludeBody bool    `json:"includeBody,omitempty" doc:"Include each discussion's body."`
+	args.Page
+}
+
+type PlaceDiscussionInput struct {
+	Board      string   `json:"board" doc:"The board's id, slug, link or name."`
+	Discussion string   `json:"discussion" doc:"The discussion's id, slug, link or title."`
+	Column     string   `json:"column" doc:"The column (name or id) to put it in."`
+	SortOrder  *float64 `json:"sortOrder" doc:"Order in the column, lowest first, among its issues and discussions. By default it keeps its place when already in the column, else goes last."`
+}
+
+type RemoveDiscussionInput struct {
+	Board      string `json:"board" doc:"The board's id, slug, link or name."`
+	Discussion string `json:"discussion" doc:"The discussion's id, slug, link or title."`
 }
 
 func visibleTo(ctx context.Context, actor *auth.Actor) (board_repo.Visible, error) {
@@ -353,38 +374,43 @@ func (self *BoardService) column(ctx context.Context, tx repository.TxInterface,
 	return nil, errdefs.BadRequest("The board has no column %q. %s", value, utils.Options(names))
 }
 
-func (self *BoardService) ListIssues(ctx context.Context, actor *auth.Actor, input *ListIssuesInput) (args.PageOf[models.BoardCard], error) {
-	id, err := self.resolve.Board(ctx, actor, input.Board)
+func (self *BoardService) cards(ctx context.Context, actor *auth.Actor, boardValue string, columnValue *string, page args.Page, discussions bool) (*ent.Board, []*ent.BoardCard, error) {
+	id, err := self.resolve.Board(ctx, actor, boardValue)
 	if err != nil {
-		return args.PageOf[models.BoardCard]{}, err
+		return nil, nil, err
 	}
 	board, err := self.repo.Board().Load(ctx, nil, id)
 	if err != nil {
-		return args.PageOf[models.BoardCard]{}, err
+		return nil, nil, err
 	}
 	visible, err := visibleTo(ctx, actor)
 	if err != nil {
-		return args.PageOf[models.BoardCard]{}, err
+		return nil, nil, err
 	}
-	filter := board_repo.CardFilter{Board: id, Visible: visible}
-	if input.Column != nil {
-		column, err := self.column(ctx, nil, id, *input.Column)
+	filter := board_repo.CardFilter{Board: id, Discussions: discussions, Visible: visible}
+	if columnValue != nil {
+		column, err := self.column(ctx, nil, id, *columnValue)
 		if err != nil {
-			return args.PageOf[models.BoardCard]{}, err
+			return nil, nil, err
 		}
 		filter.Column = &column.ID
 	}
-	if filter.Offset, err = input.Offset(); err != nil {
-		return args.PageOf[models.BoardCard]{}, err
+	if filter.Offset, err = page.Offset(); err != nil {
+		return nil, nil, err
 	}
-	filter.Limit = input.Size() + 1
+	filter.Limit = page.Size() + 1
 	cards, err := self.repo.Board().Cards(ctx, filter)
+	return board, cards, err
+}
+
+func (self *BoardService) ListIssues(ctx context.Context, actor *auth.Actor, input *ListIssuesInput) (args.PageOf[models.BoardCard], error) {
+	board, cards, err := self.cards(ctx, actor, input.Board, input.Column, input.Page, false)
 	if err != nil {
 		return args.PageOf[models.BoardCard]{}, err
 	}
 	ids := make([]uuid.UUID, len(cards))
 	for i, c := range cards {
-		ids[i] = c.IssueID
+		ids[i] = *c.IssueID
 	}
 	issues, err := self.issues.Values(ctx, nil, ids, false)
 	if err != nil {
@@ -396,7 +422,7 @@ func (self *BoardService) ListIssues(ctx context.Context, actor *auth.Actor, inp
 	}
 	values := make([]models.BoardCard, 0, len(cards))
 	for _, c := range cards {
-		issue, ok := byID[models.ID(c.IssueID)]
+		issue, ok := byID[models.ID(*c.IssueID)]
 		if !ok {
 			continue
 		}
@@ -405,6 +431,70 @@ func (self *BoardService) ListIssues(ctx context.Context, actor *auth.Actor, inp
 		})
 	}
 	return args.WrapOf(input.Page, values)
+}
+
+func (self *BoardService) ListDiscussions(ctx context.Context, actor *auth.Actor, input *ListDiscussionsInput) (args.PageOf[models.BoardDiscussionCard], error) {
+	board, cards, err := self.cards(ctx, actor, input.Board, input.Column, input.Page, true)
+	if err != nil {
+		return args.PageOf[models.BoardDiscussionCard]{}, err
+	}
+	ids := make([]uuid.UUID, len(cards))
+	for i, c := range cards {
+		ids[i] = *c.DiscussionID
+	}
+	discussions, err := self.discussions.Values(ctx, nil, actor.User, ids, input.IncludeBody)
+	if err != nil {
+		return args.PageOf[models.BoardDiscussionCard]{}, err
+	}
+	byID := make(map[string]models.Discussion, len(discussions))
+	for _, discussion := range discussions {
+		byID[discussion.ID] = discussion
+	}
+	values := make([]models.BoardDiscussionCard, 0, len(cards))
+	for _, c := range cards {
+		discussion, ok := byID[models.ID(*c.DiscussionID)]
+		if !ok {
+			continue
+		}
+		values = append(values, models.BoardDiscussionCard{
+			Board: models.BoardRefOf(board), Column: models.BoardColumnRefOf(c.Edges.Column), SortOrder: c.SortOrder, Discussion: discussion,
+		})
+	}
+	return args.WrapOf(input.Page, values)
+}
+
+type placement struct {
+	board     *ent.Board
+	column    *ent.BoardColumn
+	sortOrder float64
+	action    string
+}
+
+func (self *BoardService) place(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, subject board_repo.Subject, columnValue string, wanted *float64) (placement, error) {
+	column, err := self.column(ctx, tx, boardID, columnValue)
+	if err != nil {
+		return placement{}, err
+	}
+	current, err := self.repo.Board().Card(ctx, tx, boardID, subject)
+	if err != nil {
+		return placement{}, err
+	}
+	sortOrder, err := self.sortOrder(ctx, tx, column.ID, current, wanted)
+	if err != nil {
+		return placement{}, err
+	}
+	if err := self.repo.Board().Place(ctx, tx, boardID, column.ID, subject, sortOrder); err != nil {
+		return placement{}, err
+	}
+	board, err := self.repo.Board().Load(ctx, tx, boardID)
+	if err != nil {
+		return placement{}, err
+	}
+	action := "update"
+	if current == nil {
+		action = "create"
+	}
+	return placement{board: board, column: column, sortOrder: sortOrder, action: action}, nil
 }
 
 func (self *BoardService) Place(ctx context.Context, actor *auth.Actor, input *PlaceInput) (models.BoardCard, error) {
@@ -418,34 +508,57 @@ func (self *BoardService) Place(ctx context.Context, actor *auth.Actor, input *P
 	}
 	var value models.BoardCard
 	err = self.repo.WithTx(ctx, func(tx repository.TxInterface) error {
-		column, err := self.column(ctx, tx, boardID, input.Column)
+		placed, err := self.place(ctx, tx, boardID, board_repo.IssueSubject(issueID), input.Column, input.SortOrder)
 		if err != nil {
 			return err
 		}
-		current, err := self.repo.Board().Card(ctx, tx, boardID, issueID)
+		issue, err := self.issues.Value(ctx, tx, issueID)
 		if err != nil {
 			return err
 		}
-		sortOrder, err := self.sortOrder(ctx, tx, column.ID, current, input.SortOrder)
-		if err != nil {
-			return err
-		}
-		if err := self.repo.Board().Place(ctx, tx, boardID, column.ID, issueID, sortOrder); err != nil {
-			return err
-		}
-		if value, err = self.card(ctx, tx, boardID, column, issueID, sortOrder); err != nil {
-			return err
-		}
-		action := "update"
-		if current == nil {
-			action = "create"
-		}
-		return self.events.Emit(ctx, tx, actor, "BoardCard", action, value, nil, nil)
+		value = models.BoardCard{Board: models.BoardRefOf(placed.board), Column: models.BoardColumnRefOf(placed.column), SortOrder: placed.sortOrder, Issue: issue}
+		return self.events.Emit(ctx, tx, actor, "BoardCard", placed.action, value, nil, nil)
 	})
 	return value, err
 }
 
-func (self *BoardService) sortOrder(ctx context.Context, tx repository.TxInterface, column uuid.UUID, current *ent.BoardIssue, wanted *float64) (float64, error) {
+func (self *BoardService) PlaceDiscussion(ctx context.Context, actor *auth.Actor, input *PlaceDiscussionInput) (models.BoardDiscussionCard, error) {
+	boardID, err := self.resolve.Board(ctx, actor, input.Board)
+	if err != nil {
+		return models.BoardDiscussionCard{}, err
+	}
+	discussionID, err := self.resolve.Discussion(ctx, actor, input.Discussion)
+	if err != nil {
+		return models.BoardDiscussionCard{}, err
+	}
+	var value models.BoardDiscussionCard
+	err = self.repo.WithTx(ctx, func(tx repository.TxInterface) error {
+		placed, err := self.place(ctx, tx, boardID, board_repo.DiscussionSubject(discussionID), input.Column, input.SortOrder)
+		if err != nil {
+			return err
+		}
+		discussion, err := self.discussion(ctx, tx, actor, discussionID)
+		if err != nil {
+			return err
+		}
+		value = models.BoardDiscussionCard{Board: models.BoardRefOf(placed.board), Column: models.BoardColumnRefOf(placed.column), SortOrder: placed.sortOrder, Discussion: discussion}
+		return self.events.Emit(ctx, tx, actor, "BoardDiscussionCard", placed.action, value, nil, nil)
+	})
+	return value, err
+}
+
+func (self *BoardService) discussion(ctx context.Context, tx repository.TxInterface, actor *auth.Actor, id uuid.UUID) (models.Discussion, error) {
+	values, err := self.discussions.Values(ctx, tx, actor.User, []uuid.UUID{id}, false)
+	if err != nil {
+		return models.Discussion{}, err
+	}
+	if len(values) == 0 {
+		return models.Discussion{}, errdefs.NotFound("No such discussion")
+	}
+	return values[0], nil
+}
+
+func (self *BoardService) sortOrder(ctx context.Context, tx repository.TxInterface, column uuid.UUID, current *ent.BoardCard, wanted *float64) (float64, error) {
 	if wanted != nil {
 		return *wanted, nil
 	}
@@ -454,18 +567,6 @@ func (self *BoardService) sortOrder(ctx context.Context, tx repository.TxInterfa
 	}
 	last, err := self.repo.Board().LastSortOrder(ctx, tx, column)
 	return last + 1, err
-}
-
-func (self *BoardService) card(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, column *ent.BoardColumn, issueID uuid.UUID, sortOrder float64) (models.BoardCard, error) {
-	board, err := self.repo.Board().Load(ctx, tx, boardID)
-	if err != nil {
-		return models.BoardCard{}, err
-	}
-	issue, err := self.issues.Value(ctx, tx, issueID)
-	if err != nil {
-		return models.BoardCard{}, err
-	}
-	return models.BoardCard{Board: models.BoardRefOf(board), Column: models.BoardColumnRefOf(column), SortOrder: sortOrder, Issue: issue}, nil
 }
 
 func (self *BoardService) Remove(ctx context.Context, actor *auth.Actor, input *RemoveInput) (models.RemovedFromBoard, error) {
@@ -477,9 +578,10 @@ func (self *BoardService) Remove(ctx context.Context, actor *auth.Actor, input *
 	if err != nil {
 		return models.RemovedFromBoard{}, err
 	}
+	subject := board_repo.IssueSubject(issueID)
 	var value models.RemovedFromBoard
 	err = self.repo.WithTx(ctx, func(tx repository.TxInterface) error {
-		current, err := self.repo.Board().Card(ctx, tx, boardID, issueID)
+		current, err := self.repo.Board().Card(ctx, tx, boardID, subject)
 		if err != nil {
 			return err
 		}
@@ -498,12 +600,53 @@ func (self *BoardService) Remove(ctx context.Context, actor *auth.Actor, input *
 		if current == nil {
 			return nil
 		}
-		if _, err := self.repo.Board().Remove(ctx, tx, boardID, issueID); err != nil {
+		if _, err := self.repo.Board().Remove(ctx, tx, boardID, subject); err != nil {
 			return err
 		}
 		value.Removed = true
 		card := models.BoardCard{Board: value.Board, Column: models.BoardColumnRefOf(current.Edges.Column), SortOrder: current.SortOrder, Issue: issue}
 		return self.events.Emit(ctx, tx, actor, "BoardCard", "remove", card, nil, nil)
+	})
+	return value, err
+}
+
+func (self *BoardService) RemoveDiscussion(ctx context.Context, actor *auth.Actor, input *RemoveDiscussionInput) (models.RemovedDiscussionFromBoard, error) {
+	boardID, err := self.resolve.Board(ctx, actor, input.Board)
+	if err != nil {
+		return models.RemovedDiscussionFromBoard{}, err
+	}
+	discussionID, err := self.resolve.Discussion(ctx, actor, input.Discussion)
+	if err != nil {
+		return models.RemovedDiscussionFromBoard{}, err
+	}
+	subject := board_repo.DiscussionSubject(discussionID)
+	var value models.RemovedDiscussionFromBoard
+	err = self.repo.WithTx(ctx, func(tx repository.TxInterface) error {
+		current, err := self.repo.Board().Card(ctx, tx, boardID, subject)
+		if err != nil {
+			return err
+		}
+		board, err := self.repo.Board().Load(ctx, tx, boardID)
+		if err != nil {
+			return err
+		}
+		discussion, err := self.discussion(ctx, tx, actor, discussionID)
+		if err != nil {
+			return err
+		}
+		value = models.RemovedDiscussionFromBoard{
+			Board:      models.BoardRefOf(board),
+			Discussion: models.DiscussionRef{ID: discussion.ID, Title: discussion.Title, SlugID: discussion.SlugID},
+		}
+		if current == nil {
+			return nil
+		}
+		if _, err := self.repo.Board().Remove(ctx, tx, boardID, subject); err != nil {
+			return err
+		}
+		value.Removed = true
+		card := models.BoardDiscussionCard{Board: value.Board, Column: models.BoardColumnRefOf(current.Edges.Column), SortOrder: current.SortOrder, Discussion: discussion}
+		return self.events.Emit(ctx, tx, actor, "BoardDiscussionCard", "remove", card, nil, nil)
 	})
 	return value, err
 }

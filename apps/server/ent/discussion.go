@@ -78,13 +78,15 @@ type DiscussionEdges struct {
 	Voters []*User `json:"voters,omitempty"`
 	// Versions holds the value of the versions edge.
 	Versions []*MessageVersion `json:"versions,omitempty"`
+	// BoardCards holds the value of the board_cards edge.
+	BoardCards []*BoardCard `json:"board_cards,omitempty"`
 	// DiscussionSubscribers holds the value of the discussion_subscribers edge.
 	DiscussionSubscribers []*DiscussionSubscriber `json:"discussion_subscribers,omitempty"`
 	// DiscussionVotes holds the value of the discussion_votes edge.
 	DiscussionVotes []*DiscussionVote `json:"discussion_votes,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [11]bool
+	loadedTypes [12]bool
 }
 
 // WorkspaceOrErr returns the Workspace value or an error if the edge
@@ -174,10 +176,19 @@ func (e DiscussionEdges) VersionsOrErr() ([]*MessageVersion, error) {
 	return nil, &NotLoadedError{edge: "versions"}
 }
 
+// BoardCardsOrErr returns the BoardCards value or an error if the edge
+// was not loaded in eager-loading.
+func (e DiscussionEdges) BoardCardsOrErr() ([]*BoardCard, error) {
+	if e.loadedTypes[9] {
+		return e.BoardCards, nil
+	}
+	return nil, &NotLoadedError{edge: "board_cards"}
+}
+
 // DiscussionSubscribersOrErr returns the DiscussionSubscribers value or an error if the edge
 // was not loaded in eager-loading.
 func (e DiscussionEdges) DiscussionSubscribersOrErr() ([]*DiscussionSubscriber, error) {
-	if e.loadedTypes[9] {
+	if e.loadedTypes[10] {
 		return e.DiscussionSubscribers, nil
 	}
 	return nil, &NotLoadedError{edge: "discussion_subscribers"}
@@ -186,7 +197,7 @@ func (e DiscussionEdges) DiscussionSubscribersOrErr() ([]*DiscussionSubscriber, 
 // DiscussionVotesOrErr returns the DiscussionVotes value or an error if the edge
 // was not loaded in eager-loading.
 func (e DiscussionEdges) DiscussionVotesOrErr() ([]*DiscussionVote, error) {
-	if e.loadedTypes[10] {
+	if e.loadedTypes[11] {
 		return e.DiscussionVotes, nil
 	}
 	return nil, &NotLoadedError{edge: "discussion_votes"}
@@ -381,6 +392,11 @@ func (_m *Discussion) QueryVoters() *UserQuery {
 // QueryVersions queries the "versions" edge of the Discussion entity.
 func (_m *Discussion) QueryVersions() *MessageVersionQuery {
 	return NewDiscussionClient(_m.config).QueryVersions(_m)
+}
+
+// QueryBoardCards queries the "board_cards" edge of the Discussion entity.
+func (_m *Discussion) QueryBoardCards() *BoardCardQuery {
+	return NewDiscussionClient(_m.config).QueryBoardCards(_m)
 }
 
 // QueryDiscussionSubscribers queries the "discussion_subscribers" edge of the Discussion entity.

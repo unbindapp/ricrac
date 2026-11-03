@@ -266,6 +266,78 @@ func (_c *BoardServiceMock_List_Call) RunAndReturn(run func(ctx context.Context,
 	return _c
 }
 
+// ListDiscussions provides a mock function for the type BoardServiceMock
+func (_mock *BoardServiceMock) ListDiscussions(ctx context.Context, actor *auth.Actor, input *board_service.ListDiscussionsInput) (args.PageOf[models.BoardDiscussionCard], error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListDiscussions")
+	}
+
+	var r0 args.PageOf[models.BoardDiscussionCard]
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *board_service.ListDiscussionsInput) (args.PageOf[models.BoardDiscussionCard], error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *board_service.ListDiscussionsInput) args.PageOf[models.BoardDiscussionCard]); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(args.PageOf[models.BoardDiscussionCard])
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *board_service.ListDiscussionsInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// BoardServiceMock_ListDiscussions_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListDiscussions'
+type BoardServiceMock_ListDiscussions_Call struct {
+	*mock.Call
+}
+
+// ListDiscussions is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *board_service.ListDiscussionsInput
+func (_e *BoardServiceMock_Expecter) ListDiscussions(ctx any, actor any, input any) *BoardServiceMock_ListDiscussions_Call {
+	return &BoardServiceMock_ListDiscussions_Call{Call: _e.mock.On("ListDiscussions", ctx, actor, input)}
+}
+
+func (_c *BoardServiceMock_ListDiscussions_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *board_service.ListDiscussionsInput)) *BoardServiceMock_ListDiscussions_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *board_service.ListDiscussionsInput
+		if args[2] != nil {
+			arg2 = args[2].(*board_service.ListDiscussionsInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *BoardServiceMock_ListDiscussions_Call) Return(pageOf args.PageOf[models.BoardDiscussionCard], err error) *BoardServiceMock_ListDiscussions_Call {
+	_c.Call.Return(pageOf, err)
+	return _c
+}
+
+func (_c *BoardServiceMock_ListDiscussions_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *board_service.ListDiscussionsInput) (args.PageOf[models.BoardDiscussionCard], error)) *BoardServiceMock_ListDiscussions_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ListIssues provides a mock function for the type BoardServiceMock
 func (_mock *BoardServiceMock) ListIssues(ctx context.Context, actor *auth.Actor, input *board_service.ListIssuesInput) (args.PageOf[models.BoardCard], error) {
 	ret := _mock.Called(ctx, actor, input)
@@ -410,6 +482,78 @@ func (_c *BoardServiceMock_Place_Call) RunAndReturn(run func(ctx context.Context
 	return _c
 }
 
+// PlaceDiscussion provides a mock function for the type BoardServiceMock
+func (_mock *BoardServiceMock) PlaceDiscussion(ctx context.Context, actor *auth.Actor, input *board_service.PlaceDiscussionInput) (models.BoardDiscussionCard, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PlaceDiscussion")
+	}
+
+	var r0 models.BoardDiscussionCard
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *board_service.PlaceDiscussionInput) (models.BoardDiscussionCard, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *board_service.PlaceDiscussionInput) models.BoardDiscussionCard); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.BoardDiscussionCard)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *board_service.PlaceDiscussionInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// BoardServiceMock_PlaceDiscussion_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PlaceDiscussion'
+type BoardServiceMock_PlaceDiscussion_Call struct {
+	*mock.Call
+}
+
+// PlaceDiscussion is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *board_service.PlaceDiscussionInput
+func (_e *BoardServiceMock_Expecter) PlaceDiscussion(ctx any, actor any, input any) *BoardServiceMock_PlaceDiscussion_Call {
+	return &BoardServiceMock_PlaceDiscussion_Call{Call: _e.mock.On("PlaceDiscussion", ctx, actor, input)}
+}
+
+func (_c *BoardServiceMock_PlaceDiscussion_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *board_service.PlaceDiscussionInput)) *BoardServiceMock_PlaceDiscussion_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *board_service.PlaceDiscussionInput
+		if args[2] != nil {
+			arg2 = args[2].(*board_service.PlaceDiscussionInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *BoardServiceMock_PlaceDiscussion_Call) Return(boardDiscussionCard models.BoardDiscussionCard, err error) *BoardServiceMock_PlaceDiscussion_Call {
+	_c.Call.Return(boardDiscussionCard, err)
+	return _c
+}
+
+func (_c *BoardServiceMock_PlaceDiscussion_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *board_service.PlaceDiscussionInput) (models.BoardDiscussionCard, error)) *BoardServiceMock_PlaceDiscussion_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Remove provides a mock function for the type BoardServiceMock
 func (_mock *BoardServiceMock) Remove(ctx context.Context, actor *auth.Actor, input *board_service.RemoveInput) (models.RemovedFromBoard, error) {
 	ret := _mock.Called(ctx, actor, input)
@@ -478,6 +622,78 @@ func (_c *BoardServiceMock_Remove_Call) Return(removedFromBoard models.RemovedFr
 }
 
 func (_c *BoardServiceMock_Remove_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *board_service.RemoveInput) (models.RemovedFromBoard, error)) *BoardServiceMock_Remove_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// RemoveDiscussion provides a mock function for the type BoardServiceMock
+func (_mock *BoardServiceMock) RemoveDiscussion(ctx context.Context, actor *auth.Actor, input *board_service.RemoveDiscussionInput) (models.RemovedDiscussionFromBoard, error) {
+	ret := _mock.Called(ctx, actor, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RemoveDiscussion")
+	}
+
+	var r0 models.RemovedDiscussionFromBoard
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *board_service.RemoveDiscussionInput) (models.RemovedDiscussionFromBoard, error)); ok {
+		return returnFunc(ctx, actor, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *auth.Actor, *board_service.RemoveDiscussionInput) models.RemovedDiscussionFromBoard); ok {
+		r0 = returnFunc(ctx, actor, input)
+	} else {
+		r0 = ret.Get(0).(models.RemovedDiscussionFromBoard)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *auth.Actor, *board_service.RemoveDiscussionInput) error); ok {
+		r1 = returnFunc(ctx, actor, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// BoardServiceMock_RemoveDiscussion_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RemoveDiscussion'
+type BoardServiceMock_RemoveDiscussion_Call struct {
+	*mock.Call
+}
+
+// RemoveDiscussion is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actor *auth.Actor
+//   - input *board_service.RemoveDiscussionInput
+func (_e *BoardServiceMock_Expecter) RemoveDiscussion(ctx any, actor any, input any) *BoardServiceMock_RemoveDiscussion_Call {
+	return &BoardServiceMock_RemoveDiscussion_Call{Call: _e.mock.On("RemoveDiscussion", ctx, actor, input)}
+}
+
+func (_c *BoardServiceMock_RemoveDiscussion_Call) Run(run func(ctx context.Context, actor *auth.Actor, input *board_service.RemoveDiscussionInput)) *BoardServiceMock_RemoveDiscussion_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *auth.Actor
+		if args[1] != nil {
+			arg1 = args[1].(*auth.Actor)
+		}
+		var arg2 *board_service.RemoveDiscussionInput
+		if args[2] != nil {
+			arg2 = args[2].(*board_service.RemoveDiscussionInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *BoardServiceMock_RemoveDiscussion_Call) Return(removedDiscussionFromBoard models.RemovedDiscussionFromBoard, err error) *BoardServiceMock_RemoveDiscussion_Call {
+	_c.Call.Return(removedDiscussionFromBoard, err)
+	return _c
+}
+
+func (_c *BoardServiceMock_RemoveDiscussion_Call) RunAndReturn(run func(ctx context.Context, actor *auth.Actor, input *board_service.RemoveDiscussionInput) (models.RemovedDiscussionFromBoard, error)) *BoardServiceMock_RemoveDiscussion_Call {
 	_c.Call.Return(run)
 	return _c
 }

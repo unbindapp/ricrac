@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"math"
 	"ricrac/ent/attachment"
-	"ricrac/ent/boardissue"
+	"ricrac/ent/boardcard"
 	"ricrac/ent/comment"
 	"ricrac/ent/customerneed"
 	"ricrac/ent/cycle"
@@ -64,7 +64,7 @@ type IssueQuery struct {
 	withIssueRelationsByRelatedIssue *IssueRelationQuery
 	withIssueHistory                 *IssueHistoryQuery
 	withAttachments                  *AttachmentQuery
-	withBoardIssues                  *BoardIssueQuery
+	withBoardCards                   *BoardCardQuery
 	withDocuments                    *DocumentQuery
 	withComments                     *CommentQuery
 	withDiscussionThreads            *DiscussionThreadQuery
@@ -447,9 +447,9 @@ func (_q *IssueQuery) QueryAttachments() *AttachmentQuery {
 	return query
 }
 
-// QueryBoardIssues chains the current query on the "board_issues" edge.
-func (_q *IssueQuery) QueryBoardIssues() *BoardIssueQuery {
-	query := (&BoardIssueClient{config: _q.config}).Query()
+// QueryBoardCards chains the current query on the "board_cards" edge.
+func (_q *IssueQuery) QueryBoardCards() *BoardCardQuery {
+	query := (&BoardCardClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -460,8 +460,8 @@ func (_q *IssueQuery) QueryBoardIssues() *BoardIssueQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(issue.Table, issue.FieldID, selector),
-			sqlgraph.To(boardissue.Table, boardissue.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, issue.BoardIssuesTable, issue.BoardIssuesColumn),
+			sqlgraph.To(boardcard.Table, boardcard.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, issue.BoardCardsTable, issue.BoardCardsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -1006,7 +1006,7 @@ func (_q *IssueQuery) Clone() *IssueQuery {
 		withIssueRelationsByRelatedIssue: _q.withIssueRelationsByRelatedIssue.Clone(),
 		withIssueHistory:                 _q.withIssueHistory.Clone(),
 		withAttachments:                  _q.withAttachments.Clone(),
-		withBoardIssues:                  _q.withBoardIssues.Clone(),
+		withBoardCards:                   _q.withBoardCards.Clone(),
 		withDocuments:                    _q.withDocuments.Clone(),
 		withComments:                     _q.withComments.Clone(),
 		withDiscussionThreads:            _q.withDiscussionThreads.Clone(),
@@ -1194,14 +1194,14 @@ func (_q *IssueQuery) WithAttachments(opts ...func(*AttachmentQuery)) *IssueQuer
 	return _q
 }
 
-// WithBoardIssues tells the query-builder to eager-load the nodes that are connected to
-// the "board_issues" edge. The optional arguments are used to configure the query builder of the edge.
-func (_q *IssueQuery) WithBoardIssues(opts ...func(*BoardIssueQuery)) *IssueQuery {
-	query := (&BoardIssueClient{config: _q.config}).Query()
+// WithBoardCards tells the query-builder to eager-load the nodes that are connected to
+// the "board_cards" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *IssueQuery) WithBoardCards(opts ...func(*BoardCardQuery)) *IssueQuery {
+	query := (&BoardCardClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	_q.withBoardIssues = query
+	_q.withBoardCards = query
 	return _q
 }
 
@@ -1464,7 +1464,7 @@ func (_q *IssueQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Issue,
 			_q.withIssueRelationsByRelatedIssue != nil,
 			_q.withIssueHistory != nil,
 			_q.withAttachments != nil,
-			_q.withBoardIssues != nil,
+			_q.withBoardCards != nil,
 			_q.withDocuments != nil,
 			_q.withComments != nil,
 			_q.withDiscussionThreads != nil,
@@ -1602,10 +1602,10 @@ func (_q *IssueQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Issue,
 			return nil, err
 		}
 	}
-	if query := _q.withBoardIssues; query != nil {
-		if err := _q.loadBoardIssues(ctx, query, nodes,
-			func(n *Issue) { n.Edges.BoardIssues = []*BoardIssue{} },
-			func(n *Issue, e *BoardIssue) { n.Edges.BoardIssues = append(n.Edges.BoardIssues, e) }); err != nil {
+	if query := _q.withBoardCards; query != nil {
+		if err := _q.loadBoardCards(ctx, query, nodes,
+			func(n *Issue) { n.Edges.BoardCards = []*BoardCard{} },
+			func(n *Issue, e *BoardCard) { n.Edges.BoardCards = append(n.Edges.BoardCards, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -2181,7 +2181,7 @@ func (_q *IssueQuery) loadAttachments(ctx context.Context, query *AttachmentQuer
 	}
 	return nil
 }
-func (_q *IssueQuery) loadBoardIssues(ctx context.Context, query *BoardIssueQuery, nodes []*Issue, init func(*Issue), assign func(*Issue, *BoardIssue)) error {
+func (_q *IssueQuery) loadBoardCards(ctx context.Context, query *BoardCardQuery, nodes []*Issue, init func(*Issue), assign func(*Issue, *BoardCard)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[uuid.UUID]*Issue)
 	for i := range nodes {
@@ -2192,10 +2192,10 @@ func (_q *IssueQuery) loadBoardIssues(ctx context.Context, query *BoardIssueQuer
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(boardissue.FieldIssueID)
+		query.ctx.AppendFieldOnce(boardcard.FieldIssueID)
 	}
-	query.Where(predicate.BoardIssue(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(issue.BoardIssuesColumn), fks...))
+	query.Where(predicate.BoardCard(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(issue.BoardCardsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -2203,9 +2203,12 @@ func (_q *IssueQuery) loadBoardIssues(ctx context.Context, query *BoardIssueQuer
 	}
 	for _, n := range neighbors {
 		fk := n.IssueID
-		node, ok := nodeids[fk]
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "issue_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "issue_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "issue_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
