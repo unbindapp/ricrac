@@ -40,7 +40,7 @@ export function PageContainer({ width = "full", scroll = "pane", children }: TPr
           "dank:animate-in dank:fade-in-0 dank:slide-in-from-bottom-2 dank:ease-spring-default-spatial dank:duration-(--spring-default-spatial-duration) dank:motion-reduce:animate-none mx-auto flex w-full flex-1 flex-col gap-4 pb-8",
           width === "narrow"
             ? "max-w-3xl px-4 pt-4 sm:px-6 sm:pt-10"
-            : "dank:md:px-10 dank:md:pt-8 max-w-none px-4 pt-4",
+            : "dank:px-4 dank:pt-4 dank:md:px-10 dank:md:pt-8 max-w-none px-2 pt-2",
         )}
       >
         {children}
