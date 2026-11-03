@@ -1,5 +1,6 @@
 import { StateIcon, type TStateType } from "@/components/shared/state-icon";
 import { cn } from "@/components/ui/utils";
+import { storedColorStyle } from "@/lib/helpers/colors";
 import type { TProjectStatusType } from "@/lib/queries/projects";
 
 export const PROJECT_STATUS_TYPES: TProjectStatusType[] = [
@@ -45,8 +46,12 @@ export function ProjectStatusIcon({ type, color, name, className }: TProps) {
       viewBox="0 0 14 14"
       role="img"
       aria-label={label}
-      className={cn("size-3.5 shrink-0", !color && "text-muted-foreground", className)}
-      style={color ? { color } : undefined}
+      className={cn(
+        "size-3.5 shrink-0",
+        color ? "stored-color" : "text-muted-foreground",
+        className,
+      )}
+      style={storedColorStyle(color)}
     >
       <circle cx="7" cy="7" r="6" fill="none" stroke="currentColor" strokeWidth="1.5" />
       <path d="M5.5 4.75v4.5M8.5 4.75v4.5" stroke="currentColor" strokeWidth="1.5" />

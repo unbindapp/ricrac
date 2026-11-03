@@ -4,7 +4,7 @@ import { type ReactNode, useState } from "react";
 import type { Project } from "@/api/ops.gen";
 
 import { ErrorCard } from "@/components/layout/error-card";
-import { VirtualList } from "@/components/layout/list";
+import { VirtualList, isHeaderItem } from "@/components/layout/list";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { useNewProjectStore } from "@/components/projects/new-project-store";
 import {
@@ -104,6 +104,7 @@ export function ProjectList({
 
   return (
     <VirtualList
+      isSticky={isHeaderItem}
       flush
       items={items}
       getKey={projectListKey}

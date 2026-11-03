@@ -129,7 +129,7 @@ export function DiscussionRow({ discussion }: { discussion: Discussion }) {
           to="/$workspace/discussion/$slug"
           params={{ workspace: workspace.urlKey, slug: entitySlug(discussion) }}
           data-closed={isClosed || undefined}
-          className="has-hover:hover:bg-muted focus-visible:bg-muted data-popup-open:bg-muted data-closed:text-muted-foreground flex h-9 w-full items-center gap-3 border-b px-3 text-sm outline-hidden group-data-flush/list:h-11 group-data-flush/list:px-6 last:border-b-0"
+          className="has-hover:hover:bg-muted focus-visible:bg-muted data-popup-open:bg-muted data-closed:text-muted-foreground flex h-9 w-full items-center gap-3 border-b px-3 text-sm outline-hidden group-data-flush/list:h-11 last:border-b-0"
         />
       }
     >

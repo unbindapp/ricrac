@@ -14,7 +14,7 @@ import {
 import { PropertyPicker } from "@/components/issues/property-picker";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
-import { VirtualList } from "@/components/layout/list";
+import { VirtualList, isHeaderItem } from "@/components/layout/list";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -253,6 +253,7 @@ function PipelineReleases({ pipeline }: { pipeline: ReleasePipeline }) {
   ]);
   return (
     <VirtualList
+      isSticky={isHeaderItem}
       label="Releases"
       items={items}
       getKey={(item) =>

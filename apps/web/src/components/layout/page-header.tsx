@@ -32,7 +32,11 @@ export function PageHeader({ title, icon, description, breadcrumb, actions, tool
     );
   }
   return (
-    <header data-slot="page-header" className="flex w-full flex-col gap-3">
+    <header
+      data-slot="page-header"
+      data-sticky-bar
+      className="bg-background sticky top-4 z-10 -mx-4 -mb-2 flex flex-col gap-3 px-4 pb-2 group-data-[width=narrow]/page:static group-data-[width=narrow]/page:m-0 group-data-[width=narrow]/page:p-0 *:data-[slot=page-bar]:static"
+    >
       <PageBar>
         <div className="min-w-0 flex-1">
           <Breadcrumb

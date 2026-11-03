@@ -171,8 +171,13 @@ function VirtualIssueList({
     [clear, setFocused],
   );
 
-  const { virtualizer, scrollMargin } = useListVirtualizer(containerRef, {
+  const headerIndexes = useMemo(
+    () => items.flatMap((item, index) => (item.kind === "header" ? [index] : [])),
+    [items],
+  );
+  const { virtualizer, scrollMargin, stickyTop, activeSticky } = useListVirtualizer(containerRef, {
     count: items.length,
+    stickyIndexes: headerIndexes,
     estimateSize: (index) => (items[index].kind === "header" ? HEADER_HEIGHT : ROW_HEIGHT),
     getItemKey: (index) => items[index].key,
     overscan: OVERSCAN,
@@ -236,57 +241,69 @@ function VirtualIssueList({
   };
 
   const selectedIssues = issues.filter((issue) => selectedIds.includes(issue.id));
+  const stickyItem = activeSticky === undefined ? undefined : items[activeSticky];
+
+  const renderItem = (item: TListItem) =>
+    item.kind === "header" ? (
+      <IssueGroupHeader
+        group={item.group}
+        isCollapsed={collapsed.includes(item.group.key)}
+        onToggle={() =>
+          setCollapsed((current) =>
+            current.includes(item.group.key)
+              ? current.filter((key) => key !== item.group.key)
+              : [...current, item.group.key],
+          )
+        }
+        onCreate={canEdit ? () => openNewIssue(newIssueDefaultsForGroup(item.group)) : undefined}
+      />
+    ) : (
+      <IssueRow
+        issue={item.issue}
+        depth={item.depth}
+        segment={item.segment}
+        properties={properties}
+        isSelected={selectedIds.includes(item.issue.id)}
+        isActive={peek?.peek?.toUpperCase() === item.issue.identifier}
+        isFocused={focusedId === item.issue.id}
+        canEdit={canEdit}
+        actions={rowActions?.(item.issue)}
+        onClick={handleClick}
+        onFocus={(issue) => setFocused(issue.id)}
+      />
+    );
 
   return (
     <>
       <div ref={containerRef}>
         <List flush>
-          <div className="relative w-full" style={{ height: virtualizer.getTotalSize() }}>
-            {virtualItems.map((virtualItem) => {
-              const item = items[virtualItem.index];
-              return (
+          <div
+            data-list-track
+            className="relative w-full"
+            style={{ height: virtualizer.getTotalSize() }}
+          >
+            {stickyItem && (
+              <div data-list-cell className="bg-background sticky z-5" style={{ top: stickyTop }}>
+                {renderItem(stickyItem)}
+              </div>
+            )}
+            {virtualItems
+              .filter((virtualItem) => virtualItem.index !== activeSticky)
+              .map((virtualItem) => (
                 <div
                   key={virtualItem.key}
                   ref={virtualizer.measureElement}
                   data-index={virtualItem.index}
-                  className={cn("absolute inset-x-0 top-0", dankSpacingOf(item, virtualItem.index))}
+                  data-list-cell
+                  className={cn(
+                    "absolute inset-x-0 top-0",
+                    dankSpacingOf(items[virtualItem.index], virtualItem.index),
+                  )}
                   style={{ transform: `translateY(${virtualItem.start - scrollMargin}px)` }}
                 >
-                  {item.kind === "header" ? (
-                    <IssueGroupHeader
-                      group={item.group}
-                      isCollapsed={collapsed.includes(item.group.key)}
-                      onToggle={() =>
-                        setCollapsed((current) =>
-                          current.includes(item.group.key)
-                            ? current.filter((key) => key !== item.group.key)
-                            : [...current, item.group.key],
-                        )
-                      }
-                      onCreate={
-                        canEdit
-                          ? () => openNewIssue(newIssueDefaultsForGroup(item.group))
-                          : undefined
-                      }
-                    />
-                  ) : (
-                    <IssueRow
-                      issue={item.issue}
-                      depth={item.depth}
-                      segment={item.segment}
-                      properties={properties}
-                      isSelected={selectedIds.includes(item.issue.id)}
-                      isActive={peek?.peek?.toUpperCase() === item.issue.identifier}
-                      isFocused={focusedId === item.issue.id}
-                      canEdit={canEdit}
-                      actions={rowActions?.(item.issue)}
-                      onClick={handleClick}
-                      onFocus={(issue) => setFocused(issue.id)}
-                    />
-                  )}
+                  {renderItem(items[virtualItem.index])}
                 </div>
-              );
-            })}
+              ))}
           </div>
         </List>
       </div>

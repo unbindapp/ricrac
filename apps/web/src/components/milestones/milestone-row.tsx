@@ -17,7 +17,7 @@ export function MilestoneListHeader() {
   return (
     <div
       aria-hidden
-      className="text-muted-foreground dank:type-label-medium dank:border-0 dank:group-data-flush/list:px-4 flex h-8 w-full items-center gap-3 border-b px-3 text-xs group-data-flush/list:px-6"
+      className="text-muted-foreground dank:type-label-medium dank:border-0 dank:group-data-flush/list:px-4 flex h-8 w-full items-center gap-3 border-b px-3 text-xs"
     >
       <span className="min-w-0 flex-1">Name</span>
       <span className="hidden w-16 shrink-0 text-right sm:block">Issues</span>
@@ -33,7 +33,7 @@ export function MilestoneRow({ milestone }: { milestone: Milestone }) {
     <div
       role="listitem"
       data-interactive
-      className="has-hover:hover:bg-muted has-[a:focus-visible]:bg-muted relative flex h-9 w-full items-center gap-3 border-b px-3 text-sm group-data-flush/list:h-11 group-data-flush/list:px-6 last:border-b-0"
+      className="has-hover:hover:bg-muted has-[a:focus-visible]:bg-muted relative flex h-9 w-full items-center gap-3 border-b px-3 text-sm group-data-flush/list:h-11 last:border-b-0"
     >
       <span className="flex min-w-0 flex-1 items-center gap-2">
         <MilestoneIcon milestone={milestone} />

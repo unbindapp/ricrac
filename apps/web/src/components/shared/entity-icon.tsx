@@ -1,6 +1,7 @@
 import type { LucideIcon } from "@/components/icons";
 import { resolveEntityIcon } from "@/components/shared/entity-icons";
 import { cn } from "@/components/ui/utils";
+import { storedColorStyle } from "@/lib/helpers/colors";
 
 type TProps = {
   icon?: string | null;
@@ -20,14 +21,18 @@ export function EntityIcon({ icon, color, fallback, size = "md", label }: TProps
   const resolved = resolveEntityIcon(icon);
   const Icon =
     resolved.kind === "lucide" ? resolved.Icon : resolved.kind === "none" ? fallback : null;
-  const style = color ? { color } : undefined;
+  const style = storedColorStyle(color);
   if (Icon) {
     return (
       <Icon
         role={label ? "img" : undefined}
         aria-label={label}
         aria-hidden={label ? undefined : true}
-        className={cn("shrink-0", sizeClass[size], !color && "text-muted-foreground")}
+        className={cn(
+          "shrink-0",
+          sizeClass[size],
+          color ? "stored-color" : "text-muted-foreground",
+        )}
         style={style}
       />
     );

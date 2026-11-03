@@ -5,7 +5,7 @@ import { useState } from "react";
 import type { Milestone } from "@/api/ops.gen";
 import { CircleCheckIcon, DiamondIcon, PlusIcon } from "@/components/icons";
 import { CreateButton } from "@/components/layout/create-button";
-import { VirtualList } from "@/components/layout/list";
+import { VirtualList, isHeaderItem } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -97,6 +97,7 @@ function MilestoneList({ milestones }: { milestones: Milestone[] }) {
 
   return (
     <VirtualList
+      isSticky={isHeaderItem}
       flush
       items={items}
       getKey={milestoneListKey}
@@ -106,7 +107,7 @@ function MilestoneList({ milestones }: { milestones: Milestone[] }) {
         if (item.kind === "row") return <MilestoneRow milestone={item.milestone} />;
         const { label, icon: Icon } = milestoneGroups[item.group];
         return (
-          <div className="bg-muted dank:h-12 dank:gap-1 dank:bg-transparent dank:px-0 flex h-9 items-center px-1.5 group-data-flush/list:px-4">
+          <div className="bg-muted dank:h-12 dank:gap-1 dank:bg-transparent dank:px-0 flex h-9 items-center px-1.5 group-data-flush/list:px-1">
             <GroupToggle
               icon={<Icon className="text-muted-foreground size-4" />}
               label={label}

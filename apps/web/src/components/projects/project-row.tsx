@@ -40,7 +40,7 @@ export function ProjectListHeader() {
   return (
     <div
       aria-hidden
-      className="text-muted-foreground dank:border-0 dank:px-4 dank:type-label-medium dank:group-data-flush/list:px-4 flex h-8 w-full items-center gap-3 border-b px-3 text-xs group-data-flush/list:px-6"
+      className="text-muted-foreground dank:border-0 dank:px-4 dank:type-label-medium dank:group-data-flush/list:px-4 flex h-8 w-full items-center gap-3 border-b px-3 text-xs"
     >
       <span className="min-w-0 flex-1">Name</span>
       <span className="hidden w-24 shrink-0 md:block">Health</span>
@@ -59,7 +59,7 @@ export function ProjectRow({ project }: { project: Project }) {
       role="listitem"
       to="/$workspace/project/$slug"
       params={{ workspace: workspace.urlKey, slug: entitySlug(project) }}
-      className="has-hover:hover:bg-muted focus-visible:bg-muted flex h-9 w-full items-center gap-3 border-b px-3 text-sm outline-hidden group-data-flush/list:h-11 group-data-flush/list:px-6 last:border-b-0"
+      className="has-hover:hover:bg-muted focus-visible:bg-muted flex h-9 w-full items-center gap-3 border-b px-3 text-sm outline-hidden group-data-flush/list:h-11 last:border-b-0"
     >
       <span className="dank:gap-3 flex min-w-0 flex-1 items-center gap-2">
         <span className="dank:*:size-6 flex shrink-0">
@@ -134,7 +134,7 @@ export function ProjectGroupHeader({
     </>
   );
   return (
-    <div className="bg-muted dank:h-12 dank:bg-transparent dank:px-0 dank:group-data-flush/list:px-0 flex h-9 w-full items-center gap-2 px-1.5 text-sm group-data-flush/list:px-4">
+    <div className="bg-muted dank:h-12 dank:bg-transparent dank:px-0 dank:group-data-flush/list:px-0 flex h-9 w-full items-center gap-2 px-1.5 text-sm group-data-flush/list:px-1">
       <Button
         variant="ghost"
         size="sm"

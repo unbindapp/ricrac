@@ -35,7 +35,7 @@ export function List({ children, flush, role = "list", label, ref, style }: TLis
       style={style}
       className={cn(
         "group/list flex flex-col",
-        flush ? "-mx-4 w-auto" : "bg-card w-full overflow-hidden rounded-lg border",
+        flush ? "w-full" : "bg-card w-full overflow-hidden rounded-lg border",
       )}
     >
       {children}
@@ -52,9 +52,14 @@ type TVirtualListProps<T> = Omit<TListProps, "children" | "ref" | "style"> & {
   /** Exactly one element per item, so rows stay the list's own children. */
   renderItem: (item: T) => ReactNode;
   estimateSize?: (item: T) => number;
+  /** Group headers, pinned under the page's bars while their group is on screen. */
+  isSticky?: (item: T) => boolean;
   /** Called while the rendered rows reach the last few, to load the next page. */
   onEndReached?: () => void;
 };
+
+/** Pins the group headers of a list of `{ kind: "header" | "row" }` items. */
+export const isHeaderItem = (item: { kind: string }) => item.kind === "header";
 
 /** A List that renders only the rows near the screen; padding stands in for the rest. */
 export function VirtualList<T>({
@@ -62,22 +67,31 @@ export function VirtualList<T>({
   getKey,
   renderItem,
   estimateSize,
+  isSticky,
   onEndReached,
   ...listProps
 }: TVirtualListProps<T>) {
   const listRef = useRef<HTMLDivElement>(null);
-  const { virtualizer, scrollMargin } = useListVirtualizer(listRef, {
+  const stickyIndexes = useMemo(
+    () => (isSticky ? items.flatMap((item, index) => (isSticky(item) ? [index] : [])) : undefined),
+    [items, isSticky],
+  );
+  const { virtualizer, scrollMargin, gap, stickyTop, activeSticky } = useListVirtualizer(listRef, {
     count: items.length,
     estimateSize: (index) => estimateSize?.(items[index]) ?? DEFAULT_ROW_HEIGHT,
     getItemKey: (index) => getKey(items[index]),
+    stickyIndexes,
   });
-  const virtualItems = virtualizer.getVirtualItems();
+  const virtualItems = virtualizer.getVirtualItems().filter((item) => item.index !== activeSticky);
   const first = virtualItems[0];
   const last = virtualItems.at(-1);
+  const stuck =
+    activeSticky === undefined ? undefined : virtualizer.measurementsCache[activeSticky];
 
   useLayoutEffect(() => {
-    const rows = listRef.current?.children;
-    if (!rows) return;
+    const list = listRef.current;
+    if (!list) return;
+    const rows = [...list.children].filter((row) => !row.hasAttribute("data-list-cell"));
     virtualItems.forEach((item, position) => {
       const row = rows[position];
       if (!row) return;
@@ -91,17 +105,31 @@ export function VirtualList<T>({
     if (isNearEnd) onEndReached?.();
   }, [isNearEnd, items.length, onEndReached]);
 
+  const paddingTop = first ? first.start - scrollMargin : 0;
   return (
     <List
       {...listProps}
       ref={listRef}
       style={{
-        paddingTop: first ? first.start - scrollMargin : 0,
+        paddingTop,
         paddingBottom: last
           ? Math.max(0, virtualizer.getTotalSize() - (last.end - scrollMargin))
           : 0,
       }}
     >
+      {stuck && (
+        <div
+          data-list-cell
+          className="bg-background sticky z-5"
+          style={{
+            top: stickyTop,
+            marginTop: -paddingTop,
+            marginBottom: paddingTop - stuck.size - gap,
+          }}
+        >
+          {renderItem(items[stuck.index])}
+        </div>
+      )}
       {virtualItems.map((item) => (
         <Fragment key={item.key}>{renderItem(items[item.index])}</Fragment>
       ))}
@@ -215,7 +243,7 @@ export function ListRow({ children, actions, muted }: TListRowProps) {
       role="listitem"
       data-slot="list-row"
       className={cn(
-        "flex h-9 w-full items-center gap-2 border-b px-3 text-sm group-data-flush/list:h-11 group-data-flush/list:px-6 last:border-b-0",
+        "flex h-9 w-full items-center gap-2 border-b px-3 text-sm group-data-flush/list:h-11 last:border-b-0",
         muted && "text-muted-foreground",
       )}
     >

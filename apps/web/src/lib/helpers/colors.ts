@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 export const PRESET_COLORS = [
   "#95a2b3",
   "#5e6ad2",
@@ -32,6 +34,11 @@ export const DEFAULT_PROJECT_STATUS_COLORS = {
   completed: DEFAULT_STATE_COLORS.completed,
   canceled: DEFAULT_STATE_COLORS.canceled,
 } as const;
+
+/** The style for the `stored-color` utility. */
+export function storedColorStyle(color: string | null | undefined) {
+  return color ? ({ "--stored-color": color } as CSSProperties) : undefined;
+}
 
 export const hexColorPattern = /^#[0-9a-fA-F]{6}$/;
 

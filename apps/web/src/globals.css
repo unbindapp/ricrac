@@ -49,6 +49,17 @@
   background-clip: padding-box;
 }
 
+/* A stored color, like a status's, picked to read on dark surfaces: on light ones its lightness is
+   capped so it keeps its hue and stays readable. Set it with storedColorStyle(). */
+@utility stored-color {
+  color: var(--stored-color);
+  color: oklch(from var(--stored-color) min(l, 0.62) c h);
+
+  &:where(.dark *) {
+    color: var(--stored-color);
+  }
+}
+
 @utility line-icon {
   display: flex;
   height: 1lh;
@@ -548,4 +559,17 @@
   top: 0.1875rem;
   width: 100%;
   border-top: 2px solid var(--color-primary);
+}
+
+/* Edge-to-edge lists, after Linear: rounded rows. The gap between them
+   is a transparent border the background isn't painted under, so it still belongs to a row.
+   Unlayered so it beats the rows' own border utilities. */
+:root[data-ui-theme="default"] [data-slot="list"][data-flush] {
+  & > :not([data-list-track], [data-list-cell]),
+  & [data-list-cell] > * {
+    border-block: 1px solid transparent;
+    border-inline: 0;
+    border-radius: var(--radius-md);
+    background-clip: padding-box;
+  }
 }

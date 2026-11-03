@@ -69,7 +69,10 @@ function FallbackMobileBar() {
   const { workspace } = useWorkspace();
   const openCommandPanel = useCommandPanelStore((state) => state.setOpen);
   return (
-    <div className="dank:h-16 dank:border-0 dank:px-1 bg-sidebar sticky top-0 z-10 flex h-11 shrink-0 items-center gap-2 border-b px-4 group-has-data-mobile-bar/shell:hidden md:hidden">
+    <div
+      data-sticky-bar
+      className="dank:h-16 dank:border-0 dank:px-1 bg-sidebar sticky top-0 z-10 flex h-11 shrink-0 items-center gap-2 border-b px-4 group-has-data-mobile-bar/shell:hidden md:hidden"
+    >
       <SidebarButton />
       <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} />
       <span className="min-w-0 flex-1 truncate text-sm font-medium">{workspace.name}</span>

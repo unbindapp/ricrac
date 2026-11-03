@@ -5,7 +5,7 @@ import type { Issue, Project } from "@/api/ops.gen";
 import { BoxIcon, CircleDotIcon } from "@/components/icons";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ErrorCard } from "@/components/layout/error-card";
-import { VirtualList } from "@/components/layout/list";
+import { VirtualList, isHeaderItem } from "@/components/layout/list";
 import { ListSkeleton } from "@/components/layout/list-skeleton";
 import { Avatar } from "@/components/shared/avatar";
 import { EntityIcon } from "@/components/shared/entity-icon";
@@ -66,6 +66,7 @@ export function ViewIssues({ filter }: TProps) {
   return (
     <div className="flex w-full flex-col gap-2">
       <VirtualList
+        isSticky={isHeaderItem}
         flush
         items={items}
         getKey={(item) => (item.kind === "header" ? `type:${item.type}` : item.issue.id)}
@@ -86,7 +87,7 @@ export function ViewIssues({ filter }: TProps) {
 
 function StatusTypeHeader({ type, count }: { type: TStateType; count: number }) {
   return (
-    <div className="bg-muted dank:h-12 dank:bg-transparent dank:px-0 dank:group-data-flush/list:px-0 flex h-9 items-center gap-2 px-3 group-data-flush/list:px-6">
+    <div className="bg-muted dank:h-12 dank:bg-transparent dank:px-0 dank:group-data-flush/list:px-0 flex h-9 items-center gap-2 px-3">
       <StateIcon type={type} />
       <span className="dank:type-title-small text-sm font-medium">{stateTypeLabels[type]}</span>
       <span className="text-muted-foreground dank:type-label-large text-xs tabular-nums">
@@ -107,7 +108,7 @@ function IssueRow({ issue }: { issue: Issue }) {
       to="/$workspace/issue/$identifier"
       params={{ workspace: workspace.urlKey, identifier: issue.identifier }}
       role="listitem"
-      className="has-hover:hover:bg-muted focus-visible:bg-muted flex h-9 w-full items-center gap-2 border-b px-3 text-sm outline-hidden group-data-flush/list:h-11 group-data-flush/list:px-6 last:border-b-0"
+      className="has-hover:hover:bg-muted focus-visible:bg-muted flex h-9 w-full items-center gap-2 border-b px-3 text-sm outline-hidden group-data-flush/list:h-11 last:border-b-0"
     >
       <PriorityIcon priority={issue.priority} />
       <span className="text-muted-foreground w-16 shrink-0 font-mono text-xs">
@@ -178,7 +179,7 @@ function ProjectRow({ project }: { project: Project }) {
       to="/$workspace/project/$slug"
       params={{ workspace: workspace.urlKey, slug: project.slugId }}
       role="listitem"
-      className="has-hover:hover:bg-muted focus-visible:bg-muted flex h-9 w-full items-center gap-2 border-b px-3 text-sm outline-hidden group-data-flush/list:h-11 group-data-flush/list:px-6 last:border-b-0"
+      className="has-hover:hover:bg-muted focus-visible:bg-muted flex h-9 w-full items-center gap-2 border-b px-3 text-sm outline-hidden group-data-flush/list:h-11 last:border-b-0"
     >
       <EntityIcon icon={project.icon} color={project.color} fallback={BoxIcon} />
       <span className="min-w-0 flex-1 truncate">{project.name}</span>

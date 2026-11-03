@@ -37,10 +37,10 @@ export function PageContainer({ width = "full", scroll = "pane", children }: TPr
     >
       <div
         className={cn(
-          "dank:animate-in dank:fade-in-0 dank:slide-in-from-bottom-2 dank:ease-spring-default-spatial dank:duration-(--spring-default-spatial-duration) dank:motion-reduce:animate-none mx-auto flex w-full flex-1 flex-col gap-4 px-4 pt-4 pb-8",
+          "dank:animate-in dank:fade-in-0 dank:slide-in-from-bottom-2 dank:ease-spring-default-spatial dank:duration-(--spring-default-spatial-duration) dank:motion-reduce:animate-none mx-auto flex w-full flex-1 flex-col gap-4 pb-8",
           width === "narrow"
-            ? "max-w-3xl sm:px-6 sm:pt-10"
-            : "dank:md:px-10 dank:md:pt-8 max-w-none",
+            ? "max-w-3xl px-4 pt-4 sm:px-6 sm:pt-10"
+            : "dank:md:px-10 dank:md:pt-8 max-w-none px-4 pt-4",
         )}
       >
         {children}
@@ -61,6 +61,7 @@ export function PageContainer({ width = "full", scroll = "pane", children }: TPr
           <div
             ref={setBar}
             data-slot="page-bar-slot"
+            data-sticky-bar
             className="bg-background shrink-0 overflow-hidden rounded-lg empty:hidden max-md:sticky max-md:top-0 max-md:z-10"
           />
           {page}

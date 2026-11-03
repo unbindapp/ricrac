@@ -13,7 +13,7 @@ import {
 } from "@/components/initiatives/initiative-status";
 import { nestInitiatives } from "@/components/initiatives/initiative-tree";
 import { NewInitiativeDialog } from "@/components/initiatives/new-initiative-dialog";
-import { VirtualList } from "@/components/layout/list";
+import { VirtualList, isHeaderItem } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -158,6 +158,7 @@ function InitiativeList({
 
   return (
     <VirtualList
+      isSticky={isHeaderItem}
       flush
       items={items}
       getKey={initiativeListKey}
@@ -174,7 +175,7 @@ function InitiativeList({
           );
         }
         return (
-          <div className="bg-muted dank:h-12 dank:gap-1 dank:bg-transparent dank:px-0 flex h-9 items-center px-1.5 group-data-flush/list:px-4">
+          <div className="bg-muted dank:h-12 dank:gap-1 dank:bg-transparent dank:px-0 flex h-9 items-center px-1.5 group-data-flush/list:px-1">
             <GroupToggle
               icon={<InitiativeStatusIcon status={item.status} />}
               label={initiativeStatusLabels[item.status]}

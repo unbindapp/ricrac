@@ -1,4 +1,5 @@
 import { cn } from "@/components/ui/utils";
+import { storedColorStyle } from "@/lib/helpers/colors";
 
 export type TStateType = "triage" | "backlog" | "unstarted" | "started" | "completed" | "canceled";
 
@@ -40,8 +41,12 @@ function partialArc(progress: number) {
 
 export function StateIcon({ type, color, name, progress = 0.5, className }: TProps) {
   const label = name ?? stateTypeLabels[type];
-  const classes = cn("size-3.5 shrink-0", !color && "text-muted-foreground", className);
-  const style = color ? { color } : undefined;
+  const classes = cn(
+    "size-3.5 shrink-0",
+    color ? "stored-color" : "text-muted-foreground",
+    className,
+  );
+  const style = storedColorStyle(color);
 
   switch (type) {
     case "triage":
