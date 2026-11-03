@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import type { ReactElement, ReactNode } from "react";
 
 import type { Discussion } from "@/api/ops.gen";
+import { AddToBoardMenu } from "@/components/boards/add-to-board-menu";
 import { DiscussionTagBadges } from "@/components/forum/discussion-tags";
 import {
   ExternalLinkIcon,
@@ -218,6 +219,7 @@ export function DiscussionContextMenu({
               {isClosed ? "Reopen discussion" : "Close discussion"}
             </DropdownMenuItem>
           )}
+          {canEdit && <AddToBoardMenu subject={{ kind: "discussion", id: discussion.id }} />}
           <DropdownMenuItem
             onClick={() => {
               copyToClipboard(discussion.url);

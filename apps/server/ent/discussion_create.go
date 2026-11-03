@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"ricrac/ent/boardcard"
 	"ricrac/ent/comment"
 	"ricrac/ent/discussion"
 	"ricrac/ent/discussionthread"
@@ -329,6 +330,21 @@ func (_c *DiscussionCreate) AddVersions(v ...*MessageVersion) *DiscussionCreate 
 	return _c.AddVersionIDs(ids...)
 }
 
+// AddBoardCardIDs adds the "board_cards" edge to the BoardCard entity by IDs.
+func (_c *DiscussionCreate) AddBoardCardIDs(ids ...uuid.UUID) *DiscussionCreate {
+	_c.mutation.AddBoardCardIDs(ids...)
+	return _c
+}
+
+// AddBoardCards adds the "board_cards" edges to the BoardCard entity.
+func (_c *DiscussionCreate) AddBoardCards(v ...*BoardCard) *DiscussionCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddBoardCardIDs(ids...)
+}
+
 // Mutation returns the DiscussionMutation object of the builder.
 func (_c *DiscussionCreate) Mutation() *DiscussionMutation {
 	return _c.mutation
@@ -608,6 +624,22 @@ func (_c *DiscussionCreate) createSpec() (*Discussion, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.BoardCardsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   discussion.BoardCardsTable,
+			Columns: []string{discussion.BoardCardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(boardcard.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

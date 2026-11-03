@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"math"
 	"ricrac/ent/board"
+	"ricrac/ent/boardcard"
 	"ricrac/ent/boardcolumn"
-	"ricrac/ent/boardissue"
 	"ricrac/ent/predicate"
 	"ricrac/ent/user"
 	"ricrac/ent/workspace"
@@ -25,15 +25,15 @@ import (
 // BoardQuery is the builder for querying Board entities.
 type BoardQuery struct {
 	config
-	ctx             *QueryContext
-	order           []board.OrderOption
-	inters          []Interceptor
-	predicates      []predicate.Board
-	withWorkspace   *WorkspaceQuery
-	withCreator     *UserQuery
-	withColumns     *BoardColumnQuery
-	withBoardIssues *BoardIssueQuery
-	modifiers       []func(*sql.Selector)
+	ctx            *QueryContext
+	order          []board.OrderOption
+	inters         []Interceptor
+	predicates     []predicate.Board
+	withWorkspace  *WorkspaceQuery
+	withCreator    *UserQuery
+	withColumns    *BoardColumnQuery
+	withBoardCards *BoardCardQuery
+	modifiers      []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -136,9 +136,9 @@ func (_q *BoardQuery) QueryColumns() *BoardColumnQuery {
 	return query
 }
 
-// QueryBoardIssues chains the current query on the "board_issues" edge.
-func (_q *BoardQuery) QueryBoardIssues() *BoardIssueQuery {
-	query := (&BoardIssueClient{config: _q.config}).Query()
+// QueryBoardCards chains the current query on the "board_cards" edge.
+func (_q *BoardQuery) QueryBoardCards() *BoardCardQuery {
+	query := (&BoardCardClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -149,8 +149,8 @@ func (_q *BoardQuery) QueryBoardIssues() *BoardIssueQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(board.Table, board.FieldID, selector),
-			sqlgraph.To(boardissue.Table, boardissue.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, board.BoardIssuesTable, board.BoardIssuesColumn),
+			sqlgraph.To(boardcard.Table, boardcard.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, board.BoardCardsTable, board.BoardCardsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -345,15 +345,15 @@ func (_q *BoardQuery) Clone() *BoardQuery {
 		return nil
 	}
 	return &BoardQuery{
-		config:          _q.config,
-		ctx:             _q.ctx.Clone(),
-		order:           append([]board.OrderOption{}, _q.order...),
-		inters:          append([]Interceptor{}, _q.inters...),
-		predicates:      append([]predicate.Board{}, _q.predicates...),
-		withWorkspace:   _q.withWorkspace.Clone(),
-		withCreator:     _q.withCreator.Clone(),
-		withColumns:     _q.withColumns.Clone(),
-		withBoardIssues: _q.withBoardIssues.Clone(),
+		config:         _q.config,
+		ctx:            _q.ctx.Clone(),
+		order:          append([]board.OrderOption{}, _q.order...),
+		inters:         append([]Interceptor{}, _q.inters...),
+		predicates:     append([]predicate.Board{}, _q.predicates...),
+		withWorkspace:  _q.withWorkspace.Clone(),
+		withCreator:    _q.withCreator.Clone(),
+		withColumns:    _q.withColumns.Clone(),
+		withBoardCards: _q.withBoardCards.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
 		path:      _q.path,
@@ -394,14 +394,14 @@ func (_q *BoardQuery) WithColumns(opts ...func(*BoardColumnQuery)) *BoardQuery {
 	return _q
 }
 
-// WithBoardIssues tells the query-builder to eager-load the nodes that are connected to
-// the "board_issues" edge. The optional arguments are used to configure the query builder of the edge.
-func (_q *BoardQuery) WithBoardIssues(opts ...func(*BoardIssueQuery)) *BoardQuery {
-	query := (&BoardIssueClient{config: _q.config}).Query()
+// WithBoardCards tells the query-builder to eager-load the nodes that are connected to
+// the "board_cards" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *BoardQuery) WithBoardCards(opts ...func(*BoardCardQuery)) *BoardQuery {
+	query := (&BoardCardClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	_q.withBoardIssues = query
+	_q.withBoardCards = query
 	return _q
 }
 
@@ -487,7 +487,7 @@ func (_q *BoardQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Board,
 			_q.withWorkspace != nil,
 			_q.withCreator != nil,
 			_q.withColumns != nil,
-			_q.withBoardIssues != nil,
+			_q.withBoardCards != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -530,10 +530,10 @@ func (_q *BoardQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Board,
 			return nil, err
 		}
 	}
-	if query := _q.withBoardIssues; query != nil {
-		if err := _q.loadBoardIssues(ctx, query, nodes,
-			func(n *Board) { n.Edges.BoardIssues = []*BoardIssue{} },
-			func(n *Board, e *BoardIssue) { n.Edges.BoardIssues = append(n.Edges.BoardIssues, e) }); err != nil {
+	if query := _q.withBoardCards; query != nil {
+		if err := _q.loadBoardCards(ctx, query, nodes,
+			func(n *Board) { n.Edges.BoardCards = []*BoardCard{} },
+			func(n *Board, e *BoardCard) { n.Edges.BoardCards = append(n.Edges.BoardCards, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -631,7 +631,7 @@ func (_q *BoardQuery) loadColumns(ctx context.Context, query *BoardColumnQuery, 
 	}
 	return nil
 }
-func (_q *BoardQuery) loadBoardIssues(ctx context.Context, query *BoardIssueQuery, nodes []*Board, init func(*Board), assign func(*Board, *BoardIssue)) error {
+func (_q *BoardQuery) loadBoardCards(ctx context.Context, query *BoardCardQuery, nodes []*Board, init func(*Board), assign func(*Board, *BoardCard)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[uuid.UUID]*Board)
 	for i := range nodes {
@@ -642,10 +642,10 @@ func (_q *BoardQuery) loadBoardIssues(ctx context.Context, query *BoardIssueQuer
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(boardissue.FieldBoardID)
+		query.ctx.AppendFieldOnce(boardcard.FieldBoardID)
 	}
-	query.Where(predicate.BoardIssue(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(board.BoardIssuesColumn), fks...))
+	query.Where(predicate.BoardCard(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(board.BoardCardsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

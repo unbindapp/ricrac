@@ -46,6 +46,7 @@ export type BoardCard = {
 
 export type BoardColumn = {
   color: string | null
+  discussionCount: number
   id: string
   issueCount: number
   name: string
@@ -54,6 +55,14 @@ export type BoardColumn = {
 export type BoardColumnRef = {
   id: string
   name: string
+}
+
+export type BoardDiscussionCard = {
+  board: BoardRef
+  column: BoardColumnRef
+  discussion: Discussion
+  /** Order in the column, lowest first, among its issues and discussions. */
+  sortOrder: number
 }
 
 export type BoardRef = {
@@ -1632,6 +1641,13 @@ export type ReleaseStageRef = {
   id: string
   name: string
   type: string
+}
+
+export type RemovedDiscussionFromBoard = {
+  board: BoardRef
+  discussion: DiscussionRef
+  /** false when the discussion wasn't on the board. */
+  removed: boolean
 }
 
 export type RemovedFavorite = {
@@ -3526,7 +3542,7 @@ export type GetBoardArgs = {
 }
 
 export type SaveBoardArgs = {
-  /** All the board's columns, in order. Columns left out are removed and their issues taken off the board (the issues stay). New boards start with Ideas, Backlog, Doing and Done. */
+  /** All the board's columns, in order. Columns left out are removed and their cards taken off the board (the issues and discussions stay). New boards start with Ideas, Backlog, Doing and Done. */
   columns?: ({
     /** Hex color like #5e6ad2. */
     color?: string | null
@@ -3573,6 +3589,37 @@ export type RemoveFromBoardArgs = {
   board: string
   /** The issue: identifier like ENG-123, id or link. */
   issue: string
+}
+
+export type ListBoardDiscussionsArgs = {
+  /** The board's id, slug, link or name. */
+  board: string
+  /** Only this column (name or id). */
+  column?: string | null
+  /** The endCursor of the previous page, to continue after it. */
+  cursor?: string | null
+  /** Include each discussion's body. */
+  includeBody?: boolean
+  /** How many to return, 50 by default, at most 250. */
+  limit?: number | null
+}
+
+export type PlaceDiscussionOnBoardArgs = {
+  /** The board's id, slug, link or name. */
+  board: string
+  /** The column (name or id) to put it in. */
+  column: string
+  /** The discussion's id, slug, link or title. */
+  discussion: string
+  /** Order in the column, lowest first, among its issues and discussions. By default it keeps its place when already in the column, else goes last. */
+  sortOrder?: number | null
+}
+
+export type RemoveDiscussionFromBoardArgs = {
+  /** The board's id, slug, link or name. */
+  board: string
+  /** The discussion's id, slug, link or title. */
+  discussion: string
 }
 
 export type ListFavoritesArgs = {
@@ -4281,6 +4328,12 @@ export interface Ops {
 } }
   place_on_board: { args: PlaceOnBoardArgs; result: BoardCard }
   remove_from_board: { args: RemoveFromBoardArgs; result: RemovedFromBoard }
+  list_board_discussions: { args: ListBoardDiscussionsArgs; result: {
+  nodes: BoardDiscussionCard[]
+  pageInfo: PageInfo
+} }
+  place_discussion_on_board: { args: PlaceDiscussionOnBoardArgs; result: BoardDiscussionCard }
+  remove_discussion_from_board: { args: RemoveDiscussionFromBoardArgs; result: RemovedDiscussionFromBoard }
   list_favorites: { args: ListFavoritesArgs; result: {
   nodes: Favorite[]
   pageInfo: PageInfo

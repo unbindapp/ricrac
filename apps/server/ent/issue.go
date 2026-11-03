@@ -132,8 +132,8 @@ type IssueEdges struct {
 	IssueHistory []*IssueHistory `json:"issue_history,omitempty"`
 	// Attachments holds the value of the attachments edge.
 	Attachments []*Attachment `json:"attachments,omitempty"`
-	// BoardIssues holds the value of the board_issues edge.
-	BoardIssues []*BoardIssue `json:"board_issues,omitempty"`
+	// BoardCards holds the value of the board_cards edge.
+	BoardCards []*BoardCard `json:"board_cards,omitempty"`
 	// Documents holds the value of the documents edge.
 	Documents []*Document `json:"documents,omitempty"`
 	// Comments holds the value of the comments edge.
@@ -324,13 +324,13 @@ func (e IssueEdges) AttachmentsOrErr() ([]*Attachment, error) {
 	return nil, &NotLoadedError{edge: "attachments"}
 }
 
-// BoardIssuesOrErr returns the BoardIssues value or an error if the edge
+// BoardCardsOrErr returns the BoardCards value or an error if the edge
 // was not loaded in eager-loading.
-func (e IssueEdges) BoardIssuesOrErr() ([]*BoardIssue, error) {
+func (e IssueEdges) BoardCardsOrErr() ([]*BoardCard, error) {
 	if e.loadedTypes[15] {
-		return e.BoardIssues, nil
+		return e.BoardCards, nil
 	}
-	return nil, &NotLoadedError{edge: "board_issues"}
+	return nil, &NotLoadedError{edge: "board_cards"}
 }
 
 // DocumentsOrErr returns the Documents value or an error if the edge
@@ -823,9 +823,9 @@ func (_m *Issue) QueryAttachments() *AttachmentQuery {
 	return NewIssueClient(_m.config).QueryAttachments(_m)
 }
 
-// QueryBoardIssues queries the "board_issues" edge of the Issue entity.
-func (_m *Issue) QueryBoardIssues() *BoardIssueQuery {
-	return NewIssueClient(_m.config).QueryBoardIssues(_m)
+// QueryBoardCards queries the "board_cards" edge of the Issue entity.
+func (_m *Issue) QueryBoardCards() *BoardCardQuery {
+	return NewIssueClient(_m.config).QueryBoardCards(_m)
 }
 
 // QueryDocuments queries the "documents" edge of the Issue entity.

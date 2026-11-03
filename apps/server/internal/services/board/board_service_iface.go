@@ -16,6 +16,9 @@ type BoardServiceInterface interface {
 	Save(ctx context.Context, actor *auth.Actor, input *SaveInput) (models.Board, error)
 	Delete(ctx context.Context, actor *auth.Actor, input *IDInput) (models.DeletedBoard, error)
 	ListIssues(ctx context.Context, actor *auth.Actor, input *ListIssuesInput) (args.PageOf[models.BoardCard], error)
+	ListDiscussions(ctx context.Context, actor *auth.Actor, input *ListDiscussionsInput) (args.PageOf[models.BoardDiscussionCard], error)
 	Place(ctx context.Context, actor *auth.Actor, input *PlaceInput) (models.BoardCard, error)
+	PlaceDiscussion(ctx context.Context, actor *auth.Actor, input *PlaceDiscussionInput) (models.BoardDiscussionCard, error)
 	Remove(ctx context.Context, actor *auth.Actor, input *RemoveInput) (models.RemovedFromBoard, error)
+	RemoveDiscussion(ctx context.Context, actor *auth.Actor, input *RemoveDiscussionInput) (models.RemovedDiscussionFromBoard, error)
 }

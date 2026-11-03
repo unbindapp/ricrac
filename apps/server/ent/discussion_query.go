@@ -7,6 +7,7 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"math"
+	"ricrac/ent/boardcard"
 	"ricrac/ent/comment"
 	"ricrac/ent/discussion"
 	"ricrac/ent/discussionsubscriber"
@@ -43,6 +44,7 @@ type DiscussionQuery struct {
 	withSubscribers           *UserQuery
 	withVoters                *UserQuery
 	withVersions              *MessageVersionQuery
+	withBoardCards            *BoardCardQuery
 	withDiscussionSubscribers *DiscussionSubscriberQuery
 	withDiscussionVotes       *DiscussionVoteQuery
 	modifiers                 []func(*sql.Selector)
@@ -273,6 +275,28 @@ func (_q *DiscussionQuery) QueryVersions() *MessageVersionQuery {
 			sqlgraph.From(discussion.Table, discussion.FieldID, selector),
 			sqlgraph.To(messageversion.Table, messageversion.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, discussion.VersionsTable, discussion.VersionsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryBoardCards chains the current query on the "board_cards" edge.
+func (_q *DiscussionQuery) QueryBoardCards() *BoardCardQuery {
+	query := (&BoardCardClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(discussion.Table, discussion.FieldID, selector),
+			sqlgraph.To(boardcard.Table, boardcard.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, discussion.BoardCardsTable, discussion.BoardCardsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -525,6 +549,7 @@ func (_q *DiscussionQuery) Clone() *DiscussionQuery {
 		withSubscribers:           _q.withSubscribers.Clone(),
 		withVoters:                _q.withVoters.Clone(),
 		withVersions:              _q.withVersions.Clone(),
+		withBoardCards:            _q.withBoardCards.Clone(),
 		withDiscussionSubscribers: _q.withDiscussionSubscribers.Clone(),
 		withDiscussionVotes:       _q.withDiscussionVotes.Clone(),
 		// clone intermediate query.
@@ -633,6 +658,17 @@ func (_q *DiscussionQuery) WithVersions(opts ...func(*MessageVersionQuery)) *Dis
 	return _q
 }
 
+// WithBoardCards tells the query-builder to eager-load the nodes that are connected to
+// the "board_cards" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *DiscussionQuery) WithBoardCards(opts ...func(*BoardCardQuery)) *DiscussionQuery {
+	query := (&BoardCardClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withBoardCards = query
+	return _q
+}
+
 // WithDiscussionSubscribers tells the query-builder to eager-load the nodes that are connected to
 // the "discussion_subscribers" edge. The optional arguments are used to configure the query builder of the edge.
 func (_q *DiscussionQuery) WithDiscussionSubscribers(opts ...func(*DiscussionSubscriberQuery)) *DiscussionQuery {
@@ -733,7 +769,7 @@ func (_q *DiscussionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*D
 	var (
 		nodes       = []*Discussion{}
 		_spec       = _q.querySpec()
-		loadedTypes = [11]bool{
+		loadedTypes = [12]bool{
 			_q.withWorkspace != nil,
 			_q.withTeam != nil,
 			_q.withCreator != nil,
@@ -743,6 +779,7 @@ func (_q *DiscussionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*D
 			_q.withSubscribers != nil,
 			_q.withVoters != nil,
 			_q.withVersions != nil,
+			_q.withBoardCards != nil,
 			_q.withDiscussionSubscribers != nil,
 			_q.withDiscussionVotes != nil,
 		}
@@ -825,6 +862,13 @@ func (_q *DiscussionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*D
 		if err := _q.loadVersions(ctx, query, nodes,
 			func(n *Discussion) { n.Edges.Versions = []*MessageVersion{} },
 			func(n *Discussion, e *MessageVersion) { n.Edges.Versions = append(n.Edges.Versions, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withBoardCards; query != nil {
+		if err := _q.loadBoardCards(ctx, query, nodes,
+			func(n *Discussion) { n.Edges.BoardCards = []*BoardCard{} },
+			func(n *Discussion, e *BoardCard) { n.Edges.BoardCards = append(n.Edges.BoardCards, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1173,6 +1217,39 @@ func (_q *DiscussionQuery) loadVersions(ctx context.Context, query *MessageVersi
 	}
 	query.Where(predicate.MessageVersion(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(discussion.VersionsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.DiscussionID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "discussion_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "discussion_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *DiscussionQuery) loadBoardCards(ctx context.Context, query *BoardCardQuery, nodes []*Discussion, init func(*Discussion), assign func(*Discussion, *BoardCard)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Discussion)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(boardcard.FieldDiscussionID)
+	}
+	query.Where(predicate.BoardCard(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(discussion.BoardCardsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

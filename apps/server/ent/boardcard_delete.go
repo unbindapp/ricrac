@@ -4,7 +4,7 @@ package ent
 
 import (
 	"context"
-	"ricrac/ent/boardissue"
+	"ricrac/ent/boardcard"
 	"ricrac/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
@@ -12,26 +12,26 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// BoardIssueDelete is the builder for deleting a BoardIssue entity.
-type BoardIssueDelete struct {
+// BoardCardDelete is the builder for deleting a BoardCard entity.
+type BoardCardDelete struct {
 	config
 	hooks    []Hook
-	mutation *BoardIssueMutation
+	mutation *BoardCardMutation
 }
 
-// Where appends a list predicates to the BoardIssueDelete builder.
-func (_d *BoardIssueDelete) Where(ps ...predicate.BoardIssue) *BoardIssueDelete {
+// Where appends a list predicates to the BoardCardDelete builder.
+func (_d *BoardCardDelete) Where(ps ...predicate.BoardCard) *BoardCardDelete {
 	_d.mutation.Where(ps...)
 	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (_d *BoardIssueDelete) Exec(ctx context.Context) (int, error) {
+func (_d *BoardCardDelete) Exec(ctx context.Context) (int, error) {
 	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_d *BoardIssueDelete) ExecX(ctx context.Context) int {
+func (_d *BoardCardDelete) ExecX(ctx context.Context) int {
 	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
@@ -39,8 +39,8 @@ func (_d *BoardIssueDelete) ExecX(ctx context.Context) int {
 	return n
 }
 
-func (_d *BoardIssueDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(boardissue.Table, sqlgraph.NewFieldSpec(boardissue.FieldID, field.TypeUUID))
+func (_d *BoardCardDelete) sqlExec(ctx context.Context) (int, error) {
+	_spec := sqlgraph.NewDeleteSpec(boardcard.Table, sqlgraph.NewFieldSpec(boardcard.FieldID, field.TypeUUID))
 	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -56,32 +56,32 @@ func (_d *BoardIssueDelete) sqlExec(ctx context.Context) (int, error) {
 	return affected, err
 }
 
-// BoardIssueDeleteOne is the builder for deleting a single BoardIssue entity.
-type BoardIssueDeleteOne struct {
-	_d *BoardIssueDelete
+// BoardCardDeleteOne is the builder for deleting a single BoardCard entity.
+type BoardCardDeleteOne struct {
+	_d *BoardCardDelete
 }
 
-// Where appends a list predicates to the BoardIssueDelete builder.
-func (_d *BoardIssueDeleteOne) Where(ps ...predicate.BoardIssue) *BoardIssueDeleteOne {
+// Where appends a list predicates to the BoardCardDelete builder.
+func (_d *BoardCardDeleteOne) Where(ps ...predicate.BoardCard) *BoardCardDeleteOne {
 	_d._d.mutation.Where(ps...)
 	return _d
 }
 
 // Exec executes the deletion query.
-func (_d *BoardIssueDeleteOne) Exec(ctx context.Context) error {
+func (_d *BoardCardDeleteOne) Exec(ctx context.Context) error {
 	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
 	case n == 0:
-		return &NotFoundError{boardissue.Label}
+		return &NotFoundError{boardcard.Label}
 	default:
 		return nil
 	}
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_d *BoardIssueDeleteOne) ExecX(ctx context.Context) {
+func (_d *BoardCardDeleteOne) ExecX(ctx context.Context) {
 	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}

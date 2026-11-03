@@ -354,21 +354,21 @@ func HasBoardWith(preds ...predicate.Board) predicate.BoardColumn {
 	})
 }
 
-// HasBoardIssues applies the HasEdge predicate on the "board_issues" edge.
-func HasBoardIssues() predicate.BoardColumn {
+// HasBoardCards applies the HasEdge predicate on the "board_cards" edge.
+func HasBoardCards() predicate.BoardColumn {
 	return predicate.BoardColumn(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, BoardIssuesTable, BoardIssuesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, BoardCardsTable, BoardCardsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasBoardIssuesWith applies the HasEdge predicate on the "board_issues" edge with a given conditions (other predicates).
-func HasBoardIssuesWith(preds ...predicate.BoardIssue) predicate.BoardColumn {
+// HasBoardCardsWith applies the HasEdge predicate on the "board_cards" edge with a given conditions (other predicates).
+func HasBoardCardsWith(preds ...predicate.BoardCard) predicate.BoardColumn {
 	return predicate.BoardColumn(func(s *sql.Selector) {
-		step := newBoardIssuesStep()
+		step := newBoardCardsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

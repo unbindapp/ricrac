@@ -7,8 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"ricrac/ent/board"
+	"ricrac/ent/boardcard"
 	"ricrac/ent/boardcolumn"
-	"ricrac/ent/boardissue"
 	"time"
 
 	"entgo.io/ent/dialect"
@@ -91,19 +91,19 @@ func (_c *BoardColumnCreate) SetBoard(v *Board) *BoardColumnCreate {
 	return _c.SetBoardID(v.ID)
 }
 
-// AddBoardIssueIDs adds the "board_issues" edge to the BoardIssue entity by IDs.
-func (_c *BoardColumnCreate) AddBoardIssueIDs(ids ...uuid.UUID) *BoardColumnCreate {
-	_c.mutation.AddBoardIssueIDs(ids...)
+// AddBoardCardIDs adds the "board_cards" edge to the BoardCard entity by IDs.
+func (_c *BoardColumnCreate) AddBoardCardIDs(ids ...uuid.UUID) *BoardColumnCreate {
+	_c.mutation.AddBoardCardIDs(ids...)
 	return _c
 }
 
-// AddBoardIssues adds the "board_issues" edges to the BoardIssue entity.
-func (_c *BoardColumnCreate) AddBoardIssues(v ...*BoardIssue) *BoardColumnCreate {
+// AddBoardCards adds the "board_cards" edges to the BoardCard entity.
+func (_c *BoardColumnCreate) AddBoardCards(v ...*BoardCard) *BoardColumnCreate {
 	ids := make([]uuid.UUID, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return _c.AddBoardIssueIDs(ids...)
+	return _c.AddBoardCardIDs(ids...)
 }
 
 // Mutation returns the BoardColumnMutation object of the builder.
@@ -230,15 +230,15 @@ func (_c *BoardColumnCreate) createSpec() (*BoardColumn, *sqlgraph.CreateSpec) {
 		_node.BoardID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := _c.mutation.BoardIssuesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.BoardCardsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   boardcolumn.BoardIssuesTable,
-			Columns: []string{boardcolumn.BoardIssuesColumn},
+			Table:   boardcolumn.BoardCardsTable,
+			Columns: []string{boardcolumn.BoardCardsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(boardissue.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(boardcard.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

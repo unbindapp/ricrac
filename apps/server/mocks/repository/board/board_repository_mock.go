@@ -7,6 +7,7 @@ package mocks_repository_board
 import (
 	"context"
 	"ricrac/ent"
+	"ricrac/internal/models"
 	"ricrac/internal/repositories"
 	"ricrac/internal/repositories/board"
 
@@ -51,27 +52,27 @@ func (_m *BoardRepositoryMock) EXPECT() *BoardRepositoryMock_Expecter {
 }
 
 // Card provides a mock function for the type BoardRepositoryMock
-func (_mock *BoardRepositoryMock) Card(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, issueID uuid.UUID) (*ent.BoardIssue, error) {
-	ret := _mock.Called(ctx, tx, boardID, issueID)
+func (_mock *BoardRepositoryMock) Card(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, subject board_repo.Subject) (*ent.BoardCard, error) {
+	ret := _mock.Called(ctx, tx, boardID, subject)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Card")
 	}
 
-	var r0 *ent.BoardIssue
+	var r0 *ent.BoardCard
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) (*ent.BoardIssue, error)); ok {
-		return returnFunc(ctx, tx, boardID, issueID)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, board_repo.Subject) (*ent.BoardCard, error)); ok {
+		return returnFunc(ctx, tx, boardID, subject)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) *ent.BoardIssue); ok {
-		r0 = returnFunc(ctx, tx, boardID, issueID)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, board_repo.Subject) *ent.BoardCard); ok {
+		r0 = returnFunc(ctx, tx, boardID, subject)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*ent.BoardIssue)
+			r0 = ret.Get(0).(*ent.BoardCard)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) error); ok {
-		r1 = returnFunc(ctx, tx, boardID, issueID)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, board_repo.Subject) error); ok {
+		r1 = returnFunc(ctx, tx, boardID, subject)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -87,12 +88,12 @@ type BoardRepositoryMock_Card_Call struct {
 //   - ctx context.Context
 //   - tx repository.TxInterface
 //   - boardID uuid.UUID
-//   - issueID uuid.UUID
-func (_e *BoardRepositoryMock_Expecter) Card(ctx any, tx any, boardID any, issueID any) *BoardRepositoryMock_Card_Call {
-	return &BoardRepositoryMock_Card_Call{Call: _e.mock.On("Card", ctx, tx, boardID, issueID)}
+//   - subject board_repo.Subject
+func (_e *BoardRepositoryMock_Expecter) Card(ctx any, tx any, boardID any, subject any) *BoardRepositoryMock_Card_Call {
+	return &BoardRepositoryMock_Card_Call{Call: _e.mock.On("Card", ctx, tx, boardID, subject)}
 }
 
-func (_c *BoardRepositoryMock_Card_Call) Run(run func(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, issueID uuid.UUID)) *BoardRepositoryMock_Card_Call {
+func (_c *BoardRepositoryMock_Card_Call) Run(run func(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, subject board_repo.Subject)) *BoardRepositoryMock_Card_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -106,9 +107,9 @@ func (_c *BoardRepositoryMock_Card_Call) Run(run func(ctx context.Context, tx re
 		if args[2] != nil {
 			arg2 = args[2].(uuid.UUID)
 		}
-		var arg3 uuid.UUID
+		var arg3 board_repo.Subject
 		if args[3] != nil {
-			arg3 = args[3].(uuid.UUID)
+			arg3 = args[3].(board_repo.Subject)
 		}
 		run(
 			arg0,
@@ -120,34 +121,34 @@ func (_c *BoardRepositoryMock_Card_Call) Run(run func(ctx context.Context, tx re
 	return _c
 }
 
-func (_c *BoardRepositoryMock_Card_Call) Return(boardIssue *ent.BoardIssue, err error) *BoardRepositoryMock_Card_Call {
-	_c.Call.Return(boardIssue, err)
+func (_c *BoardRepositoryMock_Card_Call) Return(boardCard *ent.BoardCard, err error) *BoardRepositoryMock_Card_Call {
+	_c.Call.Return(boardCard, err)
 	return _c
 }
 
-func (_c *BoardRepositoryMock_Card_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, issueID uuid.UUID) (*ent.BoardIssue, error)) *BoardRepositoryMock_Card_Call {
+func (_c *BoardRepositoryMock_Card_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, subject board_repo.Subject) (*ent.BoardCard, error)) *BoardRepositoryMock_Card_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Cards provides a mock function for the type BoardRepositoryMock
-func (_mock *BoardRepositoryMock) Cards(ctx context.Context, filter board_repo.CardFilter) ([]*ent.BoardIssue, error) {
+func (_mock *BoardRepositoryMock) Cards(ctx context.Context, filter board_repo.CardFilter) ([]*ent.BoardCard, error) {
 	ret := _mock.Called(ctx, filter)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Cards")
 	}
 
-	var r0 []*ent.BoardIssue
+	var r0 []*ent.BoardCard
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, board_repo.CardFilter) ([]*ent.BoardIssue, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, board_repo.CardFilter) ([]*ent.BoardCard, error)); ok {
 		return returnFunc(ctx, filter)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, board_repo.CardFilter) []*ent.BoardIssue); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, board_repo.CardFilter) []*ent.BoardCard); ok {
 		r0 = returnFunc(ctx, filter)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*ent.BoardIssue)
+			r0 = ret.Get(0).([]*ent.BoardCard)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context, board_repo.CardFilter) error); ok {
@@ -188,12 +189,12 @@ func (_c *BoardRepositoryMock_Cards_Call) Run(run func(ctx context.Context, filt
 	return _c
 }
 
-func (_c *BoardRepositoryMock_Cards_Call) Return(boardIssues []*ent.BoardIssue, err error) *BoardRepositoryMock_Cards_Call {
-	_c.Call.Return(boardIssues, err)
+func (_c *BoardRepositoryMock_Cards_Call) Return(boardCards []*ent.BoardCard, err error) *BoardRepositoryMock_Cards_Call {
+	_c.Call.Return(boardCards, err)
 	return _c
 }
 
-func (_c *BoardRepositoryMock_Cards_Call) RunAndReturn(run func(ctx context.Context, filter board_repo.CardFilter) ([]*ent.BoardIssue, error)) *BoardRepositoryMock_Cards_Call {
+func (_c *BoardRepositoryMock_Cards_Call) RunAndReturn(run func(ctx context.Context, filter board_repo.CardFilter) ([]*ent.BoardCard, error)) *BoardRepositoryMock_Cards_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -273,23 +274,23 @@ func (_c *BoardRepositoryMock_Columns_Call) RunAndReturn(run func(ctx context.Co
 }
 
 // Counts provides a mock function for the type BoardRepositoryMock
-func (_mock *BoardRepositoryMock) Counts(ctx context.Context, boards []uuid.UUID, visible board_repo.Visible) (map[uuid.UUID]int, error) {
+func (_mock *BoardRepositoryMock) Counts(ctx context.Context, boards []uuid.UUID, visible board_repo.Visible) (map[uuid.UUID]models.BoardColumnCounts, error) {
 	ret := _mock.Called(ctx, boards, visible)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Counts")
 	}
 
-	var r0 map[uuid.UUID]int
+	var r0 map[uuid.UUID]models.BoardColumnCounts
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, []uuid.UUID, board_repo.Visible) (map[uuid.UUID]int, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, []uuid.UUID, board_repo.Visible) (map[uuid.UUID]models.BoardColumnCounts, error)); ok {
 		return returnFunc(ctx, boards, visible)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, []uuid.UUID, board_repo.Visible) map[uuid.UUID]int); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, []uuid.UUID, board_repo.Visible) map[uuid.UUID]models.BoardColumnCounts); ok {
 		r0 = returnFunc(ctx, boards, visible)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(map[uuid.UUID]int)
+			r0 = ret.Get(0).(map[uuid.UUID]models.BoardColumnCounts)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context, []uuid.UUID, board_repo.Visible) error); ok {
@@ -336,12 +337,12 @@ func (_c *BoardRepositoryMock_Counts_Call) Run(run func(ctx context.Context, boa
 	return _c
 }
 
-func (_c *BoardRepositoryMock_Counts_Call) Return(uUIDToInt map[uuid.UUID]int, err error) *BoardRepositoryMock_Counts_Call {
-	_c.Call.Return(uUIDToInt, err)
+func (_c *BoardRepositoryMock_Counts_Call) Return(uUIDToBoardColumnCounts map[uuid.UUID]models.BoardColumnCounts, err error) *BoardRepositoryMock_Counts_Call {
+	_c.Call.Return(uUIDToBoardColumnCounts, err)
 	return _c
 }
 
-func (_c *BoardRepositoryMock_Counts_Call) RunAndReturn(run func(ctx context.Context, boards []uuid.UUID, visible board_repo.Visible) (map[uuid.UUID]int, error)) *BoardRepositoryMock_Counts_Call {
+func (_c *BoardRepositoryMock_Counts_Call) RunAndReturn(run func(ctx context.Context, boards []uuid.UUID, visible board_repo.Visible) (map[uuid.UUID]models.BoardColumnCounts, error)) *BoardRepositoryMock_Counts_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -910,16 +911,16 @@ func (_c *BoardRepositoryMock_LoadAll_Call) RunAndReturn(run func(ctx context.Co
 }
 
 // Place provides a mock function for the type BoardRepositoryMock
-func (_mock *BoardRepositoryMock) Place(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, column uuid.UUID, issueID uuid.UUID, sortOrder float64) error {
-	ret := _mock.Called(ctx, tx, boardID, column, issueID, sortOrder)
+func (_mock *BoardRepositoryMock) Place(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, column uuid.UUID, subject board_repo.Subject, sortOrder float64) error {
+	ret := _mock.Called(ctx, tx, boardID, column, subject, sortOrder)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Place")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, uuid.UUID, float64) error); ok {
-		r0 = returnFunc(ctx, tx, boardID, column, issueID, sortOrder)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID, board_repo.Subject, float64) error); ok {
+		r0 = returnFunc(ctx, tx, boardID, column, subject, sortOrder)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -936,13 +937,13 @@ type BoardRepositoryMock_Place_Call struct {
 //   - tx repository.TxInterface
 //   - boardID uuid.UUID
 //   - column uuid.UUID
-//   - issueID uuid.UUID
+//   - subject board_repo.Subject
 //   - sortOrder float64
-func (_e *BoardRepositoryMock_Expecter) Place(ctx any, tx any, boardID any, column any, issueID any, sortOrder any) *BoardRepositoryMock_Place_Call {
-	return &BoardRepositoryMock_Place_Call{Call: _e.mock.On("Place", ctx, tx, boardID, column, issueID, sortOrder)}
+func (_e *BoardRepositoryMock_Expecter) Place(ctx any, tx any, boardID any, column any, subject any, sortOrder any) *BoardRepositoryMock_Place_Call {
+	return &BoardRepositoryMock_Place_Call{Call: _e.mock.On("Place", ctx, tx, boardID, column, subject, sortOrder)}
 }
 
-func (_c *BoardRepositoryMock_Place_Call) Run(run func(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, column uuid.UUID, issueID uuid.UUID, sortOrder float64)) *BoardRepositoryMock_Place_Call {
+func (_c *BoardRepositoryMock_Place_Call) Run(run func(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, column uuid.UUID, subject board_repo.Subject, sortOrder float64)) *BoardRepositoryMock_Place_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -960,9 +961,9 @@ func (_c *BoardRepositoryMock_Place_Call) Run(run func(ctx context.Context, tx r
 		if args[3] != nil {
 			arg3 = args[3].(uuid.UUID)
 		}
-		var arg4 uuid.UUID
+		var arg4 board_repo.Subject
 		if args[4] != nil {
-			arg4 = args[4].(uuid.UUID)
+			arg4 = args[4].(board_repo.Subject)
 		}
 		var arg5 float64
 		if args[5] != nil {
@@ -985,14 +986,14 @@ func (_c *BoardRepositoryMock_Place_Call) Return(err error) *BoardRepositoryMock
 	return _c
 }
 
-func (_c *BoardRepositoryMock_Place_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, column uuid.UUID, issueID uuid.UUID, sortOrder float64) error) *BoardRepositoryMock_Place_Call {
+func (_c *BoardRepositoryMock_Place_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, column uuid.UUID, subject board_repo.Subject, sortOrder float64) error) *BoardRepositoryMock_Place_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Remove provides a mock function for the type BoardRepositoryMock
-func (_mock *BoardRepositoryMock) Remove(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, issueID uuid.UUID) (bool, error) {
-	ret := _mock.Called(ctx, tx, boardID, issueID)
+func (_mock *BoardRepositoryMock) Remove(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, subject board_repo.Subject) (bool, error) {
+	ret := _mock.Called(ctx, tx, boardID, subject)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Remove")
@@ -1000,16 +1001,16 @@ func (_mock *BoardRepositoryMock) Remove(ctx context.Context, tx repository.TxIn
 
 	var r0 bool
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) (bool, error)); ok {
-		return returnFunc(ctx, tx, boardID, issueID)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, board_repo.Subject) (bool, error)); ok {
+		return returnFunc(ctx, tx, boardID, subject)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) bool); ok {
-		r0 = returnFunc(ctx, tx, boardID, issueID)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repository.TxInterface, uuid.UUID, board_repo.Subject) bool); ok {
+		r0 = returnFunc(ctx, tx, boardID, subject)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, uuid.UUID) error); ok {
-		r1 = returnFunc(ctx, tx, boardID, issueID)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repository.TxInterface, uuid.UUID, board_repo.Subject) error); ok {
+		r1 = returnFunc(ctx, tx, boardID, subject)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -1025,12 +1026,12 @@ type BoardRepositoryMock_Remove_Call struct {
 //   - ctx context.Context
 //   - tx repository.TxInterface
 //   - boardID uuid.UUID
-//   - issueID uuid.UUID
-func (_e *BoardRepositoryMock_Expecter) Remove(ctx any, tx any, boardID any, issueID any) *BoardRepositoryMock_Remove_Call {
-	return &BoardRepositoryMock_Remove_Call{Call: _e.mock.On("Remove", ctx, tx, boardID, issueID)}
+//   - subject board_repo.Subject
+func (_e *BoardRepositoryMock_Expecter) Remove(ctx any, tx any, boardID any, subject any) *BoardRepositoryMock_Remove_Call {
+	return &BoardRepositoryMock_Remove_Call{Call: _e.mock.On("Remove", ctx, tx, boardID, subject)}
 }
 
-func (_c *BoardRepositoryMock_Remove_Call) Run(run func(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, issueID uuid.UUID)) *BoardRepositoryMock_Remove_Call {
+func (_c *BoardRepositoryMock_Remove_Call) Run(run func(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, subject board_repo.Subject)) *BoardRepositoryMock_Remove_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -1044,9 +1045,9 @@ func (_c *BoardRepositoryMock_Remove_Call) Run(run func(ctx context.Context, tx 
 		if args[2] != nil {
 			arg2 = args[2].(uuid.UUID)
 		}
-		var arg3 uuid.UUID
+		var arg3 board_repo.Subject
 		if args[3] != nil {
-			arg3 = args[3].(uuid.UUID)
+			arg3 = args[3].(board_repo.Subject)
 		}
 		run(
 			arg0,
@@ -1063,7 +1064,7 @@ func (_c *BoardRepositoryMock_Remove_Call) Return(b bool, err error) *BoardRepos
 	return _c
 }
 
-func (_c *BoardRepositoryMock_Remove_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, issueID uuid.UUID) (bool, error)) *BoardRepositoryMock_Remove_Call {
+func (_c *BoardRepositoryMock_Remove_Call) RunAndReturn(run func(ctx context.Context, tx repository.TxInterface, boardID uuid.UUID, subject board_repo.Subject) (bool, error)) *BoardRepositoryMock_Remove_Call {
 	_c.Call.Return(run)
 	return _c
 }

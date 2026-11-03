@@ -1,11 +1,36 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import type { Board, BoardCard } from "@/api/ops.gen";
+import type {
+  Board,
+  BoardCard,
+  BoardColumnRef,
+  BoardDiscussionCard,
+  Discussion,
+  Issue,
+  RemovedDiscussionFromBoard,
+  RemovedFromBoard,
+} from "@/api/ops.gen";
 import { invalidateIssues } from "@/lib/queries/issues";
 import { call, callAll, type OpArgs } from "@/lib/server/client";
 
 export type TBoard = Board;
-export type TBoardCard = BoardCard;
+
+export type TBoardSubject = { kind: "issue" | "discussion"; id: string };
+
+type TPlacement = { column: BoardColumnRef; sortOrder: number };
+
+export type TBoardItem = TPlacement &
+  (
+    | { kind: "issue"; id: string; issue: Issue }
+    | { kind: "discussion"; id: string; discussion: Discussion }
+  );
+
+export function boardItemKey(subject: TBoardSubject) {
+  return `${subject.kind}:${subject.id}`;
+}
+
+const isSubject = (item: TBoardItem, subject: TBoardSubject) =>
+  item.kind === subject.kind && item.id === subject.id;
 
 export const queryKeyBoards = {
   all: (workspaceId: string) => [workspaceId, "boards"] as const,
@@ -29,10 +54,32 @@ export const boardQuery = (workspaceId: string, board: string) =>
     retry: false,
   });
 
+/** The board's issues and discussions together, ordered by column through sortOrder. */
 export const boardCardsQuery = (workspaceId: string, boardId: string) =>
   queryOptions({
     queryKey: queryKeyBoards.cards(workspaceId, boardId),
-    queryFn: () => callAll(workspaceId, "list_board_issues", { board: boardId }),
+    queryFn: async (): Promise<TBoardItem[]> => {
+      const [issues, discussions] = await Promise.all([
+        callAll(workspaceId, "list_board_issues", { board: boardId }),
+        callAll(workspaceId, "list_board_discussions", { board: boardId, includeBody: true }),
+      ]);
+      return [
+        ...issues.map(({ column, sortOrder, issue }) => ({
+          kind: "issue" as const,
+          id: issue.id,
+          column,
+          sortOrder,
+          issue,
+        })),
+        ...discussions.map(({ column, sortOrder, discussion }) => ({
+          kind: "discussion" as const,
+          id: discussion.id,
+          column,
+          sortOrder,
+          discussion,
+        })),
+      ];
+    },
   });
 
 /** The part of a board's link after /board/: its name and slug id, which get_board takes. */
@@ -63,28 +110,51 @@ export function useDeleteBoardMutation(workspaceId: string) {
   });
 }
 
+type TPlaceArgs = {
+  subject: TBoardSubject;
+  column: string;
+  columnName?: string;
+  sortOrder?: number;
+};
+
+function placeOnBoard(
+  workspaceId: string,
+  boardId: string,
+  args: TPlaceArgs,
+): Promise<BoardCard | BoardDiscussionCard> {
+  const { subject, column, sortOrder } = args;
+  if (subject.kind === "discussion") {
+    return call(workspaceId, "place_discussion_on_board", {
+      board: boardId,
+      discussion: subject.id,
+      column,
+      sortOrder,
+    });
+  }
+  return call(workspaceId, "place_on_board", {
+    board: boardId,
+    issue: subject.id,
+    column,
+    sortOrder,
+  });
+}
+
 export function usePlaceOnBoardMutation(workspaceId: string, boardId: string) {
   const queryClient = useQueryClient();
   const key = queryKeyBoards.cards(workspaceId, boardId);
   return useMutation({
-    mutationFn: (args: Omit<OpArgs<"place_on_board">, "board"> & { columnName?: string }) =>
-      call(workspaceId, "place_on_board", {
-        board: boardId,
-        issue: args.issue,
-        column: args.column,
-        sortOrder: args.sortOrder,
-      }),
+    mutationFn: (args: TPlaceArgs) => placeOnBoard(workspaceId, boardId, args),
     meta: { errorTitle: "Could not move the card" },
-    onMutate: async ({ issue, column, columnName, sortOrder }) => {
+    onMutate: async ({ subject, column, columnName, sortOrder }) => {
       await queryClient.cancelQueries({ queryKey: key });
-      const previous = queryClient.getQueryData<TBoardCard[]>(key);
+      const previous = queryClient.getQueryData<TBoardItem[]>(key);
       if (previous && columnName !== undefined && sortOrder != null) {
-        queryClient.setQueryData<TBoardCard[]>(
+        queryClient.setQueryData<TBoardItem[]>(
           key,
-          previous.map((card) =>
-            card.issue.id === issue
-              ? { ...card, column: { id: column, name: columnName }, sortOrder }
-              : card,
+          previous.map((item) =>
+            isSubject(item, subject)
+              ? { ...item, column: { id: column, name: columnName }, sortOrder }
+              : item,
           ),
         );
       }
@@ -100,9 +170,24 @@ export function usePlaceOnBoardMutation(workspaceId: string, boardId: string) {
 export function useRemoveFromBoardMutation(workspaceId: string, boardId: string) {
   const invalidate = useInvalidateBoards(workspaceId);
   return useMutation({
-    mutationFn: (issue: string) =>
-      call(workspaceId, "remove_from_board", { board: boardId, issue }),
+    mutationFn: (subject: TBoardSubject): Promise<RemovedFromBoard | RemovedDiscussionFromBoard> =>
+      subject.kind === "discussion"
+        ? call(workspaceId, "remove_discussion_from_board", {
+            board: boardId,
+            discussion: subject.id,
+          })
+        : call(workspaceId, "remove_from_board", { board: boardId, issue: subject.id }),
     meta: { errorTitle: "Could not remove the card" },
+    onSuccess: invalidate,
+  });
+}
+
+export function useAddToBoardMutation(workspaceId: string) {
+  const invalidate = useInvalidateBoards(workspaceId);
+  return useMutation({
+    mutationFn: ({ board, ...args }: TPlaceArgs & { board: TBoard }) =>
+      placeOnBoard(workspaceId, board.id, args),
+    meta: { errorTitle: "Could not add to the board" },
     onSuccess: invalidate,
   });
 }

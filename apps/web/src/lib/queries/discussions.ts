@@ -18,6 +18,7 @@ export const DISCUSSION_TITLE_MAX_LENGTH = 255;
 export const DISCUSSION_MAX_TAGS = 10;
 const DISCUSSION_TAG_MAX_LENGTH = 32;
 const DISCUSSIONS_PAGE_SIZE = 50;
+const DISCUSSION_SEARCH_LIMIT = 8;
 
 export const queryKeyDiscussions = {
   all: (workspaceId: string) => [workspaceId, "discussions"] as const,
@@ -28,6 +29,8 @@ export const queryKeyDiscussions = {
   thread: (workspaceId: string, threadId: string) =>
     [workspaceId, "discussions", "thread", threadId] as const,
   tags: (workspaceId: string) => [workspaceId, "discussions", "tags"] as const,
+  search: (workspaceId: string, query: string) =>
+    [workspaceId, "discussions", "search", query] as const,
 };
 
 /** A tag as the server stores it: lowercase, single spaces. */
@@ -54,6 +57,20 @@ export const discussionsQuery = (workspaceId: string, args: TDiscussionListArgs)
       }),
     initialPageParam: null as string | null,
     getNextPageParam: (page) => (page.pageInfo.hasNextPage ? page.pageInfo.endCursor : null),
+  });
+
+/** Open and closed discussions matching the words, the most recently active first without them. */
+export const searchDiscussionsQuery = (workspaceId: string, query: string) =>
+  queryOptions({
+    queryKey: queryKeyDiscussions.search(workspaceId, query.trim()),
+    queryFn: async () => {
+      const page = await call(workspaceId, "list_discussions", {
+        query: query.trim() || undefined,
+        status: "all",
+        limit: DISCUSSION_SEARCH_LIMIT,
+      });
+      return page.nodes;
+    },
   });
 
 /** A discussion by its link slug, slug id or id; cached by slug id. */

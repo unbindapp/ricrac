@@ -25,8 +25,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// EdgeBoard holds the string denoting the board edge name in mutations.
 	EdgeBoard = "board"
-	// EdgeBoardIssues holds the string denoting the board_issues edge name in mutations.
-	EdgeBoardIssues = "board_issues"
+	// EdgeBoardCards holds the string denoting the board_cards edge name in mutations.
+	EdgeBoardCards = "board_cards"
 	// Table holds the table name of the boardcolumn in the database.
 	Table = "board_columns"
 	// BoardTable is the table that holds the board relation/edge.
@@ -36,13 +36,13 @@ const (
 	BoardInverseTable = "boards"
 	// BoardColumn is the table column denoting the board relation/edge.
 	BoardColumn = "board_id"
-	// BoardIssuesTable is the table that holds the board_issues relation/edge.
-	BoardIssuesTable = "board_issues"
-	// BoardIssuesInverseTable is the table name for the BoardIssue entity.
-	// It exists in this package in order to avoid circular dependency with the "boardissue" package.
-	BoardIssuesInverseTable = "board_issues"
-	// BoardIssuesColumn is the table column denoting the board_issues relation/edge.
-	BoardIssuesColumn = "column_id"
+	// BoardCardsTable is the table that holds the board_cards relation/edge.
+	BoardCardsTable = "board_cards"
+	// BoardCardsInverseTable is the table name for the BoardCard entity.
+	// It exists in this package in order to avoid circular dependency with the "boardcard" package.
+	BoardCardsInverseTable = "board_cards"
+	// BoardCardsColumn is the table column denoting the board_cards relation/edge.
+	BoardCardsColumn = "column_id"
 )
 
 // Columns holds all SQL columns for boardcolumn fields.
@@ -110,17 +110,17 @@ func ByBoardField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByBoardIssuesCount orders the results by board_issues count.
-func ByBoardIssuesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByBoardCardsCount orders the results by board_cards count.
+func ByBoardCardsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newBoardIssuesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newBoardCardsStep(), opts...)
 	}
 }
 
-// ByBoardIssues orders the results by board_issues terms.
-func ByBoardIssues(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByBoardCards orders the results by board_cards terms.
+func ByBoardCards(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newBoardIssuesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newBoardCardsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newBoardStep() *sqlgraph.Step {
@@ -130,10 +130,10 @@ func newBoardStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, BoardTable, BoardColumn),
 	)
 }
-func newBoardIssuesStep() *sqlgraph.Step {
+func newBoardCardsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(BoardIssuesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, BoardIssuesTable, BoardIssuesColumn),
+		sqlgraph.To(BoardCardsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, BoardCardsTable, BoardCardsColumn),
 	)
 }

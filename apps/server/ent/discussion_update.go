@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"ricrac/ent/boardcard"
 	"ricrac/ent/comment"
 	"ricrac/ent/discussion"
 	"ricrac/ent/discussionthread"
@@ -417,6 +418,21 @@ func (_u *DiscussionUpdate) AddVersions(v ...*MessageVersion) *DiscussionUpdate 
 	return _u.AddVersionIDs(ids...)
 }
 
+// AddBoardCardIDs adds the "board_cards" edge to the BoardCard entity by IDs.
+func (_u *DiscussionUpdate) AddBoardCardIDs(ids ...uuid.UUID) *DiscussionUpdate {
+	_u.mutation.AddBoardCardIDs(ids...)
+	return _u
+}
+
+// AddBoardCards adds the "board_cards" edges to the BoardCard entity.
+func (_u *DiscussionUpdate) AddBoardCards(v ...*BoardCard) *DiscussionUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddBoardCardIDs(ids...)
+}
+
 // Mutation returns the DiscussionMutation object of the builder.
 func (_u *DiscussionUpdate) Mutation() *DiscussionMutation {
 	return _u.mutation
@@ -564,6 +580,27 @@ func (_u *DiscussionUpdate) RemoveVersions(v ...*MessageVersion) *DiscussionUpda
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveVersionIDs(ids...)
+}
+
+// ClearBoardCards clears all "board_cards" edges to the BoardCard entity.
+func (_u *DiscussionUpdate) ClearBoardCards() *DiscussionUpdate {
+	_u.mutation.ClearBoardCards()
+	return _u
+}
+
+// RemoveBoardCardIDs removes the "board_cards" edge to BoardCard entities by IDs.
+func (_u *DiscussionUpdate) RemoveBoardCardIDs(ids ...uuid.UUID) *DiscussionUpdate {
+	_u.mutation.RemoveBoardCardIDs(ids...)
+	return _u
+}
+
+// RemoveBoardCards removes "board_cards" edges to BoardCard entities.
+func (_u *DiscussionUpdate) RemoveBoardCards(v ...*BoardCard) *DiscussionUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveBoardCardIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -1042,6 +1079,51 @@ func (_u *DiscussionUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.BoardCardsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   discussion.BoardCardsTable,
+			Columns: []string{discussion.BoardCardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(boardcard.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedBoardCardsIDs(); len(nodes) > 0 && !_u.mutation.BoardCardsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   discussion.BoardCardsTable,
+			Columns: []string{discussion.BoardCardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(boardcard.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.BoardCardsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   discussion.BoardCardsTable,
+			Columns: []string{discussion.BoardCardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(boardcard.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -1443,6 +1525,21 @@ func (_u *DiscussionUpdateOne) AddVersions(v ...*MessageVersion) *DiscussionUpda
 	return _u.AddVersionIDs(ids...)
 }
 
+// AddBoardCardIDs adds the "board_cards" edge to the BoardCard entity by IDs.
+func (_u *DiscussionUpdateOne) AddBoardCardIDs(ids ...uuid.UUID) *DiscussionUpdateOne {
+	_u.mutation.AddBoardCardIDs(ids...)
+	return _u
+}
+
+// AddBoardCards adds the "board_cards" edges to the BoardCard entity.
+func (_u *DiscussionUpdateOne) AddBoardCards(v ...*BoardCard) *DiscussionUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddBoardCardIDs(ids...)
+}
+
 // Mutation returns the DiscussionMutation object of the builder.
 func (_u *DiscussionUpdateOne) Mutation() *DiscussionMutation {
 	return _u.mutation
@@ -1590,6 +1687,27 @@ func (_u *DiscussionUpdateOne) RemoveVersions(v ...*MessageVersion) *DiscussionU
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveVersionIDs(ids...)
+}
+
+// ClearBoardCards clears all "board_cards" edges to the BoardCard entity.
+func (_u *DiscussionUpdateOne) ClearBoardCards() *DiscussionUpdateOne {
+	_u.mutation.ClearBoardCards()
+	return _u
+}
+
+// RemoveBoardCardIDs removes the "board_cards" edge to BoardCard entities by IDs.
+func (_u *DiscussionUpdateOne) RemoveBoardCardIDs(ids ...uuid.UUID) *DiscussionUpdateOne {
+	_u.mutation.RemoveBoardCardIDs(ids...)
+	return _u
+}
+
+// RemoveBoardCards removes "board_cards" edges to BoardCard entities.
+func (_u *DiscussionUpdateOne) RemoveBoardCards(v ...*BoardCard) *DiscussionUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveBoardCardIDs(ids...)
 }
 
 // Where appends a list predicates to the DiscussionUpdate builder.
@@ -2091,6 +2209,51 @@ func (_u *DiscussionUpdateOne) sqlSave(ctx context.Context) (_node *Discussion, 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(messageversion.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.BoardCardsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   discussion.BoardCardsTable,
+			Columns: []string{discussion.BoardCardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(boardcard.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedBoardCardsIDs(); len(nodes) > 0 && !_u.mutation.BoardCardsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   discussion.BoardCardsTable,
+			Columns: []string{discussion.BoardCardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(boardcard.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.BoardCardsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   discussion.BoardCardsTable,
+			Columns: []string{discussion.BoardCardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(boardcard.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

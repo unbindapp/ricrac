@@ -7,8 +7,9 @@ import (
 	"fmt"
 	"math"
 	"ricrac/ent/board"
+	"ricrac/ent/boardcard"
 	"ricrac/ent/boardcolumn"
-	"ricrac/ent/boardissue"
+	"ricrac/ent/discussion"
 	"ricrac/ent/issue"
 	"ricrac/ent/predicate"
 
@@ -20,55 +21,56 @@ import (
 	"github.com/google/uuid"
 )
 
-// BoardIssueQuery is the builder for querying BoardIssue entities.
-type BoardIssueQuery struct {
+// BoardCardQuery is the builder for querying BoardCard entities.
+type BoardCardQuery struct {
 	config
-	ctx        *QueryContext
-	order      []boardissue.OrderOption
-	inters     []Interceptor
-	predicates []predicate.BoardIssue
-	withBoard  *BoardQuery
-	withColumn *BoardColumnQuery
-	withIssue  *IssueQuery
-	modifiers  []func(*sql.Selector)
+	ctx            *QueryContext
+	order          []boardcard.OrderOption
+	inters         []Interceptor
+	predicates     []predicate.BoardCard
+	withBoard      *BoardQuery
+	withColumn     *BoardColumnQuery
+	withIssue      *IssueQuery
+	withDiscussion *DiscussionQuery
+	modifiers      []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the BoardIssueQuery builder.
-func (_q *BoardIssueQuery) Where(ps ...predicate.BoardIssue) *BoardIssueQuery {
+// Where adds a new predicate for the BoardCardQuery builder.
+func (_q *BoardCardQuery) Where(ps ...predicate.BoardCard) *BoardCardQuery {
 	_q.predicates = append(_q.predicates, ps...)
 	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (_q *BoardIssueQuery) Limit(limit int) *BoardIssueQuery {
+func (_q *BoardCardQuery) Limit(limit int) *BoardCardQuery {
 	_q.ctx.Limit = &limit
 	return _q
 }
 
 // Offset to start from.
-func (_q *BoardIssueQuery) Offset(offset int) *BoardIssueQuery {
+func (_q *BoardCardQuery) Offset(offset int) *BoardCardQuery {
 	_q.ctx.Offset = &offset
 	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (_q *BoardIssueQuery) Unique(unique bool) *BoardIssueQuery {
+func (_q *BoardCardQuery) Unique(unique bool) *BoardCardQuery {
 	_q.ctx.Unique = &unique
 	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (_q *BoardIssueQuery) Order(o ...boardissue.OrderOption) *BoardIssueQuery {
+func (_q *BoardCardQuery) Order(o ...boardcard.OrderOption) *BoardCardQuery {
 	_q.order = append(_q.order, o...)
 	return _q
 }
 
 // QueryBoard chains the current query on the "board" edge.
-func (_q *BoardIssueQuery) QueryBoard() *BoardQuery {
+func (_q *BoardCardQuery) QueryBoard() *BoardQuery {
 	query := (&BoardClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := _q.prepareQuery(ctx); err != nil {
@@ -79,9 +81,9 @@ func (_q *BoardIssueQuery) QueryBoard() *BoardQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(boardissue.Table, boardissue.FieldID, selector),
+			sqlgraph.From(boardcard.Table, boardcard.FieldID, selector),
 			sqlgraph.To(board.Table, board.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, boardissue.BoardTable, boardissue.BoardColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, boardcard.BoardTable, boardcard.BoardColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -90,7 +92,7 @@ func (_q *BoardIssueQuery) QueryBoard() *BoardQuery {
 }
 
 // QueryColumn chains the current query on the "column" edge.
-func (_q *BoardIssueQuery) QueryColumn() *BoardColumnQuery {
+func (_q *BoardCardQuery) QueryColumn() *BoardColumnQuery {
 	query := (&BoardColumnClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := _q.prepareQuery(ctx); err != nil {
@@ -101,9 +103,9 @@ func (_q *BoardIssueQuery) QueryColumn() *BoardColumnQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(boardissue.Table, boardissue.FieldID, selector),
+			sqlgraph.From(boardcard.Table, boardcard.FieldID, selector),
 			sqlgraph.To(boardcolumn.Table, boardcolumn.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, boardissue.ColumnTable, boardissue.ColumnColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, boardcard.ColumnTable, boardcard.ColumnColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -112,7 +114,7 @@ func (_q *BoardIssueQuery) QueryColumn() *BoardColumnQuery {
 }
 
 // QueryIssue chains the current query on the "issue" edge.
-func (_q *BoardIssueQuery) QueryIssue() *IssueQuery {
+func (_q *BoardCardQuery) QueryIssue() *IssueQuery {
 	query := (&IssueClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := _q.prepareQuery(ctx); err != nil {
@@ -123,9 +125,9 @@ func (_q *BoardIssueQuery) QueryIssue() *IssueQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(boardissue.Table, boardissue.FieldID, selector),
+			sqlgraph.From(boardcard.Table, boardcard.FieldID, selector),
 			sqlgraph.To(issue.Table, issue.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, boardissue.IssueTable, boardissue.IssueColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, boardcard.IssueTable, boardcard.IssueColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -133,21 +135,43 @@ func (_q *BoardIssueQuery) QueryIssue() *IssueQuery {
 	return query
 }
 
-// First returns the first BoardIssue entity from the query.
-// Returns a *NotFoundError when no BoardIssue was found.
-func (_q *BoardIssueQuery) First(ctx context.Context) (*BoardIssue, error) {
+// QueryDiscussion chains the current query on the "discussion" edge.
+func (_q *BoardCardQuery) QueryDiscussion() *DiscussionQuery {
+	query := (&DiscussionClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(boardcard.Table, boardcard.FieldID, selector),
+			sqlgraph.To(discussion.Table, discussion.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, boardcard.DiscussionTable, boardcard.DiscussionColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// First returns the first BoardCard entity from the query.
+// Returns a *NotFoundError when no BoardCard was found.
+func (_q *BoardCardQuery) First(ctx context.Context) (*BoardCard, error) {
 	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
-		return nil, &NotFoundError{boardissue.Label}
+		return nil, &NotFoundError{boardcard.Label}
 	}
 	return nodes[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (_q *BoardIssueQuery) FirstX(ctx context.Context) *BoardIssue {
+func (_q *BoardCardQuery) FirstX(ctx context.Context) *BoardCard {
 	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -155,22 +179,22 @@ func (_q *BoardIssueQuery) FirstX(ctx context.Context) *BoardIssue {
 	return node
 }
 
-// FirstID returns the first BoardIssue ID from the query.
-// Returns a *NotFoundError when no BoardIssue ID was found.
-func (_q *BoardIssueQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+// FirstID returns the first BoardCard ID from the query.
+// Returns a *NotFoundError when no BoardCard ID was found.
+func (_q *BoardCardQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 	var ids []uuid.UUID
 	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
-		err = &NotFoundError{boardissue.Label}
+		err = &NotFoundError{boardcard.Label}
 		return
 	}
 	return ids[0], nil
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (_q *BoardIssueQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (_q *BoardCardQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -178,10 +202,10 @@ func (_q *BoardIssueQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	return id
 }
 
-// Only returns a single BoardIssue entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one BoardIssue entity is found.
-// Returns a *NotFoundError when no BoardIssue entities are found.
-func (_q *BoardIssueQuery) Only(ctx context.Context) (*BoardIssue, error) {
+// Only returns a single BoardCard entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one BoardCard entity is found.
+// Returns a *NotFoundError when no BoardCard entities are found.
+func (_q *BoardCardQuery) Only(ctx context.Context) (*BoardCard, error) {
 	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
@@ -190,14 +214,14 @@ func (_q *BoardIssueQuery) Only(ctx context.Context) (*BoardIssue, error) {
 	case 1:
 		return nodes[0], nil
 	case 0:
-		return nil, &NotFoundError{boardissue.Label}
+		return nil, &NotFoundError{boardcard.Label}
 	default:
-		return nil, &NotSingularError{boardissue.Label}
+		return nil, &NotSingularError{boardcard.Label}
 	}
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (_q *BoardIssueQuery) OnlyX(ctx context.Context) *BoardIssue {
+func (_q *BoardCardQuery) OnlyX(ctx context.Context) *BoardCard {
 	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
@@ -205,10 +229,10 @@ func (_q *BoardIssueQuery) OnlyX(ctx context.Context) *BoardIssue {
 	return node
 }
 
-// OnlyID is like Only, but returns the only BoardIssue ID in the query.
-// Returns a *NotSingularError when more than one BoardIssue ID is found.
+// OnlyID is like Only, but returns the only BoardCard ID in the query.
+// Returns a *NotSingularError when more than one BoardCard ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (_q *BoardIssueQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+func (_q *BoardCardQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 	var ids []uuid.UUID
 	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
@@ -217,15 +241,15 @@ func (_q *BoardIssueQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error)
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &NotFoundError{boardissue.Label}
+		err = &NotFoundError{boardcard.Label}
 	default:
-		err = &NotSingularError{boardissue.Label}
+		err = &NotSingularError{boardcard.Label}
 	}
 	return
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (_q *BoardIssueQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (_q *BoardCardQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -233,18 +257,18 @@ func (_q *BoardIssueQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	return id
 }
 
-// All executes the query and returns a list of BoardIssues.
-func (_q *BoardIssueQuery) All(ctx context.Context) ([]*BoardIssue, error) {
+// All executes the query and returns a list of BoardCards.
+func (_q *BoardCardQuery) All(ctx context.Context) ([]*BoardCard, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
 	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	qr := querierAll[[]*BoardIssue, *BoardIssueQuery]()
-	return withInterceptors[[]*BoardIssue](ctx, _q, qr, _q.inters)
+	qr := querierAll[[]*BoardCard, *BoardCardQuery]()
+	return withInterceptors[[]*BoardCard](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (_q *BoardIssueQuery) AllX(ctx context.Context) []*BoardIssue {
+func (_q *BoardCardQuery) AllX(ctx context.Context) []*BoardCard {
 	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
@@ -252,20 +276,20 @@ func (_q *BoardIssueQuery) AllX(ctx context.Context) []*BoardIssue {
 	return nodes
 }
 
-// IDs executes the query and returns a list of BoardIssue IDs.
-func (_q *BoardIssueQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
+// IDs executes the query and returns a list of BoardCard IDs.
+func (_q *BoardCardQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 	if _q.ctx.Unique == nil && _q.path != nil {
 		_q.Unique(true)
 	}
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
-	if err = _q.Select(boardissue.FieldID).Scan(ctx, &ids); err != nil {
+	if err = _q.Select(boardcard.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (_q *BoardIssueQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (_q *BoardCardQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -274,16 +298,16 @@ func (_q *BoardIssueQuery) IDsX(ctx context.Context) []uuid.UUID {
 }
 
 // Count returns the count of the given query.
-func (_q *BoardIssueQuery) Count(ctx context.Context) (int, error) {
+func (_q *BoardCardQuery) Count(ctx context.Context) (int, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
 	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, _q, querierCount[*BoardIssueQuery](), _q.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*BoardCardQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (_q *BoardIssueQuery) CountX(ctx context.Context) int {
+func (_q *BoardCardQuery) CountX(ctx context.Context) int {
 	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
@@ -292,7 +316,7 @@ func (_q *BoardIssueQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (_q *BoardIssueQuery) Exist(ctx context.Context) (bool, error) {
+func (_q *BoardCardQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
 	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
@@ -305,7 +329,7 @@ func (_q *BoardIssueQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (_q *BoardIssueQuery) ExistX(ctx context.Context) bool {
+func (_q *BoardCardQuery) ExistX(ctx context.Context) bool {
 	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
@@ -313,21 +337,22 @@ func (_q *BoardIssueQuery) ExistX(ctx context.Context) bool {
 	return exist
 }
 
-// Clone returns a duplicate of the BoardIssueQuery builder, including all associated steps. It can be
+// Clone returns a duplicate of the BoardCardQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (_q *BoardIssueQuery) Clone() *BoardIssueQuery {
+func (_q *BoardCardQuery) Clone() *BoardCardQuery {
 	if _q == nil {
 		return nil
 	}
-	return &BoardIssueQuery{
-		config:     _q.config,
-		ctx:        _q.ctx.Clone(),
-		order:      append([]boardissue.OrderOption{}, _q.order...),
-		inters:     append([]Interceptor{}, _q.inters...),
-		predicates: append([]predicate.BoardIssue{}, _q.predicates...),
-		withBoard:  _q.withBoard.Clone(),
-		withColumn: _q.withColumn.Clone(),
-		withIssue:  _q.withIssue.Clone(),
+	return &BoardCardQuery{
+		config:         _q.config,
+		ctx:            _q.ctx.Clone(),
+		order:          append([]boardcard.OrderOption{}, _q.order...),
+		inters:         append([]Interceptor{}, _q.inters...),
+		predicates:     append([]predicate.BoardCard{}, _q.predicates...),
+		withBoard:      _q.withBoard.Clone(),
+		withColumn:     _q.withColumn.Clone(),
+		withIssue:      _q.withIssue.Clone(),
+		withDiscussion: _q.withDiscussion.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
 		path:      _q.path,
@@ -337,7 +362,7 @@ func (_q *BoardIssueQuery) Clone() *BoardIssueQuery {
 
 // WithBoard tells the query-builder to eager-load the nodes that are connected to
 // the "board" edge. The optional arguments are used to configure the query builder of the edge.
-func (_q *BoardIssueQuery) WithBoard(opts ...func(*BoardQuery)) *BoardIssueQuery {
+func (_q *BoardCardQuery) WithBoard(opts ...func(*BoardQuery)) *BoardCardQuery {
 	query := (&BoardClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
@@ -348,7 +373,7 @@ func (_q *BoardIssueQuery) WithBoard(opts ...func(*BoardQuery)) *BoardIssueQuery
 
 // WithColumn tells the query-builder to eager-load the nodes that are connected to
 // the "column" edge. The optional arguments are used to configure the query builder of the edge.
-func (_q *BoardIssueQuery) WithColumn(opts ...func(*BoardColumnQuery)) *BoardIssueQuery {
+func (_q *BoardCardQuery) WithColumn(opts ...func(*BoardColumnQuery)) *BoardCardQuery {
 	query := (&BoardColumnClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
@@ -359,12 +384,23 @@ func (_q *BoardIssueQuery) WithColumn(opts ...func(*BoardColumnQuery)) *BoardIss
 
 // WithIssue tells the query-builder to eager-load the nodes that are connected to
 // the "issue" edge. The optional arguments are used to configure the query builder of the edge.
-func (_q *BoardIssueQuery) WithIssue(opts ...func(*IssueQuery)) *BoardIssueQuery {
+func (_q *BoardCardQuery) WithIssue(opts ...func(*IssueQuery)) *BoardCardQuery {
 	query := (&IssueClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
 	_q.withIssue = query
+	return _q
+}
+
+// WithDiscussion tells the query-builder to eager-load the nodes that are connected to
+// the "discussion" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *BoardCardQuery) WithDiscussion(opts ...func(*DiscussionQuery)) *BoardCardQuery {
+	query := (&DiscussionClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withDiscussion = query
 	return _q
 }
 
@@ -378,15 +414,15 @@ func (_q *BoardIssueQuery) WithIssue(opts ...func(*IssueQuery)) *BoardIssueQuery
 //		Count int `json:"count,omitempty"`
 //	}
 //
-//	client.BoardIssue.Query().
-//		GroupBy(boardissue.FieldBoardID).
+//	client.BoardCard.Query().
+//		GroupBy(boardcard.FieldBoardID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (_q *BoardIssueQuery) GroupBy(field string, fields ...string) *BoardIssueGroupBy {
+func (_q *BoardCardQuery) GroupBy(field string, fields ...string) *BoardCardGroupBy {
 	_q.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &BoardIssueGroupBy{build: _q}
+	grbuild := &BoardCardGroupBy{build: _q}
 	grbuild.flds = &_q.ctx.Fields
-	grbuild.label = boardissue.Label
+	grbuild.label = boardcard.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
 }
@@ -400,23 +436,23 @@ func (_q *BoardIssueQuery) GroupBy(field string, fields ...string) *BoardIssueGr
 //		BoardID uuid.UUID `json:"board_id,omitempty"`
 //	}
 //
-//	client.BoardIssue.Query().
-//		Select(boardissue.FieldBoardID).
+//	client.BoardCard.Query().
+//		Select(boardcard.FieldBoardID).
 //		Scan(ctx, &v)
-func (_q *BoardIssueQuery) Select(fields ...string) *BoardIssueSelect {
+func (_q *BoardCardQuery) Select(fields ...string) *BoardCardSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
-	sbuild := &BoardIssueSelect{BoardIssueQuery: _q}
-	sbuild.label = boardissue.Label
+	sbuild := &BoardCardSelect{BoardCardQuery: _q}
+	sbuild.label = boardcard.Label
 	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
-// Aggregate returns a BoardIssueSelect configured with the given aggregations.
-func (_q *BoardIssueQuery) Aggregate(fns ...AggregateFunc) *BoardIssueSelect {
+// Aggregate returns a BoardCardSelect configured with the given aggregations.
+func (_q *BoardCardQuery) Aggregate(fns ...AggregateFunc) *BoardCardSelect {
 	return _q.Select().Aggregate(fns...)
 }
 
-func (_q *BoardIssueQuery) prepareQuery(ctx context.Context) error {
+func (_q *BoardCardQuery) prepareQuery(ctx context.Context) error {
 	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
@@ -428,7 +464,7 @@ func (_q *BoardIssueQuery) prepareQuery(ctx context.Context) error {
 		}
 	}
 	for _, f := range _q.ctx.Fields {
-		if !boardissue.ValidColumn(f) {
+		if !boardcard.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
@@ -442,21 +478,22 @@ func (_q *BoardIssueQuery) prepareQuery(ctx context.Context) error {
 	return nil
 }
 
-func (_q *BoardIssueQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*BoardIssue, error) {
+func (_q *BoardCardQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*BoardCard, error) {
 	var (
-		nodes       = []*BoardIssue{}
+		nodes       = []*BoardCard{}
 		_spec       = _q.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			_q.withBoard != nil,
 			_q.withColumn != nil,
 			_q.withIssue != nil,
+			_q.withDiscussion != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
-		return (*BoardIssue).scanValues(nil, columns)
+		return (*BoardCard).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &BoardIssue{config: _q.config}
+		node := &BoardCard{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
@@ -475,28 +512,34 @@ func (_q *BoardIssueQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*B
 	}
 	if query := _q.withBoard; query != nil {
 		if err := _q.loadBoard(ctx, query, nodes, nil,
-			func(n *BoardIssue, e *Board) { n.Edges.Board = e }); err != nil {
+			func(n *BoardCard, e *Board) { n.Edges.Board = e }); err != nil {
 			return nil, err
 		}
 	}
 	if query := _q.withColumn; query != nil {
 		if err := _q.loadColumn(ctx, query, nodes, nil,
-			func(n *BoardIssue, e *BoardColumn) { n.Edges.Column = e }); err != nil {
+			func(n *BoardCard, e *BoardColumn) { n.Edges.Column = e }); err != nil {
 			return nil, err
 		}
 	}
 	if query := _q.withIssue; query != nil {
 		if err := _q.loadIssue(ctx, query, nodes, nil,
-			func(n *BoardIssue, e *Issue) { n.Edges.Issue = e }); err != nil {
+			func(n *BoardCard, e *Issue) { n.Edges.Issue = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withDiscussion; query != nil {
+		if err := _q.loadDiscussion(ctx, query, nodes, nil,
+			func(n *BoardCard, e *Discussion) { n.Edges.Discussion = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (_q *BoardIssueQuery) loadBoard(ctx context.Context, query *BoardQuery, nodes []*BoardIssue, init func(*BoardIssue), assign func(*BoardIssue, *Board)) error {
+func (_q *BoardCardQuery) loadBoard(ctx context.Context, query *BoardQuery, nodes []*BoardCard, init func(*BoardCard), assign func(*BoardCard, *Board)) error {
 	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*BoardIssue)
+	nodeids := make(map[uuid.UUID][]*BoardCard)
 	for i := range nodes {
 		fk := nodes[i].BoardID
 		if _, ok := nodeids[fk]; !ok {
@@ -523,9 +566,9 @@ func (_q *BoardIssueQuery) loadBoard(ctx context.Context, query *BoardQuery, nod
 	}
 	return nil
 }
-func (_q *BoardIssueQuery) loadColumn(ctx context.Context, query *BoardColumnQuery, nodes []*BoardIssue, init func(*BoardIssue), assign func(*BoardIssue, *BoardColumn)) error {
+func (_q *BoardCardQuery) loadColumn(ctx context.Context, query *BoardColumnQuery, nodes []*BoardCard, init func(*BoardCard), assign func(*BoardCard, *BoardColumn)) error {
 	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*BoardIssue)
+	nodeids := make(map[uuid.UUID][]*BoardCard)
 	for i := range nodes {
 		fk := nodes[i].ColumnID
 		if _, ok := nodeids[fk]; !ok {
@@ -552,11 +595,14 @@ func (_q *BoardIssueQuery) loadColumn(ctx context.Context, query *BoardColumnQue
 	}
 	return nil
 }
-func (_q *BoardIssueQuery) loadIssue(ctx context.Context, query *IssueQuery, nodes []*BoardIssue, init func(*BoardIssue), assign func(*BoardIssue, *Issue)) error {
+func (_q *BoardCardQuery) loadIssue(ctx context.Context, query *IssueQuery, nodes []*BoardCard, init func(*BoardCard), assign func(*BoardCard, *Issue)) error {
 	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*BoardIssue)
+	nodeids := make(map[uuid.UUID][]*BoardCard)
 	for i := range nodes {
-		fk := nodes[i].IssueID
+		if nodes[i].IssueID == nil {
+			continue
+		}
+		fk := *nodes[i].IssueID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -581,8 +627,40 @@ func (_q *BoardIssueQuery) loadIssue(ctx context.Context, query *IssueQuery, nod
 	}
 	return nil
 }
+func (_q *BoardCardQuery) loadDiscussion(ctx context.Context, query *DiscussionQuery, nodes []*BoardCard, init func(*BoardCard), assign func(*BoardCard, *Discussion)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*BoardCard)
+	for i := range nodes {
+		if nodes[i].DiscussionID == nil {
+			continue
+		}
+		fk := *nodes[i].DiscussionID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(discussion.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "discussion_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 
-func (_q *BoardIssueQuery) sqlCount(ctx context.Context) (int, error) {
+func (_q *BoardCardQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := _q.querySpec()
 	if len(_q.modifiers) > 0 {
 		_spec.Modifiers = _q.modifiers
@@ -594,8 +672,8 @@ func (_q *BoardIssueQuery) sqlCount(ctx context.Context) (int, error) {
 	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (_q *BoardIssueQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(boardissue.Table, boardissue.Columns, sqlgraph.NewFieldSpec(boardissue.FieldID, field.TypeUUID))
+func (_q *BoardCardQuery) querySpec() *sqlgraph.QuerySpec {
+	_spec := sqlgraph.NewQuerySpec(boardcard.Table, boardcard.Columns, sqlgraph.NewFieldSpec(boardcard.FieldID, field.TypeUUID))
 	_spec.From = _q.sql
 	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -604,20 +682,23 @@ func (_q *BoardIssueQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, boardissue.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, boardcard.FieldID)
 		for i := range fields {
-			if fields[i] != boardissue.FieldID {
+			if fields[i] != boardcard.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
 		if _q.withBoard != nil {
-			_spec.Node.AddColumnOnce(boardissue.FieldBoardID)
+			_spec.Node.AddColumnOnce(boardcard.FieldBoardID)
 		}
 		if _q.withColumn != nil {
-			_spec.Node.AddColumnOnce(boardissue.FieldColumnID)
+			_spec.Node.AddColumnOnce(boardcard.FieldColumnID)
 		}
 		if _q.withIssue != nil {
-			_spec.Node.AddColumnOnce(boardissue.FieldIssueID)
+			_spec.Node.AddColumnOnce(boardcard.FieldIssueID)
+		}
+		if _q.withDiscussion != nil {
+			_spec.Node.AddColumnOnce(boardcard.FieldDiscussionID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {
@@ -643,12 +724,12 @@ func (_q *BoardIssueQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (_q *BoardIssueQuery) sqlQuery(ctx context.Context) *sql.Selector {
+func (_q *BoardCardQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(_q.driver.Dialect())
-	t1 := builder.Table(boardissue.Table)
+	t1 := builder.Table(boardcard.Table)
 	columns := _q.ctx.Fields
 	if len(columns) == 0 {
-		columns = boardissue.Columns
+		columns = boardcard.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
 	if _q.sql != nil {
@@ -681,7 +762,7 @@ func (_q *BoardIssueQuery) sqlQuery(ctx context.Context) *sql.Selector {
 // ForUpdate locks the selected rows against concurrent updates, and prevent them from being
 // updated, deleted or "selected ... for update" by other sessions, until the transaction is
 // either committed or rolled-back.
-func (_q *BoardIssueQuery) ForUpdate(opts ...sql.LockOption) *BoardIssueQuery {
+func (_q *BoardCardQuery) ForUpdate(opts ...sql.LockOption) *BoardCardQuery {
 	if _q.driver.Dialect() == dialect.Postgres {
 		_q.Unique(false)
 	}
@@ -694,7 +775,7 @@ func (_q *BoardIssueQuery) ForUpdate(opts ...sql.LockOption) *BoardIssueQuery {
 // ForShare behaves similarly to ForUpdate, except that it acquires a shared mode lock
 // on any rows that are read. Other sessions can read the rows, but cannot modify them
 // until your transaction commits.
-func (_q *BoardIssueQuery) ForShare(opts ...sql.LockOption) *BoardIssueQuery {
+func (_q *BoardCardQuery) ForShare(opts ...sql.LockOption) *BoardCardQuery {
 	if _q.driver.Dialect() == dialect.Postgres {
 		_q.Unique(false)
 	}
@@ -705,33 +786,33 @@ func (_q *BoardIssueQuery) ForShare(opts ...sql.LockOption) *BoardIssueQuery {
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (_q *BoardIssueQuery) Modify(modifiers ...func(s *sql.Selector)) *BoardIssueSelect {
+func (_q *BoardCardQuery) Modify(modifiers ...func(s *sql.Selector)) *BoardCardSelect {
 	_q.modifiers = append(_q.modifiers, modifiers...)
 	return _q.Select()
 }
 
-// BoardIssueGroupBy is the group-by builder for BoardIssue entities.
-type BoardIssueGroupBy struct {
+// BoardCardGroupBy is the group-by builder for BoardCard entities.
+type BoardCardGroupBy struct {
 	selector
-	build *BoardIssueQuery
+	build *BoardCardQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (_g *BoardIssueGroupBy) Aggregate(fns ...AggregateFunc) *BoardIssueGroupBy {
+func (_g *BoardCardGroupBy) Aggregate(fns ...AggregateFunc) *BoardCardGroupBy {
 	_g.fns = append(_g.fns, fns...)
 	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (_g *BoardIssueGroupBy) Scan(ctx context.Context, v any) error {
+func (_g *BoardCardGroupBy) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
 	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*BoardIssueQuery, *BoardIssueGroupBy](ctx, _g.build, _g, _g.build.inters, v)
+	return scanWithInterceptors[*BoardCardQuery, *BoardCardGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (_g *BoardIssueGroupBy) sqlScan(ctx context.Context, root *BoardIssueQuery, v any) error {
+func (_g *BoardCardGroupBy) sqlScan(ctx context.Context, root *BoardCardQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
 	aggregation := make([]string, 0, len(_g.fns))
 	for _, fn := range _g.fns {
@@ -758,28 +839,28 @@ func (_g *BoardIssueGroupBy) sqlScan(ctx context.Context, root *BoardIssueQuery,
 	return sql.ScanSlice(rows, v)
 }
 
-// BoardIssueSelect is the builder for selecting fields of BoardIssue entities.
-type BoardIssueSelect struct {
-	*BoardIssueQuery
+// BoardCardSelect is the builder for selecting fields of BoardCard entities.
+type BoardCardSelect struct {
+	*BoardCardQuery
 	selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (_s *BoardIssueSelect) Aggregate(fns ...AggregateFunc) *BoardIssueSelect {
+func (_s *BoardCardSelect) Aggregate(fns ...AggregateFunc) *BoardCardSelect {
 	_s.fns = append(_s.fns, fns...)
 	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (_s *BoardIssueSelect) Scan(ctx context.Context, v any) error {
+func (_s *BoardCardSelect) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
 	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*BoardIssueQuery, *BoardIssueSelect](ctx, _s.BoardIssueQuery, _s, _s.inters, v)
+	return scanWithInterceptors[*BoardCardQuery, *BoardCardSelect](ctx, _s.BoardCardQuery, _s, _s.inters, v)
 }
 
-func (_s *BoardIssueSelect) sqlScan(ctx context.Context, root *BoardIssueQuery, v any) error {
+func (_s *BoardCardSelect) sqlScan(ctx context.Context, root *BoardCardQuery, v any) error {
 	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(_s.fns))
 	for _, fn := range _s.fns {
@@ -801,7 +882,7 @@ func (_s *BoardIssueSelect) sqlScan(ctx context.Context, root *BoardIssueQuery, 
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (_s *BoardIssueSelect) Modify(modifiers ...func(s *sql.Selector)) *BoardIssueSelect {
+func (_s *BoardCardSelect) Modify(modifiers ...func(s *sql.Selector)) *BoardCardSelect {
 	_s.modifiers = append(_s.modifiers, modifiers...)
 	return _s
 }

@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { type ReactNode, useState } from "react";
 
 import type { DiscussionDetail as TDiscussionDetail } from "@/api/ops.gen";
+import { AddToBoardMenu } from "@/components/boards/add-to-board-menu";
 import { DiscussionTagBadges, DiscussionTagsPicker } from "@/components/forum/discussion-tags";
 import { MainChatComposer, MainChatMessages } from "@/components/forum/main-chat";
 import { ThreadBranches } from "@/components/forum/thread-branches";
@@ -197,6 +198,8 @@ export function DiscussionActions({
     </DropdownMenuItem>
   );
 
+  const addToBoardItem = <AddToBoardMenu subject={{ kind: "discussion", id: discussion.id }} />;
+
   if (grouped) {
     return (
       <>
@@ -246,6 +249,7 @@ export function DiscussionActions({
                     {isClosed ? "Reopen discussion" : "Close discussion"}
                   </DropdownMenuItem>
                 )}
+                {addToBoardItem}
               </>
             )}
             {canRewrite && thumbnailItem}
@@ -281,9 +285,10 @@ export function DiscussionActions({
           )}
         </>
       )}
-      {canRewrite && (
-        <EntityMenu noun="discussion" onTrash={trash}>
-          {thumbnailItem}
+      {(canEdit || canRewrite) && (
+        <EntityMenu noun="discussion" onTrash={canRewrite ? trash : undefined}>
+          {canEdit && addToBoardItem}
+          {canRewrite && thumbnailItem}
         </EntityMenu>
       )}
       {thumbnailDialog}

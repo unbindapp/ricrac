@@ -22,6 +22,11 @@ type TProps = {
   dragProps?: HTMLAttributes<HTMLDivElement>;
 };
 
+export const cardClassName =
+  "group/card bg-card has-hover:hover:border-primary/4-10 data-active:border-primary/6-10 focus-visible:ring-primary/8-10 dank:state-layer dank:relative dank:rounded-md dank:border-0 dank:bg-m3-surface-container-low dank:p-4 dank:shadow-elevation-1 dank:has-hover:hover:shadow-elevation-2 dank:data-active:bg-m3-secondary-container dank:data-active:text-m3-on-secondary-container flex w-full cursor-default flex-col gap-2 rounded-lg border p-3 text-sm outline-hidden focus-visible:ring-1 data-dragging:opacity-40";
+
+export const cardOverlayClassName = "dank:shadow-elevation-4 shadow-lg";
+
 const hiddenUntilHover =
   "opacity-0 touch:opacity-100 group-hover/card:opacity-100 focus-visible:opacity-100 data-popup-open:opacity-100";
 
@@ -57,10 +62,7 @@ export function IssueCard({
       data-active={isActive || undefined}
       data-dragging={isDragging || undefined}
       onClick={(event) => onClick?.(event, issue)}
-      className={cn(
-        "group/card bg-card has-hover:hover:border-primary/4-10 data-active:border-primary/6-10 focus-visible:ring-primary/8-10 dank:state-layer dank:relative dank:rounded-md dank:border-0 dank:bg-m3-surface-container-low dank:p-4 dank:shadow-elevation-1 dank:has-hover:hover:shadow-elevation-2 dank:data-active:bg-m3-secondary-container dank:data-active:text-m3-on-secondary-container flex w-full cursor-default flex-col gap-2 rounded-lg border p-3 text-sm outline-hidden focus-visible:ring-1 data-dragging:opacity-40",
-        isOverlay && "dank:shadow-elevation-4 shadow-lg",
-      )}
+      className={cn(cardClassName, isOverlay && cardOverlayClassName)}
     >
       <div className="flex items-center gap-2">
         {show("identifier") && (

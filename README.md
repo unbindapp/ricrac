@@ -47,7 +47,8 @@ operations and permissions.
   threads for a bug, a design check, a question, an idea or a task, which link to issues and get
   resolved. Subscribers hear about new threads and comments.
 - **Boards**: kanban boards with columns of their own (Ideas, Design, Ready), apart from the
-  workflow statuses. Cards are issues; quick ones written on a board stay off GitHub.
+  workflow statuses. Cards are issues and forum discussions; quick issues written on a board stay
+  off GitHub.
 - **Custom views**, **favorites**, **templates** (issue templates with sub-issues, recurring
   issues on a schedule, project templates with milestones and issues, document templates), an **inbox** of notifications
   (read, archive, snooze), **customers** and customer requests, **releases** with pipelines,

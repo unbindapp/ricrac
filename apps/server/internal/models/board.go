@@ -19,10 +19,11 @@ type Board struct {
 }
 
 type BoardColumn struct {
-	ID         string  `json:"id"`
-	Name       string  `json:"name"`
-	Color      *string `json:"color"`
-	IssueCount int     `json:"issueCount"`
+	ID              string  `json:"id"`
+	Name            string  `json:"name"`
+	Color           *string `json:"color"`
+	IssueCount      int     `json:"issueCount"`
+	DiscussionCount int     `json:"discussionCount"`
 }
 
 type BoardRef struct {
@@ -43,6 +44,13 @@ type BoardCard struct {
 	Issue     Issue          `json:"issue"`
 }
 
+type BoardDiscussionCard struct {
+	Board      BoardRef       `json:"board"`
+	Column     BoardColumnRef `json:"column"`
+	SortOrder  float64        `json:"sortOrder" doc:"Order in the column, lowest first, among its issues and discussions."`
+	Discussion Discussion     `json:"discussion"`
+}
+
 type DeletedBoard struct {
 	Deleted bool   `json:"deleted"`
 	ID      string `json:"id"`
@@ -55,11 +63,21 @@ type RemovedFromBoard struct {
 	Issue   IssueRef `json:"issue"`
 }
 
-// BoardOf needs the board's workspace, creator and columns loaded; counts are issues per column.
-func BoardOf(b *ent.Board, counts map[uuid.UUID]int, publicURL string) Board {
+type RemovedDiscussionFromBoard struct {
+	Removed    bool          `json:"removed" doc:"false when the discussion wasn't on the board."`
+	Board      BoardRef      `json:"board"`
+	Discussion DiscussionRef `json:"discussion"`
+}
+
+type BoardColumnCounts struct {
+	Issues, Discussions int
+}
+
+// BoardOf needs the board's workspace, creator and columns loaded.
+func BoardOf(b *ent.Board, counts map[uuid.UUID]BoardColumnCounts, publicURL string) Board {
 	columns := make([]BoardColumn, len(b.Edges.Columns))
 	for i, c := range b.Edges.Columns {
-		columns[i] = BoardColumn{ID: ID(c.ID), Name: c.Name, Color: c.Color, IssueCount: counts[c.ID]}
+		columns[i] = BoardColumn{ID: ID(c.ID), Name: c.Name, Color: c.Color, IssueCount: counts[c.ID].Issues, DiscussionCount: counts[c.ID].Discussions}
 	}
 	return Board{
 		ID: ID(b.ID), SlugID: b.SlugID, Name: b.Name, Description: b.Description, Columns: columns,

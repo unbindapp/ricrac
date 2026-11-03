@@ -61,6 +61,8 @@ const (
 	EdgeVoters = "voters"
 	// EdgeVersions holds the string denoting the versions edge name in mutations.
 	EdgeVersions = "versions"
+	// EdgeBoardCards holds the string denoting the board_cards edge name in mutations.
+	EdgeBoardCards = "board_cards"
 	// EdgeDiscussionSubscribers holds the string denoting the discussion_subscribers edge name in mutations.
 	EdgeDiscussionSubscribers = "discussion_subscribers"
 	// EdgeDiscussionVotes holds the string denoting the discussion_votes edge name in mutations.
@@ -126,6 +128,13 @@ const (
 	VersionsInverseTable = "message_versions"
 	// VersionsColumn is the table column denoting the versions relation/edge.
 	VersionsColumn = "discussion_id"
+	// BoardCardsTable is the table that holds the board_cards relation/edge.
+	BoardCardsTable = "board_cards"
+	// BoardCardsInverseTable is the table name for the BoardCard entity.
+	// It exists in this package in order to avoid circular dependency with the "boardcard" package.
+	BoardCardsInverseTable = "board_cards"
+	// BoardCardsColumn is the table column denoting the board_cards relation/edge.
+	BoardCardsColumn = "discussion_id"
 	// DiscussionSubscribersTable is the table that holds the discussion_subscribers relation/edge.
 	DiscussionSubscribersTable = "discussion_subscribers"
 	// DiscussionSubscribersInverseTable is the table name for the DiscussionSubscriber entity.
@@ -374,6 +383,20 @@ func ByVersions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByBoardCardsCount orders the results by board_cards count.
+func ByBoardCardsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newBoardCardsStep(), opts...)
+	}
+}
+
+// ByBoardCards orders the results by board_cards terms.
+func ByBoardCards(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newBoardCardsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByDiscussionSubscribersCount orders the results by discussion_subscribers count.
 func ByDiscussionSubscribersCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -462,6 +485,13 @@ func newVersionsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(VersionsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, VersionsTable, VersionsColumn),
+	)
+}
+func newBoardCardsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(BoardCardsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, BoardCardsTable, BoardCardsColumn),
 	)
 }
 func newDiscussionSubscribersStep() *sqlgraph.Step {

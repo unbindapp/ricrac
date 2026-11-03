@@ -27,7 +27,7 @@ func (BoardColumn) Fields() []ent.Field {
 func (BoardColumn) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("board", Board.Type).Ref("columns").Field("board_id").Unique().Required(),
-		edge.To("board_issues", BoardIssue.Type),
+		edge.To("board_cards", BoardCard.Type),
 	}
 }
 

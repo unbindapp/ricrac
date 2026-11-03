@@ -58,6 +58,48 @@ func TestBoardsHoldIssuesInColumnsOfTheirOwn(t *testing.T) {
 	call(t, w.Ann, "get_issue", M{"id": "ENG-1"})
 }
 
+func discussionCardTitles(page J) []string {
+	var titles []string
+	for i := 0; i < page.At("nodes").Len(); i++ {
+		titles = append(titles, page.At("nodes", i, "column", "name").Str()+": "+page.At("nodes", i, "discussion", "title").Str())
+	}
+	return titles
+}
+
+func TestBoardsHoldDiscussionsNextToIssues(t *testing.T) {
+	w := world(t)
+	gus := w.member("gus@acme.test", "Gus Guest", "guest")
+	call(t, w.Ann, "save_board", M{"name": "Ideas"})
+	call(t, w.Ann, "save_issue", M{"title": "Dark mode", "githubRepository": "none"})
+	call(t, w.Ann, "save_discussion", M{"title": "Widget mockups", "body": "Sketches"})
+	call(t, w.Ann, "save_discussion", M{"title": "Team plans", "body": "Only ENG", "team": "ENG"})
+
+	call(t, w.Ann, "place_on_board", M{"board": "Ideas", "issue": "ENG-1", "column": "Ideas"})
+	placed := call(t, w.Ann, "place_discussion_on_board", M{"board": "Ideas", "discussion": "Widget mockups", "column": "Ideas"})
+	eq(t, placed.At("discussion", "title").Str(), "Widget mockups")
+	eq(t, placed.At("sortOrder").Num(), 2, "discussions go after the column's issues")
+	call(t, w.Ann, "place_discussion_on_board", M{"board": "Ideas", "discussion": "Team plans", "column": "Doing"})
+	eqList(t, discussionCardTitles(call(t, w.Ann, "list_board_discussions", M{"board": "Ideas"})),
+		[]string{"Ideas: Widget mockups", "Doing: Team plans"})
+	eqList(t, cardTitles(call(t, w.Ann, "list_board_issues", M{"board": "Ideas"})), []string{"Ideas: Dark mode"})
+	columns := call(t, w.Ann, "get_board", M{"id": "Ideas"}).At("columns")
+	eq(t, columns.At(0, "issueCount").Num(), 1)
+	eq(t, columns.At(0, "discussionCount").Num(), 1)
+	eq(t, columns.At(2, "discussionCount").Num(), 1)
+	eq(t, call(t, gus, "get_board", M{"id": "Ideas"}).At("columns", 2, "discussionCount").Num(), 0, "guests count only what they see")
+
+	call(t, w.Ann, "place_discussion_on_board", M{"board": "Ideas", "discussion": "Widget mockups", "column": "Done", "sortOrder": 0})
+	eqList(t, discussionCardTitles(call(t, w.Ann, "list_board_discussions", M{"board": "Ideas", "column": "Done"})), []string{"Done: Widget mockups"})
+	eq(t, call(t, w.Ann, "list_board_discussions", M{"board": "Ideas"}).At("nodes").Len(), 2, "a discussion is on a board once")
+
+	removed := call(t, w.Ann, "remove_discussion_from_board", M{"board": "Ideas", "discussion": "Team plans"})
+	check(t, removed.At("removed").Bool())
+	eq(t, removed.At("discussion", "title").Str(), "Team plans")
+	check(t, !call(t, w.Ann, "remove_discussion_from_board", M{"board": "Ideas", "discussion": "Team plans"}).At("removed").Bool())
+	call(t, w.Ann, "delete_discussion", M{"id": "Widget mockups"})
+	eq(t, call(t, w.Ann, "list_board_discussions", M{"board": "Ideas"}).At("nodes").Len(), 0, "trashed discussions leave the board's list")
+}
+
 func TestIssuesKeptOffGitHubOpenThereWhenAsked(t *testing.T) {
 	g := withGitHub(t)
 	g.syncRepo(t, "ENG")

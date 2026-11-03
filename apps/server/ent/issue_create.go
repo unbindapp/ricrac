@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"ricrac/ent/attachment"
-	"ricrac/ent/boardissue"
+	"ricrac/ent/boardcard"
 	"ricrac/ent/comment"
 	"ricrac/ent/customerneed"
 	"ricrac/ent/cycle"
@@ -612,19 +612,19 @@ func (_c *IssueCreate) AddAttachments(v ...*Attachment) *IssueCreate {
 	return _c.AddAttachmentIDs(ids...)
 }
 
-// AddBoardIssueIDs adds the "board_issues" edge to the BoardIssue entity by IDs.
-func (_c *IssueCreate) AddBoardIssueIDs(ids ...uuid.UUID) *IssueCreate {
-	_c.mutation.AddBoardIssueIDs(ids...)
+// AddBoardCardIDs adds the "board_cards" edge to the BoardCard entity by IDs.
+func (_c *IssueCreate) AddBoardCardIDs(ids ...uuid.UUID) *IssueCreate {
+	_c.mutation.AddBoardCardIDs(ids...)
 	return _c
 }
 
-// AddBoardIssues adds the "board_issues" edges to the BoardIssue entity.
-func (_c *IssueCreate) AddBoardIssues(v ...*BoardIssue) *IssueCreate {
+// AddBoardCards adds the "board_cards" edges to the BoardCard entity.
+func (_c *IssueCreate) AddBoardCards(v ...*BoardCard) *IssueCreate {
 	ids := make([]uuid.UUID, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return _c.AddBoardIssueIDs(ids...)
+	return _c.AddBoardCardIDs(ids...)
 }
 
 // AddDocumentIDs adds the "documents" edge to the Document entity by IDs.
@@ -1241,15 +1241,15 @@ func (_c *IssueCreate) createSpec() (*Issue, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := _c.mutation.BoardIssuesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.BoardCardsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   issue.BoardIssuesTable,
-			Columns: []string{issue.BoardIssuesColumn},
+			Table:   issue.BoardCardsTable,
+			Columns: []string{issue.BoardCardsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(boardissue.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(boardcard.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

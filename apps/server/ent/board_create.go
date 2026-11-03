@@ -7,8 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"ricrac/ent/board"
+	"ricrac/ent/boardcard"
 	"ricrac/ent/boardcolumn"
-	"ricrac/ent/boardissue"
 	"ricrac/ent/user"
 	"ricrac/ent/workspace"
 	"time"
@@ -141,19 +141,19 @@ func (_c *BoardCreate) AddColumns(v ...*BoardColumn) *BoardCreate {
 	return _c.AddColumnIDs(ids...)
 }
 
-// AddBoardIssueIDs adds the "board_issues" edge to the BoardIssue entity by IDs.
-func (_c *BoardCreate) AddBoardIssueIDs(ids ...uuid.UUID) *BoardCreate {
-	_c.mutation.AddBoardIssueIDs(ids...)
+// AddBoardCardIDs adds the "board_cards" edge to the BoardCard entity by IDs.
+func (_c *BoardCreate) AddBoardCardIDs(ids ...uuid.UUID) *BoardCreate {
+	_c.mutation.AddBoardCardIDs(ids...)
 	return _c
 }
 
-// AddBoardIssues adds the "board_issues" edges to the BoardIssue entity.
-func (_c *BoardCreate) AddBoardIssues(v ...*BoardIssue) *BoardCreate {
+// AddBoardCards adds the "board_cards" edges to the BoardCard entity.
+func (_c *BoardCreate) AddBoardCards(v ...*BoardCard) *BoardCreate {
 	ids := make([]uuid.UUID, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return _c.AddBoardIssueIDs(ids...)
+	return _c.AddBoardCardIDs(ids...)
 }
 
 // Mutation returns the BoardMutation object of the builder.
@@ -317,15 +317,15 @@ func (_c *BoardCreate) createSpec() (*Board, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := _c.mutation.BoardIssuesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.BoardCardsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   board.BoardIssuesTable,
-			Columns: []string{board.BoardIssuesColumn},
+			Table:   board.BoardCardsTable,
+			Columns: []string{board.BoardCardsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(boardissue.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(boardcard.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
