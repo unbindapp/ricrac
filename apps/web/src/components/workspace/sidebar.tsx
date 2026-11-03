@@ -109,10 +109,10 @@ export function Sidebar({ onNavigate, hideButton }: TSidebarProps) {
         </Button>
         {canEdit && (
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
             aria-label="New issue"
-            className="dank:bg-primary-container dank:text-primary-container-foreground dank:has-hover:hover:bg-primary-container/85 dank:active:bg-primary-container/85 dank:rounded-md dank:border-0"
+            className="text-muted-foreground"
             onClick={() => {
               onNavigate?.();
               openNewIssue();
