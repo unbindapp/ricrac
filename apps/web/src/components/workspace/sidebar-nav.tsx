@@ -14,7 +14,7 @@ type TNavItemProps = {
 };
 
 export const sidebarItemClassName =
-  "hit-gap-y h-7.5 w-full justify-start px-2 font-normal [&_svg]:text-muted-foreground dank:h-9 dank:pr-3 dank:pl-3";
+  "hit-gap-y h-8.5 w-full justify-start gap-2 px-2.5 font-normal [&_svg]:text-muted-foreground dank:h-9 dank:gap-1.5 dank:pr-3 dank:pl-3";
 
 export const sidebarActiveItemClassName =
   "data-[status=active]:bg-accent dank:data-[status=active]:bg-secondary dank:data-[status=active]:text-secondary-foreground dank:data-[status=active]:font-semibold dank:data-[status=active]:[&_svg]:text-secondary-foreground";
@@ -78,7 +78,7 @@ export function SidebarSection({
           forceMinSize={false}
           aria-expanded={isOpen}
           onClick={() => setIsOpen((open) => !open)}
-          className="text-muted-foreground h-7 min-w-0 justify-start gap-1 px-2 text-xs"
+          className="text-muted-foreground h-8 min-w-0 justify-start gap-1 px-2.5 text-xs"
         >
           <span className="truncate">{title}</span>
           <Caret isOpen={isOpen} />
