@@ -22,6 +22,8 @@ export type TUiTheme = {
   NavigationDrawer: ComponentType<{ onNavigate: () => void }>;
   /** Shows while a page loads, in place of the spinner. */
   LoadingIndicator?: ComponentType;
+  /** Claude beside the page, in place of the default panel. */
+  AssistantPanel?: ComponentType;
   /** Opens settings in a window over the page, which stays as it was, instead of as pages. */
   SettingsWindow?: ComponentType;
   icons: "lucide" | "symbols";

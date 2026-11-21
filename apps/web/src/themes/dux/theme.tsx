@@ -1,4 +1,5 @@
 import { loadSymbols } from "@/components/icons/symbol-set";
+import { DuxAssistantSheet } from "@/themes/dux/assistant-sheet";
 import { duxButtonVariants } from "@/themes/dux/button-variants";
 import { LoadingIndicator } from "@/themes/dux/loading-indicator";
 import { DuxNavigation, DuxNavigationDrawer } from "@/themes/dux/navigation";
@@ -11,22 +12,24 @@ import type { TUiTheme } from "@/themes/types";
 export const duxTheme: TUiTheme = {
   id: "dux",
   label: "Dux",
-  description: "Material 3 Expressive: bold color, round shapes and a navigation rail.",
+  description:
+    "Material 3 Expressive in two tones: an app bar, a sidebar and pages on round cards.",
   Navigation: DuxNavigation,
   useIsNavigationHidden: () => false,
   TopBar: DuxTopBar,
   NavigationDrawer: DuxNavigationDrawer,
   SettingsWindow: DuxSettingsWindow,
+  AssistantPanel: DuxAssistantSheet,
   ForumPanel: DuxForumPanel,
   LoadingIndicator,
   icons: "symbols",
-  createButton: "fab",
+  createButton: "header",
   separatesBars: true,
   inlineReplies: true,
   chatBubbles: true,
   threadsInChat: true,
   editorToolbars: false,
-  pageTitles: false,
+  pageTitles: true,
   showsEmptyPanes: false,
   mediaViewer: "stage",
   defaultAccentHue: BASELINE_HUE,

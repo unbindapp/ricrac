@@ -16,7 +16,7 @@ export function Breadcrumb({ items }: { items: TBreadcrumbItem[] }) {
   const isCollapsedOnPhones = (index: number) => index < items.length - 2;
   return (
     <nav aria-label="Breadcrumb" className="min-w-0">
-      <ol className="text-muted-foreground dux:in-data-[slot=page-bar]:type-title-large flex min-w-0 items-center gap-1.5 text-sm">
+      <ol className="text-muted-foreground flex min-w-0 items-center gap-1.5 text-sm">
         {items.map((item, index) => (
           <Fragment key={`${item.label}-${index}`}>
             {index > 0 && (

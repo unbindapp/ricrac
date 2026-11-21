@@ -20,6 +20,7 @@ import {
   ArrowUpRightIcon as LucideArrowUpRightIcon,
   ArrowUpToLineIcon as LucideArrowUpToLineIcon,
   AtSignIcon as LucideAtSignIcon,
+  BadgeCheckIcon as LucideBadgeCheckIcon,
   BeakerIcon as LucideBeakerIcon,
   BellIcon as LucideBellIcon,
   BellOffIcon as LucideBellOffIcon,
@@ -49,6 +50,7 @@ import {
   ChevronsUpDownIcon as LucideChevronsUpDownIcon,
   CircleAlertIcon as LucideCircleAlertIcon,
   CircleArrowRightIcon as LucideCircleArrowRightIcon,
+  CircleCheckBigIcon as LucideCircleCheckBigIcon,
   CircleCheckIcon as LucideCircleCheckIcon,
   CircleDashedIcon as LucideCircleDashedIcon,
   CircleDotIcon as LucideCircleDotIcon,
@@ -68,6 +70,7 @@ import {
   CpuIcon as LucideCpuIcon,
   DatabaseIcon as LucideDatabaseIcon,
   DiamondIcon as LucideDiamondIcon,
+  DoorClosedIcon as LucideDoorClosedIcon,
   DoorOpenIcon as LucideDoorOpenIcon,
   DownloadIcon as LucideDownloadIcon,
   EllipsisIcon as LucideEllipsisIcon,
@@ -163,6 +166,7 @@ import {
   ReplyIcon as LucideReplyIcon,
   RocketIcon as LucideRocketIcon,
   RotateCwIcon as LucideRotateCwIcon,
+  Rows2Icon as LucideRows2Icon,
   RulerIcon as LucideRulerIcon,
   SearchIcon as LucideSearchIcon,
   SearchXIcon as LucideSearchXIcon,
@@ -182,6 +186,7 @@ import {
   SquareCheckBigIcon as LucideSquareCheckBigIcon,
   SquareIcon as LucideSquareIcon,
   SquarePenIcon as LucideSquarePenIcon,
+  SquareUserIcon as LucideSquareUserIcon,
   StarIcon as LucideStarIcon,
   StrikethroughIcon as LucideStrikethroughIcon,
   SunIcon as LucideSunIcon,
@@ -209,6 +214,7 @@ import {
   UserPenIcon as LucideUserPenIcon,
   UserPlusIcon as LucideUserPlusIcon,
   UsersIcon as LucideUsersIcon,
+  UsersRoundIcon as LucideUsersRoundIcon,
   VideoIcon as LucideVideoIcon,
   WebhookIcon as LucideWebhookIcon,
   WorkflowIcon as LucideWorkflowIcon,
@@ -267,6 +273,7 @@ export const ArrowUpToLineIcon = /* @__PURE__ */ themedIcon(
   "ArrowUpToLineIcon",
 );
 export const AtSignIcon = /* @__PURE__ */ themedIcon(LucideAtSignIcon, "AtSignIcon");
+export const BadgeCheckIcon = /* @__PURE__ */ themedIcon(LucideBadgeCheckIcon, "BadgeCheckIcon");
 export const BeakerIcon = /* @__PURE__ */ themedIcon(LucideBeakerIcon, "BeakerIcon");
 export const BellIcon = /* @__PURE__ */ themedIcon(LucideBellIcon, "BellIcon");
 export const BellOffIcon = /* @__PURE__ */ themedIcon(LucideBellOffIcon, "BellOffIcon");
@@ -314,6 +321,10 @@ export const CircleArrowRightIcon = /* @__PURE__ */ themedIcon(
   LucideCircleArrowRightIcon,
   "CircleArrowRightIcon",
 );
+export const CircleCheckBigIcon = /* @__PURE__ */ themedIcon(
+  LucideCircleCheckBigIcon,
+  "CircleCheckBigIcon",
+);
 export const CircleCheckIcon = /* @__PURE__ */ themedIcon(LucideCircleCheckIcon, "CircleCheckIcon");
 export const CircleDashedIcon = /* @__PURE__ */ themedIcon(
   LucideCircleDashedIcon,
@@ -342,6 +353,7 @@ export const CornerLeftUpIcon = /* @__PURE__ */ themedIcon(
 export const CpuIcon = /* @__PURE__ */ themedIcon(LucideCpuIcon, "CpuIcon");
 export const DatabaseIcon = /* @__PURE__ */ themedIcon(LucideDatabaseIcon, "DatabaseIcon");
 export const DiamondIcon = /* @__PURE__ */ themedIcon(LucideDiamondIcon, "DiamondIcon");
+export const DoorClosedIcon = /* @__PURE__ */ themedIcon(LucideDoorClosedIcon, "DoorClosedIcon");
 export const DoorOpenIcon = /* @__PURE__ */ themedIcon(LucideDoorOpenIcon, "DoorOpenIcon");
 export const DownloadIcon = /* @__PURE__ */ themedIcon(LucideDownloadIcon, "DownloadIcon");
 export const EllipsisIcon = /* @__PURE__ */ themedIcon(LucideEllipsisIcon, "EllipsisIcon");
@@ -479,6 +491,7 @@ export const RepeatIcon = /* @__PURE__ */ themedIcon(LucideRepeatIcon, "RepeatIc
 export const ReplyIcon = /* @__PURE__ */ themedIcon(LucideReplyIcon, "ReplyIcon");
 export const RocketIcon = /* @__PURE__ */ themedIcon(LucideRocketIcon, "RocketIcon");
 export const RotateCwIcon = /* @__PURE__ */ themedIcon(LucideRotateCwIcon, "RotateCwIcon");
+export const Rows2Icon = /* @__PURE__ */ themedIcon(LucideRows2Icon, "Rows2Icon");
 export const RulerIcon = /* @__PURE__ */ themedIcon(LucideRulerIcon, "RulerIcon");
 export const SearchIcon = /* @__PURE__ */ themedIcon(LucideSearchIcon, "SearchIcon");
 export const SearchXIcon = /* @__PURE__ */ themedIcon(LucideSearchXIcon, "SearchXIcon");
@@ -507,6 +520,7 @@ export const SquareCheckBigIcon = /* @__PURE__ */ themedIcon(
 );
 export const SquareIcon = /* @__PURE__ */ themedIcon(LucideSquareIcon, "SquareIcon");
 export const SquarePenIcon = /* @__PURE__ */ themedIcon(LucideSquarePenIcon, "SquarePenIcon");
+export const SquareUserIcon = /* @__PURE__ */ themedIcon(LucideSquareUserIcon, "SquareUserIcon");
 export const StarIcon = /* @__PURE__ */ themedIcon(LucideStarIcon, "StarIcon");
 export const StrikethroughIcon = /* @__PURE__ */ themedIcon(
   LucideStrikethroughIcon,
@@ -546,6 +560,7 @@ export const UserMinusIcon = /* @__PURE__ */ themedIcon(LucideUserMinusIcon, "Us
 export const UserPenIcon = /* @__PURE__ */ themedIcon(LucideUserPenIcon, "UserPenIcon");
 export const UserPlusIcon = /* @__PURE__ */ themedIcon(LucideUserPlusIcon, "UserPlusIcon");
 export const UsersIcon = /* @__PURE__ */ themedIcon(LucideUsersIcon, "UsersIcon");
+export const UsersRoundIcon = /* @__PURE__ */ themedIcon(LucideUsersRoundIcon, "UsersRoundIcon");
 export const VideoIcon = /* @__PURE__ */ themedIcon(LucideVideoIcon, "VideoIcon");
 export const WebhookIcon = /* @__PURE__ */ themedIcon(LucideWebhookIcon, "WebhookIcon");
 export const WorkflowIcon = /* @__PURE__ */ themedIcon(LucideWorkflowIcon, "WorkflowIcon");

@@ -41,12 +41,10 @@ export function PageContainer({ width = "full", scroll = "pane", children }: TPr
           "px-(--page-px) pt-(--page-pt) [--page-pt:--spacing(4)] [--page-px:--spacing(4)]",
           width === "narrow" &&
             "max-w-3xl sm:[--page-pt:--spacing(10)] sm:[--page-px:--spacing(6)]",
-          width === "full" &&
-            separatesBars &&
-            "max-w-none md:[--page-pt:--spacing(8)] md:[--page-px:--spacing(10)]",
+          width === "full" && "max-w-none",
           width === "full" &&
             !separatesBars &&
-            "max-w-none md:[--page-pt:--spacing(2)] md:[--page-px:--spacing(2)]",
+            "md:[--page-pt:--spacing(2)] md:[--page-px:--spacing(2)]",
         )}
       >
         {children}

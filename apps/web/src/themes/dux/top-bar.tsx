@@ -1,108 +1,109 @@
-import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { useTheme } from "next-themes";
 
-import { type LucideIcon, MoonIcon, SettingsIcon, SunIcon, SunMoonIcon } from "@/components/icons";
-import { UserAvatar } from "@/components/issues/pickers";
-import { nextTheme, type TTheme } from "@/components/providers/themes";
+import { useIsAssistantAvailable } from "@/components/assistant/use-assistant-available";
+import { ClaudeIcon } from "@/components/icons/claude";
+import { InboxIcon, MenuIcon } from "@/components/icons";
+import { useInboxUnreadCount } from "@/components/inbox/inbox-unread-badge";
+import { useDeviceSize } from "@/components/providers/device-size-provider";
 import { Button } from "@/components/ui/button";
-import { DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { SimpleTooltip } from "@/components/ui/tooltip";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { WorkspaceMenu } from "@/components/workspace/workspace-switcher";
-import { meQuery } from "@/lib/queries/me";
+import { useAssistantStore } from "@/lib/stores/assistant";
+import { useMobileNavStore } from "@/lib/stores/mobile-nav";
+import { useSidebarStore } from "@/lib/stores/sidebar";
+import { AccountMenu } from "@/themes/dux/account-menu";
 import { GlobalSearch } from "@/themes/dux/global-search";
+import { DUX_SIDEBAR_ID } from "@/themes/dux/navigation";
 
-const themeModes: Record<TTheme, { label: string; icon: LucideIcon }> = {
-  system: { label: "Follow system", icon: SunMoonIcon },
-  light: { label: "Light", icon: SunIcon },
-  dark: { label: "Dark", icon: MoonIcon },
-};
-
-const actionClassName = "size-12 shrink-0 rounded-full active:rounded-full popup-open:rounded-full";
-
-/** The search bar centered at the top of the window, and the theme, settings and account top right. */
+/** The app bar across the window: the menu and brand on the left, search, Claude, inbox and account on the right. */
 export function DuxTopBar() {
   return (
-    <header className="hidden h-20 shrink-0 md:block">
-      <div className="fixed top-3 left-1/2 z-20 w-[min(35rem,calc(100vw-25rem))] -translate-x-1/2">
+    <header data-slot="dux-app-bar">
+      <NavigationToggle />
+      <span data-slot="dux-brand">
+        <img src="/dux.webp" alt="" />
+        <span>dux</span>
+      </span>
+      <nav aria-label="Top actions" data-slot="dux-app-bar-actions">
         <GlobalSearch />
-      </div>
-      <div className="fixed top-3 right-4 z-20 flex h-14 items-center gap-1">
-        <ThemeModeButton />
-        <SettingsButton />
+        <AskClaudeButton />
+        <InboxButton />
         <AccountMenu />
-      </div>
+      </nav>
     </header>
   );
 }
 
-function ThemeModeButton() {
-  const { theme, setTheme } = useTheme();
-  const mode = themeModes[(theme as TTheme | undefined) ?? "system"] ?? themeModes.system;
-  const label = `Theme: ${mode.label}`;
+function NavigationToggle() {
+  const isSidebarHidden = useSidebarStore((state) => state.isCollapsed);
+  const toggleSidebar = useSidebarStore((state) => state.toggle);
+  const isDrawerOpen = useMobileNavStore((state) => state.isOpen);
+  const setDrawerOpen = useMobileNavStore((state) => state.setOpen);
+  const { size } = useDeviceSize();
+  const isNarrow = size === "xs" || size === "sm";
   return (
-    <SimpleTooltip content={label}>
+    <SimpleTooltip content="Main menu" side="bottom">
+      <Button
+        variant="ghost"
+        size="icon"
+        forceMinSize={false}
+        aria-label="Main menu"
+        aria-controls={isNarrow ? undefined : DUX_SIDEBAR_ID}
+        aria-expanded={isNarrow ? isDrawerOpen : !isSidebarHidden}
+        onClick={() => {
+          if (isNarrow) return setDrawerOpen(!isDrawerOpen);
+          toggleSidebar();
+        }}
+      >
+        <MenuIcon />
+      </Button>
+    </SimpleTooltip>
+  );
+}
+
+function AskClaudeButton() {
+  const isAvailable = useIsAssistantAvailable();
+  const isOpen = useAssistantStore((state) => state.isOpen);
+  const toggle = useAssistantStore((state) => state.toggle);
+  if (!isAvailable) return null;
+  return (
+    <SimpleTooltip content="Ask Claude" side="bottom">
+      <Button
+        variant="ghost"
+        size="icon"
+        forceMinSize={false}
+        aria-label="Ask Claude"
+        aria-pressed={isOpen}
+        data-slot="dux-ask-claude"
+        onClick={toggle}
+      >
+        <ClaudeIcon />
+      </Button>
+    </SimpleTooltip>
+  );
+}
+
+function InboxButton() {
+  const { workspace } = useWorkspace();
+  const unread = useInboxUnreadCount();
+  const label = unread > 0 ? `Inbox, ${unread} unread` : "Inbox";
+  return (
+    <SimpleTooltip content="Inbox" side="bottom">
       <Button
         variant="ghost"
         size="icon"
         forceMinSize={false}
         aria-label={label}
-        className={actionClassName}
-        onClick={() => setTheme(nextTheme(theme))}
+        data-slot="dux-inbox"
+        render={<Link to="/$workspace/inbox" params={{ workspace: workspace.urlKey }} />}
       >
-        <mode.icon />
+        <InboxIcon />
+        {unread > 0 && (
+          <span aria-hidden data-slot="dux-badge">
+            {unread > 99 ? "99+" : unread}
+          </span>
+        )}
       </Button>
     </SimpleTooltip>
-  );
-}
-
-function SettingsButton() {
-  const { workspace, isAdmin } = useWorkspace();
-  return (
-    <SimpleTooltip content="Settings">
-      <Button
-        variant="ghost"
-        size="icon"
-        forceMinSize={false}
-        aria-label="Settings"
-        className={actionClassName}
-        render={
-          <Link
-            to={isAdmin ? "/$workspace/settings" : "/$workspace/settings/account"}
-            params={{ workspace: workspace.urlKey }}
-          />
-        }
-      >
-        <SettingsIcon />
-      </Button>
-    </SimpleTooltip>
-  );
-}
-
-function AccountMenu() {
-  const { data: me } = useQuery(meQuery);
-  if (!me) return null;
-  return (
-    <WorkspaceMenu
-      align="end"
-      header={
-        <DropdownMenuLabel className="flex flex-col gap-0.5">
-          <span className="text-foreground truncate text-sm">{me.name}</span>
-          <span className="truncate">{me.email}</span>
-        </DropdownMenuLabel>
-      }
-      trigger={
-        <Button
-          variant="ghost"
-          size="icon"
-          forceMinSize={false}
-          aria-label="Account and workspaces"
-          className="popup-open:rounded-full ml-1 size-9 shrink-0 overflow-hidden rounded-full active:rounded-full [&>*]:size-9"
-        >
-          <UserAvatar user={me} size="lg" />
-        </Button>
-      }
-    />
   );
 }

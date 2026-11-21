@@ -20,7 +20,13 @@ import { useUiTheme } from "@/themes/ui-theme-provider";
 export function WorkspaceShell({ children }: { children: ReactNode }) {
   const { canEdit } = useWorkspace();
   const openNewIssue = useNewIssueStore((state) => state.open);
-  const { Navigation, TopBar, SettingsWindow, useIsNavigationHidden } = useUiTheme();
+  const {
+    Navigation,
+    TopBar,
+    SettingsWindow,
+    AssistantPanel: ThemeAssistantPanel = AssistantPanel,
+    useIsNavigationHidden,
+  } = useUiTheme();
   const isNavigationHidden = useIsNavigationHidden();
 
   useHotkeyScope([{ hotkey: "C", callback: () => openNewIssue(), enabled: canEdit }]);
@@ -28,17 +34,19 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
   return (
     <div
       data-sidebar-collapsed={isNavigationHidden || undefined}
-      className="group/shell bg-sidebar flex h-svh w-full overflow-clip max-md:has-data-[scroll=window]:h-auto max-md:has-data-[scroll=window]:min-h-svh"
+      className="group/shell bg-sidebar flex h-svh w-full flex-col overflow-clip max-md:has-data-[scroll=window]:h-auto max-md:has-data-[scroll=window]:min-h-svh"
     >
-      <Navigation />
-      <div className="dux:md:gap-0 dux:md:pt-0 dux:md:pr-3 dux:md:pb-3 flex min-w-0 flex-1 flex-col md:gap-2 md:py-2 md:pr-2 md:group-data-sidebar-collapsed/shell:pl-2">
-        <FallbackMobileBar />
-        {TopBar && <TopBar />}
-        <div className="dux:gap-3 flex min-h-0 flex-1 gap-2">
-          <main className="bg-background dux:border-0 flex min-h-0 min-w-0 flex-1 flex-col overflow-clip has-data-[slot=split-view]:border-0 has-data-[slot=split-view]:bg-transparent md:rounded-lg md:border">
-            {children}
-          </main>
-          <AssistantPanel />
+      {TopBar && <TopBar />}
+      <div className="flex min-h-0 w-full flex-1">
+        <Navigation />
+        <div className="dux:md:p-0 dux:md:pr-2 dux:md:pb-2 dux:max-md:px-2 dux:max-md:pb-2 flex min-w-0 flex-1 flex-col md:gap-2 md:py-2 md:pr-2 md:group-data-sidebar-collapsed/shell:pl-2">
+          <FallbackMobileBar />
+          <div className="dux:gap-0 flex min-h-0 flex-1 gap-2">
+            <main className="bg-background dux:border-0 dux:bg-card flex min-h-0 min-w-0 flex-1 flex-col overflow-clip has-data-[slot=split-view]:border-0 has-data-[slot=split-view]:bg-transparent md:rounded-lg md:border">
+              {children}
+            </main>
+            <ThemeAssistantPanel />
+          </div>
         </div>
       </div>
       <MobileNavDrawer />
@@ -71,7 +79,7 @@ function FallbackMobileBar() {
   return (
     <div
       data-sticky-bar
-      className="dux:h-16 dux:border-0 dux:px-1 bg-sidebar sticky top-0 z-10 flex h-11 shrink-0 items-center gap-2 border-b px-4 group-has-data-mobile-bar/shell:hidden md:hidden"
+      className="dux:hidden bg-sidebar sticky top-0 z-10 flex h-11 shrink-0 items-center gap-2 border-b px-4 group-has-data-mobile-bar/shell:hidden md:hidden"
     >
       <SidebarButton />
       <WorkspaceIcon name={workspace.name} logoUrl={workspace.logoUrl} />

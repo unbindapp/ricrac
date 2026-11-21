@@ -56,7 +56,7 @@ export function PageHeader({ title, icon, description, breadcrumb, actions, tool
 
 function TitleIcon({ icon }: { icon: ReactNode }) {
   return (
-    <span className="text-muted-foreground dux:[&_svg]:size-6 flex shrink-0 items-center [&_svg]:size-4">
+    <span className="text-muted-foreground dux:hidden flex shrink-0 items-center [&_svg]:size-4">
       {icon}
     </span>
   );
