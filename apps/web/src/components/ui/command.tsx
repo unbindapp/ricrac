@@ -16,7 +16,7 @@ const commandVariants = cva(
         default: "bg-popover text-popover-foreground dux:bg-transparent",
         modal: "bg-background text-foreground",
         searchView:
-          "bg-popover text-popover-foreground dux:bg-m3-surface-container-high dux:text-m3-on-surface dux:rounded-xl dux:border-0 dux:shadow-elevation-3 dux:[--tw-shadow-color:initial] dux:[&_[cmdk-list]]:p-2 dux:[&_[cmdk-item]]:min-h-14 dux:[&_[cmdk-item]>svg]:size-6 dux:[&_[cmdk-item][data-selected=true]]:rounded-lg dux:[&_[cmdk-group]_[cmdk-group-heading]]:type-title-small dux:[&_[cmdk-group]_[cmdk-group-heading]]:text-m3-on-surface-variant dux:[&_[cmdk-group]_[cmdk-group-heading]]:min-h-12 dux:[&_[cmdk-group]_[cmdk-group-heading]]:px-5",
+          "bg-popover text-popover-foreground dux:bg-popover dux:text-m3-on-surface dux:rounded-xl dux:border-0 dux:shadow-elevation-3 dux:[--tw-shadow-color:initial] dux:[&_[cmdk-list]]:p-2 dux:[&_[cmdk-item]]:min-h-14 dux:[&_[cmdk-item]>svg]:size-6 dux:[&_[cmdk-item][data-selected=true]]:rounded-lg dux:[&_[cmdk-group]_[cmdk-group-heading]]:type-title-small dux:[&_[cmdk-group]_[cmdk-group-heading]]:text-m3-on-surface-variant dux:[&_[cmdk-group]_[cmdk-group-heading]]:min-h-12 dux:[&_[cmdk-group]_[cmdk-group-heading]]:px-5",
       },
       wrapper: {
         default:
@@ -119,7 +119,7 @@ function CommandList({ className, ...props }: React.ComponentProps<typeof Comman
   return (
     <CommandPrimitive.List
       className={cn(
-        "dux:px-0 dux:py-0.5 p-1 [&_[cmdk-group]:not([hidden])~[cmdk-group]:not([hidden])]:mt-1",
+        "dux:p-2 dux:flex dux:flex-col dux:gap-0.5 p-1 [&_[cmdk-group]:not([hidden])~[cmdk-group]:not([hidden])]:mt-1",
         className,
       )}
       {...props}

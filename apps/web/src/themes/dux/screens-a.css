@@ -226,7 +226,7 @@
   letter-spacing: 0.03125rem;
 }
 :root[data-ui-theme="dux"] [data-slot="properties"] [data-picker="row"]:focus-visible {
-  outline: none;
+  outline-offset: -3px;
 }
 /* The picker's ::before and state layer span the whole row, so the label opens it too. */
 :root[data-ui-theme="dux"] [data-slot="properties"] [data-picker="row"]::before {

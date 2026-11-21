@@ -62,7 +62,7 @@
 :root[data-ui-theme="dux"] [data-slot="dux-app-bar"] {
   position: sticky;
   top: 0;
-  z-index: 60;
+  z-index: 40;
   display: flex;
   flex: none;
   align-items: center;
@@ -238,7 +238,7 @@
       opacity: 1;
     }
 
-    [data-expanded] > * > & {
+    [data-expanded] & {
       opacity: 1;
       pointer-events: auto;
     }

@@ -8,7 +8,7 @@ type TProps = {
 export function PageToolbar({ children, actions }: TProps) {
   return (
     <div data-slot="page-toolbar" className="flex min-h-8 w-full items-center gap-2">
-      <div className="scrollbar-hidden flex min-w-0 flex-1 items-center gap-2 overflow-x-auto">
+      <div className="scrollbar-hidden dux:-m-1.5 dux:p-1.5 flex min-w-0 flex-1 items-center gap-2 overflow-x-auto">
         {children}
       </div>
       {actions && <div className="dux:gap-3 flex shrink-0 items-center gap-1">{actions}</div>}

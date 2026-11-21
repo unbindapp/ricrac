@@ -493,13 +493,6 @@
   }
 }
 
-/* No focus rings: no outlines, and none of the rings utilities draw. Unlayered to beat them. */
-:root[data-ui-theme="dux"] :is(:focus, :focus-visible, :focus-within) {
-  outline: none;
-  --tw-ring-shadow: 0 0 #0000;
-  --tw-ring-offset-shadow: 0 0 #0000;
-}
-
 /* Material 3 type scale roles, for elements that take one role whatever their size class says. */
 @utility type-display-large {
   font-size: 3.5625rem;

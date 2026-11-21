@@ -119,7 +119,7 @@ export function IssueFilters({ filters, onChange, teamId, hiddenFields = [] }: T
   });
 
   return (
-    <div className="scrollbar-hidden flex min-w-0 items-center gap-2 overflow-x-auto max-sm:shrink-0">
+    <div className="scrollbar-hidden dux:-m-1.5 dux:p-1.5 flex min-w-0 items-center gap-2 overflow-x-auto max-sm:shrink-0">
       {shown.map((field) => (
         <FilterChip
           key={field}

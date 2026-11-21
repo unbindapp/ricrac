@@ -65,7 +65,7 @@ function MobileNavDrawer() {
   const setOpen = useMobileNavStore((state) => state.setOpen);
   return (
     <Drawer direction="left" open={isOpen} onOpenChange={setOpen}>
-      <DrawerContent className="dux:w-80 w-72 max-w-full">
+      <DrawerContent className="dux:w-70 w-72 max-w-full">
         <DrawerTitle className="sr-only">Navigation</DrawerTitle>
         <NavigationDrawer onNavigate={() => setOpen(false)} />
       </DrawerContent>

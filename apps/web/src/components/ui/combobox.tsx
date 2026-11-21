@@ -71,7 +71,7 @@ function ComboboxList({ className, ...props }: ComboboxPrimitive.List.Props) {
   return (
     <ComboboxPrimitive.List
       className={cn(
-        "dux:px-0 dux:py-0.5 flex min-h-0 flex-col overflow-y-auto p-1 outline-hidden",
+        "dux:p-2 dux:gap-0.5 flex min-h-0 flex-col overflow-y-auto p-1 outline-hidden",
         className,
       )}
       {...props}

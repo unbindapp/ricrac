@@ -30,7 +30,7 @@ function DropdownMenuTrigger({ ...props }: MenuPrimitive.Trigger.Props) {
 }
 
 export const duxMenuItemClassName =
-  "dux:relative dux:mx-1 dux:min-h-11 dux:gap-3 dux:rounded-xs dux:px-4 dux:py-2 dux:type-body-large dux:state-layer dux:[--accent:transparent] dux:[--menu-icon:var(--m3-on-surface-variant)] dux:[&.text-destructive]:[--menu-icon:currentColor] dux:[&>svg]:size-5 dux:[&>svg]:text-(--menu-icon) dux:transition-[border-radius,background-color] dux:duration-(--spring-fast-spatial-duration) dux:ease-spring-fast-spatial dux:focus-visible:outline-solid dux:focus-visible:outline-3 dux:focus-visible:-outline-offset-3 dux:focus-visible:outline-m3-secondary";
+  "dux:relative dux:bg-(--dux-item) dux:min-h-11 dux:gap-3 dux:rounded-xs dux:px-4 dux:py-2 dux:type-body-large dux:state-layer dux:[--accent:transparent] dux:[--menu-icon:var(--m3-on-surface-variant)] dux:[&.text-destructive]:[--menu-icon:currentColor] dux:[&>svg]:size-5 dux:[&>svg]:text-(--menu-icon) dux:transition-[border-radius,background-color] dux:duration-(--spring-fast-spatial-duration) dux:ease-spring-fast-spatial dux:focus-visible:outline-solid dux:focus-visible:outline-3 dux:focus-visible:-outline-offset-3 dux:focus-visible:outline-m3-secondary";
 
 export const duxMenuItemShapeClassName =
   "dux:[&:not(:is([role^=menuitem],[role=option])~&)]:rounded-t-md dux:[&:not(:has(~:is([role^=menuitem],[role=option])))]:rounded-b-md";
@@ -39,13 +39,13 @@ export const duxMenuItemDisabledClassName =
   "dux:data-disabled:opacity-100 dux:data-disabled:text-m3-on-surface/38 dux:data-disabled:[--menu-icon:currentColor]";
 
 export const duxMenuContainerClassName =
-  "dux:bg-m3-surface-container-low dux:text-m3-on-surface dux:rounded-lg dux:border-0 dux:shadow-elevation-2 dux:[--tw-shadow-color:initial]";
+  "dux:bg-popover dux:text-m3-on-surface dux:rounded-lg dux:border-0 dux:shadow-elevation-2 dux:[--tw-shadow-color:initial]";
 
 export const duxPopupMotionClassName =
   "dux:popup-motion dux:data-open:animate-none dux:data-closed:animate-none";
 
 export const dropdownContentVariants = cva(
-  "bg-popover text-popover-foreground shadow-shadow-color/shadow-opacity flex max-h-[min(30rem,var(--available-height))] max-w-(--available-width) origin-(--transform-origin) flex-col overflow-hidden rounded-lg border p-0 shadow-lg outline-none dux:w-max dux:min-w-28 dux:max-w-[min(17.5rem,var(--available-width))] dux:gap-0.5 dux:overflow-visible dux:rounded-none dux:border-0 dux:bg-transparent dux:p-0 dux:text-m3-on-surface dux:shadow-none",
+  "bg-popover text-popover-foreground shadow-shadow-color/shadow-opacity flex max-h-[min(30rem,var(--available-height))] max-w-(--available-width) origin-(--transform-origin) flex-col overflow-hidden rounded-lg border p-0 shadow-lg outline-none dux:w-max dux:min-w-28 dux:max-w-[min(17.5rem,var(--available-width))] dux:gap-0.5 dux:overflow-y-auto dux:rounded-lg dux:border-0 dux:bg-popover dux:p-1 dux:text-m3-on-surface dux:shadow-elevation-2 dux:[--tw-shadow-color:initial]",
   {
     variants: {
       animate: {
@@ -136,7 +136,7 @@ function MenuPopupChildren({ children }: { children: React.ReactNode }) {
       key={index}
       role="none"
       data-slot="dropdown-menu-segment"
-      className="bg-m3-surface-container-low shadow-elevation-2 flex min-h-0 flex-col overflow-y-auto rounded-sm py-0.5 first:rounded-t-lg last:rounded-b-lg"
+      className="flex shrink-0 flex-col gap-0.5 p-1"
     >
       {segment}
     </div>

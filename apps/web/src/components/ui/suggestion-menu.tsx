@@ -52,7 +52,7 @@ function SuggestionMenu({
       className={cn(
         "bg-popover text-popover-foreground shadow-shadow-color/shadow-opacity fixed z-[1100] flex max-h-72 w-64 flex-col overflow-y-auto rounded-lg border p-1 shadow-lg",
         duxMenuContainerClassName,
-        "dux:px-0 dux:py-0.5",
+        "dux:p-2 dux:gap-0.5",
       )}
       style={{ ...position, left: Math.min(position.left, window.innerWidth - 264) }}
     >

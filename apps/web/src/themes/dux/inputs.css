@@ -233,7 +233,6 @@
       .rr-prose input[type="checkbox"]:enabled
     ):focus-visible {
     --checkbox-state-layer-opacity: 0.1;
-    outline: none;
   }
   :root[data-ui-theme="dux"]
     :is(

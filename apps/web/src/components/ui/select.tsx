@@ -82,7 +82,7 @@ function SelectContent({
           )}
           {...props}
         >
-          <SelectPrimitive.List className="dux:px-0 dux:py-0.5 flex flex-col overflow-y-auto p-1">
+          <SelectPrimitive.List className="dux:p-2 dux:gap-0.5 flex flex-col overflow-y-auto p-1">
             {children}
           </SelectPrimitive.List>
         </SelectPrimitive.Popup>

@@ -183,12 +183,7 @@ function CustomerForm({ customer, onDone }: { customer?: Customer; onDone: () =>
                 label="Logo"
                 upload={uploadImage}
                 preview={(logoUrl) => (
-                  <CustomerLogo
-                    id={customer.id}
-                    name={customer.name}
-                    logoUrl={logoUrl}
-                    size="lg"
-                  />
+                  <CustomerLogo id={customer.id} name={customer.name} logoUrl={logoUrl} size="lg" />
                 )}
               />
             )}
