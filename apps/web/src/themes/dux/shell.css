@@ -686,7 +686,8 @@
   background: var(--dux-content);
 }
 
-:root[data-ui-theme="dux"] main > div:has(> [data-slot="page-bar-slot"]) {
+:root[data-ui-theme="dux"] div:has(> [data-slot="page-bar-slot"]),
+:root[data-ui-theme="dux"] [data-slot="split-pane"]:has([data-slot="page-bar-slot"]) {
   gap: 0;
   background: transparent;
 }
