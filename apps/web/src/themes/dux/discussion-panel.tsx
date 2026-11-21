@@ -5,7 +5,14 @@ import type { DiscussionDetail } from "@/api/ops.gen";
 import { DiscussionActions, DiscussionTitle } from "@/components/forum/discussion-detail";
 import { DiscussionTagsPicker } from "@/components/forum/discussion-tags";
 import { useCanRewrite } from "@/components/forum/use-can-rewrite";
-import { ArrowLeftIcon, LockIcon, PinIcon, PlusIcon, XIcon } from "@/components/icons";
+import {
+  ArrowLeftIcon,
+  LockIcon,
+  MessagesSquareIcon,
+  PinIcon,
+  PlusIcon,
+  XIcon,
+} from "@/components/icons";
 import { userName } from "@/components/issues/grouping";
 import { ChatLeadContext } from "@/components/layout/chat-layout";
 import { AvatarStack, PersonAvatar } from "@/components/projects/people";
@@ -76,7 +83,7 @@ export function DiscussionPanel({ discussion, chat, threadId, onBackToChat, onCl
   );
 }
 
-/** The post as the chat's first message: its author's avatar beside the byline, text, cover and tags. */
+/** The post that opens the chat: its cover, who wrote it and when, its tags and text, then the chat. */
 function Post({ discussion }: { discussion: DiscussionDetail }) {
   const creator = discussion.creator;
   const body = discussion.body ?? "";
@@ -86,35 +93,36 @@ function Post({ discussion }: { discussion: DiscussionDetail }) {
       : null;
   return (
     <article aria-label="Post" data-slot="discussion-post">
-      <span data-slot="post-avatar">{creator && <PersonAvatar user={creator} size="lg" />}</span>
-      <div data-slot="post-content">
-        <div data-slot="post-by">
-          <span data-slot="post-author">{creator ? userName(creator) : "A deleted user"}</span>
-          <span data-slot="op-badge">OP</span>
-          <RelativeTime value={discussion.createdAt} />
-          {discussion.pinnedAt && (
-            <span data-slot="status-chip">
-              <PinIcon />
-              Pinned
-            </span>
-          )}
-          {discussion.closedAt && (
-            <span data-slot="status-chip">
-              <LockIcon />
-              Closed
-            </span>
-          )}
-          <UpvoteChip discussion={discussion} />
-          {discussion.subscribers.length > 0 && (
-            <span data-slot="byline-people" role="group" aria-label="Participants">
-              <AvatarStack users={discussion.subscribers} max={5} />
-            </span>
-          )}
-        </div>
-        <PostBody discussion={discussion} />
-        {cover && <img data-slot="discussion-cover" src={cover} alt="" />}
-        <PostTags discussion={discussion} />
+      <div data-slot="discussion-cover" aria-hidden>
+        {cover ? <img src={cover} alt="" /> : <MessagesSquareIcon />}
       </div>
+      <div data-slot="post-by">
+        {creator && <PersonAvatar user={creator} size="sm" />}
+        <span data-slot="post-author">{creator ? userName(creator) : "A deleted user"}</span>
+        <span data-slot="op-badge">OP</span>
+        <RelativeTime value={discussion.createdAt} />
+        {discussion.pinnedAt && (
+          <span data-slot="status-chip">
+            <PinIcon className="fill-current" />
+            Pinned
+          </span>
+        )}
+        {discussion.closedAt && (
+          <span data-slot="status-chip">
+            <LockIcon />
+            Closed
+          </span>
+        )}
+        <UpvoteChip discussion={discussion} />
+        {discussion.subscribers.length > 0 && (
+          <span data-slot="byline-people" role="group" aria-label="Participants">
+            <AvatarStack users={discussion.subscribers} max={5} />
+          </span>
+        )}
+      </div>
+      <PostTags discussion={discussion} />
+      <PostBody discussion={discussion} />
+      <h3 data-slot="post-chat-title">Chat</h3>
     </article>
   );
 }
@@ -128,7 +136,7 @@ function PostTags({ discussion }: { discussion: DiscussionDetail }) {
     <div data-slot="post-tags">
       {discussion.tags.map((tag) => (
         <span key={tag} data-slot="tag-chip">
-          #{tag}
+          {tag}
           {canEdit && (
             <Button
               variant="ghost"
