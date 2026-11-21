@@ -134,7 +134,7 @@ export function AttachmentTray({
             size="icon"
             forceMinSize={false}
             aria-label={`Remove ${item.name}`}
-            className="dank:size-8 dank:[&>svg]:size-5 absolute top-1 right-1 size-6"
+            className="dux:size-8 dux:[&>svg]:size-5 absolute top-1 right-1 size-6"
             onClick={() => onRemove(item.id)}
           >
             <XIcon className="size-3.5" />
@@ -189,7 +189,7 @@ export function MessageAttachments({ attachments }: { attachments: TChatAttachme
           href={attachment.url}
           target="_blank"
           rel="noreferrer noopener"
-          className="bg-card has-hover:hover:bg-card-hover dank:relative dank:state-layer dank:has-hover:hover:bg-card dank:px-4 flex h-14 w-64 max-w-full items-center gap-3 rounded-md border px-3 transition-colors"
+          className="bg-card has-hover:hover:bg-card-hover dux:relative dux:state-layer dux:has-hover:hover:bg-card dux:px-4 flex h-14 w-64 max-w-full items-center gap-3 rounded-md border px-3 transition-colors"
         >
           <FileIcon className="text-muted-foreground size-5 shrink-0" />
           <span className="text-primary min-w-0 truncate text-sm">{attachment.name}</span>

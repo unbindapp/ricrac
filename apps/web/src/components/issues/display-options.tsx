@@ -117,7 +117,7 @@ export function DisplayOptions({ value, onChange, onReset }: TProps) {
           role="radiogroup"
           aria-label="Layout"
           data-slot="connected-button-group"
-          className="dank:*:flex-1 -mx-1 grid grid-cols-2"
+          className="dux:*:flex-1 -mx-1 grid grid-cols-2"
         >
           {layouts.map((layout) => (
             <Button
@@ -187,7 +187,7 @@ export function DisplayOptions({ value, onChange, onReset }: TProps) {
         </div>
         <div className="flex flex-col gap-2">
           <p className="text-muted-foreground text-xs font-medium">Display properties</p>
-          <div className="dank:m-0 dank:gap-2 -m-0.75 flex flex-wrap">
+          <div className="dux:m-0 dux:gap-2 -m-0.75 flex flex-wrap">
             {ISSUE_PROPERTIES.map((property) => {
               const isOn = value.properties.includes(property.value);
               return (
@@ -198,7 +198,7 @@ export function DisplayOptions({ value, onChange, onReset }: TProps) {
                   forceMinSize={false}
                   aria-pressed={isOn}
                   data-active={isOn || undefined}
-                  className="hit-gap bg-muted text-muted-foreground data-active:bg-accent data-active:text-foreground dank:h-8 dank:gap-2 dank:rounded-sm dank:border dank:border-m3-outline-variant dank:bg-transparent dank:bg-clip-border dank:px-4 dank:text-m3-on-surface-variant dank:data-active:border-transparent dank:data-active:bg-m3-secondary-container dank:data-active:pl-2 dank:data-active:text-m3-on-secondary-container h-7.5 px-2"
+                  className="hit-gap bg-muted text-muted-foreground data-active:bg-accent data-active:text-foreground dux:h-8 dux:gap-2 dux:rounded-sm dux:border dux:border-m3-outline-variant dux:bg-transparent dux:bg-clip-border dux:px-4 dux:text-m3-on-surface-variant dux:data-active:border-transparent dux:data-active:bg-m3-secondary-container dux:data-active:pl-2 dux:data-active:text-m3-on-secondary-container h-7.5 px-2"
                   onClick={() =>
                     onChange({
                       properties: isOn
@@ -208,7 +208,7 @@ export function DisplayOptions({ value, onChange, onReset }: TProps) {
                   }
                 >
                   {isOn && (
-                    <span className="dank:flex hidden">
+                    <span className="dux:flex hidden">
                       <CheckIcon className="size-4.5" />
                     </span>
                   )}

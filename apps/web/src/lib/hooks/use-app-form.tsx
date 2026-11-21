@@ -207,7 +207,7 @@ function TextField({ label, description, hideLabel, transform, ...inputProps }: 
   const field = useFieldContext<string>();
   const { id, describedBy } = useFieldIds(description);
   const { error } = useFieldError(field);
-  const isOutlined = useUiTheme().id === "dank";
+  const isOutlined = useUiTheme().id === "dux";
   const input = (
     <Input
       {...inputProps}
@@ -249,7 +249,7 @@ function TextareaField({ label, description, hideLabel, ...textareaProps }: TTex
   const field = useFieldContext<string>();
   const { id, describedBy } = useFieldIds(description);
   const { error } = useFieldError(field);
-  const isOutlined = useUiTheme().id === "dank";
+  const isOutlined = useUiTheme().id === "dux";
   const textarea = (
     <Textarea
       {...textareaProps}
@@ -283,7 +283,7 @@ function TextareaField({ label, description, hideLabel, ...textareaProps }: TTex
 }
 
 const outlinedSelectTriggerClassName =
-  "dank:h-14 dank:rounded-xs dank:border-0 dank:px-4 dank:text-base dank:focus-visible:ring-0 has-hover:hover:ring-0";
+  "dux:h-14 dux:rounded-xs dux:border-0 dux:px-4 dux:text-base dux:focus-visible:ring-0 has-hover:hover:ring-0";
 
 export type TSelectFieldItem = {
   value: string;
@@ -309,7 +309,7 @@ function SelectField({
   const { id, describedBy } = useFieldIds(description);
   const { error } = useFieldError(field);
   const selected = items.find((item) => item.value === field.state.value);
-  const isOutlined = useUiTheme().id === "dank";
+  const isOutlined = useUiTheme().id === "dux";
   const select = (
     <Select
       items={items}

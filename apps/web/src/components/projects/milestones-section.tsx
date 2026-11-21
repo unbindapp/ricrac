@@ -77,7 +77,7 @@ function MilestoneRow({
         to="/$workspace/project/$slug/issues"
         params={{ workspace: workspace.urlKey, slug: entitySlug(project) }}
         search={{ milestone: milestone.id }}
-        className="dank:font-normal min-w-0 flex-1 truncate font-medium"
+        className="dux:font-normal min-w-0 flex-1 truncate font-medium"
         title={milestone.description ?? undefined}
       >
         {milestone.name}

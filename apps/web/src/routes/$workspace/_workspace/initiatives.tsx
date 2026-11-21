@@ -177,7 +177,7 @@ function InitiativeList({
           );
         }
         return (
-          <div className="bg-muted dank:h-12 dank:gap-1 dank:bg-transparent dank:px-0 flex h-9 items-center px-1.5 group-data-flush/list:px-1">
+          <div className="bg-muted dux:h-12 dux:gap-1 dux:bg-transparent dux:px-0 flex h-9 items-center px-1.5 group-data-flush/list:px-1">
             <GroupToggle
               icon={<InitiativeStatusIcon status={item.status} />}
               label={initiativeStatusLabels[item.status]}

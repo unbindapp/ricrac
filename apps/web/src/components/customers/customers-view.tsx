@@ -139,7 +139,7 @@ function CustomerTableHeader() {
   return (
     <div
       role="row"
-      className="bg-card text-muted-foreground dank:type-label-medium dank:border-0 dank:bg-transparent dank:px-4 flex h-9 items-center gap-3 border-b px-3 text-xs font-medium"
+      className="bg-card text-muted-foreground dux:type-label-medium dux:border-0 dux:bg-transparent dux:px-4 flex h-9 items-center gap-3 border-b px-3 text-xs font-medium"
     >
       <span role="columnheader" className="min-w-0 flex-1">
         Name
@@ -189,9 +189,9 @@ function CustomerRow({ customer, segment }: { customer: Customer; segment?: stri
     >
       <span role="cell" className="flex min-w-0 flex-1 items-center gap-2">
         <CustomerLogo id={customer.id} name={customer.name} logoUrl={customer.logoUrl} />
-        <span className="dank:font-normal truncate font-medium">{customer.name}</span>
+        <span className="dux:font-normal truncate font-medium">{customer.name}</span>
         {customer.domains[0] && (
-          <span className="text-muted-foreground dank:text-sm hidden truncate text-xs sm:inline">
+          <span className="text-muted-foreground dux:text-sm hidden truncate text-xs sm:inline">
             {customer.domains[0]}
           </span>
         )}
@@ -230,7 +230,7 @@ function Cell({ className, children }: { className: string; children: ReactNode 
   return (
     <span
       role="cell"
-      className={cn("text-muted-foreground dank:text-sm min-w-0 items-center", className)}
+      className={cn("text-muted-foreground dux:text-sm min-w-0 items-center", className)}
     >
       {children || <span aria-hidden>–</span>}
     </span>

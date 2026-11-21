@@ -104,23 +104,23 @@ export function MultiPicker({
             variant="outline"
             aria-label={label}
             data-focus-indicator="child"
-            className="dank:type-body-large dank:text-m3-on-surface dank:border-m3-outline dank:has-hover:hover:border-m3-on-surface dank:focus-visible:border-m3-primary dank:focus-visible:ring-m3-primary dank:min-h-14 dank:gap-3 dank:rounded-xs dank:py-2 dank:pr-3 dank:pl-4 dank:after:hidden dank:focus-visible:ring-1 dank:focus-visible:ring-inset dank:active:rounded-xs h-auto min-h-9 w-full justify-start px-3 py-1.5 font-normal"
+            className="dux:type-body-large dux:text-m3-on-surface dux:border-m3-outline dux:has-hover:hover:border-m3-on-surface dux:focus-visible:border-m3-primary dux:focus-visible:ring-m3-primary dux:min-h-14 dux:gap-3 dux:rounded-xs dux:py-2 dux:pr-3 dux:pl-4 dux:after:hidden dux:focus-visible:ring-1 dux:focus-visible:ring-inset dux:active:rounded-xs h-auto min-h-9 w-full justify-start px-3 py-1.5 font-normal"
           >
             <span className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
               {picked.length === 0 && <span className="text-muted-foreground">{placeholder}</span>}
               {picked.map((option) => (
                 <span
                   key={option.value}
-                  className="bg-muted dank:type-label-large dank:text-m3-on-surface-variant dank:border-m3-outline-variant dank:h-8 dank:gap-2 dank:rounded-sm dank:border dank:bg-transparent dank:px-2 flex h-6 max-w-48 items-center gap-1.5 rounded-md px-2 text-xs"
+                  className="bg-muted dux:type-label-large dux:text-m3-on-surface-variant dux:border-m3-outline-variant dux:h-8 dux:gap-2 dux:rounded-sm dux:border dux:bg-transparent dux:px-2 flex h-6 max-w-48 items-center gap-1.5 rounded-md px-2 text-xs"
                 >
                   {option.icon}
                   <span className="truncate">{option.label}</span>
                 </span>
               ))}
             </span>
-            <span className="text-muted-foreground dank:text-m3-on-surface-variant contents">
-              <ChevronsUpDownIcon className="dank:hidden size-3.5" />
-              <ChevronDownIcon className="dank:block hidden size-6" />
+            <span className="text-muted-foreground dux:text-m3-on-surface-variant contents">
+              <ChevronsUpDownIcon className="dux:hidden size-3.5" />
+              <ChevronDownIcon className="dux:block hidden size-6" />
             </span>
           </Button>
         }

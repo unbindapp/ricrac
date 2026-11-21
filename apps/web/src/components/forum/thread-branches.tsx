@@ -356,7 +356,7 @@ function BranchLink({
       activeProps={{ className: "bg-muted" }}
       data-slot="branch-link"
       className={cn(
-        "has-hover:hover:bg-muted focus-visible:bg-muted dank:relative dank:state-layer flex items-center gap-2 pr-3 pl-1 outline-hidden",
+        "has-hover:hover:bg-muted focus-visible:bg-muted dux:relative dux:state-layer flex items-center gap-2 pr-3 pl-1 outline-hidden",
         height === "tall" ? "h-12" : "h-9",
       )}
     >

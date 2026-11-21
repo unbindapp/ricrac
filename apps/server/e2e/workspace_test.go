@@ -46,25 +46,25 @@ func TestSetsTheWorkspaceTheme(t *testing.T) {
 	bob := w.member("bob@acme.test", "Bob Jones", "member")
 	eq(t, call(t, bob, "get_workspace", M{}).At("theme").Str(), "default")
 
-	contains(t, fails(t, bob, "update_workspace", M{"theme": "dank"}), "admins")
+	contains(t, fails(t, bob, "update_workspace", M{"theme": "dux"}), "admins")
 	contains(t, fails(t, w.Ann, "update_workspace", M{"theme": "neon"}), "theme")
-	eq(t, call(t, w.Ann, "update_workspace", M{"theme": "dank"}).At("theme").Str(), "dank")
-	eq(t, call(t, bob, "get_workspace", M{}).At("theme").Str(), "dank")
+	eq(t, call(t, w.Ann, "update_workspace", M{"theme": "dux"}).At("theme").Str(), "dux")
+	eq(t, call(t, bob, "get_workspace", M{}).At("theme").Str(), "dux")
 
 	req := httptest.NewRequest("GET", "/api/me", nil)
 	req.Header.Set("Cookie", w.session(bob.User))
 	_, me := send(w.Router, req)
-	eq(t, me.At("workspaces", 0, "theme").Str(), "dank")
+	eq(t, me.At("workspaces", 0, "theme").Str(), "dux")
 
 	log := call(t, w.Ann, "get_audit_log", M{"type": "workspace.updated"})
 	eq(t, log.At("nodes").Len(), 1)
-	eq(t, log.At("nodes", 0, "metadata", "theme").JSON(), `{"from":"default","to":"dank"}`)
+	eq(t, log.At("nodes", 0, "metadata", "theme").JSON(), `{"from":"default","to":"dux"}`)
 }
 
 func TestEachMemberMayOverrideTheWorkspaceTheme(t *testing.T) {
 	w := world(t)
 	bob := w.member("bob@acme.test", "Bob Jones", "member")
-	call(t, w.Ann, "update_workspace", M{"theme": "dank"})
+	call(t, w.Ann, "update_workspace", M{"theme": "dux"})
 	ownTheme := func(c *Actor) J {
 		req := httptest.NewRequest("GET", "/api/me", nil)
 		req.Header.Set("Cookie", w.session(c.User))
@@ -80,7 +80,7 @@ func TestEachMemberMayOverrideTheWorkspaceTheme(t *testing.T) {
 	eq(t, ownTheme(bob).Str(), "default")
 	check(t, ownTheme(w.Ann).IsNull(), "others keep following")
 	check(t, call(t, w.Ann, "get_user", M{"id": "bob"}).At("theme").IsNull(), "only shown for yourself")
-	eq(t, call(t, bob, "get_workspace", M{}).At("theme").Str(), "dank")
+	eq(t, call(t, bob, "get_workspace", M{}).At("theme").Str(), "dux")
 
 	check(t, call(t, bob, "update_user", M{"id": "me", "theme": nil}).At("theme").IsNull())
 	check(t, ownTheme(bob).IsNull())

@@ -37,7 +37,7 @@ export function PageContainer({ width = "full", scroll = "pane", children }: TPr
     >
       <div
         className={cn(
-          "dank:animate-in dank:fade-in-0 dank:slide-in-from-bottom-2 dank:ease-spring-default-spatial dank:duration-(--spring-default-spatial-duration) dank:motion-reduce:animate-none mx-auto flex w-full flex-1 flex-col gap-4 pb-8",
+          "dux:animate-in dux:fade-in-0 dux:slide-in-from-bottom-2 dux:ease-spring-default-spatial dux:duration-(--spring-default-spatial-duration) dux:motion-reduce:animate-none mx-auto flex w-full flex-1 flex-col gap-4 pb-8",
           "px-(--page-px) pt-(--page-pt) [--page-pt:--spacing(4)] [--page-px:--spacing(4)]",
           width === "narrow" &&
             "max-w-3xl sm:[--page-pt:--spacing(10)] sm:[--page-px:--spacing(6)]",
@@ -53,7 +53,7 @@ export function PageContainer({ width = "full", scroll = "pane", children }: TPr
         {createButton === "fab" && (
           <div
             ref={setFab}
-            className="dank:md:bottom-6 dank:md:-mr-4 dank:md:-mb-2 pointer-events-none sticky bottom-4 z-20 mt-auto -mb-4 flex justify-end *:pointer-events-auto empty:hidden"
+            className="dux:md:bottom-6 dux:md:-mr-4 dux:md:-mb-2 pointer-events-none sticky bottom-4 z-20 mt-auto -mb-4 flex justify-end *:pointer-events-auto empty:hidden"
           />
         )}
       </div>

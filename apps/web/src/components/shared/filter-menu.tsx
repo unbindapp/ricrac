@@ -36,7 +36,7 @@ export function FilterMenu<T extends string>({ label, value, options, onChange }
             variant="outline"
             size="sm"
             aria-label={`${label}: ${current.label}`}
-            className="dank:bg-secondary dank:text-secondary-foreground dank:border-0 w-fit"
+            className="dux:bg-secondary dux:text-secondary-foreground dux:border-0 w-fit"
           >
             <current.icon className="size-4" />
             <span>{current.label}</span>

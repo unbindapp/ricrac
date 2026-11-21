@@ -53,9 +53,9 @@
     U+A720-A7FF;
 }
 
-/* Material 3 Expressive. Roles follow the baseline scheme's tones; theme/dank/palette.ts sets the
+/* Material 3 Expressive. Roles follow the baseline scheme's tones; theme/dux/palette.ts sets the
    --palette-* tones from the accent color. */
-:root[data-ui-theme="dank"] {
+:root[data-ui-theme="dux"] {
   --m3-primary: var(--palette-primary-40);
   --m3-on-primary: var(--palette-primary-100);
   --m3-primary-container: var(--palette-primary-90);
@@ -211,7 +211,7 @@
   --opacity-selected-border: 85%;
 }
 
-:root.dark[data-ui-theme="dank"] {
+:root.dark[data-ui-theme="dux"] {
   --m3-primary: var(--palette-primary-80);
   --m3-on-primary: var(--palette-primary-20);
   --m3-primary-container: var(--palette-primary-30);
@@ -481,19 +481,19 @@
 }
 
 @layer utilities {
-  html:where([data-ui-theme="dank"]) :is(pre, code) {
+  html:where([data-ui-theme="dux"]) :is(pre, code) {
     font-family: var(--font-code);
   }
 }
 
 @layer components {
-  html:where([data-ui-theme="dank"]) .rr-prose :is(code, pre) {
+  html:where([data-ui-theme="dux"]) .rr-prose :is(code, pre) {
     font-family: var(--font-code);
   }
 }
 
 /* No focus rings: no outlines, and none of the rings utilities draw. Unlayered to beat them. */
-:root[data-ui-theme="dank"] :is(:focus, :focus-visible, :focus-within) {
+:root[data-ui-theme="dux"] :is(:focus, :focus-visible, :focus-within) {
   outline: none;
   --tw-ring-shadow: 0 0 #0000;
   --tw-ring-offset-shadow: 0 0 #0000;

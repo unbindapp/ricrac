@@ -67,7 +67,7 @@ function ColorSwatches({
           variant="ghost"
           size="icon"
           forceMinSize={false}
-          className="dank:size-8 dank:justify-self-center dank:rounded-full dank:active:rounded-full"
+          className="dux:size-8 dux:justify-self-center dux:rounded-full dux:active:rounded-full"
           onClick={() => onChange(color)}
         >
           <span

@@ -11,7 +11,7 @@ import { SimpleTooltip } from "@/components/ui/tooltip";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { WorkspaceMenu } from "@/components/workspace/workspace-switcher";
 import { meQuery } from "@/lib/queries/me";
-import { GlobalSearch } from "@/themes/dank/global-search";
+import { GlobalSearch } from "@/themes/dux/global-search";
 
 const themeModes: Record<TTheme, { label: string; icon: LucideIcon }> = {
   system: { label: "Follow system", icon: SunMoonIcon },
@@ -22,7 +22,7 @@ const themeModes: Record<TTheme, { label: string; icon: LucideIcon }> = {
 const actionClassName = "size-12 shrink-0 rounded-full active:rounded-full popup-open:rounded-full";
 
 /** The search bar centered at the top of the window, and the theme, settings and account top right. */
-export function DankTopBar() {
+export function DuxTopBar() {
   return (
     <header className="hidden h-20 shrink-0 md:block">
       <div className="fixed top-3 left-1/2 z-20 w-[min(35rem,calc(100vw-25rem))] -translate-x-1/2">

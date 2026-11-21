@@ -286,7 +286,7 @@ export function IssueProperties({
                     size="sm"
                     forceMinSize={false}
                     aria-label="Add property"
-                    className="text-muted-foreground dank:w-8 dank:px-0 px-2"
+                    className="text-muted-foreground dux:w-8 dux:px-0 px-2"
                   >
                     <PlusIcon className="size-4" />
                   </Button>

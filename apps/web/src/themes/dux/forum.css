@@ -1,5 +1,5 @@
 /* The forum in the page's panel, measured from the Ricrac workspace mockup. */
-:root[data-ui-theme="dank"] {
+:root[data-ui-theme="dux"] {
   & :is([data-slot="forum-list"], [data-slot="discussion-panel"]) {
     --panel-padding-y: 32px;
     --panel-padding-x: 40px;

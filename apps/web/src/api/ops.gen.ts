@@ -1991,7 +1991,7 @@ export type Workspace = {
   /** The workspace's team (a workspace has one), when you can see it; its key is the issue prefix. */
   teams: WorkspaceTeam[]
   /** The look of the web app for everyone in the workspace. */
-  theme: "default" | "dank"
+  theme: "default" | "dux"
   url: string
   urlKey: string
 }
@@ -2023,7 +2023,7 @@ export type WorkspaceUser = {
   /** Their teams that you can see. */
   teams: TeamRef[]
   /** Your look of the web app in this workspace, over the workspace's theme; null follows it. Only shown for yourself. */
-  theme: "default" | "dank" | null
+  theme: "default" | "dux" | null
   timezone: string | null
 }
 
@@ -2045,7 +2045,7 @@ export type WorkspaceUserDetail = {
   /** Their teams that you can see. */
   teams: TeamRef[]
   /** Your look of the web app in this workspace, over the workspace's theme; null follows it. Only shown for yourself. */
-  theme: "default" | "dank" | null
+  theme: "default" | "dux" | null
   timezone: string | null
 }
 
@@ -2061,7 +2061,7 @@ export type UpdateWorkspaceArgs = {
   /** Let anyone with a link read its issues without signing in. */
   public?: boolean | null
   /** The look of the web app for everyone in the workspace. */
-  theme?: "default" | "dank" | null
+  theme?: "default" | "dux" | null
   /** 2 to 32 lowercase letters, digits and dashes; must not be taken by another workspace. */
   urlKey?: string | null
 }
@@ -2095,7 +2095,7 @@ export type UpdateUserArgs = {
   /** owner, admin, member or guest. Needs an admin; owner changes need an owner. */
   role?: string | null
   /** Your look of the web app in this workspace, over the workspace's theme; null follows it. */
-  theme?: "default" | "dank" | null
+  theme?: "default" | "dux" | null
   /** Your IANA timezone, like Europe/Berlin; null clears it. */
   timezone?: string | null
 }

@@ -31,7 +31,7 @@ function TabsList({
         className={cn(
           "-mx-1 flex items-center",
           variant === "tabs" &&
-            "dank:relative dank:mx-0 dank:h-12 dank:items-stretch dank:shadow-[inset_0_-1px_0_var(--m3-outline-variant)]",
+            "dux:relative dux:mx-0 dux:h-12 dux:items-stretch dux:shadow-[inset_0_-1px_0_var(--m3-outline-variant)]",
           className,
         )}
         {...props}
@@ -40,7 +40,7 @@ function TabsList({
         {variant === "tabs" && (
           <TabsPrimitive.Indicator
             data-slot="tabs-indicator"
-            className="bg-m3-primary dank:block ease-spring-default-spatial absolute bottom-0 left-[calc(var(--active-tab-left)+1rem)] hidden h-[3px] w-[calc(var(--active-tab-width)-2rem)] rounded-t-[3px] transition-[left,width] duration-(--spring-default-spatial-duration)"
+            className="bg-m3-primary dux:block ease-spring-default-spatial absolute bottom-0 left-[calc(var(--active-tab-left)+1rem)] hidden h-[3px] w-[calc(var(--active-tab-width)-2rem)] rounded-t-[3px] transition-[left,width] duration-(--spring-default-spatial-duration)"
           />
         )}
       </TabsPrimitive.List>
@@ -48,10 +48,10 @@ function TabsList({
   );
 }
 
-const dankTab =
-  "dank:relative dank:h-12 dank:min-w-22.5 dank:justify-center dank:rounded-none dank:border-0 dank:bg-transparent dank:px-4 dank:type-title-small dank:text-m3-on-surface-variant dank:state-layer dank:has-hover:hover:text-m3-on-surface dank:data-active:bg-transparent dank:data-active:text-m3-primary dank:has-hover:hover:data-active:text-m3-primary";
+const duxTab =
+  "dux:relative dux:h-12 dux:min-w-22.5 dux:justify-center dux:rounded-none dux:border-0 dux:bg-transparent dux:px-4 dux:type-title-small dux:text-m3-on-surface-variant dux:state-layer dux:has-hover:hover:text-m3-on-surface dux:data-active:bg-transparent dux:data-active:text-m3-primary dux:has-hover:hover:data-active:text-m3-primary";
 
-const dankSegment = "dank:justify-center dank:px-4 dank:type-label-large dank:[&_svg]:size-5";
+const duxSegment = "dux:justify-center dux:px-4 dux:type-label-large dux:[&_svg]:size-5";
 
 function TabsTab({ className, ...props }: TabsPrimitive.Tab.Props) {
   const variant = useContext(TabsVariantContext);
@@ -60,7 +60,7 @@ function TabsTab({ className, ...props }: TabsPrimitive.Tab.Props) {
       data-slot="tabs-tab"
       className={cn(
         "hit-gap-x bg-muted text-muted-foreground has-hover:hover:text-foreground data-active:bg-accent data-active:text-foreground focus-visible:ring-primary/8-10 flex h-7 items-center gap-1.5 rounded-md px-2.5 text-sm font-medium whitespace-nowrap outline-hidden select-none focus-visible:ring-1 [&_svg]:size-4 [&_svg]:shrink-0",
-        variant === "tabs" ? dankTab : dankSegment,
+        variant === "tabs" ? duxTab : duxSegment,
         className,
       )}
       {...props}

@@ -22,7 +22,7 @@ import { submitHandler, useAppForm } from "@/lib/hooks/use-app-form";
 import { signOut } from "@/lib/queries/me";
 import { useUpdateUserMutation, workspaceMeQuery } from "@/lib/queries/users";
 import { useAccentHueStore } from "@/lib/stores/accent-hue";
-import { BASELINE_HUE, paletteVariables } from "@/themes/dank/palette";
+import { BASELINE_HUE, paletteVariables } from "@/themes/dux/palette";
 import { uiThemeOf, uiThemes } from "@/themes/registry";
 import { isUiThemeId, UI_THEME_IDS } from "@/themes/types";
 import { useUiTheme } from "@/themes/ui-theme-provider";
@@ -50,7 +50,7 @@ const accentPresets = [
   { hue: 50, name: "Yellow" },
 ];
 
-const dankAccentPresets = [
+const duxAccentPresets = [
   { hue: BASELINE_HUE, name: "Purple" },
   { hue: 320, name: "Pink" },
   { hue: 0, name: "Red" },
@@ -63,16 +63,16 @@ const dankAccentPresets = [
 
 const accentSwatch = (hue: number) => `hsl(${hue} 60% 50%)`;
 
-const dankPrimaries = new Map<string, string>();
+const duxPrimaries = new Map<string, string>();
 
-/** The primary color Dank paints for a hue: tone 40 of its primary palette in light, 80 in dark. */
-function dankPrimary(hue: number, isDark: boolean) {
+/** The primary color Dux paints for a hue: tone 40 of its primary palette in light, 80 in dark. */
+function duxPrimary(hue: number, isDark: boolean) {
   const key = `${hue}:${isDark}`;
-  const cached = dankPrimaries.get(key);
+  const cached = duxPrimaries.get(key);
   if (cached) return cached;
   const accentHue = hue === BASELINE_HUE ? null : hue;
   const color = paletteVariables(accentHue)[`--palette-primary-${isDark ? 80 : 40}`];
-  dankPrimaries.set(key, color);
+  duxPrimaries.set(key, color);
   return color;
 }
 
@@ -282,10 +282,10 @@ function AccentField() {
   const setHue = useAccentHueStore((state) => state.setHue);
   const previewHue = useAccentHueStore((state) => state.previewHue);
   const hue = chosenHue ?? defaultAccentHue;
-  const isDank = themeId === "dank";
+  const isDux = themeId === "dux";
   const isDark = resolvedTheme === "dark";
-  const presets = isDank ? dankAccentPresets : accentPresets;
-  const swatch = isDank ? (value: number) => dankPrimary(value, isDark) : accentSwatch;
+  const presets = isDux ? duxAccentPresets : accentPresets;
+  const swatch = isDux ? (value: number) => duxPrimary(value, isDark) : accentSwatch;
   return (
     <div className="flex flex-col gap-3">
       <div className="flex min-h-8 items-center gap-2">
@@ -303,7 +303,7 @@ function AccentField() {
         value={hue}
         size="large"
         thumbLabel="Accent hue"
-        trackStyle={{ background: isDank ? hueGradientOf(swatch) : hueGradient }}
+        trackStyle={{ background: isDux ? hueGradientOf(swatch) : hueGradient }}
         onValueChange={(value) => previewHue(value)}
         onValueCommitted={(value) => setHue(value)}
       />
@@ -311,21 +311,21 @@ function AccentField() {
         {presets.map((preset) => (
           <Button
             key={preset.hue}
-            variant={preset.hue === hue && !isDank ? "outline" : "ghost"}
+            variant={preset.hue === hue && !isDux ? "outline" : "ghost"}
             size="icon"
             aria-label={preset.name}
             aria-pressed={preset.hue === hue}
-            className="dank:aria-pressed:rounded-md dank:aria-pressed:bg-m3-inverse-surface"
-            onClick={() => setHue(isDank && preset.hue === BASELINE_HUE ? null : preset.hue)}
+            className="dux:aria-pressed:rounded-md dux:aria-pressed:bg-m3-inverse-surface"
+            onClick={() => setHue(isDux && preset.hue === BASELINE_HUE ? null : preset.hue)}
           >
             <span
-              className="dank:size-6 size-4 rounded-full"
+              className="dux:size-6 size-4 rounded-full"
               style={{ background: swatch(preset.hue) }}
             />
           </Button>
         ))}
       </div>
-      {isDank ? <DankRolePreview /> : <AccentPreview />}
+      {isDux ? <DuxRolePreview /> : <AccentPreview />}
     </div>
   );
 }
@@ -346,7 +346,7 @@ function AccentPreview() {
   );
 }
 
-const dankRoles = [
+const duxRoles = [
   { label: "Primary", className: "bg-m3-primary text-m3-on-primary" },
   {
     label: "Secondary",
@@ -359,10 +359,10 @@ const dankRoles = [
   },
 ];
 
-function DankRolePreview() {
+function DuxRolePreview() {
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-      {dankRoles.map((role) => (
+      {duxRoles.map((role) => (
         <span
           key={role.label}
           className={`type-label-large flex h-12 items-center justify-center rounded-md ${role.className}`}

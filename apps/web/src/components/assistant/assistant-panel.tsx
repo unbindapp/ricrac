@@ -51,7 +51,7 @@ export function AssistantPanel() {
   return (
     <aside
       data-slot="split-pane"
-      className="bg-background dank:border-0 flex w-96 shrink-0 flex-col overflow-hidden rounded-lg border"
+      className="bg-background dux:border-0 flex w-96 shrink-0 flex-col overflow-hidden rounded-lg border"
     >
       <AssistantChat onClose={close} />
     </aside>
@@ -65,7 +65,7 @@ function AssistantChat({ onClose }: { onClose: () => void }) {
   const header = (
     <PanelBar>
       <SparklesIcon className="text-muted-foreground size-4" />
-      <h2 className="dank:type-title-medium min-w-0 flex-1 truncate text-sm font-medium">Claude</h2>
+      <h2 className="dux:type-title-medium min-w-0 flex-1 truncate text-sm font-medium">Claude</h2>
       <HeaderAction label="New conversation" onClick={reset}>
         <SquarePenIcon className="size-4" />
       </HeaderAction>
@@ -149,7 +149,7 @@ function AssistantComposer({ isRunning, onAsk, onStop }: TComposerProps) {
           value={prompt}
           onChange={(event) => setPrompt(event.target.value)}
           onKeyDown={sendOnEnter}
-          className="dank:min-h-12 dank:py-3 field-sizing-content max-h-40 min-h-10 min-w-0 flex-1 resize-none"
+          className="dux:min-h-12 dux:py-3 field-sizing-content max-h-40 min-h-10 min-w-0 flex-1 resize-none"
         />
         {isRunning ? (
           <SimpleTooltip content="Stop">
@@ -176,7 +176,7 @@ function AssistantComposer({ isRunning, onAsk, onStop }: TComposerProps) {
           </Button>
         )}
       </div>
-      <p className="text-muted-foreground dank:hidden px-1 text-xs max-sm:hidden">
+      <p className="text-muted-foreground dux:hidden px-1 text-xs max-sm:hidden">
         Enter to send, Shift+Enter for a new line
       </p>
     </div>

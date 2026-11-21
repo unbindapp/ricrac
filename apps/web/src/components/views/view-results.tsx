@@ -87,10 +87,10 @@ export function ViewIssues({ filter }: TProps) {
 
 function StatusTypeHeader({ type, count }: { type: TStateType; count: number }) {
   return (
-    <div className="bg-muted dank:h-12 dank:bg-transparent dank:px-0 dank:group-data-flush/list:px-0 flex h-9 items-center gap-2 px-3">
+    <div className="bg-muted dux:h-12 dux:bg-transparent dux:px-0 dux:group-data-flush/list:px-0 flex h-9 items-center gap-2 px-3">
       <StateIcon type={type} />
-      <span className="dank:type-title-small text-sm font-medium">{stateTypeLabels[type]}</span>
-      <span className="text-muted-foreground dank:type-label-large text-xs tabular-nums">
+      <span className="dux:type-title-small text-sm font-medium">{stateTypeLabels[type]}</span>
+      <span className="text-muted-foreground dux:type-label-large text-xs tabular-nums">
         {count}
       </span>
     </div>

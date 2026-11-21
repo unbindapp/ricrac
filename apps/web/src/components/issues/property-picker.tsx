@@ -158,7 +158,7 @@ function PickerGroups({
             {option.icon}
             <span className="min-w-0 flex-1 truncate">{option.label}</span>
             {option.description && (
-              <span className="text-muted-foreground dank:type-label-small truncate text-xs">
+              <span className="text-muted-foreground dux:type-label-small truncate text-xs">
                 {option.description}
               </span>
             )}

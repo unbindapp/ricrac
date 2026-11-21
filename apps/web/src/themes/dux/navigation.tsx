@@ -1,10 +1,10 @@
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
 import { useRememberSettingsReturn } from "@/lib/stores/settings-return";
 import { SIDEBAR_HOTKEY } from "@/lib/stores/sidebar";
-import { NavigationRail } from "@/themes/dank/navigation-rail";
-import { useNavigationStore } from "@/themes/dank/navigation-store";
+import { NavigationRail } from "@/themes/dux/navigation-rail";
+import { useNavigationStore } from "@/themes/dux/navigation-store";
 
-export function DankNavigation() {
+export function DuxNavigation() {
   const isExpanded = useNavigationStore((state) => state.isExpanded);
   const toggle = useNavigationStore((state) => state.toggle);
   useHotkeyScope([{ hotkey: SIDEBAR_HOTKEY, callback: toggle }]);
@@ -21,7 +21,7 @@ export function DankNavigation() {
 }
 
 /** The expanded rail, modal over the page on narrow screens. */
-export function DankNavigationDrawer({ onNavigate }: { onNavigate: () => void }) {
+export function DuxNavigationDrawer({ onNavigate }: { onNavigate: () => void }) {
   return (
     <NavigationRail
       isExpanded

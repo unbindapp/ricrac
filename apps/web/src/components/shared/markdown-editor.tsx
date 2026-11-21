@@ -534,7 +534,7 @@ function IncomingNotice({ onShow, onDismiss }: { onShow: () => void; onDismiss: 
         size="icon"
         forceMinSize={false}
         aria-label="Keep your version"
-        className="dank:size-8 dank:[&>svg]:size-5 size-5"
+        className="dux:size-8 dux:[&>svg]:size-5 size-5"
         onClick={onDismiss}
       >
         <XIcon className="size-3.5" />

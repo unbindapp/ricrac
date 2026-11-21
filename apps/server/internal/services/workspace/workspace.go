@@ -88,11 +88,11 @@ type UpdateInput struct {
 	Name    *string               `json:"name" doc:"1 to 80 characters."`
 	URLKey  *string               `json:"urlKey" doc:"2 to 32 lowercase letters, digits and dashes; must not be taken by another workspace."`
 	LogoURL args.Nullable[string] `json:"logoUrl" doc:"Image URL; null removes the logo."`
-	Theme   *string               `json:"theme" enum:"default,dank" doc:"The look of the web app for everyone in the workspace."`
+	Theme   *string               `json:"theme" enum:"default,dux" doc:"The look of the web app for everyone in the workspace."`
 	Public  *bool                 `json:"public" doc:"Let anyone with a link read its issues without signing in."`
 }
 
-var themes = []string{"default", "dank"}
+var themes = []string{"default", "dux"}
 
 func sameText(a, b *string) bool {
 	if a == nil || b == nil {

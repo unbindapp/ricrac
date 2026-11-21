@@ -116,7 +116,7 @@ export function NavigationRail({
         "group/rail flex h-full shrink-0 flex-col gap-1 overflow-x-hidden overflow-y-auto px-5 py-3",
         isModal
           ? "bg-m3-surface-container w-full"
-          : "duration-(--spring-default-spatial-duration) ease-spring-default-spatial w-24 transition-[width] data-expanded:w-70",
+          : "ease-spring-default-spatial w-24 transition-[width] duration-(--spring-default-spatial-duration) data-expanded:w-70",
       )}
     >
       <div className="flex h-14 shrink-0 items-center">

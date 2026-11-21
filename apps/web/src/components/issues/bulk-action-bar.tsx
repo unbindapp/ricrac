@@ -79,9 +79,9 @@ export function BulkActionBar({ issues, onClear }: TProps) {
       <div
         role="toolbar"
         aria-label="Bulk actions"
-        className="bg-popover dank:min-h-16 dank:gap-1 dank:rounded-full dank:border-0 dank:px-2 pointer-events-auto flex max-w-full flex-wrap items-center gap-2 rounded-lg border p-2 shadow-lg"
+        className="bg-popover dux:min-h-16 dux:gap-1 dux:rounded-full dux:border-0 dux:px-2 pointer-events-auto flex max-w-full flex-wrap items-center gap-2 rounded-lg border p-2 shadow-lg"
       >
-        <span className="dank:type-label-large dank:pl-2 px-1 text-sm font-medium whitespace-nowrap">
+        <span className="dux:type-label-large dux:pl-2 px-1 text-sm font-medium whitespace-nowrap">
           {issues.length} selected
         </span>
         <Button variant="ghost" size="sm" aria-label="Clear selection" onClick={onClear}>

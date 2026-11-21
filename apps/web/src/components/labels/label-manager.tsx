@@ -220,17 +220,17 @@ function Row({
         className={cn("size-2.5 shrink-0 rounded-full", label.retiredAt && "opacity-50")}
         style={{ backgroundColor: label.color }}
       />
-      <span className={cn("shrink-0 truncate", !label.retiredAt && "dank:font-normal font-medium")}>
+      <span className={cn("shrink-0 truncate", !label.retiredAt && "dux:font-normal font-medium")}>
         {label.name}
       </span>
       {meta}
       {label.retiredAt && <Badge variant="muted">Retired</Badge>}
       {label.description && (
-        <span className="text-muted-foreground dank:text-sm hidden min-w-0 truncate sm:inline">
+        <span className="text-muted-foreground dux:text-sm hidden min-w-0 truncate sm:inline">
           {label.description}
         </span>
       )}
-      <span className="text-muted-foreground dank:type-label-small ml-auto shrink-0 text-xs">
+      <span className="text-muted-foreground dux:type-label-small ml-auto shrink-0 text-xs">
         {trailing}
       </span>
       {menu}

@@ -71,7 +71,7 @@ export function CommentComposer({
   return (
     <div
       data-m3-field="outlined"
-      className="bg-card dank:p-4 flex w-full flex-col gap-2 rounded-lg border p-3"
+      className="bg-card dux:p-4 flex w-full flex-col gap-2 rounded-lg border p-3"
     >
       <MarkdownEditor
         key={formKey}
@@ -138,7 +138,7 @@ export function CommentThread({
   }
 
   return (
-    <div className="bg-card dank:rounded-md flex w-full flex-col rounded-lg border">
+    <div className="bg-card dux:rounded-md flex w-full flex-col rounded-lg border">
       <CommentItem
         comment={thread}
         thread={thread}
@@ -228,11 +228,11 @@ function CommentItem({
     <article
       id={`comment-${comment.id}`}
       aria-label={`Comment from ${authorName}`}
-      className="group/comment group/reactable dank:p-4 flex flex-col gap-2 p-3"
+      className="group/comment group/reactable dux:p-4 flex flex-col gap-2 p-3"
     >
       <header className="flex min-h-7 items-center gap-2">
         <CommentAvatar comment={comment} />
-        <span className="dank:type-title-small truncate text-sm font-medium">{authorName}</span>
+        <span className="dux:type-title-small truncate text-sm font-medium">{authorName}</span>
         {comment.githubAuthor && (
           <a
             href={`https://github.com/${comment.githubAuthor}`}
@@ -263,7 +263,7 @@ function CommentItem({
             variant="ghost"
             size="icon"
             aria-label="Reply"
-            className="dank:size-8 dank:[&>svg]:size-5 size-7 opacity-0 group-hover/comment:opacity-100 focus-visible:opacity-100"
+            className="dux:size-8 dux:[&>svg]:size-5 size-7 opacity-0 group-hover/comment:opacity-100 focus-visible:opacity-100"
             onClick={onReply}
           >
             <ReplyIcon className="size-4" />
@@ -277,7 +277,7 @@ function CommentItem({
                   variant="ghost"
                   size="icon"
                   aria-label="Comment actions"
-                  className="dank:size-8 dank:[&>svg]:size-5 size-7 opacity-0 group-hover/comment:opacity-100 focus-visible:opacity-100 data-popup-open:opacity-100"
+                  className="dux:size-8 dux:[&>svg]:size-5 size-7 opacity-0 group-hover/comment:opacity-100 focus-visible:opacity-100 data-popup-open:opacity-100"
                 >
                   <EllipsisIcon className="size-4" />
                 </Button>

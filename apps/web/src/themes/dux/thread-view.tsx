@@ -23,10 +23,10 @@ import {
   useSaveDiscussionThreadMutation,
 } from "@/lib/queries/discussions";
 import { isMissing } from "@/lib/queries/projects";
-import { Byline } from "@/themes/dank/byline";
+import { Byline } from "@/themes/dux/byline";
 
 /** A thread in place of the post and its chat: its own header over its messages, Escape steps back. */
-export function DankThreadView({ threadId, onBack }: { threadId: string; onBack: () => void }) {
+export function DuxThreadView({ threadId, onBack }: { threadId: string; onBack: () => void }) {
   const { workspace } = useWorkspace();
   const { data, isPending, error, refetch } = useQuery(
     discussionThreadQuery(workspace.id, threadId),

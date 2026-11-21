@@ -29,7 +29,7 @@ function Slider<Value extends number | readonly number[]>({
   size = "default",
   ...props
 }: SliderProps<Value>) {
-  const isDank = useUiTheme().id === "dank";
+  const isDux = useUiTheme().id === "dux";
   const _values = Array.isArray(value)
     ? value
     : Array.isArray(defaultValue)
@@ -69,7 +69,7 @@ function Slider<Value extends number | readonly number[]>({
       )}
       {...props}
     >
-      {isDank ? (
+      {isDux ? (
         <SliderPrimitive.Control className="group/slider relative flex min-h-11 w-full touch-none items-center select-none active:cursor-grabbing has-hover:hover:cursor-grab has-hover:hover:active:cursor-grabbing data-disabled:pointer-events-none">
           <SliderPrimitive.Track
             data-slot="slider-track"

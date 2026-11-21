@@ -5,8 +5,8 @@ import { cn } from "@/components/ui/utils";
 import { useUiTheme } from "@/themes/ui-theme-provider";
 
 function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
-  const isDank = useUiTheme().id === "dank";
-  if (isDank) return <DankCheckbox className={className} {...props} />;
+  const isDux = useUiTheme().id === "dux";
+  if (isDux) return <DuxCheckbox className={className} {...props} />;
   return (
     <CheckboxPrimitive.Root
       data-slot="checkbox"
@@ -26,8 +26,8 @@ function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
   );
 }
 
-// Box, check color and state layer come from [data-slot="checkbox"] in themes/dank/inputs.css
-function DankCheckbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
+// Box, check color and state layer come from [data-slot="checkbox"] in themes/dux/inputs.css
+function DuxCheckbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
   return (
     <CheckboxPrimitive.Root
       data-slot="checkbox"

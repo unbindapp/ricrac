@@ -7,21 +7,21 @@ import { useUiTheme } from "@/themes/ui-theme-provider";
 
 type TProps = Omit<ComponentProps<typeof Button>, "variant" | "size"> & { selected: boolean };
 
-/** One choice of a few, toggled in place: a filter chip in Dank. */
+/** One choice of a few, toggled in place: a filter chip in Dux. */
 export function FilterChip({ selected, className, children, ...props }: TProps) {
-  const isDank = useUiTheme().id === "dank";
+  const isDux = useUiTheme().id === "dux";
   return (
     <Button
       variant={selected ? "secondary" : "ghost"}
       size="sm"
       className={cn(
-        "dank:h-8 dank:gap-2 dank:rounded-sm dank:px-4 dank:active:rounded-sm dank:has-[>svg]:pl-2 dank:[&>svg]:size-4.5",
-        !selected && "dank:border-m3-outline-variant dank:text-m3-on-surface-variant dank:border",
+        "dux:h-8 dux:gap-2 dux:rounded-sm dux:px-4 dux:active:rounded-sm dux:has-[>svg]:pl-2 dux:[&>svg]:size-4.5",
+        !selected && "dux:border-m3-outline-variant dux:text-m3-on-surface-variant dux:border",
         className,
       )}
       {...props}
     >
-      {selected && isDank && <CheckIcon />}
+      {selected && isDux && <CheckIcon />}
       {children}
     </Button>
   );

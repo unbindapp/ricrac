@@ -1,5 +1,5 @@
 /* Panes on the shell, rounded as in the Ricrac workspace mockup. */
-:root[data-ui-theme="dank"]
+:root[data-ui-theme="dux"]
   :is(
     main,
     [data-slot="page-bar-slot"],
@@ -12,7 +12,7 @@
 }
 
 /* Rail items: the active one keeps its indicator when hovered, under a state layer. */
-:root[data-ui-theme="dank"] [data-slot="rail-item"] {
+:root[data-ui-theme="dux"] [data-slot="rail-item"] {
   background-color: transparent;
   color: var(--m3-on-surface-variant);
 
@@ -39,6 +39,6 @@
 }
 
 /* The search bar rests low over the shell and lifts to level 3 while it lists what matches. */
-:root[data-ui-theme="dank"] [data-slot="global-search"]:not([data-open]) {
+:root[data-ui-theme="dux"] [data-slot="global-search"]:not([data-open]) {
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
 }

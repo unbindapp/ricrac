@@ -157,8 +157,8 @@ export function IssueDetailHeader({ issue, variant, onClose, onSetSla }: TProps)
                           onClick={() => snooze(option.until.toISOString())}
                         >
                           <option.icon className="size-4" />
-                          <span className="dank:min-w-0 dank:truncate flex-1">{option.label}</span>
-                          <span className="text-muted-foreground dank:type-label-small dank:shrink-0 dank:whitespace-nowrap text-xs">
+                          <span className="dux:min-w-0 dux:truncate flex-1">{option.label}</span>
+                          <span className="text-muted-foreground dux:type-label-small dux:shrink-0 dux:whitespace-nowrap text-xs">
                             {formatDateTime(option.until)}
                           </span>
                         </DropdownMenuItem>

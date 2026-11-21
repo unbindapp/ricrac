@@ -94,7 +94,7 @@ function VersionBrowser({
           <div
             role="listbox"
             aria-label="Versions"
-            className="dank:gap-0.5 dank:p-2 flex flex-col p-1"
+            className="dux:gap-0.5 dux:p-2 flex flex-col p-1"
           >
             {versions.data.map((version) => (
               <Button
@@ -104,16 +104,16 @@ function VersionBrowser({
                 variant={version.id === selected ? "secondary" : "ghost"}
                 size="sm"
                 forceMinSize={false}
-                className="dank:text-m3-on-surface dank:aria-selected:text-m3-on-secondary-container dank:rounded-xs dank:aria-selected:rounded-lg dank:px-4 dank:min-h-18 dank:justify-center h-auto flex-col items-start gap-0.5 py-2 text-left"
+                className="dux:text-m3-on-surface dux:aria-selected:text-m3-on-secondary-container dux:rounded-xs dux:aria-selected:rounded-lg dux:px-4 dux:min-h-18 dux:justify-center h-auto flex-col items-start gap-0.5 py-2 text-left"
                 onClick={() => setSelectedId(version.id)}
               >
                 <span
-                  className="dank:type-body-large text-sm"
+                  className="dux:type-body-large text-sm"
                   title={formatDateTime(version.createdAt)}
                 >
                   {formatRelative(version.createdAt)}
                 </span>
-                <span className="text-muted-foreground dank:type-body-medium dank:group-aria-selected/button:text-m3-on-secondary-container text-xs font-normal">
+                <span className="text-muted-foreground dux:type-body-medium dux:group-aria-selected/button:text-m3-on-secondary-container text-xs font-normal">
                   {version.author?.name ?? "Someone"}
                 </span>
               </Button>
@@ -158,7 +158,7 @@ function VersionPreview({
       {data && (
         <>
           <div className="flex items-center gap-2">
-            <h3 className="dank:type-title-medium min-w-0 flex-1 truncate text-base font-semibold">
+            <h3 className="dux:type-title-medium min-w-0 flex-1 truncate text-base font-semibold">
               {data.title}
             </h3>
             {canRestore && (

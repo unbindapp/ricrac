@@ -273,10 +273,10 @@ function PipelineReleases({ pipeline }: { pipeline: ReleasePipeline }) {
 
 function StageHeader({ group }: { group: TStageGroup }) {
   return (
-    <h2 className="bg-muted dank:h-12 dank:border-0 dank:bg-transparent dank:px-4 dank:type-title-small flex h-9 items-center gap-2 border-b px-3 text-sm font-medium">
+    <h2 className="bg-muted dux:h-12 dux:border-0 dux:bg-transparent dux:px-4 dux:type-title-small flex h-9 items-center gap-2 border-b px-3 text-sm font-medium">
       {group.stage && <ReleaseStageIcon type={group.stage.type} color={group.stage.color} />}
       <span>{group.stage?.name ?? "No stage"}</span>
-      <span className="text-muted-foreground dank:type-label-large text-xs font-normal">
+      <span className="text-muted-foreground dux:type-label-large text-xs font-normal">
         {group.releases.length}
       </span>
     </h2>
@@ -310,7 +310,7 @@ function ReleaseRow({ release }: { release: Release }) {
           name={release.stage.name}
         />
       )}
-      <span className="dank:font-normal min-w-0 truncate font-medium">{release.name}</span>
+      <span className="dux:font-normal min-w-0 truncate font-medium">{release.name}</span>
       {release.version && (
         <span className="text-muted-foreground shrink-0 font-mono text-xs">{release.version}</span>
       )}
@@ -384,9 +384,9 @@ function NoteRow({ note }: { note: ReleaseNote }) {
       className="has-hover:hover:bg-accent focus-visible:ring-primary/8-10 flex h-9 cursor-default items-center gap-2 border-b px-3 text-sm outline-hidden last:border-b-0 focus-visible:ring-1 focus-visible:ring-inset"
     >
       <FileTextIcon className="text-muted-foreground size-4 shrink-0" />
-      <span className="dank:font-normal min-w-0 truncate font-medium">{note.title}</span>
+      <span className="dux:font-normal min-w-0 truncate font-medium">{note.title}</span>
       {covered && (
-        <span className="text-muted-foreground dank:text-sm hidden truncate text-xs sm:inline">
+        <span className="text-muted-foreground dux:text-sm hidden truncate text-xs sm:inline">
           {covered}
         </span>
       )}

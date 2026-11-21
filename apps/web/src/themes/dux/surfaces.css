@@ -1,5 +1,5 @@
 /* M3 Expressive lists (ListTokens). Unlayered so they beat the row utilities list consumers write. */
-:root[data-ui-theme="dank"] {
+:root[data-ui-theme="dux"] {
   & [data-slot="list"] {
     width: 100%;
     margin-inline: 0;

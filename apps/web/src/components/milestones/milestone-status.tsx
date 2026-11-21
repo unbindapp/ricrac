@@ -33,7 +33,7 @@ export function MilestoneIcon({
       aria-hidden
       data-done={isMilestoneDone(milestone) || undefined}
       className={cn(
-        "text-muted-foreground data-done:fill-primary data-done:text-primary dank:size-5 size-3.5 shrink-0",
+        "text-muted-foreground data-done:fill-primary data-done:text-primary dux:size-5 size-3.5 shrink-0",
         className,
       )}
     />

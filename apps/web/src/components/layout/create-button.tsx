@@ -42,7 +42,7 @@ export function CreateButton({ label, icon: Icon = PlusIcon, size, isLarge, ...p
         {...props}
         variant="tonal"
         forceMinSize={false}
-        className="bg-m3-primary-container text-m3-on-primary-container shadow-elevation-3 has-hover:hover:shadow-elevation-4 dank:h-14 dank:rounded-lg dank:px-4 dank:active:rounded-lg dank:text-base dank:leading-6 dank:tracking-[0.009375rem] dank:[&_svg]:size-6 gap-2"
+        className="bg-m3-primary-container text-m3-on-primary-container shadow-elevation-3 has-hover:hover:shadow-elevation-4 dux:h-14 dux:rounded-lg dux:px-4 dux:active:rounded-lg dux:text-base dux:leading-6 dux:tracking-[0.009375rem] dux:[&_svg]:size-6 gap-2"
       >
         <Icon />
         {label}

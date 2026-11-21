@@ -17,7 +17,7 @@ export function MilestoneListHeader() {
   return (
     <div
       aria-hidden
-      className="text-muted-foreground dank:type-label-medium dank:border-0 dank:group-data-flush/list:px-4 flex h-8 w-full items-center gap-3 border-b px-3 text-xs"
+      className="text-muted-foreground dux:type-label-medium dux:border-0 dux:group-data-flush/list:px-4 flex h-8 w-full items-center gap-3 border-b px-3 text-xs"
     >
       <span className="min-w-0 flex-1">Name</span>
       <span className="hidden w-16 shrink-0 text-right sm:block">Issues</span>
@@ -40,7 +40,7 @@ export function MilestoneRow({ milestone }: { milestone: Milestone }) {
         <Link
           to="/$workspace/milestone/$id"
           params={{ workspace: workspace.urlKey, id: milestone.id }}
-          className="dank:font-normal truncate font-medium outline-hidden after:absolute after:inset-0"
+          className="dux:font-normal truncate font-medium outline-hidden after:absolute after:inset-0"
         >
           {milestone.name}
         </Link>

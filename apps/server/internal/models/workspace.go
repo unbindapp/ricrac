@@ -24,7 +24,7 @@ type Workspace struct {
 	URLKey      string          `json:"urlKey"`
 	LogoURL     *string         `json:"logoUrl"`
 	URL         string          `json:"url"`
-	Theme       string          `json:"theme" enum:"default,dank" doc:"The look of the web app for everyone in the workspace."`
+	Theme       string          `json:"theme" enum:"default,dux" doc:"The look of the web app for everyone in the workspace."`
 	Public      bool            `json:"public" doc:"Anyone with a link can read its issues without signing in."`
 	CreatedAt   string          `json:"createdAt"`
 	Role        string          `json:"role" enum:"owner,admin,member,guest" doc:"Your role."`
@@ -51,7 +51,7 @@ type WorkspaceUser struct {
 	Active             bool      `json:"active" doc:"False once removed from the workspace."`
 	IsMe               bool      `json:"isMe"`
 	EmailNotifications *bool     `json:"emailNotifications" doc:"Only shown for yourself."`
-	Theme              *string   `json:"theme" enum:"default,dank" doc:"Your look of the web app in this workspace, over the workspace's theme; null follows it. Only shown for yourself."`
+	Theme              *string   `json:"theme" enum:"default,dux" doc:"Your look of the web app in this workspace, over the workspace's theme; null follows it. Only shown for yourself."`
 	JoinedAt           string    `json:"joinedAt"`
 	Teams              []TeamRef `json:"teams" doc:"Their teams that you can see."`
 }

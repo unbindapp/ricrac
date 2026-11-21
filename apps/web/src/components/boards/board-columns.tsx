@@ -182,11 +182,11 @@ function Column({
     <section
       aria-label={column.name}
       data-over={isOver || undefined}
-      className="bg-muted dank:border-transparent dank:data-over:border-m3-primary data-over:border-primary flex w-72 shrink-0 flex-col rounded-lg border"
+      className="bg-muted dux:border-transparent dux:data-over:border-m3-primary data-over:border-primary flex w-72 shrink-0 flex-col rounded-lg border"
     >
-      <header className="dank:h-12 dank:pl-4 flex h-10 items-center gap-2 pr-1 pl-3 text-sm">
-        <span className="dank:type-title-small min-w-0 truncate font-medium">{column.name}</span>
-        <span className="text-muted-foreground dank:type-label-large text-xs">{cards.length}</span>
+      <header className="dux:h-12 dux:pl-4 flex h-10 items-center gap-2 pr-1 pl-3 text-sm">
+        <span className="dux:type-title-small min-w-0 truncate font-medium">{column.name}</span>
+        <span className="text-muted-foreground dux:type-label-large text-xs">{cards.length}</span>
         <span className="flex-1" />
         {canEdit && (
           <DiscussionSearchPicker

@@ -22,14 +22,14 @@ const SERIES: { key: TKey; label: string; swatch: string; stroke: string }[] = [
   {
     key: "started",
     label: "Started",
-    swatch: "bg-chart-4 dank:bg-m3-tertiary",
-    stroke: "stroke-chart-4 dank:stroke-m3-tertiary",
+    swatch: "bg-chart-4 dux:bg-m3-tertiary",
+    stroke: "stroke-chart-4 dux:stroke-m3-tertiary",
   },
   {
     key: "completed",
     label: "Completed",
-    swatch: "bg-chart-1 dank:bg-m3-primary",
-    stroke: "stroke-chart-1 dank:stroke-m3-primary",
+    swatch: "bg-chart-1 dux:bg-m3-primary",
+    stroke: "stroke-chart-1 dux:stroke-m3-primary",
   },
 ];
 
@@ -99,11 +99,11 @@ export function BurnUpChart({ cycle }: { cycle: Cycle }) {
             y1={y(max * ratio)}
             y2={y(max * ratio)}
             vectorEffect="non-scaling-stroke"
-            className="stroke-border dank:stroke-m3-outline-variant"
+            className="stroke-border dux:stroke-m3-outline-variant"
             strokeWidth={1}
           />
         ))}
-        <path d={completedArea} className="fill-chart-1/10 dank:fill-m3-primary/10" />
+        <path d={completedArea} className="fill-chart-1/10 dux:fill-m3-primary/10" />
         {SERIES.map((series) => (
           <path
             key={series.key}

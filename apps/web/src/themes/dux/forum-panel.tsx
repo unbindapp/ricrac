@@ -24,16 +24,16 @@ import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { useLoadMore } from "@/lib/hooks/use-load-more";
 import { entitySlug } from "@/lib/helpers/entity-slug";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
-import { DiscussionPanel } from "@/themes/dank/discussion-panel";
-import { ForumToolbar, type TForumLayout } from "@/themes/dank/forum-controls";
-import { UpvoteChip } from "@/themes/dank/upvote-chip";
+import { DiscussionPanel } from "@/themes/dux/discussion-panel";
+import { ForumToolbar, type TForumLayout } from "@/themes/dux/forum-controls";
+import { UpvoteChip } from "@/themes/dux/upvote-chip";
 import type { TForumPanelProps } from "@/themes/types";
 
 const GRID_CARD_HEIGHT = 340;
 const LIST_CARD_HEIGHT = 120;
 
 /** The forum in the page's panel: its discussions as cards, or the open one in their place. */
-export function DankForumPanel({
+export function DuxForumPanel({
   filters,
   discussion,
   chat,

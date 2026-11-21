@@ -1,7 +1,7 @@
 import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip";
 import * as React from "react";
 
-import { dankPopupMotionClassName } from "@/components/ui/dropdown-menu";
+import { duxPopupMotionClassName } from "@/components/ui/dropdown-menu";
 import { cn } from "@/components/ui/utils";
 import { useUiTheme } from "@/themes/ui-theme-provider";
 
@@ -31,7 +31,7 @@ function TooltipContent({
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Positioner
         side={side}
-        sideOffset={sideOffset ?? (id === "dank" ? 4 : 6)}
+        sideOffset={sideOffset ?? (id === "dux" ? 4 : 6)}
         align={align}
         className="isolate z-[1500]"
       >
@@ -39,8 +39,8 @@ function TooltipContent({
           data-slot="tooltip-content"
           className={cn(
             "bg-popover text-popover-foreground shadow-shadow-color/shadow-opacity data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 max-w-xs origin-(--transform-origin) rounded-md border px-2 py-1 text-xs leading-snug shadow-md",
-            "dank:bg-m3-inverse-surface dank:text-m3-inverse-on-surface dank:type-body-small dank:min-h-6 dank:max-w-50 dank:min-w-10 dank:rounded-xs dank:border-0 dank:shadow-none",
-            dankPopupMotionClassName,
+            "dux:bg-m3-inverse-surface dux:text-m3-inverse-on-surface dux:type-body-small dux:min-h-6 dux:max-w-50 dux:min-w-10 dux:rounded-xs dux:border-0 dux:shadow-none",
+            duxPopupMotionClassName,
             className,
           )}
           {...props}

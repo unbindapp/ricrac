@@ -20,9 +20,9 @@ import {
   useDeleteDiscussionThreadMutation,
   useSaveDiscussionMutation,
 } from "@/lib/queries/discussions";
-import { PostBody } from "@/themes/dank/post-body";
-import { DankThreadView } from "@/themes/dank/thread-view";
-import { UpvoteChip } from "@/themes/dank/upvote-chip";
+import { PostBody } from "@/themes/dux/post-body";
+import { DuxThreadView } from "@/themes/dux/thread-view";
+import { UpvoteChip } from "@/themes/dux/upvote-chip";
 
 type TProps = {
   discussion: DiscussionDetail;
@@ -66,7 +66,7 @@ export function DiscussionPanel({ discussion, chat, threadId, onBackToChat, onCl
         </div>
       </header>
       {threadId ? (
-        <DankThreadView key={threadId} threadId={threadId} onBack={onBackToChat} />
+        <DuxThreadView key={threadId} threadId={threadId} onBack={onBackToChat} />
       ) : (
         <ChatLeadContext value={<Post discussion={discussion} />}>
           <div data-slot="discussion-chat">{chat}</div>

@@ -36,7 +36,7 @@ export function MainChatPanel({
   const header = !lead && (
     <PanelBar>
       <MessagesSquareIcon className="text-muted-foreground size-4" />
-      <span className="dank:type-title-medium text-sm font-medium">Main chat</span>
+      <span className="dux:type-title-medium text-sm font-medium">Main chat</span>
       <span className="text-muted-foreground min-w-0 flex-1 text-xs tabular-nums">
         {count} {count === 1 ? "message" : "messages"}
       </span>

@@ -4,11 +4,11 @@
 
 @import "./styles/tokens.css";
 
-@import "./themes/dank/dank.css";
+@import "./themes/dux/dux.css";
 
 @custom-variant dark (&:is(.dark *));
 
-@custom-variant dank (&:where([data-ui-theme="dank"], [data-ui-theme="dank"] *));
+@custom-variant dux (&:where([data-ui-theme="dux"], [data-ui-theme="dux"] *));
 
 @custom-variant popup-open (&[data-popup-open][aria-expanded="true"]);
 
@@ -574,7 +574,7 @@
   z-index: 6;
 }
 
-:root[data-ui-theme="dank"] [data-slot="list"] > [data-sticky-header] {
+:root[data-ui-theme="dux"] [data-slot="list"] > [data-sticky-header] {
   background-color: var(--color-background);
 }
 
