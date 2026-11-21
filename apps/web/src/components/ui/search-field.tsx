@@ -11,10 +11,10 @@ type TProps = Omit<ComponentPropsWithRef<"input">, "className"> & {
   icon?: boolean;
 };
 
-/** A field that filters what a page lists. Dank draws it as Material's search bar. */
+/** A field that filters what a page lists. Dux draws it as Material's search bar. */
 export function SearchField({ className, icon = true, ...props }: TProps) {
-  const isDank = useUiTheme().id === "dank";
-  if (isDank) {
+  const isDux = useUiTheme().id === "dux";
+  if (isDux) {
     return (
       <div className={cn("relative w-90 max-w-full shrink-0", className)}>
         <SearchIcon className="text-m3-on-surface pointer-events-none absolute top-1/2 left-4 size-6 -translate-y-1/2" />

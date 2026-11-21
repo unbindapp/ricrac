@@ -165,7 +165,7 @@ function ReleasePage({
         <aside aria-label="Properties" className="w-full shrink-0 lg:w-72">
           <div
             data-slot="properties"
-            className="dank:rounded-none dank:border-0 dank:bg-transparent dank:p-0 flex flex-col gap-1 rounded-lg border p-4 lg:sticky lg:top-0"
+            className="dux:rounded-none dux:border-0 dux:bg-transparent dux:p-0 flex flex-col gap-1 rounded-lg border p-4 lg:sticky lg:top-0"
           >
             <ReleaseProperties release={release} pipeline={pipeline} />
           </div>

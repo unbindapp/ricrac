@@ -15,7 +15,7 @@ import { cn } from "@/components/ui/utils";
 
 const MAX_ROW_LABELS = 3;
 
-const dankIconTrigger = "dank:size-8 dank:*:size-5";
+const duxIconTrigger = "dux:size-8 dux:*:size-5";
 
 /** Empty controls stay out of sight until the row is hovered or the control is focused or open. */
 export const hiddenUntilHover =
@@ -81,7 +81,7 @@ export function IssueRow({
           appearance="icon"
           disabled={!canEdit}
           priority={issue.priority}
-          className={cn(dankIconTrigger, issue.priority === 0 && hiddenUntilHover)}
+          className={cn(duxIconTrigger, issue.priority === 0 && hiddenUntilHover)}
           onChange={(priority) => patch(issue, { priority })}
         />
       )}
@@ -96,23 +96,23 @@ export function IssueRow({
           disabled={!canEdit}
           teamId={issue.team.id}
           state={issue.state}
-          className={dankIconTrigger}
+          className={duxIconTrigger}
           onChange={(state) => patch(issue, { state })}
         />
       )}
       <span
         data-nested={depth > 0 || undefined}
-        className="dank:font-normal min-w-0 flex-1 truncate font-medium data-nested:pl-4"
+        className="dux:font-normal min-w-0 flex-1 truncate font-medium data-nested:pl-4"
       >
         {issue.title}
       </span>
-      <span className="dank:gap-2 hidden min-w-0 shrink items-center justify-end gap-1.5 overflow-hidden sm:flex">
+      <span className="dux:gap-2 hidden min-w-0 shrink items-center justify-end gap-1.5 overflow-hidden sm:flex">
         <SnoozedChip issue={issue} />
         <SlaChip issue={issue} />
         {show("labels") &&
           labels.map((label) => <LabelChip key={label.id} name={label.name} color={label.color} />)}
         {show("labels") && hiddenLabels > 0 && (
-          <span className="text-muted-foreground dank:type-label-large text-xs">
+          <span className="text-muted-foreground dux:type-label-large text-xs">
             +{hiddenLabels}
           </span>
         )}
@@ -149,7 +149,7 @@ export function IssueRow({
           appearance="icon"
           disabled={!canEdit}
           assignee={issue.assignee}
-          className={cn(dankIconTrigger, !issue.assignee && hiddenUntilHover)}
+          className={cn(duxIconTrigger, !issue.assignee && hiddenUntilHover)}
           onChange={(assignee) => patch(issue, { assignee })}
         />
       )}

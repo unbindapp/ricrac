@@ -9,7 +9,7 @@ import { useSettingsGroups } from "@/components/settings/settings-groups";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/ui/utils";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
-import { SettingsWindow } from "@/themes/dank/settings-window";
+import { SettingsWindow } from "@/themes/dux/settings-window";
 
 const sectionBadges = [
   "bg-primary text-primary-foreground",
@@ -20,7 +20,7 @@ const sectionBadges = [
 ];
 
 /** Settings in a window over the page, which stays mounted under it while it is open. */
-export function DankSettingsWindow() {
+export function DuxSettingsWindow() {
   const settingsPath = useSearch({
     from: "/$workspace/_workspace",
     select: (search) => search.settings,

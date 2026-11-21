@@ -148,7 +148,7 @@ export function ProjectLabelsPicker({
         size="sm"
         forceMinSize={false}
         aria-label="Change labels"
-        className="dank:text-m3-on-surface h-auto min-h-8 w-full flex-wrap justify-start gap-1 py-1"
+        className="dux:text-m3-on-surface h-auto min-h-8 w-full flex-wrap justify-start gap-1 py-1"
       >
         {labels.map((label) => (
           <LabelChip key={label.id} name={label.name} color={label.color} />
@@ -353,7 +353,7 @@ function PeriodGrid({
               size="sm"
               forceMinSize={false}
               aria-pressed={isCurrent}
-              className="dank:type-body-large dank:text-m3-on-surface-variant dank:aria-pressed:bg-m3-primary dank:aria-pressed:text-m3-on-primary dank:h-9 dank:rounded-full dank:active:rounded-full"
+              className="dux:type-body-large dux:text-m3-on-surface-variant dux:aria-pressed:bg-m3-primary dux:aria-pressed:text-m3-on-primary dux:h-9 dux:rounded-full dux:active:rounded-full"
               onClick={() => onPick(period.date)}
             >
               {period.label}

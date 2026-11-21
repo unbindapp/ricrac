@@ -30,7 +30,7 @@ export function CopyField({ value, label }: { value: string; label: string }) {
       <p
         aria-label={label}
         data-m3-field="outlined"
-        className="bg-input dank:px-4 dank:py-3.75 dank:type-body-large min-w-0 flex-1 truncate rounded-md border px-3 py-2 font-mono text-xs"
+        className="bg-input dux:px-4 dux:py-3.75 dux:type-body-large min-w-0 flex-1 truncate rounded-md border px-3 py-2 font-mono text-xs"
       >
         {value}
       </p>

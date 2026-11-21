@@ -29,15 +29,15 @@ export function ListSkeleton({ rows = 6, flush }: { rows?: number; flush?: boole
       data-slot="list-skeleton"
       aria-busy
       aria-label="Loading"
-      className="dank:gap-0.5 dank:border-0 flex w-full flex-col overflow-hidden rounded-lg border"
+      className="dux:gap-0.5 dux:border-0 flex w-full flex-col overflow-hidden rounded-lg border"
     >
       {Array.from({ length: rows }, (_, index) => (
         <div
           key={index}
-          className="dank:h-14 dank:gap-3 dank:rounded-xs dank:border-0 dank:bg-card dank:px-4 dank:first:rounded-t-lg dank:last:rounded-b-lg flex h-9 items-center gap-2 border-b px-3 last:border-b-0"
+          className="dux:h-14 dux:gap-3 dux:rounded-xs dux:border-0 dux:bg-card dux:px-4 dux:first:rounded-t-lg dux:last:rounded-b-lg flex h-9 items-center gap-2 border-b px-3 last:border-b-0"
         >
-          <Skeleton className="dank:size-6 size-4 rounded-full" />
-          <Skeleton className={`dank:h-4 h-3 ${widths[index % widths.length]}`} />
+          <Skeleton className="dux:size-6 size-4 rounded-full" />
+          <Skeleton className={`dux:h-4 h-3 ${widths[index % widths.length]}`} />
         </div>
       ))}
     </div>

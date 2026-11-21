@@ -16,13 +16,13 @@ export function IssueGroupHeader({ group, isCollapsed, onToggle, onCreate }: TPr
     <>
       <GroupIcon meta={group.meta} />
       <span className="truncate">{group.label}</span>
-      <span className="text-muted-foreground dank:type-label-large text-sm font-normal">
+      <span className="text-muted-foreground dux:type-label-large text-sm font-normal">
         {group.issues.length}
       </span>
     </>
   );
   return (
-    <div className="bg-muted dank:h-12 dank:bg-transparent dank:px-0 flex h-9 w-full items-center gap-2 px-1 text-sm">
+    <div className="bg-muted dux:h-12 dux:bg-transparent dux:px-0 flex h-9 w-full items-center gap-2 px-1 text-sm">
       <Button
         variant="ghost"
         size="sm"
@@ -30,17 +30,17 @@ export function IssueGroupHeader({ group, isCollapsed, onToggle, onCreate }: TPr
         aria-label={group.label}
         aria-expanded={!isCollapsed}
         onClick={onToggle}
-        className="dank:size-10 dank:justify-center dank:p-0 min-w-0 justify-start px-2"
+        className="dux:size-10 dux:justify-center dux:p-0 min-w-0 justify-start px-2"
       >
         <span className="contents">
           <ChevronRightIcon
             data-open={!isCollapsed || undefined}
-            className="text-muted-foreground dank:size-6 size-3.5 transition-transform data-open:rotate-90"
+            className="text-muted-foreground dux:size-6 size-3.5 transition-transform data-open:rotate-90"
           />
         </span>
-        <span className="dank:hidden contents">{title}</span>
+        <span className="dux:hidden contents">{title}</span>
       </Button>
-      <span className="dank:flex dank:type-title-small hidden min-w-0 items-center gap-2">
+      <span className="dux:flex dux:type-title-small hidden min-w-0 items-center gap-2">
         {title}
       </span>
       <span className="flex-1" />
@@ -64,7 +64,7 @@ export function IssueGroupHeaderPlaceholder() {
   return (
     <div
       aria-hidden
-      className="bg-muted dank:h-12 dank:bg-transparent flex h-9 w-full items-center gap-2 px-3 text-sm"
+      className="bg-muted dux:h-12 dux:bg-transparent flex h-9 w-full items-center gap-2 px-3 text-sm"
     >
       <Skeleton className="size-3.5" />
       <Skeleton className="size-3.5 rounded-full" />

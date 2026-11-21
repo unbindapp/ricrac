@@ -141,7 +141,7 @@ function LabelRow({
         className="flex min-w-0 flex-1 items-center gap-2 data-indent:pl-6"
       >
         {label.isGroup ? (
-          <FolderIcon className="text-muted-foreground dank:size-5 size-4 shrink-0" />
+          <FolderIcon className="text-muted-foreground dux:size-5 size-4 shrink-0" />
         ) : (
           <span
             aria-hidden
@@ -149,16 +149,16 @@ function LabelRow({
             style={{ backgroundColor: label.color }}
           />
         )}
-        <span className="dank:font-normal truncate font-medium">{label.name}</span>
+        <span className="dux:font-normal truncate font-medium">{label.name}</span>
         {label.description && (
-          <span className="text-muted-foreground dank:text-sm hidden truncate text-xs sm:inline">
+          <span className="text-muted-foreground dux:text-sm hidden truncate text-xs sm:inline">
             {label.description}
           </span>
         )}
         {label.retiredAt && <Badge variant="muted">Retired</Badge>}
       </span>
       {!label.isGroup && label.projectCount > 0 && (
-        <span className="text-muted-foreground dank:type-label-small shrink-0 text-xs tabular-nums">
+        <span className="text-muted-foreground dux:type-label-small shrink-0 text-xs tabular-nums">
           {label.projectCount} project{label.projectCount === 1 ? "" : "s"}
         </span>
       )}

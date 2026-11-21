@@ -121,7 +121,7 @@ type UpdateUserInput struct {
 	DisplayName        *string               `json:"displayName" doc:"Your short handle, used for @mentions."`
 	Timezone           args.Nullable[string] `json:"timezone" doc:"Your IANA timezone, like Europe/Berlin; null clears it."`
 	EmailNotifications *bool                 `json:"emailNotifications" doc:"Whether you get unread notifications by email."`
-	Theme              args.Nullable[string] `json:"theme" enum:"default,dank" doc:"Your look of the web app in this workspace, over the workspace's theme; null follows it."`
+	Theme              args.Nullable[string] `json:"theme" enum:"default,dux" doc:"Your look of the web app in this workspace, over the workspace's theme; null follows it."`
 }
 
 func (self *WorkspaceService) UpdateUser(ctx context.Context, actor *auth.Actor, input *UpdateUserInput) (models.WorkspaceUserDetail, error) {

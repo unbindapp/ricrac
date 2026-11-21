@@ -10,9 +10,9 @@ type TProps = {
 };
 
 export function ToggleKnob({ checked, hasChanges, size = "md", className }: TProps) {
-  const isDank = useUiTheme().id === "dank";
-  if (isDank)
-    return <DankSwitchTrack checked={checked} hasChanges={hasChanges} className={className} />;
+  const isDux = useUiTheme().id === "dux";
+  if (isDux)
+    return <DuxSwitchTrack checked={checked} hasChanges={hasChanges} className={className} />;
   return (
     <div
       data-checked={checked || undefined}
@@ -30,8 +30,8 @@ export function ToggleKnob({ checked, hasChanges, size = "md", className }: TPro
   );
 }
 
-// Colors and handle geometry come from [data-slot="switch"] in themes/dank/inputs.css
-function DankSwitchTrack({ checked, hasChanges, className }: Omit<TProps, "size">) {
+// Colors and handle geometry come from [data-slot="switch"] in themes/dux/inputs.css
+function DuxSwitchTrack({ checked, hasChanges, className }: Omit<TProps, "size">) {
   return (
     <div
       data-checked={checked || undefined}

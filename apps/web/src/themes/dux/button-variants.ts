@@ -14,7 +14,7 @@ const outlined =
 const text = "bg-transparent disabled:text-m3-on-surface-variant/38";
 
 /** Material 3 Expressive buttons: filled, tonal, outlined and text, in the extra small and small sizes. */
-export const dankButtonVariants: typeof buttonVariants = cva(
+export const duxButtonVariants: typeof buttonVariants = cva(
   "state-layer relative z-0 max-w-full touch-manipulation select-none group/button text-center text-sm leading-5 font-medium tracking-[0.00625rem] focus-visible:z-[1] ease-spring-fast-spatial duration-(--spring-fast-spatial-duration) transition-[border-radius,box-shadow] disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&>[data-slot=button-spinner]+svg]:hidden data-pending:[&:not(:has(>[data-slot=button-spinner]+svg))>*:not([data-slot=button-spinner])]:opacity-0",
   {
     variants: {

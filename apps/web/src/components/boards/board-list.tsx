@@ -53,18 +53,18 @@ function BoardRow({ board }: { board: TBoard }) {
       data-interactive
       className="has-hover:hover:bg-accent/50 flex h-11 w-full items-center gap-2 border-b px-3 text-sm last:border-b-0"
     >
-      <span className="dank:*:size-6 flex shrink-0">
+      <span className="dux:*:size-6 flex shrink-0">
         <EntityIcon icon={null} color={null} fallback={KanbanIcon} />
       </span>
       <Link
         to="/$workspace/board/$board_id"
         params={{ workspace: workspace.urlKey, board_id: boardParam(board) }}
-        className="dank:flex-col dank:items-stretch dank:gap-0 dank:before:absolute dank:before:inset-0 flex min-w-0 flex-1 items-baseline gap-2 outline-hidden focus-visible:underline"
+        className="dux:flex-col dux:items-stretch dux:gap-0 dux:before:absolute dux:before:inset-0 flex min-w-0 flex-1 items-baseline gap-2 outline-hidden focus-visible:underline"
       >
-        <span className="dank:font-normal truncate font-medium">{board.name}</span>
+        <span className="dux:font-normal truncate font-medium">{board.name}</span>
         <span
           data-slot="list-supporting"
-          className="text-muted-foreground dank:block hidden truncate text-xs sm:inline"
+          className="text-muted-foreground dux:block hidden truncate text-xs sm:inline"
         >
           {board.description ?? board.columns.map((column) => column.name).join(" · ")}
         </span>

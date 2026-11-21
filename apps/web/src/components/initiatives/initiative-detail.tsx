@@ -177,7 +177,7 @@ function InitiativeDetailContent({ initiative }: { initiative: TInitiativeDetail
             )}
           </div>
           {initiative.projectCount > 0 && (
-            <div className="bg-card dank:rounded-md flex flex-col gap-2 rounded-lg border p-4">
+            <div className="bg-card dux:rounded-md flex flex-col gap-2 rounded-lg border p-4">
               <div className="flex items-baseline gap-2">
                 <span className="text-base font-semibold tabular-nums">
                   {Math.round(initiative.progress * 100)}%
@@ -215,7 +215,7 @@ function InitiativeDetailContent({ initiative }: { initiative: TInitiativeDetail
           <ParentDocuments parent={{ initiative: initiative.id }} />
         </div>
         <aside aria-label="Properties" className="w-full shrink-0 lg:sticky lg:top-0 lg:w-80">
-          <div className="bg-card dank:rounded-none dank:border-0 dank:bg-transparent dank:p-0 rounded-lg border p-4">
+          <div className="bg-card dux:rounded-none dux:border-0 dux:bg-transparent dux:p-0 rounded-lg border p-4">
             <InitiativeProperties initiative={initiative} />
           </div>
         </aside>

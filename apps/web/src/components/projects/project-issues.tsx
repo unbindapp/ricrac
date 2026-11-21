@@ -120,7 +120,7 @@ export function ProjectIssues({ project, milestone, onMilestoneChange }: TProps)
             const isCollapsed = closedByDefault !== toggled.includes(type);
             return (
               <div key={type} role="presentation" data-slot="list-group" className="contents">
-                <div className="bg-muted dank:h-12 dank:gap-1 dank:border-0 dank:bg-transparent dank:px-0 flex h-9 items-center border-b px-1.5">
+                <div className="bg-muted dux:h-12 dux:gap-1 dux:border-0 dux:bg-transparent dux:px-0 flex h-9 items-center border-b px-1.5">
                   <GroupToggle
                     icon={<StateIcon type={type} />}
                     label={stateTypeLabels[type]}
@@ -170,8 +170,8 @@ function MilestoneChip({
       {icon && (
         <DiamondIcon
           className={cn(
-            "text-muted-foreground dank:text-m3-primary size-3.5",
-            isActive && "dank:hidden",
+            "text-muted-foreground dux:text-m3-primary size-3.5",
+            isActive && "dux:hidden",
           )}
         />
       )}

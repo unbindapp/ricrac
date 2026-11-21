@@ -23,9 +23,9 @@ type TProps = {
 };
 
 export const cardClassName =
-  "group/card bg-card has-hover:hover:border-primary/4-10 data-active:border-primary/6-10 focus-visible:ring-primary/8-10 dank:state-layer dank:relative dank:rounded-md dank:border-0 dank:bg-m3-surface-container-low dank:p-4 dank:shadow-elevation-1 dank:has-hover:hover:shadow-elevation-2 dank:data-active:bg-m3-secondary-container dank:data-active:text-m3-on-secondary-container flex w-full cursor-default flex-col gap-2 rounded-lg border p-3 text-sm outline-hidden focus-visible:ring-1 data-dragging:opacity-40";
+  "group/card bg-card has-hover:hover:border-primary/4-10 data-active:border-primary/6-10 focus-visible:ring-primary/8-10 dux:state-layer dux:relative dux:rounded-md dux:border-0 dux:bg-m3-surface-container-low dux:p-4 dux:shadow-elevation-1 dux:has-hover:hover:shadow-elevation-2 dux:data-active:bg-m3-secondary-container dux:data-active:text-m3-on-secondary-container flex w-full cursor-default flex-col gap-2 rounded-lg border p-3 text-sm outline-hidden focus-visible:ring-1 data-dragging:opacity-40";
 
-export const cardOverlayClassName = "dank:shadow-elevation-4 shadow-lg";
+export const cardOverlayClassName = "dux:shadow-elevation-4 shadow-lg";
 
 const hiddenUntilHover =
   "opacity-0 touch:opacity-100 group-hover/card:opacity-100 focus-visible:opacity-100 data-popup-open:opacity-100";
@@ -91,10 +91,10 @@ export function IssueCard({
             onChange={(state) => patch(issue, { state })}
           />
         )}
-        <p className="dank:type-title-medium min-w-0 flex-1">{issue.title}</p>
+        <p className="dux:type-title-medium min-w-0 flex-1">{issue.title}</p>
       </div>
       {hasFooter && (
-        <div className="dank:gap-2 flex flex-wrap items-center gap-1.5">
+        <div className="dux:gap-2 flex flex-wrap items-center gap-1.5">
           {show("priority") && issue.priority !== 0 && (
             <PriorityPicker
               appearance="icon"

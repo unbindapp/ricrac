@@ -14,10 +14,10 @@ type TNavItemProps = {
 };
 
 export const sidebarItemClassName =
-  "hit-gap-y h-8.5 w-full justify-start gap-2 px-2.5 font-normal [&_svg]:text-muted-foreground dank:h-9 dank:gap-1.5 dank:pr-3 dank:pl-3";
+  "hit-gap-y h-8.5 w-full justify-start gap-2 px-2.5 font-normal [&_svg]:text-muted-foreground dux:h-9 dux:gap-1.5 dux:pr-3 dux:pl-3";
 
 export const sidebarActiveItemClassName =
-  "data-[status=active]:bg-accent dank:data-[status=active]:bg-secondary dank:data-[status=active]:text-secondary-foreground dank:data-[status=active]:font-semibold dank:data-[status=active]:[&_svg]:text-secondary-foreground";
+  "data-[status=active]:bg-accent dux:data-[status=active]:bg-secondary dux:data-[status=active]:text-secondary-foreground dux:data-[status=active]:font-semibold dux:data-[status=active]:[&_svg]:text-secondary-foreground";
 
 export function SidebarNavItem({
   label,

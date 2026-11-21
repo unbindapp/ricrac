@@ -53,26 +53,26 @@
     U+A720-A7FF;
 }
 
-/* Material 3 Expressive. Roles follow the baseline scheme's tones; theme/dank/palette.ts sets the
-   --palette-* tones from the accent color. */
-:root[data-ui-theme="dank"] {
+/* Material 3 Expressive in two tones: one purple accent over near-neutral surfaces. palette.ts sets
+   the --palette-* tones from the accent color. */
+:root[data-ui-theme="dux"] {
   --m3-primary: var(--palette-primary-40);
-  --m3-on-primary: var(--palette-primary-100);
-  --m3-primary-container: var(--palette-primary-90);
-  --m3-on-primary-container: var(--palette-primary-10);
-  --m3-inverse-primary: var(--palette-primary-80);
-  --m3-secondary: var(--palette-secondary-40);
-  --m3-on-secondary: var(--palette-secondary-100);
-  --m3-secondary-container: var(--palette-secondary-90);
-  --m3-on-secondary-container: var(--palette-secondary-10);
-  --m3-tertiary: var(--palette-tertiary-40);
-  --m3-on-tertiary: var(--palette-tertiary-100);
-  --m3-tertiary-container: var(--palette-tertiary-90);
-  --m3-on-tertiary-container: var(--palette-tertiary-10);
+  --m3-on-primary: var(--palette-primary-98);
+  --m3-primary-container: var(--palette-primary-82);
+  --m3-on-primary-container: var(--palette-primary-29);
+  --m3-inverse-primary: var(--palette-primary-82);
+  --m3-secondary: var(--m3-primary);
+  --m3-on-secondary: var(--m3-on-primary);
+  --m3-secondary-container: var(--m3-primary-container);
+  --m3-on-secondary-container: var(--m3-on-primary-container);
+  --m3-tertiary: var(--m3-primary);
+  --m3-on-tertiary: var(--m3-on-primary);
+  --m3-tertiary-container: var(--m3-primary-container);
+  --m3-on-tertiary-container: var(--m3-on-primary-container);
   --m3-error: var(--palette-error-40);
   --m3-on-error: var(--palette-error-100);
-  --m3-error-container: var(--palette-error-90);
-  --m3-on-error-container: var(--palette-error-10);
+  --m3-error-container: var(--palette-error-65);
+  --m3-on-error-container: var(--palette-error-22);
   --m3-surface: var(--palette-neutral-98);
   --m3-surface-dim: var(--palette-neutral-87);
   --m3-surface-bright: var(--palette-neutral-98);
@@ -81,15 +81,20 @@
   --m3-surface-container: var(--palette-neutral-94);
   --m3-surface-container-high: var(--palette-neutral-92);
   --m3-surface-container-highest: var(--palette-neutral-90);
-  --m3-on-surface: var(--palette-neutral-10);
+  --m3-on-surface: var(--palette-neutral-21);
   --m3-surface-variant: var(--palette-neutral-variant-90);
-  --m3-on-surface-variant: var(--palette-neutral-variant-30);
-  --m3-inverse-surface: var(--palette-neutral-20);
-  --m3-inverse-on-surface: var(--palette-neutral-95);
-  --m3-outline: var(--palette-neutral-variant-50);
-  --m3-outline-variant: var(--palette-neutral-variant-80);
+  --m3-on-surface-variant: var(--palette-neutral-variant-40);
+  --m3-inverse-surface: var(--palette-neutral-4);
+  --m3-inverse-on-surface: var(--palette-neutral-65);
+  --m3-outline: var(--palette-neutral-variant-51);
+  --m3-outline-variant: color-mix(in srgb, var(--m3-outline) 40%, var(--m3-surface));
   --m3-scrim: var(--palette-neutral-0);
   --m3-shadow: var(--palette-neutral-0);
+
+  --dux-canvas: var(--m3-surface-container-low);
+  --dux-panel: var(--m3-surface-container);
+  --dux-item: var(--m3-surface-container-lowest);
+  --dux-content: var(--m3-surface-container-lowest);
   --m3-green: var(--palette-green-40);
   --m3-on-green: var(--palette-green-100);
   --m3-orange: var(--palette-orange-40);
@@ -135,12 +140,12 @@
   --radius-2xl: 2rem;
   --radius-3xl: 3rem;
 
-  --sidebar: var(--m3-surface);
-  --background: var(--m3-surface-container-low);
+  --sidebar: var(--dux-canvas);
+  --background: var(--dux-content);
   --foreground: var(--m3-on-surface);
-  --card: var(--m3-surface);
-  --card-hover: color-mix(in srgb, var(--m3-on-surface) 8%, var(--m3-surface));
-  --popover: var(--m3-surface-container);
+  --card: var(--dux-panel);
+  --card-hover: color-mix(in srgb, var(--m3-on-surface) 8%, var(--dux-panel));
+  --popover: var(--dux-panel);
   --popover-foreground: var(--m3-on-surface);
   --primary: var(--m3-primary);
   --primary-foreground: var(--m3-on-primary);
@@ -180,6 +185,7 @@
   --border: var(--m3-outline-variant);
   --input: transparent;
   --ring: var(--m3-secondary);
+  --focus-ring: 3px solid var(--m3-secondary);
 
   --chart-1: #5e6ad2;
   --chart-2: #3b7fe0;
@@ -211,39 +217,34 @@
   --opacity-selected-border: 85%;
 }
 
-:root.dark[data-ui-theme="dank"] {
+:root.dark[data-ui-theme="dux"] {
   --m3-primary: var(--palette-primary-80);
-  --m3-on-primary: var(--palette-primary-20);
-  --m3-primary-container: var(--palette-primary-30);
+  --m3-on-primary: var(--palette-primary-27);
+  --m3-primary-container: var(--palette-primary-35);
   --m3-on-primary-container: var(--palette-primary-90);
   --m3-inverse-primary: var(--palette-primary-40);
-  --m3-secondary: var(--palette-secondary-80);
-  --m3-on-secondary: var(--palette-secondary-20);
-  --m3-secondary-container: var(--palette-secondary-30);
-  --m3-on-secondary-container: var(--palette-secondary-90);
-  --m3-tertiary: var(--palette-tertiary-80);
-  --m3-on-tertiary: var(--palette-tertiary-20);
-  --m3-tertiary-container: var(--palette-tertiary-30);
-  --m3-on-tertiary-container: var(--palette-tertiary-90);
-  --m3-error: var(--palette-error-80);
+  --m3-error: var(--palette-error-65);
   --m3-on-error: var(--palette-error-20);
   --m3-error-container: var(--palette-error-30);
-  --m3-on-error-container: var(--palette-error-90);
-  --m3-surface: var(--palette-neutral-6);
-  --m3-surface-dim: var(--palette-neutral-6);
+  --m3-on-error-container: var(--palette-error-74);
+  --m3-surface: var(--palette-neutral-4);
+  --m3-surface-dim: var(--palette-neutral-4);
   --m3-surface-bright: var(--palette-neutral-24);
-  --m3-surface-container-lowest: var(--palette-neutral-4);
-  --m3-surface-container-low: var(--palette-neutral-10);
-  --m3-surface-container: var(--palette-neutral-12);
-  --m3-surface-container-high: var(--palette-neutral-17);
-  --m3-surface-container-highest: var(--palette-neutral-22);
-  --m3-on-surface: var(--palette-neutral-90);
-  --m3-surface-variant: var(--palette-neutral-variant-30);
-  --m3-on-surface-variant: var(--palette-neutral-variant-80);
-  --m3-inverse-surface: var(--palette-neutral-90);
-  --m3-inverse-on-surface: var(--palette-neutral-20);
-  --m3-outline: var(--palette-neutral-variant-60);
-  --m3-outline-variant: var(--palette-neutral-variant-30);
+  --m3-surface-container-lowest: var(--palette-neutral-0);
+  --m3-surface-container-low: var(--palette-neutral-6);
+  --m3-surface-container: var(--palette-neutral-9);
+  --m3-surface-container-high: var(--palette-neutral-12);
+  --m3-surface-container-highest: var(--palette-neutral-15);
+  --m3-on-surface: var(--palette-neutral-91);
+  --m3-surface-variant: var(--palette-neutral-variant-15);
+  --m3-on-surface-variant: var(--palette-neutral-variant-70);
+  --m3-inverse-surface: var(--palette-neutral-98);
+  --m3-inverse-on-surface: var(--palette-neutral-36);
+  --m3-outline: var(--palette-neutral-variant-49);
+
+  --dux-panel: var(--m3-surface-container-high);
+  --dux-item: color-mix(in srgb, var(--m3-on-surface) 6%, var(--m3-surface-container-highest));
+  --dux-content: var(--m3-surface);
   --m3-green: var(--palette-green-80);
   --m3-on-green: var(--palette-green-20);
   --m3-orange: var(--palette-orange-80);
@@ -481,22 +482,15 @@
 }
 
 @layer utilities {
-  html:where([data-ui-theme="dank"]) :is(pre, code) {
+  html:where([data-ui-theme="dux"]) :is(pre, code) {
     font-family: var(--font-code);
   }
 }
 
 @layer components {
-  html:where([data-ui-theme="dank"]) .rr-prose :is(code, pre) {
+  html:where([data-ui-theme="dux"]) .rr-prose :is(code, pre) {
     font-family: var(--font-code);
   }
-}
-
-/* No focus rings: no outlines, and none of the rings utilities draw. Unlayered to beat them. */
-:root[data-ui-theme="dank"] :is(:focus, :focus-visible, :focus-within) {
-  outline: none;
-  --tw-ring-shadow: 0 0 #0000;
-  --tw-ring-offset-shadow: 0 0 #0000;
 }
 
 /* Material 3 type scale roles, for elements that take one role whatever their size class says. */

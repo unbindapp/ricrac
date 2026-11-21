@@ -109,7 +109,7 @@ function MilestoneList({ milestones }: { milestones: Milestone[] }) {
         if (item.kind === "row") return <MilestoneRow milestone={item.milestone} />;
         const { label, icon: Icon } = milestoneGroups[item.group];
         return (
-          <div className="bg-muted dank:h-12 dank:gap-1 dank:bg-transparent dank:px-0 flex h-9 items-center px-1.5 group-data-flush/list:px-1">
+          <div className="bg-muted dux:h-12 dux:gap-1 dux:bg-transparent dux:px-0 flex h-9 items-center px-1.5 group-data-flush/list:px-1">
             <GroupToggle
               icon={<Icon className="text-muted-foreground size-4" />}
               label={label}

@@ -1,7 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useLayoutEffect, useRef, useState } from "react";
-import { useLocalStorage } from "usehooks-ts";
 
 import type { Discussion } from "@/api/ops.gen";
 import { DiscussionContextMenu, discussionCover } from "@/components/forum/discussion-card";
@@ -12,28 +11,25 @@ import {
   TrashedDiscussionRow,
 } from "@/components/forum/forum-views";
 import { NewDiscussionDialog } from "@/components/forum/new-discussion-dialog";
-import { ImageIcon, PencilIcon, PlusIcon } from "@/components/icons";
-import { commentExcerpt } from "@/components/inbox/notifications";
+import { ChevronRightIcon, MessagesSquareIcon, PinIcon, PlusIcon } from "@/components/icons";
+import { userName } from "@/components/issues/grouping";
 import { CreateButton } from "@/components/layout/create-button";
-import { VirtualGrid, VirtualList } from "@/components/layout/list";
+import { VirtualList } from "@/components/layout/list";
 import { ListStates } from "@/components/layout/list-states";
-import { PageSlotsContext } from "@/components/layout/page-container";
 import { RelativeTime } from "@/components/shared/relative-time";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 import { useLoadMore } from "@/lib/hooks/use-load-more";
 import { entitySlug } from "@/lib/helpers/entity-slug";
 import { useHotkeyScope } from "@/lib/hotkeys/use-hotkey-scope";
-import { DiscussionPanel } from "@/themes/dank/discussion-panel";
-import { ForumToolbar, type TForumLayout } from "@/themes/dank/forum-controls";
-import { UpvoteChip } from "@/themes/dank/upvote-chip";
+import { DiscussionPanel } from "@/themes/dux/discussion-panel";
+import { activeFilterCount, ForumChips, ForumFilterButton } from "@/themes/dux/forum-controls";
 import type { TForumPanelProps } from "@/themes/types";
 
-const GRID_CARD_HEIGHT = 340;
-const LIST_CARD_HEIGHT = 120;
+const ROW_HEIGHT = 90;
 
-/** The forum in the page's panel: its discussions as cards, or the open one in their place. */
-export function DankForumPanel({
+/** The forum in one card: its discussions as a list, or the open one in their place. */
+export function DuxForumPanel({
   filters,
   discussion,
   chat,
@@ -65,7 +61,9 @@ export function DankForumPanel({
           onClose={close}
         />
       ) : (
-        <section data-slot="discussion-panel">{fallback}</section>
+        <section data-slot="discussion-panel">
+          <div data-slot="dux-pane-main">{fallback}</div>
+        </section>
       )}
     </div>
   );
@@ -74,11 +72,9 @@ export function DankForumPanel({
 function ForumList({ filters }: { filters: TForumFilters }) {
   const { workspace, canEdit } = useWorkspace();
   const navigate = useNavigate();
-  const [layout, setLayout] = useLocalStorage<TForumLayout>("forum-layout", "grid");
-  const [fab, setFab] = useState<HTMLElement | null>(null);
+  const [areChipsShown, setAreChipsShown] = useState(activeFilterCount(filters) > 0);
   const status = filters.status ?? "open";
   const isTrash = status === "trash";
-  const isGrid = layout === "grid" && !isTrash;
   const list = useInfiniteQuery(
     forumDiscussionsQuery(workspace.id, {
       status,
@@ -98,9 +94,20 @@ function ForumList({ filters }: { filters: TForumFilters }) {
     });
 
   return (
-    <PageSlotsContext value={{ bar: null, fab }}>
-      <section aria-label="Forum" data-slot="forum-list" data-scroll="window">
-        <ForumToolbar filters={filters} layout={layout} onFilter={filter} onLayout={setLayout} />
+    <section aria-label="Forum" data-slot="forum-list">
+      <div data-slot="dux-pane-head">
+        <h1 data-slot="dux-pane-title">Forum</h1>
+        <ForumFilterButton
+          filters={filters}
+          isExpanded={areChipsShown}
+          onToggle={() => setAreChipsShown((shown) => !shown)}
+        />
+        {canEdit && !isTrash && (
+          <NewDiscussionDialog trigger={<CreateButton label="New discussion" size="sm" />} />
+        )}
+      </div>
+      <div data-slot="dux-pane-main">
+        {areChipsShown && <ForumChips filters={filters} onFilter={filter} />}
         <ListStates
           isPending={list.isPending}
           error={list.error}
@@ -131,14 +138,14 @@ function ForumList({ filters }: { filters: TForumFilters }) {
               renderItem={(discussion) => <TrashedDiscussionRow discussion={discussion} />}
             />
           ) : (
-            <VirtualGrid
+            <VirtualList
+              flush
               label="Discussions"
               items={discussions}
               getKey={(discussion) => discussion.id}
-              renderItem={(discussion) => <ForumCard discussion={discussion} filters={filters} />}
-              rowProps={{ "data-slot": "forum-cards", "data-layout": isGrid ? "grid" : "list" }}
-              estimateRowHeight={isGrid ? GRID_CARD_HEIGHT : LIST_CARD_HEIGHT}
+              estimateSize={() => ROW_HEIGHT}
               onEndReached={loadMore}
+              renderItem={(discussion) => <ForumRow discussion={discussion} filters={filters} />}
             />
           )}
           {list.hasNextPage && (
@@ -153,21 +160,15 @@ function ForumList({ filters }: { filters: TForumFilters }) {
             </Button>
           )}
         </ListStates>
-        {canEdit && !isTrash && (
-          <NewDiscussionDialog
-            trigger={<CreateButton label="New discussion" icon={PencilIcon} isLarge />}
-          />
-        )}
-        <div ref={setFab} data-slot="forum-fab" />
-      </section>
-    </PageSlotsContext>
+      </div>
+    </section>
   );
 }
 
-function ForumCard({ discussion, filters }: { discussion: Discussion; filters: TForumFilters }) {
+function ForumRow({ discussion, filters }: { discussion: Discussion; filters: TForumFilters }) {
   const { workspace } = useWorkspace();
-  const excerpt = commentExcerpt(discussion.body ?? "");
   const replies = discussion.commentCount;
+  const upvotes = discussion.upvoteCount;
   return (
     <DiscussionContextMenu
       discussion={discussion}
@@ -185,18 +186,17 @@ function ForumCard({ discussion, filters }: { discussion: Discussion; filters: T
       <ForumThumb discussion={discussion} />
       <span data-slot="forum-card-text">
         <span data-slot="forum-card-title">{discussion.title}</span>
-        {excerpt && <span data-slot="forum-card-excerpt">{excerpt}</span>}
         <span data-slot="forum-card-meta">
-          <span>
-            {replies} {replies === 1 ? "reply" : "replies"}
-            {discussion.closedAt && " · Closed"}
-            {" · "}
-            <RelativeTime value={discussion.lastActivityAt} />
-          </span>
-          <UpvoteChip discussion={discussion} />
+          {discussion.pinnedAt && <PinIcon aria-label="Pinned" className="fill-current" />}
+          {discussion.creator && `by ${userName(discussion.creator)} · `}
+          <RelativeTime value={discussion.lastActivityAt} />
+          {` · ${replies} ${replies === 1 ? "reply" : "replies"}`}
+          {upvotes > 0 && ` · ${upvotes} ${upvotes === 1 ? "upvote" : "upvotes"}`}
+          {discussion.closedAt && " · Closed"}
         </span>
         {discussion.tags.length > 0 && <FittingTags tags={discussion.tags} />}
       </span>
+      <ChevronRightIcon data-slot="forum-card-trail" />
     </DiscussionContextMenu>
   );
 }
@@ -236,7 +236,7 @@ function FittingTags({ tags }: { tags: string[] }) {
     <span ref={rowRef} data-slot="forum-card-tags">
       {tags.map((tag, index) => (
         <span key={tag} data-tag data-overflow={index >= shown || undefined}>
-          #{tag}
+          {tag}
         </span>
       ))}
       {hidden > 0 && (
@@ -254,7 +254,7 @@ function ForumThumb({ discussion }: { discussion: Discussion }) {
     <span data-slot="forum-thumb" aria-hidden>
       {cover?.kind === "image" && <img src={cover.url} alt="" loading="lazy" />}
       {cover?.kind === "video" && <video src={cover.url} muted preload="metadata" />}
-      {!cover && <ImageIcon />}
+      {!cover && <MessagesSquareIcon />}
     </span>
   );
 }

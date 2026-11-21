@@ -205,7 +205,7 @@ function IssueDetailContent({
         )}
       </div>
       {!isPeek && !hasPropertiesAside && (
-        <section aria-label="Properties" className="dank:border-0 dank:p-0 rounded-lg border p-3">
+        <section aria-label="Properties" className="dux:border-0 dux:p-0 rounded-lg border p-3">
           {properties}
         </section>
       )}
@@ -268,7 +268,7 @@ function IssueDetailContent({
             aria-label="Properties"
             className="flex w-80 shrink-0 flex-col gap-2 border-l px-5 py-4"
           >
-            <h2 className="text-muted-foreground dank:type-title-small flex h-7 items-center text-xs font-medium">
+            <h2 className="text-muted-foreground dux:type-title-small flex h-7 items-center text-xs font-medium">
               Properties
             </h2>
             {properties}
@@ -309,7 +309,7 @@ function IssueDetailPlaceholder({
         </div>
       </div>
       {variant === "page" && !hasPropertiesAside && (
-        <div className="dank:border-0 dank:p-0 rounded-lg border p-3">
+        <div className="dux:border-0 dux:p-0 rounded-lg border p-3">
           <PropertyLinesPlaceholder />
         </div>
       )}
@@ -333,7 +333,7 @@ function IssueDetailPlaceholder({
         </div>
         {hasPropertiesAside && (
           <aside aria-hidden className="flex w-80 shrink-0 flex-col gap-2 border-l px-5 py-4">
-            <h2 className="text-muted-foreground dank:type-title-small flex h-7 items-center text-xs font-medium">
+            <h2 className="text-muted-foreground dux:type-title-small flex h-7 items-center text-xs font-medium">
               Properties
             </h2>
             <PropertyLinesPlaceholder />
@@ -373,7 +373,7 @@ function EmptyExtras({
   if (issue.attachments.length === 0) actions.push(<AttachMenu key="attach" issue={issue} />);
   if (actions.length === 0 && !customerNeed && !reaction) return null;
   return (
-    <div className="dank:ml-0 dank:gap-2 -ml-2.5 flex flex-wrap items-center gap-1">
+    <div className="dux:ml-0 dux:gap-2 -ml-2.5 flex flex-wrap items-center gap-1">
       {actions}
       {customerNeed}
       {reaction}
@@ -390,7 +390,7 @@ function LifecycleBanner({ issue }: { issue: TIssueDetail }) {
   return (
     <div
       role="status"
-      className="bg-muted dank:rounded-md dank:border-0 dank:p-4 flex items-center gap-2 rounded-lg border p-3 text-sm"
+      className="bg-muted dux:rounded-md dux:border-0 dux:p-4 flex items-center gap-2 rounded-lg border p-3 text-sm"
     >
       <Icon className="text-muted-foreground size-4 shrink-0" />
       <p className="min-w-0 flex-1">
@@ -423,7 +423,7 @@ function TriageBanner({ issue }: { issue: TIssueDetail }) {
   return (
     <div
       role="status"
-      className="bg-muted dank:rounded-md dank:border-0 dank:p-4 flex flex-wrap items-center gap-2 rounded-lg border p-3 text-sm"
+      className="bg-muted dux:rounded-md dux:border-0 dux:p-4 flex flex-wrap items-center gap-2 rounded-lg border p-3 text-sm"
     >
       <TriangleIcon className="text-muted-foreground size-4 shrink-0" />
       <p className="min-w-0 flex-1">

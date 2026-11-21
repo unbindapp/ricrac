@@ -4,7 +4,7 @@ import { Command as CommandPrimitive } from "cmdk";
 import { LoaderIcon, SearchIcon } from "@/components/icons";
 import { cn } from "@/components/ui/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { dankMenuItemClassName } from "@/components/ui/dropdown-menu";
+import { duxMenuItemClassName } from "@/components/ui/dropdown-menu";
 import { useUiTheme } from "@/themes/ui-theme-provider";
 import { cva, VariantProps } from "class-variance-authority";
 
@@ -13,10 +13,10 @@ const commandVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-popover text-popover-foreground dank:bg-transparent",
+        default: "bg-popover text-popover-foreground dux:bg-transparent",
         modal: "bg-background text-foreground",
         searchView:
-          "bg-popover text-popover-foreground dank:bg-m3-surface-container-high dank:text-m3-on-surface dank:rounded-xl dank:border-0 dank:shadow-elevation-3 dank:[--tw-shadow-color:initial] dank:[&_[cmdk-list]]:p-2 dank:[&_[cmdk-item]]:min-h-14 dank:[&_[cmdk-item]>svg]:size-6 dank:[&_[cmdk-item][data-selected=true]]:rounded-lg dank:[&_[cmdk-group]_[cmdk-group-heading]]:type-title-small dank:[&_[cmdk-group]_[cmdk-group-heading]]:text-m3-on-surface-variant dank:[&_[cmdk-group]_[cmdk-group-heading]]:min-h-12 dank:[&_[cmdk-group]_[cmdk-group-heading]]:px-5",
+          "bg-popover text-popover-foreground dux:bg-popover dux:text-m3-on-surface dux:rounded-xl dux:border-0 dux:shadow-elevation-3 dux:[--tw-shadow-color:initial] dux:[&_[cmdk-list]]:p-2 dux:[&_[cmdk-item]]:min-h-14 dux:[&_[cmdk-item]>svg]:size-6 dux:[&_[cmdk-item][data-selected=true]]:rounded-lg dux:[&_[cmdk-group]_[cmdk-group-heading]]:type-title-small dux:[&_[cmdk-group]_[cmdk-group-heading]]:text-m3-on-surface-variant dux:[&_[cmdk-group]_[cmdk-group-heading]]:min-h-12 dux:[&_[cmdk-group]_[cmdk-group-heading]]:px-5",
       },
       wrapper: {
         default:
@@ -82,7 +82,7 @@ function CommandInput({
   Icon?: React.ComponentType<{ className?: string }>;
   hideIcon?: boolean;
 }) {
-  const styles = useUiTheme().id === "dank" ? dankCommandInputStyles : commandInputStyles;
+  const styles = useUiTheme().id === "dux" ? duxCommandInputStyles : commandInputStyles;
   return (
     <div className={cn(styles.wrapper, classNameWrapper)} cmdk-input-wrapper="">
       <div data-show-spinner={showSpinner || undefined} className={styles.icon}>
@@ -107,7 +107,7 @@ const commandInputStyles = {
     "placeholder:text-muted-foreground flex w-full rounded-md bg-transparent py-3 pr-4 pl-9.5 text-sm leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50",
 };
 
-const dankCommandInputStyles = {
+const duxCommandInputStyles = {
   wrapper: "relative flex h-14 shrink-0 items-center border-b border-m3-outline",
   icon: "text-m3-on-surface group pointer-events-none absolute left-4 size-6 shrink-0",
   glyph: "size-full",
@@ -119,7 +119,7 @@ function CommandList({ className, ...props }: React.ComponentProps<typeof Comman
   return (
     <CommandPrimitive.List
       className={cn(
-        "dank:px-0 dank:py-0.5 p-1 [&_[cmdk-group]:not([hidden])~[cmdk-group]:not([hidden])]:mt-1",
+        "dux:p-2 dux:flex dux:flex-col dux:gap-0.5 p-1 [&_[cmdk-group]:not([hidden])~[cmdk-group]:not([hidden])]:mt-1",
         className,
       )}
       {...props}
@@ -144,7 +144,7 @@ function CommandGroup({
     <CommandPrimitive.Group
       className={cn(
         "group/command text-foreground [&_[cmdk-group-heading]]:text-muted-foreground overflow-hidden [&_[cmdk-group-heading]]:flex [&_[cmdk-group-heading]]:items-center [&_[cmdk-group-heading]]:gap-3 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium",
-        "dank:text-m3-on-surface dank:[&_[cmdk-group-heading]]:type-label-large dank:[&_[cmdk-group-heading]]:text-m3-on-surface dank:[&_[cmdk-group-heading]]:min-h-8 dank:[&_[cmdk-group-heading]]:py-1.5 dank:[&_[cmdk-group-heading]]:pr-1 dank:[&_[cmdk-group-heading]]:pl-3",
+        "dux:text-m3-on-surface dux:[&_[cmdk-group-heading]]:type-label-large dux:[&_[cmdk-group-heading]]:text-m3-on-surface dux:[&_[cmdk-group-heading]]:min-h-8 dux:[&_[cmdk-group-heading]]:py-1.5 dux:[&_[cmdk-group-heading]]:pr-1 dux:[&_[cmdk-group-heading]]:pl-3",
         className,
       )}
       {...props}
@@ -159,7 +159,7 @@ function CommandSeparator({
   return (
     <CommandPrimitive.Separator
       className={cn(
-        "bg-border dank:mx-3 dank:my-0.5 dank:bg-m3-outline-variant -mx-1 my-1 h-px",
+        "bg-border dux:mx-3 dux:my-0.5 dux:bg-m3-outline-variant -mx-1 my-1 h-px",
         className,
       )}
       {...props}
@@ -168,7 +168,7 @@ function CommandSeparator({
 }
 
 const commandItemVariants = cva(
-  `relative flex cursor-default leading-tight gap-2 select-none items-center rounded-md px-2 py-2 text-sm outline-hidden data-[disabled=true]:pointer-events-none data-[selected=true]:bg-border data-[disabled=true]:data-[selected=true]:bg-transparent data-[selected=true]:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 ${dankMenuItemClassName} dank:not-data-checked:data-[selected=true]:bg-transparent dank:data-[selected=true]:after:opacity-10 dank:data-checked:rounded-md dank:data-checked:bg-m3-tertiary-container dank:data-checked:text-m3-on-tertiary-container dank:data-checked:[--menu-icon:currentColor]`,
+  `relative flex cursor-default leading-tight gap-2 select-none items-center rounded-md px-2 py-2 text-sm outline-hidden data-[disabled=true]:pointer-events-none data-[selected=true]:bg-border data-[disabled=true]:data-[selected=true]:bg-transparent data-[selected=true]:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 ${duxMenuItemClassName} dux:not-data-checked:data-[selected=true]:bg-transparent dux:data-[selected=true]:after:opacity-10 dux:data-checked:rounded-md dux:data-checked:bg-m3-tertiary-container dux:data-checked:text-m3-on-tertiary-container dux:data-checked:[--menu-icon:currentColor]`,
   {
     variants: {
       variant: {
@@ -180,7 +180,7 @@ const commandItemVariants = cva(
       },
       fadeOnDisabled: {
         default:
-          "disabled:opacity-50 data-[disabled=true]:opacity-50 dank:data-[disabled=true]:opacity-100 dank:data-[disabled=true]:text-m3-on-surface/38 dank:data-[disabled=true]:[--menu-icon:currentColor]",
+          "disabled:opacity-50 data-[disabled=true]:opacity-50 dux:data-[disabled=true]:opacity-100 dux:data-[disabled=true]:text-m3-on-surface/38 dux:data-[disabled=true]:[--menu-icon:currentColor]",
         false: "",
       },
     },
@@ -212,7 +212,7 @@ function CommandShortcut({ className, ...props }: React.HTMLAttributes<HTMLSpanE
   return (
     <span
       className={cn(
-        "text-muted-foreground dank:type-label-small dank:text-m3-on-surface-variant ml-auto text-xs tracking-widest",
+        "text-muted-foreground dux:type-label-small dux:text-m3-on-surface-variant ml-auto text-xs tracking-widest",
         className,
       )}
       {...props}

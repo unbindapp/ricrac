@@ -49,7 +49,7 @@ function GithubNotConfigured() {
       description={description}
       actions={<Badge variant="muted">Not set up</Badge>}
     >
-      <div className="bg-muted dank:rounded-md flex flex-col gap-1 rounded-lg p-4">
+      <div className="bg-muted dux:rounded-md flex flex-col gap-1 rounded-lg p-4">
         <p className="text-sm font-medium">This server has no GitHub App</p>
         <p className="text-muted-foreground text-sm">
           Whoever runs this Ricrac server creates a GitHub App and sets the GITHUB_ variables, as
@@ -87,11 +87,11 @@ function GithubNotConnected() {
 function Feature({ icon: Icon, title, text }: { icon: LucideIcon; title: string; text: string }) {
   return (
     <li className="flex items-start gap-3">
-      <span className="bg-muted text-muted-foreground dank:bg-m3-primary-container dank:text-m3-on-primary-container dank:size-10 dank:rounded-full flex size-8 shrink-0 items-center justify-center rounded-lg">
-        <Icon className="dank:size-5 size-4" />
+      <span className="bg-muted text-muted-foreground dux:bg-m3-primary-container dux:text-m3-on-primary-container dux:size-10 dux:rounded-full flex size-8 shrink-0 items-center justify-center rounded-lg">
+        <Icon className="dux:size-5 size-4" />
       </span>
       <span className="flex min-w-0 flex-col">
-        <span className="dank:text-base dank:font-normal text-sm font-medium">{title}</span>
+        <span className="dux:text-base dux:font-normal text-sm font-medium">{title}</span>
         <span className="text-muted-foreground text-sm">{text}</span>
       </span>
     </li>

@@ -176,7 +176,7 @@ function BoardColumn({
       <section
         ref={setNodeRef}
         aria-label={`${group.status.name}, no projects`}
-        className="bg-muted dank:border-transparent flex w-10 shrink-0 flex-col items-center gap-2 rounded-lg border py-3"
+        className="bg-muted dux:border-transparent flex w-10 shrink-0 flex-col items-center gap-2 rounded-lg border py-3"
       >
         <ProjectStatusIcon type={group.status.type} color={group.status.color} />
         <span
@@ -192,14 +192,14 @@ function BoardColumn({
     <section
       aria-label={group.status.name}
       data-over={isOver || undefined}
-      className="bg-muted data-over:border-primary/5-10 dank:border-transparent dank:data-over:border-m3-primary flex max-h-full w-72 shrink-0 flex-col rounded-lg border"
+      className="bg-muted data-over:border-primary/5-10 dux:border-transparent dux:data-over:border-m3-primary flex max-h-full w-72 shrink-0 flex-col rounded-lg border"
     >
-      <header className="dank:h-12 dank:pr-1 dank:pl-4 flex h-10 shrink-0 items-center gap-2 pr-1.5 pl-3 text-sm">
+      <header className="dux:h-12 dux:pr-1 dux:pl-4 flex h-10 shrink-0 items-center gap-2 pr-1.5 pl-3 text-sm">
         <ProjectStatusIcon type={group.status.type} color={group.status.color} />
-        <span className="dank:type-title-small min-w-0 truncate font-medium">
+        <span className="dux:type-title-small min-w-0 truncate font-medium">
           {group.status.name}
         </span>
-        <span className="text-muted-foreground dank:type-label-large text-xs tabular-nums">
+        <span className="text-muted-foreground dux:type-label-large text-xs tabular-nums">
           {group.projects.length}
         </span>
         <span className="flex-1" />
@@ -294,8 +294,8 @@ function ProjectCard({
       aria-label={project.name}
       data-dragging={isDragging || undefined}
       className={cn(
-        "bg-card has-hover:hover:border-primary/4-10 focus-visible:ring-primary/8-10 dank:state-layer dank:rounded-md dank:border-0 dank:bg-m3-surface-container-low dank:p-4 dank:shadow-elevation-1 dank:has-hover:hover:shadow-elevation-2 relative flex w-full cursor-default flex-col gap-3 rounded-lg border p-3 text-sm outline-hidden focus-visible:ring-1 data-dragging:opacity-40",
-        isOverlay && "dank:shadow-elevation-4 shadow-lg",
+        "bg-card has-hover:hover:border-primary/4-10 focus-visible:ring-primary/8-10 dux:state-layer dux:rounded-md dux:border-0 dux:bg-m3-surface-container-low dux:p-4 dux:shadow-elevation-1 dux:has-hover:hover:shadow-elevation-2 relative flex w-full cursor-default flex-col gap-3 rounded-lg border p-3 text-sm outline-hidden focus-visible:ring-1 data-dragging:opacity-40",
+        isOverlay && "dux:shadow-elevation-4 shadow-lg",
       )}
     >
       <div className="flex min-w-0 items-center gap-2">
@@ -303,7 +303,7 @@ function ProjectCard({
         <Link
           to="/$workspace/project/$slug"
           params={{ workspace: workspace.urlKey, slug: entitySlug(project) }}
-          className="dank:type-title-medium min-w-0 flex-1 truncate font-medium after:absolute after:inset-0"
+          className="dux:type-title-medium min-w-0 flex-1 truncate font-medium after:absolute after:inset-0"
         >
           {project.name}
         </Link>

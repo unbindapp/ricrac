@@ -119,7 +119,7 @@ export function IssueFilters({ filters, onChange, teamId, hiddenFields = [] }: T
   });
 
   return (
-    <div className="scrollbar-hidden flex min-w-0 items-center gap-2 overflow-x-auto max-sm:shrink-0">
+    <div className="scrollbar-hidden dux:-m-1.5 dux:p-1.5 flex min-w-0 items-center gap-2 overflow-x-auto max-sm:shrink-0">
       {shown.map((field) => (
         <FilterChip
           key={field}
@@ -193,17 +193,17 @@ function FilterChip({
     <div
       role="group"
       aria-label={`${label} filter`}
-      className="bg-background dank:h-8 dank:rounded-sm dank:bg-transparent dank:type-label-large flex h-7 items-center overflow-hidden rounded-md border text-sm"
+      className="bg-background dux:h-8 dux:rounded-sm dux:bg-transparent dux:type-label-large flex h-7 items-center overflow-hidden rounded-md border text-sm"
     >
-      <span className="text-muted-foreground dank:gap-2 dank:pl-2 flex items-center gap-1.5 px-2">
-        <Icon className="dank:size-4.5 size-3.5" />
+      <span className="text-muted-foreground dux:gap-2 dux:pl-2 flex items-center gap-1.5 px-2">
+        <Icon className="dux:size-4.5 size-3.5" />
         {label}
       </span>
       {field === "due_date" ? (
         <DueDateFilter filters={filters} onChange={onChange} open={isOpen} onOpenChange={setOpen} />
       ) : (
         <>
-          <span className="text-muted-foreground dank:border-l-0 dank:type-label-large border-l px-2 text-xs">
+          <span className="text-muted-foreground dux:border-l-0 dux:type-label-large border-l px-2 text-xs">
             {values.length > 1 ? "is any of" : "is"}
           </span>
           <PropertyPicker
@@ -219,7 +219,7 @@ function FilterChip({
                 variant="ghost"
                 size="sm"
                 forceMinSize={false}
-                className="dank:border-l-0 h-full rounded-none border-l font-normal"
+                className="dux:border-l-0 h-full rounded-none border-l font-normal"
               >
                 {chipValueText(values, options, pluralNouns[field])}
               </Button>
@@ -233,7 +233,7 @@ function FilterChip({
         forceMinSize={false}
         aria-label={`Remove ${label.toLowerCase()} filter`}
         onClick={remove}
-        className="dank:border-l-0 dank:[&>svg]:size-4.5 h-full rounded-none border-l px-1.5"
+        className="dux:border-l-0 dux:[&>svg]:size-4.5 h-full rounded-none border-l px-1.5"
       >
         <XIcon className="size-3.5" />
       </Button>
@@ -293,7 +293,7 @@ function DueDateFilter({
             variant="ghost"
             size="sm"
             forceMinSize={false}
-            className="text-muted-foreground dank:border-l-0 dank:type-label-large h-full rounded-none border-l text-xs font-normal"
+            className="text-muted-foreground dux:border-l-0 dux:type-label-large h-full rounded-none border-l text-xs font-normal"
           >
             {operator}
           </Button>
@@ -307,7 +307,7 @@ function DueDateFilter({
                 variant="ghost"
                 size="sm"
                 forceMinSize={false}
-                className="dank:border-l-0 h-full rounded-none border-l font-normal"
+                className="dux:border-l-0 h-full rounded-none border-l font-normal"
               >
                 {value ? formatDueDate(value) : "pick a date"}
               </Button>

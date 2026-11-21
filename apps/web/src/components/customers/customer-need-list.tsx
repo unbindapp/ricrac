@@ -21,7 +21,7 @@ type TProps = {
 };
 
 const linkClassName =
-  "flex min-w-0 items-center gap-1.5 font-medium outline-hidden focus-visible:underline has-hover:hover:underline dank:font-normal";
+  "flex min-w-0 items-center gap-1.5 font-medium outline-hidden focus-visible:underline has-hover:hover:underline dux:font-normal";
 
 export function CustomerNeedList({ needs, scope, show }: TProps) {
   return (
@@ -53,7 +53,7 @@ function NeedItem({
       data-segment={segment}
       className="flex flex-col gap-1 border-b px-3 py-2 last:border-b-0"
     >
-      <div className="dank:text-base flex min-h-7 items-center gap-2 text-sm">
+      <div className="dux:text-base flex min-h-7 items-center gap-2 text-sm">
         {need.priority === 1 && <ImportantIcon />}
         <div className="flex min-w-0 flex-1 items-center">
           {show === "customer" ? <CustomerLink need={need} /> : <TargetLink need={need} />}

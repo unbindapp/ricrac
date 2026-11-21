@@ -40,7 +40,7 @@ export function ProjectListHeader() {
   return (
     <div
       aria-hidden
-      className="text-muted-foreground dank:border-0 dank:px-4 dank:type-label-medium dank:group-data-flush/list:px-4 flex h-8 w-full items-center gap-3 border-b px-3 text-xs"
+      className="text-muted-foreground dux:border-0 dux:px-4 dux:type-label-medium dux:group-data-flush/list:px-4 flex h-8 w-full items-center gap-3 border-b px-3 text-xs"
     >
       <span className="min-w-0 flex-1">Name</span>
       <span className="hidden w-24 shrink-0 md:block">Health</span>
@@ -61,16 +61,16 @@ export function ProjectRow({ project }: { project: Project }) {
       params={{ workspace: workspace.urlKey, slug: entitySlug(project) }}
       className="has-hover:hover:bg-muted focus-visible:bg-muted flex h-9 w-full items-center gap-3 border-b px-3 text-sm outline-hidden group-data-flush/list:h-11 last:border-b-0"
     >
-      <span className="dank:gap-3 flex min-w-0 flex-1 items-center gap-2">
-        <span className="dank:*:size-6 flex shrink-0">
+      <span className="dux:gap-3 flex min-w-0 flex-1 items-center gap-2">
+        <span className="dux:*:size-6 flex shrink-0">
           <ProjectIcon icon={project.icon} color={project.color} />
         </span>
-        <span className="dank:flex-col dank:items-stretch dank:gap-0 flex min-w-0 items-center gap-2">
-          <span className="dank:font-normal truncate font-medium">{project.name}</span>
+        <span className="dux:flex-col dux:items-stretch dux:gap-0 flex min-w-0 items-center gap-2">
+          <span className="dux:font-normal truncate font-medium">{project.name}</span>
           {project.summary && (
             <span
               data-slot="list-supporting"
-              className="text-muted-foreground dank:block hidden min-w-0 truncate text-xs lg:inline"
+              className="text-muted-foreground dux:block hidden min-w-0 truncate text-xs lg:inline"
             >
               {project.summary}
             </span>
@@ -128,13 +128,13 @@ export function ProjectGroupHeader({
     <>
       <ProjectStatusIcon type={status.type} color={status.color} />
       <span className="truncate">{status.name}</span>
-      <span className="text-muted-foreground dank:type-label-large text-xs font-normal tabular-nums">
+      <span className="text-muted-foreground dux:type-label-large text-xs font-normal tabular-nums">
         {count}
       </span>
     </>
   );
   return (
-    <div className="bg-muted dank:h-12 dank:bg-transparent dank:px-0 dank:group-data-flush/list:px-0 flex h-9 w-full items-center gap-2 px-1.5 text-sm group-data-flush/list:px-1">
+    <div className="bg-muted dux:h-12 dux:bg-transparent dux:px-0 dux:group-data-flush/list:px-0 flex h-9 w-full items-center gap-2 px-1.5 text-sm group-data-flush/list:px-1">
       <Button
         variant="ghost"
         size="sm"
@@ -142,17 +142,17 @@ export function ProjectGroupHeader({
         aria-label={status.name}
         aria-expanded={!isCollapsed}
         onClick={onToggle}
-        className="dank:size-10 dank:justify-center dank:p-0 min-w-0 justify-start"
+        className="dux:size-10 dux:justify-center dux:p-0 min-w-0 justify-start"
       >
         <span className="contents">
           <ChevronRightIcon
             data-open={!isCollapsed || undefined}
-            className="text-muted-foreground dank:size-6 size-3.5 transition-transform data-open:rotate-90"
+            className="text-muted-foreground dux:size-6 size-3.5 transition-transform data-open:rotate-90"
           />
         </span>
-        <span className="dank:hidden contents">{title}</span>
+        <span className="dux:hidden contents">{title}</span>
       </Button>
-      <span className="dank:flex dank:type-title-small hidden min-w-0 items-center gap-2">
+      <span className="dux:flex dux:type-title-small hidden min-w-0 items-center gap-2">
         {title}
       </span>
       <span className="flex-1" />

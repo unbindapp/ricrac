@@ -4,7 +4,7 @@ import type { DiscussionDetail } from "@/api/ops.gen";
 import type { TForumFilters } from "@/components/forum/forum-views";
 import type { buttonVariants } from "@/components/ui/button";
 
-export const UI_THEME_IDS = ["default", "dank"] as const;
+export const UI_THEME_IDS = ["default", "dux"] as const;
 export type TUiThemeId = (typeof UI_THEME_IDS)[number];
 
 /** A look for the whole app: its tokens and component styles live in CSS under [data-ui-theme=id]. */
@@ -22,6 +22,8 @@ export type TUiTheme = {
   NavigationDrawer: ComponentType<{ onNavigate: () => void }>;
   /** Shows while a page loads, in place of the spinner. */
   LoadingIndicator?: ComponentType;
+  /** Claude beside the page, in place of the default panel. */
+  AssistantPanel?: ComponentType;
   /** Opens settings in a window over the page, which stays as it was, instead of as pages. */
   SettingsWindow?: ComponentType;
   icons: "lucide" | "symbols";

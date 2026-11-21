@@ -239,12 +239,12 @@ function BoardColumn({
     <section
       aria-label={group.label}
       data-over={isOver || undefined}
-      className="bg-muted data-over:border-primary/5-10 dank:border-transparent dank:data-over:border-m3-primary flex w-72 shrink-0 flex-col rounded-lg border"
+      className="bg-muted data-over:border-primary/5-10 dux:border-transparent dux:data-over:border-m3-primary flex w-72 shrink-0 flex-col rounded-lg border"
     >
-      <header className="dank:h-12 dank:pl-4 flex h-10 items-center gap-2 pr-1 pl-3 text-sm">
+      <header className="dux:h-12 dux:pl-4 flex h-10 items-center gap-2 pr-1 pl-3 text-sm">
         <GroupIcon meta={group.meta} />
-        <span className="dank:type-title-small min-w-0 truncate font-medium">{group.label}</span>
-        <span className="text-muted-foreground dank:type-label-large text-xs">
+        <span className="dux:type-title-small min-w-0 truncate font-medium">{group.label}</span>
+        <span className="text-muted-foreground dux:type-label-large text-xs">
           {group.issues.length}
         </span>
         <span className="flex-1" />

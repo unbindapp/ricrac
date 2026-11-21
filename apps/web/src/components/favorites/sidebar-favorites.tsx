@@ -137,7 +137,7 @@ function FavoriteItem({ favorite, onNavigate }: { favorite: TFavorite } & TProps
         size="sm"
         forceMinSize={false}
         onClick={onNavigate}
-        className={`${sidebarItemClassName} ${sidebarActiveItemClassName} pr-8 dank:pr-8`}
+        className={`${sidebarItemClassName} ${sidebarActiveItemClassName} dux:pr-8 pr-8`}
       >
         <span className="text-muted-foreground flex size-4 shrink-0 items-center justify-center">
           {target.icon}

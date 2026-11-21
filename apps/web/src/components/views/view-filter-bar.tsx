@@ -149,8 +149,8 @@ function ConditionChip({
   };
 
   return (
-    <div className="bg-background dank:h-8 dank:rounded-sm dank:bg-transparent dank:type-label-large flex h-7 items-center overflow-hidden rounded-md border text-xs">
-      <span className="text-muted-foreground dank:pl-4 flex h-full items-center px-2">
+    <div className="bg-background dux:h-8 dux:rounded-sm dux:bg-transparent dux:type-label-large flex h-7 items-center overflow-hidden rounded-md border text-xs">
+      <span className="text-muted-foreground dux:pl-4 flex h-full items-center px-2">
         {fieldLabels[condition.field]}
       </span>
       {canNegate ? (
@@ -162,7 +162,7 @@ function ConditionChip({
                 variant="ghost"
                 size="sm"
                 forceMinSize={false}
-                className="dank:border-l-0 dank:type-label-large h-full rounded-none border-l px-2 text-xs font-normal"
+                className="dux:border-l-0 dux:type-label-large h-full rounded-none border-l px-2 text-xs font-normal"
               >
                 {opLabel(condition)}
               </Button>
@@ -182,7 +182,7 @@ function ConditionChip({
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
-        <span className="text-muted-foreground dank:border-l-0 flex h-full items-center border-l px-2">
+        <span className="text-muted-foreground dux:border-l-0 flex h-full items-center border-l px-2">
           is
         </span>
       )}
@@ -201,7 +201,7 @@ function ConditionChip({
               size="sm"
               forceMinSize={false}
               data-empty={condition.values.length === 0 || undefined}
-              className="data-empty:text-muted-foreground dank:border-l-0 dank:type-label-large h-full max-w-56 rounded-none border-l px-2 text-xs font-medium"
+              className="data-empty:text-muted-foreground dux:border-l-0 dux:type-label-large h-full max-w-56 rounded-none border-l px-2 text-xs font-medium"
             >
               {label.icon}
               <span className="truncate">{label.text}</span>
@@ -224,7 +224,7 @@ function ConditionChip({
           forceMinSize={false}
           aria-label={`Remove the ${fieldLabels[condition.field].toLowerCase()} filter`}
           onClick={() => onChange(null)}
-          className="text-muted-foreground dank:h-full dank:border-l-0 dank:[&>svg]:size-4.5 size-7 rounded-none border-l"
+          className="text-muted-foreground dux:h-full dux:border-l-0 dux:[&>svg]:size-4.5 size-7 rounded-none border-l"
         >
           <XIcon className="size-3.5" />
         </Button>

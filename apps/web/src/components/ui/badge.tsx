@@ -3,25 +3,25 @@ import * as React from "react";
 
 import { cn } from "@/components/ui/utils";
 
-const dankChip =
-  "dank:h-8 dank:gap-2 dank:rounded-sm dank:px-4 dank:type-label-large dank:has-[>svg]:pl-2 dank:[&_svg]:size-4.5";
+const duxChip =
+  "dux:h-8 dux:gap-2 dux:rounded-sm dux:px-4 dux:type-label-large dux:has-[>svg]:pl-2 dux:[&_svg]:size-4.5";
 
-const dankOutlinedChip = `${dankChip} dank:border-m3-outline-variant dank:bg-transparent`;
+const duxOutlinedChip = `${duxChip} dux:border-m3-outline-variant dux:bg-transparent`;
 
 const badgeVariants = cva(
   "inline-flex h-5 max-w-full shrink-0 items-center gap-1 rounded-full border px-2 text-xs leading-none font-medium whitespace-nowrap [&_svg]:size-3.5 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: `bg-primary text-primary-foreground border-transparent ${dankChip} dank:bg-m3-secondary-container dank:text-m3-on-secondary-container`,
-        outline: `text-foreground bg-background ${dankOutlinedChip} dank:text-m3-on-surface`,
-        muted: `bg-muted text-muted-foreground border-transparent ${dankOutlinedChip} dank:text-m3-on-surface-variant`,
-        destructive: `text-destructive bg-destructive/3-10 border-destructive/5-10 ${dankOutlinedChip}`,
-        warning: `text-warning bg-warning/3-10 border-warning/5-10 ${dankOutlinedChip}`,
-        success: `text-success bg-success/3-10 border-success/5-10 ${dankOutlinedChip}`,
-        process: `text-process bg-process/3-10 border-process/5-10 ${dankOutlinedChip}`,
+        default: `bg-primary text-primary-foreground border-transparent ${duxChip} dux:bg-m3-secondary-container dux:text-m3-on-secondary-container`,
+        outline: `text-foreground bg-background ${duxOutlinedChip} dux:text-m3-on-surface`,
+        muted: `bg-muted text-muted-foreground border-transparent ${duxOutlinedChip} dux:text-m3-on-surface-variant`,
+        destructive: `text-destructive bg-destructive/3-10 border-destructive/5-10 ${duxOutlinedChip}`,
+        warning: `text-warning bg-warning/3-10 border-warning/5-10 ${duxOutlinedChip}`,
+        success: `text-success bg-success/3-10 border-success/5-10 ${duxOutlinedChip}`,
+        process: `text-process bg-process/3-10 border-process/5-10 ${duxOutlinedChip}`,
         count:
-          "bg-muted text-muted-foreground dank:h-4 dank:min-w-4 dank:justify-center dank:border-0 dank:bg-m3-error dank:px-1 dank:type-label-small dank:text-m3-on-error border-transparent",
+          "bg-muted text-muted-foreground dux:h-4 dux:min-w-4 dux:justify-center dux:border-0 dux:bg-m3-error dux:px-1 dux:type-label-small dux:text-m3-on-error border-transparent",
       },
     },
     defaultVariants: { variant: "outline" },

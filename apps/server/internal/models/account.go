@@ -19,9 +19,9 @@ type WorkspaceSummary struct {
 	URLKey  string    `json:"urlKey"`
 	Role    string    `json:"role"`
 	LogoURL *string   `json:"logoUrl"`
-	Theme   string    `json:"theme" enum:"default,dank" doc:"The look of the web app for everyone in the workspace."`
+	Theme   string    `json:"theme" enum:"default,dux" doc:"The look of the web app for everyone in the workspace."`
 	// Their own pick in this workspace, over theme; null follows it.
-	OwnTheme *string `json:"ownTheme" enum:"default,dank"`
+	OwnTheme *string `json:"ownTheme" enum:"default,dux"`
 	// They may ask Claude here.
 	Assistant bool `json:"assistant"`
 	// They may turn Claude on here and pick who uses it.

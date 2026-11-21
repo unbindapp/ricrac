@@ -1,0 +1,781 @@
+/* The forum in one card: a 56px bar over a content card holding the list, or the open post and its
+   chat in the list's place. */
+:root[data-ui-theme="dux"] {
+  & :is([data-slot="forum-list"], [data-slot="forum-detail"], [data-slot="discussion-panel"]) {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  & [data-slot="forum-detail"] {
+    animation: post-in 320ms var(--ease-emphasized) both;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  & :is([data-slot="dux-pane-head"], [data-slot="post-head"]) {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    height: 56px;
+    padding: 0 8px;
+
+    & button[data-slot="dux-filter-button"],
+    & [data-slot="post-actions"] > button,
+    & [data-slot="post-back"] {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      color: var(--m3-on-surface-variant);
+
+      &:active {
+        border-radius: 8px;
+      }
+
+      & > svg {
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    & button[aria-pressed="true"],
+    & button[data-slot="dux-filter-button"][aria-expanded="true"] {
+      background: var(--m3-secondary-container);
+      color: var(--m3-on-secondary-container);
+    }
+  }
+
+  & :is([data-slot="dux-pane-title"], [data-slot="post-head-title"]),
+  & [data-slot="post-head"] [data-m3-title] {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    padding: 0 4px 0 12px;
+    overflow: hidden;
+    color: var(--m3-on-surface);
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  & [data-slot="post-back"] + :is([data-slot="post-head-title"], [data-m3-title]) {
+    padding-left: 4px;
+  }
+
+  & [data-slot="post-head"] [data-m3-title] textarea[data-variant="title"] {
+    --text-2xl: 18px;
+    --text-2xl--line-height: 24px;
+    --tw-leading: 24px;
+    max-width: 100%;
+    font-weight: 500;
+  }
+
+  & [data-slot="post-actions"] {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 4px;
+  }
+
+  & [data-slot="dux-pane-main"] {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    padding: 16px;
+    overflow-y: auto;
+    border-radius: 20px 20px 0 0;
+    background: var(--dux-content);
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  /* Filter chips in one row that scrolls sideways, with room for their focus rings. */
+  & [data-slot="dux-chips"] {
+    display: flex;
+    flex: none;
+    flex-wrap: nowrap;
+    gap: 8px;
+    margin: -6px -6px 0;
+    padding: 6px 6px 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    animation: dux-chips-in 221ms cubic-bezier(0.05, 0.7, 0.1, 1);
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  & [data-slot="dux-chip-group"] {
+    display: flex;
+    flex: none;
+    gap: 8px;
+
+    & + & {
+      padding-left: 8px;
+      border-left: 1px solid var(--m3-outline-variant);
+    }
+  }
+
+  & [data-slot="dux-chip"] {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid var(--m3-outline);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--m3-on-surface);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: 0.1px;
+    white-space: nowrap;
+    transition:
+      background-color var(--spring-default-effects-duration) var(--ease-spring-default-effects),
+      border-color var(--spring-default-effects-duration) var(--ease-spring-default-effects),
+      border-radius var(--spring-default-effects-duration) var(--ease-spring-default-effects);
+
+    &::after {
+      display: none;
+    }
+
+    & > svg {
+      width: 16px;
+      height: 16px;
+      margin-left: -4px;
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        background: color-mix(in srgb, var(--m3-on-surface) 8%, transparent);
+      }
+    }
+
+    &[aria-pressed="true"] {
+      border-color: transparent;
+      background: var(--m3-secondary-container);
+      color: var(--m3-on-secondary-container);
+
+      @media (hover: hover) {
+        &:hover {
+          background: color-mix(
+            in srgb,
+            var(--m3-secondary-container) 88%,
+            var(--m3-on-secondary-container)
+          );
+        }
+      }
+    }
+
+    &:active {
+      border-radius: 4px;
+    }
+  }
+
+  /* Discussions as an M3 list: rows 2px apart, rounder at the ends of the list. */
+  & [data-slot="forum-list"] [data-slot="list"] {
+    gap: 2px;
+  }
+
+  & [data-slot="list"] > [data-slot="forum-card"] {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    min-height: 88px;
+    padding: 12px 16px;
+    border-radius: 4px;
+    background: var(--dux-panel);
+    color: var(--m3-on-surface);
+    text-align: left;
+    transition: background-color var(--spring-default-effects-duration)
+      var(--ease-spring-default-effects);
+
+    &::after {
+      display: none;
+    }
+
+    &[data-index="0"] {
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+    }
+
+    &:last-child {
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        background: color-mix(in srgb, var(--m3-on-surface) 8%, var(--dux-panel));
+      }
+    }
+
+    &[data-closed] [data-slot="forum-card-title"] {
+      color: var(--m3-on-surface-variant);
+    }
+  }
+
+  & [data-slot="forum-thumb"] {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    overflow: hidden;
+    border-radius: 12px;
+    background: var(--m3-primary-container);
+    color: var(--m3-on-primary-container);
+
+    & svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    & :is(img, video) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  & [data-slot="forum-card-text"] {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  & [data-slot="forum-card-title"] {
+    overflow: hidden;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: 0.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  & [data-slot="forum-card-meta"] {
+    display: block;
+    overflow: hidden;
+    color: var(--m3-on-surface-variant);
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    & svg {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      margin-right: 4px;
+      vertical-align: -3px;
+      color: var(--m3-primary);
+    }
+  }
+
+  & [data-slot="forum-card-tags"] {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    overflow: hidden;
+
+    & > :is([data-tag], [data-slot="tags-more"]) {
+      display: inline-flex;
+      flex: none;
+      align-items: center;
+      height: 24px;
+      padding: 0 10px;
+      border-radius: 12px;
+      background: var(--m3-secondary-container);
+      color: var(--m3-on-secondary-container);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 16px;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    & > [data-overflow] {
+      display: none;
+    }
+  }
+
+  & [data-slot="forum-card-trail"] {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    color: var(--m3-on-surface-variant);
+  }
+
+  & [data-slot="upvote-chip"] {
+    gap: 4px;
+    height: 24px;
+    padding: 0 8px;
+    border-radius: 12px;
+    background: var(--m3-secondary-container);
+    color: var(--m3-on-secondary-container);
+    font-size: 12px;
+    font-weight: 500;
+
+    &[aria-pressed="true"] {
+      background: var(--m3-primary);
+      color: var(--m3-on-primary);
+    }
+  }
+
+  &
+    [data-slot="discussion-panel"]
+    > :is([data-slot="discussion-chat"], [data-slot="thread-view"], [data-slot="dux-pane-main"]) {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: 20px 20px 0 0;
+    background: var(--dux-content);
+  }
+
+  & [data-slot="discussion-post"] {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+
+    & [data-slot="post-body"] .rr-prose {
+      color: var(--m3-on-surface);
+      font-size: 16px;
+      line-height: 24px;
+      letter-spacing: 0.5px;
+    }
+
+    & .rr-embed {
+      max-width: min(100%, 520px);
+
+      & > button {
+        border-radius: 12px;
+      }
+    }
+
+    & .rr-embed .rr-media {
+      max-height: 360px;
+      border: 0;
+      border-radius: 12px;
+    }
+  }
+
+  & [data-slot="discussion-cover"] {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    margin-bottom: 20px;
+    overflow: hidden;
+    aspect-ratio: 16 / 7;
+    border-radius: 16px;
+    background: var(--m3-primary-container);
+    color: var(--m3-on-primary-container);
+
+    & svg {
+      width: 48px;
+      height: 48px;
+    }
+
+    & img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  & [data-slot="post-by"] {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+    min-width: 0;
+    color: var(--m3-on-surface-variant);
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+
+    & > [data-slot="avatar"] {
+      width: 20px;
+      height: 20px;
+      font-size: 10px;
+    }
+
+    & :is([data-slot="upvote-chip"], [data-slot="status-chip"]) {
+      height: 20px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+
+    & [data-slot="status-chip"] {
+      gap: 4px;
+      padding: 0 8px 0 6px;
+
+      & svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+
+    & [data-slot="byline-people"] [data-slot="avatar"] {
+      width: 20px;
+      height: 20px;
+      font-size: 10px;
+    }
+  }
+
+  & [data-slot="post-author"] {
+    color: var(--m3-on-surface);
+    font-weight: 500;
+  }
+
+  & [data-slot="op-badge"] {
+    padding: 0 6px;
+    border-radius: 6px;
+    background-color: var(--m3-primary-container);
+    color: var(--m3-on-primary-container);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 16px;
+  }
+
+  & [data-slot="discussion-post"] > [data-slot="post-tags"] {
+    margin: 16px 0 20px;
+  }
+
+  & [data-slot="post-chat-title"] {
+    margin: 16px 0 0;
+    padding-top: 16px;
+    border-top: 1px solid var(--m3-outline-variant);
+    color: var(--m3-on-surface);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: 0.1px;
+  }
+
+  & [data-slot="discussion-chat"] {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+
+    & > section,
+    & [data-slot="chat-layout"],
+    & [data-slot="chat-layout"] > div {
+      border-radius: 0;
+      background-color: transparent;
+    }
+
+    & [data-slot="chat-layout"] {
+      gap: 12px;
+    }
+
+    & [data-slot="panel-bar"] {
+      height: auto;
+      padding: 0;
+      border-radius: 0;
+      background-color: transparent;
+    }
+
+    & [data-slot="chat-column"] {
+      gap: 16px;
+      width: 100%;
+      max-width: 768px;
+      margin-inline: auto;
+      padding: 24px;
+    }
+
+    & [data-slot="chat-composer"] {
+      padding: 8px 16px 16px;
+    }
+  }
+
+  & [data-slot="message-media"]:not([data-count="1"]) {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    width: 28rem;
+    max-width: 100%;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+
+    &:is([data-count="2"], [data-count="4"]) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    & .rr-embed {
+      width: 100%;
+      max-width: none;
+    }
+
+    & .rr-media {
+      width: 100%;
+      max-height: none;
+      aspect-ratio: 1;
+      border: 0;
+      border-radius: var(--radius-xs);
+      object-fit: cover;
+    }
+  }
+
+  & [data-slot="byline"] {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    color: var(--m3-on-surface-variant);
+    font-size: 13px;
+    line-height: 1.25rem;
+
+    & b {
+      color: var(--m3-on-surface);
+      font-weight: 600;
+    }
+
+    & > [data-slot="avatar"] {
+      width: 24px;
+      height: 24px;
+      font-size: 11px;
+    }
+  }
+
+  & [data-slot="byline-people"] {
+    display: flex;
+    margin-left: auto;
+    padding-left: 8px;
+  }
+
+  & [data-slot="byline-people"] [data-slot="avatar"] {
+    width: 24px;
+    height: 24px;
+    margin-left: -8px;
+    box-shadow: 0 0 0 2px var(--m3-surface-container-low);
+    font-size: 11px;
+  }
+
+  & [data-slot="status-chip"] {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 12px 0 8px;
+    border-radius: 14px;
+    background-color: var(--m3-surface-container-high);
+    color: var(--m3-on-surface-variant);
+    font-size: 13px;
+    font-weight: 500;
+
+    & svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    &[data-resolved] {
+      background-color: var(--m3-secondary-container);
+      color: var(--m3-on-secondary-container);
+    }
+  }
+
+  & [data-slot="post-tags"] {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+
+  & [data-slot="tag-chip"] {
+    display: inline-flex;
+    align-items: center;
+    height: 24px;
+    padding: 0 8px;
+    border-radius: 6px;
+    background-color: var(--m3-surface-variant);
+    color: var(--m3-on-surface-variant);
+    font-size: 12px;
+    font-weight: 500;
+
+    @media (hover: hover) {
+      &:hover [data-slot="tag-remove"] {
+        width: 20px;
+        margin-left: 4px;
+        opacity: 1;
+      }
+    }
+
+    &:focus-within [data-slot="tag-remove"] {
+      width: 20px;
+      margin-left: 4px;
+      opacity: 1;
+    }
+  }
+
+  & [data-slot="tag-remove"] {
+    width: 0;
+    height: 20px;
+    margin: 0;
+    overflow: hidden;
+    border-radius: 50%;
+    color: var(--m3-on-surface-variant);
+    opacity: 0;
+    transition:
+      width 0.12s,
+      opacity 0.12s,
+      margin 0.12s;
+
+    & svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  & [data-slot="tag-add"] {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    color: var(--m3-on-surface-variant);
+
+    &::after {
+      display: none;
+    }
+
+    & svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        background-color: var(--m3-surface-container-low);
+        color: var(--m3-on-surface);
+      }
+    }
+  }
+
+  & [data-slot="thread-head"] {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--m3-surface-variant);
+    animation: thread-in 0.22s ease;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  & [data-slot="thread-head-top"] {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  & [data-slot="thread-kind-chip"] [data-picker="compact"] {
+    gap: 6px;
+    height: 28px;
+    min-height: 28px;
+    padding: 0 12px 0 8px;
+    border: 0;
+    border-radius: 14px;
+    background-color: var(--thread-container);
+    color: var(--thread-on-container);
+    font-size: 13px;
+    font-weight: 500;
+
+    & svg {
+      width: 18px;
+      height: 18px;
+      color: inherit;
+    }
+  }
+
+  & [data-slot="resolve-button"] {
+    gap: 6px;
+    height: 36px;
+    margin-left: auto;
+    padding: 0 16px 0 12px;
+    border-radius: 18px;
+    font-size: 14px;
+
+    & svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    &[data-resolved] {
+      background-color: var(--m3-surface-container-high);
+      color: var(--m3-on-surface);
+    }
+  }
+
+  & [data-slot="thread-title"] textarea[data-variant="title"] {
+    --text-2xl: 22px;
+    --text-2xl--line-height: 1.75rem;
+    --tw-leading: 1.75rem;
+    font-weight: 500;
+  }
+}
+
+@keyframes post-in {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes thread-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes dux-chips-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

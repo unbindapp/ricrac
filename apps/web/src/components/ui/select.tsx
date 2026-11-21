@@ -3,11 +3,11 @@ import * as React from "react";
 
 import { CheckIcon, ChevronDownIcon, ChevronsUpDownIcon } from "@/components/icons";
 import {
-  dankMenuContainerClassName,
-  dankMenuItemClassName,
-  dankMenuItemDisabledClassName,
-  dankMenuItemShapeClassName,
-  dankPopupMotionClassName,
+  duxMenuContainerClassName,
+  duxMenuItemClassName,
+  duxMenuItemDisabledClassName,
+  duxMenuItemShapeClassName,
+  duxPopupMotionClassName,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/components/ui/utils";
 
@@ -26,15 +26,15 @@ function SelectTrigger({
       data-focus-indicator="child"
       className={cn(
         "group/select bg-input has-hover:hover:ring-border focus-visible:ring-primary/8-10 aria-invalid:border-destructive/8-10 flex h-8 w-full min-w-0 items-center justify-between gap-2 rounded-md border px-2.5 text-left text-sm select-none focus-visible:ring-1 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50 has-hover:hover:ring-1 data-[size=sm]:h-7 data-[size=sm]:px-2 [&_svg]:pointer-events-none [&_svg]:shrink-0",
-        "dank:type-body-large dank:text-m3-on-surface dank:border-m3-outline dank:has-hover:hover:border-m3-on-surface dank:focus-visible:border-m3-primary dank:focus-visible:ring-m3-primary dank:aria-invalid:border-m3-error dank:aria-invalid:ring-m3-error dank:disabled:border-m3-on-surface/12 dank:disabled:text-m3-on-surface/38 dank:h-14 dank:gap-1 dank:rounded-xs dank:bg-transparent dank:pr-3 dank:pl-4 dank:transition-[border-color,box-shadow] dank:focus-visible:ring-1 dank:focus-visible:ring-inset dank:disabled:opacity-100 dank:has-hover:hover:ring-0 dank:has-hover:hover:focus-visible:ring-1 dank:data-[size=sm]:type-body-medium dank:data-[size=sm]:h-10 dank:data-[size=sm]:pr-2 dank:data-[size=sm]:pl-3",
+        "dux:type-body-large dux:text-m3-on-surface dux:border-m3-outline dux:has-hover:hover:border-m3-on-surface dux:focus-visible:border-m3-primary dux:focus-visible:ring-m3-primary dux:aria-invalid:border-m3-error dux:aria-invalid:ring-m3-error dux:disabled:border-m3-on-surface/12 dux:disabled:text-m3-on-surface/38 dux:h-14 dux:gap-1 dux:rounded-xs dux:bg-transparent dux:pr-3 dux:pl-4 dux:transition-[border-color,box-shadow] dux:focus-visible:ring-1 dux:focus-visible:ring-inset dux:disabled:opacity-100 dux:has-hover:hover:ring-0 dux:has-hover:hover:focus-visible:ring-1 dux:data-[size=sm]:type-body-medium dux:data-[size=sm]:h-10 dux:data-[size=sm]:pr-2 dux:data-[size=sm]:pl-3",
         className,
       )}
       {...props}
     >
       {children}
-      <SelectPrimitive.Icon className="text-muted-foreground dank:text-m3-on-surface-variant dank:group-aria-invalid/select:text-m3-error">
-        <ChevronsUpDownIcon className="dank:hidden size-3.5" />
-        <ChevronDownIcon className="dank:block dank:group-data-[size=sm]/select:size-5 dank:group-data-popup-open/select:rotate-180 dank:transition-transform dank:duration-(--spring-fast-spatial-duration) dank:ease-spring-fast-spatial hidden size-6" />
+      <SelectPrimitive.Icon className="text-muted-foreground dux:text-m3-on-surface-variant dux:group-aria-invalid/select:text-m3-error">
+        <ChevronsUpDownIcon className="dux:hidden size-3.5" />
+        <ChevronDownIcon className="dux:block dux:group-data-[size=sm]/select:size-5 dux:group-data-popup-open/select:rotate-180 dux:transition-transform dux:duration-(--spring-fast-spatial-duration) dux:ease-spring-fast-spatial hidden size-6" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   );
@@ -76,13 +76,13 @@ function SelectContent({
           data-focus-indicator="child"
           className={cn(
             "bg-popover text-popover-foreground shadow-shadow-color/shadow-opacity flex max-h-[min(24rem,var(--available-height))] min-w-(--anchor-width) origin-(--transform-origin) flex-col overflow-hidden rounded-lg border shadow-lg outline-hidden",
-            dankMenuContainerClassName,
-            dankPopupMotionClassName,
+            duxMenuContainerClassName,
+            duxPopupMotionClassName,
             className,
           )}
           {...props}
         >
-          <SelectPrimitive.List className="dank:px-0 dank:py-0.5 flex flex-col overflow-y-auto p-1">
+          <SelectPrimitive.List className="dux:p-2 dux:gap-0.5 flex flex-col overflow-y-auto p-1">
             {children}
           </SelectPrimitive.List>
         </SelectPrimitive.Popup>
@@ -98,19 +98,19 @@ function SelectItem({ className, children, ...props }: SelectPrimitive.Item.Prop
       data-focus-indicator="child"
       className={cn(
         "data-highlighted:bg-accent data-highlighted:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-md py-1.5 pr-8 pl-2 text-sm leading-tight outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
-        dankMenuItemClassName,
-        dankMenuItemShapeClassName,
-        dankMenuItemDisabledClassName,
-        "dank:data-selected:bg-m3-tertiary-container dank:data-selected:text-m3-on-tertiary-container dank:data-selected:rounded-md dank:data-selected:[--menu-icon:currentColor] dank:pr-12",
+        duxMenuItemClassName,
+        duxMenuItemShapeClassName,
+        duxMenuItemDisabledClassName,
+        "dux:data-selected:bg-m3-tertiary-container dux:data-selected:text-m3-on-tertiary-container dux:data-selected:rounded-md dux:data-selected:[--menu-icon:currentColor] dux:pr-12",
         className,
       )}
       {...props}
     >
-      <SelectPrimitive.ItemText className="dank:gap-3 dank:[&>svg]:size-5 dank:[&>svg]:text-(--menu-icon) flex min-w-0 flex-1 items-center gap-1.5">
+      <SelectPrimitive.ItemText className="dux:gap-3 dux:[&>svg]:size-5 dux:[&>svg]:text-(--menu-icon) flex min-w-0 flex-1 items-center gap-1.5">
         {children}
       </SelectPrimitive.ItemText>
-      <SelectPrimitive.ItemIndicator className="dank:right-4 absolute right-2 flex items-center">
-        <CheckIcon className="dank:size-5 size-4" />
+      <SelectPrimitive.ItemIndicator className="dux:right-4 absolute right-2 flex items-center">
+        <CheckIcon className="dux:size-5 size-4" />
       </SelectPrimitive.ItemIndicator>
     </SelectPrimitive.Item>
   );
@@ -120,7 +120,7 @@ function SelectGroupLabel({ className, ...props }: SelectPrimitive.GroupLabel.Pr
   return (
     <SelectPrimitive.GroupLabel
       className={cn(
-        "text-muted-foreground dank:min-h-8 dank:py-1.5 dank:pr-1 dank:pl-3 dank:type-label-large dank:text-m3-on-surface px-2 py-1 text-xs font-medium",
+        "text-muted-foreground dux:min-h-8 dux:py-1.5 dux:pr-1 dux:pl-3 dux:type-label-large dux:text-m3-on-surface px-2 py-1 text-xs font-medium",
         className,
       )}
       {...props}
@@ -132,7 +132,7 @@ function SelectSeparator({ className, ...props }: SelectPrimitive.Separator.Prop
   return (
     <SelectPrimitive.Separator
       className={cn(
-        "bg-border dank:mx-3 dank:my-0.5 dank:bg-m3-outline-variant -mx-1 my-1 h-px",
+        "bg-border dux:mx-3 dux:my-0.5 dux:bg-m3-outline-variant -mx-1 my-1 h-px",
         className,
       )}
       {...props}

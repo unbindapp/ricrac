@@ -89,7 +89,7 @@ export function ChatLayout({
       <ChatReplyContext value={{ replyingTo, setReplyingTo }}>
         <div
           data-slot="chat-layout"
-          className="dank:gap-3 dank:bg-sidebar flex min-h-0 w-full flex-1 flex-col"
+          className="dux:gap-3 dux:bg-sidebar flex min-h-0 w-full flex-1 flex-col"
         >
           {bar && separatesBars && (
             <div
@@ -111,7 +111,7 @@ export function ChatLayout({
           {!lead && header}
           <div
             data-slot="chat-body"
-            className="dank:rounded-lg dank:bg-background flex min-h-0 flex-1 flex-col overflow-hidden"
+            className="dux:rounded-lg dux:bg-background flex min-h-0 flex-1 flex-col overflow-hidden"
           >
             <div
               ref={scrollRef}

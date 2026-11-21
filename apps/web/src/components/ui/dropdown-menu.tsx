@@ -29,27 +29,27 @@ function DropdownMenuTrigger({ ...props }: MenuPrimitive.Trigger.Props) {
   return <MenuPrimitive.Trigger data-slot="dropdown-menu-trigger" {...props} />;
 }
 
-export const dankMenuItemClassName =
-  "dank:relative dank:mx-1 dank:min-h-11 dank:gap-3 dank:rounded-xs dank:px-4 dank:py-2 dank:type-body-large dank:state-layer dank:[--accent:transparent] dank:[--menu-icon:var(--m3-on-surface-variant)] dank:[&.text-destructive]:[--menu-icon:currentColor] dank:[&>svg]:size-5 dank:[&>svg]:text-(--menu-icon) dank:transition-[border-radius,background-color] dank:duration-(--spring-fast-spatial-duration) dank:ease-spring-fast-spatial dank:focus-visible:outline-solid dank:focus-visible:outline-3 dank:focus-visible:-outline-offset-3 dank:focus-visible:outline-m3-secondary";
+export const duxMenuItemClassName =
+  "dux:relative dux:bg-(--dux-item) dux:min-h-11 dux:gap-3 dux:rounded-xs dux:px-4 dux:py-2 dux:type-body-large dux:state-layer dux:[--accent:transparent] dux:[--menu-icon:var(--m3-on-surface-variant)] dux:[&.text-destructive]:[--menu-icon:currentColor] dux:[&>svg]:size-5 dux:[&>svg]:text-(--menu-icon) dux:transition-[border-radius,background-color] dux:duration-(--spring-fast-spatial-duration) dux:ease-spring-fast-spatial dux:focus-visible:outline-solid dux:focus-visible:outline-3 dux:focus-visible:-outline-offset-3 dux:focus-visible:outline-m3-secondary";
 
-export const dankMenuItemShapeClassName =
-  "dank:[&:not(:is([role^=menuitem],[role=option])~&)]:rounded-t-md dank:[&:not(:has(~:is([role^=menuitem],[role=option])))]:rounded-b-md";
+export const duxMenuItemShapeClassName =
+  "dux:[&:not(:is([role^=menuitem],[role=option])~&)]:rounded-t-md dux:[&:not(:has(~:is([role^=menuitem],[role=option])))]:rounded-b-md";
 
-export const dankMenuItemDisabledClassName =
-  "dank:data-disabled:opacity-100 dank:data-disabled:text-m3-on-surface/38 dank:data-disabled:[--menu-icon:currentColor]";
+export const duxMenuItemDisabledClassName =
+  "dux:data-disabled:opacity-100 dux:data-disabled:text-m3-on-surface/38 dux:data-disabled:[--menu-icon:currentColor]";
 
-export const dankMenuContainerClassName =
-  "dank:bg-m3-surface-container-low dank:text-m3-on-surface dank:rounded-lg dank:border-0 dank:shadow-elevation-2 dank:[--tw-shadow-color:initial]";
+export const duxMenuContainerClassName =
+  "dux:bg-popover dux:text-m3-on-surface dux:rounded-lg dux:border-0 dux:shadow-elevation-2 dux:[--tw-shadow-color:initial]";
 
-export const dankPopupMotionClassName =
-  "dank:popup-motion dank:data-open:animate-none dank:data-closed:animate-none";
+export const duxPopupMotionClassName =
+  "dux:popup-motion dux:data-open:animate-none dux:data-closed:animate-none";
 
 export const dropdownContentVariants = cva(
-  "bg-popover text-popover-foreground shadow-shadow-color/shadow-opacity flex max-h-[min(30rem,var(--available-height))] max-w-(--available-width) origin-(--transform-origin) flex-col overflow-hidden rounded-lg border p-0 shadow-lg outline-none dank:w-max dank:min-w-28 dank:max-w-[min(17.5rem,var(--available-width))] dank:gap-0.5 dank:overflow-visible dank:rounded-none dank:border-0 dank:bg-transparent dank:p-0 dank:text-m3-on-surface dank:shadow-none",
+  "bg-popover text-popover-foreground shadow-shadow-color/shadow-opacity flex max-h-[min(30rem,var(--available-height))] max-w-(--available-width) origin-(--transform-origin) flex-col overflow-hidden rounded-lg border p-0 shadow-lg outline-none dux:w-max dux:min-w-28 dux:max-w-[min(17.5rem,var(--available-width))] dux:gap-0.5 dux:overflow-y-auto dux:rounded-lg dux:border-0 dux:bg-popover dux:p-1 dux:text-m3-on-surface dux:shadow-elevation-2 dux:[--tw-shadow-color:initial]",
   {
     variants: {
       animate: {
-        default: `data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 ${dankPopupMotionClassName}`,
+        default: `data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 ${duxPopupMotionClassName}`,
         false: "",
       },
     },
@@ -130,13 +130,13 @@ function menuSegments(children: React.ReactNode) {
 
 function MenuPopupChildren({ children }: { children: React.ReactNode }) {
   const { id } = useUiTheme();
-  if (id !== "dank") return children;
+  if (id !== "dux") return children;
   return menuSegments(children).map((segment, index) => (
     <div
       key={index}
       role="none"
       data-slot="dropdown-menu-segment"
-      className="bg-m3-surface-container-low shadow-elevation-2 flex min-h-0 flex-col overflow-y-auto rounded-sm py-0.5 first:rounded-t-lg last:rounded-b-lg"
+      className="flex shrink-0 flex-col gap-0.5 p-1"
     >
       {segment}
     </div>
@@ -147,7 +147,7 @@ function DropdownMenuGroup({ className, ...props }: MenuPrimitive.Group.Props) {
   return (
     <MenuPrimitive.Group
       data-slot="dropdown-menu-group"
-      className={cn("dank:p-0 p-1", className)}
+      className={cn("dux:p-0 p-1", className)}
       {...props}
     />
   );
@@ -165,7 +165,7 @@ function DropdownMenuLabel({
       data-slot="dropdown-menu-label"
       data-inset={inset}
       className={cn(
-        "text-muted-foreground dank:min-h-8 dank:py-1.5 dank:pr-1 dank:pl-3 dank:type-label-large dank:text-m3-on-surface px-2 py-1 text-xs font-medium data-inset:pl-8",
+        "text-muted-foreground dux:min-h-8 dux:py-1.5 dux:pr-1 dux:pl-3 dux:type-label-large dux:text-m3-on-surface px-2 py-1 text-xs font-medium data-inset:pl-8",
         className,
       )}
       {...props}
@@ -194,10 +194,10 @@ function DropdownMenuItem({
       data-focus-indicator="child"
       className={cn(
         "active:bg-accent data-highlighted:bg-accent data-highlighted:text-accent-foreground relative flex cursor-default items-center justify-start gap-2 rounded-md px-2 py-1.5 text-sm leading-tight outline-hidden select-none data-disabled:pointer-events-none data-inset:pl-8 [&>svg]:shrink-0",
-        dankMenuItemClassName,
-        dankMenuItemShapeClassName,
-        "dank:data-inset:pl-12 dank:data-checked:rounded-md dank:data-checked:bg-m3-tertiary-container dank:data-checked:text-m3-on-tertiary-container dank:data-checked:[--menu-icon:currentColor]",
-        fadeOnDisabled && `data-disabled:opacity-50 ${dankMenuItemDisabledClassName}`,
+        duxMenuItemClassName,
+        duxMenuItemShapeClassName,
+        "dux:data-inset:pl-12 dux:data-checked:rounded-md dux:data-checked:bg-m3-tertiary-container dux:data-checked:text-m3-on-tertiary-container dux:data-checked:[--menu-icon:currentColor]",
+        fadeOnDisabled && `data-disabled:opacity-50 ${duxMenuItemDisabledClassName}`,
         className,
       )}
       {...props}
@@ -224,9 +224,9 @@ function DropdownMenuSubTrigger({
       data-focus-indicator="child"
       className={cn(
         "data-highlighted:bg-accent data-popup-open:bg-accent flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0",
-        dankMenuItemClassName,
-        dankMenuItemShapeClassName,
-        "dank:data-inset:pl-12",
+        duxMenuItemClassName,
+        duxMenuItemShapeClassName,
+        "dux:data-inset:pl-12",
         className,
       )}
       {...props}
@@ -270,15 +270,15 @@ function DropdownMenuCheckboxItem({
       data-focus-indicator="child"
       className={cn(
         "group/checkbox data-highlighted:bg-accent data-highlighted:text-accent-foreground relative flex cursor-default items-center justify-start rounded-md py-1.5 pr-2 pl-8 text-sm leading-tight outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50",
-        dankMenuItemClassName,
-        dankMenuItemShapeClassName,
-        dankMenuItemDisabledClassName,
+        duxMenuItemClassName,
+        duxMenuItemShapeClassName,
+        duxMenuItemDisabledClassName,
         className,
       )}
       checked={checked}
       {...props}
     >
-      <span className="border-muted-more-foreground group-data-checked/checkbox:bg-foreground group-data-checked/checkbox:text-background group-data-checked/checkbox:border-foreground dank:static dank:mx-px dank:size-4.5 dank:rounded-2px dank:border-2 dank:border-m3-on-surface-variant dank:p-0 dank:group-data-checked/checkbox:border-m3-primary dank:group-data-checked/checkbox:bg-m3-primary dank:group-data-checked/checkbox:text-m3-on-primary absolute left-2 flex size-4 shrink-0 items-center justify-center rounded-sm border p-px">
+      <span className="border-muted-more-foreground group-data-checked/checkbox:bg-foreground group-data-checked/checkbox:text-background group-data-checked/checkbox:border-foreground dux:static dux:mx-px dux:size-4.5 dux:rounded-2px dux:border-2 dux:border-m3-on-surface-variant dux:p-0 dux:group-data-checked/checkbox:border-m3-primary dux:group-data-checked/checkbox:bg-m3-primary dux:group-data-checked/checkbox:text-m3-on-primary absolute left-2 flex size-4 shrink-0 items-center justify-center rounded-sm border p-px">
         <MenuPrimitive.CheckboxItemIndicator className="size-full">
           <CheckIcon strokeWidth={3} className="size-full" />
         </MenuPrimitive.CheckboxItemIndicator>
@@ -293,7 +293,7 @@ function DropdownMenuRadioGroup({ className, ...props }: MenuPrimitive.RadioGrou
     <MenuPrimitive.RadioGroup
       data-slot="dropdown-menu-radio-group"
       className={cn(
-        "bg-background dank:gap-0 dank:rounded-none dank:border-0 dank:bg-transparent dank:p-0 gap-0.5 rounded-lg border p-1",
+        "bg-background dux:gap-0 dux:rounded-none dux:border-0 dux:bg-transparent dux:p-0 gap-0.5 rounded-lg border p-1",
         className,
       )}
       {...props}
@@ -313,19 +313,19 @@ function DropdownMenuRadioItem({
       data-focus-indicator="child"
       className={cn(
         "group/radio data-highlighted:bg-accent data-highlighted:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50",
-        dankMenuItemClassName,
-        dankMenuItemShapeClassName,
-        dankMenuItemDisabledClassName,
+        duxMenuItemClassName,
+        duxMenuItemShapeClassName,
+        duxMenuItemDisabledClassName,
         hideIndicator && "pl-2",
         className,
       )}
       {...props}
     >
       {!hideIndicator && (
-        <span className="dank:static dank:size-5 dank:rounded-full dank:border-2 dank:border-m3-on-surface-variant dank:group-data-checked/radio:border-m3-primary absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-          <MenuPrimitive.RadioItemIndicator className="dank:flex dank:items-center dank:justify-center">
-            <CircleIcon className="dank:hidden h-2 w-2 fill-current" />
-            <span className="bg-m3-primary dank:block hidden size-2.5 rounded-full" />
+        <span className="dux:static dux:size-5 dux:rounded-full dux:border-2 dux:border-m3-on-surface-variant dux:group-data-checked/radio:border-m3-primary absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+          <MenuPrimitive.RadioItemIndicator className="dux:flex dux:items-center dux:justify-center">
+            <CircleIcon className="dux:hidden h-2 w-2 fill-current" />
+            <span className="bg-m3-primary dux:block hidden size-2.5 rounded-full" />
           </MenuPrimitive.RadioItemIndicator>
         </span>
       )}
@@ -362,7 +362,7 @@ function DropdownMenuSeparator({ className, ...props }: MenuPrimitive.Separator.
     <MenuPrimitive.Separator
       data-slot="dropdown-menu-separator"
       className={cn(
-        "bg-border dank:mx-3 dank:my-0.5 dank:bg-m3-outline-variant pointer-events-none h-px shrink-0 rounded-full in-data-[slot=dropdown-menu-group]:-mx-1 in-data-[slot=dropdown-menu-group]:my-1 in-data-[slot=dropdown-menu-sub-content]:-mx-1 in-data-[slot=dropdown-menu-sub-content]:my-1",
+        "bg-border dux:mx-3 dux:my-0.5 dux:bg-m3-outline-variant pointer-events-none h-px shrink-0 rounded-full in-data-[slot=dropdown-menu-group]:-mx-1 in-data-[slot=dropdown-menu-group]:my-1 in-data-[slot=dropdown-menu-sub-content]:-mx-1 in-data-[slot=dropdown-menu-sub-content]:my-1",
         className,
       )}
       {...props}
@@ -375,7 +375,7 @@ function DropdownMenuShortcut({ className, ...props }: React.ComponentProps<"spa
     <span
       data-slot="dropdown-menu-shortcut"
       className={cn(
-        "dank:type-label-small dank:text-m3-on-surface-variant dank:opacity-100 ml-auto text-xs tracking-widest opacity-60",
+        "dux:type-label-small dux:text-m3-on-surface-variant dux:opacity-100 ml-auto text-xs tracking-widest opacity-60",
         className,
       )}
       {...props}

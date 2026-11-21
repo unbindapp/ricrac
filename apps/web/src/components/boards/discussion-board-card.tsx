@@ -49,7 +49,7 @@ export function DiscussionBoardCard({
       )}
       <div className="flex items-start gap-2">
         <KindIcon className="text-muted-foreground mt-0.5 size-4 shrink-0" />
-        <p className="dank:type-title-medium min-w-0 flex-1">{discussion.title}</p>
+        <p className="dux:type-title-medium min-w-0 flex-1">{discussion.title}</p>
       </div>
       <div className="text-muted-foreground flex min-w-0 flex-wrap items-center gap-1.5 text-xs">
         <DiscussionTagBadges tags={discussion.tags} max={MAX_TAGS} />

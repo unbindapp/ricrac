@@ -31,8 +31,8 @@ const inputVariants = cva(
   },
 );
 
-// State colors come from [data-text-field] in themes/dank/inputs.css
-export const dankTextFieldVariants = cva(
+// State colors come from [data-text-field] in themes/dux/inputs.css
+export const duxTextFieldVariants = cva(
   "min-w-0 bg-transparent text-base text-m3-on-surface caret-(--text-field-caret) outline-none placeholder:text-m3-on-surface-variant disabled:cursor-not-allowed disabled:text-m3-on-surface/38 disabled:placeholder:text-m3-on-surface/38",
   {
     variants: {
@@ -49,7 +49,7 @@ export const dankTextFieldVariants = cva(
 
 const InOutlinedField = React.createContext(false);
 
-export function useDankTextFieldBox(framed: boolean | null | undefined) {
+export function useDuxTextFieldBox(framed: boolean | null | undefined) {
   const inField = React.useContext(InOutlinedField);
   if (inField) return "inField";
   if (framed) return "none";
@@ -142,11 +142,11 @@ function Input({
   hasChanges,
   ...props
 }: InputProps) {
-  const isDank = useUiTheme().id === "dank";
-  const dankBox = useDankTextFieldBox(framed);
+  const isDux = useUiTheme().id === "dux";
+  const duxBox = useDuxTextFieldBox(framed);
   const generatedId = React.useId();
 
-  if (isDank && layout === "label-included") {
+  if (isDux && layout === "label-included") {
     const id = props.id ?? generatedId;
     return (
       <OutlinedField
@@ -160,7 +160,7 @@ function Input({
           type={type}
           data-slot="input"
           data-text-field=""
-          className={cn(dankTextFieldVariants({ box: "inField" }), "h-14", className)}
+          className={cn(duxTextFieldVariants({ box: "inField" }), "h-14", className)}
           {...props}
           id={id}
           placeholder={props.placeholder || " "}
@@ -169,19 +169,19 @@ function Input({
     );
   }
 
-  if (isDank) {
+  if (isDux) {
     return (
       <input
         type={type}
         data-slot="input"
         data-text-field=""
         className={cn(
-          dankTextFieldVariants({ box: dankBox }),
-          dankBox === "none" ? "flex h-9" : "h-14",
+          duxTextFieldVariants({ box: duxBox }),
+          duxBox === "none" ? "flex h-9" : "h-14",
           className,
         )}
         {...props}
-        placeholder={dankBox === "inField" ? props.placeholder || " " : props.placeholder}
+        placeholder={duxBox === "inField" ? props.placeholder || " " : props.placeholder}
       />
     );
   }

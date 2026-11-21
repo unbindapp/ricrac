@@ -171,9 +171,9 @@ export type WorkspaceSummary = {
   logoUrl: string | null
   managesAssistant: boolean
   name: string
-  ownTheme: "default" | "dank" | null
+  ownTheme: "default" | "dux" | null
   role: string
   /** The look of the web app for everyone in the workspace. */
-  theme: "default" | "dank"
+  theme: "default" | "dux"
   urlKey: string
 }

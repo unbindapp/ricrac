@@ -17,7 +17,7 @@ export function SidebarButton() {
         variant="ghost"
         size="icon"
         aria-label="Open navigation"
-        className="text-muted-foreground -ml-1 group-data-visitor/shell:hidden md:hidden"
+        className="text-muted-foreground dux:hidden -ml-1 group-data-visitor/shell:hidden md:hidden"
         onClick={() => setOpen(true)}
       >
         <PanelLeftIcon className="size-4" />

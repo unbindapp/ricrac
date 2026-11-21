@@ -12,9 +12,7 @@ import { useCanClose, useCanRewrite } from "@/components/forum/use-can-rewrite";
 import {
   BellIcon,
   BellOffIcon,
-  ChevronDownIcon,
   ImageIcon,
-  LinkIcon,
   LockIcon,
   LockOpenIcon,
   MessagesSquareIcon,
@@ -44,7 +42,6 @@ import {
   useDiscussionLifecycleMutation,
   useSaveDiscussionMutation,
 } from "@/lib/queries/discussions";
-import { useCopyToClipboard } from "@/lib/hooks/use-copy";
 import { meQuery } from "@/lib/queries/me";
 import { useUiTheme } from "@/themes/ui-theme-provider";
 
@@ -140,7 +137,7 @@ export function DiscussionActions({
   children,
 }: {
   discussion: TDiscussionDetail;
-  /** Only copying the link is a button of its own; the rest wait in the menu beside it. */
+  /** Only copying the link and pinning are buttons of their own; the rest wait in the menu beside them. */
   grouped?: boolean;
   children?: ReactNode;
 }) {
@@ -152,7 +149,6 @@ export function DiscussionActions({
   const { mutateAsync: changeLifecycle } = useDiscussionLifecycleMutation(workspace.id);
   const navigate = useNavigate();
   const [isEditingThumbnail, setIsEditingThumbnail] = useState(false);
-  const { copyToClipboard } = useCopyToClipboard();
   const isPinned = Boolean(discussion.pinnedAt);
   const isClosed = Boolean(discussion.closedAt);
   const isSubscribed = discussion.subscribers.some((user) => user.id === me?.id);
@@ -201,30 +197,27 @@ export function DiscussionActions({
   const addToBoardItem = <AddToBoardMenu subject={{ kind: "discussion", id: discussion.id }} />;
 
   if (grouped) {
+    const pinLabel = isPinned ? "Unpin" : "Pin to the top";
     return (
       <>
         {children}
-        <Button
-          variant="ghost"
-          forceMinSize={false}
-          onClick={() => {
-            copyToClipboard(discussion.url);
-            toast.add({ type: "success", title: "Link copied" });
-          }}
-        >
-          <LinkIcon />
-          Copy link
-        </Button>
+        <CopyLinkAction url={discussion.url} />
+        {canEdit && (
+          <SimpleTooltip content={pinLabel}>
+            <Button
+              variant="ghost"
+              size="icon"
+              forceMinSize={false}
+              aria-label="Pin to the top"
+              aria-pressed={isPinned}
+              onClick={() => save({ id: discussion.id, pinned: !isPinned })}
+            >
+              <PinIcon data-pinned={isPinned || undefined} className="data-pinned:fill-current" />
+            </Button>
+          </SimpleTooltip>
+        )}
         {(canEdit || canRewrite) && (
-          <EntityMenu
-            noun="discussion"
-            onTrash={canRewrite ? trash : undefined}
-            trigger={
-              <Button variant="ghost" forceMinSize={false} aria-label="More discussion actions">
-                <ChevronDownIcon />
-              </Button>
-            }
-          >
+          <EntityMenu noun="discussion" onTrash={canRewrite ? trash : undefined}>
             {canEdit && (
               <>
                 <DropdownMenuItem onClick={subscribe}>
@@ -234,10 +227,6 @@ export function DiscussionActions({
                     <BellIcon className="size-4" />
                   )}
                   {isSubscribed ? "Unsubscribe" : "Subscribe"}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => save({ id: discussion.id, pinned: !isPinned })}>
-                  {isPinned ? <PinOffIcon className="size-4" /> : <PinIcon className="size-4" />}
-                  {isPinned ? "Unpin" : "Pin to the top"}
                 </DropdownMenuItem>
                 {canClose && (
                   <DropdownMenuItem onClick={() => save({ id: discussion.id, closed: !isClosed })}>

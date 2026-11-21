@@ -1,21 +1,21 @@
 import * as React from "react";
 
-import { dankTextFieldVariants, useDankTextFieldBox } from "@/components/ui/input";
+import { duxTextFieldVariants, useDuxTextFieldBox } from "@/components/ui/input";
 import { cn } from "@/components/ui/utils";
 import { useUiTheme } from "@/themes/ui-theme-provider";
 
 function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
-  const isDank = useUiTheme().id === "dank";
-  const dankBox = useDankTextFieldBox(false);
+  const isDux = useUiTheme().id === "dux";
+  const duxBox = useDuxTextFieldBox(false);
 
-  if (isDank) {
+  if (isDux) {
     return (
       <textarea
         data-slot="textarea"
         data-text-field=""
-        className={cn(dankTextFieldVariants({ box: dankBox }), "flex min-h-14 py-4", className)}
+        className={cn(duxTextFieldVariants({ box: duxBox }), "flex min-h-14 py-4", className)}
         {...props}
-        placeholder={dankBox === "inField" ? props.placeholder || " " : props.placeholder}
+        placeholder={duxBox === "inField" ? props.placeholder || " " : props.placeholder}
       />
     );
   }

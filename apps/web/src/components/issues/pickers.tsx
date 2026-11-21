@@ -132,7 +132,7 @@ export function PickerTrigger({
           data-muted={muted || undefined}
           data-picker="row"
           className={cn(
-            "data-muted:text-muted-foreground dank:text-m3-on-surface dank:data-muted:text-m3-on-surface-variant h-auto min-h-7 w-full min-w-0 justify-start py-1 font-normal",
+            "data-muted:text-muted-foreground dux:text-m3-on-surface dux:data-muted:text-m3-on-surface-variant h-auto min-h-7 w-full min-w-0 justify-start py-1 font-normal",
             className,
           )}
           {...props}

@@ -1,5 +1,5 @@
 /* Chats, measured from the Ricrac workspace mockup. */
-:root[data-ui-theme="dank"] {
+:root[data-ui-theme="dux"] {
   & [data-slot="message-avatar"] {
     display: none;
   }
@@ -226,57 +226,94 @@
     }
   }
 
+  /* One pill: attach and other tools, the field and send, ringed in the accent while typing. */
   & [data-slot="composer"] {
-    gap: 8px;
+    gap: 0;
+    padding: 4px 8px 4px 12px;
     border: 0;
-    border-radius: 0;
-    background-color: transparent;
+    border-radius: 32px;
+    background-color: var(--dux-panel);
     box-shadow: none;
+
+    &:focus-within {
+      box-shadow: inset 0 0 0 2px var(--m3-primary);
+    }
+
+    &:has([data-slot="composer-tray"]) {
+      border-radius: 24px;
+    }
   }
 
   & [data-slot="composer-tray"] {
-    padding: 0;
+    padding: 8px 4px;
     border: 0;
   }
 
   & [data-slot="composer-row"] {
-    gap: 8px;
+    align-items: center;
+    gap: 4px;
     padding: 0;
   }
 
   & [data-slot="composer-tool"],
   & [data-slot="composer-send"] {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
+    flex: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 18px;
+
+    &:not(:disabled):active {
+      border-radius: 8px;
+    }
 
     & svg {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
+    }
+
+    &:focus-visible {
+      outline-offset: 0;
     }
   }
 
   & [data-slot="composer-tool"] {
-    background-color: var(--m3-surface-container-high);
-    color: var(--m3-on-surface-variant);
+    background-color: transparent;
+    color: var(--m3-primary);
   }
 
   & [data-slot="composer-send"] {
     background-color: var(--m3-primary);
     color: var(--m3-on-primary);
+
+    & svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    &:disabled {
+      background-color: var(--m3-primary);
+      color: var(--m3-on-primary);
+      opacity: 0.38;
+    }
   }
 
   & [data-slot="composer-field"] {
-    align-self: auto;
+    align-self: center;
     min-height: 56px;
-    padding: 14px 20px;
-    border-radius: 28px;
-    background-color: var(--m3-surface-container-high);
+    padding: 16px 8px;
+    border-radius: 0;
+    background-color: transparent;
     color: var(--m3-on-surface);
 
     & .ProseMirror {
-      font-size: 16px;
+      font-size: 15px;
       line-height: 24px;
+      letter-spacing: 0.2px;
+      caret-color: var(--m3-primary);
+    }
+
+    & .ProseMirror:focus-visible {
+      outline: none;
     }
 
     & p.is-editor-empty:first-child::before {
@@ -284,13 +321,9 @@
       height: 24px;
       margin-bottom: -24px;
       overflow: hidden;
+      color: var(--m3-on-surface-variant);
       text-overflow: ellipsis;
       white-space: nowrap;
-    }
-
-    &:focus-within {
-      outline: 3px solid var(--m3-secondary);
-      outline-offset: 2px;
     }
   }
 

@@ -18,7 +18,7 @@ export function ProgressBar({ value, label, showValue = true, className }: TProp
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={percent}
-        className="bg-muted dank:relative dank:h-1 dank:overflow-visible dank:bg-transparent h-1.5 w-full min-w-12 overflow-hidden rounded-full"
+        className="bg-muted dux:relative dux:h-1 dux:overflow-visible dux:bg-transparent h-1.5 w-full min-w-12 overflow-hidden rounded-full"
       >
         <div
           data-done={percent === 100 || undefined}
@@ -29,12 +29,12 @@ export function ProgressBar({ value, label, showValue = true, className }: TProp
           <>
             <div
               aria-hidden
-              className="bg-m3-secondary-container dank:block absolute inset-y-0 right-0 hidden rounded-full"
+              className="bg-m3-secondary-container dux:block absolute inset-y-0 right-0 hidden rounded-full"
               style={{ left: percent > 0 ? `calc(${percent}% + 0.25rem)` : 0 }}
             />
             <div
               aria-hidden
-              className="bg-m3-primary dank:block absolute inset-y-0 right-0 hidden size-1 rounded-full"
+              className="bg-m3-primary dux:block absolute inset-y-0 right-0 hidden size-1 rounded-full"
             />
           </>
         )}

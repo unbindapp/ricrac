@@ -32,7 +32,7 @@ function WorkspaceDangerSettingsPage() {
           <Button
             variant="outline"
             size="sm"
-            className="dank:text-m3-error"
+            className="dux:text-m3-error"
             onClick={() => setIsLeaving(true)}
           >
             Leave workspace

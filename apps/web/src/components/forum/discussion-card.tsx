@@ -66,11 +66,11 @@ export function DiscussionGridSkeleton() {
       {Array.from({ length: SKELETON_CARDS }, (_, index) => (
         <div
           key={index}
-          className="bg-card dank:rounded-md flex flex-col overflow-hidden rounded-lg border"
+          className="bg-card dux:rounded-md flex flex-col overflow-hidden rounded-lg border"
         >
           <div className="bg-muted aspect-video border-b" />
           <div className="flex flex-col gap-3 p-4">
-            <Skeleton className="dank:h-8 dank:rounded-sm h-4 w-16 rounded-full" />
+            <Skeleton className="dux:h-8 dux:rounded-sm h-4 w-16 rounded-full" />
             <Skeleton className="h-4 w-3/4" />
             <Skeleton className="h-3 w-1/2" />
           </div>
@@ -90,14 +90,14 @@ export function DiscussionCard({ discussion }: { discussion: Discussion }) {
           role="listitem"
           to="/$workspace/discussion/$slug"
           params={{ workspace: workspace.urlKey, slug: entitySlug(discussion) }}
-          className="bg-card has-hover:hover:bg-card-hover has-hover:hover:border-muted-most-foreground data-popup-open:border-muted-most-foreground focus-visible:ring-ring dank:relative dank:state-layer dank:rounded-md dank:has-hover:hover:bg-card dank:has-hover:hover:border-border dank:data-popup-open:border-border dank:has-hover:hover:shadow-elevation-1 dank:focus-visible:ring-0 dank:transition-shadow flex min-w-0 flex-col overflow-hidden rounded-lg border outline-hidden transition-colors focus-visible:ring-1"
+          className="bg-card has-hover:hover:bg-card-hover has-hover:hover:border-muted-most-foreground data-popup-open:border-muted-most-foreground focus-visible:ring-ring dux:relative dux:state-layer dux:rounded-md dux:has-hover:hover:bg-card dux:has-hover:hover:border-border dux:data-popup-open:border-border dux:has-hover:hover:shadow-elevation-1 dux:focus-visible:ring-0 dux:transition-shadow flex min-w-0 flex-col overflow-hidden rounded-lg border outline-hidden transition-colors focus-visible:ring-1"
         />
       }
     >
       <DiscussionPreview body={discussion.body ?? ""} thumbnailUrl={discussion.thumbnailUrl} />
       <div className="flex flex-1 flex-col gap-3 p-4">
         <DiscussionTags discussion={discussion} />
-        <h2 className="dank:type-title-medium line-clamp-2 text-base leading-snug font-semibold">
+        <h2 className="dux:type-title-medium line-clamp-2 text-base leading-snug font-semibold">
           {discussion.title}
         </h2>
         <div className="text-muted-foreground mt-auto flex min-w-0 items-center gap-3 text-xs">
@@ -134,14 +134,14 @@ export function DiscussionRow({ discussion }: { discussion: Discussion }) {
         />
       }
     >
-      <StatusIcon className="text-muted-foreground dank:size-6 size-4 shrink-0" />
-      <span className="dank:font-normal min-w-0 flex-1 truncate font-medium">
+      <StatusIcon className="text-muted-foreground dux:size-6 size-4 shrink-0" />
+      <span className="dux:font-normal min-w-0 flex-1 truncate font-medium">
         {discussion.title}
       </span>
       <span className="hidden shrink-0 items-center gap-1.5 md:flex">
         <DiscussionTagBadges tags={discussion.tags} max={MAX_ROW_TAGS} />
       </span>
-      <span className="text-muted-foreground dank:type-label-small flex shrink-0 text-xs">
+      <span className="text-muted-foreground dux:type-label-small flex shrink-0 text-xs">
         <DiscussionCounts discussion={discussion} />
       </span>
       <span className="flex w-6 shrink-0 justify-center">
@@ -153,7 +153,7 @@ export function DiscussionRow({ discussion }: { discussion: Discussion }) {
           </SimpleTooltip>
         )}
       </span>
-      <span className="text-muted-foreground dank:type-label-small w-20 shrink-0 text-right text-xs">
+      <span className="text-muted-foreground dux:type-label-small w-20 shrink-0 text-right text-xs">
         <RelativeTime value={discussion.lastActivityAt} />
       </span>
     </DiscussionContextMenu>
@@ -281,7 +281,7 @@ function DiscussionPreview({ body, thumbnailUrl }: { body: string; thumbnailUrl:
 
 function DiscussionTags({ discussion }: { discussion: Discussion }) {
   return (
-    <div className="dank:gap-2 flex min-w-0 flex-wrap items-center gap-1.5">
+    <div className="dux:gap-2 flex min-w-0 flex-wrap items-center gap-1.5">
       {discussion.pinnedAt && (
         <Badge variant="process" data-m3-chip="assist">
           <PinIcon />

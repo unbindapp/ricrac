@@ -84,15 +84,15 @@ export function NotificationPane({
       aria-label={target.title}
       className="bg-background flex min-h-0 w-full flex-1 flex-col"
     >
-      <div className="dank:h-16 dank:border-b-0 dank:pr-1 dank:pl-4 flex h-12 shrink-0 items-center gap-2 border-b px-3">
-        <div className="dank:type-title-large dank:gap-2 flex min-w-0 flex-1 items-center gap-1.5 text-sm">
+      <div className="dux:h-16 dux:border-b-0 dux:pr-1 dux:pl-4 flex h-12 shrink-0 items-center gap-2 border-b px-3">
+        <div className="dux:type-title-large dux:gap-2 flex min-w-0 flex-1 items-center gap-1.5 text-sm">
           <NotificationTargetIcon target={target} />
           {target.kind === "issue" && (
-            <span className="text-muted-foreground dank:type-title-large shrink-0 font-mono text-xs">
+            <span className="text-muted-foreground dux:type-title-large shrink-0 font-mono text-xs">
               {target.identifier}
             </span>
           )}
-          <span className="dank:font-normal truncate font-medium">{target.title}</span>
+          <span className="dux:font-normal truncate font-medium">{target.title}</span>
         </div>
         <ActionTooltip label={isUnread ? "Mark read" : "Mark unread"} hotkey="U">
           <Button
@@ -143,7 +143,7 @@ export function NotificationPane({
           <NotificationIssue identifier={target.identifier} />
         ) : (
           link && (
-            <div className="dank:pl-11 flex px-4 pb-4">
+            <div className="dux:pl-11 flex px-4 pb-4">
               <LinkButton {...link} variant="outline" size="sm">
                 <NotificationTargetIcon target={target} />
                 {targetLabels[target.kind]}
@@ -188,7 +188,7 @@ function NotificationEvents({ group }: { group: TNotificationGroup }) {
   const shown = showAll ? group.notifications : group.notifications.slice(0, SHOWN_EVENTS);
   const hidden = group.notifications.length - shown.length;
   return (
-    <ol aria-label="What happened" className="dank:border-b-0 flex flex-col gap-3 border-b p-4">
+    <ol aria-label="What happened" className="dux:border-b-0 flex flex-col gap-3 border-b p-4">
       {shown.map((notification) => {
         const { actor, text } = notificationSentence(notification);
         const TypeIcon = notificationTypeIcon(notification.type);
@@ -226,7 +226,7 @@ function NotificationEvents({ group }: { group: TNotificationGroup }) {
                   variant="ghost"
                   size="sm"
                   forceMinSize={false}
-                  className="bg-muted/60 text-muted-foreground dank:bg-m3-surface-container-highest dank:rounded-md dank:active:rounded-md dank:px-4 dank:py-3 h-auto justify-start py-1.5 text-left font-normal whitespace-normal"
+                  className="bg-muted/60 text-muted-foreground dux:bg-m3-surface-container-highest dux:rounded-md dux:active:rounded-md dux:px-4 dux:py-3 h-auto justify-start py-1.5 text-left font-normal whitespace-normal"
                 >
                   <span className="line-clamp-2">{excerpt}</span>
                 </LinkButton>

@@ -45,7 +45,7 @@ function FieldButton({
       aria-invalid={invalid || undefined}
       data-muted={!text || undefined}
       data-focus-indicator="child"
-      className="data-muted:text-muted-foreground aria-invalid:border-destructive dank:type-body-large dank:text-m3-on-surface dank:data-muted:text-m3-on-surface-variant dank:border-m3-outline dank:has-hover:hover:border-m3-on-surface dank:focus-visible:border-m3-primary dank:focus-visible:ring-m3-primary dank:aria-invalid:border-m3-error dank:h-14 dank:gap-3 dank:rounded-xs dank:px-4 dank:after:hidden dank:focus-visible:ring-1 dank:focus-visible:ring-inset dank:active:rounded-xs dank:[&>svg]:size-6 dank:[&>svg]:text-m3-on-surface-variant w-full justify-start font-normal"
+      className="data-muted:text-muted-foreground aria-invalid:border-destructive dux:type-body-large dux:text-m3-on-surface dux:data-muted:text-m3-on-surface-variant dux:border-m3-outline dux:has-hover:hover:border-m3-on-surface dux:focus-visible:border-m3-primary dux:focus-visible:ring-m3-primary dux:aria-invalid:border-m3-error dux:h-14 dux:gap-3 dux:rounded-xs dux:px-4 dux:after:hidden dux:focus-visible:ring-1 dux:focus-visible:ring-inset dux:active:rounded-xs dux:[&>svg]:size-6 dux:[&>svg]:text-m3-on-surface-variant w-full justify-start font-normal"
       {...props}
     >
       {icon}

@@ -1,7 +1,7 @@
 import { type LinkProps, useNavigate } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { type FocusEvent, useRef, useState } from "react";
 
-import { TriangleAlertIcon, XIcon } from "@/components/icons";
+import { SearchIcon, TriangleAlertIcon, XIcon } from "@/components/icons";
 import { SearchHitGroups } from "@/components/search/search-hit-groups";
 import { useSearch } from "@/components/search/use-search";
 import { Button } from "@/components/ui/button";
@@ -9,54 +9,87 @@ import { Command, CommandEmpty, CommandInput, CommandList } from "@/components/u
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useWorkspace } from "@/components/workspace/workspace-provider";
 
-/** Searches the whole workspace from a bar that docks what matches under it while you type. */
+/** A search button that opens into a field, listing what matches in the workspace under it. */
 export function GlobalSearch() {
   const { workspace } = useWorkspace();
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
   const [query, setQuery] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isListOpen, setIsListOpen] = useState(false);
   const search = useSearch(query);
-  const isListShown = isOpen && Boolean(query.trim());
+  const isListShown = isExpanded && isListOpen && Boolean(query.trim());
 
-  const close = () => {
-    setIsOpen(false);
-    inputRef.current?.blur();
+  const expand = () => {
+    setIsExpanded(true);
+    inputRef.current?.focus();
+  };
+  const clear = () => {
+    setQuery("");
+    inputRef.current?.focus();
+  };
+  const collapse = () => {
+    setQuery("");
+    setIsListOpen(false);
+    setIsExpanded(false);
+    toggleRef.current?.focus();
   };
   const open = (link: LinkProps) => {
     setQuery("");
-    close();
+    setIsListOpen(false);
+    setIsExpanded(false);
+    inputRef.current?.blur();
     void navigate(link);
+  };
+  const collapseWhenLeft = (event: FocusEvent<HTMLDivElement>) => {
+    if (event.currentTarget.contains(event.relatedTarget)) return;
+    setIsListOpen(false);
+    if (!query) setIsExpanded(false);
   };
 
   return (
     <Command
       shouldFilter={false}
       loop
-      variant="searchView"
       wrapper="none"
-      data-slot="global-search"
-      data-open={isListShown || undefined}
-      className="h-auto"
+      role="search"
+      data-slot="dux-search"
+      data-expanded={isExpanded || undefined}
+      onBlur={collapseWhenLeft}
       onKeyDown={(event) => {
-        if (event.key === "Escape") close();
+        if (event.key === "Escape") collapse();
       }}
     >
-      <div data-slot="search-bar" className="flex h-14 shrink-0 items-center pr-1">
+      <div data-slot="dux-search-field">
+        <Button
+          ref={toggleRef}
+          variant="ghost"
+          size="icon"
+          forceMinSize={false}
+          aria-label="Search"
+          aria-expanded={isExpanded}
+          onClick={expand}
+        >
+          <SearchIcon />
+        </Button>
         <CommandInput
           ref={inputRef}
           value={query}
+          hideIcon
+          tabIndex={isExpanded ? 0 : -1}
           onValueChange={(value) => {
             setQuery(value);
-            setIsOpen(true);
+            setIsListOpen(true);
           }}
-          onFocus={() => setIsOpen(true)}
-          onBlur={() => setIsOpen(false)}
-          showSpinner={search.isPending}
+          onFocus={() => {
+            setIsExpanded(true);
+            setIsListOpen(true);
+          }}
+          showSpinner={false}
           aria-label="Search"
           placeholder={`Search ${workspace.name}`}
-          classNameWrapper="min-w-0 flex-1 border-0 [&>div]:left-5 [&>div]:size-6 [&>div]:text-m3-on-surface-variant [&_svg]:text-m3-on-surface-variant"
-          className="text-m3-on-surface placeholder:text-m3-on-surface-variant h-14 pr-2 pl-14 text-base leading-6"
+          classNameWrapper="contents"
         />
         {query && (
           <Button
@@ -64,22 +97,15 @@ export function GlobalSearch() {
             size="icon"
             forceMinSize={false}
             aria-label="Clear search"
-            className="text-m3-on-surface size-12 shrink-0 rounded-full active:rounded-full"
             onMouseDown={(event) => event.preventDefault()}
-            onClick={() => {
-              setQuery("");
-              inputRef.current?.focus();
-            }}
+            onClick={clear}
           >
             <XIcon />
           </Button>
         )}
       </div>
       {isListShown && (
-        <div
-          className="border-m3-outline flex max-h-120 min-h-60 flex-col border-t"
-          onMouseDown={(event) => event.preventDefault()}
-        >
+        <div data-slot="dux-search-results" onMouseDown={(event) => event.preventDefault()}>
           <ScrollArea className="min-h-0">
             <CommandList className="p-2">
               <CommandEmpty>{search.isPending ? "Searching…" : "Nothing found"}</CommandEmpty>

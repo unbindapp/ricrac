@@ -62,7 +62,7 @@ export function ReactionBar({
 }: TProps) {
   if (disabled && reactions.length === 0) return null;
   return (
-    <div data-slot="reaction-bar" className="dank:gap-2 flex flex-wrap items-center gap-1.5">
+    <div data-slot="reaction-bar" className="dux:gap-2 flex flex-wrap items-center gap-1.5">
       {reactions.map((reaction) => (
         <SimpleTooltip key={reaction.emoji} content={reactorNames(reaction)}>
           <Button
@@ -78,7 +78,7 @@ export function ReactionBar({
             onClick={() => onToggle(reaction.emoji, reaction.reacted)}
           >
             <span>{reaction.emoji}</span>
-            <span className="dank:type-label-large text-xs">{reaction.count}</span>
+            <span className="dux:type-label-large text-xs">{reaction.count}</span>
           </Button>
         </SimpleTooltip>
       ))}
@@ -111,7 +111,7 @@ export function AddReactionButton({
             forceMinSize={false}
             aria-label="Add reaction"
             data-reveal={revealOnHover || undefined}
-            className="dank:size-8 dank:[&>svg]:size-5 size-7 data-reveal:opacity-0 data-reveal:group-hover/reactable:opacity-100 data-reveal:focus-visible:opacity-100 data-reveal:data-popup-open:opacity-100"
+            className="dux:size-8 dux:[&>svg]:size-5 size-7 data-reveal:opacity-0 data-reveal:group-hover/reactable:opacity-100 data-reveal:focus-visible:opacity-100 data-reveal:data-popup-open:opacity-100"
           >
             <SmilePlusIcon className="text-muted-foreground size-4" />
           </Button>

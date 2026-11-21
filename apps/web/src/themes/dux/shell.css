@@ -1,0 +1,993 @@
+/* The Dux shell: an app bar across the window, a sidebar, and pages on a panel card whose
+   content sits on a second card under the page bar. */
+:root[data-ui-theme="dux"] {
+  --dux-slide: 250ms cubic-bezier(0.2, 0, 0, 1);
+  --dux-focus-ring: var(--m3-secondary);
+}
+
+/* Focus rings: 3px in the accent, outside standalone controls and inside rows, which sit flush in
+   scrolling containers that would clip an outer ring. Fields show focus on their own outline. */
+:root[data-ui-theme="dux"] :focus-visible {
+  outline: 3px solid var(--dux-focus-ring);
+  outline-offset: 2px;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-ring-offset-shadow: 0 0 #0000;
+}
+
+:root[data-ui-theme="dux"] :focus:not(:focus-visible) {
+  outline: none;
+}
+
+:root[data-ui-theme="dux"]
+  :is(
+    [role="menuitem"],
+    [role="menuitemradio"],
+    [role="menuitemcheckbox"],
+    [role="option"],
+    [role="listitem"],
+    [role="row"],
+    [role="treeitem"],
+    [role="tab"],
+    [data-slot="list-item"],
+    [data-slot="dux-nav-item"],
+    [data-slot="dux-account-row"],
+    [data-slot="forum-card"],
+    [cmdk-item]
+  ):focus-visible,
+:root[data-ui-theme="dux"] [data-slot="list"] :is(a, [tabindex]):focus-visible,
+:root[data-ui-theme="dux"] [data-slot="dux-sidebar"] :is(a, button):focus-visible {
+  outline-offset: -3px;
+}
+
+:root[data-ui-theme="dux"]
+  :is(
+    input,
+    textarea,
+    select,
+    [contenteditable="true"],
+    [cmdk-input],
+    [data-slot="tooltip-content"]
+  ):focus-visible,
+:root[data-ui-theme="dux"]
+  :is(
+    [role="dialog"],
+    [role="menu"],
+    [role="listbox"],
+    [data-slot="dux-account-menu"]
+  ):focus-visible {
+  outline: none;
+}
+
+/* App bar */
+:root[data-ui-theme="dux"] [data-slot="dux-app-bar"] {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 16px;
+  height: 64px;
+  padding: 0 20px 0 12px;
+  background: var(--dux-canvas);
+
+  @media (max-width: 767px) {
+    gap: 8px;
+    padding: 0 12px 0 8px;
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-brand"] {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 12px;
+  width: 176px;
+  color: var(--m3-on-surface);
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 28px;
+  letter-spacing: 0;
+  user-select: none;
+
+  & img {
+    display: block;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+  }
+
+  @media (max-width: 767px) {
+    display: none;
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-app-bar-actions"] {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+
+  @media (max-width: 767px) {
+    gap: 8px;
+  }
+}
+
+/* Icon buttons in the app bar: 40px, round, squaring to 8px while pressed. */
+:root[data-ui-theme="dux"]
+  [data-slot="dux-app-bar"]
+  :is(button, a):not([data-slot="dux-search"] *, [cmdk-input]) {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  color: var(--m3-on-surface-variant);
+
+  &:active {
+    border-radius: 8px;
+  }
+
+  & > svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  &:is([aria-pressed="true"], [data-status="active"]) {
+    background: var(--m3-primary-container);
+    color: var(--m3-on-primary-container);
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-ask-claude"] > svg {
+  width: 22px;
+  height: 22px;
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-badge"] {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  z-index: 1;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--m3-primary);
+  color: var(--m3-on-primary);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0;
+  text-align: center;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Search: an icon button that opens into a 240px field. */
+:root[data-ui-theme="dux"] [data-slot="dux-search"] {
+  position: relative;
+  flex: none;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  border-radius: 0;
+  background: transparent;
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-search-field"] {
+  display: flex;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: transparent;
+  transition:
+    width var(--dux-slide),
+    background-color var(--spring-default-effects-duration) var(--ease-spring-default-effects);
+
+  [data-expanded] > & {
+    width: 240px;
+    background: var(--dux-item);
+
+    @media (max-width: 767px) {
+      width: min(200px, calc(100vw - 200px));
+    }
+  }
+
+  [data-expanded] > &:focus-within {
+    box-shadow: inset 0 0 0 2px var(--m3-primary);
+  }
+
+  & button {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    color: var(--m3-on-surface-variant);
+  }
+
+  & button:focus-visible {
+    outline-offset: -3px;
+  }
+
+  [data-expanded] > & button {
+    color: var(--m3-on-surface);
+  }
+
+  & [cmdk-input] {
+    flex: 1;
+    width: 0;
+    min-width: 0;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--m3-on-surface);
+    caret-color: var(--m3-primary);
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--spring-fast-effects-duration) var(--ease-spring-fast-effects);
+
+    &::placeholder {
+      color: var(--m3-on-surface-variant);
+      opacity: 1;
+    }
+
+    [data-expanded] & {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  & [cmdk-input-wrapper] > div {
+    display: none;
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-search-results"] {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  width: min(420px, calc(100vw - 24px));
+  max-height: min(480px, calc(100vh - 88px));
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--dux-panel);
+  box-shadow: var(--shadow-elevation-2);
+  animation: dux-pop 221ms cubic-bezier(0.05, 0.7, 0.1, 1);
+  transform-origin: top right;
+
+  & [cmdk-item] {
+    min-height: 44px;
+    border-radius: 4px;
+    background: var(--dux-item);
+  }
+}
+
+@keyframes dux-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Account */
+:root[data-ui-theme="dux"] [data-slot="dux-pfp"] {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--m3-primary-container);
+  color: var(--m3-on-primary-container);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0;
+
+  & img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-account-button"] {
+  overflow: hidden;
+  padding: 0;
+
+  &::after {
+    z-index: 1;
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-account-menu"] {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(340px, calc(100vw - 32px));
+  max-height: min(var(--available-height), calc(100vh - 72px));
+  padding: 8px;
+  overflow-y: auto;
+  border-radius: 28px;
+  background: var(--dux-panel);
+  color: var(--m3-on-surface);
+  box-shadow:
+    0 8px 24px rgb(0 0 0 / 0.25),
+    0 0 0 1px color-mix(in srgb, var(--m3-on-surface) 8%, transparent);
+  outline: none;
+  scrollbar-width: none;
+  transform-origin: var(--transform-origin);
+
+  &[data-open] {
+    animation: dux-pop 221ms cubic-bezier(0.05, 0.7, 0.1, 1);
+  }
+
+  &[data-ending-style] {
+    opacity: 0;
+    transition: opacity 120ms linear;
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-account-top"] {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: -4px;
+
+  & button {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    color: var(--m3-on-surface-variant);
+
+    &:active {
+      border-radius: 8px;
+    }
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-account-group"] {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-account-row"] {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  background: var(--dux-item);
+  color: var(--m3-on-surface);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+  text-align: left;
+  outline: none;
+  cursor: default;
+  user-select: none;
+
+  [data-slot="dux-account-group"] > &:first-child {
+    border-radius: 16px 16px 4px 4px;
+  }
+
+  [data-slot="dux-account-group"] > &:last-child {
+    border-radius: 4px 4px 16px 16px;
+  }
+
+  [data-slot="dux-account-group"] > &:only-child {
+    border-radius: 16px;
+  }
+
+  &:not([data-head]) {
+    cursor: pointer;
+  }
+
+  &:not([data-head])::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: currentColor;
+    opacity: 0;
+    transition: opacity var(--spring-default-effects-duration) var(--ease-spring-default-effects);
+  }
+
+  &[data-highlighted]::before {
+    opacity: 0.08;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--dux-focus-ring);
+    outline-offset: -3px;
+  }
+
+  & > svg {
+    width: 22px;
+    height: 22px;
+    flex: none;
+    color: var(--m3-on-surface-variant);
+  }
+
+  &[data-head] {
+    min-height: 72px;
+    gap: 14px;
+  }
+
+  &[data-head] [data-slot="dux-pfp"] {
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    font-size: 16px;
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-account-who"] {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+
+  & b {
+    overflow: hidden;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  & span {
+    overflow: hidden;
+    color: var(--m3-on-surface-variant);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-account-label"] {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-account-check"] {
+  display: flex;
+  color: var(--m3-primary);
+
+  & svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-account-row"] [data-slot="dux-badge"] {
+  position: static;
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-workspace-icon"] {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--m3-primary-container);
+  color: var(--m3-on-primary-container);
+
+  & svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  & img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+/* Sidebar */
+:root[data-ui-theme="dux"] [data-slot="dux-sidebar"] {
+  flex: none;
+  width: 256px;
+  padding: 0 8px 8px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  transition:
+    width var(--dux-slide),
+    padding var(--dux-slide),
+    visibility 0s;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  & [data-slot="dux-nav"] {
+    width: 240px;
+    transition: transform var(--dux-slide);
+  }
+
+  &[data-hidden] {
+    width: 0;
+    padding-inline: 0;
+    visibility: hidden;
+    transition:
+      width var(--dux-slide),
+      padding var(--dux-slide),
+      visibility 0s linear 250ms;
+  }
+
+  &[data-hidden] [data-slot="dux-nav"] {
+    transform: translateX(-100%);
+  }
+
+  &[data-drawer] {
+    width: 100%;
+    height: 100%;
+    padding: 8px;
+    background: var(--dux-canvas);
+
+    & [data-slot="dux-nav"] {
+      width: auto;
+    }
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-sidebar"] + div {
+  transition: padding-left var(--dux-slide);
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-sidebar"][data-hidden] + div {
+  @media (min-width: 768px) {
+    padding-left: 8px;
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-nav"] {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-nav-item"] {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 22px;
+  color: var(--m3-on-surface);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--spring-default-effects-duration) var(--ease-spring-default-effects),
+    color var(--spring-default-effects-duration) var(--ease-spring-default-effects);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: currentColor;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--spring-default-effects-duration) var(--ease-spring-default-effects);
+  }
+
+  @media (hover: hover) {
+    &:hover::before {
+      opacity: 0.08;
+    }
+  }
+
+  &:focus-visible::before,
+  &:active::before {
+    opacity: 0.1;
+  }
+
+  & > svg {
+    width: 22px;
+    height: 22px;
+    flex: none;
+    color: var(--m3-on-surface-variant);
+  }
+
+  &:is([data-status="active"], [data-current]) {
+    background: var(--m3-secondary-container);
+    color: var(--m3-on-secondary-container);
+  }
+
+  &:is([data-status="active"], [data-current]) > svg {
+    color: var(--m3-on-secondary-container);
+  }
+}
+
+/* Favorites under the destinations, behind a group label. */
+:root[data-ui-theme="dux"] [data-slot="dux-nav"] .group\/section {
+  margin-top: 12px;
+
+  & > div:first-child button {
+    height: 36px;
+    padding: 8px 16px;
+    color: var(--m3-on-surface);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  & [role="listitem"] > a {
+    height: 44px;
+    gap: 16px;
+    padding-inline: 16px 40px;
+    border-radius: 22px;
+    color: var(--m3-on-surface);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  & a[data-status="active"] {
+    background: var(--m3-secondary-container);
+    color: var(--m3-on-secondary-container);
+  }
+}
+
+/* Pages: a panel card with the page bar on it and the content on a card under it. */
+:root[data-ui-theme="dux"] main {
+  position: relative;
+  z-index: 0;
+  border-radius: 24px;
+  background: var(--dux-panel);
+}
+
+:root[data-ui-theme="dux"] [data-slot="page-container"][data-bar="apart"],
+:root[data-ui-theme="dux"] main > [data-slot="page-container"] {
+  border-radius: 20px 20px 0 0;
+  background: var(--dux-content);
+}
+
+:root[data-ui-theme="dux"] div:has(> [data-slot="page-bar-slot"]),
+:root[data-ui-theme="dux"] [data-slot="split-pane"]:has([data-slot="page-bar-slot"]) {
+  gap: 0;
+  background: transparent;
+}
+
+:root[data-ui-theme="dux"] [data-slot="page-bar-slot"] {
+  border-radius: 0;
+  background: transparent;
+}
+
+:root[data-ui-theme="dux"] [data-slot="page-bar"] {
+  height: 56px;
+  min-height: 56px;
+  gap: 8px;
+  padding: 0 8px 0 20px;
+  border: 0;
+  background: transparent;
+  color: var(--m3-on-surface);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: 0;
+
+  & nav[aria-label="Breadcrumb"] ol {
+    gap: 4px;
+    color: var(--m3-on-surface-variant);
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: 0;
+  }
+
+  & nav[aria-label="Breadcrumb"] [aria-current="page"] {
+    color: var(--m3-on-surface);
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="split-pane"],
+:root[data-ui-theme="dux"] [data-slot="chat-layout"] > div,
+:root[data-ui-theme="dux"] [data-slot="panel-bar"] {
+  border-radius: 20px 20px 0 0;
+}
+
+/* Ask Claude: a side sheet docked beside the page on wide screens and over it on narrow ones. */
+:root[data-ui-theme="dux"] [data-slot="dux-sheet"] {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  width: 380px;
+  margin-left: 16px;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--dux-panel);
+  color: var(--m3-on-surface);
+  animation: dux-sheet-in var(--dux-slide);
+
+  @media (max-width: 1023px) {
+    position: fixed;
+    top: 64px;
+    right: 8px;
+    bottom: 8px;
+    z-index: 41;
+    width: min(380px, calc(100vw - 16px));
+    margin: 0;
+    box-shadow: var(--shadow-elevation-2);
+  }
+
+  @media (max-width: 767px) {
+    inset: 64px 0 0 0;
+    width: 100%;
+    border-radius: 16px 16px 0 0;
+  }
+}
+
+@keyframes dux-sheet-in {
+  from {
+    transform: translateX(calc(100% + 16px));
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-ask-claude"][aria-pressed="true"] {
+  background: var(--m3-primary-container);
+  color: var(--m3-on-primary-container);
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-sheet-head"] {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  min-height: 56px;
+  padding: 0 8px 0 20px;
+
+  & button {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    color: var(--m3-on-surface-variant);
+
+    &:active {
+      border-radius: 8px;
+    }
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-sheet-title"] {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: 0;
+
+  & svg {
+    width: 22px;
+    height: 22px;
+    color: var(--m3-primary);
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-sheet-main"] {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 20px 20px 0 0;
+  background: var(--dux-content);
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-sheet-body"] {
+  flex: 1;
+  min-height: 0;
+  padding: 24px 24px 16px;
+  overflow-y: auto;
+  scrollbar-width: none;
+
+  & > h2 {
+    margin: 0 0 12px;
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 36px;
+    letter-spacing: 0;
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-sheet-description"] {
+  margin: 0;
+  color: var(--m3-on-surface-variant);
+  font-size: 15px;
+  line-height: 22px;
+  letter-spacing: 0.2px;
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-sheet-suggestions"] {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 28px;
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-suggestion"] {
+  display: block;
+  height: auto;
+  min-height: 40px;
+  padding: 10px 16px;
+  border-radius: 20px;
+  background: var(--dux-panel);
+  color: var(--m3-on-surface);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+  text-align: left;
+  white-space: normal;
+
+  &::after {
+    display: none;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      background: color-mix(in srgb, var(--m3-on-surface) 8%, var(--dux-panel));
+    }
+  }
+
+  &:active {
+    border-radius: 8px;
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-sheet-messages"] {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  & [data-slot="message-bubble"] {
+    max-width: 85%;
+    margin-left: auto;
+    padding: 10px 16px;
+    border-radius: 16px 16px 4px 16px;
+    background: var(--m3-primary-container);
+    color: var(--m3-on-primary-container);
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0.2px;
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-sheet-composer"] {
+  flex: none;
+  padding: 12px 16px max(16px, env(safe-area-inset-bottom));
+}
+
+/* A pill holding the field and its send button, ringed in the accent while typing. */
+:root[data-ui-theme="dux"] [data-slot="dux-composer-row"] {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px 4px 20px;
+  border-radius: 32px;
+  background: var(--dux-panel);
+
+  &:focus-within {
+    box-shadow: inset 0 0 0 2px var(--m3-primary);
+  }
+
+  & textarea {
+    flex: 1;
+    min-width: 0;
+    min-height: 56px;
+    max-height: 160px;
+    padding: 16px 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    color: var(--m3-on-surface);
+    caret-color: var(--m3-primary);
+    font-size: 15px;
+    line-height: 24px;
+    letter-spacing: 0.2px;
+    resize: none;
+    field-sizing: content;
+    outline: none;
+
+    &::placeholder {
+      color: var(--m3-on-surface-variant);
+      opacity: 1;
+    }
+  }
+}
+
+:root[data-ui-theme="dux"] [data-slot="dux-send"] {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  background: var(--m3-primary);
+  color: var(--m3-on-primary);
+  box-shadow: none;
+
+  & svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  @media (hover: hover) {
+    &:not(:disabled):hover {
+      background: color-mix(in srgb, var(--m3-primary) 88%, var(--m3-on-primary));
+    }
+  }
+
+  &:not(:disabled):active {
+    border-radius: 8px;
+  }
+
+  &:disabled {
+    background: var(--m3-primary);
+    color: var(--m3-on-primary);
+    opacity: 0.38;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-ui-theme="dux"]
+    :is(
+      [data-slot="dux-sidebar"],
+      [data-slot="dux-nav"],
+      [data-slot="dux-search-field"],
+      [data-slot="dux-search-field"] [cmdk-input],
+      [data-slot="dux-nav-item"]
+    ) {
+    transition: none;
+  }
+
+  :root[data-ui-theme="dux"]
+    :is([data-slot="dux-account-menu"], [data-slot="dux-search-results"], [data-slot="dux-sheet"]) {
+    animation: none;
+  }
+}

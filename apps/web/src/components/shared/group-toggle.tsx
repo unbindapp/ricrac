@@ -12,16 +12,16 @@ type TProps = {
   onToggle: () => void;
 };
 
-/** Opens and closes a group of a list; in Dank an icon button beside the group's title. */
+/** Opens and closes a group of a list; in Dux an icon button beside the group's title. */
 export function GroupToggle({ icon, label, count, isCollapsed, onToggle }: TProps) {
-  const isDank = useUiTheme().id === "dank";
+  const isDux = useUiTheme().id === "dux";
   const chevron = (
     <ChevronRightIcon
       data-open={!isCollapsed || undefined}
       className="text-muted-foreground size-3.5 transition-transform data-open:rotate-90"
     />
   );
-  if (!isDank) {
+  if (!isDux) {
     return (
       <Button
         variant="ghost"
